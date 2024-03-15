@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Userexits Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/userexits/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 25 May 2018 11:53:31 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Userexits Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Kleinigkeiten SAPMV45A Auftragsbearbeitung</title>
+		<link>/blog/kleinigkeiten-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 12:35:55 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=584</guid>
+
+					<description><![CDATA[<p>Hier stehen ein paar Kleinigkeiten zur Auftragsbearbeitung. Funktionsbausteine, Felder, Tipps und so weiter.</p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-2/">Kleinigkeiten SAPMV45A Auftragsbearbeitung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier stehen ein paar Kleinigkeiten zur Auftragsbearbeitung. Funktionsbausteine, Felder, Tipps und so weiter.</p>
+<h2 class="head1">Eingabebereitschaft prüfen</h2>
+<p>Um in einem User-Exit SAPMV45A zu prüfen, ob ein Feld eingabebereit ist, kann der folgende Funktionsbaustein verwendet werden:</p>
+<pre class="lang:abap decode:true ">  CALL FUNCTION 'SD_FIELD_INPUT_CHECK'
+    EXPORTING
+      TABNAME        = 'KUAGV'
+      FIELDNAME      = 'KUNNR'
+    IMPORTING
+      DISPLAY_STATUS = DA_SUBRC.</pre>
+<h2>Views zu Partnern</h2>
+<p>Standardmäßig sind die Daten zu den gängigen Partnern in den folgenden Views zu finden. Es muss nicht jedes Mal die Partnertabelle XVBPA gelesen werden:</p>
+<ul>
+<li>KUAGV Auftraggeber</li>
+<li>KUWEV Warenempfänger</li>
+<li>KUPAV Partner aus KNVP</li>
+<li>KURGV Regulierer</li>
+</ul>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-2/">Kleinigkeiten SAPMV45A Auftragsbearbeitung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Meldung beim Stornieren eines Warenausgangs</title>
+		<link>/blog/meldung-beim-stornieren-eines-warenausgangs/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 21 May 2008 18:17:25 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[V2 - Lieferung]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=479</guid>
+
+					<description><![CDATA[<p>Beim Stornieren eines Warenausgangs mit der Transaktion VL09 wird ein Protokoll ausgegeben. Wenn Sie in einem Userexit ebenfalls Daten zur&#252;cksetzen, so k&#246;nnen Sie auch eine Meldung in das Protokoll schreiben.</p>
+<p>Der Beitrag <a href="/blog/meldung-beim-stornieren-eines-warenausgangs/">Meldung beim Stornieren eines Warenausgangs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Beim Stornieren eines Warenausgangs mit der Transaktion VL09 wird ein Protokoll ausgegeben. Wenn Sie in einem Userexit ebenfalls Daten zur&uuml;cksetzen, so k&ouml;nnen Sie auch eine Meldung in das Protokoll schreiben.<br /><P>Beim Stornieren wird der <STRONG>Userexit_Save_Document_Prepare </STRONG>durchlaufen. Das Kennzeichen <STRONG>V50AGL-WARENAUSG_STORNO </STRONG>ist dabei gesetzt.</P><P>Sie k&ouml;nnen nun Anpassungen an eigenen Tabellen vornehmen und dies im Storno-Protokoll anzeigen. Sie k&ouml;nnen aber auch den&nbsp;Anwender dar&uuml;ber informieren, dass er eventuell in bestimmten F&auml;llen noch auf andere Sachen achten muss. Dies k&ouml;nnte ebenfalls durch einen Hinweis im Protokoll geschehen.</P><P class="sap1">IF V50AGL-WARENAUSG_STORNO &lt;&gt; space.<BR><FONT color="#fb2412">*** Anwender informieren<BR></FONT>&nbsp; &nbsp; CALL FUNCTION &#8216;MESSAGE_STORE&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; arbgb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;OO&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;I&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; txtnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;000&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; zeile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 0<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;ACHTUNG: Bitte Abteilung F45 informieren!!&#8217;<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_active = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>ENDIF.<BR></P></p>
+<p>Der Beitrag <a href="/blog/meldung-beim-stornieren-eines-warenausgangs/">Meldung beim Stornieren eines Warenausgangs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Partnertabelle</title>
+		<link>/blog/partnertabelle/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 18 Nov 2005 11:26:24 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=357</guid>
+
+					<description><![CDATA[<p>H&#228;ufig wird in SAPMV45A-Userexits ein bestimmter Partner ben&#246;tigt. Entweder, um die Partnernummer zu verwenden oder auch um Adressdaten herauszubekommen. Wir zeigen Ihnen, wie Sie am einfachsten an die Daten kommen</p>
+<p>Der Beitrag <a href="/blog/partnertabelle/">Partnertabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>H&auml;ufig wird in SAPMV45A-Userexits ein bestimmter Partner ben&ouml;tigt. Entweder, um die Partnernummer zu verwenden oder auch um Adressdaten herauszubekommen. Wir zeigen Ihnen, wie Sie am einfachsten an die Daten kommen<br /><P class="head1">Tabelle XVBPA</P><P>Die Partner stehen in der internen Tabelle XVBPA. Die Partnerverwendung (Feld PARVW) gibt dabei Auskunft &uuml;ber die Rolle des Partners. </P><P>Wenn es sich um einen Partner auf Kopfebene handelt, ist das Feld POSNR initial.</P><P class="head1">Views verwenden</P><P>H&auml;ufig sieht man in Programmen folgendes:</P><P class="sap1">READ TABLE XVBPA WITH KEY PARVW = &#8216;WE&#8217; POSNR = 0.<BR>IF sy-subrc = 0.<BR><FONT color="#fb2412">*** Pr&uuml;fungen mit Warenempf&auml;nger<BR></FONT>&nbsp; &#8230;&nbsp; <BR>ENDIF.</P><P>Dies k&ouml;nnen Sie sich sparen, zumindest f&uuml;r den&nbsp;Warenempf&auml;nger, den Auftraggeber und den Regulierer, denn f&uuml;r diese gibt es Views, die st&auml;ndig aktuell gehalten werden:</P><UL><LI>Auftraggeber:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; KUAGV</LI><LI>Regulierer:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; KURGV</LI><LI>Warenempf&auml;nger: KUWEV</LI></UL><P class="head1">Adresse ge&auml;ndert?</P><P>Ob die Adresse manuell im Beleg ge&auml;ndert wurde, erkennen Sie an dem Feld ADRNR. Wenn diese mit der Partnerrolle beginnt, dann wurde der Partner ge&auml;ndert.</P><P>Die aktuellen Adressdaten stehen in der internen Tabelle XVBADR.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/partnertabelle/">Partnertabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Texte löschen</title>
+		<link>/blog/texte-loeschen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 19 Aug 2005 21:55:24 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=353</guid>
+
+					<description><![CDATA[<p>Mit diesem Coding k&#246;nnen Sie bereits erfasste Texte in der Auftragsbearbeitung wieder l&#246;schen. Das ist dann hilfreich, wenn aufgrund einer sepziellen Situation festgestellt wird, dass die Position gel&#246;scht werden soll. Es finde sich aber wahrscheinlich auch andere Einsatzm&#246;glichkeiten.</p>
+<p>Der Beitrag <a href="/blog/texte-loeschen/">Texte löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Coding k&ouml;nnen Sie bereits erfasste Texte in der Auftragsbearbeitung wieder l&ouml;schen. Das ist dann hilfreich, wenn aufgrund einer sepziellen Situation festgestellt wird, dass die Position gel&ouml;scht werden soll. Es finde sich aber wahrscheinlich auch andere Einsatzm&ouml;glichkeiten.<br /><P class="text1">Die Texte werden bis zur Speicherung des Auftrags im SAP-Memory gehalten. Welche Texte vorhanden sind, wird in dem <STRONG>Textkatalog</STRONG> festgehalten.</P><P class="text1">Im folgenden Coding wird der Positionstext f&uuml;r die Position 10 mit der ID &#8220;0001&#8221; gel&ouml;scht.</P><P class="sap1"><FONT color="#fb2412">*** Datendeklaration<BR></FONT>&nbsp;&nbsp;DATA<BR>&nbsp;&nbsp;&nbsp; BEGIN OF lt_catalog OCCURS 0,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tdobject&nbsp;&nbsp;&nbsp; LIKE thead-tdobject,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tdname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE thead-tdname,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tdid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE thead-tdid,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tdspras&nbsp;&nbsp;&nbsp;&nbsp; LIKE thead-tdspras,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; function(1),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rename(1)&nbsp;&nbsp; TYPE c,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; filler,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id(6)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE n,<BR>&nbsp;&nbsp;&nbsp; END&nbsp;&nbsp; OF lt_catalog,</P><P class="sap1">&nbsp;&nbsp;&nbsp; lv_memoname(16).</P><P class="sap1"><FONT color="#fb2412">*** Katalog der ge&auml;nderten Texte einlesen<BR></FONT>&nbsp; IMPORT catalog TO lt_catalog FROM MEMORY ID &#8216;SAPLSTXD&#8217;.</P><P class="sap1">&nbsp; LOOP AT lt_catalog WHERE&nbsp;tdobject = &#8216;VBBP&#8217;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND tdid&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;0010&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** richtige Positionsnummer??<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;IF lt_catalog-tdname+10(6) = &#8216;000010&#8217;.<BR><FONT color="#fb2412">*** Ge&auml;nderten Text&nbsp;&#8220;0010&#8221; suchen<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_memoname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;SAPLSTXD&#8217;.<BR>&nbsp; &nbsp;&nbsp;&nbsp; lv_memoname+8(6) = lt_catalog-id.<BR><FONT color="#fb2412">*** &#8230; und l&ouml;schen<BR></FONT>&nbsp;&nbsp;&nbsp; &nbsp; FREE MEMORY ID lv_memoname.<BR><FONT color="#fb2412">*** Eintrag aus Katalog l&ouml;schen<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE lt_catalog.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">&nbsp; ENDLOOP.</P><P class="sap1"><FONT color="#fb2412">*** Katalog &#8220;Ge&auml;nderte Texte&#8221; wieder zur&uuml;sckschreiben<BR></FONT>&nbsp; EXPORT catalog FROM lt_catalog TO MEMORY ID &#8216;SAPLSTXD&#8217;.</P></p>
+<p>Der Beitrag <a href="/blog/texte-loeschen/">Texte löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Abfrage verschiedener Aktivitäten</title>
+		<link>/blog/abfrage-verschiedener-aktivitaeten/</link>
+					<comments>/blog/abfrage-verschiedener-aktivitaeten/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 28 Dec 2004 11:20:15 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=300</guid>
+
+					<description><![CDATA[<p>Bei der Programmierung von User-Exits muss man darauf achten, dass die Routinen auch aufgerufen werden, wenn der Auftrag nicht mit der VA02 bearbeitet wird, sonndern evtl. durch einen BAPI aufgerufen wird, oder zugeh&#246;rige Montageauftrag ge&#228;ndert wird. Welche Aktivit&#228;ten m&#246;glich sind und wie sie abzufragen sind, verraten wir Ihnen hier.</p>
+<p>Der Beitrag <a href="/blog/abfrage-verschiedener-aktivitaeten/">Abfrage verschiedener Aktivitäten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei der Programmierung von User-Exits muss man darauf achten, dass die Routinen auch aufgerufen werden, wenn der Auftrag nicht mit der VA02 bearbeitet wird, sonndern evtl. durch einen BAPI aufgerufen wird, oder zugeh&ouml;rige Montageauftrag ge&auml;ndert wird. Welche Aktivit&auml;ten m&ouml;glich sind und wie sie abzufragen sind, verraten wir Ihnen hier.<br /><P>Bei einer &Auml;nderung von &#8220;Aussen&#8221; wird nicht die Transaktion VA02 aufgerufen, sondern es werden Funktionsbausteine verwendet.</P><P>Wird die Auftragsbearbeitung von einem anderen Programm aufgerufen, so wird die Variable <STRONG>CALL_ACTIVITY </STRONG>gesetzt. </P><P>Die folgenden Werte sind vorgesehen (Include RVDIREKT):</P><P class="sap1"><FONT color="#fb2412">* Aktivit&auml;ten bei CALL_FUNCTION<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_atp_simulate(4)&nbsp;&nbsp;&nbsp; VALUE &#8216;SIMU&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_atp_area(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;V03R&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_purchase(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;ME21&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_invoice_receipt(4) VALUE &#8216;MR01&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_invoice_request(4) VALUE &#8216;VA90&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_service_request(4) VALUE &#8216;IW51&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_good_movement(4)&nbsp;&nbsp; VALUE &#8216;MB11&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Montage, Fertigungsauftr&auml;ge, Planauftr&auml;ge, Netzpl&auml;ne:</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_assembly(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;CO01&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_assembly_co40(4)&nbsp;&nbsp; VALUE &#8216;CO40&#8217;,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;n_667847<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_assembly_co08(4)&nbsp;&nbsp; VALUE &#8216;CO08&#8217;,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;n_667847<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_service_order(4)&nbsp;&nbsp; VALUE &#8216;IW31&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Kreditaktivit&auml;ten beginnen alle mit CR</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit(2)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;CR&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Kreditaktivit&auml;ten im einzelnen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_recheck(4)&nbsp; VALUE &#8216;CRCH&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_authori(4)&nbsp; VALUE &#8216;CRAU&#8217;, &#8220;komplette Pr&uuml;fung<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_authpre(4)&nbsp; VALUE &#8216;CRAP&#8217;, &#8220;interne Pr&uuml;fung<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_release(4)&nbsp; VALUE &#8216;CRRL&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_reject(4)&nbsp;&nbsp; VALUE &#8216;CRRJ&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_forward(4)&nbsp; VALUE &#8216;CRFW&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Kreditneuaufbau RFDKLI20 ohne &Auml;nderungsbelege</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_recreate(4) VALUE &#8216;CRRE&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Unterkontrakte im PUSH-Modus aus Gruppenkontrakt aktualisieren</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_gruko_pushdata(4) VALUE &#8216;GKPU&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Reparaturabwicklung</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_rueck_inspection(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;RINS&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_rueck_notification(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;RNOT&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_rueck_service_order(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;RSOR&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_rueck_start_of_repair(4)&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;RSST&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_dialog_pull_inspection(4)&nbsp;&nbsp;&nbsp; VALUE &#8216;DPIL&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_dialog_pull_service_order(4) VALUE &#8216;DPSO&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_dialog(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;DIAL&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_nodialog(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;NDIA&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Abrechnung der Bonusabsprachen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_rebate_set(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;VBO1&#8217;.</P><P class="text1">Bei Auftrags&auml;nderungen mit der VA02 ist die Variable initial.</P></p>
+<p>Der Beitrag <a href="/blog/abfrage-verschiedener-aktivitaeten/">Abfrage verschiedener Aktivitäten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/abfrage-verschiedener-aktivitaeten/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Zugriff auf das Protokoll bei Lieferungsanlage</title>
+		<link>/blog/zugriff-auf-das-protokoll-bei-lieferungsanlage/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Sep 2004 11:25:14 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<category><![CDATA[V2 - Lieferung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=280</guid>
+
+					<description><![CDATA[<p>Wenn Lieferungen per Batchinput angelegt werden, dann hat man leider keinen Zugriff auf das erzeugte Protokoll. Das ist &#228;rgerlich. Mit einem kleinen Trick geht es dennoch.</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-das-protokoll-bei-lieferungsanlage/">Zugriff auf das Protokoll bei Lieferungsanlage</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wenn Lieferungen per Batchinput angelegt werden, dann hat man leider keinen Zugriff auf das erzeugte Protokoll. Das ist &auml;rgerlich. Mit einem kleinen Trick geht es dennoch.<br /><P>In den Userexits besteht die M&ouml;glichkeit, die Meldungen abzufangen und ins SAP-Memory zu exportieren. Im rufenden Programm kann die Tabelle wieder importiert und ausgegeben werden.</P><P class="head1">Export der Meldungstabelle</P><P>Das folgende Coding bezieht sich auf den Modulpool <STRONG>SAPMV50A</STRONG>.</P><P>Falls die Lieferung nicht angelegt werden kann, wird der <STRONG>USEREXIT_REFRESH_DOCUMENT </STRONG>durchlaufen. Hier steht noch die Tabelle CVBFS zur Verf&uuml;gung. In dieser Tabelle stehen die aufgelaufenen Meldungen.</P><P class="text1">Warnungen, die bei der Anlage der Lieferung erzeugt werden, k&ouml;nnen im <STRONG>USEREXIT_SAVE_DOCUMENT </STRONG>abgegriffen werden.</P><P class="text1">Verwenden Sie zum Export das folgende Coding:</P><FONT size="2"><P class="sap1"><FONT color="#fb2412">*** Export der Meldungstabelle&nbsp;</FONT><BR>IF t180-tcode = </FONT>&#8216;VL01&#8217;&nbsp;AND sy-binpt <FONT size="2">&lt;&gt; space.<BR>&nbsp; EXPORT cvbfs&nbsp;TO&nbsp;MEMORY&nbsp;ID &#8216;ZX_CVBFS&#8217;.<BR>ENDIF.</P></FONT><P class="head1">Import der Meldungstabelle</P><FONT size="2"><P class="sap1">import cvbfs to t_cvbfs from memory id &#8216;ZX_CVBFS&#8217;.<BR>if not t_cvbfs[] is initial.<BR>&nbsp; loop at t_cvbfs.<BR><FONT color="#fb2412">*** Meldung sammeln<BR></FONT>&nbsp;&nbsp;&nbsp; call function &#8216;MESSAGE_STORE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arbgb = t_cvbfs-msgid<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msgty = t_cvbfs-msgty<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv1 = t_cvbfs-msgv1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msgv2 = t_cvbfs-msgv2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv3 = t_cvbfs-msgv3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv4 = t_cvbfs-msgv4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; txtnr = t_cvbfs-msgno<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; zeile = g_zeile<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exceptions<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; others = 3.<BR>&nbsp;&nbsp;endloop.<BR>endif.</P></FONT><P class="text1">Mit den Funktionsbausteinen MESSAGE_STORE und MESSAGES_SHOW k&ouml;nnen Sie die Meldungen in einem schicken Fenster ausgeben</P></p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-das-protokoll-bei-lieferungsanlage/">Zugriff auf das Protokoll bei Lieferungsanlage</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Zugriff auf Außenhandelsdaten beim Sichern</title>
+		<link>/blog/zugriff-auf-aussenhandelsdaten-beim-sichern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 31 Mar 2004 00:23:06 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV50A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=229</guid>
+
+					<description><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie beim Sichern der Lieferung Einflu&#223; auf die Au&#223;enhandelsdaten der Position nehmen k&#246;nnen. </p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-aussenhandelsdaten-beim-sichern/">Zugriff auf Außenhandelsdaten beim Sichern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie beim Sichern der Lieferung Einflu&szlig; auf die Au&szlig;enhandelsdaten der Position nehmen k&ouml;nnen. <br /><P class="text1">In dem folgenden Coding wird die statistische Warennummer der Lieferpositionen ge&auml;ndert. </P><P class="text1"><STRONG><U>Achtung:</U></STRONG> Es werden die Au&szlig;enhandelsdaten nur dann ge&auml;ndert, wenn w&auml;hrend der Lieferungsbearbeitung auf die Au&szlig;enhandelsdaten zugegriffen wurde!</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* <BR>* Aufruf aus USEREXIT_SAVE_DOCUMENT_PREPARE <BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* <BR>* &Auml;ndern der Statistischen Warennummer der&nbsp;Au&szlig;enhandelsdaten <BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* </FONT></P><P class="sap1"><FONT color="#fb2412">*&#8211; Datendeklaration<BR></FONT>DATA zxt_xlips&nbsp;&nbsp;&nbsp;&nbsp; LIKE xlips&nbsp; OCCURS 0 WITH HEADER LINE. <BR>DATA zxl_eipo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE eipovb. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Feldsymbole</FONT><BR>FIELD-SYMBOLS &lt;xeipo&gt; STRUCTURE eipovb DEFAULT zxl_eipo. <BR>FIELD-SYMBOLS &lt;teipo&gt; TYPE ANY TABLE. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Daten&auml;nderung nur beim Anlegen/ &Auml;ndern einer Lieferung</FONT><BR>IF t180-trtyp = &#8216;H&#8217; OR t180-trtyp = &#8216;V&#8217;. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Dirty Assign auf Aussenhandelspositionsdaten in FUGR V50E</FONT> <BR>&nbsp; UNASSIGN &lt;teipo&gt;. <BR>&nbsp; ASSIGN (&#8216;(SAPLV50E)XEIPO[]&#8217;) TO &lt;teipo&gt;. </P><P class="sap1">&nbsp; IF &lt;teipo&gt; IS ASSIGNED. <BR><FONT color="#fb2412">*&#8211; Au&szlig;enhandelsdaten bearbeiten<BR></FONT>&nbsp;&nbsp;&nbsp; LOOP AT &lt;teipo&gt; ASSIGNING &lt;xeipo&gt;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK &lt;xeipo&gt;-updkz &lt;&gt; &#8216;D&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READ TABLE xlips INTO zxt_xlips WITH KEY posnr = &lt;xeipo&gt;-expos. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK sy-subrc = 0. <BR><FONT color="#fb2412">*&#8211; &Auml;ndern der stat. Warennummer&nbsp;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF &lt;xeipo&gt;-stawn &lt;&gt; zxt_xlips-zz_nimex. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-stawn = &#8216;Tricktresor&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF &lt;xeipo&gt;-updkz = space.<BR><FONT color="#fb2412">*&#8211; Updatekennzeichen setzen<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-updkz = &#8216;U&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF. <BR>&nbsp;&nbsp;&nbsp; ENDLOOP. <BR>&nbsp; ENDIF. </P><P class="sap1">ENDIF. </P></p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-aussenhandelsdaten-beim-sichern/">Zugriff auf Außenhandelsdaten beim Sichern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Zugriff auf Außenhandelsdaten</title>
+		<link>/blog/zugriff-auf-aussenhandelsdaten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 31 Mar 2004 00:08:39 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV50A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=228</guid>
+
+					<description><![CDATA[<p>In der Lieferung haben Sie kaum M&#246;glichkeiten, auf die Au&#223;enhandelsdaten zuzugreifen. Wir zeigen Ihnen jedoch eine M&#246;glichkeit des Zugriffs. Das Lesen der Daten ist mittels Funktionsbaustein einfach, das Ver&#228;ndern erfordert jedoch ein trickreicheres Vorgehen...</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-aussenhandelsdaten/">Zugriff auf Außenhandelsdaten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In der Lieferung haben Sie kaum M&ouml;glichkeiten, auf die Au&szlig;enhandelsdaten zuzugreifen. Wir zeigen Ihnen jedoch eine M&ouml;glichkeit des Zugriffs. Das Lesen der Daten ist mittels Funktionsbaustein einfach, das Ver&auml;ndern erfordert jedoch ein trickreicheres Vorgehen&#8230;<br /><P>In diesem Fall stellen wir Ihnen Coding vor, mit dem Sie aus der Routine &nbsp;USEREXIT_MOVE_FIELD_TO_LIPS die Au&szlig;enhandelsdaten einer Position &auml;ndern k&ouml;nnen. Falls diese Position keine Au&szlig;enhandelsdaten haben sollte, so kann dies jedoch erzwungen werden.</P><P>Der Grund hierf&uuml;r k&ouml;nnte sein, dass die Ware nicht an den Warenempf&auml;nger verschickt wird, sondern ein Handelsb&uuml;ro im Inland, dass die Waren weiter ins Ausland versendet. Da der Warenempf&auml;nger im Inland ist, werden keine Au&szlig;enhandelsdaten angelegt.</P><P>Das folgende Coding gilt f&uuml;r das Release 4.6C.</P><P><STRONG><U>ACHTUNG:</U></STRONG> Bitte beachten Sie, dass wir keine Garantie f&uuml;r das hundertprozentige Funktionieren geben k&ouml;nnen und nicht f&uuml;r Fehler haften! Bitte testen Sie deswegen Ihre Prozesse ausreichend, um sicherzustellen, dass diese Routine in Ihrem System verwendet werden kann!!</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* * Aufruf aus USEREXIT_MOVE_FIELD_TO_LIPS <BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* <BR>* &Auml;ndern der Statistischen Warennummer der&nbsp;Au&szlig;enhandelsdaten <BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* </FONT></P><P class="sap1"><FONT color="#fb2412">*&#8211; Variablendeklaration</FONT><BR>DATA zxt_xlips&nbsp;&nbsp;&nbsp;&nbsp; LIKE xlips&nbsp; OCCURS 0 WITH HEADER LINE. <BR>DATA zxl_eipo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE eipo. <BR>DATA zxl_xeipo&nbsp;&nbsp;&nbsp;&nbsp; LIKE eipovb. <BR>DATA zxt_xeipo&nbsp;&nbsp;&nbsp;&nbsp; LIKE eipovb OCCURS 0 WITH HEADER LINE. <BR>DATA zxv_exist&nbsp;&nbsp;&nbsp;&nbsp; TYPE c. <BR>DATA zxl_eipo_old&nbsp; LIKE eipo. <BR>DATA zxl_eipo_dl&nbsp;&nbsp; LIKE eipo. <BR>DATA zxl_item_exist. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Feldsymbole<BR></FONT>FIELD-SYMBOLS &lt;eipo&gt;&nbsp; STRUCTURE eipo&nbsp;&nbsp; DEFAULT zxl_eipo. <BR>FIELD-SYMBOLS &lt;xeipo&gt; STRUCTURE eipovb DEFAULT zxl_xeipo. <BR>FIELD-SYMBOLS &lt;teipo&gt; TYPE ANY TABLE. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Aufruf beim Anlegen oder &Auml;ndern einer Position<BR></FONT>IF ( t180-trtyp = &#8216;H&#8217; OR t180-trtyp = &#8216;V&#8217; ) AND NOT lips IS INITIAL. </P><P class="sap1">&nbsp; UNASSIGN &lt;teipo&gt;. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Lesend der Exportdaten </FONT><BR>&nbsp; CALL FUNCTION &#8216;EXPIMP_ITEM_DATA_READ&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exnum&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = likp-exnum <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; expos&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lips-posnr <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e_line_item_exists = zxl_item_exist. </P><P class="sap1">&nbsp; IF zxl_item_exist = space. <BR><FONT color="#fb2412">*&#8211; Keine Exportdaten vorhanden: F&uuml;llen <BR></FONT>&nbsp;&nbsp;&nbsp; PERFORM lips_fuellen_export(sapfv50p). <BR>&nbsp; ELSE. <BR><FONT color="#fb2412">*&#8211; Exportdaten sind vorhanden: Bereitstellen</FONT> <BR>&nbsp;&nbsp;&nbsp; PERFORM eipo_bereitstellen(saplv50e). <BR>&nbsp; ENDIF. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Dirty Assign auf Aussenhandelspositionsdaten in FUGR V50E</FONT> <BR>&nbsp; ASSIGN (&#8216;(SAPLV50E)XEIPO[]&#8217;) TO &lt;teipo&gt;. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Exportdaten bearbeiten</FONT> <BR>&nbsp; IF &lt;teipo&gt; IS ASSIGNED. <BR>&nbsp;&nbsp;&nbsp; LOOP AT &lt;teipo&gt; ASSIGNING &lt;xeipo&gt;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK &lt;xeipo&gt;-expos = lips-posnr. <BR><FONT color="#fb2412">*&#8211; setzen der Stat. Warennummer&nbsp;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-stawn = &#8216;Tricktresor&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-herkl = &#8216;FR&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-herkr = &#8217;02&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-exprf = &#8216;10000&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-exart = &#8217;11&#8217;.&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT. <BR>&nbsp;&nbsp;&nbsp; ENDLOOP. <BR>&nbsp; ENDIF. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Falls noch keine EXNUM im Lieferkopf steht, dies nun nachholen: </FONT><BR>&nbsp; READ TABLE xlikp WITH KEY vbeln = likp-vbeln. <BR>&nbsp; IF sy-subrc = 0 AND xlikp-exnum IS INITIAL. <BR>&nbsp;&nbsp;&nbsp; xlikp-exnum = likp-exnum. <BR>&nbsp;&nbsp;&nbsp; MODIFY xlikp INDEX sy-tabix. <BR>&nbsp; ENDIF. <BR>ENDIF. </P></p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-aussenhandelsdaten/">Zugriff auf Außenhandelsdaten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Anlegen mit Bezug</title>
+		<link>/blog/anlegen-mit-bezug/</link>
+					<comments>/blog/anlegen-mit-bezug/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Oct 2003 13:25:00 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SD]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=138</guid>
+
+					<description><![CDATA[<p>Wird ein Beleg mit Bezug auf einen anderen Vertriebsbeleg angelegt, muss dies in der Programmierung der User-Exits evtl. ber&#252;cksichtigt werden.</p>
+<p>Der Beitrag <a href="/blog/anlegen-mit-bezug/">Anlegen mit Bezug</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wird ein Beleg mit Bezug auf einen anderen Vertriebsbeleg angelegt, muss dies in der Programmierung der User-Exits evtl. ber&uuml;cksichtigt werden.<br /><P>Erkennen kann man die &#8220;Anlage mit Bezug&#8221; dadurch, dass entweder das Feld VBAK-VGBEL gef&uuml;llt ist oder dadurch, dass die Struktur <FONT color="#fb2412"><STRONG>CVBAK</STRONG></FONT> mit den Daten des Vorlagebelegs gef&uuml;llt ist. </P><P>Beachten Sie, dass es zwei M&ouml;glichkeiten gibt, sich z. B. auf ein&nbsp;Angebot zu beziehen:</P><OL><LI>Es wird auf dem Einstiegsbild ein Vorlagebeleg ausgew&auml;hlt</LI><LI>Das System erkennt automatisch offene Angebote und der Anwender w&auml;hlt aus dem Popup einen Vorlagebeleg aus.</LI></OL><P>Durch den Bezug zu einem vorlagebeleg werden diverse Kopierroutinen gestartet, die Daten aus dem Vorlagebelg in den aktuellen Beleg kopieren (Kopfdaten, Positionen, Partner etc.)</P></p>
+<p>Der Beitrag <a href="/blog/anlegen-mit-bezug/">Anlegen mit Bezug</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/anlegen-mit-bezug/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Save_Document</title>
+		<link>/blog/save_document/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 27 Aug 2003 13:24:24 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<category><![CDATA[SAPMV50A]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=128</guid>
+
+					<description><![CDATA[<p>Richtlinie zur Bearbeitung der Lieferpositionen im USEREXIT_SAVE_DOCUMENT.</p>
+<p>Der Beitrag <a href="/blog/save_document/">Save_Document</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Richtlinie zur Bearbeitung der Lieferpositionen im USEREXIT_SAVE_DOCUMENT.<br /><P class="sap1"><FONT color="#fb2412">*&#8211; Bearbeitung der Lieferpositionen</FONT><BR>loop at xlips where vbeln eq likp-vbeln<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and updkz ne updkz_delete.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Interne Indices setzen</FONT><BR>&nbsp;&nbsp;ilips-tabix = sy-tabix.<BR>&nbsp; slips-tabix = sy-tabix.<BR><FONT color="#fb2412">*&#8211; Bearbeiten vorbereiten</FONT><BR>&nbsp; perform lips_bearbeiten_vorbereiten(sapfv50p).<BR><BR><FONT color="#fb2412">*&#8211;&nbsp;Hier Felder der XLIPS &auml;ndern</FONT><BR>&nbsp; &#8230;<BR>&nbsp; &#8230;<BR><BR><FONT color="#fb2412">*&#8211; Bearbeitung abschliessen</FONT><BR>&nbsp; perform lips_bearbeiten(sapfv50p).</P><P class="sap1">endloop.<BR></P><P class="sap1">&nbsp;</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/save_document/">Save_Document</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

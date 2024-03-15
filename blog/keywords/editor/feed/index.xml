@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Editor Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/editor/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 24 Jan 2019 18:37:47 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Editor Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Muster für neuen Report</title>
+		<link>/blog/muster-fuer-neuen-report/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 20 Apr 2016 09:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Editor]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=506</guid>
+
+					<description><![CDATA[<p>Beim Anlegen eines Reports wird ein vorgegebener Programmkopf erzeugt, der - im Gegensatz zu Mustern - nicht angepasst werden kann. Wir zeigen Ihnen, mit welchen Tricks es doch funktioniert...</p>
+<p>Der Beitrag <a href="/blog/muster-fuer-neuen-report/">Muster für neuen Report</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Beim Anlegen eines Reports wird ein vorgegebener Programmkopf erzeugt, der &#8211; im Gegensatz zu Mustern &#8211; nicht angepasst werden kann. Wir zeigen Ihnen, mit welchen Tricks es doch funktioniert&#8230;</p>
+<p>Mit der Tabellenanzeige SE16n können Sie die Tabelle TSE05 anpassen. Hier stehen die Muster für neue Programme und Includes.</p>
+<p>Geben Sie &amp;sap_edit in die OK-Code-Zeile ein und selektieren Sie dann die Einträge:</p>
+<p>APP_OBJ  = &#8220;ADDM&#8221;<br />
+KEYWORD = &#8220;REPORT&#8221;</p>
+<p>Nun können Sie Einträge hinzufügen und die vorhandenen Ändern.</p>
+<p><u><strong>TIPP:<br />
+</strong></u>Es lassen sich auch <strong>mehrere </strong>Zeilen aus dem Editor kopieren um diese dann per Copy &amp; Paste hier wieder einzufügen!</p>
+<p>In der Tabelle TSE05 stehen alle Muster &#8211; auch die selbst definierten. Sie können also alles anpassen. Aber Vorsicht: Die neuen Muster gelten natürlich für alle SAP-Anwender!!!</p>
+<p>Ebenfalls änderbar sind hier die Muster für Includes, TOP-Includes, Dynpro-Ablauflogik, Form-Routinen, Klassen, Module usw.</p>
+<p>In Funktionsgruppe SEUR, Routine FETCH_TEMPLATE werden noch Bezeichner ersetzt. Leider werden $DATE und $USER mit &#8220;Space&#8221; ersetzt und nicht mit dem aktuellen Datum und dem Usernamen&#8230;</p>
+<p>Die Muster POOL, POOL+T und TOP (Modulpool) werden die Variablen $DATE und $USER allerdings ersetzt.</p>
+<h2>SAP-Editor</h2>
+<p>SAP hat einen eigenen Editor mit dem die Muster bearbeitet werden können: Funktionsbaustein RS_MODIFY_TSE05.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2008/08/2016-04-19_20-12-22.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-586759" src="https://tricktresor.com/wp-content/uploads/2008/08/2016-04-19_20-12-22.jpg" alt="2016-04-19_20-12-22" width="356" height="258" srcset="/wp-content/uploads/2008/08/2016-04-19_20-12-22.jpg 356w, /wp-content/uploads/2008/08/2016-04-19_20-12-22-300x217.jpg 300w" sizes="(max-width: 356px) 100vw, 356px" /></a></p>
+<p>Natürlich muss auch hier getrickst werden&#8230; SAP setzt automatisch ein &#8220;S&#8221; an die erste Stelle von OBJECTTYPE, wenn es sich um ein SAP-eigenes System handelt und &#8220;U&#8221;, wenn es sich um ein Kundensystem handelt.</p>
+<p>Mit einer einfachen Variablenänderung im Debugger lassen sich hier auch andere Muster bearbeiten.</p>
+<p>Als Befehle für Parameter OPERATION stehen zur Verfügung:</p>
+<ul>
+<li>DISPLAY &#8211; Vorhandenes Muster anzeigen</li>
+<li>MODIFY &#8211; Vorhandenes Muster bearbeiten</li>
+<li>DELETE &#8211; Vorhandens Muster löschen</li>
+<li>ADD &#8211; Neues Muster anlegen</li>
+</ul>
+<h2>Ofizielle Doku für Release 7.50</h2>
+<p class="title topictitle1"><a href="https://help.sap.com/viewer/bd833c8355f34e96a6e83096b38bf192/7.5.9/en-US/97e961d946a84209aa0466417584970d.html">Defining Code Templates for ABAP Programs</a></p>
+<p>Der Beitrag <a href="/blog/muster-fuer-neuen-report/">Muster für neuen Report</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>WMHelp &#8211; XMLpad-Editor [Tool]</title>
+		<link>/blog/wmhelp-xmlpad-editor-tool/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 17 Feb 2016 18:42:46 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[freeware]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=490192</guid>
+
+					<description><![CDATA[<p>Gute Tools sind selten und teilweise schwer zu finden. Mit dem WMHep XMLpad for Windows habe ich einen guten und verlässlichen XML-Editor gefunden. Diesen stelle ich hier kurz vor. </p>
+<p>Der Beitrag <a href="/blog/wmhelp-xmlpad-editor-tool/">WMHelp &#8211; XMLpad-Editor [Tool]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Nachdem ich nach einer Neuinstallation meines Notebooks wieder lange nach einem XML-Editor gesucht habe, hier ein Merker für mich und für euch:</p>
+<p><a href="http://xmlpad-mobile.com/">WMHelp &#8211; XMLpad</a> =&gt; Link ist nicht mehr aktuell; Alternative: Download bei <a href="http://www.tucows.com/thankyou.html?swid=507699">tucows.com</a>.</p>
+<p>Ich muss gelegentlich XML-Dateien sichten und analysieren. Dafür brauche ich kein riesiges Tool aber Notepad reicht auch nicht mehr aus. Nach langem Suchen bin ich auf WMHelp XMLpad gestoßen. Er hat mir sehr gut gefallen und bietet jede Menge Features und Ansichten.</p>
+<p>Ihr seht eine einfache XML-Datei, die in Wikipedia als Beispiel verwendet wird:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-17_19-27-56.jpg" rel="attachment wp-att-490193"><img decoding="async" class="alignnone size-full wp-image-490193" src="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-17_19-27-56.jpg" alt="2016-02-17_19-27-56" width="1101" height="713" srcset="/wp-content/uploads/2016/02/2016-02-17_19-27-56.jpg 1101w, /wp-content/uploads/2016/02/2016-02-17_19-27-56-300x194.jpg 300w, /wp-content/uploads/2016/02/2016-02-17_19-27-56-768x497.jpg 768w, /wp-content/uploads/2016/02/2016-02-17_19-27-56-1024x663.jpg 1024w" sizes="(max-width: 1101px) 100vw, 1101px" /></a></p>
+<p>Auf Knopfdruck lässt sich ein DTD zur Datei erzeugen. Das XML kann auf Fehler geprüft werden. Im Viewer kann direkt auf einzelne Knoten zugegriffen werden.</p>
+<p>Sehr schön finde ich die Ansichten <em>Grid View</em> und <em>Table View</em>:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-17_19-28-14.jpg" rel="attachment wp-att-490194"><img decoding="async" class="alignnone size-full wp-image-490194" src="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-17_19-28-14.jpg" alt="2016-02-17_19-28-14" width="640" height="359" srcset="/wp-content/uploads/2016/02/2016-02-17_19-28-14.jpg 640w, /wp-content/uploads/2016/02/2016-02-17_19-28-14-300x168.jpg 300w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-17_19-28-25.jpg" rel="attachment wp-att-490195"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-490195" src="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-17_19-28-25.jpg" alt="2016-02-17_19-28-25" width="640" height="359" srcset="/wp-content/uploads/2016/02/2016-02-17_19-28-25.jpg 640w, /wp-content/uploads/2016/02/2016-02-17_19-28-25-300x168.jpg 300w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p>Das Programm ist Freeware und kann hier herunter geladen werden:</p>
+<p>http://xmlpad-mobile.com/wp-content/uploads/2014/03/XmlPad_3.0.4.1.zip</p>
+<p>Der Beitrag <a href="/blog/wmhelp-xmlpad-editor-tool/">WMHelp &#8211; XMLpad-Editor [Tool]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Formeleditor</title>
+		<link>/blog/formeleditor/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Jul 2014 18:30:52 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[Formeln]]></category>
+		<category><![CDATA[Formeleditor]]></category>
+		<category><![CDATA[Eigene Felder]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Eigenes]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4946</guid>
+
+					<description><![CDATA[<p>Der Formeleditor ist ein mächtiges Werkzeug, der sich für viele Gelegenheiten nutzen lässt. Viele Beispielprogramme demonstrieren die Verwendung. Die hier vorgestellten Funktionen lösen die alten Funktionsbausteine EVAL_FORMULA und CHECK_FORMULA zum evaluieren einer Formel ab. </p>
+<p>Der Beitrag <a href="/blog/formeleditor/">Formeleditor</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im Beitrag <a title="Formelberechnung" href="https://tricktresor.com/blog/formelberechnung/">Formelberechnung </a>habe ich bereits gezeigt, wie man eigene Formeln verwenden kann. Für eine Anwendung wäre es jedoch schön, wenn der Anwender selbst Formeln erstellen könnte und zwar mit vorgegebenen Feldern und Operationen.</p>
+<p>Dies ist möglich mit dem Formeleditor. Gleichzeitig wird hier für die Prüfung und Evaluierung der Formeln keine Funktionsbausteine mehr verwendet, sondern Klassen. Aber der Reihe nach&#8230;</p>
+<h2>Formeleditor</h2>
+<p>Der Formeleditor wird durch den Funktionsbaustein <!--StartFragment -->FOBU_DIALOG_START aufgerufen. Die Verwendung wird in mehreren Beispielprogrammen gut demonstriert (siehe unten).</p>
+<p>In einem Eingabefeld kann man die Formel entweder direkt eingeben (Expertenmodus) oder man kann die einzelnen Komponenten per Drag and Drop oder Doppelklick einfügen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200715.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4951" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200715-300x144.jpg" alt="Formeleditor Eingabe" width="300" height="144" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_200715-300x144.jpg 300w, /wp-content/uploads/2014/07/Bild_2014_07_16_200715.jpg 510w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Elemente des Editors lassen sich gezielt steuern. In den Beispielprogrammen wird ersichtlich, was wie verwendet werden kann.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200704.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4950" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200704-300x85.jpg" alt="Formeleditor" width="300" height="85" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_200704-300x85.jpg 300w, /wp-content/uploads/2014/07/Bild_2014_07_16_200704-624x177.jpg 624w, /wp-content/uploads/2014/07/Bild_2014_07_16_200704.jpg 835w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Einige Formeln lassen sich mit einer Hilfefunktion einfügen (Kleines grünes PLUS-Icon rechts neben den Sortieren Buttons):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200725.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4957" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200725-300x81.jpg" alt="Formel einfügen" width="300" height="81" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_200725-300x81.jpg 300w, /wp-content/uploads/2014/07/Bild_2014_07_16_200725-624x169.jpg 624w, /wp-content/uploads/2014/07/Bild_2014_07_16_200725.jpg 758w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Klassen</h2>
+<h3>CL_FOBU_FORMULA</h3>
+<p>Um mit dem Editor kommunizieren zu können, wird diese Klasse benötigt.</p>
+<h3>CL_FOEV_FORMULA</h3>
+<p>Diese Klasse wird verwendet, um die Formeln zu speichern, zu laden, zu prüfen und auszuwerten.</p>
+<h3>CL_FOBU_CONNECTOR</h3>
+<p>Sobald eigene Felder verwendet werden sollen, müssen diese mithilfe der Klasse definiert und bekannt gemacht werden. Für jedes Feld kann ein eigenes Icon definiert werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200712.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4952 size-full" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200712.jpg" alt="Formeleditor eigene Felder" width="377" height="231" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_200712.jpg 377w, /wp-content/uploads/2014/07/Bild_2014_07_16_200712-300x183.jpg 300w" sizes="(max-width: 377px) 100vw, 377px" /></a></p>
+<h3>Demoprogramme</h3>
+<table>
+<tbody>
+<tr>
+<th> Programm</th>
+<th> Bezeichnung</th>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE1</td>
+<td>Beispielprogramme FoBuEv: Einfachst-Aufruf</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE2</td>
+<td>Beispielprogramme FoBuEv: Aufruf mit eigenen Feldern</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE3</td>
+<td>Beisp.Prog FoBuEv: Aufruf mitTypprüfung, eigenem GUI-Status und TraceDer Trace wird im Menü eingeschaltet!</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200706.jpg"><img loading="lazy" decoding="async" class="alignnone size-thumbnail wp-image-4949" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200706-300x300.jpg" alt="Formel_trace" width="150" height="150" /></a></td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE4</td>
+<td>Beisp.Prog FoBuEv: Aufruf mit eigenen Funktionen</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE5</td>
+<td>Beisp.Prog FoBuEv: Implementierung einer Methode per FoBuEv</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE6</td>
+<td>Beisp.Prog FoBuEv: Aufruf mit eigenen Drucktasten und IF-Funktion</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE8</td>
+<td>Beisp.Prog FoBuEv: Rechnen mit Währungsbeträgen, Mengen und Preisen</td>
+</tr>
+<tr>
+<td>RS_FOBU_METHOD_EXAMPLE</td>
+<td>Beispielprogramm für Formula Builder Methoden</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/formeleditor/">Formeleditor</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>High Definition SAP? Ein Erfahrungsbericht</title>
+		<link>/blog/high-definition-sap-ein-erfahrungsbericht/</link>
+					<comments>/blog/high-definition-sap-ein-erfahrungsbericht/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 19 Jun 2014 19:14:57 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Hilfe]]></category>
+		<category><![CDATA[Rahmen]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[auflösung]]></category>
+		<category><![CDATA[Performance]]></category>
+		<category><![CDATA[elemente]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Darstellung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[skalierung]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[Schriftgröße]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Generell]]></category>
+		<category><![CDATA[Materialstamm]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4819</guid>
+
+					<description><![CDATA[<p>Mehr ist besser. Das gilt für Geschwindigkeit, Speicher und auch die Auflösung. Dass dies jedoch im Falle der Auflösung nicht unbedingt der Fall ist, möchte ich dir in diesem Artikel zeigen. Ein Notebook mit der Auflösung von 2880x1620 Bildpunkten sollte ein scharfes Bild und gemütliches Arbeiten garantieren. Leider ist dem nicht so, denn nicht nur das Betriebssystem muss mitspielen, sondern auch alle anderen Programme. Wie auch der SAPGUI...</p>
+<p>Der Beitrag <a href="/blog/high-definition-sap-ein-erfahrungsbericht/">High Definition SAP? Ein Erfahrungsbericht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich habe ein neues Notebook: Lenovo T540p. Ein tolles Gerät! Schnell, lautlos und eine Auflösung von 2880&#215;1620 Bildpunkten. Bringt die hohe Auflösung etwas bei der Arbeit mit SAP? Um es gleich vorweg zu nehmen: Nein. Im Gegenteil, es bereitet eher Probleme, denn nicht alle GUI-Elemente werden entsprechend vergrößert.</p>
+<h2>Generell</h2>
+<p>Eine hohe Auflösung ist erst einmal toll, denn das Bild wird schärfer. Theoretisch jedenfalls, denn praktisch müssen alle beteiligten Komponenten mithelfen. Bei einer hohen Auflösung wird erst einmal alles kleiner, denn viele GUI-Elemente werden in Pixel gemessen und nicht in ihrer wahren Darstellungsgröße. Ein Desktopicon von Windows XP hat eine feste Größe von 32&#215;32 Pixeln. Moderne Betriebssysteme haben zwar inzwischen deutliche größere Icons, jedoch ist das gesamte Zusammenspiel zwischen Fenster, Fensterrahmen, Icons, GUI-Elementen (Dropdownboxen, Scrollbalken, Kontextmenus etc) und der Schrift wichtig. Nicht nur das Betriebssystem muss eine Skalierung der Darstellungsgröße unterstützen, sondern auch die Software. Meine Testsoftware ist in diesem Fall der SAPGUI.</p>
+<h2>SAPGUI 730</h2>
+<p>Den SAPGUI kann man skalieren indem man die Schriftgröße einstellt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190643.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4835 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190643-300x229.jpg" alt="Bild_2014_06_19_190643" width="300" height="229" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190643-300x229.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190643-1024x782.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190643-624x476.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190643.jpg 1604w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der Dialog sieht im Großen und Ganzen gut aus. Auffällig ist, dass die <em>Aufklapper</em> am TreeControl äußerst klein ausfallen. Dieser Umstand zieht sich leider durch den gesamten SAPGUI. Aus diesem Grund muss man bei der Arbeit mit einer hohen Auflösung auch bei einer großen Darstellung der Objekte eine ruhige Maushand haben.</p>
+<h2>Windows-Einstellungen</h2>
+<p>Im Folgenden möchte ich euch einfach mehr oder weniger kommentarlos ein paar Screenshots zeigen, die ich mit einer Windows-Skalierung von (meistens) 200% gemacht habe:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190619.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4823 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190619-300x184.jpg" alt="Bild_2014_06_19_190619" width="300" height="184" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190619-300x184.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190619-624x384.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190619.jpg 812w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Zum Angeben hier noch ein Screenshot meiner Auflösung:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190637.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4824 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190637-300x136.jpg" alt="Bild_2014_06_19_190637" width="300" height="136" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190637-300x136.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190637-624x283.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190637.jpg 908w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Icons und Fenster werden dadurch im Windows so dargestellt, dass ich nicht nach zwei Stunden Arbeit mit Augenkrebs rechnen muss.</p>
+<h2>Testen der SAPGUI-Elemente</h2>
+<p>Die folgenden Testst habe ich mit dem <a title="Signature Theme | SAP Design Guild" href="http://www.sapdesignguild.org/resources/visualdesign_mic.asp">Signature-Theme</a> gemacht. Um die einzelnen Controls auszuprobieren, habe ich die gängigen Entwicklungswerkzeuge geprüft und bin die SAP-Demoprogramme durchgegangen.</p>
+<p>Als erstes viel mir auf, dass die Standardicons leider alle unscharf dargestellt werden:</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4843" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190653.jpg" alt="Bild_2014_06_19_190653" width="145" height="55" /></p>
+<p>Auch die Suchhilfe sieht unschön aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190631.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4840 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190631-300x130.jpg" alt="Bild_2014_06_19_190631" width="300" height="130" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190631-300x130.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190631-1024x446.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190631-624x272.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190631.jpg 1552w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Im Startmenü sieht man deutlich, wie klein die <em>Baumaufklapper</em> sind. Auch ist gut zu erkennen, dass die Standardelemente unscharf sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190610.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4837 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190610-300x269.jpg" alt="Bild_2014_06_19_190610" width="300" height="269" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190610-300x269.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190610-624x560.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190610.jpg 760w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Hilfe zum SAPGUI ist okay:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190601.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4829 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190601-300x287.jpg" alt="Bild_2014_06_19_190601" width="300" height="287" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190601-300x287.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190601-624x597.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190601.jpg 972w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Eine Registerkarte verschluckt ein Teil der Beschriftung. Die Icons sowie die Schrift auf Drucktasten sieht sehr gequetscht aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190658.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4836 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190658-300x55.jpg" alt="Bild_2014_06_19_190658" width="300" height="55" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190658-300x55.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190658-624x115.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190658-800x148.jpg 800w, /wp-content/uploads/2014/06/Bild_2014_06_19_190658.jpg 803w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Icons im SAPLOGON werden nicht skaliert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190604.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4822 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190604-300x90.jpg" alt="Bild_2014_06_19_190604" width="300" height="90" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190604-300x90.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190604-624x188.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190604.jpg 752w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die F1-Hilfe im Performance-Assistant hat ein Problem mit dem Splitter:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190628.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4830 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190628-300x84.jpg" alt="Bild_2014_06_19_190628" width="300" height="84" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190628-300x84.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190628-1024x288.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190628-624x175.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190628.jpg 1100w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h3>Entwicklungswerkzeuge</h3>
+<p>Der Formulareditor sieht erstaunlicherweise sehr gut aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190659.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4847 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190659-300x68.jpg" alt="Bild_2014_06_19_190659" width="300" height="68" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190659-300x68.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190659-1024x233.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190659-624x142.jpg 624w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die grafische Tabellendarstellung ist okay (Transaktion SE11)</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190645.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4846 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190645-300x158.jpg" alt="Bild_2014_06_19_190645" width="300" height="158" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190645-300x158.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190645-1024x541.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190645-624x329.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190645.jpg 1302w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die SE80 hat große Probleme bei der Darstellung der Web-Elemente:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190645.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4820 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190651-300x148.jpg" alt="Bild_2014_06_19_190651" width="300" height="148" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190651-300x148.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-1024x507.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-624x308.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651.jpg 1036w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Schriftart im Editor lässt sich im übrigen einfach in der unteren rechten Ecke einstellen. Dies geht unabhängig von der Skalierung sehr gut:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_210641.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4848 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_210641-300x194.jpg" alt="Bild_2014_06_19_210641" width="300" height="194" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_210641-300x194.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_210641-624x404.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_210641.jpg 742w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Zum Vergleich: So sollte die SE80 aussehen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200629.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4827 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200629-300x184.jpg" alt="Bild_2014_06_19_200629" width="300" height="184" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_200629-300x184.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_200629-624x384.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_200629.jpg 710w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der grafische Dynproeditor sieht ebenfalls merkwürdig aus. Die Dynpro-Elemente sind deutlich größer als der Rest der Anwendung;</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190625.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4821 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190625-300x208.jpg" alt="Bild_2014_06_19_190625" width="300" height="208" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190625-300x208.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190625-1024x712.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190625-624x434.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190625.jpg 1299w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der Quickviewer sieht auf den ersten Blick gut aus. Auf den zweiten Blick fällt auf, dass die Schlüsselfelder mit einem äußerst kleinen Symbol gekennzeichnet sind. Die Überschrift in der Navigation passt nicht 100%ig. In der Drucktastenleiste sieht man wieder sehr schön, dass die Icons unscharf sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190602.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4845 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190602-300x253.jpg" alt="Bild_2014_06_19_190602" width="300" height="253" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190602-300x253.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190602-1024x866.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190602-624x527.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190602.jpg 1026w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h3>Controls</h3>
+<p>Als erstes habe ich das Calendar Control getestet. Gruselig und nicht zu verwenden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190651-2.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4844" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190651-2.jpg" alt="Bild_2014_06_19_190651 (2)" width="666" height="221" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190651-2.jpg 666w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-2-300x99.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-2-624x207.jpg 624w" sizes="(max-width: 666px) 100vw, 666px" /></a></p>
+<p>Dropdown-Listboxen werden gut dargestellt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190609.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4842 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190609-300x192.jpg" alt="Bild_2014_06_19_190609" width="300" height="192" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190609-300x192.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190609-624x399.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190609.jpg 687w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die HTML-Elemente auf Dynamischen Dokumenten sehen nicht wirklich gut aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190639.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4841 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190639-300x144.jpg" alt="Bild_2014_06_19_190639" width="300" height="144" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190639-300x144.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190639-1024x494.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190639-624x301.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190639.jpg 1129w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Das Text Control &#8211; hier ein Beispiel aus dem Materialstamm &#8211; sieht gut aus. Alle Elemente habe eine einheitliche Größe:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190654.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4839 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190654-300x140.jpg" alt="Bild_2014_06_19_190654" width="300" height="140" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190654-300x140.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190654-1024x480.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190654-624x292.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190654.jpg 1343w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Im ALV-Grid-Control fällt wieder auf, dass die Icons in der Toolbar unscharf sind. Das Element &#8220;Alle Einträge markieren&#8221; ist zu klein:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190616.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4838 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190616-300x102.jpg" alt="Bild_2014_06_19_190616" width="300" height="102" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190616-300x102.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190616-1024x348.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190616-624x212.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190616.jpg 1363w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Im Tree Control fallen erneut lediglich die kleinen Aufklapper auf (bzw. eigentlich fallen sie gar nicht auf, weil sie so klein sind&#8230;):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200604.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4828 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200604-300x87.jpg" alt="Bild_2014_06_19_200604" width="300" height="87" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_200604-300x87.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_200604-1024x298.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_200604-624x182.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_200604.jpg 1498w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der grafische Texteditor ist okay auch wenn die Listboxen zur Auswahl der Formate zu klein sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190618.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4833 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190618-300x80.jpg" alt="Bild_2014_06_19_190618" width="300" height="80" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190618-300x80.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190618-624x166.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190618.jpg 1016w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Druckansicht zeigt ein deutliches Missverhältnis zwischen Rahmen und Vorschautext:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190626-2.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4832 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190626-2.jpg" alt="Bild_2014_06_19_190626 (2)" width="290" height="309" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190626-2.jpg 290w, /wp-content/uploads/2014/06/Bild_2014_06_19_190626-2-281x300.jpg 281w" sizes="(max-width: 290px) 100vw, 290px" /></a></p>
+<h2>Fazit</h2>
+<p>Eine große Auflösung ist toll. Leider macht die Software noch nicht komplett mit. Das gilt nicht nur für den SAPGUI, auch andere Softwareprodukte haben Schwierigkeiten mit der hohen Auflösung. Die meisten Probleme sind eher kleiner Natur, jedoch stören sie für mein Empfinden den tollen Gesamteindruck eines so stark ausgestatteten Rechners. Immerhin möchte ich mit einem besseren Computer als vorher ein besseres Ergebnis haben und kein schlechteres. Ich kann also nicht empfehlen, einen Windows-Computer mit einer so hohen Auflösung zu kaufen. In vielen Fällen bringt dies Probleme mit sich. Es wird sicherlich noch ein paar Entwicklungszyklen brauchen, bis die Darstellung auf hochauflösenden Displays zufriedenstellend sein wird.</p>
+<p>Die Skalierung des SAPGUI funktioniert in den meisten Fällen gut. Anwender dürften wenig Probleme haben. Ich kann mir gut vorstellen, dass SAP in den nächsten SAPGUI-Updates die ärgerlichsten Fehler beheben wird und vielleicht gibt es demnächst auch ein High-Definition-Theme von SAP?</p>
+<p>Interessant wäre noch, wie sich das <a title="Corbu Design | SAP Design Guild" href="http://help.sap.com/saphelp_nw73ehp1/helpdata/de/13/20a20fb440434da696cb450d2a6bd3/content.htm">Corbu-Design</a> verhält.</p>
+<h2>Problemlösung</h2>
+<p>Nachdem die Darstellung des SAPGUI teilweise wirklich gruselig war und das Arbeiten im Falle der SE80 sogar stark behindert, habe ich mich entschieden, die Auflösung des Notebook-Displays einfach auf 1920&#215;1080 Pixel einzustellen. Die Auflösung des Bildschirms ist einerseits so hoch, dass ich keine Verzerrung und kein Verschwimmen bemerke und auf der anderen Seite ist sie hoch genug um viel Programm anzuzeigen. Es ist ein kleiner Wermutstropfen wenn ich meine Pferdestärken nicht ausfahren kann, aber das können mein Ego und ich verschmerzen&#8230;</p>
+<h2>Nachtrag</h2>
+<p>Wie bereits erwähnt wäre noch interessant, wie sich das Corbu-Theme verhält. Dies habe ich auch noch ausprobiert.</p>
+<p>Leider sind auch hier &#8211; wie zu erwarten &#8211; die Icons unscharf, da sie nur in einer geringen Auflösung vorliegen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180655.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4860 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180655-300x175.jpg" alt="Corbu-Theme groß" width="300" height="175" srcset="/wp-content/uploads/2014/06/Bild_2014_06_23_180655-300x175.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_23_180655-1024x598.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_23_180655-624x364.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_23_180655.jpg 1027w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Auch der SAPGUI in der Version 740 bringt leider keine Besserung&#8230;</p>
+<p>Der Beitrag <a href="/blog/high-definition-sap-ein-erfahrungsbericht/">High Definition SAP? Ein Erfahrungsbericht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/high-definition-sap-ein-erfahrungsbericht/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Editor-Tastaturkommandos</title>
+		<link>/blog/editor-tastaturkommandos/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Jun 2014 12:32:45 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Befehl]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Eigenes]]></category>
+		<category><![CDATA[tastenkombination]]></category>
+		<category><![CDATA[tastenkürzel]]></category>
+		<category><![CDATA[Tastaturkürzel]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4780</guid>
+
+					<description><![CDATA[<p>Im neuen ABAP-Editor, der mittlerweile auch einige Jahre auf dem Buckel hat, können Tastenkombinationen angepasst und neu hinzugefügt werden. Meiner Ansicht nach, sind die wichtigen Befehle bereits belegt. Einen Befehl, den ich sehr hilfreich finde, habe ich mir jedoch neu eingestellt. Ich gebe einen kurzen Überblick über weniger bekannte Funktionen und die Zuweisung neuer Tastaturkürzel.</p>
+<p>Der Beitrag <a href="/blog/editor-tastaturkommandos/">Editor-Tastaturkommandos</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im neuen ABAP-Editor, der mittlerweile auch einige Jahre auf dem Buckel hat, können Tastenkombinationen angepasst und neu hinzugefügt werden. Meiner Ansicht nach, sind die wichtigen Befehle bereits belegt. Einen Befehl, den ich sehr hilfreich finde, habe ich mir jedoch neu eingestellt. Aber dazu später mehr.</p>
+<p>Inzwischen bekannt sein dürfte, dass der Editor die Auswahl von Textblöcken beherrscht:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_11_140655.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4785" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_11_140655.jpg" alt="Bild_2014_06_11_140655" width="438" height="248" srcset="/wp-content/uploads/2014/06/Bild_2014_06_11_140655.jpg 438w, /wp-content/uploads/2014/06/Bild_2014_06_11_140655-300x169.jpg 300w" sizes="(max-width: 438px) 100vw, 438px" /></a></p>
+<p>Hierzu muss vor der Auswahl mit der Maus die ALT-Taste gedrückt werden. Der Textblock kann dann markiert und ebenfalls als Block wieder eingefügt werden.</p>
+<h2>Hilfreiche unbekannte(?) Tastaturkürzel</h2>
+<table>
+<tbody>
+<tr>
+<td style="width: 30%;">STRG-SHIFT-L</td>
+<td>Aktuelle Zeile löschen</td>
+</tr>
+<tr>
+<td>STRG-SHIFT-T</td>
+<td>Aktuelle Zeile kopieren</td>
+</tr>
+<tr>
+<td>STRG-SHIFT-X</td>
+<td>Aktuelle Zeile ausschneiden</td>
+</tr>
+<tr>
+<td style="width: 30%;" scope="col">STRG-D</td>
+<td>Aktuelle Zeile verdoppeln</td>
+</tr>
+<tr>
+<td>STRG-U</td>
+<td>Upper case markierter Text</td>
+</tr>
+<tr>
+<td>STRG-L</td>
+<td>Lower case markierter Text</td>
+</tr>
+<tr>
+<td>STRG-ALT-CURSUP</td>
+<td>Aktuelle Zeile nach oben bewegen</td>
+</tr>
+<tr>
+<td>STRG-ALT-CURSDOWN</td>
+<td>Aktuelle Zeile nach unten bewegen</td>
+</tr>
+</tbody>
+</table>
+<h2>Weniger hilfreiche Tastaturkürzel</h2>
+<table>
+<tbody>
+<tr>
+<td style="width: 30%;" scope="col">STRG-ALT-T</td>
+<td>Aktuelle Zeile mit darüber liegender Zeile tauschen</td>
+</tr>
+<tr>
+<td>STRG-K</td>
+<td>Switch Case (Großbuchstaben werden klein und umgekehrt</td>
+</tr>
+<tr>
+<td>STRG-T</td>
+<td>Alle Anfangsbuchstaben klein</td>
+</tr>
+<tr>
+<td>STRG-J</td>
+<td>Alle Anfangsbuchstaben groß</td>
+</tr>
+</tbody>
+</table>
+<h2>Nicht zugewiesene Editorbefehle</h2>
+<p>Wenn ich das richtig gesehen habe, gibt es für jede Aktion im Editor ein eigenes Kommando, also auch für die &#8220;normalen&#8221; Aktionen, wie z.B. Cursor links, Cursor rechts, Seite hoch, Ende der Zeile usw. Die meisten Befehle sind bereits Tastaturkürzeln zugewiesen und in der <a title="SAPGUI | Tastaturkürzel" href="http://help.sap-ag.de/saphelp_crmhana/helpdata/de/4b/42dbcf01944ba2e10000000a42189c/content.htm">Hilfe </a>beschrieben.</p>
+<p>Neben fragwürdigen Befehlen, wie zum Beispiel dem Sortieren von Zeilen (Edit.SortLines) gibt es auch hilfreiche. Ich habe häufig den Fall, dass ich Code, der an mehreren Stellen verteilt ist, in ein anderes Programm kopieren möchte. Meistens sind es die DATA-Anweisung und der oder die zugehörigen Befehle. Bisher habe ich die Programmteile einzeln kopiert. Mit dem <strong>Editorbefehl Edit.CopyAppend</strong> ist es möglich, die aktuelle Selektion einfach an vorhandene im Zwischenspeicher befindliche Zeilen anzuhängen. Das finde ich sehr praktisch, denn nun kann ich die DATA-Anweisung kopieren und per STRG-ä (in meinem Fall) das Coding an die DATA-Anweisung im Zwischenspeicher anhängen, in die andere Anwendung wechseln und im gesamten wieder einfügen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_11_120614.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4784 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_11_120614.jpg" alt="Editor.CopyAppend" width="697" height="433" srcset="/wp-content/uploads/2014/06/Bild_2014_06_11_120614.jpg 697w, /wp-content/uploads/2014/06/Bild_2014_06_11_120614-300x186.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_11_120614-624x387.jpg 624w" sizes="(max-width: 697px) 100vw, 697px" /></a></p>
+<p>Einfach den gewünschten Befehl auswählen und <em>Neue Tastenkombination</em> zuweisen.</p>
+<p>[notice type=&#8217;info&#8217;]Wenn die Tastenkombination bereits zugewiesen wurde, erhalten Sie eine Meldung, dass diese nicht mehr verwendet werden kann. Sie müssen dann die alte Tastenkombination entfernen, <strong>sichern</strong> <strong>(!!)</strong> und können dann die Tastenkombination neu zuweisen.[/notice]</p>
+<p>Der Beitrag <a href="/blog/editor-tastaturkommandos/">Editor-Tastaturkommandos</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Hovitaga Advanced Pattern Enhancement</title>
+		<link>/blog/hovitaga-advanced-pattern-enhancement/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Mar 2014 15:44:49 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Muster]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Download]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4550</guid>
+
+					<description><![CDATA[<p>Wer in ABAP programmiert hat mit Sicherheit schon den Befehl "Muster einfügen" im Editor verwendet. Hierüber lassen sich in erster Linie die Aufrufe für Funktionsbausteine und Methoden in den Quelltext einfügen. Gerade bei Funktionsbausteinen ist dies ein unerlässliches Hilfsmittel, denn die Syntaxprüfung prüft bei Funktionsbausteinen nicht, ob ein falscher Parameter verwendet wird. Die ungarische SAP-Entwicklerfirma Hovitaga hat für das Einfügen von Mustern ein kleines kostenloses AddOn entwickelt.</p>
+<p>Der Beitrag <a href="/blog/hovitaga-advanced-pattern-enhancement/">Hovitaga Advanced Pattern Enhancement</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wer in ABAP programmiert hat mit Sicherheit schon den Befehl &#8220;Muster einfügen&#8221; im Editor verwendet. Hierüber lassen sich in erster Linie die Aufrufe für Funktionsbausteine und Methoden in den Quelltext einfügen. Gerade bei Funktionsbausteinen ist dies ein unerlässliches Hilfsmittel, denn die Syntaxprüfung prüft bei Funktionsbausteinen nicht, ob ein falscher Parameter verwendet wird.</p>
+<p>Die ungarische SAP-Entwicklerfirma <a title="Homepage | Hovitaga" href="http://www.hovitaga.com/">Hovitaga </a>hat für das Einfügen von Mustern ein kleines kostenloses AddOn entwickelt. Doch der Reihe nach.</p>
+<h2>Einfügen von Mustern</h2>
+<p>Über das Menü <em>Hilfsmittel &#8211; Einstellungen</em> im Editor können einige Einstellungen für das Einfügen von Mustern vorgenommen werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_07_16_22_14.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4552" alt="Muster Einstellungen" src="https://tricktresor.com/wp-content/uploads/2014/03/03_07_16_22_14-282x300.jpg" width="282" height="300" srcset="/wp-content/uploads/2014/03/03_07_16_22_14-282x300.jpg 282w, /wp-content/uploads/2014/03/03_07_16_22_14.jpg 565w" sizes="(max-width: 282px) 100vw, 282px" /></a></p>
+<p>&nbsp;</p>
+<h2>Muster einfügen SAP Standard</h2>
+<p>Das Einfügen von Mustern erfolgt über den Druckknopf <em>Muster</em> im Editor. Es erscheint ein Popup in dem man auswählen muss, für welchen Befehl man ein Muster einfügen möchte. Wir entscheiden uns für die Option <em>ABAP Objects Muster</em> und gelangen auf ein weiteres Popup:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_07_16_11_34.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4553" alt="ABAP Objects Muster" src="https://tricktresor.com/wp-content/uploads/2014/03/03_07_16_11_34-289x300.jpg" width="289" height="300" srcset="/wp-content/uploads/2014/03/03_07_16_11_34-289x300.jpg 289w, /wp-content/uploads/2014/03/03_07_16_11_34.jpg 376w" sizes="(max-width: 289px) 100vw, 289px" /></a></p>
+<p>&nbsp;</p>
+<p>Nachdem ich mich an dieser Stelle häufig ärgere, dass in der Suchhilfe zur Methode alle Methoden der Klasse angezeigt werden und keine Unterscheidung zwischen PRIVATE, PROTECTED oder PUBLIC gemacht wird, endet hier auch die Funktionalität im SAP Standard. Je nach Release wird vor dem Aufruf der Methode noch die Datendeklaration eingefügt.</p>
+<h2>Muster einfügen Hovitaga style</h2>
+<p>Dort, wo SAP aufhört, fängt die Funktionalität von Hovitaga an. An der Stelle, wo normalerweise der Code in den Quelltext eingefügt wird, erscheint erneut ein Popup:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_07_15_50_29.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4554" alt="Hovitaga Dialog" src="https://tricktresor.com/wp-content/uploads/2014/03/03_07_15_50_29-300x191.jpg" width="300" height="191" srcset="/wp-content/uploads/2014/03/03_07_15_50_29-300x191.jpg 300w, /wp-content/uploads/2014/03/03_07_15_50_29-1024x655.jpg 1024w, /wp-content/uploads/2014/03/03_07_15_50_29-624x399.jpg 624w, /wp-content/uploads/2014/03/03_07_15_50_29.jpg 1363w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Hier kann durch verschiedene Funktionen der Aufruf im Quelltext gesteuert werden. Anstatt im Coding nicht benötigte Parameter zu löschen, kann im Dialog bereits entschieden werden, welche Parameter benötigt werden. Auf Wunsch wird auch die Datendeklaration für den jeweiligen Parameter eingefügt. Für Tabellenparameter kann auch ein entsprechender Arbeitsbereich deklariert werden. Hovitaga folgt hierbei den üblichen Namenskonventionen:</p>
+<ul>
+<li>S = Struktur</li>
+<li>T = Tabelle</li>
+<li>V = Variable</li>
+<li>R = Referenz auf ein Objekt</li>
+</ul>
+<p>Durch einen Schalter kann zwischen globaler und lokaler Datendeklaration gewählt werden, was sich in der Namenskonvention durch die Verwendung von G oder L auswirkt.</p>
+<p>In einer Vorschau wird der einzufügende Aufruf angezeigt. Man sieht sofort, wie sich die Änderungen von z.B. &#8220;Remove Unsed Lines&#8221; auswirken.</p>
+<h2>Fazit</h2>
+<p>Ich möchte nicht soweit gehen, dass es ein unentbehrliches Tool für den ABAP-Programmierer ist. Allerdings finden sich sinnvolle Funktionen in dieser Erweiterung, die das Leben durchaus leichter machen können. Es gibt also eine klare Tricktresor-Empfehlung!</p>
+<h2>Download</h2>
+<p><a title="Advanced Pattern Enhancement | Hovitaga" href="http://www.hovitaga.com/Advanced-pattern-enhancement-overview">Hovitaga Advanced Pattern Enhancement &#8211; Product page and Download</a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/hovitaga-advanced-pattern-enhancement/">Hovitaga Advanced Pattern Enhancement</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAPlink</title>
+		<link>/blog/saplink/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Feb 2014 16:19:19 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Upload]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4476</guid>
+
+					<description><![CDATA[<p>Das Open Source Projekt SAPlink ist eine sehr gute Alternative zu dem SAP-Transportsystem. Mithilfe von SAPlink lassen sich die meisten Repository-Objekte (Klassen, Programme, Datenelemente etc.) komplett exportieren und in einem anderen System wieder importieren. </p>
+<p>Der Beitrag <a href="/blog/saplink/">SAPlink</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Open Source Projekt <a title="SAPlink | code.google.com" href="https://code.google.com/p/saplink/">SAPlink</a> erlaubt es, die meisten Repository-Objekt in einem <em>nugget</em> auf dem Frontend zu exportieren und in einem anderen System wieder zu importieren.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4468" alt="nugget3" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_02_26.jpg" width="300" height="133" /></p>
+<h2>Nuggets</h2>
+<p>Ein Nugget ist einem XML-Datei, die von SAPlink auf dem Frontend erzeugt wird. Diese Datei kann mit einem normalen Text-Editor bearbeitet und geändert werden. Die Datei kann in einem beliebigen anderen SAP-System auf dem SAPlink installiert ist wieder importiert werden.</p>
+<p>Eine schöne Beschreibung findet sich auf dem <a title="SAPlink-Doku | Berater-Wiki" href="http://www.berater-wiki.de/index.php?title=SAPlink">Berater-Wiki</a>.</p>
+<p>Alle Objekte eines nuggets werden importiert und müssen nachträglich manuell aktiviert werden. Beim Upload kann ein Paketname angegeben werden, dem die neuen Objekte zugeordnet werden sollen.</p>
+<h2>SAPlink-Objekte</h2>
+<p>Die meisten Repository-Objekte werden von SAPlink von Haus aus unterstützt. Es gibt jedoch einige Objekte, die nachträglich installiert werden müssen. Eine Liste dieser Plugins findet sich hier:</p>
+<p>https://www.assembla.com/spaces/saplink-plugins/wiki</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/saplink/">SAPlink</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Klasse in ein Interface kopieren</title>
+		<link>/blog/klasse-in-ein-interface-kopieren/</link>
+					<comments>/blog/klasse-in-ein-interface-kopieren/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Feb 2014 12:12:52 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[saplink]]></category>
+		<category><![CDATA[refactoring]]></category>
+		<category><![CDATA[interface]]></category>
+		<category><![CDATA[nugget]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4465</guid>
+
+					<description><![CDATA[<p>Im Zuge einer Refactoring-Maßnahme kann es nötig sein, Methoden in ein Interface auszulagern. Hierbei gibt es jedoch leider keinerlei Unterstützung durch die Workbench. Helfen tut hier das kostenlose Tool SAPlink.</p>
+<p>Der Beitrag <a href="/blog/klasse-in-ein-interface-kopieren/">Klasse in ein Interface kopieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Aufgabe: Im Zuge einer Refactoring-Maßnahme sollen Methoden einer Klasse in ein Interface überführt werden. Im Class-browser gibt es dafür leider keine Unterstützung. Es ist also nicht möglich, eine Klasse auf ein Interface zu kopieren, oder den Typ der Klasse zu ändern.</p>
+<p>Eine einfache Möglichkeit bietet das kostenlos Tool <a title="SAPlink | code.google.com" href="https://code.google.com/p/saplink/" target="_blank">SAPlink</a>. Mit diesem Tool ist es möglich, viele Repository-Objekte (Datenelemente, Tabellen, Klassen, Programme etc.) in ein <em>nugget</em> zu exportieren. Das nugget ist eine XML-Datei, die alle notwendigen Attribute eines SAP-Entwicklungsobjekets enthält und in einem anderen SAP-System wieder eingespielt werden kann.</p>
+<h2>Nugget bearbeiten</h2>
+<p>SAPlink können wir für diese Aufgabe nutzen. Nach dem Erzeugen des nuggets muss dieses mit einem normalen Editor bearbeitet werden.</p>
+<ol>
+<li>CLAS durch INTF ersetzen<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_00_14.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4469" style="line-height: 1.5em;" alt="nugget_text1" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_00_14-201x300.jpg" width="201" height="300" srcset="/wp-content/uploads/2014/02/02_20_13_00_14-201x300.jpg 201w, /wp-content/uploads/2014/02/02_20_13_00_14.jpg 443w" sizes="(max-width: 201px) 100vw, 201px" /></a></li>
+<li>Klassenname durch Interfacenamen ersetzen:<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_01_43.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4470" alt="nugget_text2" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_01_43-300x155.jpg" width="300" height="155" srcset="/wp-content/uploads/2014/02/02_20_13_01_43-300x155.jpg 300w, /wp-content/uploads/2014/02/02_20_13_01_43-624x323.jpg 624w, /wp-content/uploads/2014/02/02_20_13_01_43.jpg 870w" sizes="(max-width: 300px) 100vw, 300px" /></a></li>
+</ol>
+<h2>Vorgehen</h2>
+<ol>
+<li>SAPlink starten (in der Regel Programm ZSAPLINK)</li>
+<li>Nugget erzeugen (XML-Datei wird auf dem PC angelegt)<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_12_58_47.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4466" alt="saplink1" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_12_58_47-300x205.jpg" width="300" height="205" srcset="/wp-content/uploads/2014/02/02_20_12_58_47-300x205.jpg 300w, /wp-content/uploads/2014/02/02_20_12_58_47.jpg 583w" sizes="(max-width: 300px) 100vw, 300px" /></a></li>
+<li>gewünschte Klasse ins nugget exportieren<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_12_59_30.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4467" alt="saplink2" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_12_59_30-300x211.jpg" width="300" height="211" srcset="/wp-content/uploads/2014/02/02_20_12_59_30-300x211.jpg 300w, /wp-content/uploads/2014/02/02_20_12_59_30-624x440.jpg 624w, /wp-content/uploads/2014/02/02_20_12_59_30.jpg 627w" sizes="(max-width: 300px) 100vw, 300px" /></a></li>
+<li>nugget bearbeiten (siehe oben)</li>
+<li>nugget importieren<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_02_26.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4468" alt="nugget3" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_02_26.jpg" width="300" height="133" /></a></li>
+</ol>
+<h2>Hinweise</h2>
+<p>Interfaces haben keinen Quelltext. Der Quelltext der exportierten Klasse wird beim Import in das Interface ignoriert. Der Quelltext muss also nicht extra aus dem nugget gelöscht werden.</p>
+<p>Interfaces haben keinen CONSTRUCTOR. Dieser kann entweder aus dem nugget gelöscht werden oder später im importierten Interface.</p>
+<p>Eventuell muss für SAPlink das Objekt für Interfaces INTF separat installiert werden.</p>
+<p>Weitere Infos zu SAPlink gibt es hier:</p>
+<p><a title="SAPlink Homepage | assembla" href="https://www.assembla.com/spaces/saplink/wiki">Assembla &#8211; SAPlink project homepage</a></p>
+<p><a title="SAPlink | Berater-Wiki" href="http://www.berater-wiki.de/index.php?title=SAPlink">Berater-Wiki</a></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/klasse-in-ein-interface-kopieren/">Klasse in ein Interface kopieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/klasse-in-ein-interface-kopieren/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Zeile je nach Feldwert komplett färben</title>
+		<link>/blog/zeile-je-nach-feldwert-komplett-faerben/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 13 Jan 2014 16:42:52 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[farbe]]></category>
+		<category><![CDATA[farben]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Listen]]></category>
+		<category><![CDATA[Editor]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4209</guid>
+
+					<description><![CDATA[<p>Bei Excel-Listen gibt es häufig die Anforderung, eine komplette Zeile abhängig von einem bestimmten Feldwert in dieser Zeile einzufärben. Das geht mit Hilfe der bedingten Formatierung. Allerdings ist diese Lösung meine Erachtens sehr komplex, unübersichtlich und schlecht zu warten. In diesem Artikel stelle ich eine Lösung vor, die mithilfe von Visual Basic die Zeilenfarbe individuell setzt.</p>
+<p>Der Beitrag <a href="/blog/zeile-je-nach-feldwert-komplett-faerben/">Zeile je nach Feldwert komplett färben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei Excel-Listen gibt es häufig die Anforderung, eine komplette Zeile abhängig von einem bestimmten Feldwert in dieser Zeile einzufärben. Das geht mit Hilfe der bedingten Formatierung. Allerdings ist diese Lösung meine Erachtens sehr komplex, unübersichtlich und schlecht zu warten.</p>
+<p>Aus diesem Grund habe ich ein kleines Visual-Basic-Script geschrieben, mit dessen Hilfe das Einfärben einer Zeile einfach und nachvollziehbar funktioniert. Die Zeilenfarbe soll abhängig vom Status sein.</p>
+<h2>Statustabelle</h2>
+<p>Hierfür füge die folgende Tabelle ein:</p>
+<p><img loading="lazy" decoding="async" width="200" height="100" class="alignnone size-full wp-image-4213" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d411bba6be4.png" /></p>
+<p>Um die Tabelle zu erstellen, trage die Werte wie aus dem Screenshot ersichtlich in die Zellen ein und klicke auf <em>Einfügen &#8211; Tabelle</em>. Dann markiere den Bereich:</p>
+<p><img loading="lazy" decoding="async" width="244" height="157" class="alignnone size-full wp-image-4214" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d41226c32c0.png" /></p>
+<p>Du hast nun die Tabelle erstellt. Mit dieser Tabelle definieren wir den die Farbe der einzelnen Status.</p>
+<h2>Liste</h2>
+<p>Ausgangsbasis soll eine kleine Liste sein. Erstelle diese Liste ebenfalls als Tabelle und erstelle die Datenüberprüfung vom Typ <em>Liste</em> für das Feld <em>Status</em>. Wie das geht, ist in <a title="Datenüberprüfung/ Dropdown-Listen in Excel" href="https://tricktresor.com/blog/datenueberpruefung-dropdown-listen-in-excel/" target="_blank">diesem Artikel </a>beschrieben.</p>
+<p><img loading="lazy" decoding="async" width="673" height="243" class="alignnone size-full wp-image-4211" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d40ee722afd.png" srcset="/wp-content/uploads/2014/01/img_52d40ee722afd.png 673w, /wp-content/uploads/2014/01/img_52d40ee722afd-300x108.png 300w, /wp-content/uploads/2014/01/img_52d40ee722afd-624x225.png 624w" sizes="(max-width: 673px) 100vw, 673px" /></p>
+<h2>VBA</h2>
+<p>Wir erstellen nun eine kleine Visual-Basic-Routine, die bei jeder Änderung des Arbeitsblattes ausgeführt wird. Öffne in den Entwicklertools (muss gegebenenfalls in den Excel-Optionen aktiviert werden!) den Visual Basic Editor und füge für das Arbeitsblatt mit der Liste den folgenden Code ein:</p>
+<pre>Option Explicit
+Private Sub Worksheet_Change(ByVal Target As Range)
+ Dim l_column As Integer
+ Dim l_color As Integer
+ Dim l_status_row As Integer
+ Dim l_status_col As Integer
+ Dim l_number_of_columns_to_color As Integer
+
+''' Anzahl der einzufärbenden Spalten
+ l_number_of_columns_to_color = 3
+''' Index der Spalte, in der der Status definiert wurde
+ l_status_col = 1
+
+ If Target.Column = 2 Then
+
+ For l_status_row = 1 To 20
+
+ If Worksheets("Status").Cells(l_status_row, l_status_col).Value = Cells(Target.Row, Target.Column).Value Then
+ On Error GoTo NOT_AN_INTEGER
+ l_color = CInt(Worksheets("Status").Cells(l_status_row, l_status_col + 1).Value)
+ Exit For
+NOT_AN_INTEGER:
+ l_color = 0
+  End If
+ Next l_status_row
+
+ For l_column = 1 To l_number_of_columns_to_color
+ Cells(Target.Row, l_column).Interior.ColorIndex = l_color
+ Next l_column
+ End If
+
+End Sub</pre>
+<p>[notice type=&#8217;alert&#8217;]Achte darauf, dass der im Coding verwendete Name für das Arbeitsblatt Worksheets(&#8220;Status&#8221;) mit deinem überein stimmt![/notice]</p>
+<p><img loading="lazy" decoding="async" width="568" height="101" class="alignnone size-full wp-image-4215" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d4158c1e935.png" srcset="/wp-content/uploads/2014/01/img_52d4158c1e935.png 568w, /wp-content/uploads/2014/01/img_52d4158c1e935-300x53.png 300w" sizes="(max-width: 568px) 100vw, 568px" /></p>
+<p>[notice type=&#8217;info&#8217;]Die Arbeitsmappe enthält nun Coding und kann nicht mehr als normale Excel-Datei gespeichert werden. Du musst sie als XLSM-Datei (Excel-Arbeitsmappe mit Makros) speichern:</p>
+<p><img loading="lazy" decoding="async" width="810" height="179" class="alignnone size-full wp-image-4216" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d416081903d.png" srcset="/wp-content/uploads/2014/01/img_52d416081903d.png 810w, /wp-content/uploads/2014/01/img_52d416081903d-300x66.png 300w, /wp-content/uploads/2014/01/img_52d416081903d-624x137.png 624w" sizes="(max-width: 810px) 100vw, 810px" /></p>
+<p>[/notice]</p>
+<h2>Anmerkungen</h2>
+<p>Die Farbe der Zeilen wird nicht automatisch geändert, wenn der Farbindex in der Statustabelle geändert wird!</p>
+<p>Die Farbe wird neu gesetzt, sobald ein Status ausgewählt wird. Möchte man sicher sein, dass eine Zeile immer komplett eingefärbt ist, dann kann die Codezeile</p>
+<pre>If Target.Column = 2 Then</pre>
+<p>und das entsprechende End If am Ende des Codings entfernt werden. In diesem Fall wird bei jeder Änderung in der Tabelle die Farbe für die Tabellenzeile neu gesetzt.</p>
+<p>Die Anzahl der einzufärbenden Zellen muss im Coding angepasst werden. Werden Spalten an die Liste angehängt, dann muss der Wert <strong>l_number_of_columns_to_color</strong> angepasst werden.</p>
+<p>Der Beitrag <a href="/blog/zeile-je-nach-feldwert-komplett-faerben/">Zeile je nach Feldwert komplett färben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Editor-Aufruf</title>
+		<link>/blog/editor-aufruf/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 21 Aug 2013 14:07:11 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[ABAP Tools]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=677</guid>
+
+					<description><![CDATA[<p>M&#246;glichkeiten, den ABAP-Editor aufzurufen gibt es viele. Hier zeigen wir Ihnen einige davon...</p>
+<p>Der Beitrag <a href="/blog/editor-aufruf/">Editor-Aufruf</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Möglichkeiten, den ABAP-Editor aufzurufen gibt es viele. Hier zeigen wir Ihnen einige davon&#8230;</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4055" alt="ABAP Editor" src="https://tricktresor.com/wp-content/uploads/2013/08/12_10_21_56_58-300x162.jpg" width="300" height="162" srcset="/wp-content/uploads/2013/08/12_10_21_56_58-300x162.jpg 300w, /wp-content/uploads/2013/08/12_10_21_56_58-624x338.jpg 624w, /wp-content/uploads/2013/08/12_10_21_56_58.jpg 629w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<h1 class="head1">EDITOR-CALL</h1>
+<p>Der einfachste Aufruf:</p>
+<pre>DATA lv_progname TYPE syrepid.
+lv_progname = 'ZZMEINPROGRAMM'.
+EDITOR-CALL FOR REPORT lv_progname.</pre>
+<h1 class="head1">RS_TOOL_ACCESS</h1>
+<pre>  CALL FUNCTION 'RS_TOOL_ACCESS'
+     EXPORTING
+       operation           = 'DOCS'
+       object_name         = 'ZZPROGNAME'
+       object_type         = 'PROG'
+     EXCEPTIONS
+       not_executed        = 1
+       invalid_object_type = 2
+       OTHERS              = 3.</pre>
+<h1 class="head1">Programm TPDA_EDITOR_START</h1>
+<pre>DATA prg_info  TYPE tpda_prg_info.
+DATA dynp_info TYPE tpda_dynp_info.
+
+authority-check object 'S_DEVELOP'
+  id 'DEVCLASS' field '*'
+  id 'OBJTYPE' field '*'
+  id 'OBJNAME' field '*'
+  id 'P_GROUP' field '*'
+  id 'ACTVT' field '3'.
+
+IF dynp IS NOT INITIAL.
+  dynp_info-program  = prgm.
+  dynp_info-dynpnr   = dynp.
+  dynp_info-dynpline = line.
+ELSE.
+  prg_info-program  = prgm.
+  prg_info-include  = incl.
+  prg_info-line     = line.
+ENDIF.
+
+CALL METHOD cl_tpda_services_tools=&gt;navigate_to_source
+  EXPORTING
+    p_prg_info  = prg_info
+    p_dynp_info = dynp_info.</pre>
+<h1 class="head1">Funktionsbaustein EDITOR_PROGRAM</h1>
+<pre>CALL FUNCTION 'EDITOR_PROGRAM'
+  EXPORTING
+    display = 'X'
+    program = 'ZZTESTPROG'
+  EXCEPTIONS
+    OTHERS  = 2.</pre>
+<p>Der Beitrag <a href="/blog/editor-aufruf/">Editor-Aufruf</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

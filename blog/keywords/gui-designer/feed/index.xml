@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>GUI-Designer Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/gui-designer/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 17 Oct 2018 17:19:56 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>GUI-Designer Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>GUI-Designer &#8220;guidrasil&#8221;</title>
+		<link>/blog/gui-designer-guidrasil/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 17 Oct 2018 17:19:56 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[rtti]]></category>
+		<category><![CDATA[cl_gui_textedit]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<category><![CDATA[cl_gui_picture]]></category>
+		<category><![CDATA[guidrasil]]></category>
+		<category><![CDATA[GUI-Designer]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019340</guid>
+
+					<description><![CDATA[<p>Vor langer Zeit habe ich mich mit der automatischen und generischen Erzeugung und Verwaltung von SAPGUI-Controls beschäftigt. Aus dieser Beschäftigung heraus ist der GUI-Designer entstanden, den ich guidrasil getauft habe. Folge mir in die Welt der Controls und Container...</p>
+<p>Der Beitrag <a href="/blog/gui-designer-guidrasil/">GUI-Designer &#8220;guidrasil&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Vor langer Zeit habe ich mich mit der automatischen und generischen Erzeugung und Verwaltung von <em>SAPGUI-Controls</em> beschäftigt.</p>
+<h2>Was sind Controls?</h2>
+<p>Controls sind ActiveX-Komponenten (auch OCX-Komponenten genannt), die im SAPGUI verwendet werden können und mit diesem ausgeliefert werden. Diese Windows-Komponenten werden über entsprechende Klassen im SAP angesprochen und erzeugt. Die Erzeugung erfolgt in der Regel ähnlich:</p>
+<ol>
+<li>CREATE OBJECT &lt;object reference&gt;</li>
+<li>&lt;object reference&gt;-SET_&#8230;.</li>
+<li>Manche Controls benötigen noch ein explizites DISPLAY.</li>
+</ol>
+<p>Die typischen GUI-Controls sind:</p>
+<ul>
+<li>CL_GUI_ALV_GRID</li>
+<li>CL_GUI_TEXTEDIT</li>
+<li>CL_GUI_PICTURE</li>
+<li>CL_GUI_CALENDAR</li>
+<li>CL_GUI_HTML_VIEWER</li>
+<li>CL_GUI_SIMPLE_TREE</li>
+<li>CL_GUI_COLUMN_TREE</li>
+<li>CL_GUI_LIST_TREE</li>
+</ul>
+<p>Controls benötigen einen Container, in dem sie platziert werden können. Lustiger Weise erben die Container-Klassen von der gleichen Klasse wie die Controls selber: CL_GUI_CONTROL. Die Container erben dann alle von CL_GUI_CONTAINER:</p>
+<ul>
+<li>CL_GUI_DOCKING_CONTAINER</li>
+<li>CL_GUI_CUSTOM_CONTAINER</li>
+<li>CL_GUI_DIALOGBOX_CONTAINER</li>
+</ul>
+<p>Eine Sonderstellung nehmen die Splitter-Controls ein, denn sie stellen ebenfalls wieder Container zur Verfügung:</p>
+<ul>
+<li>CL_GUI_SPLITTER_CONTAINER</li>
+<li>CL_GUI_EASY_SPLITTER_CONTAINER</li>
+</ul>
+<h3>Programmierung von Controls</h3>
+<p>Eine typische Programmierung sieht wie folgt aus:</p>
+<ul>
+<li>Erzeuge einen Container</li>
+<li>Erzeuge das Control in diesem Container</li>
+<li>Setze Eigenschaften des Controls</li>
+</ul>
+<p>In diesem <a href="https://tricktresor.com/blog/dockingcontainer/">Demoprogramm</a> zeige ich kurz, wie ein Textedit-Control in einem Docking-Container aufgebaut wird.</p>
+<h3>Setzen von Eigenschaften</h3>
+<p>Die Ansteuerung der Controls ist natürlich immer unterschiedlich, da sich die Control unterscheiden. Ein Picture-Control ist nun mal immer read-only, Ein Textedit-Control nicht. Das ist auch genau das Problem: Wenn ich ein Control häufig verwende, dann kenne ich die Eigenschaften und notwendigen Attribute. Wenn nicht, dann muss ich suchen. Zudem ist die Aktivierung von Attributen manchmal per BOOLEAN notwendig (X und space) und manchmal verlangt das Control &#8220;1&#8221; und &#8220;0&#8221;.</p>
+<h2>Idee eines GUI-Designers</h2>
+<p>Da die Controls alle von der Klasse CL_GUI_CONTROL abstammen, ist es möglich jedes Control über eine generelle Methodenschnittstelle zu erzeugen. Ich kann also einer Methode irgend einen Container übergeben (egal, ob Docking-Container, Custom-Container oder Dialogbox) und das Control wieder zurück bekommen. Oder ich kann ein Control erzeugen und es in einer Tabelle speichern.</p>
+<p>Das folgende Beispielprogramm macht genau das: Durch die Einstellungen auf dem Selektionsbildschirm wird definiert, welche Art von Control auf welcher Seite angedockt werden soll. Mit &lt;ENTER&gt; werden der Container sowie das Control erzeugt und in einer internen Tabelle abgelegt:</p>
+<p><img fetchpriority="high" decoding="async" class="alignnone size-large wp-image-1019345" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil-demo01-1024x773.png" alt="" width="640" height="483" srcset="/wp-content/uploads/2018/10/guidrasil-demo01-1024x773.png 1024w, /wp-content/uploads/2018/10/guidrasil-demo01-300x226.png 300w, /wp-content/uploads/2018/10/guidrasil-demo01-768x580.png 768w, /wp-content/uploads/2018/10/guidrasil-demo01.png 1378w" sizes="(max-width: 640px) 100vw, 640px" /></p>
+<h3>Demoprogramm</h3>
+<pre>REPORT zguidrsail_demo_generic_ctrl.
+
+SELECTION-SCREEN BEGIN OF BLOCK ctrl WITH FRAME TITLE TEXT-ctl.
+PARAMETERS p_text RADIOBUTTON GROUP ctrl DEFAULT 'X'.
+PARAMETERS p_icon RADIOBUTTON GROUP ctrl.
+SELECTION-SCREEN END OF BLOCK ctrl.
+
+SELECTION-SCREEN BEGIN OF BLOCK side WITH FRAME TITLE TEXT-sid.
+PARAMETERS p_left RADIOBUTTON GROUP side DEFAULT 'X'.
+PARAMETERS p_rigt RADIOBUTTON GROUP side.
+PARAMETERS p_botm RADIOBUTTON GROUP side.
+SELECTION-SCREEN END OF BLOCK side.
+
+CLASS ctrl_demo DEFINITION.
+  PUBLIC SECTION.
+    METHODS add_text
+      IMPORTING
+        side TYPE i.
+    METHODS add_icon
+      IMPORTING
+        side TYPE i.
+  PROTECTED SECTION.
+    TYPES: BEGIN OF ts_object,
+             container TYPE REF TO cl_gui_container,
+             control   TYPE REF TO cl_gui_control,
+           END OF ts_object.
+
+    DATA objects TYPE STANDARD TABLE OF ts_object.
+    METHODS append_control
+      IMPORTING
+        container TYPE REF TO cl_gui_container
+        control   TYPE REF TO cl_gui_control.
+
+ENDCLASS.
+
+CLASS ctrl_demo IMPLEMENTATION.
+  METHOD add_text.
+    DATA(parent) = NEW cl_gui_docking_container( side = side ratio = 20 ).
+    DATA(textedit) = NEW cl_gui_textedit( parent = parent ).
+    textedit-&gt;set_text_as_stream( VALUE texttab( ( tdline = `This is a demonstration` ) ) ).
+    append_control( container = parent control = textedit ).
+  ENDMETHOD.
+  METHOD add_icon.
+    DATA(parent) = NEW cl_gui_docking_container( side = side ratio = 20 ).
+    DATA(icon) = NEW cl_gui_picture( parent = parent ).
+    icon-&gt;load_picture_from_sap_icons( icon_message_question ).
+    icon-&gt;set_display_mode( cl_gui_picture=&gt;display_mode_fit_center ).
+    append_control( container = parent control = icon ).
+  ENDMETHOD.
+  METHOD append_control.
+    APPEND VALUE #( container = container control = control ) TO objects.
+  ENDMETHOD.
+ENDCLASS.
+
+INITIALIZATION.
+  DATA(demo) = NEW ctrl_demo( ).
+
+AT SELECTION-SCREEN.
+
+  CASE 'X'.
+    WHEN p_left.
+      DATA(side) = cl_gui_docking_container=&gt;dock_at_left.
+    WHEN p_rigt.
+      side = cl_gui_docking_container=&gt;dock_at_right.
+    WHEN p_botm.
+      side = cl_gui_docking_container=&gt;dock_at_bottom.
+  ENDCASE.
+
+  CASE 'X'.
+    WHEN p_text.
+      demo-&gt;add_text( side = side ).
+    WHEN p_icon.
+      demo-&gt;add_icon( side = side ).
+  ENDCASE.</pre>
+<h3>Dynamische Verwaltung</h3>
+<p>Da ich nun alle erzeugten Container und Controls in einer Tabelle habe, kann ich auch auf die Objekte und deren Eigenschaften zugreifen. Ich könnte zum Beispiel die Tabelle durchgehen und fragen: Ist im Feld CONTAINER ein Objekt der Klasse CL_GUI_DOCKING_CONTAINER? Wenn ja, frage ich das Control nach seinen wichtigen Eigenschaften: RATIO und SIDE:</p>
+<pre>IF itab-container IS INSTANCE OF cl_gui_docking_container.
+  DATA dock TYPE REF TO cl_gui_docking_container.
+  dock ?= itab-container.
+  DATA(side) = dock-&gt;get_docking_side( ).
+  dock-&gt;get_ratio( ratio = DATA(ratio) ).
+ENDIF.</pre>
+<p>Auf diese Weise könnte ich mir alle wichtigen Eigenschaften eines Controls beschaffen und speichern.</p>
+<h3>Dynamische Erzeugung</h3>
+<p>Mit Hilfe von RTTI (Run Time Type Information) in Form der Klasse CL_ABAP_TYPEDESCR kann ich sogar den Klassennamen des Objektes ermitteln:</p>
+<p>DATA(clsnam) = cl_abap_typedescr=&gt;describe_by_object_ref( itab-container )-&gt;get_relative_name( ).<br />
+Wenn ich diesen habe, dann ich das Objekt auch dynamisch erzeugen:</p>
+<pre>DATA: container TYPE REF TO cl_gui_container, 
+      exc_ref TYPE REF TO cx_root.
+
+DATA: ptab TYPE abap_parmbind_tab.
+
+ptab = VALUE #( 
+                ( name  = 'SIDE' 
+                  kind  = cl_abap_objectdescr=&gt;exporting 
+                  value = REF #( side ) ) 
+                ( name  = 'RATIO' 
+                  kind  = cl_abap_objectdescr=&gt;exporting 
+                  value = REF #( ratio ) ) ).
+
+TRY. 
+    CREATE OBJECT container TYPE (clsnam) 
+      PARAMETER-TABLE ptab. 
+  CATCH cx_sy_create_object_error INTO exc_ref. 
+    MESSAGE exc_ref-&gt;get_text( ) TYPE 'I'. 
+ENDTRY.</pre>
+<p>Eine dynamische Erzeugung ist jedoch gar nicht notwendig, denn ich kenne ja den Klassennamen und kann die Erzeugung wiederum an eine Erbauer-Klasse auslagern.</p>
+<h2>guidrasil</h2>
+<p>Nach dem oben beschriebenen Prinzip funktioniert der GUI-Designer ungefähr. Eine wichtige Eigenschaft ist jedoch, dass man erst auswählen muss, auf welcher Seite man einen Docking-Container erstellen möchte. In diesem Docking-Container wird dann ein Splitter erzeugt, der oben eine Toolbar integriert und unten erneut einen leeren Container anzeigt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_02.png"><img decoding="async" class="alignnone size-full wp-image-1019347" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_02.png" alt="" width="663" height="392" srcset="/wp-content/uploads/2018/10/guidrasil_02.png 663w, /wp-content/uploads/2018/10/guidrasil_02-300x177.png 300w" sizes="(max-width: 663px) 100vw, 663px" /></a></p>
+<p>&nbsp;</p>
+<p>In der Toolbar kann man dann die gewünschten Controls oder Splitter-Container auswählen. Der GUI-Designer merkt sich, welche Objekte an welcher Stelle erzeugt werden. Das Erzeugen der einzelnen Controls sowie das Speichern der unterstützten Eigenschaften übernimmt die Erbauer-Klasse, die es für jedes Control gibt.</p>
+<p>Zusätzlich stellt die Erbauer-Klasse auch noch einen Dialog zur Verfügung, in dem die Eigenschaften des Control eingestellt werden können.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png"><img decoding="async" class="alignnone size-full wp-image-1019346" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png" alt="" width="340" height="200" srcset="/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png 340w, /wp-content/uploads/2018/10/guidrasil_ctrl_function_icon-300x176.png 300w" sizes="(max-width: 340px) 100vw, 340px" /></a></p>
+<h2>I&#8217;d rather write code that writes code than write code</h2>
+<p>Eine weitere Eigenschaft der Erbauer-Klasse ist, dass jede Erbauer-Klasse ja genau weiß, wie das eigene Control erzeugt werden muss. Das heißt, es kann auch Code zur Verfügung stellen, der für die Erzeugung des Controls notwendig ist.</p>
+<p>Der GUI-Designer weiß genau, welche Controls in welcher Reihenfolge erzeugt werden müssen. Der Designer muss also nur noch jedes Control nach dem Erzeugungscode fragen&#8230;</p>
+<h2>abapGit</h2>
+<p>Der GUI-Designer guidrasil ist verfügbar per <a href="https://github.com/larshp/abapGit">abapGit</a> auf <a href="https://github.com/tricktresor">Github</a>:</p>
+<p><a href="https://github.com/tricktresor/guidrasil">https://github.com/tricktresor/guidrasil</a></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/gui-designer-guidrasil/">GUI-Designer &#8220;guidrasil&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

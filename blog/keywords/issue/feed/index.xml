@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>issue Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/issue/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 20 Oct 2020 17:01:01 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>issue Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Automatische Aufgabengenerierung [abapGit]</title>
+		<link>/blog/automatische-aufgabengenerierung-abapgit/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 20 Oct 2020 17:00:59 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abapGit]]></category>
+		<category><![CDATA[github]]></category>
+		<category><![CDATA[issue]]></category>
+		<guid isPermaLink="false">/?p=1024465</guid>
+
+					<description><![CDATA[<p>Dank des devtoberfestes habe ich diese Woche einiges über github gelernt. Ein cooles Feature möchte ich gerne mit euch teilen: Github actions Github actions können verwendet werden, um auf github Ereignisse reagieren zu können. Ein wichtiges Ereignis ist der Commit einer Datei (push). TODO to Issue Action Mit einer YAML-Definition kann man mit einer Action auf die Ereignisse reagieren. Ich habe im github Marketplace die Action TODO to issue action gefunden und einmal ausprobiert. Mit...</p>
+<p>Der Beitrag <a href="/blog/automatische-aufgabengenerierung-abapgit/">Automatische Aufgabengenerierung [abapGit]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Dank des <a href="https://github.com/SAP-samples/sap-devtoberfest-2020/blob/master/topics/github/readme.md">devtoberfestes</a> habe ich diese Woche einiges über github gelernt. Ein cooles Feature möchte ich gerne mit euch teilen:</p>
+
+
+
+<h2 class="wp-block-heading">Github actions</h2>
+
+
+
+<p><a class="keychainify-checked" href="https://github.com/features/actions">Github actions</a> können verwendet werden, um auf github Ereignisse reagieren zu können. Ein wichtiges Ereignis ist der Commit einer Datei (push). </p>
+
+
+
+<h2 class="wp-block-heading">TODO to Issue Action</h2>
+
+
+
+<p>Mit einer YAML-Definition kann man mit einer <em>Action</em> auf die Ereignisse reagieren. Ich habe im github Marketplace die Action<a href="https://github.com/marketplace/actions/todo-to-issue"> TODO to issue action </a>gefunden und einmal ausprobiert.</p>
+
+
+
+<p>Mit dieser Action ist es möglich auf einen bestimmten <em>Marker</em> zu reagieren, der im Quelltext vorkommt. Sinnvoll ist im ABAP-Umfeld das Doppelte Anführungszeichen, dass einen Kommentar einleitet, gefolgt von dem Wort &#8220;TODO&#8221;. Findet der Workflow beim Einchecken (push) eines Sourcecodes diesen Marker, dann erstellt die Action automatisch ein Issue im github Repository.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="500" height="616" src="/wp-content/uploads/2020/10/issue05.jpg" alt="" class="wp-image-1024467" srcset="/wp-content/uploads/2020/10/issue05.jpg 500w, /wp-content/uploads/2020/10/issue05-244x300.jpg 244w" sizes="(max-width: 500px) 100vw, 500px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Test Repository</h2>
+
+
+
+<p>Um das Ganze auszuprobieren, habe ich ein Testrepository im github angelegt: <a class="keychainify-checked" href="https://github.com/tricktresor/todo_action_test">TODO to Issue</a>.</p>
+
+
+
+<h2 class="wp-block-heading">Vorbereitungen</h2>
+
+
+
+<p>Um TODO to Action Issues in deinem Repository zu aktivieren, musst du zwei Dinge tun:</p>
+
+
+
+<ul><li>Erstellen der Workflowdatei</li><li>Anlegen des TODO Labeles</li></ul>
+
+
+
+<h3 class="wp-block-heading">YAML-Workflowdatei</h3>
+
+
+
+<p>Um den Workflow einzurichten, brauchst du nur eine YML-Datei in dem Ordner .github/workflows erstellen. Wahrscheinlich existiert der Ordner noch nicht. Dann lege ihn einfach an.</p>
+
+
+
+<p>Die Datei kann zum Beispiel wie folgt aussehen:</p>
+
+
+
+<pre class="wp-block-preformatted">name: todo2issue
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: TODO to Issue
+        uses: alstr/todo-to-issue-action@v2.0
+        with:
+          REPO: ${{ github.repository }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL: "\"TODO"
+          COMMENT_MARKER: "\""
+          CLOSE_ISSUES: true
+        id: "todo"</pre>
+
+
+
+<p>Die wichtige Anpassung für ABAP-Programme ist die Definition des COMMENT_MARKERs mit &#8220;. Da das doppelte Anführungszeichen ein Sonderzeichen ist, muss es mit dem Escape-Zeichen &#8216;\&#8217; erstellt werden.</p>
+
+
+
+<p>Die Definition des * als Kommentarmarker hat bei mir zu einem Syntaxfehler im YAML-File geführt. Das doppelte Anführungszeichen finde ich aber eh sinnvoller.</p>
+
+
+
+<h3 class="wp-block-heading">Label TODO</h3>
+
+
+
+<p>Wechsele in deinem Repository zu der Registerkarte <em>Issues</em> und lege ein Issue an. Auf der rechten Seite kannst du aus den verfügbaren Labels auswählen. TODO existiert noch nicht und du musst es anlegen.</p>
+
+
+
+<h2 class="wp-block-heading">Anwendung</h2>
+
+
+
+<p>Um die Anlage eines Issues zu prüfen, habe ich ein einfaches Programm erstellt und einen TODO-Kommentar eingefügt:</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT langs INTO DATA(lang). "TODO use ALV grid for display<br>  WRITE: / lang-sptxt.<br>ENDLOOP.</code></pre>
+
+
+
+<p>Beim Einchecken mit abapGit wird auf das Ereignis <em>push</em> reagiert und der Workflow startet:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="339" src="/wp-content/uploads/2020/10/SNAG-00796-1024x339.png" alt="" class="wp-image-1024470" srcset="/wp-content/uploads/2020/10/SNAG-00796-1024x339.png 1024w, /wp-content/uploads/2020/10/SNAG-00796-300x99.png 300w, /wp-content/uploads/2020/10/SNAG-00796-768x254.png 768w, /wp-content/uploads/2020/10/SNAG-00796-1536x509.png 1536w, /wp-content/uploads/2020/10/SNAG-00796.png 1543w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Registerkarte &#8220;Actions&#8221; direkt nach dem push</figcaption></figure>
+
+
+
+<p>Die Verarbeitung dauert etwa eine Minute. Danach ist das Issue in der Registerkarte <em>Issues </em>vorhanden:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="199" src="/wp-content/uploads/2020/10/SNAG-00799-1024x199.png" alt="" class="wp-image-1024469" srcset="/wp-content/uploads/2020/10/SNAG-00799-1024x199.png 1024w, /wp-content/uploads/2020/10/SNAG-00799-300x58.png 300w, /wp-content/uploads/2020/10/SNAG-00799-768x149.png 768w, /wp-content/uploads/2020/10/SNAG-00799.png 1216w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Die automatisch generierten Aufgaben in der Registerkarte &#8220;Issues&#8221;</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Features</h2>
+
+
+
+<p>In der Action <em>TODO to Issue Action </em>gibt es noch ein paar zusätzliche Features, die sehr interessant sind:</p>
+
+
+
+<h3 class="wp-block-heading">Closing issues</h3>
+
+
+
+<p>Wenn das Label CLOSE_ISSUES auf TRUE gesetzt wird, dann erkennt die Action, wenn ein TODO aus dem Quelltext entfernt wurde. Was will man mehr? </p>
+
+
+
+<h3 class="wp-block-heading">Multiline Todos</h3>
+
+
+
+<p>Mit mehrzeiligen Kommentaren kann ein Issue mit einer Beschreibung angelegt werden:</p>
+
+
+
+<pre class="wp-block-preformatted">"TODO Come up with a more imaginative greeting
+"Everyone uses hello world and it's boring.</pre>
+
+
+
+<h3 class="wp-block-heading">Dynamic Labels</h3>
+
+
+
+<p>Fügt man dem TODO-Kommentar das Schlüsselwort <em>labels:</em> voran, dann kann man zusätzliche Tags (Labels) mitgeben:</p>
+
+
+
+<pre class="wp-block-preformatted">labels: enhancement, help wanted</pre>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Ich finde, dass das Feature <em>TODO to Action Issue</em> extrem hilfreich ist. Die Verwaltung funktioniert nach ersten Tests sehr gut. Im Issue selbst ist gut erkenntlich, in welchem Zusammenhang das todo steht. Ein direkter Link zum Sourcecode ist ebenfalls vorhanden. Auch das Löschen von Todos funktioniert gut. Änderungen im Quelltext erzeugen keine doppelten Issues. Wenn ein Issue geschlossen wurde, wird es erneut angelegt, sobald ein Issue mit dem gleichen Text wieder auftaucht.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="500" height="649" src="/wp-content/uploads/2020/10/issues3.jpg" alt="" class="wp-image-1024468" srcset="/wp-content/uploads/2020/10/issues3.jpg 500w, /wp-content/uploads/2020/10/issues3-231x300.jpg 231w" sizes="(max-width: 500px) 100vw, 500px" /></figure>
+
+
+
+<p>Viel Spaß beim Verwaltungen deiner Projekte mit Issues!</p>
+<p>Der Beitrag <a href="/blog/automatische-aufgabengenerierung-abapgit/">Automatische Aufgabengenerierung [abapGit]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

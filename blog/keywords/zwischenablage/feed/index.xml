@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>zwischenablage Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/zwischenablage/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 20 Feb 2020 07:27:28 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>zwischenablage Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Dateiausgabe in Zwischenablage umleiten</title>
+		<link>/blog/dateiausgabe-in-zwischenablage-umleiten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Feb 2020 07:27:28 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[exe]]></category>
+		<category><![CDATA[zwischenablage]]></category>
+		<category><![CDATA[cl_gui_frontend_services]]></category>
+		<guid isPermaLink="false">/?p=1023236</guid>
+
+					<description><![CDATA[<p>Im Forum kam die Frage auf, wie man am einfachsten das Ergebnis eines Betriebssystemkommandos beziehungsweise eines EXE-Programms in ABAP einlesen kann. Stefan hat einen genialen Trick aufgezeigt (Danke dafür!!): Mit Hilfe des Systemkommandos CLIP wird die Ausgabe einfach in die Windows-Zwischenablage umgeleitet. Das Einlesen der Zwischenablage in eine interne Tabelle ist mit Hilfe von CL_GUI_FRONTEND_SERVICES=>CLIPBOARD_IMPORT dann ebenfalls einfach möglich. Demoprogramm</p>
+<p>Der Beitrag <a href="/blog/dateiausgabe-in-zwischenablage-umleiten/">Dateiausgabe in Zwischenablage umleiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Im Forum kam die Frage auf, wie man am einfachsten das Ergebnis eines Betriebssystemkommandos beziehungsweise eines EXE-Programms in ABAP einlesen kann. </p>
+
+
+
+<p>Stefan hat einen genialen Trick aufgezeigt (Danke dafür!!): Mit Hilfe des Systemkommandos <a href="https://ss64.com/nt/clip.html">CLIP</a> wird die Ausgabe einfach in die Windows-Zwischenablage umgeleitet.</p>
+
+
+
+<p>Das Einlesen der Zwischenablage in eine interne Tabelle ist mit Hilfe von CL_GUI_FRONTEND_SERVICES=>CLIPBOARD_IMPORT dann ebenfalls einfach möglich.</p>
+
+
+
+<h2 class="wp-block-heading">Demoprogramm</h2>
+
+
+
+<pre class="wp-block-code"><code>DATA clipboard   TYPE STANDARD TABLE OF char255 with EMPTY KEY.
+cl_gui_frontend_services=>execute(
+  EXPORTING
+    application = 'cmd.exe'
+    parameter   = '/C "dir c:\temp\*.* | clip"'
+    minimized   = 'X' " disable cmd flash
+    synchronous = 'X' " wait for cmd to finish
+  EXCEPTIONS
+    OTHERS      = 10 ).
+cl_gui_frontend_services=>clipboard_import(
+  IMPORTING
+    data     = clipboard
+    length   = DATA(length)
+  EXCEPTIONS
+    OTHERS   = 4 ).
+
+cl_demo_output=>display_data( clipboard ).</code></pre>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/dateiausgabe-in-zwischenablage-umleiten/">Dateiausgabe in Zwischenablage umleiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

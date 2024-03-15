@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_salv_table Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_salv_table/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 14 Oct 2022 14:39:00 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_salv_table Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SALV-Table-Popup als Suchhilfe</title>
+		<link>/blog/salv-table-popup-als-suchhilfe/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 14 Oct 2022 14:30:36 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[suchhilfe]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<guid isPermaLink="false">/?p=1039202</guid>
+
+					<description><![CDATA[<p>In diesem Artikel habe ich dir gezeigt, wie du die Klasse CL_SALV_TABLE als Popup und zur Auswahl von Daten nutzen kannst. Heute möchte ich dir zeigen, wie du diese Funktion in einer Suchhilfe mit Hilfe eines Suchhilfe-Exits nutzen kannst. In diesem Beispiel rufen wir, wie in dem verlinkten Artikel, eine Liste der Wochentage auf aus denen der Anwender einen auswählen kann. Der einzige Unterschied zum verlinkten Code ist, dass ich für die Schlüsselkomponente nun ein...</p>
+<p>Der Beitrag <a href="/blog/salv-table-popup-als-suchhilfe/">SALV-Table-Popup als Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In diesem <a class="keychainify-checked" href="/blog/cl_salv_table-als-auswahl-popup/">Artikel</a> habe ich dir gezeigt, wie du die Klasse CL_SALV_TABLE als Popup und zur Auswahl von Daten nutzen kannst. Heute möchte ich dir zeigen, wie du diese Funktion in einer Suchhilfe mit Hilfe eines Suchhilfe-Exits nutzen kannst. In diesem Beispiel rufen wir, wie in dem verlinkten Artikel, eine Liste der Wochentage auf aus denen der Anwender einen auswählen kann.</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="161" height="252" src="/wp-content/uploads/2022/10/image-6.png" alt="" class="wp-image-1039205"/><figcaption class="wp-element-caption">Auswahl Wochentag</figcaption></figure>
+
+
+
+<p>Der einzige Unterschied zum verlinkten Code ist, dass ich für die Schlüsselkomponente nun ein einstelliges Kennzeichen vom Typ WEEKDAY verwende.</p>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe</h2>
+
+
+
+<p>In der Codezentrale kannst du dir ansehen, wie du einen Wert in einem Report über eine eigenprogrammierte F4-Suchhilfe übergeben kannst:</p>
+
+
+
+<figure class="wp-block-embed is-type-wp-embed is-provider-die-codezentrale wp-block-embed-die-codezentrale"><div class="wp-block-embed__wrapper">
+<blockquote hcb-fetch-image-from="https://codezentrale.de/abap-salv-table-als-f4-suchhilfe-popup-verwenden/" class="wp-embedded-content" data-secret="z0AikdQtOG"><a href="https://codezentrale.de/abap-salv-table-als-f4-suchhilfe-popup-verwenden/">[ABAP] SALV-Table als F4-Suchhilfe-PopUp verwenden</a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" title="&#8222;[ABAP] SALV-Table als F4-Suchhilfe-PopUp verwenden&#8220; &#8212; Die Codezentrale" src="https://codezentrale.de/abap-salv-table-als-f4-suchhilfe-popup-verwenden/embed/#?secret=EJsPswRNQw#?secret=z0AikdQtOG" data-secret="z0AikdQtOG" width="600" height="338" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+</div></figure>
+
+
+
+<p>Das Verfahren nützt dir jedoch nichts, wenn du die F4-Hilfe ohne Programmierung in einem Dynprofeld nutzen möchtest. Hierfür musst du in der Transaktion SE11 eine separate Suchhilfe anlegen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="771" height="584" src="/wp-content/uploads/2022/10/image-4.png" alt="" class="wp-image-1039203" srcset="/wp-content/uploads/2022/10/image-4.png 771w, /wp-content/uploads/2022/10/image-4-300x227.png 300w, /wp-content/uploads/2022/10/image-4-768x582.png 768w" sizes="(max-width: 771px) 100vw, 771px" /><figcaption class="wp-element-caption">Suchhilfe mit Suchhilfe-Exit</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe-Exit</h2>
+
+
+
+<p>Die Anlage der Suchhilfe ist in diesem Fall jedoch erst Schritt zwei. Im ersten Schritt musst du einen Funktionsbaustein anlegen, der die Werte anzeigt und mit der Suchhilfe kommuniziert.</p>
+
+
+
+<p>Für den Suchhilfe-Exit benötigst du einen Funktionsbaustein mit einer definierten Schnittstelle. In der F1-Hilfe zum Suchhilfe-Exit erfährst du, dass du den Baustein <strong>F4IF_SHLP_EXIT_EXAMPLE</strong> als Vorlage verwenden kannst. Du  musst eine neue Funktionsgruppe anlegen (Transaktion SE37: <em>Springen • Funktionsgruppe • Funktionsgruppe anlegen</em>) und den Vorlage-Baustein in diese Gruppe kopieren.</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="399" height="142" src="/wp-content/uploads/2022/10/image-5.png" alt="" class="wp-image-1039204" srcset="/wp-content/uploads/2022/10/image-5.png 399w, /wp-content/uploads/2022/10/image-5-300x107.png 300w" sizes="(max-width: 399px) 100vw, 399px" /><figcaption class="wp-element-caption">Vorlagebaustein kopieren</figcaption></figure>
+
+
+
+<p>Am Ende des kopierten Funktionsbausteins setzt du das folgende Coding ein:</p>
+
+
+
+<pre class="wp-block-code"><code>  IF callcontrol-step = 'DISP'.
+    DATA(my_popup) = NEW main( ).
+
+    my_popup-&gt;set_items(
+      VALUE #(
+        ( key = '1' value = 'Monday' )
+        ( key = '2' value = 'Tuesday' )
+        ( key = '3' value = 'Wednesday' )
+        ( key = '4' value = 'Thursday' )
+        ( key = '5' value = 'Friday' )
+        ( key = '6' value = 'Saturday' )
+        ( key = '7' value = 'Sunday' ) ) ).
+
+    TRY.
+        DATA(selected_entry) = my_popup-&gt;ask( 'Select day' ).
+        append value #( string = conv #( selected_entry-key ) ) to record_tab.
+        callcontrol-step = 'RETURN'.
+      CATCH cancelled.
+        callcontrol-step = 'EXIT'.
+    ENDTRY.
+  ENDIF.
+</code></pre>
+
+
+
+<p>In diesem Beispiel habe ich das Coding (Siehe <a class="keychainify-checked" href="/blog/cl_salv_table-als-auswahl-popup/">CL_SALV_TABLE als Auswahl-Popup</a>) als lokale Klasse im Funktionsbaustein verwendet. Sinnvoller wäre es jedoch, die Klasse MAIN als globale Klasse anzulegen (Transaktion SE24). In diesem Fall musst du bei der Instanziierung natürlich nicht MAIN verwenden, sondern den Namen der globalen Klasse.</p>
+
+
+
+<p>Wichtig ist, dass bei Auswahl eines Eintrags die RECORD_TAB mit dem gewählten Eintrag angereichert wird und der CALLCONTROL-STEP auf &#8220;RETURN&#8221; gesetzt wird. Bricht der Benutzer den Dialog ab, dann muss CALLCONTROL-STEP auf &#8220;EXIT&#8221; gesetzt werden.</p>
+
+
+
+<p>Den Funktionsbaustein und die Funktionsgruppe musst du selbstverständlich aktivieren.</p>
+
+
+
+<h2 class="wp-block-heading">Aktivierung Suchhilfe</h2>
+
+
+
+<p>Nachdem du den Suchhilfe-Exit Funktionsbaustein in die Suchhilfe eingetragen hast, musst du die Suchhilfe aktivieren und kannst sie testen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="744" height="584" src="/wp-content/uploads/2022/10/image-7.png" alt="" class="wp-image-1039206" srcset="/wp-content/uploads/2022/10/image-7.png 744w, /wp-content/uploads/2022/10/image-7-300x235.png 300w, /wp-content/uploads/2022/10/image-7-117x91.png 117w" sizes="(max-width: 744px) 100vw, 744px" /><figcaption class="wp-element-caption">Test der Suchhilfe</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe einbinden</h2>
+
+
+
+<p>Du kannst diese Suchhilfe nun in einem Datenelement unter der Registerkarte &#8220;Weitere Eigenschaften&#8221; festlegen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="587" height="407" src="/wp-content/uploads/2022/10/image-8.png" alt="" class="wp-image-1039207" srcset="/wp-content/uploads/2022/10/image-8.png 587w, /wp-content/uploads/2022/10/image-8-300x208.png 300w, /wp-content/uploads/2022/10/image-8-200x140.png 200w" sizes="(max-width: 587px) 100vw, 587px" /><figcaption class="wp-element-caption">Suchhilfe im Datenelement definieren</figcaption></figure>
+
+
+
+<p>Die Suchhilfe steht dir nun immer zur Verfügung, wenn du dieses Datenelement in einer Struktur verwendest. </p>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe testen</h2>
+
+
+
+<p>Wenn du Suchhilfen mit Suchhilfe-Exits testest, dann achte darauf, dass du nach jeder Codeänderung im Suchhilfe-Exit-Funktionsbaustein die Transaktion SE11 neu aufrufst. Andernfalls ist das alte Coding noch geladen und du wirst die Änderungen nicht sehen!</p>
+<p>Der Beitrag <a href="/blog/salv-table-popup-als-suchhilfe/">SALV-Table-Popup als Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid aus SALV ermitteln</title>
+		<link>/blog/alv-grid-aus-salv-ermitteln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 09 Jun 2021 14:56:09 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[salv]]></category>
+		<guid isPermaLink="false">/?p=1029100</guid>
+
+					<description><![CDATA[<p>Die Klasse CL_SALV_TABLE erfreut sich seit Jahren großer Beliebtheit. In erster Linie wahrscheinlich deswegen, weil man ohne Ermittlung des Feldkatalogs oder Vorgabe der zugrunde liegenden Datenstruktur eine Tabelle als Grid anzeigen kann. Das SALV verwendet intern jedoch immer noch die Klasse CL_GUI_ALV_GRID. Und es kann durchaus sein, dass man, nachdem man etwas mit dem SALV programmiert hat, an dieses Objekt herankommen möchte. Achtung! Änderungen in System ab Release 7.55 Wie das geht, zeige ich dir...</p>
+<p>Der Beitrag <a href="/blog/alv-grid-aus-salv-ermitteln/">ALV-Grid aus SALV ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Die Klasse CL_SALV_TABLE erfreut sich seit Jahren großer Beliebtheit. In erster Linie wahrscheinlich deswegen, weil man ohne Ermittlung des Feldkatalogs oder Vorgabe der zugrunde liegenden Datenstruktur eine Tabelle als Grid anzeigen kann. Das SALV verwendet intern jedoch immer noch die Klasse CL_GUI_ALV_GRID. Und es kann durchaus sein, dass man, nachdem man etwas mit dem SALV programmiert hat, an dieses Objekt herankommen möchte.</p>
+
+
+
+<div class="wp-block-group alignfull has-background ext-my-0 ext-py-lg editor:no-inserter" style="background-color:#1966c2"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<div class="wp-block-columns alignwide are-vertically-aligned-center is-layout-flex wp-container-core-columns-is-layout-1 wp-block-columns-is-layout-flex">
+<div class="wp-block-column is-vertically-aligned-center is-layout-flow wp-block-column-is-layout-flow" style="flex-basis:100%">
+<h2 class="has-white-color has-text-color has-large-font-size ext-mt-0 wp-block-heading" id="new-755" style="font-style:normal;font-weight:400;line-height:1.1">Achtung! Änderungen in System ab Release 7.55</h2>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-font-size is-style-fill has-medium-font-size"><a class="wp-block-button__link has-white-color has-text-color has-background" href="/blog/alv-grid-aus-salv-ermitteln-ab-release-7-55/" style="background-color:#ff5900" rel="">Hier geht&#8217;s zum neuen Beitrag</a></div>
+</div>
+</div>
+</div>
+</div></div>
+
+
+
+<p>Wie das geht, zeige ich dir mit der folgenden Klasse.</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<pre class="wp-block-code"><code>CLASS lcl_access_salv DEFINITION INHERITING FROM cl_salv_model_list FINAL.
+  PUBLIC SECTION.
+    CLASS-METHODS:
+      get_cl_gui_alv_grid IMPORTING io_salv        TYPE REF TO cl_salv_model_list
+                          RETURNING VALUE(ro_grid) TYPE REF TO cl_gui_alv_grid.
+ENDCLASS.
+
+CLASS lcl_access_salv IMPLEMENTATION.
+  METHOD get_cl_gui_alv_grid.
+    DATA:lo_salv    TYPE REF TO cl_salv_table.
+*--------------------------------------------------------------------*
+* Must be bound
+*--------------------------------------------------------------------*
+    IF io_salv IS NOT BOUND.
+      RETURN.
+    ENDIF.
+*--------------------------------------------------------------------*
+* Adapter must be bound
+*--------------------------------------------------------------------*
+    IF   io_salv-&gt;r_controller IS NOT BOUND
+      OR io_salv-&gt;r_controller-&gt;r_adapter IS NOT BOUND.
+      MESSAGE 'Minor programming fault: Call GET_GRID_FROM_SALV after SALV-&gt;DISPLAY( )!'(001) 
+         TYPE 'S' DISPLAY LIKE 'W'.
+      lo_salv ?= io_salv.  " Calling method has cl_salv_table typed in interface
+      lo_salv-&gt;display( ).
+    ENDIF.
+    IF   io_salv-&gt;r_controller IS NOT BOUND
+      OR io_salv-&gt;r_controller-&gt;r_adapter IS NOT BOUND.
+      RETURN.  " Still not bound  --&gt; can't do anything
+    ENDIF.
+*--------------------------------------------------------------------*
+* If method not present or wrong return type exception will handle this and we return unbound grid
+*--------------------------------------------------------------------*
+    TRY.
+
+        " Works for CL_SALV_FULLSCREEN_ADAPTER as well as for CL_SALV_GRID_ADAPTER
+        CALL METHOD io_salv-&gt;r_controller-&gt;r_adapter-&gt;('GET_GRID')  
+          RECEIVING
+            value = ro_grid.
+      CATCH cx_root ##CATCH_ALL. " don't dump
+        RETURN.
+    ENDTRY.
+  ENDMETHOD.
+ENDCLASS.</code></pre>
+<p>Der Beitrag <a href="/blog/alv-grid-aus-salv-ermitteln/">ALV-Grid aus SALV ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Welche Redefinitionen gibt es?</title>
+		<link>/blog/welche-redefinitionen-gibt-es/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 26 Jun 2018 15:50:15 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<category><![CDATA[klasse]]></category>
+		<category><![CDATA[Methode]]></category>
+		<category><![CDATA[Redefinition]]></category>
+		<category><![CDATA[cl_oo_class]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018881</guid>
+
+					<description><![CDATA[<p>In einem Projekt habe ich viel mit einer Superklasse und vielen Vererbungen gearbeitet. Die Superklasse besitzt sozusagen die Standardimplementierung für die einzelnen Funktionen und die Unterklassen können das Verhalten durch Redefinition ändern, wenn es erforderlich ist. mit der Zeit sind viele Unterklassen zusammen gekommen. Das Konzept hat sich gut bewährt. Allerdings stellt sich nun das Problem, dass ich bei einer neuen Klasse nicht mehr wusste, bei welcher anderen Unterklasse es eine Abweichung zum Standard gibt....</p>
+<p>Der Beitrag <a href="/blog/welche-redefinitionen-gibt-es/">Welche Redefinitionen gibt es?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Projekt habe ich viel mit einer Superklasse und vielen Vererbungen gearbeitet. Die Superklasse besitzt sozusagen die Standardimplementierung für die einzelnen Funktionen und die Unterklassen können das Verhalten durch Redefinition ändern, wenn es erforderlich ist.</p>
+<p>mit der Zeit sind viele Unterklassen zusammen gekommen. Das Konzept hat sich gut bewährt. Allerdings stellt sich nun das Problem, dass ich bei einer neuen Klasse nicht mehr wusste, bei welcher anderen Unterklasse es eine Abweichung zum Standard gibt. Um das herauszubekommen musste ich jede einzelne Klasse anklicken, die Methodenliste herunter scrollen, die entsprechende Methode finden und schauen ob und wie die Redefinition aussah.</p>
+<p>Für einen Programmierer natürlich ein nicht zu tolerierendes Vorgehen! 8)</p>
+<h2>Finde Redefinitionen!</h2>
+<p>Der unten stehende Report nutzt die Klasse CL_OO_CLASS um die Subklassen zu ermitteln. In den Redefinition der Subklasse wird nach der vorgegebenen Methode gesucht. Ist diese vorhanden, also redefiniert, dann wird sie in der Liste ausgegeben.</p>
+<p>Mit einem Doppelklick auf eine Methode wird der Quelltext im Docker angezeigt. Zur Anzeige des Quelltextes wird die Klasse CL_GUI_ABAPEDIT verwendet.</p>
+<p><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/06/redef1.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018882" src="https://tricktresor.com/wp-content/uploads/2018/06/redef1-1024x648.png" alt="" width="640" height="405" srcset="/wp-content/uploads/2018/06/redef1-1024x648.png 1024w, /wp-content/uploads/2018/06/redef1-300x190.png 300w, /wp-content/uploads/2018/06/redef1-768x486.png 768w, /wp-content/uploads/2018/06/redef1-174x111.png 174w, /wp-content/uploads/2018/06/redef1.png 1179w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Coding</h2>
+<pre class="lang:abap decode:true ">REPORT ztrcktrsr_find_redefinitions.
+
+<!--StartFragment --><span class="L0S52">DATA </span>gv_clsname         <span class="L0S52">TYPE </span>seoclsname<span class="L0S55">.</span>
+<span class="L0S52">DATA </span>gv_cpdname         <span class="L0S52">TYPE </span>seocpdname<span class="L0S55">.</span>
+<span class="L0S52">DATA </span>gt_dynp            <span class="L0S52">TYPE </span><span class="L0S52">TABLE </span><span class="L0S52">OF </span>dynpread <span class="L0S52">WITH </span><span class="L0S52">DEFAULT </span><span class="L0S52">KEY</span><span class="L0S55">.</span> 
+
+PARAMETERS p_clas TYPE seoclsname DEFAULT 'CL_GUI_CONTROL'.
+PARAMETERS p_meth TYPE seocpdname DEFAULT 'FREE'.
+
+<!--StartFragment --><span class="L0S52">AT </span><span class="L0S52">SELECTION-SCREEN </span><span class="L0S52">ON </span><span class="L0S52">VALUE-REQUEST </span><span class="L0S52">FOR </span>p_clas<span class="L0S55">.</span>
+
+  <span class="L0S52">CALL </span><span class="L0S52">FUNCTION </span><span class="L0S33">'SEOM_OO_PATTERN_SELECTION'</span>
+    <span class="L0S52">IMPORTING</span>
+      clsname             <span class="L0S55">= </span>gv_clsname
+      cpdname             <span class="L0S55">= </span>gv_cpdname
+    <span class="L0S52">EXCEPTIONS</span>
+      selection_cancelled <span class="L0S55">= </span><span class="L0S32">1</span>
+      <span class="L0S52">OTHERS              </span><span class="L0S55">= </span><span class="L0S32">2</span><span class="L0S55">.</span>
+  <span class="L0S52">IF </span>sy<span class="L0S70">-</span>subrc <span class="L0S55">= </span><span class="L0S32">0</span><span class="L0S55">.</span>
+    p_clas <span class="L0S55">= </span>gv_clsname<span class="L0S55">.</span>
+    gt_dynp <span class="L0S55">= </span><span class="L0S52">VALUE </span>#<span class="L0S55">( </span><span class="L0S55">( </span>fieldname <span class="L0S55">= </span><span class="L0S33">'P_METH' </span>fieldvalue <span class="L0S55">= </span>gv_cpdname <span class="L0S55">) </span><span class="L0S55">)</span><span class="L0S55">.</span>
+    <span class="L0S52">CALL </span><span class="L0S52">FUNCTION </span><span class="L0S33">'DYNP_VALUES_UPDATE'</span>
+      <span class="L0S52">EXPORTING</span>
+        dyname     <span class="L0S55">= </span>sy<span class="L0S70">-</span>cprog
+        dynumb     <span class="L0S55">= </span>sy<span class="L0S70">-</span>dynnr
+      <span class="L0S52">TABLES</span>
+        dynpfields <span class="L0S55">= </span>gt_dynp
+      <span class="L0S52">EXCEPTIONS</span>
+        <span class="L0S52">OTHERS     </span><span class="L0S55">= </span><span class="L0S32">8</span><span class="L0S55">.</span>
+    <span class="L0S52">IF </span>sy<span class="L0S70">-</span>subrc &lt;&gt; <span class="L0S32">0</span><span class="L0S55">.</span>
+      p_meth <span class="L0S55">= </span>gv_cpdname<span class="L0S55">.</span>
+    <span class="L0S52">ENDIF</span><span class="L0S55">.</span>
+  <span class="L0S52">ENDIF</span><span class="L0S55">.</span> 
+CLASS lcl_main DEFINITION.
+  PUBLIC SECTION.
+    METHODS on_double_click
+                  FOR EVENT double_click OF cl_salv_events_table
+      IMPORTING row column.
+    METHODS docker.
+    METHODS display.
+    METHODS do
+      IMPORTING
+        i_class  TYPE clike
+        i_method TYPE clike
+        i_start  TYPE boolean_flg.
+  PROTECTED SECTION.
+    DATA mt_redef     TYPE STANDARD TABLE OF seoredef.
+    DATA mo_docker    TYPE REF TO cl_gui_docking_container.
+    DATA mo_editor    TYPE REF TO cl_gui_abapedit.
+    METHODS display_source IMPORTING is_source TYPE seoredef.
+
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+  METHOD on_double_click.
+    docker( ).
+    DATA(redef) = mt_redef[ row ].
+
+    display_source( redef ).
+
+  ENDMETHOD.
+
+  METHOD display_source.
+    DATA lt_source TYPE STANDARD TABLE OF string.
+
+    DATA(include) = cl_oo_classname_service=&gt;get_method_include(
+                      EXPORTING mtdkey = VALUE #( clsname = is_source-clsname
+                                                  cpdname = is_source-mtdname ) ).
+    READ REPORT include INTO lt_source.
+    mo_editor-&gt;set_text( lt_source ).
+
+  ENDMETHOD.
+
+  METHOD docker.
+
+    CHECK mo_docker IS INITIAL.
+    mo_docker = NEW #( side = cl_gui_docking_container=&gt;dock_at_right ratio = 50 ).
+    mo_editor = NEW #( parent = mo_docker ).
+    mo_editor-&gt;set_readonly_mode( 1 ).
+
+  ENDMETHOD.
+
+  METHOD display.
+
+    TRY.
+        " create SALV
+        CALL METHOD cl_salv_table=&gt;factory
+          IMPORTING
+            r_salv_table = DATA(lr_table)
+          CHANGING
+            t_table      = mt_redef.
+
+        lr_table-&gt;get_functions( )-&gt;set_all( ).
+
+        " register event DOUBLE_CLICK
+        SET HANDLER on_double_click FOR lr_table-&gt;get_event( ).
+
+        " hide columns which are not relevant
+        DATA(lr_columns) = lr_table-&gt;get_columns( ).
+        lr_columns-&gt;get_column( 'VERSION' )-&gt;set_technical( ).
+        lr_columns-&gt;get_column( 'MTDABSTRCT' )-&gt;set_technical( ).
+        lr_columns-&gt;get_column( 'MTDFINAL' )-&gt;set_technical( ).
+        lr_columns-&gt;get_column( 'ATTVALUE' )-&gt;set_technical( ).
+        lr_columns-&gt;get_column( 'EXPOSURE' )-&gt;set_technical( ).
+        lr_table-&gt;display( ).
+      CATCH cx_salv_error.
+    ENDTRY.
+
+
+  ENDMETHOD.
+
+
+  METHOD do.
+
+    DATA lr_class TYPE REF TO cl_oo_class.
+    DATA lt_subclasses TYPE seo_relkeys.
+    DATA ls_subclass   LIKE LINE OF lt_subclasses.
+
+    TRY .
+        lr_class ?= cl_oo_class=&gt;get_instance( i_class ).
+
+        LOOP AT lr_class-&gt;redefinitions INTO DATA(ls_redef) WHERE mtdname = i_method.
+          APPEND ls_redef TO mt_redef.
+        ENDLOOP.
+        lt_subclasses = lr_class-&gt;get_subclasses( ).
+
+        IF i_start = abap_true.
+          " search
+          LOOP AT lt_subclasses INTO ls_subclass.
+            do( i_class  = ls_subclass-clsname
+                i_method = i_method
+                i_start  = space ).
+          ENDLOOP.
+        ENDIF.
+
+      CATCH cx_class_not_existent.
+
+    ENDTRY.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+START-OF-SELECTION.
+
+  DATA(main) = NEW lcl_main( ).
+  main-&gt;do( i_class  = p_clas
+            i_method = p_meth
+            i_start  = abap_true ).
+  main-&gt;display( ).</pre>
+<h2>abapGit</h2>
+<p>Der inzwischen obligatorische Link zu Github: <a class="keychainify-checked" href="https://github.com/tricktresor/find_redefinitions">https://github.com/tricktresor/find_redefinitions</a></p>
+<p>Der Beitrag <a href="/blog/welche-redefinitionen-gibt-es/">Welche Redefinitionen gibt es?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Manchmal, aber nur manchmal&#8230; ♫</title>
+		<link>/blog/manchmal-aber-nur-manchmal-%e2%99%ab/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 11 Aug 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<category><![CDATA[dec]]></category>
+		<category><![CDATA[Datentypen]]></category>
+		<category><![CDATA[ALV]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=190554</guid>
+
+					<description><![CDATA[<p>hält SAP Überraschungen bereit, das glaubt man kaum... In einem Projekt haben wir uns gewundert, warum es in einer dynamisch generierten internen Tabelle einen CONVERSION OVERFLOW gab, obwohl das Feld vom Typ DEC ausreichend groß dimensioniert war. Die Lösung war offensichtlich. Hinterher...</p>
+<p>Der Beitrag <a href="/blog/manchmal-aber-nur-manchmal-%e2%99%ab/">Manchmal, aber nur manchmal&#8230; ♫</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>hält SAP Überraschungen bereit, das glaubt man kaum&#8230;</p>
+<p>Aber von vorne.</p>
+<p>In einem Projekt haben wir uns gewundert, warum es in einer dynamisch generierten internen Tabelle einen CONVERSION OVERFLOW gab, obwohl das Feld vom Typ DEC ausreichend groß dimensioniert war. Die Lösung war offensichtlich. Hinterher&#8230;</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-31-23.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-190690" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-31-23.jpg" alt="2015-08-10_15-31-23" width="891" height="55" srcset="/wp-content/uploads/2015/08/2015-08-10_15-31-23.jpg 891w, /wp-content/uploads/2015/08/2015-08-10_15-31-23-300x19.jpg 300w" sizes="(max-width: 891px) 100vw, 891px" /></a></p>
+<h2>Erzeugung</h2>
+<p>Wir sind bei der Erzeugung der internen Tabelle wie folgt vorgegangen:</p>
+<ul>
+<li>Definition des Feldkataloges</li>
+<li>Erzeugung der internen Tabelle mit Hilfe von cl_alv_table_create=&gt;create_dynamic_table</li>
+</ul>
+<p>Beispielhaft kann die Erzeugung folgendermaßen veranschaulicht werden:</p>
+<pre>  FIELD-SYMBOLS &lt;fcat&gt;  TYPE lvc_s_fcat.
+  DATA gt_table         TYPE lvc_t_fcat.
+
+  APPEND INITIAL LINE TO gt_fcat ASSIGNING .
+  &lt;fcat&gt;-fieldname = 'FELD1'.
+  &lt;fcat&gt;-scrtext_l = 'Feld 1: CHAR'.
+  &lt;fcat&gt;-inttype   = 'C'.
+  &lt;fcat&gt;-intlen    = 20.
+  &lt;fcat&gt;-datatype  = 'CHAR'.
+
+  APPEND INITIAL LINE TO gt_fcat ASSIGNING .
+  &lt;fcat&gt;-fieldname = 'FELD2'.
+  &lt;fcat&gt;-scrtext_l = 'Feld 2: DEC'.
+  &lt;fcat&gt;-inttype   = 'P'.
+  &lt;fcat&gt;-intlen    = 16.
+  &lt;fcat&gt;-datatype  = 'DEC'.
+  &lt;fcat&gt;-decimals  = 2.
+
+  CALL METHOD cl_alv_table_create=&gt;create_dynamic_table
+    EXPORTING
+      it_fieldcatalog           = gt_fcat
+      i_length_in_byte          = abap_true
+    IMPORTING
+      ep_table                  = gd_table
+    EXCEPTIONS
+      generate_subpool_dir_full = 9.</pre>
+<h2>Das macht SAP</h2>
+<p>Im Debugger sieht man die erzeugte Datenstruktur im Detail.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-40-25.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-190691" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-40-25.jpg" alt="2015-08-10_15-40-25" width="768" height="128" srcset="/wp-content/uploads/2015/08/2015-08-10_15-40-25.jpg 768w, /wp-content/uploads/2015/08/2015-08-10_15-40-25-300x50.jpg 300w" sizes="(max-width: 768px) 100vw, 768px" /></a></p>
+<p>Hier ist auch erkennbar, dass die gepackte Zahl im internen Format nicht 16 Bytes groß ist, sondern nur 8. Dadurch passt nur eine vierzehnstellige Zahl (plus Vorzeichen) in das Feld. Im Coding wurde jedoch die maximale Größe von intern 16 Bytes verwendet.</p>
+<h2>Versteckte Parameter</h2>
+<p>Ich habe mir die Erzeugung der internen Tabelle durch cl_alv_table_create=&gt;create_dynamic_table genauer angesehen und bin dann recht schnell auf den Parameter I_LENGTH_IN_BYTE gestoßen. Dieser Parameter ist in der Schnittstelle &#8211; wie so oft &#8211; sehr anschaulich und gut dokumentiert:</p>
+<p><em>boolsche Variable (X=true, space=false)</em></p>
+<p>Der Parameter ist optional und hat als Vorgabewert ABAP_FALSE.</p>
+<p>Um es vorweg zu nehmen: Nachdem wir den Parameter auf ABAP_TRUE gesetzt haben, funktionierte alles, wie erwartet.</p>
+<p>Beim Debuggen bin ich irgendwann auf folgende Stelle gestossen:</p>
+<pre>if ls_fieldcat-inttype eq 'P'.
+  if r_length_in_byte eq abap_true.
+    l_leng = ls_fieldcat-intlen.
+  else.
+    l_leng =  ( ls_fieldcat-intlen + 1 ) / 2.
+  endif.
+endif.
+</pre>
+<p>Meiner Meinung nach ist das Coding hier verkehrt, da gepackte Zahlen immer aus Halbbytes bestehen. An dieser Stelle darf nicht einfach die Länge halbiert werden. Warum genau diese &#8220;Halbierung&#8221; statt findet, habe ich auch nicht verstanden. Es hat wahrscheinlich mit Unicode zu tun.</p>
+<h2>Fazit</h2>
+<p>Die Erzeugung von internen Tabellen sollte meiner Meinung nach eh nicht mehr mit dem erwähnten Funktion erzeugt werden, da hier im Hintergrund Subroutine-Pools generiert werden. Die Verwendung ist nur eingeschränkt möglich (maximale Anzahl Aufrufe: 36). Inzwischen sind die Möglichkeiten mit <a href="https://tricktresor.com/blog/interne-tabelle-mit-components/">CREATE DATA &amp; RTTC</a> deutlich eleganter und zukunftssicherer. Allerdings habe ich die Verwendung von <a href="https://tricktresor.com/blog/interne-tabelle-zur-laufzeit-generieren/">CREATE_DYNMIC_TABLE </a>auch schon mal als elegant bezeichnet&#8230;</p>
+<p>Die Methode mit CREATE_DYNAMIC_TABLE hat auch einen großen Vorteil: Bei dem Aufbau der internen Tabelle kann ich gleich semantische Informationen mitgeben/ anreichern (Titel, Texte, Suchhilfen etc.), die nicht automatisch übernommen werden. Ich dann diesen Feldkatalog nicht nur zur Erzeugung der internen Tabelle verwenden, sondern auch für die Anzeige.</p>
+<p>Bei der Variante über CREATE DATA und RTTC werden fast ausschließlich die technischen Informationen ausgewertet. Wenn ein verwendetes Datenelement korrekte Überschriften hat, ist es okay, aber wenn ich eigene Felder mit einem generischen Datenelement aufbaue (FELD1, FELD2) und diese im gleichen Zug benennen will, dann muss ich dies separat tun.</p>
+<p>Der Beitrag <a href="/blog/manchmal-aber-nur-manchmal-%e2%99%ab/">Manchmal, aber nur manchmal&#8230; ♫</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Beliebige Tabelle anzeigen</title>
+		<link>/blog/beliebige-tabelle-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2012 14:29:20 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=656</guid>
+
+					<description><![CDATA[<p>Das SALV-Model eignet sich wunderbar, um eine interne Tabelle anzuzeigen. Der gro&#223;e Vorteil gegen&#252;ber der klassischen ALV-Grid Klassen ist, dass weder Strukturname noch Feldkatalog &#252;bergeben werden m&#252;ssen. Das sucht sich der SALV selbst zusammen.</p>
+<p>Der Beitrag <a href="/blog/beliebige-tabelle-anzeigen/">Beliebige Tabelle anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das SALV-Model eignet sich wunderbar, um eine interne Tabelle anzuzeigen. Der große Vorteil gegenüber der klassischen ALV-Grid Klassen ist, dass weder Strukturname noch Feldkatalog übergeben werden müssen. Das sucht sich der SALV selbst zusammen.</p>
+<p>Das ist alles an Coding, was nötig ist:</p>
+<p class="sap1">  DATA: gref_salv TYPE REF TO cl_salv_table.</p>
+<p>TRY.<br />
+CALL METHOD cl_salv_table=&gt;factory<br />
+IMPORTING<br />
+r_salv_table = gref_salv<br />
+CHANGING<br />
+t_table      = gt_itab.<br />
+CATCH cx_salv_msg .<br />
+ENDTRY.</p>
+<p>gref_salv-&gt;display( ).</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/beliebige-tabelle-anzeigen/">Beliebige Tabelle anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

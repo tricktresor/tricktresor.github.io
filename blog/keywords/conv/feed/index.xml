@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>CONV Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/conv/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:47 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>CONV Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>REDUCE + SWITCH + COND [ABAP740]</title>
+		<link>/blog/reduce-switch-cond-abap740/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 03 May 2017 13:07:57 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[abap740]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[switch]]></category>
+		<category><![CDATA[CONV]]></category>
+		<category><![CDATA[COND]]></category>
+		<category><![CDATA[string]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018016</guid>
+
+					<description><![CDATA[<p>Heute im Code-Dojo hatte ich die Aufgabe gestellt, eine Funktion zu schreiben, die einen String mit variabel zu bestimmender Länge und zufälligen Zeichenfolgen aus Zahlen und Buchstaben zurück liefert. Zum Beispiel &#8220;I71B7HJ4BG&#8221; oder &#8220;6EE17ICBF54IE486EHD8&#8221;. Idee Mit VALUE und FOR sollte ein String Zeichen für Zeichen zusammengesetzt werden. Mit einer Zufallsfunktion sollte ermittelt werden, ob ein Buchstabe oder eine Zahl eingesetzt werden soll. Per SWITCH sollte ebenfalls eine Zufallsfunktion aufgerufen werden, die eine Zahl bzw. einen Buchstaben...</p>
+<p>Der Beitrag <a href="/blog/reduce-switch-cond-abap740/">REDUCE + SWITCH + COND [ABAP740]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute im Code-Dojo hatte ich die Aufgabe gestellt, eine Funktion zu schreiben, die einen String mit variabel zu bestimmender Länge und zufälligen Zeichenfolgen aus Zahlen und Buchstaben zurück liefert. Zum Beispiel &#8220;I71B7HJ4BG&#8221; oder &#8220;6EE17ICBF54IE486EHD8&#8221;.</p>
+<h2>Idee</h2>
+<p>Mit VALUE und FOR sollte ein String Zeichen für Zeichen zusammengesetzt werden. Mit einer Zufallsfunktion sollte ermittelt werden, ob ein Buchstabe oder eine Zahl eingesetzt werden soll. Per SWITCH sollte ebenfalls eine Zufallsfunktion aufgerufen werden, die eine Zahl bzw. einen Buchstaben zurück liefert.. Per String-Konkatenation sollten die zufälligen Zeichen zusammengesetzt werden.</p>
+<h2>Abweichung</h2>
+<p>die Aufgabe lässt sich mit VALUE nicht lösen. Stattdessen muss REDUCE genommen werden.</p>
+<h2>Code</h2>
+<p>Für jede Stelle des zu generierenden Strings (FOR &#8211; UNTIL &#8211; NEXT) wird eine Funktion RND_TYPE aufgerufen. Diese gibt zufällig den Wert TRUE oder FALSE zurück. Per SWITCH-Anweisung wird entschieden, ob eine Zahl (FALSE) oder ein Buchstabe (TRUE) generiert werden soll. Das generierte Zeichen wird per String-Konkatenation Zeichen für Zeichen zusammengebaut.</p>
+<p>&nbsp;</p>
+<pre class="lang:abap decode:true">REPORT.
+
+CLASS main DEFINITION.
+   PUBLIC SECTION.
+     DATA rnd_num TYPE REF TO cl_abap_random_int.
+     DATA rnd_chr TYPE REF TO cl_abap_random_int.
+     METHODS constructor.
+     METHODS rnd_type
+       RETURNING VALUE(type) TYPE boolean.
+     METHODS create_random_string
+       IMPORTING max           TYPE i
+       RETURNING VALUE(string) TYPE string.
+     METHODS get_random_char
+       RETURNING VALUE(char) TYPE char01.
+     METHODS get_random_number
+       RETURNING VALUE(number) TYPE numc01.
+ ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+   METHOD constructor.
+     rnd_chr = cl_abap_random_int=&gt;create( seed = CONV #( sy-uzeit ) min = 0 max = 25 ).
+     rnd_num = cl_abap_random_int=&gt;create( seed = CONV #( sy-uzeit ) min = 0 max = 9 ).
+   ENDMETHOD.
+   METHOD rnd_type.
+
+    type = COND #( LET random = get_random_number( ) IN
+                    WHEN random &lt;= 5 THEN abap_true
+                    ELSE abap_false ).
+   ENDMETHOD.
+
+  METHOD get_random_char.
+     DATA(offset) = rnd_num-&gt;get_next( ).
+     char = sy-abcde+offset(1).
+   ENDMETHOD.
+
+  METHOD get_random_number.
+     number = rnd_num-&gt;get_next( ).
+   ENDMETHOD.
+
+  METHOD create_random_string.
+
+    string = REDUCE #( INIT text = ``
+                        FOR i = 1
+                        UNTIL i &gt; max
+                        NEXT text = text &amp;&amp; SWITCH #( rnd_type( )
+                                              WHEN abap_true  THEN get_random_char( )
+                                              WHEN abap_false THEN get_random_number( ) ) ).
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+PARAMETERS p_len type i DEFAULT 10.
+PARAMETERS p_str TYPE char20 MODIF ID a.
+
+AT SELECTION-SCREEN OUTPUT.
+   LOOP AT SCREEN.
+     CASE screen-group1.
+       WHEN 'A'.
+         screen-input = '0'.
+         MODIFY SCREEN.
+     ENDCASE.
+   ENDLOOP.
+
+AT SELECTION-SCREEN.
+   p_str = NEW main( )-&gt;create_random_string( p_len ).</pre>
+<h2>Lessons Learned</h2>
+<p>Mit REDUCE können Operationen auf einen Datentyp &#8220;reduziert&#8221; werden. Mit VALUE funktioniert das nicht.</p>
+<pre class="lang:abap decode:true">string = REDUCE #( INIT text = ``
+                   FOR i = 1
+                   UNTIL i &gt; max
+                   NEXT text = text &amp;&amp; SWITCH #( rnd_type( )
+                                         WHEN abap_true  THEN get_random_char( )
+                                         WHEN abap_false THEN get_random_number( ) ) ).</pre>
+<p>Mit SWITCH können nur Exakte Werte abgefragt werden (wie bei CASE auch mit OR verknüpft). Es sind jedoch keine &#8220;Größer-/ Kleiner-Vergleiche&#8221; möglich.</p>
+<pre class="lang:abap decode:true ">[...] SWITCH #( rnd_type( )
+        WHEN abap_true  THEN get_random_char( )
+        WHEN abap_false THEN get_random_number( ) ) ).</pre>
+<p>Mit COND können beliebige Bedingungen geprüft werden. Allerdings muss hier jede Bedingung separat angegeben werden. Wenn der abzufragende Wert das Ergebnis einer Funktion ist, so sollte mit LET gearbeitet werden, um nicht für jede Bedingung die Funktion aufrufen zu müssen.</p>
+<pre class="lang:abap decode:true">var = COND #( LET random = get_random_number( ) IN
+              WHEN random &lt;= 5 THEN abap_true
+              ELSE abap_false ).</pre>
+<p>Die implizite Typ-Definition mit INIT (bei der REDUCE-Anweisung) ist mit Vorsicht zu genießen! Ich hatte aus Gewohnheit einen leeren &#8220;String&#8221; mit Hochkomma-Space-Hochkomma definiert. In Wirklichkeit hatte ich damit aber einen CHAR(1)-Feld definiert und die Funktion hat immer nur ein Zeichen zurück geliefert. Die String-Konkatenation hat diesen fest definierten Typ also nicht automatisch erweitert, so wie es beim String der Fall ist. Erst die Verwendung eines <em>echten</em> Strings durch die Backticks &#8220; liefert das gewünschte Ergebnis.</p>
+<p>Es kann auch der Typ direkt angegeben werden (INIT text TYPE string) aber dann ist keine Vorbelegung mehr möglich. Eine implizite Definition durch Vorbelegung ist dann jedoch wieder durch die Verwendung von CONV möglich: INIT text = CONV string( &#8216;hallo&#8217; )</p>
+<p>Bei der FOR-Funktion (FOR i = 1) muss das Hochzählen der Variable (THEN i + 1) nicht zwingend definiert werden! Wird THEN nicht angegeben, so wird implizit die Inkrementierung um Eins vorgenommen:</p>
+<pre class="lang:abap decode:true ">[...] FOR i = 1 UNTIL i &gt; 10 [...]</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/reduce-switch-cond-abap740/">REDUCE + SWITCH + COND [ABAP740]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

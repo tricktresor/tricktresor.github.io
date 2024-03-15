@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>suppress dialog Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/suppress-dialog/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:04 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>suppress dialog Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>List-Ereignisse aus ALV</title>
+		<link>/blog/list-ereignisse-aus-alv/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 14 Aug 2012 18:34:50 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[callback]]></category>
+		<category><![CDATA[usercommand]]></category>
+		<category><![CDATA[hotspot]]></category>
+		<category><![CDATA[suppress dialog]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=653</guid>
+
+					<description><![CDATA[<p>Hin und wieder stolpert man einfach &#252;ber kleinere oder gr&#246;&#223;ere Fallen im SAP-System. So auch dann, wenn man aus dem REUSE-ALV-Grid abspringt um eine Listausgabe zu machen und meint, man k&#246;nne von dort die guten alten Verzweigungslisten nutzen (AT LINE-SELETION). Weit gefehlt, denn...</p>
+<p>Der Beitrag <a href="/blog/list-ereignisse-aus-alv/">List-Ereignisse aus ALV</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hin und wieder stolpert man einfach über kleinere oder größere Fallen im SAP-System. So auch dann, wenn man aus dem REUSE-ALV-Grid abspringt um eine Listausgabe zu machen und meint, man könne von dort die guten alten Verzweigungslisten nutzen (AT LINE-SELETION). Weit gefehlt, denn&#8230;</p>
+<p><span style="line-height: 1.5em;">Aber fangen wir noch mal von vorne an: Folgendes kleine Programm gibt mithilfe des REUSE-ALV-Grid-Bausteins eine ALV-Grid-Liste aus. Per Doppelklick kann man Details zu einem Eintrag anzeigen lassen. Diese Details werden als einfache Liste ausgegeben. Zugegeben, modern ist das nicht, aber die Listausgabe hat auch ihre Vorteile: Sie ist flexibel und lässt sich ohne Feldkatalog darstellen.</span></p>
+<h1>Coding Eins</h1>
+<pre>REPORT.
+TYPE-POOLS slis.
+
+DATA gt_data       TYPE STANDARD TABLE OF t005t.
+DATA gs_data       TYPE                   t005t.
+DATA gv_fieldname  TYPE c LENGTH 40.
+DATA gv_fieldvalue TYPE c LENGTH 40.
+
+SELECT-OPTIONS: s_land1 FOR gs_data-land1.
+
+*** Duble click in list ***
+AT LINE-SELECTION.
+
+*** field values
+  GET CURSOR FIELD  gv_fieldname VALUE  gv_fieldvalue.
+
+  CASE sy-lsind.
+    WHEN 1.
+      WRITE: / 'Mehr Informationen zu Land', gs_data-landx HOTSPOT ON.
+
+  ENDCASE.
+
+*** Start of program ***
+START-OF-SELECTION.
+
+  PERFORM selection.
+  PERFORM display.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  selection
+*&amp;---------------------------------------------------------------------*
+FORM selection.
+  SELECT * FROM t005t INTO TABLE gt_data
+   WHERE land1 IN s_land1
+     AND spras = sy-langu.
+ENDFORM.                    "selection
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  display
+*&amp;---------------------------------------------------------------------*
+FORM display.
+
+*** Data
+  DATA lt_fcat         TYPE lvc_t_fcat.
+  FIELD-SYMBOLS &lt;fcat&gt; TYPE lvc_s_fcat.
+
+*** get fieldcatalog
+  CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_buffer_active        = space
+      i_structure_name       = 'T005T'
+      i_client_never_display = 'X'
+      i_bypassing_buffer     = 'X'
+    CHANGING
+      ct_fieldcat            = lt_fcat
+    EXCEPTIONS
+      inconsistent_interface = 1
+      program_error          = 2
+      OTHERS                 = 3.
+
+*** set hotspot and colours
+  LOOP AT lt_fcat ASSIGNING &lt;fcat&gt;.
+    IF &lt;fcat&gt;-fieldname = 'LAND1'.
+      &lt;fcat&gt;-hotspot = 'X'.
+      &lt;fcat&gt;-emphasize = 'C400'.
+    ENDIF.
+  ENDLOOP.
+
+*** display
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY_LVC'
+    EXPORTING
+      i_bypassing_buffer      = 'X'
+      i_buffer_active         = space
+      i_callback_program      = sy-cprog
+      i_callback_user_command = 'CALLBACK_ALV_USERCOMMAND'
+      it_fieldcat_lvc         = lt_fcat
+    TABLES
+      t_outtab                = gt_data
+    EXCEPTIONS
+      program_error           = 1
+      OTHERS                  = 2.
+<span style="line-height: 1.6em;">ENDFORM.                    "anzeige</span>
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  callback_alv_usercommand
+*&amp;---------------------------------------------------------------------*
+FORM callback_alv_usercommand
+    USING r_ucomm     LIKE sy-ucomm
+          rs_selfield TYPE slis_selfield.
+
+  CASE r_ucomm.
+    WHEN '&amp;IC1'.
+      READ TABLE gt_data INTO gs_data INDEX rs_selfield-tabindex.
+      IF sy-subrc = 0.
+        LEAVE TO LIST-PROCESSING.
+        SET PF-STATUS space.
+        WRITE: / 'Land', gs_data-landx HOTSPOT ON.
+      ENDIF.
+  ENDCASE.
+
+ENDFORM.                    "callback_alv_usercommand</pre>
+<h2>Warum funktioniert der Doppelklick in der Liste nicht?</h2>
+<p>Wenn Sie das Programm ausführen, werden Sie merken, dass der Doppelklick aus dem ALV wunderbar funktioniert. Auch die Listausgabe funktioniert einwandfrei. Doch obwohl wir die Zeile mit &#8220;HOTSPOT ON&#8221; ausgeben, was normalerweise das Ereignis &#8220;AT LINE-SELECTION&#8221; aktiviert, klappt dies nicht mehr.</p>
+<h2>Die Lösung</h2>
+<p>Wenn Sie über das Menü &#8220;System &#8211; Status&#8221; schauen, dann werden Sie feststellen, dass Sie sich entweder &#8220;in gar keinem Programm mehr befinden&#8221; oder in der Funktionsgruppe des Reuse-Bausteins SAPLSLVC_FULLSCREEN.</p>
+<p>Sie springen zwar in die Routine CALLBACK_ALV_USERCOMMAND, allerdings hat sich das Hauptprogramm durch den Aufruf des Funktionsbausteins geändert.</p>
+<p>Dies ist auch der Grund, warum AT LINE-SELECTION nicht funktioniert, denn hier haben Sie das Coding ja nicht hinterlegt, sondern in Ihrem Programm.</p>
+<p>Was also tun: Die Lösung ist: Sie müssen dafür sorgen, dass sie bei der Listausgabe in Ihrem Programm bleiben bzw. in Ihre Programm zurück kehren.</p>
+<p>Das tun Sie, indem Sie die Liste nicht im CALLBACK_ALV_USERCOMMAND ausgebene, sondern mithilfe von CALL SCREEN in ein Dynpro Ihres Programms springen:</p>
+<h1>Coding Zwei</h1>
+<p>Ersetzen Sie die Callbackroutine:</p>
+<pre>*&amp;---------------------------------------------------------------------*
+*&amp;      Form  callback_alv_usercommand
+*&amp;---------------------------------------------------------------------*
+FORM callback_alv_usercommand
+    USING r_ucomm     LIKE sy-ucomm
+          rs_selfield TYPE slis_selfield.
+
+  CASE r_ucomm.
+    WHEN '&amp;IC1'.
+      READ TABLE gt_data INTO gs_data INDEX rs_selfield-tabindex.
+      IF sy-subrc = 0.
+        CALL SCREEN 100.                                                
+      ENDIF.
+  ENDCASE.
+
+ENDFORM.                    "callback_alv_usercommand
+
+Dafür müssen Sie aber natürlich das Dynpro 100 anlegen. tun Sie das und implementieren Sie die folgenden beiden in der Ablauflogik verwendeten Module:
+
+Ablauflogik
+
+PROCESS BEFORE OUTPUT.
+  MODULE status_0100.
+*
+PROCESS AFTER INPUT.
+  MODULE user_command_0100.
+
+PBO + PAI
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  STATUS_0100  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE status_0100 OUTPUT.
+
+  SUPPRESS DIALOG.
+
+ENDMODULE.                 " STATUS_0100  OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  USER_COMMAND_0100  INPUT
+*&amp;---------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+
+  CASE sy-ucomm.
+    WHEN 'BACK' OR '%EX' OR 'RW'.
+      SET SCREEN 0. LEAVE SCREEN.
+    WHEN OTHERS.
+      LEAVE TO LIST-PROCESSING.
+      SET PF-STATUS space.
+      WRITE: / 'Land', gs_data-landx HOTSPOT ON.
+  ENDCASE.
+
+ENDMODULE.                 " USER_COMMAND_0100  INPUT</pre>
+<p>Erklärung</p>
+<p>Durch SUPPRESS DIALOG wird das PBO übersprungen und es wird sofort in das PAI verzweigt. Hier erfolgt ein LEAVE TO LIST-PROCESSING um eine Liste ausgeben zu können.</p>
+<p>Der &#8220;SET-PF-STATUS space&#8221; muss sein, um den Standard-List-Status zu verwenden. Ansonsten wäre noch der Status des ALV-Grid aktiv.</p>
+<p>Nun befinden wir uns wieder in unserem Programm und AT LINE-SELECTION wird durchlaufen.</p>
+<p>Der Beitrag <a href="/blog/list-ereignisse-aus-alv/">List-Ereignisse aus ALV</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

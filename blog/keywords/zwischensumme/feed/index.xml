@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Zwischensumme Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/zwischensumme/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:52 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Zwischensumme Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Autosumme in ALV-Grid &#8211; Version 1</title>
+		<link>/blog/autosumme-in-alv-grid-version-1/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2016 17:50:59 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=861138</guid>
+
+					<description><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&#038;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen...!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&amp;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen&#8230;!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Ich erinnerte mich an das Event delayed_changed_sel_callback, mit dem man eine Selektion im Grid verzögert auswerten konnte. Mit Hilfe der Tastenkombination STRG+Y kann man einzelne Zellen markieren. Diese Funktionen wollte ich nutzen, um die markierten Zellenwerte auszulesen und zu summieren.</p>
+<p>Herausgekommen ist das unten stehende Programm. Der eigentliche Teil, die Summierung der Zellen, steht komplett in der Methode HANDLE_DELAYED_SELECTION.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-861506" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg" alt="2016-10-07_19-06-25" width="856" height="274" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg 856w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-300x96.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-768x246.jpg 768w" sizes="(max-width: 856px) 100vw, 856px" /></a></p>
+<h2>Vorgehen</h2>
+<p>Event delayed_changed_sel_callback registrieren und einen Eventhandler in der Klasse zuordnen (Handle_Delayed_Selection).</p>
+<p>Wie kommt man an die markierten Zellen heran? Dafür gibt es die Methode Get_Selected_Cells. Sie liefert eine Tabelle zurück, in der die markierten Feldnamen und der Zeilenindex stehen. Mittels READ TABLE und ASSIGN COMPONENT kann man also auf einen Zellwert zugreifen.</p>
+<p>Nun muss noch mittels DESCRIBE FIELD geprüft werden, ob es sich um ein Feld mit einem numerischen Wert handelt. Wenn das der Fall ist, kann der Wert der Zelle aufsummiert werden.</p>
+<p>&nbsp;</p>
+<h2>Normale Zellen vs. Summenzeilen</h2>
+<p>Das Vorgehen bei einem ALV-Grid, in dem keine Summen oder Zwischensummen gebildet wurden, ist einfach und erfolgt nach dem oben genannten Schema. Eine Herausforderung sind jedoch die (Zwischen-) Summenstufen gewesen. Diese werden im ALV-Grid in eigenen &#8211; geschützten &#8211; Tabellen verwaltet:</p>
+<table>
+<tbody>
+<tr>
+<td>Tabelle</td>
+<td>Bedeutung</td>
+<td>Bemerkung</td>
+</tr>
+<tr>
+<td>MT_CT00</td>
+<td>Summetabelle</td>
+<td>Sie enthält in der Regel nur einen Eintrag. Ausnahme: Es sind in der Summierung der Feldwerte unterschiedliche Einheiten vorhanden.</td>
+</tr>
+<tr>
+<td>MT_CT01</td>
+<td>Zwischensummentabelle 1</td>
+<td>Erste Zwischensummenstufe</td>
+</tr>
+<tr>
+<td>MT_CTnn</td>
+<td>Zwischensummentabelle n</td>
+<td>Tabellen für Zwischensummenstufe nn</td>
+</tr>
+<tr>
+<td>MT_CT09</td>
+<td>Zwischensummentabelle 9</td>
+<td>9 ist die höchste Stufe. Mehr Zwischensummen können nicht erstellt werden.</td>
+</tr>
+</tbody>
+</table>
+<p>Immerhin gibt es in diesem Fall eine Methode, mit der man sich die Zwischensummentabellen &#8211; bzw. eine Referenz auf diese &#8211; besorgen kann: <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/9e/2c7b38180fee45e10000009b38f8cf/content.htm">Get_Subtotals</a>. Im Feld ROW_ID-ROWTYPE der Zellen-Tabelle steht, ob es sich um die Totals-Tabelle handelt (1. Zeichen = T) oder eine Zwischensumme (1. Zeichen = S). Nicht gruppierte Zellen haben den Eintrag SPACE.</p>
+<p>Eine Selektion auf ein Summenfeld liefert zum Beispiel diesen ROWTYPE: S 0101X0000000001. Der Vierstellige Code nach dem S sagt aus, um welche Hierarchiestufe es sich handelt (Stellen 1 und 2 des Codes). Die Stellen 3 und 4 des Codes sagen aus, in welcher Tabelle das markierte Feld steht. In diesem Fall ist es Level 1 der Hierarchie und Tabelle MT_CT01.</p>
+<p>Anhand dieses Code kann man also herausfinden, in welcher Zwischensummentabelle nachgeschaut werden muss. Dies tue ich hier:</p>
+<pre>lv_index = ls_cell-row_id-rowtype+4(2).
+lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ASSIGN (lv_tablename) TO &lt;ref_data&gt;.</pre>
+<p>Nachdem wir nun wissen, in welcher Tabelle wir nachsehen müssen um den markierten Zellwert zu finden, müssen wir nun noch den richtigen Index ermitteln. Dieser wird leider nicht mitgegeben, sondern muss aus der Tabelle GROUPLEVELS, die über Get_Subtotals geliefert wird, ermittelt werden:</p>
+<pre>READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+IF sy-subrc = 0.
+  ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ENDIF.</pre>
+<h2></h2>
+<p><strong>Achtung!</strong> Das Programm funktioniert nur, wenn es sich um <em>reine</em> (Zwischen-) Summen handelt! Zwischensummen, die aus mehreren Zeilen bestehen weil sich die zugehörige Einheit unterscheidet, können (noch) nicht erkannt werden. Hier muss ich noch etwas forschen&#8230;</p>
+<h2>Zwischensummen bilden</h2>
+<p>Ein kurzer Hinweis, wie man im ALV-Grid Zwischensummen bildet:</p>
+<p>Wähle als erstes mindestens eine Spalte über die du dann mit Hilfe des Summenicons <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg"><img decoding="async" class="alignnone size-full wp-image-861510" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg" alt="2016-10-07_19-48-00" width="34" height="20" /></a> eine Summe bildest. Danach kannst du weitere Spalten markieren und mit dem Zwischensummenicon <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg"><img decoding="async" class="alignnone size-full wp-image-861511" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg" alt="2016-10-07_19-49-31" width="34" height="20" /></a> die Spalten definieren, über die zusätzlich eine Zwischensumme erstellt werden soll.</p>
+<h2>Aufrisssummenstufe</h2>
+<p>Über die Aufrisssummenstufe kannst du einfach festlegen, dass nur Zwischensummenzeilen einer bestimmten Hierarchie angezeigt werden sollen:</p>
+<p>Auswahl im Menü:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861508" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg" alt="2016-10-07_19-41-49" width="336" height="137" srcset="/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg 336w, /wp-content/uploads/2016/10/2016-10-07_19-41-49-300x122.jpg 300w" sizes="(max-width: 336px) 100vw, 336px" /></a></p>
+<p>Auswahl der Hierarchieebene:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861509" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg" alt="2016-10-07_19-06-45" width="364" height="208" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg 364w, /wp-content/uploads/2016/10/2016-10-07_19-06-45-300x171.jpg 300w" sizes="(max-width: 364px) 100vw, 364px" /></a></p>
+<p>Anzeige der gewählten Zwischensummen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861507" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg" alt="2016-10-07_19-22-39" width="847" height="139" srcset="/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg 847w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-300x49.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-768x126.jpg 768w" sizes="(max-width: 847px) 100vw, 847px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zz_alv_autosumme.
+
+PARAMETERS p_total TYPE p DECIMALS 2.
+
+CLASS lcl_main DEFINITION.
+
+ PUBLIC SECTION.
+ METHODS start.
+ PROTECTED SECTION.
+ DATA mr_grid TYPE REF TO cl_gui_alv_grid.
+ DATA mt_data TYPE STANDARD TABLE OF spfli.
+ DATA mv_data_table TYPE tabname VALUE 'SPFLI'.
+ DATA mr_dock TYPE REF TO cl_gui_docking_container.
+ METHODS create_docker.
+ METHODS create_grid.
+ METHODS handle_delayed_selection
+ FOR EVENT delayed_changed_sel_callback
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ METHODS register_events.
+ METHODS select_data.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+ METHOD start.
+ select_data( ).
+ create_docker( ).
+ create_grid( ).
+ register_events( ).
+ ENDMETHOD.
+
+ METHOD create_docker.
+ "Create Docking container at bottom
+ CREATE OBJECT mr_dock
+ EXPORTING
+ side = cl_gui_docking_container=&gt;dock_at_bottom
+ ratio = 90
+ no_autodef_progid_dynnr = abap_false.
+
+ ENDMETHOD.
+
+ METHOD create_grid.
+ "Create ALV-Grid
+ CREATE OBJECT mr_grid
+ EXPORTING
+ i_appl_events = abap_true
+ i_parent = mr_dock.
+
+ "and display data
+ mr_grid-&gt;set_table_for_first_display(
+ EXPORTING
+ i_structure_name = mv_data_table
+ CHANGING
+ it_outtab = mt_data ).
+
+ "Set focus on grid so user can directly scroll and select cells via CTRL+Y
+ cl_gui_container=&gt;set_focus( mr_grid ).
+
+ ENDMETHOD.
+ METHOD handle_delayed_selection.
+
+ "Local data
+ DATA lt_cells TYPE lvc_t_cell.
+ DATA ls_cell LIKE LINE OF lt_cells.
+ DATA lv_total TYPE p DECIMALS 2.
+ DATA lv_val_type TYPE c.
+ DATA lv_index TYPE n LENGTH 2.
+ DATA lv_tablename TYPE string.
+ DATA lt_grouplevels TYPE lvc_t_grpl.
+ DATA ls_grouplevel LIKE LINE OF lt_grouplevels.
+
+ FIELD-SYMBOLS &lt;ref_data&gt; TYPE REF TO data.
+ FIELD-SYMBOLS &lt;table&gt; TYPE table.
+ FIELD-SYMBOLS &lt;warea&gt; TYPE any.
+ FIELD-SYMBOLS &lt;val&gt; TYPE any.
+
+ "data references to sub totals tables
+ DATA ld_ct00 TYPE REF TO data.
+ DATA ld_ct01 TYPE REF TO data.
+ DATA ld_ct02 TYPE REF TO data.
+ DATA ld_ct03 TYPE REF TO data.
+ DATA ld_ct04 TYPE REF TO data.
+ DATA ld_ct05 TYPE REF TO data.
+ DATA ld_ct06 TYPE REF TO data.
+ DATA ld_ct07 TYPE REF TO data.
+ DATA ld_ct08 TYPE REF TO data.
+ DATA ld_ct09 TYPE REF TO data.
+
+ "get selected cells (selection via CTRL + Y)
+ sender-&gt;get_selected_cells( IMPORTING et_cell = lt_cells ).
+
+ "If there is only one cell selected, we do not need to sum that...
+ CHECK lines( lt_cells ) &gt; 1.
+
+ "Read all cell values
+ LOOP AT lt_cells INTO ls_cell.
+
+ "in case of rowtype (normal cell, total or subtotal) assign correct data table
+ CASE ls_cell-row_id-rowtype(1).
+ "Total sum of all
+ WHEN 'T'.
+ sender-&gt;get_subtotals( IMPORTING ep_collect00 = ld_ct00 ).
+
+ ASSIGN ld_ct00 TO &lt;ref_data&gt;.
+ ls_cell-row_id-index = 1.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "subtotals
+ WHEN 'S'.
+ sender-&gt;get_subtotals( IMPORTING
+ ep_collect01 = ld_ct01
+ ep_collect02 = ld_ct02
+ ep_collect03 = ld_ct03
+ ep_collect04 = ld_ct04
+ ep_collect05 = ld_ct05
+ ep_collect06 = ld_ct06
+ ep_collect07 = ld_ct07
+ ep_collect08 = ld_ct08
+ ep_collect09 = ld_ct09
+ et_grouplevels = lt_grouplevels ).
+
+ lv_index = ls_cell-row_id-rowtype+4(2).
+ lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ ASSIGN (lv_tablename) TO &lt;ref_data&gt;.
+
+ READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+ IF sy-subrc = 0.
+ ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ ENDIF.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "Normal cell value
+ WHEN space.
+ ASSIGN mt_data TO &lt;table&gt;.
+ ENDCASE.
+
+
+ "Only read table line when index changes
+ AT NEW row_id.
+ READ TABLE &lt;table&gt; ASSIGNING &lt;warea&gt; INDEX ls_cell-row_id-index.
+ ENDAT.
+ "Assign selected fieldname of workarea
+ ASSIGN COMPONENT ls_cell-col_id OF STRUCTURE &lt;warea&gt; TO &lt;val&gt;.
+ IF sy-subrc = 0.
+ "check correct type of field: Only numeric fields will be taken
+ DESCRIBE FIELD &lt;val&gt; TYPE lv_val_type.
+ CASE lv_val_type.
+ WHEN 'P' "Packed
+ OR 'N' "Numchar
+ OR 'b' "Integer
+ OR 'a' "decfloat
+ OR 'e' "decfloat
+ OR 'F'. "Float?
+ "add cell value to total
+ ADD &lt;val&gt; TO lv_total.
+ ENDCASE.
+ ENDIF.
+ ENDLOOP.
+
+ IF lv_total IS NOT INITIAL.
+ "There were numeric fields selected and therefor we have a total to show:
+ MESSAGE s000(oo) WITH 'TOTAL:' space lv_total.
+ "Parameterfeld ebenfalls füllen
+ p_total = lv_total.
+ ENDIF.
+ ENDMETHOD.
+
+ METHOD register_events.
+ "Set handler
+ SET HANDLER handle_delayed_selection FOR mr_grid.
+ "register event for delayed selection
+ mr_grid-&gt;register_delayed_event( mr_grid-&gt;mc_evt_delayed_change_select ).
+ ENDMETHOD.
+
+ METHOD select_data.
+ "Select data
+ SELECT * FROM (mv_data_table) INTO TABLE mt_data UP TO 100 ROWS.
+ ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+ DATA(gr_main) = NEW lcl_main( ).
+ gr_main-&gt;start( ).</pre>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Gruppensummenstufenberechnung</title>
+		<link>/blog/gruppensummenstufenberechnung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 15 Dec 2015 22:06:40 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[soft-refresh]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Gruppe]]></category>
+		<category><![CDATA[Gruppenstufe]]></category>
+		<category><![CDATA[refresh]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=389721</guid>
+
+					<description><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten...</p>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten&#8230;</p>
+<p>Vielen Dank an Stefan, der sich die Mühe gemacht hat, ein Minimaldemo zu erstellen.</p>
+<h2>Gruppenstufen</h2>
+<p>Nach dem Start des Demoprogramms erscheint ein &#8220;normaler&#8221; ALV mit Daten aus der Flugdatenbank:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" rel="attachment wp-att-389724"><img loading="lazy" decoding="async" class="alignnone wp-image-389724 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" alt="2015-12-15_22-48-55" width="741" height="327" srcset="/wp-content/uploads/2015/12/2015-12-15_22-48-55.png 741w, /wp-content/uploads/2015/12/2015-12-15_22-48-55-300x132.png 300w" sizes="(max-width: 741px) 100vw, 741px" /></a></p>
+<p>Bei normaler Summierung und Bildung von Gruppenstufen, gibt es keine Bezeichnung der gebildeten Gruppen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" rel="attachment wp-att-389725"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-389725" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" alt="2015-12-15_22-50-50" width="740" height="285" srcset="/wp-content/uploads/2015/12/2015-12-15_22-50-50.png 740w, /wp-content/uploads/2015/12/2015-12-15_22-50-50-300x116.png 300w" sizes="(max-width: 740px) 100vw, 740px" /></a></p>
+<p>Die Bildung der Gruppenbezeichnung kann sehr komplex werden. Das Beispiel demonstriert die Bezeichnung der Gruppenstufen im Feld &#8220;PLANETYPE&#8221;:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" rel="attachment wp-att-389723"><img loading="lazy" decoding="async" class="alignnone wp-image-389723 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" alt="2015-12-15_22-41-44" width="752" height="322" srcset="/wp-content/uploads/2015/12/2015-12-15_22-41-44.png 752w, /wp-content/uploads/2015/12/2015-12-15_22-41-44-300x128.png 300w" sizes="(max-width: 752px) 100vw, 752px" /></a></p>
+<p>&nbsp;</p>
+<h2>Code</h2>
+<pre>REPORT zdemo_alv_summenzeilen.
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_helper DEFINITION FINAL.
+ PUBLIC SECTION.
+
+ CLASS-METHODS: read_data,
+ display,
+ handle_after_user_command FOR EVENT after_user_command OF cl_gui_alv_grid,
+ summenzeilen_anpassen.
+
+ CLASS-DATA: mo_grid TYPE REF TO cl_gui_alv_grid,
+ mt_data TYPE STANDARD TABLE OF saplane WITH NON-UNIQUE DEFAULT KEY.
+ENDCLASS. "lcl_helper DEFINITION
+
+
+START-OF-SELECTION.
+ lcl_helper=&gt;read_data( ).
+
+END-OF-SELECTION.
+ lcl_helper=&gt;display( ).
+
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_helper IMPLEMENTATION.
+
+ METHOD read_data.
+
+ SELECT *
+ INTO TABLE mt_data
+ FROM saplane.
+
+ ENDMETHOD. "read_data
+
+ METHOD display.
+
+ DATA: ls_variant TYPE disvariant.
+ WRITE:/ 'Wenn man das hier liest, ist ein interner Fehler aufgetreten'. "#EC NOTEXT
+
+*--------------------------------------------------------------------*
+* ALV erzeugen
+*--------------------------------------------------------------------*
+ CREATE OBJECT mo_grid
+ EXPORTING
+ i_parent = cl_gui_container=&gt;screen0
+ EXCEPTIONS
+ OTHERS = 1.
+
+*--------------------------------------------------------------------*
+* Event AFTER_USER_COMMAND nutzbar machen
+* Da sehr viele Usercommands ( auch SAP-Usercommands ) implizit einen
+* full-refresh des Grid durchführen, müssen wir uns stets dahinter klemmen
+* um unsere eigene Zwischensummenzeilengenerierung zu erhalten
+*--------------------------------------------------------------------*
+ SET HANDLER handle_after_user_command FOR mo_grid.
+
+*--------------------------------------------------------------------*
+* Defaultlayouts ermöglichen, um Zwischensummen ohne Userinteraktion zu demonstrieren
+*--------------------------------------------------------------------*
+ ls_variant-handle = '0001'.
+ ls_variant-report = sy-repid.
+
+*--------------------------------------------------------------------*
+* Anzeigen des grid
+*--------------------------------------------------------------------*
+ mo_grid-&gt;set_table_for_first_display( EXPORTING
+ i_structure_name = 'SAPLANE'
+ is_variant = ls_variant
+ i_save = 'A'
+ i_default = 'X'
+ CHANGING
+ it_outtab = mt_data
+ EXCEPTIONS
+ OTHERS = 1 ).
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "display
+
+ METHOD handle_after_user_command.
+*--------------------------------------------------------------------*
+* SAP hat evtl. noch keinen Refresh gemacht.
+* Daher würden Änderungen, die in der Methode summenzeilen_anpassen
+* gemacht und dann mit soft-refresh an den Grid gereicht würden im
+* Nachgang durch den ausstehenden full-refresh zunichte gemacht, da
+* der Grid beim full refresh auch die Summen- und Zwischensummenzeilen
+* neu generiert
+* Daher wird der full-refresh jetzt explizit vor unserer Anpassung
+* ausgeführt und der nachfolgende soft_refresh lässt unsere
+* Summenzeilen stehen.
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = ' ' ).
+
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "handle_AFTER_USER_COMMAND
+
+ METHOD summenzeilen_anpassen.
+
+ DATA: lr_data_summe TYPE REF TO data,
+ lr_data_zwischensumme TYPE REF TO data,
+ lt_grouplevels TYPE lvc_t_grpl, "#EC NEEDED Normalerweise braucht man das um gezielt die Zwischensummen zu manipulieren
+ lv_tabix TYPE numc2.
+
+ FIELD-SYMBOLS: &lt;lt_data&gt; LIKE mt_data,
+ &lt;ls_data&gt; LIKE LINE OF &lt;lt_data&gt;.
+*--------------------------------------------------------------------*
+* Zwischensummenzeilen holen -
+*--------------------------------------------------------------------*
+ mo_grid-&gt;get_subtotals( IMPORTING
+ ep_collect00 = lr_data_summe " Summenzeile
+ ep_collect01 = lr_data_zwischensumme " Zwischensummenzeile - Stufe 1
+* EP_COLLECT02 - EP_COLLECT09 Zwischensummenzeilen - Stufe 2-9
+ et_grouplevels = lt_grouplevels ). " Informationen welche Zwischensummenzeile(n) zu welchen Gridzeilen gehören
+
+*--------------------------------------------------------------------*
+* Hier kann das jetzt hinreichend komplex werden
+* Zur Demo werde ich in alle Summen und Zwischensummen im Feld
+* "PLANETYPE" etwas einfüllen
+*--------------------------------------------------------------------*
+ IF lr_data_summe IS BOUND.
+ ASSIGN lr_data_summe-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe1-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+ IF lr_data_zwischensumme IS BOUND.
+ ASSIGN lr_data_zwischensumme-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe2-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+
+*--------------------------------------------------------------------*
+* ALV-Anzeige neu aufbauen lassen, ohne Zwischensummen vom ALV generieren zu lassen
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = 'X' ).
+
+ ENDMETHOD. "summenzeilen_anpassen
+ENDCLASS. "lcl_helper IMPLEMENTATION</pre>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

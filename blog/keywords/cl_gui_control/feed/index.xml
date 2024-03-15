@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_gui_control Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_gui_control/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:48 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_gui_control Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Controls stapeln</title>
+		<link>/blog/controls-stapeln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Mar 2017 19:56:15 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[cl_gui_control]]></category>
+		<category><![CDATA[control]]></category>
+		<category><![CDATA[sichtbarkeit]]></category>
+		<category><![CDATA[set_visible]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017943</guid>
+
+					<description><![CDATA[<p>Heute ist mir wieder eine kleine Spielerei unter die Finger gekommen, die einerseits wichtige Grundlagen zeigt und andererseits eine nette Spielerei ist, die durchaus einen Nutzwert hat. Es geht um die Anzeige und Steuerung von Controls.</p>
+<p>Der Beitrag <a href="/blog/controls-stapeln/">Controls stapeln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute ist mir wieder eine kleine Spielerei unter die Finger gekommen, die einerseits wichtige Grundlagen zeigt und andererseits eine nette Spielerei ist, die durchaus einen Nutzwert hat. Es geht um die Anzeige und Steuerung von Controls.</p>
+<p>Um ein Control anzeigen zu können, benötigt man einen Container. In diesem Beispiel verwende ich einen Docking-Container.</p>
+<pre class="">go_dock = NEW #( side = cl_gui_docking_container=&gt;dock_at_right ratio = 80 ).</pre>
+<p>In diesen Container hänge ich ein Text-Control.</p>
+<pre class="">go_text = NEW #( parent = go_dock ).</pre>
+<p>Allerdings ist das noch nichts Besonderes.</p>
+<h2>Controls stapeln</h2>
+<p>Besonders wird es, wenn ich noch ein ALV-Grid und noch ein Picture-Control in den gleichen Container packe.</p>
+<pre class="">" ALV-Grid
+go_grid = NEW #( i_parent = go_dock ).
+go_grid-&gt;set_table_for_first_display(
+  EXPORTING i_structure_name = 'T000'
+  CHANGING it_outtab = gt_data_alv ).
+
+" Picture
+go_pic = NEW cl_gui_picture( parent = go_dock ).</pre>
+<p>Die Controls sind nun gewissermaßen gestapelt. Sie liegen übereinander in dem Container. Das zuletzt instantiierte Control wird angezeigt. Die anderen Controls sind jedoch noch da! Und sie sind auch nutzbar. Man muss lediglich die jeweils darüber liegenden Controls auf &#8220;nicht sichtbar&#8221; stellen.</p>
+<p>Jedes Control hat die Methode SET_VISIBLE mit der man die Sichtbarkeit eines Controls steuern kann (Vererbung von CL_GUI_CONTROL). Jeder Container hat übrigens ebenfalls diese Eigenschaft (denn auch diese erben von CL_GUI_CONTROL)! Das heißt, es kann auch ein Docking-Container komplett ausgeblendet werden, ohne dass er wirklich &#8220;weg&#8221; ist.</p>
+<p>In seltenen Fällen kann man sich diesen Umstand zu Nutze machen. Bei diesem Trick verwende ich ein ähnliches Verfahren: Werte aus Excel per DOI (unsichtbar). Hier wird nur nicht der Container unsichtbar geschaltet, sondern das Control wird an ein Standard-Dynpro gehängt, dass nicht angezeigt wird.</p>
+<p>Man kann also dadurch, dass man nur das gewünschte Control auf &#8220;sichtbar&#8221; und alle anderen auf &#8220;unsichtbar&#8221; stellt, zwischen den einzelnen Control hin- und her schalten. Es ist dementsprechend nicht notwendig, das im Container befindliche Control zu zerstören und das neue aufzubauen um einen Wechsel zu realisieren.</p>
+<h2>Beliebter Fehler</h2>
+<p>Den Zustand, den ich hier bewusst und mit voller Absicht herbei führe, ist wahrscheinlich schon häufig die Ursache vieler verzweifelter Stunden im Debugger und einiger grauer Haare gewesen. Häufig passiert es nämlich (nicht nur Anfängern, sondern auch Profis!), dass man ein und dasselbe Control mehrfach instantiiert und dem gleichen Container zuordnet. Das macht SAP auch klaglos mit und stellt die neuen Control-Instanzen immer wieder in den Container hinein. Sichtbar ist einzig und allein das zuerst erzeugte Control.</p>
+<p>Das ist genau das tückische daran, denn durch diesen Umstand ergeben sich eine Vielzahl von Symptomen, die man sich auch nach stundenlangem Debugging häufig nicht erklären kann:</p>
+<ul>
+<li>Geänderte Daten werden nicht im ALV-Grid angezeigt</li>
+<li>Datenänderungen werden vom ALV nicht in die interne Tabelle übernommen</li>
+<li>Doppelklick funktioniert nicht mehr</li>
+<li>Änderungen am Control werden nicht sichtbar (geändertes Bild, Icon, aktualisierte Website, &#8230;)</li>
+</ul>
+<p>Sofern man daran denkt, dass der Fehler einer Mehrfach-Instantiierung vielleicht vorliegen könnte, kann man sehr leicht prüfen, ob das wirklich der Fall ist. Jeder Container hat das Attribut CHILDREN. In dieser Tabelle werden die dem Container zugeordneten Controls verwaltet:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-36-42.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017947 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-36-42.jpg" alt="" width="288" height="199" /></a></p>
+<p>Wenn man in seinem Programm zwar den Container nur einmal erzeugt, aber bei jedem Tastendruck (PAI) eventuell ein neues Control, dann könnte es so aussehen, wie hier:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-42-31.jpg"><img decoding="async" class="size-full wp-image-1017948 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-42-31.jpg" alt="" width="295" height="327" srcset="/wp-content/uploads/2017/03/2017-03-29_21-42-31.jpg 295w, /wp-content/uploads/2017/03/2017-03-29_21-42-31-271x300.jpg 271w" sizes="(max-width: 295px) 100vw, 295px" /></a></p>
+<p>[notice type=&#8217;info&#8217;]TIPP<br />
+In den meisten Fällen ist es sinnvoll und ausreichend, wenn man abfragt, ob der Container bereits erzeugt wurde. Falls er noch nicht erzeugt wurde (Programmstart etc.), dann erzeugt man den Container und auch gleich das Control.[/notice]</p>
+<p>Häufig treten solche Fehler auf, wenn man Codezeilen von einer Routine oder Methode in ein Programm-Ereignis kopiert oder umgekehrt. Auf einmal befindet sich der Codeabschnitt, der vorher nur einmal aufgerufen wurde, an einer Stelle im Programm, die mehrmals durchlaufen wird.</p>
+<h2>Screenshots</h2>
+<p>Die Anzeige wird über die entsprechenden Radiobuttons gesteuert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-17.jpg"><img decoding="async" class="size-full wp-image-1017946 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-17.jpg" alt="" width="690" height="525" srcset="/wp-content/uploads/2017/03/2017-03-29_21-37-17.jpg 690w, /wp-content/uploads/2017/03/2017-03-29_21-37-17-300x228.jpg 300w" sizes="(max-width: 690px) 100vw, 690px" /></a> <a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-37.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017945 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-37.jpg" alt="" width="690" height="525" srcset="/wp-content/uploads/2017/03/2017-03-29_21-37-37.jpg 690w, /wp-content/uploads/2017/03/2017-03-29_21-37-37-300x228.jpg 300w" sizes="(max-width: 690px) 100vw, 690px" /></a> <a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-48.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017944 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-48.jpg" alt="" width="690" height="525" srcset="/wp-content/uploads/2017/03/2017-03-29_21-37-48.jpg 690w, /wp-content/uploads/2017/03/2017-03-29_21-37-48-300x228.jpg 300w" sizes="(max-width: 690px) 100vw, 690px" /></a></p>
+<h2>Code</h2>
+<pre class="">REPORT zz_switch_controls.
+
+
+*== Data
+DATA gt_data_alv TYPE STANDARD TABLE OF t000 WITH NON-UNIQUE DEFAULT KEY.
+DATA go_dock TYPE REF TO cl_gui_docking_container.
+DATA go_text TYPE REF TO cl_gui_textedit.
+DATA go_grid TYPE REF TO cl_gui_alv_grid.
+DATA go_pic TYPE REF TO cl_gui_picture.
+
+*== Selektionsbild
+PARAMETERS: rb_text RADIOBUTTON GROUP rb1 DEFAULT 'X' USER-COMMAND space,
+ rb_grid RADIOBUTTON GROUP rb1,
+ rb_pic RADIOBUTTON GROUP rb1.
+
+AT SELECTION-SCREEN.
+ "steuern der controls
+  CASE 'X'.
+    WHEN rb_grid. 
+      go_text-&gt;set_visible( space ).
+      go_pic-&gt;set_visible( space ).
+      go_grid-&gt;set_visible( 'X' ).
+    WHEN rb_text.
+      go_text-&gt;set_visible( 'X' ).
+      go_pic-&gt;set_visible( space ).
+      go_grid-&gt;set_visible( space ).
+    WHEN rb_pic.
+      go_text-&gt;set_visible( space ).
+      go_pic-&gt;set_visible( 'X' ).
+      go_grid-&gt;set_visible( space ).
+  ENDCASE.
+
+INITIALIZATION.
+
+*== Docker
+ go_dock = NEW #( side = cl_gui_docking_container=&gt;dock_at_right ratio = 80 ).
+
+*== Textedit
+ go_text = NEW #( parent = go_dock ).
+
+*== ALV-Grid
+ SELECT *
+ INTO TABLE gt_data_alv
+ FROM t000.
+
+ go_grid = NEW #( i_parent = go_dock ).
+ go_grid-&gt;set_table_for_first_display(
+     EXPORTING i_structure_name = 'T000'
+     CHANGING it_outtab = gt_data_alv ).
+
+*== Picture
+ go_pic = NEW cl_gui_picture( parent = go_dock ).
+ go_pic-&gt;load_picture_from_sap_icons( icon_booking_ok ).
+ go_pic-&gt;set_display_mode( cl_gui_picture=&gt;display_mode_fit ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/controls-stapeln/">Controls stapeln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Slider (2)</title>
+		<link>/blog/slider-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 08 Mar 2012 14:51:23 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[shellstyle]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_custom_container]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[cl_gui_textedit]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<category><![CDATA[cl_gui_control]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[register events]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[OCX]]></category>
+		<category><![CDATA[class definition]]></category>
+		<category><![CDATA[class implementation]]></category>
+		<category><![CDATA[set property]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=638</guid>
+
+					<description><![CDATA[<p>Noch eine Variante des Sliders. Diesmal mithilfe einer Windows-OCX-Bibliothek. Der Slider hat keine Beschriftung, hat aber den Vorteil, dass auf eine Wert&#228;nderung sofort reagiert werden kann.</p>
+<p>Der Beitrag <a href="/blog/slider-2/">Slider (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Noch eine Variante des Sliders. Diesmal mithilfe einer Windows-OCX-Bibliothek. Der Slider hat keine Beschriftung, hat aber den Vorteil, dass auf eine Wertänderung sofort reagiert werden kann.</p>
+<h2 class="head1">Dynpro</h2>
+<p>Sie müssen das Dynpro 9000 anlegen mit folgenden &#8220;Custom Containern&#8221;:</p>
+<ul>
+<li>CONTAINER_TEXT</li>
+<li>SLIDER_TOP</li>
+<li>SLIDER_LEFT</li>
+</ul>
+<p><code> +----------------------------------------+<br />
+|  SLIDER_TOP                            |<br />
++----+----------------------------------------+<br />
+|    |                                        |<br />
+| SL |  CONTAINER_TEXT                        |<br />
+| ID |                                        |<br />
+| ER |                                        |<br />
+| _  |                                        |<br />
+| LE |                                        |<br />
+| FT |                                        |<br />
+|    |                                        |<br />
+|    |                                        |<br />
++----+----------------------------------------+</code></p>
+<h2 class="head1">Screenshot</h2>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/slider2.jpg" /><br />
+So sieht der Slider aus</td>
+</tr>
+</tbody>
+</table>
+<h2 class="head1">Coding</h2>
+<pre>REPORT.
+
+DATA: gcl_text TYPE REF TO cl_gui_textedit.
+
+*----------------------------------------------------------------------*
+* CLASS my_slider DEFINITION
+*----------------------------------------------------------------------*
+CLASS my_slider DEFINITION INHERITING FROM cl_gui_control.
+PUBLIC SECTION.
+METHODS: constructor
+IMPORTING
+value(parent) TYPE REF TO cl_gui_object
+value(name) TYPE string OPTIONAL
+value(style) TYPE i OPTIONAL
+value(orientation) TYPE i
+DEFAULT 0 " 1 = vertical
+value(maximum) TYPE i
+DEFAULT 10
+value(event_while_move) TYPE flag
+DEFAULT ' '
+EXCEPTIONS error_cntl_create
+gui_type_not_supported,
+dispatch REDEFINITION.
+EVENTS: on_change EXPORTING value(slider_position) TYPE i.
+
+DATA: event_while_move TYPE flag.
+
+PRIVATE SECTION.
+METHODS: register_events.
+
+ENDCLASS. "my_slider DEFINITION
+
+*----------------------------------------------------------------------*
+* CLASS LCL_eventreceiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_eventreceiver DEFINITION.
+PUBLIC SECTION.
+CLASS-METHODS: handle_on_change FOR EVENT on_change
+OF my_slider
+IMPORTING sender
+slider_position.
+ENDCLASS. "LCL_eventreceiver DEFINITION
+
+END-OF-SELECTION.
+PERFORM create_objects.
+CALL SCREEN 9000.
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form CREATE_OBJECTS
+*&amp;---------------------------------------------------------------------*
+FORM create_objects.
+
+DATA repid TYPE syrepid.
+DATA dynnr TYPE sydynnr.
+DATA cl_container TYPE REF TO cl_gui_custom_container.
+DATA cl_container2 TYPE REF TO cl_gui_custom_container.
+
+repid = sy-repid.
+dynnr = '9000'.
+
+CREATE OBJECT cl_container
+EXPORTING
+container_name = 'CONTAINER_TEXT'
+repid = repid
+dynnr = dynnr.
+CREATE OBJECT gcl_text
+EXPORTING
+parent = cl_container.
+
+DATA: cl_slider TYPE REF TO my_slider.
+
+CREATE OBJECT cl_container
+EXPORTING
+container_name = 'SLIDER_TOP'
+repid = repid
+dynnr = dynnr.
+CREATE OBJECT cl_slider
+EXPORTING
+parent = cl_container
+maximum = 20
+event_while_move = 'X'.
+SET HANDLER lcl_eventreceiver=&gt;handle_on_change FOR cl_slider.
+
+CREATE OBJECT cl_container
+EXPORTING
+container_name = 'SLIDER_LEFT'
+repid = repid
+dynnr = dynnr.
+CREATE OBJECT cl_slider
+EXPORTING
+parent = cl_container
+maximum = 5
+orientation = 1.
+SET HANDLER lcl_eventreceiver=&gt;handle_on_change FOR cl_slider.
+
+ENDFORM. " CREATE_OBJECTS
+
+*----------------------------------------------------------------------*
+* CLASS my_slider IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS my_slider IMPLEMENTATION.
+
+METHOD dispatch.
+
+DATA: value TYPE i.
+
+GET PROPERTY OF me-&gt;h_control-obj 'Value' = value.
+RAISE EVENT on_change EXPORTING slider_position = value.
+
+ENDMETHOD. "dispatch
+
+METHOD register_events.
+DATA: ex_event TYPE cntl_event.
+DATA: events_ex TYPE cntl_events. " table
+
+IF me-&gt;event_while_move = 'X'.
+ex_event-eventid = 1."Jede Bewegung
+ELSE.
+ex_event-eventid = 2."Nur am ende
+ENDIF.
+ex_event-is_shellevent = ' '.
+ex_event-is_systemevent = 'X'.
+
+APPEND ex_event TO events_ex.
+CALL METHOD me-&gt;set_registered_events_ex
+EXPORTING
+eventtab = events_ex.
+
+ENDMETHOD. "register_events
+
+METHOD constructor.
+DATA prog_id(80).
+
+IF parent IS INITIAL.
+RAISE error_cntl_create.
+ENDIF.
+
+CLASS cl_gui_cfw DEFINITION LOAD.
+
+* assign prog_id to get the frontend specific control
+IF NOT activex IS INITIAL.
+prog_id = 'MSComctlLib.Slider'.
+ELSEIF NOT javabean IS INITIAL.
+RAISE gui_type_not_supported.
+ENDIF.
+
+IF prog_id IS INITIAL.
+RAISE gui_type_not_supported.
+ENDIF.
+
+* Set the window styles of the control when style parameter was not
+* set with constructor call.
+* For more information on the styles see WIN32 SDK
+IF style IS INITIAL.
+* otherwise the control would be invisible and the mistake would be
+* hard to find
+style = cl_gui_control=&gt;ws_visible
++ cl_gui_control=&gt;ws_child
++ cl_gui_control=&gt;ws_clipsiblings.
+
+ENDIF.
+
+* Create the control
+CALL METHOD super-&gt;constructor
+EXPORTING
+clsid = prog_id
+shellstyle = style
+parent = parent
+lifetime = lifetime
+name = name
+EXCEPTIONS
+OTHERS = 1.
+
+IF sy-subrc &lt;&gt; 0.
+RAISE error_cntl_create.
+ENDIF.
+
+me-&gt;event_while_move = event_while_move.
+
+* Slidereigenschaften
+SET PROPERTY OF me-&gt;h_control-obj 'Max' = maximum.
+SET PROPERTY OF me-&gt;h_control-obj 'Orientation' = orientation.
+SET PROPERTY OF me-&gt;h_control-obj 'Text' = 'Tricktresor-Slider'.
+
+* register instance at framework
+CALL METHOD cl_gui_cfw=&gt;subscribe
+EXPORTING
+shellid = h_control-shellid
+ref = me
+EXCEPTIONS
+OTHERS = 1.
+
+IF sy-subrc &lt;&gt; 0.
+RAISE error_cntl_create.
+ENDIF.
+me-&gt;register_events( ).
+ENDMETHOD. "constructor
+
+ENDCLASS. "my_slider IMPLEMENTATION
+
+*----------------------------------------------------------------------*
+* CLASS LCL_eventreceiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_eventreceiver IMPLEMENTATION.
+METHOD handle_on_change.
+
+DATA text TYPE string.
+DATA: slider TYPE REF TO my_slider.
+
+slider ?= sender.
+
+WRITE slider_position TO sy-lisel LEFT-JUSTIFIED.
+IF slider-&gt;event_while_move = 'X'.
+CONCATENATE 'X-Position: Moving to' sy-lisel
+INTO text SEPARATED BY space.
+ELSE.
+CONCATENATE 'Y-Position: End of Move:' sy-lisel
+INTO text SEPARATED BY space.
+ENDIF.
+
+gcl_text-&gt;set_textstream( EXPORTING text = text ).
+ENDMETHOD. "handle_on_change
+ENDCLASS. "LCL_eventreceiver DEFINITION</pre>
+<p>Der Beitrag <a href="/blog/slider-2/">Slider (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>MS Agenten Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/ms-agenten/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 02 Jul 2018 09:58:26 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>MS Agenten Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Merlin in Aktion</title>
+		<link>/blog/merlin-in-aktion/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 12 May 2006 14:37:21 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[MS Agenten]]></category>
+		<category><![CDATA[Agenten]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=372</guid>
+
+					<description><![CDATA[<p>Dieses Programm zeigt Merlin in Aktion. Es begleitet den Anwender durch das Programm und hilft ihm bei der Dateneingabe.</p>
+<p>Der Beitrag <a href="/blog/merlin-in-aktion/">Merlin in Aktion</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>[notice type=&#8217;info&#8217;]Leider funktioniert Merlin nicht mehr, da es den Assistenten nicht mehr gibt. Dummerweise habe ich auch keine Screenshots gemacht, denn es sah wirklich ganz putzig aus, Merlin in Aktion zu sehen.[/notice]</p>
+<p>Dieses Programm zeigt Merlin in Aktion. Es begleitet den Anwender durch das Programm und hilft ihm bei der Dateneingabe.</p>
+<p>Wahrscheinlich lassen sich auch noch andere Windows-Objekte in SAP einbinden. Ein Beispiel ist z.B. eine Anwendung, in der der Mediaplayer zum Abspielen von MP3-Dateien verwendet wird:</p>
+<h2><strong>SAP Developer Network</strong><br />
+<a href="https://www.sdn.sap.com/irj/sdn/weblogs?blog=/pub/wlg/995" target="_blank" rel="noopener">https://www.sdn.sap.com/irj/sdn/weblogs?blog=/pub/wlg/995</a></h2>
+<p>Falls jemand eine Idee hat, welche Windows-Objekte noch sinnvoll in SAP eingebunden werden könnten, freue ich mich auf eine <a href="https://tricktresor.com/content/index.php?aID=21" target="_blank" rel="noopener">Info</a>!</p>
+<p class="head1">Microsoft(R)</p>
+<p>Hier stehen noch Infos zur Programmierung des Agenten:<br />
+<a href="http://msdn2.microsoft.com/en-us/library/ms696328.aspx" target="_blank" rel="noopener">http://msdn2.microsoft.com/en-us/library/ms696328.aspx</a></p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true">*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZZ_Agent_Demo                                               *
+*&amp;---------------------------------------------------------------------*
+* Einbindung des Microsoft (R) Agenten in SAP R/3                      *
+*----------------------------------------------------------------------*
+*                                                                      *
+*                                                                      *
+*                    https://tricktresor.com                        / *
+*                                                                      *
+*                                                                      *
+*----------------------------------------------------------------------*
+* Agents Animations:                                                   *
+* http://msdn.microsoft.com/library/                                   *
+* default.asp?url=/library/en-us/msagent/pacontrol_41gq.asp            *
+*----------------------------------------------------------------------*
+* Weitere Agents zum Download:                                         *
+* http://www.msagentring.org/                                          *
+*----------------------------------------------------------------------*
+* Downloads zu Agenten:                                                *
+* http://www.microsoft.com/msagent/downloads/user.asp                  *
+*----------------------------------------------------------------------*
+* MASH: Microsoft Agent Scripting Helper                               *
+* MASH is an easy-to-use program that lets you record and playback     *
+* entertaining Microsoft Agent character presentations by simply       *
+* dragging characters around the screen and directing what they        *
+* say and do.                                                          *
+* http://www.bellcraft.com/mash/download.aspx                          *
+*----------------------------------------------------------------------*
+
+REPORT zz_agent_demo.
+
+
+*** Klassen
+CLASS cl_agent     DEFINITION DEFERRED.
+CLASS cl_char_coll DEFINITION DEFERRED.
+CLASS cl_char      DEFINITION DEFERRED.
+CLASS cl_gui_cfw   DEFINITION LOAD.
+
+*** Welcher Agent soll gestartet werden?
+CONSTANTS:
+      cr_agent     TYPE string   VALUE 'Merlin.acs'.
+
+DATA: gr_agent     TYPE REF TO cl_agent,
+      gr_name(80)  TYPE c,
+      gr_text      TYPE string,
+      gr_control   TYPE REF TO cl_gui_custom_container,
+      gr_chars     TYPE REF TO cl_char_coll,
+      gr_char      TYPE REF TO cl_char.
+
+*** Selektionsbild
+SELECTION-SCREEN BEGIN OF BLOCK dat WITH FRAME TITLE text-dat.
+PARAMETERS:
+  p_name(40) LOWER CASE,
+  p_datum TYPE sydatum.
+SELECTION-SCREEN END   OF BLOCK dat.
+
+*** Process Before Output
+AT SELECTION-SCREEN OUTPUT.
+
+
+*** Control und Agent erzeugen wenn dies noch nicht geschehen
+  IF gr_agent IS INITIAL.
+    PERFORM activate.
+  ENDIF.
+
+  IF p_name IS INITIAL.
+*** Agent hilft bei: Name
+    SET CURSOR FIELD 'P_NAME'.
+    PERFORM agent_help_name.
+
+  ELSEIF p_datum IS INITIAL.
+*** Agent hilft bei: Datum
+    SET CURSOR FIELD 'P_DATUM'.
+    PERFORM agent_help_datum.
+
+  ELSE.
+*** Agent sagt: "Daten sind vollständig"
+    PERFORM agent_help_start.
+  ENDIF.
+
+
+*----------------------------------------------------------------------*
+*       CLASS cl_Agent DEFINITION
+*----------------------------------------------------------------------*
+* Hier wird die eigene Wrapper Klasse definiert
+*----------------------------------------------------------------------*
+CLASS cl_agent DEFINITION INHERITING FROM cl_gui_control.
+
+  PUBLIC SECTION.
+    METHODS: constructor
+               IMPORTING container TYPE REF TO cl_gui_custom_container,
+             get_chars
+               RETURNING value(re_value) TYPE REF TO cl_char_coll.
+
+ENDCLASS.                    "cl_Agent DEFINITION
+
+*---------------------------------------------------------------------*
+*       CLASS cl_char DEFINITION
+*---------------------------------------------------------------------*
+CLASS cl_char DEFINITION INHERITING FROM cl_gui_object.
+
+*** Methoden der "Character"-Klasse
+  PUBLIC SECTION.
+    METHODS: constructor,
+             moveto
+               IMPORTING im_x TYPE int4
+                         im_y TYPE int4,
+             show,
+             hide,
+             stop,
+             play
+               IMPORTING im_animation TYPE string,
+             speak
+               IMPORTING im_value TYPE string.
+
+ENDCLASS.                    "cl_char DEFINITION
+
+*---------------------------------------------------------------------*
+*       CLASS cl_char_coll DEFINITION
+*---------------------------------------------------------------------*
+CLASS cl_char_coll DEFINITION INHERITING FROM cl_gui_object.
+
+  PUBLIC SECTION.
+    METHODS: constructor,
+             get_item
+               IMPORTING im_value TYPE string
+               RETURNING value(re_value) TYPE REF TO cl_char,
+             load
+               IMPORTING im_name TYPE string
+                         im_file TYPE string.
+
+ENDCLASS.                    "cl_char_coll DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS cl_Agent IMPLEMENTATION
+*----------------------------------------------------------------------**** Hier die Klasse implementiert
+CLASS cl_agent IMPLEMENTATION.
+  METHOD constructor.
+    CALL METHOD super-&gt;constructor
+      EXPORTING
+        clsid             = 'Agent.Control.2'
+      EXCEPTIONS
+        cntl_error        = 1
+        cntl_system_error = 2
+        create_error      = 3
+        lifetime_error    = 4
+        OTHERS            = 6.
+
+  ENDMETHOD.                    "constructor
+
+  METHOD get_chars.
+    CREATE OBJECT re_value.
+
+    CALL METHOD get_property_gui_object
+      EXPORTING
+        property            = 'Characters'
+        queue_only          = ' '
+        value_as_gui_object = re_value
+      EXCEPTIONS
+        cntl_error          = 1
+        cntl_system_error   = 2.
+    IF sy-subrc &lt;&gt; 0.
+
+    ENDIF.
+  ENDMETHOD.                    "get_chars
+
+ENDCLASS.                    "cl_Agent IMPLEMENTATION
+
+*---------------------------------------------------------------------*
+*       CLASS cl_char IMPLEMENTATION
+*---------------------------------------------------------------------*
+CLASS cl_char IMPLEMENTATION.
+
+  METHOD constructor.
+*** Konstruktor für eigene Klasse
+    CALL METHOD super-&gt;constructor( ).
+  ENDMETHOD.                    "constructor
+
+  METHOD moveto.
+*** Agent bewegt sich
+    CALL METHOD call_method
+      EXPORTING
+        p1                = im_x
+        p2                = im_y
+        method            = 'MoveTo'
+        p_count           = 2
+        queue_only        = space.
+  ENDMETHOD.                    "moveto
+
+  METHOD show.
+*** Agenten einblenden
+    CALL METHOD call_method
+      EXPORTING
+        method            = 'Show'
+        p_count           = 0
+        queue_only        = space.
+  ENDMETHOD.                    "show
+
+  METHOD stop.
+*** Ausführungen des Agenten anhalten
+    CALL METHOD call_method
+      EXPORTING
+        method            = 'Stop'
+        p_count           = 0
+        queue_only        = space.
+  ENDMETHOD.                    "stop
+
+  METHOD hide.
+*** Agenten ausblenden
+    CALL METHOD call_method
+      EXPORTING
+        method            = 'Hide'
+        p_count           = 0
+        queue_only        = space.
+  ENDMETHOD.                    "hide
+
+  METHOD speak.
+*** Agent spricht
+    CALL METHOD call_method
+      EXPORTING
+        p1                = im_value
+        method            = 'Speak'
+        p_count           = 1
+        queue_only        = space.
+  ENDMETHOD.                    "speak
+
+  METHOD play.
+*** Animationen des Agenten
+    CALL METHOD call_method
+      EXPORTING
+        p1                = 'Animation'
+        p2                = im_animation
+        method            = 'Get'
+        p_count           = 2
+        queue_only        = space.
+
+    CALL METHOD call_method
+      EXPORTING
+        p1                = im_animation
+        method            = 'Play'
+        p_count           = 1
+        queue_only        = space.
+  ENDMETHOD.                    "play
+
+ENDCLASS.                    "cl_char IMPLEMENTATION
+
+*---------------------------------------------------------------------*
+*       CLASS cl_char_coll IMPLEMENTATION
+*---------------------------------------------------------------------*
+CLASS cl_char_coll IMPLEMENTATION.
+
+  METHOD constructor.
+*** Konstruktor für eigene Klasse
+    CALL METHOD super-&gt;constructor( ).
+  ENDMETHOD.                    "constructor
+
+  METHOD get_item.
+*** Wert holen
+    CREATE OBJECT re_value.
+    CALL METHOD get_property_gui_object
+      EXPORTING
+        p1                  = im_value
+        property            = 'Item'
+        queue_only          = ' '
+        value_as_gui_object = re_value
+        p_count             = 1.
+  ENDMETHOD.                    "get_item
+
+  METHOD load.
+*** Agenten laden
+    CALL METHOD call_method
+      EXPORTING
+        p1                = im_name
+        p2                = im_file
+        method            = 'Load'
+        p_count           = 2
+        queue_only        = space.
+  ENDMETHOD.                    "load
+
+ENDCLASS.                    "cl_char_coll IMPLEMENTATION
+
+*--------------------------------------------------------------------*
+* Program Start
+*--------------------------------------------------------------------*
+START-OF-SELECTION.
+
+CALL METHOD gr_char-&gt;stop( ).
+WRITE: / 'Das war eine Demonstration des Microsoft (R) Agenten'.
+WRITE: / 'Präsentiert von www.Tricktresor.de'.
+
+END-OF-SELECTION.
+
+
+
+*&amp;--------------------------------------------------------------------*
+*&amp;      Form  activate
+*&amp;--------------------------------------------------------------------*
+FORM activate.
+
+*** Objekt "Agent" erzeugen
+  CREATE OBJECT gr_agent
+     EXPORTING
+        container          = gr_control.
+
+*** Agenten laden
+  gr_chars = gr_agent-&gt;get_chars( ).
+  CALL METHOD gr_chars-&gt;load( im_name = 'Agent'
+                              im_file = cr_agent ).
+  gr_char = gr_chars-&gt;get_item( 'Agent' ).
+  gr_char-&gt;moveto( im_x = 400
+                   im_y = 125 ).
+  gr_char-&gt;show( ).
+
+ENDFORM.                    "activate
+
+*&amp;--------------------------------------------------------------------*
+*&amp;      Form  agent_help_name
+*&amp;--------------------------------------------------------------------*
+FORM agent_help_name.
+
+  gr_char-&gt;stop( ).
+  gr_char-&gt;moveto(
+    im_x = 400
+    im_y = 125 ).
+  gr_char-&gt;play( im_animation = 'GestureRight' ).
+  gr_char-&gt;speak( 'Bitte gib hier deinen Namen ein...' ).
+  gr_char-&gt;play( im_animation = 'Idle3_2' ).
+
+ENDFORM.                    "agent_help_name
+
+*&amp;--------------------------------------------------------------------*
+*&amp;      Form  agent_help_datum
+*&amp;--------------------------------------------------------------------*
+FORM agent_help_datum.
+
+  gr_char-&gt;stop( ).
+  gr_char-&gt;moveto(
+    im_x = 310
+    im_y = 150 ).
+  gr_char-&gt;play( im_animation = 'GestureRight' ).
+  gr_char-&gt;speak( 'Bitte gib hier das Datum ein...' ).
+
+ENDFORM.                    "agent_help_datum
+
+*&amp;--------------------------------------------------------------------*
+*&amp;      Form  agent_help_start
+*&amp;--------------------------------------------------------------------*
+FORM agent_help_start.
+
+  gr_char-&gt;stop( ).
+  gr_char-&gt;moveto(
+    im_x = 310
+    im_y = 120 ).
+  gr_char-&gt;play( im_animation = 'Congratulate' ).
+  gr_char-&gt;speak( 'Die Daten sind vollständig!' ).
+  gr_char-&gt;hide( ).
+
+ENDFORM.                    "agent_help_datum</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/merlin-in-aktion/">Merlin in Aktion</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

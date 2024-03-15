@@ -1,0 +1,1014 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>color Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/color/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 14 Apr 2020 13:01:33 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>color Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SimDia² &#8211; SAP-Datenimport einfach?</title>
+		<link>/blog/simdia2-sap-datenimport-einfach/</link>
+					<comments>/blog/simdia2-sap-datenimport-einfach/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 14 Apr 2014 15:24:30 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[Scripting]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[LSMW]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Popups]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Batch Input]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[Viewcluster]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4659</guid>
+
+					<description><![CDATA[<p>Für die Datenmigration von Fremdsystemen oder Excel stehen in SAP viele Möglichkeiten offen. In diesem Artikel stelle ich euch SimDia² vor mit dem die Datenübernahme aus Exceldateien ein Kinderspiel wird. Die Übernahme der Felder wird durch einfaches Anklicken im SAPGUI definiert. Es können "Kopfdaten" und "Positionsdaten" übernommen werden. </p>
+<p>Der Beitrag <a href="/blog/simdia2-sap-datenimport-einfach/">SimDia² &#8211; SAP-Datenimport einfach?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><span style="line-height: 1.5em;">[pullquote float=&#8217;left&#8217; color=&#8217;#000000&#8242; bgcolor=&#8217;#ffffff&#8217;]Wir schärfen Ihre Axt, während Sie den Baum fällen.[/pullquote] So lautet das Motto von </span><a style="line-height: 1.5em;" title="ERSAsoft | Homepage" href="https://ersasoft.de/de?s=tt">ERSAsoft</a><span style="line-height: 1.5em;">.&nbsp;</span>Der Slogan ist eine Anspielung auf das Zitat „Ich hab keine Zeit meine Axt zu schärfen. Ich muss einen Baum fällen.“ aus der Erzählung „Komm, ich erzähl dir eine Geschichte“ von <a title="Jorge Bucay | Wikipedia" href="http://de.wikipedia.org/wiki/Jorge_Bucay">Jorge Bucay</a>.</p>
+<p>Er soll den Anspruch von ERSAsoft verdeutlichen, Tools zu entwickeln, die „den Umgang mit SAP so einfach und komfortabel wie möglich gestalten“. Ob das Datenimport-Tool SimDia²&nbsp; diesem Anspruch wirklich gerecht wird, wollte ich prüfen.</p>
+<h2>Was ist SimDia²?</h2>
+<p><a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist ein ein Tool, um Daten aus Excel nach SAP zu importieren. Dabei arbeitet das Programm direkt im SAPGUI-Dialog. Damit wird auch schnell klar, welche Zielrichtung SimDia² verfolgt: den Import kleinster bis mittlerer Datenmengen (von zwei bis &gt;10.000 Datensätzen). Für wirklich große Datenmigrationen mit mehreren 100.000 oder gar Millionen Datensätzen ist es nicht gedacht.</p>
+<p>Aufgaben, bei denen Daten von Excel in eine SAP-Transaktion übertragen werden, sollen mit SimDia² einfacher werden. Auf der&nbsp;<a title="Demo-Videos | SimDia²" href="https://ersasoft.de/de/videos/?s=tt">Video-Seite&nbsp;</a>werden deswegen auch typische Beispiele aus der täglichen Arbeit eines SAP-Fachanwenders vorgestellt: Personaldaten erfassen, Rechnungen buchen oder Materialstücklisten einpflegen.</p>
+<p>Diese Videos habe ich mir natürlich angesehen und war begeistert. Das Versprechen „Dateneingabe so einfach und komfortabel wie möglich“ war offensichtlich kein leeres. Und dass man damit wohl auch mehr machen kann, als Stamm- und Bewegungsdaten zu importieren, war mir schnell klar. Aber dazu später mehr.</p>
+<h2>Technik</h2>
+<p><span style="line-height: 1.5em;"><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_05_56.jpg"><img fetchpriority="high" decoding="async" class="alignright size-medium wp-image-4662" src="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_05_56-300x255.jpg" alt="simdia und se11" width="300" height="255" srcset="/wp-content/uploads/2014/03/03_21_17_05_56-300x255.jpg 300w, /wp-content/uploads/2014/03/03_21_17_05_56-624x531.jpg 624w, /wp-content/uploads/2014/03/03_21_17_05_56.jpg 861w" sizes="(max-width: 300px) 100vw, 300px" /></a>Nachdem ich mich in meinem SAP-Leben bereits häufiger mit den verschiedensten Tools zur Datenübernahme beschäftigt habe, war ich gespannt, was SimDia² zu bieten hat. Bei meinem ersten Kontakt mit dem Tool fand ich es spontan sehr innovativ und hilfreich, dass sich das SimDia²-Fenster in den SAP GUI integriert. Technisch stimmt das zwar nicht, denn SimDia²&nbsp; ist ein reines Windows-Programm mit einem eigenen Fenster, das sich über den SAP GUI legt, aber es sieht zuerst einmal so aus, als wäre das Tool nahtlos in SAP integriert.</span></p>
+<p>Das Programm verwendet die SAP GUI Scripting API, um Daten mit SAP GUI auszutauschen sowie VBA als Schnittstelle zu Excel. Ein gravierender Vorteil der Realisierung als Windows-Programm: außer einem aktivierten GUI-Scripting sind keinerlei Eingriffe in SAP erforderlich.</p>
+<p>Darüber hinaus ist SimDia² praktisch „out-of-the-box“ ablauffähig. Ausgeliefert wird es als ZIP-Archiv: nach dem Entpacken ist es <a href="https://ersasoft.de/de/videos/?s=tt#Video1">sofort startklar</a>.</p>
+<h2>Anwendung</h2>
+<p>Wie erwähnt, ist SimDia² als Datenimport-Tool konzipiert. Diese Aufgabe bewältigte es in den (wenigen) von mir durchgeführten Tests problemlos. Da ich aber aus der Entwicklung komme und eher selten (eigentlich: nie) typische Daten-Imports durchführen muss, habe ich überlegt, mit welcher Anwendung ich SimDia² noch testen könnte.</p>
+<p>Dabei stieß ich auf eine Tätigkeit, die mich jedes Mal schrecklich nervt: das Anlegen von Datenelementen und den dazugehörigen Domänen in ABAP. Da meine Entwicklungen in der Regel eher übersichtlich sind, kommt das massenweise Anlegen von Datenelementen und Domänen bei mir nicht häufig vor. Ich kann mir jedoch gut vorstellen, dass SimDia² bei größeren Projekten, in denen zuvor ein umfangreiches Datenmodell erstellt wird, gut zum Einsatz kommen kann.</p>
+<p>Hierfür könnten die Attribute von allen Datenelementen und Domänen in einer Excel-Datei einfach erfasst, diskutiert und gegebenenfalls noch geändert werden. Sobald die Entwicklung in SAP beginnt, lässt man die Repository Objekte durch SimDia²&nbsp;anlegen.</p>
+<p>Um zu prüfen, wie SimDia² mit Popups, Radiobuttons und Ankreuzfeldern klar kommt, wollte ich Datenelement und Domäne in einem Rutsch anlegen. Alle notwendigen Attribute hatte ich in einer Excel-Datei gespeichert und die Aufzeichnung gestartet.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/04_14_16_53_40.jpg"><img decoding="async" class="size-medium wp-image-4707 alignleft" src="https://tricktresor.com/wp-content/uploads/2014/03/04_14_16_53_40-300x158.jpg" alt="simdia Excel" width="300" height="158" srcset="/wp-content/uploads/2014/03/04_14_16_53_40-300x158.jpg 300w, /wp-content/uploads/2014/03/04_14_16_53_40-624x330.jpg 624w, /wp-content/uploads/2014/03/04_14_16_53_40.jpg 724w" sizes="(max-width: 300px) 100vw, 300px" /></a><span style="line-height: 1.5em;">Für die Aufzeichnung werden im SimDia²-Fenster die Daten aus der ersten Tabellenzeile als Druckknöpfe angezeigt.</span></p>
+<p>Zur programm-internen <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial1">Verknüpfung der Excel-Daten mit den jeweiligen SAP-Feldern</a> positioniert man einfach den Cursor im gewünschten SAP-Feld und klickt im SimDia²-Fenster auf den entsprechenden Button. Der Wert wird daraufhin übernommen und die Aktion aufgezeichnet. So verfährt man, bis alle erforderlichen Felder und Aktionen in SAP erfolgt und aufgezeichnet sind.&nbsp;Und das geht nun wirklich schnell, einfach und intuitiv.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_07_33.jpg"><img decoding="async" class="alignright size-medium wp-image-4664" src="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_07_33-236x300.jpg" alt="simdia_buttons" width="236" height="300" srcset="/wp-content/uploads/2014/03/03_21_17_07_33-236x300.jpg 236w, /wp-content/uploads/2014/03/03_21_17_07_33.jpg 415w" sizes="(max-width: 236px) 100vw, 236px" /></a></p>
+<p><b>Funktionalität</b></p>
+<p>SimDia² kann grundsätzlich mit allen SAP-Dynpros und Transaktionen arbeiten (einige Transaktionen sind allerdings zur Automatisierung nicht besonders gut geeignet; s.u.). Dabei ist es egal, ob es sich um Standard-, modifizierte oder kundeneigene Transaktionen handelt. Auch nachträgliche Dynpro-Änderungen sind unproblematisch &#8211; solange keine in der Aufzeichnung benutzte Datenfelder entfernt werden.</p>
+<p>Während des Imports werden alle SAP-Meldungen direkt in der Excel-Datei protokolliert, sodass alle innerhalb von SAP durchgeführten Verarbeitungsschritte nachvollzogen werden können.</p>
+<p>Darüber hinaus enthält SimDia² einige Funktionen, die ich in anderen Import-Tools noch nie gesehen habe. Hier nur zwei Beispiele:</p>
+<ul>
+<li>In Table Controls lassen sich nicht nur neue Sätze <span style="text-decoration: underline;">anlegen</span>. Auch bereits existierende Sätze können zielsicher identifiziert und <span style="text-decoration: underline;">geändert</span> werden.</li>
+<li>SimDia² kann nicht nur Daten aus Excel nach SAP übertragen, sondern auch umgekehrt. Aber nicht nur das. Die exportierten Daten können z.B. mit Excel-internen Funktionen beliebig modifiziert und sofort nach SAP zurück übertragen werden.</li>
+</ul>
+<p>Wie weiter oben bereits angedeutet, kann SimDia² aber auch noch mehr, als Daten zu importieren. Da das Programm alle in SAP vorgenommenen Aktionen aufzeichnen und später beliebig wiederholen kann, eignet es sich auch super als Automatisierungstool für SAP. Da ist es egal, ob man schnell mal ein paar hundert Datensätze in einem Testsystem löschen muss, ViewCluster in der Transaktion SM34 anlegen will oder regelmäßig ein paar dutzend Reports ausführen soll.</p>
+<h2>Pro und Contra</h2>
+<p>SimDia² ist darauf spezialisiert, <em>flache Daten</em> und dazugehörige <em>Positionsdaten</em> zu übernehmen. Es können keine Abfragen oder Verzweigungen programmiert werden. Das macht das Tool einerseits sehr interessant für Key- oder Poweruser, die „ihre“ Imports jetzt selbst vorbereiten und durchführen können.</p>
+<p>Gleichzeitig zeigen sich aber auch die Grenzen zur klassischen Programmierung. Sobald eine SAP-Anwendung auf einen Eingabewert mit unterschiedlichen Dynpros &#8220;antwortet&#8221;, muss der Anwender für jeden Eingabewert eine eigene Aufzeichnung erstellen.</p>
+<p>Dem steht jedoch der benötigte Zeitaufwand gegenüber: mit etwas Erfahrung (s.u.) braucht man für eine Aufzeichnung mit SimDia² nicht länger als 1-2 Minuten. Bei einem Import mit der LSMW sind dies wohl eher 1-2 Stunden. Und ganz zu schweigen natürlich von einer klassisch programmierten Lösung.</p>
+<p>Der Support von <a href="https://ersasoft.de/de/?s=tt">ERSAsoft</a> ist super. Probleme oder Fragen sind schnell per Mail, Telefon oder Teamviewer geklärt. Rüdiger Specht, Gründer und Inhaber, ist dabei stets ruhig, freundlich, geduldig und kompetent. Bei Problemen oder Schwierigkeiten redet er nicht um den heißen Brei herum, sondern sagt klar und deutlich, was Sache ist.</p>
+<h2>Fazit</h2>
+<p>Obwohl SimDia² sehr einfach zu bedienen ist, hatte ich die ersten Male das Gefühl, dass es &#8220;rum zickt&#8221;. Ich habe jedoch schnell gemerkt, dass die Zickerei an den unterschiedlich programmierten SAP-Programmen liegt. Bei der Aufzeichnung muss man sich an die Gegebenheiten der SAP-Transaktionen richten. Auch wenn SimDia² einfach zu bedienen und schnell zu erlernen ist, heißt es auch hier: Übung macht den Meister und SAP-Knowhow sollte vorhanden sein.</p>
+<p>Insgesamt ist SimDia² sehr innovativ, wirklich einfach zu bedienen und schnell zu erlernen. Das ist das riesengroße Plus. Das, was ich bei SimDia² vermisst habe, als negativ zu bewerten, wäre falsch, denn einem Porsche kreide ich auch nicht an, dass er zwar 260 km/h fährt, ich aber nicht gleichzeitig ein Klavier damit transportieren kann. SimDia² ist dafür konzipiert, bestimmte Aufgaben im Zusammenspiel mit Excel schnell und intuitiv zu lösen. Und das tut es.</p>
+<p>Damit ist das Programm SAP-internen Tools wie LSMW oder Batch Input haushoch überlegen.</p>
+<p>Ist eine Aufzeichnung erst einmal &#8220;im Kasten&#8221;, dann ist der Aufruf schnell möglich und die neuen Daten sind ratzfatz im SAP. Anwendern, die regelmäßig Daten von Excel nach SAP überführen müssen, kann ich SimDia² wirklich nur ans Herz legen.</p>
+<h2>Update</h2>
+<p>In diesem Artikel beschreibe ich die neue Version von SimDia²:</p>
+<p>https://tricktresor.com/blog/simdia2-neue-version-des-besten-sap-import-tools/</p>
+<br />
+[accordian]</p>
+<p>Und jetzt kommt das Beste: ERSAsoft bietet allen Tricktresor-Fans einen Nachlass von 5% an. Füllt einfach das unten stehende Formular aus und ihr bekommt den erwähnten Nachlass gewährt. So. Noch leichter kann ich euch den SAP-Datenimport wirklich nicht machen&#8230;!</p>
+<h2>Tricktresor- Bonus</h2>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>https://tricktresor.com/blog/simdia%C2%B2-als-alternative-zur-programmierung/</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p>
+<p>Der Beitrag <a href="/blog/simdia2-sap-datenimport-einfach/">SimDia² &#8211; SAP-Datenimport einfach?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/simdia2-sap-datenimport-einfach/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Launige Betrachtung zum Unicode</title>
+		<link>/blog/launige-betrachtung-zum-unicode/</link>
+					<comments>/blog/launige-betrachtung-zum-unicode/#comments</comments>
+		
+		<dc:creator><![CDATA[Gastbeitrag]]></dc:creator>
+		<pubDate>Thu, 27 Feb 2014 10:52:05 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Sprüche & Geschichten]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Unicode]]></category>
+		<category><![CDATA[color]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4515</guid>
+
+					<description><![CDATA[<p>Wenn man wie ich die 40 überschritten hat, denkt man über manche Dinge in besonderer Weise nach. Zum Beispiel über die Rechtschreibreform – einer Kapitulation vor den eher schlichten Gemütern, die nicht begreifen wollten, daß (pardon: dass) man &#8220;Katastrophe&#8221; mit ph und &#8220;doof&#8221; mit f schreibt. Delphine und Naßzellen gehören der Vergangenheit an, umfangreiche Arbeiten sind jetzt &#8220;aufwändig&#8221;, Grundfeste (&#8220;ss&#8221; nicht am Silbenende; trenne nie &#8220;st&#8221;, denn es tut ihm weh) wurden erschüttert. Nur mit...</p>
+<p>Der Beitrag <a href="/blog/launige-betrachtung-zum-unicode/">Launige Betrachtung zum Unicode</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wenn man wie ich die 40 überschritten hat, denkt man über manche Dinge in besonderer Weise nach.</p>
+<p>Zum Beispiel über die Rechtschreibreform – einer Kapitulation vor den eher schlichten Gemütern, die nicht begreifen wollten, daß (pardon: dass) man &#8220;Katastrophe&#8221; mit ph und &#8220;doof&#8221; mit f schreibt.</p>
+<p>Delphine und Naßzellen gehören der Vergangenheit an, umfangreiche Arbeiten sind jetzt &#8220;aufwändig&#8221;, Grundfeste (&#8220;ss&#8221; nicht am Silbenende; trenne nie &#8220;st&#8221;, denn es tut ihm weh) wurden erschüttert.</p>
+<p>Nur mit einem Quäntchen Glück kommt man mit 0 Fehlern durch.</p>
+<h2>1 + 1 = 3?</h2>
+<p>Die Angst ging in dieser Generation um. Ob sie wohl als nächstes an das kleine Einmaleins rangehen? 1 + 1 = 3, nur eine Frage der Zeit? Na ja, diese Kuh scheint vorerst vom Eis zu sein.<br />
+(&#8220;1 + 1 ? Hä? Alder, meine iPhone isse schneller als deine Kopf.&#8221;)</p>
+<p>Doch jetzt: Mit aller Macht kommt er, der Unicode.</p>
+<p>Vorbei sind die Zeiten &#8220;<i>&#8230; and a byte is still a byte</i>&#8220;. Unvorstellbar für die ältere Generation der Datenverarbeiter, die in Zeiten von Lochstreifen und Lochkarte das Bit quasi noch hautnah fühlen konnten. Entweder als zusätzlich gestanztes Loch in einer Lochkarte (Datenfehler), als wieder zugeklebtes Loch in einem Lochstreifen (Tippfehler) oder zumindest als Konfettibestandteil im Haar beim Studentenfasching.</p>
+<p>[pullquote float=&#8217;CENTER&#8217; color=&#8217;#000000&#8242; bgcolor=&#8217;#ff5900&#8242;]Ziel des Unicode ist es, für jedes Sinn tragende Schriftzeichen aller bekannten Schriftkulturen einen digitalen Code festzulegen.[/pullquote]</p>
+<p>Na, da freue ich mich aber für Japaner und Chinesen, die den Halbsatz &#8220;Der vom Tautropfen der Lotusblüte benetzte Strahl der Morgensonne&#8221; ja unbedingt in 3 Byte unterbringen müssen. Oder für die alten <i>Ugariter</i>, die es seit mehr als 3.000 Jahren nicht mehr gibt.</p>
+<h2>Kamasutra</h2>
+<p>Gleichsam beruhigt es mich ungemein, dass seit März 2005 auch die <i>Kharoshthi-Schrift</i> aus dem antiken Indien unicode-fähig ist. Damit kann man jetzt wohl das Kamasutra in Originalversion über Dateischnittstelle einlesen. Hauptsache es gibt keinen Kurzdump. (&#8220;Das Programm ist auf eine <i>Stellung</i> gestoßen, die nicht durch eine Ausnahme behandelt werden kann.&#8221;)</p>
+<p>Ein historischer Meilenstein wurde im Oktober 2010 erreicht: Japanische Emoticons (<i>Emoji</i>) sind codierbar. (Kein Witz!)<br />
+Die Unicode-Kenner schnalzen kollektiv mit der Zunge.</p>
+<p>Oder Musiknoten, seit März 2001 möglich. Super, dann braucht man sich den Scheiß nicht mehr anzuhören, sondern kann gleich die Noten einlesen.</p>
+<p>Hat eigentlich schon mal jemand daran gedacht, das deutsche Steuerrecht incl. aller Zusätze und Novellen in <i>phönizischer Schrift</i> darzustellen? Nicht? Wie? Ach so, macht keinen Sinn. Aha.</p>
+<p>Einigermaßen lustig ist, dass die Hauptkritik am Unicode aus dem ostasiatischen Raum zu vernehmen ist. Obwohl gerade dort diejenigen Sprachen beheimatet sind, die gern als Begründung für die Notwendigkeit eines Unicode benutzt werden. Menschenskinder, dabei hätte es sich doch jeder von uns an fünf Fingern abzählen können, dass die Jungs Schwierigkeiten mit der <i>Han-Vereinheitlichung</i> haben werden, nicht wahr?</p>
+<p>&#8220;Liebe japanische Kollegen, wir brauchen nicht mehr auf englisch zu kommunizieren, Ihr könnt Eure Daten jetzt auf japanisch schicken. Verstehen wir zwar nicht, können wir aber einlesen.&#8221;</p>
+<p>&#8220;Ja, Frau Lehmann, wir brauchen Ihre 30 monatlichen Datensätze für die Verbuchung jetzt im Unicode ISO 10646. Wir müssen sicherstellen, dass die Verbuchung auch die alten <i>Sumerer</i> hingekriegt hätten.&#8221;</p>
+<h2>Word und Unicode</h2>
+<p>Nach dem Motto &#8220;Vorfreude, schönste Freude&#8221; hier noch ein kleines Schmankerl:</p>
+<p>Man gebe in einem Word-Text das Wort &#8220;Unicode&#8221; ein. Jetzt stelle man den Cursor hinter das &#8220;U&#8221; und drückt &#8220;Alt+C&#8221;. Man sieht den Code für das &#8220;U&#8221;. (Erneut Alt+C setzt es zurück.)</p>
+<p>Man wiederhole die Übung für das &#8220;o&#8221; und das &#8220;e&#8221;. Super!</p>
+<p>Wie hieß es doch so schön: Ein bisschen Raten ist halt dabei.</p>
+<p>[pullquote float=&#8217;CENTER&#8217; color=&#8217;#ffffff&#8217; bgcolor=&#8217;#ff5900&#8242;]Der Unicode, der Unicode,<br />
+der kommt jetzt grade groß in Mod&#8217;.<br />
+Wie das Bit auch kommt,<br />
+wie das Byte auch fällt,<br />
+der Unicode, der hält.[/pullquote]</p>
+<p><b>Mannomann! Diese Kanaillen!</b></p>
+<p>PS:</p>
+<ul>
+<li>Im SAP Online-Service-System (OSS) gibt es (Stand: 15.11.2011) insgesamt 9.386 Hinweise für den Suchbegriff &#8220;Unicode&#8221;.</li>
+<li>Im Jahr 2011 sind es 1.009 Hinweise, 145 seit dem 17.10.2011.</li>
+<li>Der Suchbegriff &#8220;Verbuchung&#8221; bringt 9.184 Treffer, &#8220;FI-Beleg&#8221; 4.556 Treffer.</li>
+</ul>
+<p>Mathias Gebhardt, SAP-Berater</p>
+<p>Im November 2011</p>
+<p>Der Beitrag <a href="/blog/launige-betrachtung-zum-unicode/">Launige Betrachtung zum Unicode</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/launige-betrachtung-zum-unicode/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Zeile je nach Feldwert komplett färben</title>
+		<link>/blog/zeile-je-nach-feldwert-komplett-faerben/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 13 Jan 2014 16:42:52 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[farben]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Listen]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[farbe]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4209</guid>
+
+					<description><![CDATA[<p>Bei Excel-Listen gibt es häufig die Anforderung, eine komplette Zeile abhängig von einem bestimmten Feldwert in dieser Zeile einzufärben. Das geht mit Hilfe der bedingten Formatierung. Allerdings ist diese Lösung meine Erachtens sehr komplex, unübersichtlich und schlecht zu warten. In diesem Artikel stelle ich eine Lösung vor, die mithilfe von Visual Basic die Zeilenfarbe individuell setzt.</p>
+<p>Der Beitrag <a href="/blog/zeile-je-nach-feldwert-komplett-faerben/">Zeile je nach Feldwert komplett färben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei Excel-Listen gibt es häufig die Anforderung, eine komplette Zeile abhängig von einem bestimmten Feldwert in dieser Zeile einzufärben. Das geht mit Hilfe der bedingten Formatierung. Allerdings ist diese Lösung meine Erachtens sehr komplex, unübersichtlich und schlecht zu warten.</p>
+<p>Aus diesem Grund habe ich ein kleines Visual-Basic-Script geschrieben, mit dessen Hilfe das Einfärben einer Zeile einfach und nachvollziehbar funktioniert. Die Zeilenfarbe soll abhängig vom Status sein.</p>
+<h2>Statustabelle</h2>
+<p>Hierfür füge die folgende Tabelle ein:</p>
+<p><img loading="lazy" decoding="async" width="200" height="100" class="alignnone size-full wp-image-4213" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d411bba6be4.png" /></p>
+<p>Um die Tabelle zu erstellen, trage die Werte wie aus dem Screenshot ersichtlich in die Zellen ein und klicke auf <em>Einfügen &#8211; Tabelle</em>. Dann markiere den Bereich:</p>
+<p><img loading="lazy" decoding="async" width="244" height="157" class="alignnone size-full wp-image-4214" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d41226c32c0.png" /></p>
+<p>Du hast nun die Tabelle erstellt. Mit dieser Tabelle definieren wir den die Farbe der einzelnen Status.</p>
+<h2>Liste</h2>
+<p>Ausgangsbasis soll eine kleine Liste sein. Erstelle diese Liste ebenfalls als Tabelle und erstelle die Datenüberprüfung vom Typ <em>Liste</em> für das Feld <em>Status</em>. Wie das geht, ist in <a title="Datenüberprüfung/ Dropdown-Listen in Excel" href="https://tricktresor.com/blog/datenueberpruefung-dropdown-listen-in-excel/" target="_blank">diesem Artikel </a>beschrieben.</p>
+<p><img loading="lazy" decoding="async" width="673" height="243" class="alignnone size-full wp-image-4211" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d40ee722afd.png" srcset="/wp-content/uploads/2014/01/img_52d40ee722afd.png 673w, /wp-content/uploads/2014/01/img_52d40ee722afd-300x108.png 300w, /wp-content/uploads/2014/01/img_52d40ee722afd-624x225.png 624w" sizes="(max-width: 673px) 100vw, 673px" /></p>
+<h2>VBA</h2>
+<p>Wir erstellen nun eine kleine Visual-Basic-Routine, die bei jeder Änderung des Arbeitsblattes ausgeführt wird. Öffne in den Entwicklertools (muss gegebenenfalls in den Excel-Optionen aktiviert werden!) den Visual Basic Editor und füge für das Arbeitsblatt mit der Liste den folgenden Code ein:</p>
+<pre>Option Explicit
+Private Sub Worksheet_Change(ByVal Target As Range)
+ Dim l_column As Integer
+ Dim l_color As Integer
+ Dim l_status_row As Integer
+ Dim l_status_col As Integer
+ Dim l_number_of_columns_to_color As Integer
+
+''' Anzahl der einzufärbenden Spalten
+ l_number_of_columns_to_color = 3
+''' Index der Spalte, in der der Status definiert wurde
+ l_status_col = 1
+
+ If Target.Column = 2 Then
+
+ For l_status_row = 1 To 20
+
+ If Worksheets("Status").Cells(l_status_row, l_status_col).Value = Cells(Target.Row, Target.Column).Value Then
+ On Error GoTo NOT_AN_INTEGER
+ l_color = CInt(Worksheets("Status").Cells(l_status_row, l_status_col + 1).Value)
+ Exit For
+NOT_AN_INTEGER:
+ l_color = 0
+  End If
+ Next l_status_row
+
+ For l_column = 1 To l_number_of_columns_to_color
+ Cells(Target.Row, l_column).Interior.ColorIndex = l_color
+ Next l_column
+ End If
+
+End Sub</pre>
+<p>[notice type=&#8217;alert&#8217;]Achte darauf, dass der im Coding verwendete Name für das Arbeitsblatt Worksheets(&#8220;Status&#8221;) mit deinem überein stimmt![/notice]</p>
+<p><img loading="lazy" decoding="async" width="568" height="101" class="alignnone size-full wp-image-4215" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d4158c1e935.png" srcset="/wp-content/uploads/2014/01/img_52d4158c1e935.png 568w, /wp-content/uploads/2014/01/img_52d4158c1e935-300x53.png 300w" sizes="(max-width: 568px) 100vw, 568px" /></p>
+<p>[notice type=&#8217;info&#8217;]Die Arbeitsmappe enthält nun Coding und kann nicht mehr als normale Excel-Datei gespeichert werden. Du musst sie als XLSM-Datei (Excel-Arbeitsmappe mit Makros) speichern:</p>
+<p><img loading="lazy" decoding="async" width="810" height="179" class="alignnone size-full wp-image-4216" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d416081903d.png" srcset="/wp-content/uploads/2014/01/img_52d416081903d.png 810w, /wp-content/uploads/2014/01/img_52d416081903d-300x66.png 300w, /wp-content/uploads/2014/01/img_52d416081903d-624x137.png 624w" sizes="(max-width: 810px) 100vw, 810px" /></p>
+<p>[/notice]</p>
+<h2>Anmerkungen</h2>
+<p>Die Farbe der Zeilen wird nicht automatisch geändert, wenn der Farbindex in der Statustabelle geändert wird!</p>
+<p>Die Farbe wird neu gesetzt, sobald ein Status ausgewählt wird. Möchte man sicher sein, dass eine Zeile immer komplett eingefärbt ist, dann kann die Codezeile</p>
+<pre>If Target.Column = 2 Then</pre>
+<p>und das entsprechende End If am Ende des Codings entfernt werden. In diesem Fall wird bei jeder Änderung in der Tabelle die Farbe für die Tabellenzeile neu gesetzt.</p>
+<p>Die Anzahl der einzufärbenden Zellen muss im Coding angepasst werden. Werden Spalten an die Liste angehängt, dann muss der Wert <strong>l_number_of_columns_to_color</strong> angepasst werden.</p>
+<p>Der Beitrag <a href="/blog/zeile-je-nach-feldwert-komplett-faerben/">Zeile je nach Feldwert komplett färben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Interne Tabelle DDIC</title>
+		<link>/blog/interne-tabelle-ddic/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2012 13:57:36 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[create data]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[cl_abap_tabledescr]]></category>
+		<category><![CDATA[assign component]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[cl_abap_typedescr]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[color]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=655</guid>
+
+					<description><![CDATA[<p>Eine interne Tabelle anhand einer gegebenen DDIC-Struktur erzeugen und Ausgabe als einfache Liste</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-ddic/">Interne Tabelle DDIC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine interne Tabelle anhand einer gegebenen DDIC-Struktur erzeugen und Ausgabe als einfache Liste</p>
+<p class="head1">Verwendung</p>
+<p>Die in diesem Beispiel verwendete Möglichkeit interne Tabellen und Arbeitsbereiche dynamisch zu erzeugen kann verwendet werden, wenn der Inhalt einer Datenbanktabelle ausgelesen werden soll.</p>
+<p>So könnte man zum Beispiel ein Programm schreiben, das alle Tabellen ausliest, in denen das Datenelement &#8220;MATNR&#8221; vor kommt. Für jede Tabelle wird dann dynamisch eine interne Tabelle generiert und mittels ASSIGN COMPONENT &#8216;MATNR&#8217; könnten dynamisch Prüfungen auf die Materialnummer erfolgen.</p>
+<p class="head1">Coding</p>
+<p class="sap1"><span style="color: #fb2412;">*== data</span><br />
+DATA gr_struct     TYPE REF TO cl_abap_structdescr.<br />
+DATA gr_table      TYPE REF TO cl_abap_tabledescr.<br />
+DATA gd_table      TYPE REF TO data.<br />
+DATA gd_line       TYPE REF TO data.</p>
+<p class="sap1"><span style="color: #fb2412;">*== field symbols</span><br />
+FIELD-SYMBOLS &lt;workarea&gt; TYPE ANY.<br />
+FIELD-SYMBOLS &lt;table&gt;    TYPE ANY TABLE.<br />
+FIELD-SYMBOLS &lt;value&gt;    TYPE ANY.</p>
+<p class="sap1">PARAMETERS p_table TYPE tabname DEFAULT &#8216;T000&#8217;.</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*== get structure description</span><br />
+gr_struct  ?= cl_abap_typedescr=&gt;describe_by_name( p_table ).<br />
+*== create table description using structure description<br />
+gr_table   ?= cl_abap_tabledescr=&gt;create( gr_struct ).</p>
+<p class="sap1"><span style="color: #fb2412;">*== create work area</span><br />
+CREATE DATA gd_line TYPE HANDLE gr_struct.<br />
+ASSIGN gd_line-&gt;* TO &lt;workarea&gt;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== create internal table</span><br />
+CREATE DATA gd_table TYPE HANDLE gr_table.<br />
+ASSIGN gd_table-&gt;* TO &lt;table&gt;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== select data from database into dynamically generated internal table</span><br />
+SELECT * FROM (p_table)<br />
+INTO CORRESPONDING FIELDS OF TABLE &lt;table&gt; UP TO 20 ROWS.</p>
+<p class="sap1"><span style="color: #fb2412;">*== loop at all table lines for output</span><br />
+LOOP AT &lt;table&gt; ASSIGNING &lt;workarea&gt;.<br />
+NEW-LINE.<br />
+DO.<br />
+<span style="color: #fb2412;">*== loop at all components of the structure</span><br />
+ASSIGN COMPONENT sy-index OF STRUCTURE &lt;workarea&gt; TO &lt;value&gt;.<br />
+IF sy-subrc &gt; 0.<br />
+EXIT.<br />
+ELSE.<br />
+<span style="color: #fb2412;">*== and write into list</span><br />
+WRITE &lt;value&gt; COLOR COL_NORMAL.<br />
+ENDIF.<br />
+ENDDO.<br />
+ENDLOOP.</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-ddic/">Interne Tabelle DDIC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Daten einer Website per HTTP ermitteln</title>
+		<link>/blog/daten-einer-website/</link>
+					<comments>/blog/daten-einer-website/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Jul 2012 20:02:59 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[cl_http_client]]></category>
+		<category><![CDATA[url]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Regex]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[color]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=649</guid>
+
+					<description><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Mithilfe der Klasse CL_HTTP_CLIENT besorgen wir uns den Quelltext einer Internetseite. Die URL muss dabei komplett angegeben werden, also inklusive http://</p>
+<h2 class="head1">Coding</h2>
+<p class="sap1">
+<pre class="lang:abap decode:true ">*:: Selection screen
+PARAMETERS p_url TYPE string LOWER CASE
+DEFAULT '/wp-content/index.php?aID=0'.
+
+START-OF-SELECTION.
+
+  PERFORM get_urls USING p_url.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_URLS
+*&amp;---------------------------------------------------------------------*
+FORM get_urls  USING  iv_url TYPE clike.
+
+*:: local data
+  DATA lv_http_url     TYPE string.
+  DATA lr_http_client  TYPE REF TO if_http_client.
+  DATA lv_html_code    TYPE string.
+
+  DATA lt_urls         TYPE STANDARD TABLE OF string
+WITH NON-UNIQUE DEFAULT KEY.
+  DATA lt_new          LIKE lt_urls.
+  DATA lv_regex        TYPE string.
+
+  DATA lv_url          TYPE string.
+  DATA lv_dummy1       TYPE string.
+  DATA lv_dummy2       TYPE string.
+
+  STATICS lt_list      TYPE HASHED TABLE OF string
+WITH UNIQUE KEY table_line.
+
+*:: create url
+  CALL METHOD cl_http_client=&gt;create_by_url
+    EXPORTING
+      url                = iv_url
+    IMPORTING
+      client             = lr_http_client
+    EXCEPTIONS
+      argument_not_found = 1
+      plugin_not_active  = 2
+      internal_error     = 3
+      OTHERS             = 4.
+  IF sy-subrc &gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to create url, Sy-Subrc;', sy-subrc.
+    STOP.
+  ENDIF.
+
+*:: Send out request
+  lr_http_client-&gt;send( ).
+
+*:: Receive result as stream
+  CALL METHOD lr_http_client-&gt;receive
+    EXCEPTIONS
+      http_communication_failure = 1
+      http_invalid_state         = 2
+      http_processing_failed     = 3
+      OTHERS                     = 4.
+
+  IF sy-subrc &lt;&gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to read data, Sy-Subrc;', sy-subrc.
+  ELSE.
+*:: Get sourcecode
+    lv_html_code = lr_http_client-&gt;response-&gt;get_cdata( ).
+    WRITE:/ iv_url COLOR 5.
+
+*:: simple method - Find urls
+    SPLIT lv_html_code AT 'href=' INTO TABLE lt_urls.
+    LOOP AT lt_urls INTO lv_url.
+      FORMAT COLOR OFF.
+      CHECK lv_url IS NOT INITIAL.
+      CHECK lv_url(1) = `"`
+      OR lv_url(1) = `'`.
+      FIND lv_url(1) IN lv_url+1 MATCH OFFSET sy-fdpos.
+      CHECK sy-subrc = 0.
+      lv_url = lv_url+1(sy-fdpos).
+
+      IF lv_url IS INITIAL.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '#'.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '/'.  "Root
+        FORMAT COLOR COL_GROUP.
+
+      ELSEIF lv_url(1) = '?'.
+        SPLIT iv_url AT '?' INTO lv_dummy1 lv_dummy2.
+        IF sy-subrc = 0.
+          CONCATENATE lv_dummy1 lv_url INTO lv_url.
+        ELSE.
+        ENDIF.
+      ELSEIF lv_url(5) = 'https' OR lv_url(5) = 'HTTPS'.
+        FORMAT COLOR COL_POSITIVE.
+      ELSEIF lv_url(4) = 'http' OR lv_url(4) = 'HTTP'.
+        FORMAT COLOR COL_NORMAL.
+      ENDIF.
+
+*:: try to find main URL in link
+      CONCATENATE '^' iv_url INTO lv_regex.
+      FIND REGEX lv_regex IN lv_url.
+      IF sy-subrc = 0.
+        FORMAT INTENSIFIED ON.
+      ELSE.
+        FORMAT INTENSIFIED OFF.
+      ENDIF.
+      WRITE: /10 lv_url.
+
+    ENDLOOP.
+    ULINE.
+
+  ENDIF.
+
+ENDFORM.                    " GET_URLS</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/daten-einer-website/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Exporting ALV to Memory2</title>
+		<link>/blog/exporting-alv-to-memory2/</link>
+					<comments>/blog/exporting-alv-to-memory2/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 12 Sep 2011 14:54:53 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[if_ixml_stream_factory]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[if_ixml_document]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[if_ixml_parser]]></category>
+		<category><![CDATA[cl_alv_table_create=>create_dynamic_table]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[demoprogramme]]></category>
+		<category><![CDATA[if_ixml]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=625</guid>
+
+					<description><![CDATA[<p>Wir greifen den Trick - nach SUBMIT an die ALV-Daten im Office-Format zu gelangen - noch einmal auf und zeigen, wie man aus dem XML-String eine Tabelle erh&#228;lt.</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory2/">Exporting ALV to Memory2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wir greifen den Trick &#8211; nach SUBMIT an die ALV-Daten im Office-Format zu gelangen &#8211; noch einmal auf und zeigen, wie man aus dem XML-String eine Tabelle erhält.</p>
+<p>In diesem Beispiel rufen wir das Beispielprogramm BCALV_FULLSCREEN_DEMO auf, um mittels ALV-Grid Daten zu erzeugen.</p>
+<p>Die Flugdatenbank muss natürlich gefüllt sein!!</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4193" src="https://tricktresor.com/wp-content/uploads/2011/09/01_13_11_46_26-300x140.jpg" alt="BCALV_FULLSCREEN_DEMO" width="300" height="140" srcset="/wp-content/uploads/2011/09/01_13_11_46_26-300x140.jpg 300w, /wp-content/uploads/2011/09/01_13_11_46_26-624x292.jpg 624w, /wp-content/uploads/2011/09/01_13_11_46_26.jpg 727w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<p>Die grundlegenden Bestandteile sind bereits im vorherigen Artikel erläutert worden. In diesem Programm zeigen wir, wie man die im XML-Format vorliegenden Daten in eine interne Tabelle umwandelt.</p>
+<p>Das XML-Ergebnis wird dabei Ereignisgesteuert bearbeitet. Das bedeutet: Die XML-Tags werden Stück für Stück durchlaufen und im Programm wird entsprechend darauf reagiert.</p>
+<p class="head1">XML</p>
+<p>Die zurückgelieferte XML-Struktur, die die Tabelle beschreibt ist recht komplex. Hier ist die Beispiel-XML-Datei zu sehen: <a href="http://pastebin.com/XkgctkJA" target="_blank" rel="noopener">http://pastebin.com/XkgctkJA</a></p>
+<p>Uns interessieren jedoch nur die folgenden Tags:</p>
+<p class="head2">Anzahl der Spalten</p>
+<p class="sap1">&lt;Table&gt;&lt;Column/&gt;&lt;Column/&gt;&lt;/Table&gt;</p>
+<p class="head2">Zellen und Zelleninhalte</p>
+<p class="sap1">&lt;Cell&gt;&lt;Data&gt;Inhalt&lt;/data&gt;&lt;/cell&gt;</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true ">REPORT  zz_export_alv_to_memory_demo01.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_xml DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_xml DEFINITION.
+
+  PUBLIC SECTION.
+CLASS-METHODS call_report  IMPORTING iv_repid TYPE syrepid
+iv_list  TYPE char1.
+
+    CLASS-METHODS create_table IMPORTING iv_fields TYPE i
+EXPORTING ed_table TYPE REF TO data.
+
+    CLASS-METHODS display_data IMPORTING it_table TYPE STANDARD TABLE PREFERRED PARAMETER it_table.
+
+ENDCLASS.                    "lcl_xml DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_xml IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_xml IMPLEMENTATION.
+
+  METHOD call_report.
+
+*== Data
+DATA lv_guid   TYPE guid_32.
+DATA ls_params TYPE rsparams.
+DATA lt_params TYPE TABLE OF rsparams.
+
+*== Create and export GUIID for ALV
+lv_guid = cl_salv_export_db_storage=&gt;create_guid( ).
+EXPORT l_mode = 'M' TO MEMORY ID 'ALV_EXTRACT_MODE'.
+EXPORT l_guid = lv_guid TO MEMORY ID 'ALV_EXTRACT_GUID'.
+
+*== Call Report
+    SUBMIT (iv_repid)
+WITH SELECTION-TABLE lt_params
+AND RETURN.                                       "#EC CI_SUBMIT
+
+    DATA lv_xstring           TYPE xstring.
+DATA lr_stream_factory    TYPE REF TO if_ixml_stream_factory.
+DATA lr_ixml              TYPE REF TO if_ixml.
+DATA lr_istream           TYPE REF TO if_ixml_istream.
+DATA lr_doc               TYPE REF TO if_ixml_document.
+DATA lr_parser            TYPE REF TO if_ixml_parser.
+DATA lv_events            TYPE i.
+DATA lv_number_of_fields  TYPE i.
+
+    DATA lr_event             TYPE REF TO if_ixml_event.
+DATA lv_type              TYPE i.
+DATA lv_current_node      TYPE string.
+DATA lv_current_value     TYPE string.
+DATA lv_cell_index        TYPE i.
+
+*== Import XML-data from AVL and convert to stream
+lv_xstring        = cl_salv_export_db_storage=&gt;import_xmlstring
+( guid  = lv_guid ).
+lr_ixml           = cl_ixml=&gt;create( ).
+lr_stream_factory = lr_ixml-&gt;create_stream_factory( ).
+lr_istream        = lr_stream_factory-&gt;create_istream_xstring
+( string = lv_xstring ).
+
+    lr_doc            = lr_ixml-&gt;create_document( ).
+
+*== Create parser for document
+    lr_parser   = lr_ixml-&gt;create_parser(
+document       = lr_doc
+istream        = lr_istream
+stream_factory = lr_stream_factory ).
+
+*== deactivate DOM generation
+lr_parser-&gt;set_dom_generating( space ).
+
+*== data for dynamically generated internal table
+DATA ld_table            TYPE REF TO data.
+FIELD-SYMBOLS &lt;table&gt;    TYPE STANDARD TABLE.
+FIELD-SYMBOLS &lt;row&gt;      TYPE ANY. "line of &lt;table&gt;.
+FIELD-SYMBOLS &lt;cell&gt;     TYPE string.
+
+*== define Parser events
+lv_events = if_ixml_event=&gt;co_event_element_pre2
++ if_ixml_event=&gt;co_event_element_post
++ if_ixml_event=&gt;co_event_text_post.
+
+*== Register XML-Events
+lr_parser-&gt;set_event_subscription( lv_events ).
+
+    DO.
+
+*== get next event (XML-tag)
+lr_event = lr_parser-&gt;parse_event( ).
+IF lr_event IS INITIAL.
+EXIT.
+ENDIF.
+
+*== get type of event
+lv_type = lr_event-&gt;get_type( ).
+*== New element
+CASE lv_type.
+WHEN if_ixml_event=&gt;co_event_element_pre2.
+*===&gt; Event "PRE2"
+lv_current_node = lr_event-&gt;get_name( ).
+IF iv_list &lt;&gt; space.
+WRITE: / lv_current_node.
+ENDIF.
+
+          CASE lv_current_node.
+WHEN 'Column'.
+*=====&gt; New Column: Add column counter
+ADD 1 TO lv_number_of_fields.
+
+            WHEN 'Row'.
+*=====&gt; New Row
+IF &lt;table&gt; IS NOT ASSIGNED.
+*=====&gt; Create table if not done yet
+create_table( EXPORTING iv_fields = lv_number_of_fields
+IMPORTING ed_table  = ld_table ).
+
+                ASSIGN ld_table-&gt;* TO &lt;table&gt;.
+ENDIF.
+
+*=====&gt; Insert new table line
+APPEND INITIAL LINE TO &lt;table&gt; ASSIGNING &lt;row&gt;.
+CLEAR lv_cell_index.
+
+            WHEN 'Cell'.
+*======&gt; new cell data:
+ADD 1 TO lv_cell_index.
+ASSIGN COMPONENT lv_cell_index
+OF STRUCTURE &lt;row&gt; TO &lt;cell&gt;.
+ENDCASE.
+
+        WHEN if_ixml_event=&gt;co_event_text_post.
+*===&gt; Event "TEXT"
+CASE lv_current_node.
+WHEN 'Data'.
+*=====&gt; get cell value and assign to table cell
+&lt;cell&gt; = lr_event-&gt;get_value( ).
+ENDCASE.
+
+          IF iv_list &lt;&gt; space.
+lv_current_value = lr_event-&gt;get_value( )..
+WRITE lv_current_value COLOR COL_TOTAL.
+ENDIF.
+
+        WHEN if_ixml_event=&gt;co_event_element_post.
+*===&gt; Event "POST"
+IF iv_list &lt;&gt; space.
+lv_current_node = lr_event-&gt;get_name( ).
+WRITE: lv_current_node COLOR COL_GROUP.
+ENDIF.
+
+      ENDCASE.
+ENDDO.
+
+*== Display table
+    IF &lt;table&gt; IS ASSIGNED.
+display_data( &lt;table&gt; ).
+ENDIF.
+
+  ENDMETHOD.                    "call_report
+
+METHOD create_table.
+
+*== field catalog
+    DATA lt_fcat             TYPE lvc_t_fcat.
+FIELD-SYMBOLS &lt;fcat&gt;     TYPE lvc_s_fcat.
+
+*== create field catalog for internal table
+    DO iv_fields TIMES.
+*== cell
+APPEND INITIAL LINE TO lt_fcat ASSIGNING &lt;fcat&gt;.
+&lt;fcat&gt;-fieldname = sy-index.
+CONDENSE &lt;fcat&gt;-fieldname.
+&lt;fcat&gt;-tabname   = 'GT_TABLE'.
+&lt;fcat&gt;-inttype   = 'g'. "String
+ENDDO.
+
+*== generate internal table from given field catalog
+CALL METHOD cl_alv_table_create=&gt;create_dynamic_table
+EXPORTING
+it_fieldcatalog           = lt_fcat
+IMPORTING
+ep_table                  = ed_table
+EXCEPTIONS
+generate_subpool_dir_full = 1
+OTHERS                    = 2.
+
+  ENDMETHOD.                    "create_table
+
+  METHOD display_data.
+
+*== Data
+DATA lv_col          TYPE i.
+FIELD-SYMBOLS &lt;row&gt;  TYPE ANY.
+FIELD-SYMBOLS &lt;cell&gt; TYPE string.
+
+*== Display all table lines
+LOOP AT it_table ASSIGNING &lt;row&gt;.
+NEW-LINE.
+DO.
+*== Display each table cell
+ASSIGN COMPONENT sy-index OF STRUCTURE &lt;row&gt; TO &lt;cell&gt;.
+IF sy-subrc = 0.
+lv_col = ( sy-index - 1 ) * 21.
+WRITE AT lv_col(19)  &lt;cell&gt; COLOR COL_POSITIVE.
+ELSE.
+EXIT. "from do
+ENDIF.
+ENDDO.
+ENDLOOP.
+ENDMETHOD.                    "display_data
+
+ENDCLASS.                    "lcl_xml IMPLEMENTATION
+
+***___________________________________________________________________
+***
+*** SELECTION SCREEN
+***___________________________________________________________________
+***
+
+SELECTION-SCREEN BEGIN OF BLOCK reps   WITH FRAME TITLE text-var.
+PARAMETERS p_repid TYPE syrepid        DEFAULT 'BCALV_FULLSCREEN_DEMO'.
+PARAMETERS p_data  RADIOBUTTON GROUP x DEFAULT 'X'.
+PARAMETERS p_list  RADIOBUTTON GROUP x.
+SELECTION-SCREEN END OF BLOCK reps.
+
+START-OF-SELECTION.
+
+*== Start report
+lcl_xml=&gt;call_report( EXPORTING iv_repid = p_repid
+iv_list  = p_list ).
+
+</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory2/">Exporting ALV to Memory2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/exporting-alv-to-memory2/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Kleinigkeiten &#8211; ALV Feldkatalog</title>
+		<link>/blog/kleinigkeiten_alv_feldkatalog/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 12 Nov 2008 13:54:51 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[farbe]]></category>
+		<category><![CDATA[farben]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[farbcode]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=513</guid>
+
+					<description><![CDATA[<p>Kleinigkeiten zum Thema ALV. Farben, Farbcodierung, editierbares Grid, Felder, Infos</p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten_alv_feldkatalog/">Kleinigkeiten &#8211; ALV Feldkatalog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Kleinigkeiten zum Thema ALV.</p>
+<h1 class="head1">Feldkatalog: Feld EMPHASIZE</h1>
+<p>In diesem vierstelligen Feld kann eine Farbinformation mitgegeben werden:</p>
+<p>1. Stelle = C (Festwert &#8220;Colour&#8221;)<br />
+2. Stelle = Farbindex 1 &#8211; 7<br />
+3. Stelle = Hervorgehoben an/aus ( 1 oder 0 )<br />
+4. Stelle = Invertieren an/aus ( 1 oder 0 )</p>
+<pre>CONSTANTS gc_col_blue       TYPE c length 4 VALUE 'C100'.
+CONSTANTS gc_col_grey       TYPE c length 4 VALUE 'C200'.
+CONSTANTS gc_col_yellow     TYPE c length 4 VALUE 'C300'.
+CONSTANTS gc_col_light_blue TYPE c length 4 VALUE 'C400'.
+CONSTANTS gc_col_green      TYPE c length 4 VALUE 'C500'.
+CONSTANTS gc_col_red        TYPE c length 4 VALUE 'C600'.
+CONSTANTS gc_col_orange     TYPE c length 4 VALUE 'C700'.</pre>
+<h1 class="head1">Editierbarer ALV-Grid</h1>
+<p>Hat man einen editierbaren ALV-Grid und drückt die ENTF-Taste, so wird die gesamte Zeile gelöscht. Dieses Event kann man nicht abfangen.</p>
+<p>Es kann aber die Funktion abgeändert werden: Setzt man im Layout das Feld <strong>NO_ROWINS</strong> auf &#8220;X&#8221;, dann werden nur die <strong>Feldinhalte</strong>, nicht aber die komplette Zeile gelöscht.</p>
+<p>Ein weiterer Effekt ist, dass die lokalen Funktionen &#8220;Zeile anhängen&#8221;, &#8220;Zeile einfügen&#8221;, &#8220;Zeile löschen&#8221; und &#8220;Zeile kopieren&#8221; nicht mehr angeboten werden:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/ALV/Funktionscode_ALV.jpg" alt="" /></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten_alv_feldkatalog/">Kleinigkeiten &#8211; ALV Feldkatalog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bubble-la-Bap</title>
+		<link>/blog/bubble-la-bap/</link>
+					<comments>/blog/bubble-la-bap/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 17 Dec 2007 11:02:22 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[Spiele]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=447</guid>
+
+					<description><![CDATA[<p>Das Spiel "Jawbreaker" mit neuer Grafik-Engine und kompletter Undo-Funktion. Bubble-La-Bap ist ein Wortspiel mit "Bubbles", dem Originalnamen auf Windows(R)-Mobile-Ger&#228;ten, "ABAP" und "Papperlapapp". Viel Spa&#223;! ACHTUNG: SUCHTGEFAHR!!!</p>
+<p>Der Beitrag <a href="/blog/bubble-la-bap/">Bubble-la-Bap</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Spiel &#8220;Jawbreaker&#8221; mit neuer Grafik-Engine und kompletter Undo-Funktion. Bubble-La-Bap ist ein Wortspiel mit &#8220;Bubbles&#8221;, dem Originalnamen auf Windows(R)-Mobile-Geräten, &#8220;ABAP&#8221; und &#8220;Papperlapapp&#8221;. Viel Spaß! ACHTUNG: SUCHTGEFAHR!!!</p>
+<h2 class="head1">Beschreibung</h2>
+<p class="text1">Bei &#8220;Bubble-La-Bap&#8221; müssen die &#8220;Bälle&#8221; zum platzen gebracht werden. Sobald mindestens zwei gleichfarbige Bälle neben- oder übereinander stehen, können diese angeklickt und &#8220;aufgelöst&#8221; werden. Die darüber liegenden Bälle rutschen nach unten und nach rechts nach. Beim Spielmodus &#8220;fortlaufend&#8221; werden leere Spalten von links wieder aufgefüllt.</p>
+<p class="text1">Je mehr Bälle zusammen aufgelöst werden, umso mehr Punkte gibt es. Für zwei Bälle gibt es nur vier Punkte, für neun Bälle schon 72&#8230;</p>
+<p class="text1">Das Spiel wurde unter Release ERP 5.0 geschrieben, sollte aber ab Version 4.6C lauffähig sein.</p>
+<h2 class="head1">Screenshot</h2>
+<p><img decoding="async" src="https://tricktresor.com/wp-content/uploads/tt_images/spiele/bubblelabap1.jpg" alt="" />  <img decoding="async" src="https://tricktresor.com/wp-content/uploads/tt_images/spiele/bubblelabap2.jpg" alt="" /></p>
+<h2 class="head1">Vorbereitungen</h2>
+<h3 class="head2">GUI-Status 0100</h3>
+<p class="text1">Der GUI-Status &#8216;0100&#8217; muss angelegt werden. Funktionstasten:</p>
+<ul>
+<li>
+<div class="text1"><strong>NEW</strong> &#8211; Neues Spiel &#8211; F8</div>
+</li>
+<li>
+<div class="text1"><strong>UNDO</strong> &#8211; Zug rückgängig &#8211; F5</div>
+</li>
+</ul>
+<h3 class="head2">Dynpro</h3>
+<p>Dynpro 100 muss angelegt werden mit dem CustomContainer &#8220;CC_FIELDS&#8221; der Größe 60 x 20.</p>
+<h3 class="head2">Ablauflogik</h3>
+<p class="sap1">PROCESS BEFORE OUTPUT.<br />
+MODULE STATUS_0100.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE USER_COMMAND_0100.</p>
+<h2 class="head1">Coding</h2>
+<p class="text1"><a title="Bubble-la-Bap | Games" href="https://tricktresor.com/wp-content/downloads/bubblelabap.txt" target="_blank">Der Quelltext zum Download hier</a></p>
+<p class="head1">Anpassungen an andere Releases</p>
+<p class="head2">Release 4.7</p>
+<p class="text1">Type-Pool WRFAC ist nicht vorhanden. Deswegen muss die dort verwendete Konstante WRFAC_STYLE_COLOR_NEGATIVE lokal definiert werden:</p>
+<p class="sap1">DATA wrfac_style_color_negative(4) TYPE x VALUE &#8216;00000007&#8217;.</p>
+<p class="text1">
+<p>Der Beitrag <a href="/blog/bubble-la-bap/">Bubble-la-Bap</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bubble-la-bap/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Bewertung lesen</title>
+		<link>/blog/bewertung-lesen/</link>
+					<comments>/blog/bewertung-lesen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 Nov 2003 15:59:59 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<category><![CDATA[color]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=150</guid>
+
+					<description><![CDATA[<p>Um die Bewertung zu einem Objekt zu lesen, gibt es mehrere Funktionsbausteine... Hier sehen Sie aber auch, wie die Merkmalsbewertungen &#252;ber die Tabellen gezielt gelesen werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/bewertung-lesen/">Bewertung lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um die Bewertung zu einem Objekt zu lesen, gibt es mehrere Funktionsbausteine&#8230; Hier sehen Sie aber auch, wie die Merkmalsbewertungen über die Tabellen gezielt gelesen werden können.</p>
+<p>Verwenden Sie einen der folgenden Bausteine zum Lesen der Klassifizierungsdaten:</p>
+<ul>
+<li>BAPI_OBJCL_GETDETAIL</li>
+<li>BAPI_OBJCL_GETCLASSES</li>
+<li>CACL_OBJECT_READ_VALIDATION</li>
+</ul>
+<h2>BAPI_OBJCL_GETDETAIL</h2>
+<p>Beispielaufruf für das Material MAT1234, Charge CH12345. Die Klasse heisst ZM_ZUSATZ.</p>
+<pre>OBJECTKEY                       MAT1234           CH12345 
+OBJECTTABLE                     MCH1 
+CLASSNUM                        ZM_ZUSATZ 
+CLASSTYPE                       023 
+KEYDATE                         08.12.2003 
+UNVALUATED_CHARS 
+LANGUAGE                        DE</pre>
+<p>In den Tabellen <strong>ALLOCVALUESNUM </strong>erhalten Sie die numerischen Werte zurück; in der Tabelle <strong>ALLOCVALUESCHAR</strong> die Zeichenartigen Merkmale und in der Tabelle <strong>ALLOCVALUESCURR</strong> die Währungsmerkmale.</p>
+<p>Informationen stehen in der Tabelle <strong>RETURN</strong>.</p>
+<p>[notice type=&#8217;info&#8217;]Wenn Sie nicht sicher sind, welche Klassennummer verwendet wurde &#8212; z.B. weil dem Material verschiedene Klassen zugeordnet werden können &#8211;, dann verwenden Sie bitte den Baustein <strong>BAPI_OBJCL_GETCLASSES!</strong>[/notice]</p>
+<h2>Zusammengesetzter Objektschlüssel</h2>
+<p>Bei Klassifizierungen für Tabellen mit mehreren Schlüsselfeldern muss der Objektschlüssel aus diesen zusammengesetzt werden. Eine einfache Methode bietet der Baustein BAPI_OBJCL_CONCATENATEKEY. Im Falle des oben genannten Beispiels müssen dem Baustein die Namen und Werte der Schlüsselfelder in einer Tabelle übergeben werden (Wie bei CACL_OBJECT_VALIDATION_READ). Übergeben wird dann der korrekt zusammengesetzte Schlüssel.</p>
+<h2>Vorhandene Bewertungen ermitteln</h2>
+<p>Falls ein Material, eine Charge etc. mehreren Klassen zugeordnet werden kann, so muss zuvor geprüft werden, zu welcher Klasse überhaupt Bewertungen vorhanden sind.</p>
+<p>Diese Arbeit übernimmt der Baustein <strong>BAPI_OBJCL_GETCLASSES</strong>. Er ist genau so &#8220;zu füttern&#8221;, wie BAPI_OBJCL_GETDETAIL.</p>
+<p>Bei Bedarf (Parameter READ_VALUATIONS) werden auch gleich die zugehörigen Bewertungen gelesen.</p>
+<h3>CACL_OBJECT_READ_VALIDATION</h3>
+<p>Beispiel zum Lesen einer Klassifizierung zum Kunden:</p>
+<pre class="sap1">OBJECT_TYPE               KNA1          
+CLASS_TYPE                011 
+CLASS                     Z_DEB_CLASS          
+WITH_UNASSIGNED_CHARACTS  
+WITH_INHERITED_CHARACTS   
+DATE                                
+LANGUAGE                  DE</pre>
+<p>Die Tabelle OBJECT_IDENTIFICATION muss mit dem oder den Feldnamen gefüllt werden und dem entsprechenden Wert des Objekts:</p>
+<pre>FIELD                     VALUE                     
+KUNNR                     784653
+CLAF_CLASSIFICATION_OF_OBJECTS
+CLASS                     Z_DEB_CLASS
+CLASSTEXT                 X
+CLASSTYPE                 011
+FEATURES                  X
+LANGUAGE                  DE
+OBJECT                    0000012345  "Kundennummer
+OBJECTTABLE               KNA1
+KEY_DATE                  11.04.2014
+INITIAL_CHARACT           X
+NO_VALUE_DESCRIPT   
+CHANGE_SERVICE_CLF        X</pre>
+<h3>Bewertung über Tabellen lesen</h3>
+<p>Das folgende Programm liest gezielt einzelne Merkmalsbewertungen zu einem Objekt &#8212; in diesem Fall eine Charge.</p>
+<pre>REPORT z_merkmale_lesen.
+DATA:
+  l_atwrt TYPE atwrt,
+  l_atflv TYPE atflv,
+  l_anzst TYPE anzst,
+  l_anzdz TYPE anzdz,
+  l_wert(30),
+  l_objek TYPE cuobn,
+  l_atfor TYPE atfor,   "Format
+  l_klart TYPE klassenart VALUE '023',
+  l_obtab TYPE tabelle    VALUE 'MCH1'.
+
+PARAMETERS: p_matnr TYPE matnr DEFAULT 'MAT123',
+            p_charg TYPE charg_d.
+
+START-OF-SELECTION.
+  PERFORM lies_merkmal USING 'ZM_LAENGE'. "Länge
+  PERFORM lies_merkmal USING 'ZM_ANZAHL'. "Anzahl je Einheit
+
+*---------------------------------------------------------------------*
+*       FORM lies_merkmal                                             *
+*---------------------------------------------------------------------*
+FORM lies_merkmal USING value(f_merkmal).
+*-- Objektnummer aus Materialnummer und Charge bauen
+  l_objek        = p_matnr.
+  l_objek+18(10) = p_charg.
+  WRITE: / f_merkmal COLOR COL_POSITIVE.
+  POSITION 20.
+
+  CLEAR: l_atwrt, l_atflv, l_atfor, l_anzst, l_anzdz.
+
+*-- Merkmalswert über Inner Join ermitteln
+  SELECT SINGLE ausp~atwrt
+                ausp~atflv
+                cabn~atfor
+                cabn~anzdz
+    FROM ausp
+   INNER JOIN inob ON inob~cuobj = ausp~objek
+   INNER JOIN cabn ON ausp~atinn = cabn~atinn
+    INTO (l_atwrt, l_atflv, l_atfor, l_anzdz)
+   WHERE inob~klart = l_klart
+     AND inob~obtab = l_obtab
+     AND inob~objek = l_objek
+     AND cabn~atnam = f_merkmal.
+  IF sy-subrc &gt; 0.
+    WRITE: 'nicht bewertet.'.
+  ELSE.
+
+*-- Je nach Merkmalsformat unterschiedliche Zuweisung
+    CASE l_atfor.
+      WHEN 'CHAR'.
+*-- Zeichenformat
+        WRITE: l_atwrt.  
+      WHEN 'NUM' OR 'DATE' OR 'TIME'.
+*-- Numerisches Format
+        WRITE l_atflv TO l_wert EXPONENT 0 NO-GROUPING NO-ZERO
+                                         LEFT-JUSTIFIED DECIMALS l_anzdz.
+        WRITE: l_wert.
+    ENDCASE.
+  ENDIF.
+
+ENDFORM.</pre>
+<p>Der Beitrag <a href="/blog/bewertung-lesen/">Bewertung lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bewertung-lesen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

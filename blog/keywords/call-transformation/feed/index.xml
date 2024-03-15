@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>call transformation Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/call-transformation/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:52 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>call transformation Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Serialize me</title>
+		<link>/blog/serialize-me/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Dec 2015 17:42:33 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ZIP]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[call transformation]]></category>
+		<category><![CDATA[interface]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=368973</guid>
+
+					<description><![CDATA[<p>Serialisierung von Objekten. Was ist das? Wozu braucht man das? Wie kann man es sinnvoll nutzen? </p>
+<p>Der Beitrag <a href="/blog/serialize-me/">Serialize me</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Interface IF_SERIALIZABLE_OBJECT läuft einem hin und wieder in SAP-Standardklassen über den Weg.</p>
+<h2>Was ist Serialisierung?</h2>
+<p>Wikipedia sagt über <a href="https://de.wikipedia.org/wiki/Serialisierung">Serialisierung</a>:</p>
+<blockquote><p>Die <b>Serialisierung</b> ist in der Informatik eine Abbildung von strukturierten Daten auf eine sequenzielle Darstellungsform.</p></blockquote>
+<p>Eine der bekanntesten Anwendungen für die Serialisierung ist das JSON-Format, in dem komplexe Daten in einer lesbaren Form dargestellt werden können.</p>
+<p>Eine andere Form der Serialisierung lässt sich mit XML bewerkstelligen.</p>
+<h2>Interface IF_SERIALIZABLE_OBJECT</h2>
+<p>Damit ein Objekt (Klasse) serialisierbar ist, muss es das Interface IF_SERIALIZABLE_OBJECT implementieren:</p>
+<pre>CLASS lcl_serialize_me DEFINITION.
+ PUBLIC SECTION.
+ INTERFACES if_serializable_object.
+
+ DATA mt_t005  TYPE STANDARD TABLE OF t005.
+ DATA mt_t005t TYPE STANDARD TABLE OF t005t.
+
+ENDCLASS.</pre>
+<p>Zur Demonstration habe ich die zwei öffentlichen Attribute MT_T005 und MT_T005T hinzugefügt.</p>
+<p>Um die Klasse nutzen zu können, muss sie instantiiert werden:</p>
+<pre>DATA ref TYPE REF TO lcl_serialize_me.
+CREATE OBJECT ref.</pre>
+<p>In die Tabellen laden wir nun alle EG-Länder inklusive Texte:</p>
+<pre> SELECT * FROM t005 INTO TABLE ref-&gt;mt_t005 WHERE xegld = abap_true.
+ IF sy-subrc = 0.
+   SELECT * FROM t005t INTO TABLE ref-&gt;mt_t005t
+      FOR ALL ENTRIES IN ref-&gt;mt_t005
+    WHERE land1 = ref-&gt;mt_t005-land1
+      AND spras = sy-langu.
+ ENDIF.
+</pre>
+<p>Somit haben wir eine Objektreferenz erzeugt, die ein paar Daten enthält.</p>
+<p>Diese Daten sind auch serialisierbar. Andere Daten, wie zum Beispiel Attribute mit Referenzen zu anderen Klassen, sind nicht serialisierbar.</p>
+<p>Deswegen darf das Interface IF_SERIALIZABLE_OBJECT nur dann implementiert werden, wenn alle Attribute der Klasse für die Serialisierung geeignet sind.</p>
+<h2>Serialisierung</h2>
+<p>Nun soll das Objekt mittels XML serialisiert werden. Das geht schnell und einfach:</p>
+<pre>DATA ser TYPE string.</pre>
+<pre>CALL TRANSFORMATION id
+     SOURCE model = ref
+     RESULT XML ser.</pre>
+<p>Das Ergebnis ist ein lesbarer XML-String (Ausschnitt):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-20-37.png"><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-368974" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-20-37-300x168.png" alt="2015-12-02_18-20-37" width="300" height="168" srcset="/wp-content/uploads/2015/12/2015-12-02_18-20-37-300x168.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-20-37-1024x572.png 1024w, /wp-content/uploads/2015/12/2015-12-02_18-20-37.png 1145w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Tipp: Im Debugger ist es möglich, einen XML-String komplett darstellen zu lassen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-21-08.png"><img decoding="async" class="alignnone size-medium wp-image-368975" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-21-08-300x101.png" alt="2015-12-02_18-21-08" width="300" height="101" srcset="/wp-content/uploads/2015/12/2015-12-02_18-21-08-300x101.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-21-08.png 960w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Speicherplatz sparen</h2>
+<p>Da die Tabellen gefüllt sind, ist das Objekt recht groß geworden. Mit GZIP schrumpfen wir es auf eine kleinere Größe:</p>
+<pre>DATA zip TYPE xstring.
+cl_abap_gzip=&gt;compress_text(
+     EXPORTING text_in  = ser
+     IMPORTING gzip_out = zip ).</pre>
+<p>Dies aber nur nebenbei&#8230;</p>
+<h2>Deserialisierung</h2>
+<p>Nun möchten wir das serialisierte Objekt natürlich irgendwo speichern, ablegen oder verschicken.</p>
+<p>Das ist jedoch nur sinnvoll, wenn wir es auch wieder deserialisieren können&#8230;</p>
+<p>Die Objektreferenz ist in dem Fall natürlich leer:</p>
+<pre>CLEAR ref.
+</pre>
+<p>Die Deserialisierung funktioniert ebenfalls mittel CALL TRANSFORMATION in der Standardvariante:</p>
+<pre>CALL TRANSFORMATION id
+     SOURCE XML ser
+     RESULT model = ref.</pre>
+<p>Im Debugger kannst du überprüfen, dass die komplette Referenz wiederhergestellt wurde. Das ist fast schon Zauberei&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Vielen Dank an Haubi für diese Idee!</p>
+<h2>Nutzen</h2>
+<p>Wozu die Serialisierung und Deserialisierung tatsächlich nützlich ist, wird man wahrscheinlich erst wissen, wenn man es braucht. Daher ist es in jedem Fall gut zu wissen, dass es funktioniert.</p>
+<h2>DEMO</h2>
+<p>Ein einfaches Demoprogramm ist DEMO_SERIALIZABLE_OBJECT. Hier wird ebenfalls die Serialisierung demonstriert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-41-07.png"><img decoding="async" class="alignnone size-medium wp-image-368977" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-41-07-300x269.png" alt="2015-12-02_18-41-07" width="300" height="269" srcset="/wp-content/uploads/2015/12/2015-12-02_18-41-07-300x269.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-41-07-1024x917.png 1024w, /wp-content/uploads/2015/12/2015-12-02_18-41-07.png 1116w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Wer ein komplexes Demoprogramm zur Konvertierung von (Daten-) Typen sehen möchte, sollte sich das Programm STRANSDEMO_FLIGHTS anschauen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-37-23.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-368976" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-37-23-300x237.png" alt="2015-12-02_18-37-23" width="300" height="237" srcset="/wp-content/uploads/2015/12/2015-12-02_18-37-23-300x237.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-37-23-1024x810.png 1024w, /wp-content/uploads/2015/12/2015-12-02_18-37-23.png 1466w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Viel Spaß damit; mir ist es zu kompliziert!</p>
+<p>Der Beitrag <a href="/blog/serialize-me/">Serialize me</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Daten dynamisch verwalten</title>
+		<link>/blog/daten-dynamisch-verwalten/</link>
+					<comments>/blog/daten-dynamisch-verwalten/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 31 May 2012 16:05:40 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[export to database]]></category>
+		<category><![CDATA[export]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[call transformation]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[rtti]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=647</guid>
+
+					<description><![CDATA[<p>Daten werden in der Regel in Tabellen abgelegt. Bei komplexen Datenstrukturen oder auch bei Daten, die nicht allzulange vorgehalten werden m&#252;ssen, bietet sich ein EXPORT TO DATABASE an. Zusammen mit der Umwandlung von Daten ins XML-Format kann man eine Menge interessanter Dinge machen. In diesem Beispiel Speichern wir eine Tabelle mit einer bestimmten Struktur und lesen die Daten danach wieder in eine Tabelle mit einer anderen Struktur.</p>
+<p>Der Beitrag <a href="/blog/daten-dynamisch-verwalten/">Daten dynamisch verwalten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Daten werden in der Regel in Tabellen abgelegt. Bei komplexen Datenstrukturen oder auch bei Daten, die nicht allzulange vorgehalten werden müssen, bietet sich ein EXPORT TO DATABASE an. Zusammen mit der Umwandlung von Daten ins XML-Format kann man eine Menge interessanter Dinge machen. In diesem Beispiel Speichern wir eine Tabelle mit einer bestimmten Struktur und lesen die Daten danach wieder in eine Tabelle mit einer anderen Struktur.</p>
+<h2 class="head1">Um was geht es?</h2>
+<p>Wir simulieren in diesem Beispiel eine Strukturänderung, die in Folge einer Programmerweiterung auftreten kann.</p>
+<p>Stellen Sie sich vor, Sie haben eine Struktur in der Sie die Materialnummer und eine Serialnummer zu einem &#8220;Vorgang&#8221; speichern.</p>
+<p>Die Struktur sähe dann z.B. so aus:</p>
+<pre class="lang:abap decode:true ">TYPES: BEGIN OF ty_struc,
+         vorgang TYPE c LENGTH 10,
+         matnr   TYPE c LENGTH 18,
+         sernr   TYPE c LENGTH 18,
+       END OF ty_struc.</pre>
+<p>Die Speicherung erfolgt durch EXPORT TO DATABASE:</p>
+<p class="sap1">EXPORT gt_data TO DATABASE indx(zz) ID &#8216;$mydata$&#8217;.</p>
+<p>Das Programm läuft und funktioniert gut. Es werden zu einem Vorgang Materialnummer und Serialnummer gespeichert und gelesen.</p>
+<h2 class="head1">Strukturänderung</h2>
+<p>Nach einiger Zeit erweist es sich jedoch als hilfreich, die Equipmentnummer zum Vorgang ebenfalls zu speichern. Sie fügen den Feldern VORGANG, MATNR und SERNR also das Feld EQUNR hinzu:</p>
+<pre class="lang:abap decode:true ">TYPES: BEGIN OF ty_struc,
+         vorgang TYPE c LENGTH 10,
+         equnr   TYPE c LENGTH 18,
+         matnr   TYPE c LENGTH 18,
+         sernr   TYPE c LENGTH 18,
+       END OF ty_struc.</pre>
+<p>Wenn Sie nun allerdings einen alten Vorgang bearbeiten, werden Sie einen Shortdump bekommen:</p>
+<p class="sap1">Laufzeitfehler         CONNE_IMPORT_WRONG_COMP_LENG<br />
+Ausnahme               CX_SY_IMPORT_MISMATCH_ERROR</p>
+<p class="text1">Die Zusätze IGNORING STRUCTURE BOUNDARIES oder IGNORING CONVERSION CONVERSION ERRORS helfen uns leider nicht weiter.</p>
+<h2 class="head1">Die Lösung</h2>
+<p class="text1">Man kann einfach Abhilfe schaffen, in dem man von Anfang an die Daten in ein XML-Objekt umwandelt. Das geht mithilfe von CALL TRANSFORMATION extrem schnell, unkompliziert und sicher.</p>
+<pre class="lang:abap decode:true ">CALL TRANSFORMATION id 
+     SOURCE data = gt_data
+     RESULT XML xml_string.</pre>
+<p>Der Trick dabei ist, dass im Datencluster nicht vorhandene Felder einfach ignoriert werden. Ebenso werden Felder ignoriert, die zwar im Datencluster, aber nicht in der zu importierenden Struktur/ Tabelle vorhanden sind.</p>
+<p class="text1">Die Struktur kann fast beliebig geändert werden, solange die Feldnamen identisch bleiben. Sogar Feldtypen können problemlos geändert werden.</p>
+<p class="text1">Wenn natürlich ein CHAR-Feld in ein INT-Feld geändert wird, dann kann ein C-Wert natürlich nicht in ein numerisches Feld gewandelt werden.</p>
+<h2 class="head1">Und wozu brauche ich das?</h2>
+<p class="text1">Die Anwendung ist sicherlich nicht ganz alltäglich, denn normalerweise wird man wohl eine Datenbank-Tabelle definieren und die Daten dort strukturiert ablegen.</p>
+<p class="text1">Interessant wird es, wenn die Daten zu einer Anwendung teilweise dynamisch &#8211; zum Beispiel unterschiedliche Felder je Belegart &#8211; verwaltet werden. Sie könnten dann per Customizing zusätzliche Felder definieren, die in einer Anwendung geändert werden sollen. Mittels RTTI ist es inzwischen einfach, anhand eines Feldkatalogs eine interne Tabelle zu generieren.</p>
+<p class="text1">siehe: <a href="/wp-content/index.php?aID=426" target="_self">Interne Tabelle zur Laufzeit generieren</a></p>
+<p class="text1">Zur Anzeige oder Änderung kann dann ein ALV-Grid verwendet werden. Wenn Sie diese Art der Datenspeicherung verwenden, dann kann die Tabellenstruktur fast beliebig geändert werden.</p>
+<h2 class="head1">Coding</h2>
+<p class="text1">Das folgende Programm demonstriert das Vorgehen und simuliert die zeitliche Änderung einer Struktur dadurch, das einfach zwei verschiedene Strukturen verwendet werden.</p>
+<pre class="lang:abap decode:true ">*== old structure
+TYPES: BEGIN OF ty_test1,
+         eins TYPE c LENGTH 2,
+         zwei TYPE c LENGTH 2,
+         drei TYPE c LENGTH 2,
+       END OF ty_test1.
+
+*== new structure
+TYPES: BEGIN OF ty_test2,
+         neu TYPE c LENGTH 2,
+         eins TYPE c LENGTH 5,
+         zwei TYPE i,
+       END OF ty_test2.
+
+*== data tables
+DATA gt_test1 TYPE STANDARD TABLE OF ty_test1.
+DATA gt_test2 TYPE STANDARD TABLE OF ty_test2.
+*== id for storing data
+DATA gc_id TYPE c LENGTH 20 VALUE '$TRICKTRESOR!'.
+*== XML-String containing the data in XML-format
+DATA gv_xml TYPE string.
+*== exception reference CALL TRANSFORMATION
+DATA gx_error TYPE REF TO cx_dynamic_check.
+
+START-OF-SELECTION.
+
+*== add test data to "old" table
+  APPEND 'AA1111' TO gt_test1.
+  APPEND 'BB2222' TO gt_test1.
+  APPEND 'CC3333' TO gt_test1.</pre>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/screenshots/gt_test1.jpg" alt="" /></p>
+<p class="sap1">
+<pre class="lang:abap decode:true">*== save xml string into&amp;nbsp;data cluster*== Transform data table into xml string
+CALL TRANSFORMATION id
+     SOURCE test = gt_test1
+     RESULT XML gv_xml.
+
+EXPORT test = gv_xml TO DATABASE indx(zv) ID gc_id.
+
+*== clearance
+CLEAR gt_test1.
+CLEAR gt_test2.
+CLEAR gv_xml.
+
+*== import data into xml string
+IMPORT test TO gv_xml FROM DATABASE indx(zv) ID gc_id.
+
+TRY .
+*== transform xml data into table with NEW structure
+  CALL TRANSFORMATION id
+       SOURCE XML gv_xml
+       RESULT test = gt_test2.
+    CATCH cx_transformation_error INTO gx_error.
+  BREAK-POINT.
+ENDTRY.</pre>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/screenshots/gt_test2.jpg" alt="" /></p>
+<p>Der Beitrag <a href="/blog/daten-dynamisch-verwalten/">Daten dynamisch verwalten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/daten-dynamisch-verwalten/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

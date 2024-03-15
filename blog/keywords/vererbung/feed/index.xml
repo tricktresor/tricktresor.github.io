@@ -1,0 +1,1310 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>vererbung Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/vererbung/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 04 Jan 2022 13:53:18 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>vererbung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ALV-Grid um Sortierfunktion erweitern (Vererbung)</title>
+		<link>/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Oct 2017 18:28:09 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[Sortierung]]></category>
+		<category><![CDATA[Erweiterung]]></category>
+		<category><![CDATA[Geschützte Methoden]]></category>
+		<category><![CDATA[Redefinition]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018153</guid>
+
+					<description><![CDATA[<p>Objektorientierte Programmierung ist häufig immer noch ein rotes Tuch für viele. Man weiß zwar, wie Methoden aufgerufen werden und dass ein Objekt mit CREATE OBJECT oder NEW erzeugt werden muss aber die Designprinzipien sind irgendwie unklar. Und SAP-Klassen sind eh unantastbar. In diesem Artikel möchte ich dir eine Möglichkeit vorstellen, wie du den SAP-Standard mit Standardmitteln, nämlich mit Hilfe der Vererbung, erweitern kannst. Ich erweitere Beispielhaft die Funktionalität des ALV-Grid.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/">ALV-Grid um Sortierfunktion erweitern (Vererbung)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Objektorientierte Programmierung ist häufig immer noch ein rotes Tuch für viele. Man weiß zwar, wie Methoden aufgerufen werden und dass ein Objekt mit CREATE OBJECT oder NEW erzeugt werden muss aber die Designprinzipien sind irgendwie unklar. Und SAP-Klassen sind eh <em>unantastbar</em>.</p>
+<p>In diesem Artikel möchte ich dir eine Möglichkeit vorstellen, wie du den SAP-Standard mit Standardmitteln, nämlich mit Hilfe der Vererbung, erweitern kannst.</p>
+<h2>Enjoy und Bedienung</h2>
+<p>Trotz der GUI-Elemente, die unter dem Schlagwort <a href="https://www.computerwoche.de/a/ein-freundlicheres-gesicht-fuer-r-3-sap-enjoy,506853"><em>ENJOY</em> </a>eingeführt wurden, sind viele Elemente immer noch nicht wirklich benutzerfreundlich. Einiges kann man ändern, anderes nicht. Eine Möglichkeit um mit Hilfe der SAP-Standardcontrols ein neues Look &amp; Feel zu erzeugen, habe ich in diesem Beitrag gezeigt: Moderne UI mit altem SAPGUI und ALV-Grid</p>
+<p>Hier habe ich das Standard-ALV-Grid verwendet, um eine neue Funktionalität zu erzeugen. Dies ist allerdings ein eigenständiges Objekt und erweitert nicht die Standardfunktionalität des ALV-Grids.</p>
+<p>Wie das Überschreiben von geschützten Methoden generell funktioniert, habe ich hier beschrieben: <a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">Geschützte Methoden nutzen</a></p>
+<p>Dieser Artikel soll zeigen, dass es sich eventuell lohnt, auch über andere Erweiterungen von SAP-Standardfunktionalitäten nachzudenken. Es gibt Funktionalitäten, die eventuell in <strong>jedem</strong> ALV-Grid hilfreich wären. Zum Beispiel das einfache Umsortieren von Einträgen.</p>
+<h3>Umsortierung mittels Drag &amp; Drop</h3>
+<p>Eine Möglichkeit ist die Sortierung mittels Drag&amp;Drop im ALV-Feldkatalog:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/alv-grid-sort.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018154" src="https://tricktresor.com/wp-content/uploads/2017/10/alv-grid-sort.png" alt="" width="595" height="450" srcset="/wp-content/uploads/2017/10/alv-grid-sort.png 595w, /wp-content/uploads/2017/10/alv-grid-sort-300x227.png 300w" sizes="(max-width: 595px) 100vw, 595px" /></a></p>
+<p>Die Bedienung ist hier zwar auch gewöhnungsbedürftig, denn ein Eintrag, der umsortiert werden soll, muss erst mit einem Klick markiert und kann dann erst mittels Drag &amp; Drop an eine andere Stelle verschoben werden, aber immerhin.</p>
+<h3>Umsortierung mit Funktionstasten</h3>
+<p>Eine andere Möglichkeit wäre das Verschieben von Einträgen mit Funktionstasten. Folgender Screenshot ist aus dem unten stehenden Demo-Programm. Das ALV-Grid wurde um die Funktionstasten &#8220;Sort Up&#8221; und &#8220;Sort Down&#8221; erweitert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/alv2.png"><img decoding="async" class="alignnone size-full wp-image-1018155" src="https://tricktresor.com/wp-content/uploads/2017/10/alv2.png" alt="" width="801" height="296" srcset="/wp-content/uploads/2017/10/alv2.png 801w, /wp-content/uploads/2017/10/alv2-300x111.png 300w, /wp-content/uploads/2017/10/alv2-768x284.png 768w, /wp-content/uploads/2017/10/alv2-800x296.png 800w" sizes="(max-width: 801px) 100vw, 801px" /></a></p>
+<p>Wie das im Einzelnen geht, erkläre ich gleich.</p>
+<h2>Redefinition</h2>
+<p>eine wirklich starke Waffe des objektorientierten Sprachumfangs ist die Vererbung. Sofern die anzupassende Klasse nicht als &#8220;Final&#8221; definiert wurde, können <em>geschützte</em> und <em>öffentliche</em> Methoden redefiniert werden. Leider wird bei Anlage einer Klasse das Kennzeichen &#8220;Final&#8221; vorbelegt, so dass der Programmierer dieses aktiv entfernen muss. Ist dieses Kennzeichen gesetzt, funktioniert die Ableitung bzw. Vererbung nicht.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/klasse_final.png"><img decoding="async" class="alignnone size-full wp-image-1018156" src="https://tricktresor.com/wp-content/uploads/2017/10/klasse_final.png" alt="" width="504" height="340" srcset="/wp-content/uploads/2017/10/klasse_final.png 504w, /wp-content/uploads/2017/10/klasse_final-300x202.png 300w" sizes="(max-width: 504px) 100vw, 504px" /></a></p>
+<p>Die Klasse CL_GUI_ALV_GRID allerdings darf vererbt werden, denn sie ist nicht als final gekennzeichnet. Nichts desto Trotz muss bei Klassen sehr genau definiert werden, welche Methoden vererbt werden dürfen und welche nicht.</p>
+<h2>Funktion &#8220;Umsortieren&#8221;</h2>
+<p>Die neue Funktion nenne ich &#8220;Umsortieren&#8221;, denn es ist keine Sortieren-Funktion, die man aus dem Standard kennt. Um Einträge umsortieren zu können, wird in der Regel im SAP mit einem Sortierfeld gearbeitet, das der Anwender manuell pflegen muss. Dazu wird häufig in Zehnerschritten gearbeitet, um später Einträge einfügen zu können. Einträge in dieser Form in eine andere Reihenfolge zu bringen ist in der Regel sehr mühselig.</p>
+<p>Die Idee ist, dass der Anwender einen Eintrag markieren kann und diesem mit den Funktionstasten &#8220;Sort Up&#8221; und Sort Down&#8221; in der Liste hoch und runter verschieben kann. Ein Feld, in der die aktuelle Reihenfolge festgehalten wird, brauchen wir natürlich trotzdem.</p>
+<h2>Vererbung</h2>
+<p>Ich möchte die Klasse CL_GUI_ALV_GRID also für meine Zwecke missbrauchen und muss sie deswegen ableiten bzw. vererben. Dazu lege ich in der Transaktion SE80 oder SE24 eine neue Klasse an: ZCL_GUI_ALV_GRID_SORT und gebe als Oberklasse zu zu beerbende Klasse CL_GUI_ALV_GRID an:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018157" src="https://tricktresor.com/wp-content/uploads/2017/10/class1.png" alt="" width="661" height="229" srcset="/wp-content/uploads/2017/10/class1.png 661w, /wp-content/uploads/2017/10/class1-300x104.png 300w, /wp-content/uploads/2017/10/class1-660x229.png 660w" sizes="(max-width: 661px) 100vw, 661px" /></a></p>
+<h2>Sortierfeld</h2>
+<p>Der Programmierer muss angeben können, welches Feld für die Sortierung der Einträge verwendet werden soll. In diesem Feld wird dann die automatische Nummerierung anhand der Reihenfolge gesetzt. Ich lege dafür die Methode SET_SORT_FIELD an mit dem Übergabeparameter FIELDNAME.</p>
+<p>Diese Methode muss vor SET_TABLE_FOR_FIRST_DISPLAY aufgerufen werden, damit die Umsortierfunktionalität von Anfang an zur Verfügung steht.</p>
+<p>Das Sortierfeld merke ich mir im Attribut MV_SORT_FIELD.</p>
+<h2>Ereignis TOOLBAR</h2>
+<p>Da ich das Ereignis TOOLBAR nutzen möchte, um die neuen Funktionstasten einzubauen, muss ich es für meine abgeleitete Klasse registrieren:</p>
+<pre class="lang:abap decode:true">SET HANDLER on_toolbar FOR me.</pre>
+<p>Zusätzlich benötige ich eine Methode, die beim Auslösen des Ereignisses angesprungen wird: ON_TOOLBAR. Diese Methode muss als Ereignisbehandler für das Ereignis TOOLBAR definiert werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class2.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018158" src="https://tricktresor.com/wp-content/uploads/2017/10/class2.png" alt="" width="420" height="383" srcset="/wp-content/uploads/2017/10/class2.png 420w, /wp-content/uploads/2017/10/class2-300x274.png 300w" sizes="(max-width: 420px) 100vw, 420px" /></a></p>
+<p>Der Methode stehen nun theoretisch alle Parameter des Ereignisses zur Verfügung. Allerdings müssen diese manuell übernommen werden. Die Drucktaste &#8220;Ereignisparameter&#8221; in der Sicht &#8220;Parameter&#8221; erledigt das für mich:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class3.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018159" src="https://tricktresor.com/wp-content/uploads/2017/10/class3.png" alt="" width="830" height="256" srcset="/wp-content/uploads/2017/10/class3.png 830w, /wp-content/uploads/2017/10/class3-300x93.png 300w, /wp-content/uploads/2017/10/class3-768x237.png 768w" sizes="(max-width: 830px) 100vw, 830px" /></a></p>
+<p>In der Methode füge ich die Drucktasten SORT_UP und SORT_DOWN der Toolbar hinzu.</p>
+<pre class="lang:abap decode:true">  METHOD on_toolbar.
+
+    check mv_sort_field is NOT INITIAL.
+
+    APPEND VALUE #(   function  = 'Sort_down'
+                      icon      = icon_next_page
+                      quickinfo = space
+                      butn_type = if_sat_ui_button_types=&gt;normal
+                      disabled  = space
+                      text      = 'Sort down'
+                      checked   = space ) TO e_object-&gt;mt_toolbar.
+    APPEND VALUE #(   function  = 'Sort_up'
+                      icon      = icon_previous_page
+                      quickinfo = space
+                      butn_type = if_sat_ui_button_types=&gt;normal
+                      disabled  = space
+                      text      = 'Sort up'
+                      checked   = space ) TO e_object-&gt;mt_toolbar.
+
+  ENDMETHOD.</pre>
+<h2>Redefinition DISPATCH</h2>
+<p>Um intern auf die Drucktasten reagieren zu können, muss ich die Methode DISPATCH redefinieren und meine Drucktasten SORT_UP und SORT_DOWN für das Ereignis TOOLBAR_BUTTON_CLICK abfangen.</p>
+<p>In allen anderen Fällen muss die Methode DISPATCH der abgeleiteten Klasse aufgerufen werden (SUPER-&gt;DISPATCH).</p>
+<p>Im Falle des Ereignisses TOOLBAR_BUTTON_CLICK muss ich mir noch die Ereignisparameter besorgen in denen der Funktionscode der Drucktaste steht (Methode GET_EVENT_PARAMETER).</p>
+<p>Nun gilt es noch, folgendes zu tun:</p>
+<ul>
+<li>Abfrage auf die Funktionscodes SORT_UP und SORT_DOWN</li>
+<li>Zugriff auf die Datentabelle erhalten</li>
+<li>Ermitteln der aktuellen Cursorposition</li>
+<li>Umsortieren des Eintrags</li>
+<li>Neunummerierung</li>
+<li>Cursor auf die umsortierte Zeile setzen</li>
+<li>Anzeige aktualisieren</li>
+</ul>
+<pre class="lang:abap decode:true">  METHOD dispatch.
+
+    DATA action TYPE string.
+    CASE eventid.
+      WHEN evt_toolbar_button_click.
+        CALL METHOD get_event_parameter
+          EXPORTING
+            parameter_id = 0
+            queue_only   = space
+          IMPORTING
+            parameter    = action.
+        CALL METHOD cl_gui_cfw=&gt;flush.
+        CASE action.
+          WHEN 'Sort_up'.
+            CALL METHOD get_current_cell
+              IMPORTING
+                es_row_id = DATA(ls_row)
+                es_row_no = DATA(ls_row_no).
+            FIELD-SYMBOLS &lt;outtab&gt; TYPE table.
+            ASSIGN mt_outtab-&gt;* TO &lt;outtab&gt;.
+            IF ls_row-index &gt; 1.
+              READ TABLE &lt;outtab&gt; ASSIGNING FIELD-SYMBOL(&lt;outline&gt;) INDEX ls_row-index.
+              DATA(indx) = ls_row-index - 1.
+              ASSIGN COMPONENT 2 OF STRUCTURE &lt;outline&gt; TO FIELD-SYMBOL(&lt;value&gt;).
+              IF sy-subrc = 0.
+                INSERT &lt;outline&gt; INTO &lt;outtab&gt; INDEX indx.
+                indx = indx + 2.
+                DELETE &lt;outtab&gt; INDEX indx.
+                indx = indx - 2.
+
+                LOOP AT &lt;outtab&gt; ASSIGNING &lt;outline&gt;.
+                  ASSIGN COMPONENT mv_sort_field OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+                  &lt;value&gt; = sy-tabix.
+                ENDLOOP.
+                refresh_table_display( is_stable = VALUE #( col = abap_true row = abap_true ) i_soft_refresh = abap_true ).
+                set_selected_rows( it_row_no = VALUE #( ( row_id = indx ) ) ).
+              ENDIF.
+            ENDIF.
+            EXIT.
+          WHEN 'Sort_down'.
+            CALL METHOD get_current_cell
+              IMPORTING
+                es_row_id = ls_row
+                es_row_no = ls_row_no.
+            ASSIGN mt_outtab-&gt;* TO &lt;outtab&gt;.
+            IF ls_row-index &lt; lines( &lt;outtab&gt; ).
+              READ TABLE &lt;outtab&gt; ASSIGNING &lt;outline&gt; INDEX ls_row-index.
+              indx = ls_row-index + 2.
+              ASSIGN COMPONENT 2 OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+              IF sy-subrc = 0.
+                INSERT &lt;outline&gt; INTO &lt;outtab&gt; INDEX indx.
+                indx = indx - 2.
+                DELETE &lt;outtab&gt; INDEX indx.
+                indx = indx + 1.
+                LOOP AT &lt;outtab&gt; ASSIGNING &lt;outline&gt;.
+                  ASSIGN COMPONENT mv_sort_field OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+                  &lt;value&gt; = sy-tabix.
+                ENDLOOP.
+
+                refresh_table_display( is_stable = VALUE #( col = abap_true row = abap_true ) i_soft_refresh = abap_true ).
+                set_selected_rows( it_row_no = VALUE #( ( row_id = indx ) ) ).
+              ENDIF.
+            ENDIF.
+            EXIT.
+        ENDCASE.
+    ENDCASE.
+
+
+    super-&gt;dispatch(
+      EXPORTING
+        cargo             = cargo
+        eventid           = eventid
+        is_shellevent     = is_shellevent
+        is_systemdispatch = is_systemdispatch
+      EXCEPTIONS
+        cntl_error        = 1
+        OTHERS            = 2 ).
+
+  ENDMETHOD.</pre>
+<h2>Testprogramm</h2>
+<p>In folgendem Testprogramm kannst du die Verwendung des neuen Standards sehen. Du siehst, dass trotz meines Eingriffs in die Toolbar weiterhin Drucktasten hinzugefügt werden können:</p>
+<pre class="lang:abap decode:true">REPORT zz_alv_grid_sort.
+
+DATA gs_data TYPE vbak.
+
+SELECT-OPTIONS s_vbeln FOR gs_data-vbeln.
+
+
+CLASS main DEFINITION.
+  PUBLIC SECTION.
+    TYPES ty_data       TYPE vbak.
+
+    TYPES ty_data_t     TYPE STANDARD TABLE OF ty_data
+                             WITH DEFAULT KEY.
+
+    DATA ms_data        TYPE ty_data.
+    DATA mt_data        TYPE ty_data_t.
+
+    DATA mr_grid        TYPE REF TO zcl_gui_alv_grid_sort.
+    METHODS start.
+  PROTECTED SECTION.
+    METHODS selection.
+    METHODS display.
+    METHODS handle_toolbar      FOR EVENT toolbar
+                  OF cl_gui_alv_grid
+      IMPORTING e_object.
+    METHODS handle_user_command FOR EVENT user_command
+                  OF cl_gui_alv_grid
+      IMPORTING e_ucomm sender.
+
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+
+  METHOD handle_user_command.
+
+    DATA lt_rows TYPE lvc_t_row.
+    DATA ls_row   TYPE lvc_s_row.
+    DATA ls_data  TYPE ty_data.
+
+    CASE e_ucomm.
+      WHEN 'USER01'.
+        sender-&gt;get_selected_rows( IMPORTING et_index_rows = lt_rows ).
+        LOOP AT lt_rows INTO ls_row.
+          READ TABLE mt_data INTO ls_data INDEX ls_row-index.
+          IF sy-subrc = 0.
+            MESSAGE i000(oo) WITH 'Usercommand 01: Beleg' ls_data-vbeln.
+          ENDIF.
+        ENDLOOP.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD handle_toolbar.
+
+    DATA: ls_toolbar  TYPE stb_button.
+
+*** Trenner
+    CLEAR ls_toolbar.
+    MOVE 3 TO ls_toolbar-butn_type.
+    APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+*** Icon “Test”
+    CLEAR ls_toolbar.
+    MOVE icon_generate              TO ls_toolbar-icon.
+    MOVE 'USER01'                   TO ls_toolbar-function.
+    MOVE 'User 01'                  TO ls_toolbar-quickinfo.
+    MOVE 'Userbutton 01'            TO ls_toolbar-text.
+    APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+  ENDMETHOD.
+
+
+  METHOD start.
+    selection( ).
+    display( ).
+  ENDMETHOD.
+
+  METHOD selection.
+    SELECT * FROM vbak INTO TABLE mt_data UP TO 10 ROWS.
+  ENDMETHOD.
+
+  METHOD display.
+
+    WRITE 'DUMMY'.
+
+    CREATE OBJECT mr_grid
+      EXPORTING
+        i_parent      = cl_gui_container=&gt;screen0
+        i_appl_events = space.
+
+    mr_grid-&gt;set_sort_field( 'ERNAM' ).
+
+    SET HANDLER handle_toolbar      FOR mr_grid.
+    SET HANDLER handle_user_command FOR mr_grid.
+
+
+    DATA lv_structure_name    TYPE dd02l-tabname VALUE 'VBAK'.
+    DATA ls_variant           TYPE disvariant.
+    DATA lv_save              TYPE char01 VALUE 'U'.
+    DATA lv_default           TYPE char01 VALUE abap_true.
+    DATA ls_layout            TYPE lvc_s_layo.
+
+    ls_layout-sel_mode       = 'A'.
+    ls_layout-grid_title     = 'Titel'.
+
+    mr_grid-&gt;set_table_for_first_display(
+      EXPORTING
+        i_structure_name              = lv_structure_name
+        is_variant                    = ls_variant
+        i_save                        = lv_save
+        i_default                     = lv_default
+        is_layout                     = ls_layout
+      CHANGING
+        it_outtab                     = mt_data ).
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+START-OF-SELECTION.
+  NEW main( )-&gt;start( ).</pre>
+<p>&nbsp;</p>
+<h2>Ergebnis</h2>
+<p>Du kannst nun den Cursor auf einen Eintrag stellen und durch Klicken auf &#8220;Sort Up&#8221; oder &#8220;Sort Down&#8221; den Eintrag umsortieren. Die Sortierung wird in dem Feld &#8220;ERNAM &#8211; Angelegt von&#8221; vorgehalten.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class4.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018161" src="https://tricktresor.com/wp-content/uploads/2017/10/class4.png" alt="" width="753" height="335" srcset="/wp-content/uploads/2017/10/class4.png 753w, /wp-content/uploads/2017/10/class4-300x133.png 300w" sizes="(max-width: 753px) 100vw, 753px" /></a></p>
+<h2>Fazit</h2>
+<p>Die Änderung von SAP-Standardfunktionen ist möglich. Allerdings ist das erstens nicht immer so einfach, wie in diesem Artikel beschrieben. In der Regel muss man genau und langwierig debuggen und prüfen, wo welche Methoden verwendet werden können. Zudem müssen die Funktionen natürlich ausgiebig getestet werden. Immerhin sollen sie genau wie die Standardfunktionalität zuverlässig funktionieren.</p>
+<p>Des Weiteren sollten Funktionen, die wirklich in einer Vielzahl von eigenen Programmierungen eingesetzt werden sauber ausprogrammiert werden. In dem hier vorgestellten Beispiel sollte zum Beispiel sichergestellt werden, dass das Feld mit der Sortierung auch wirklich im Feldkatalog vorhanden ist. Die Benutzereigene Sortierung muss irgendwie berücksichtigt werden.</p>
+<p>Zudem sollte es natürlich möglich sein, auch mehrere Zeilen zu markieren und diese en bloc zu verschieben. Das hängt aber wiederum von der Programmierung ab, ob wirklich mehrere Zeilen markiert werden dürfen oder nicht.</p>
+<p>Ebenso wäre die Eingangs erwähnte Sortierung mittels Drag &amp; Drop sinnvoll. Diese könnte dann allerdings einer anderen vom Programmierer erstellten Drag &amp; Drop Funktionalität in die Quere kommen.</p>
+<p>Allerdings lohnt es sich, hier Aufwand zu investieren, denn die erweiterte Funktionalität kann eventuell viele separate Programmierungen überflüssig machen oder vorhandene Programmierungen auf einfache Weise benutzerfreundlicher machen.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/">ALV-Grid um Sortierfunktion erweitern (Vererbung)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Redefinierte Methoden?</title>
+		<link>/blog/redefinierte-methoden/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 09 Nov 2015 17:59:37 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[klasse]]></category>
+		<category><![CDATA[Redefnition]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=332915</guid>
+
+					<description><![CDATA[<p>Heute habe ich in einer Klassenhierarchie (Superklasse -> vererbte Klassen) eine Klasse gesucht habe, bei der ich eine bestimmte Methode redefiniert habe. Bei der Suche bin ich auf eine Tabelle gestossen, die die gewünschte Information liefert...</p>
+<p>Der Beitrag <a href="/blog/redefinierte-methoden/">Redefinierte Methoden?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute habe ich in einer Klassenhierarchie (Superklasse -&gt; vererbte Klassen) eine Klasse gesucht habe, bei der ich eine bestimmte Methode redefiniert habe.</p>
+<p>Als anständiger Programmierer war ich natürlich zu faul, mich auch nur durch drei vererbte Klassen durchzuklicken&#8230; Also bin ich auf die Suche nach einem passenden Funktionsbaustein gegangen und dabei auf SEO_INHERITANC_READ gestossen. Diesem Funktionsbaustein kannst du eine Klasse übergeben und erhältst alle redefinierten Methoden.</p>
+<p>Nicht ganz das, was ich gesucht habe, aber die verwendete Tabelle SEOREDEF lieferte mir die gewünschten Informationen im Handumdrehen.</p>
+<p>Hier ein Beispiel in dem du siehst, welche Methoden von CL_GUI_CONTAINER in direkt geerbten Klassen redefiniert wurden:</p>
+<p><img loading="lazy" decoding="async" class="aligncenter wp-image-332916 size-full" src="https://tricktresor.com/wp-content/uploads/2015/11/2015-11-09_18-17-16.png" alt="2015-11-09_18-17-16" width="577" height="530" srcset="/wp-content/uploads/2015/11/2015-11-09_18-17-16.png 577w, /wp-content/uploads/2015/11/2015-11-09_18-17-16-300x276.png 300w" sizes="(max-width: 577px) 100vw, 577px" /></p>
+<p>Allerdings ist diese Methode nicht 100%ig, denn es wird natürlich nur die direkte Vererbung gespeichert. Von der Klasse CL_GUI_DOCKING_CONTAINER zum Beispiel erben weitere Klassen. Deren Redefinitionen sind nur sichtbar, wenn du die Klasse CL_GUI_DOCKING_CONTAINER direkt eingibst.</p>
+<p>Um zu sehen, wo entlang einer Vererbungshierarchie welche Methoden redefiniert wurden, muss also noch ein Programm geschrieben werden.</p>
+<h2>Programm</h2>
+<p>Hier ist das kleine Programm. Quick and dirty. Methode GET_SUBCLASSES der Klasse CL_OO_CLASS gibt alle vererbten Klassen zurück.</p>
+<p>von diesen Klassen werden die redefinierten Methoden ermittelt.</p>
+<p>Um zu sehen, welche Methode in welcher Klasse redefiniert wurde, muss nach Methode gefiltert oder sortiert werden:</p>
+<p><img loading="lazy" decoding="async" class="aligncenter wp-image-332984 size-full" src="https://tricktresor.com/wp-content/uploads/2015/11/2015-11-09_18-49-58.png" alt="2015-11-09_18-49-58" width="589" height="464" srcset="/wp-content/uploads/2015/11/2015-11-09_18-49-58.png 589w, /wp-content/uploads/2015/11/2015-11-09_18-49-58-300x236.png 300w" sizes="(max-width: 589px) 100vw, 589px" /></p>
+<h2>Code</h2>
+<pre>REPORT.
+
+PARAMETERS p_class TYPE seoclsname DEFAULT 'CL_GUI_CONTAINER'.
+
+DATA gt_redef TYPE STANDARD TABLE OF seoredef.
+
+START-OF-SELECTION.
+
+ PERFORM do USING p_class 'X'.
+ PERFORM display.
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form display
+*&amp;---------------------------------------------------------------------*
+FORM display.
+
+ DATA lr_table TYPE REF TO cl_salv_table.
+ DATA lr_funcs TYPE REF TO cl_salv_functions_list.
+
+ CALL METHOD cl_salv_table=&gt;factory
+ IMPORTING
+ r_salv_table = lr_table
+ CHANGING
+ t_table = gt_redef.
+
+ lr_funcs = lr_table-&gt;get_functions( ).
+ lr_funcs-&gt;set_all( ).
+
+ lr_table-&gt;display( ).
+ENDFORM. "display
+
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form do
+*&amp;---------------------------------------------------------------------*
+FORM do USING i_class TYPE seoclsname
+ i_start TYPE boolean.
+
+ DATA lr_class TYPE REF TO cl_oo_class.
+ DATA lt_subclasses TYPE seo_relkeys.
+ DATA ls_subclass LIKE LINE OF lt_subclasses.
+
+ TRY .
+ lr_class ?= cl_oo_class=&gt;get_instance( i_class ).
+
+ APPEND LINES OF lr_class-&gt;redefinitions TO gt_redef.
+ lt_subclasses = lr_class-&gt;get_subclasses( ).
+
+ IF i_start = abap_true.
+ LOOP AT lt_subclasses INTO ls_subclass.
+ PERFORM do USING ls_subclass-clsname space.
+ ENDLOOP.
+ ENDIF.
+
+ CATCH cx_class_not_existent.
+
+ ENDTRY.
+
+ENDFORM. "do</pre>
+<pre></pre>
+<p>Der Beitrag <a href="/blog/redefinierte-methoden/">Redefinierte Methoden?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Grid mit Variantenschnellzugriff (Menü)</title>
+		<link>/blog/grid-mit-variantenschnellzugriff-menue/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 16 Aug 2011 19:23:04 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[splitter]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[cl_gui_splitter_container]]></category>
+		<category><![CDATA[BW]]></category>
+		<category><![CDATA[cl_gui_container]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[toolbar]]></category>
+		<category><![CDATA[sender]]></category>
+		<category><![CDATA[Layout]]></category>
+		<category><![CDATA[LVC_VARIANT_SELECT]]></category>
+		<category><![CDATA[set_variant]]></category>
+		<category><![CDATA[set_frontend_fieldcatalog]]></category>
+		<category><![CDATA[cl_gui_custom_container]]></category>
+		<category><![CDATA[set_filter_criteria]]></category>
+		<category><![CDATA[register events]]></category>
+		<category><![CDATA[set_sort_criteria]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=611</guid>
+
+					<description><![CDATA[<p>Dies ist eine andere Version mit der ein Varianten-Schnellzugriff in einem ALV-Grid realisiert wurde. Dieses Programm verwaltet vier Grids und in jedem Grid werden die vorhandenen Varianten in zwei Men&#252;s angezeigt: System- und Benutzervarianten. Der Name der aktuell ausgew&#228;hlten Variante wird dabei im jeweiligen Men&#252; angezeigt. </p>
+<p>Der Beitrag <a href="/blog/grid-mit-variantenschnellzugriff-menue/">Grid mit Variantenschnellzugriff (Menü)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Dies ist eine andere Version mit der ein Varianten-Schnellzugriff in einem ALV-Grid realisiert wurde. Dieses Programm verwaltet vier Grids und in jedem Grid werden die vorhandenen Varianten in zwei Menüs angezeigt: System- und Benutzervarianten. Der Name der aktuell ausgewählten Variante wird dabei im jeweiligen Menü angezeigt.</p>
+<h2 class="head1">Screenshot</h2>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/ALV/Bild527.jpg" alt="" /></p>
+<h2 class="head1">Erklärung</h2>
+<p class="text1">Die beiden Events, die für die Umsetzung maßgeblich beteiligt sind: TOOLBAR und MENU_BUTTON.</p>
+<p class="text1">Im Event TOOLBAR werden die Menüs erstellt. In MENU_BUTTON werden die zugehörigen Untermenüs aufgebaut, wenn der Benutzer auf einen Menu-Button geklickt hat. Die Menüs in der Toolbar werden also erst zum Zeitpunkt des Anklickens aufgebaut.</p>
+<p class="text1"><img decoding="async" src="/wp-content/uploads/tt_images/ALV/Bild528.jpg" alt="" /></p>
+<p>Links die globalen Varianten, rechts Benutzervarianten</p>
+<h2>Coding</h2>
+<pre class="lang:abap decode:true ">*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZZ_GRID_VARIANT_MENU
+*&amp;---------------------------------------------------------------------*
+
+***_________________________________***
+***                                 ***
+***    https://tricktresor.com   / ***
+***_________________________________***
+***                                 ***
+
+* BESCHREIBUNG
+* ============
+* Das Programm enthält eine Klasse, mit deren Hilfe vier durch einen
+* Splitter getrennte ALV-Grids angezeigt werden
+* Es können Varianten abgespeichert werden, die dann als Schnellzugriff
+* mit einem Menü in der Toolbar aktiviert werden.
+
+* DYNPRO 100
+* ==========
+* Dynpro 100 muss angelegt werden.
+* Es muss einen CustomContainer mit Namen CONTAINER enthalten
+* Der Status "100" muss angelegt werden. Die Funktionstaste F3 muss
+* mit dem Funktionscode BACK belegt werden.
+
+* DYNPRO-ABLAUFLOGIK
+* ==================
+* PROCESS BEFORE OUTPUT.
+*   MODULE pbo.
+*
+* PROCESS AFTER INPUT.
+*   MODULE pai.
+
+REPORT zz_grid_variant.
+
+*** Class for event receiver
+CLASS lcl_event_receiver DEFINITION DEFERRED.
+
+*** global data
+DATA gr_grid1    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid2    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid3    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid4    TYPE REF TO            lcl_event_receiver.
+
+DATA gv_matnr    TYPE matnr.
+DATA gt_mara     TYPE STANDARD TABLE OF mara.
+DATA gt_marc     TYPE STANDARD TABLE OF marc.
+DATA gt_mard     TYPE STANDARD TABLE OF mard.
+DATA gt_mvke     TYPE STANDARD TABLE OF mvke.
+
+DATA gr_cc       TYPE REF TO            cl_gui_custom_container.
+DATA gr_splitter TYPE REF TO            cl_gui_splitter_container.
+
+DATA gr_cont1    TYPE REF TO            cl_gui_container.
+DATA gr_cont2    TYPE REF TO            cl_gui_container.
+DATA gr_cont3    TYPE REF TO            cl_gui_container.
+DATA gr_cont4    TYPE REF TO            cl_gui_container.
+
+SELECT-OPTIONS s_matnr FOR gv_matnr.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+
+  PUBLIC SECTION.
+
+    DATA gr_grid    TYPE REF TO            cl_gui_alv_grid.
+DATA gr_cont    TYPE REF TO            cl_gui_container.
+DATA gs_variant TYPE                   disvariant.
+DATA gs_layout  TYPE                   lvc_s_layo.
+DATA gv_table   TYPE                   text80.
+
+    DATA ls_toolbar       TYPE stb_button.
+DATA ls_variant       TYPE disvariant.
+
+*** Variants
+DATA lt_ltdx          TYPE STANDARD TABLE OF ltdx.
+
+*** Variant texts
+DATA lt_ltdxt         TYPE STANDARD TABLE OF ltdxt.
+
+METHODS:
+
+*** constructor
+constructor
+IMPORTING i_handle    TYPE c
+i_container TYPE REF TO cl_gui_container
+i_title     TYPE lvc_title
+i_table     TYPE c,
+
+*** event for menu button
+handle_menu_button
+FOR EVENT menu_button OF cl_gui_alv_grid
+IMPORTING e_object e_ucomm sender,
+
+*** event for double click
+handle_double_click
+FOR EVENT double_click OF cl_gui_alv_grid
+IMPORTING e_row e_column es_row_no sender,
+
+*** event for adding buttons to toolbar
+handle_toolbar
+FOR EVENT toolbar OF cl_gui_alv_grid
+IMPORTING e_object e_interactive sender,
+
+*** event for pressed buttons
+handle_user_command
+FOR EVENT user_command OF cl_gui_alv_grid
+IMPORTING e_ucomm sender.
+
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+
+  METHOD constructor.
+
+    FIELD-SYMBOLS &lt;outtab&gt; TYPE STANDARD TABLE.
+
+    gv_table = i_table.
+ASSIGN (gv_table) TO &lt;outtab&gt;.
+CHECK sy-subrc = 0.
+
+*** Create ALV Grid
+CREATE OBJECT gr_grid
+EXPORTING
+i_parent = i_container.
+
+*** Set variant
+CLEAR gs_variant.
+gs_variant-report    = sy-repid.
+gs_variant-handle    = i_handle.
+gs_variant-username  = sy-uname.
+
+*** Layout
+gs_layout-grid_title = i_title.
+gs_layout-no_toolbar = ' '.
+
+*** Set display
+CALL METHOD gr_grid-&gt;set_table_for_first_display
+EXPORTING
+i_structure_name = i_handle
+is_variant       = gs_variant
+i_save           = 'A'
+i_default        = 'X'
+is_layout        = gs_layout
+CHANGING
+it_outtab        = &lt;outtab&gt;
+EXCEPTIONS
+OTHERS           = 4.
+
+**** Create event handler for grid
+SET HANDLER handle_user_command
+handle_toolbar
+handle_double_click
+handle_menu_button
+FOR gr_grid.
+
+*** set toolbar interactive
+CALL METHOD gr_grid-&gt;set_toolbar_interactive.
+
+  ENDMETHOD.                    "constructor
+
+  METHOD handle_double_click.
+
+    FIELD-SYMBOLS &lt;outtab&gt; TYPE STANDARD TABLE.
+FIELD-SYMBOLS &lt;outwa&gt;  TYPE ANY.
+FIELD-SYMBOLS &lt;value&gt;  TYPE ANY.
+
+    ASSIGN (gv_table) TO &lt;outtab&gt;.
+CHECK sy-subrc = 0.
+
+    CASE e_column.
+WHEN 'MATNR'.
+READ TABLE &lt;outtab&gt; ASSIGNING &lt;outwa&gt; INDEX es_row_no-row_id.
+IF sy-subrc = 0.
+ASSIGN COMPONENT e_column OF STRUCTURE &lt;outwa&gt; TO &lt;value&gt;.
+IF sy-subrc = 0.
+SET PARAMETER ID 'MAT' FIELD &lt;value&gt;.
+CALL TRANSACTION 'MM03' AND SKIP FIRST SCREEN.
+ENDIF.
+ENDIF.
+ENDCASE.
+
+  ENDMETHOD.                    "handle_double_click
+
+  METHOD handle_toolbar.
+
+    FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+**** Get actual variant
+CALL METHOD sender-&gt;get_variant
+IMPORTING
+es_variant = ls_variant.
+
+*** Read existing variants
+SELECT * FROM ltdx INTO TABLE lt_ltdx UP TO 10 ROWS
+WHERE relid  = 'LT'
+AND report = gs_variant-report
+AND handle = gs_variant-handle
+AND srtf2  = 0
+AND ( username = space
+OR  username = sy-uname )
+ORDER BY username variant.
+
+    IF sy-subrc = 0.
+*** add Separator to toolbar
+ls_toolbar-function  = 'DUMMY'.
+ls_toolbar-butn_type = '3'.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+*** Get variant texts
+SELECT * FROM ltdxt INTO TABLE lt_ltdxt
+FOR ALL ENTRIES IN lt_ltdx
+WHERE relid  = 'LT'
+AND report = gs_variant-report
+AND handle = gs_variant-handle
+AND variant = lt_ltdx-variant
+AND langu = sy-langu.
+
+*** Check if there are global variants...
+READ TABLE lt_ltdx TRANSPORTING NO FIELDS
+WITH KEY username = space.
+IF sy-subrc = 0.
+*** add menu "GLOBAL" to toolbar
+CLEAR ls_toolbar.
+IF ls_variant-variant IS NOT INITIAL AND
+ls_variant-variant(1) = '/'.
+*** If variant is actually set: Display name of variant
+READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY username = space
+variant  = ls_variant-variant.
+IF sy-subrc = 0.
+ls_toolbar-text = &lt;ltdxt&gt;-text.
+ENDIF.
+ENDIF.
+ls_toolbar-function  = 'GLOBAL'.
+ls_toolbar-icon      = icon_bw_gis.
+ls_toolbar-butn_type = '2'.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+ENDIF.
+
+*** Check if there are user specific variants...
+READ TABLE lt_ltdx TRANSPORTING NO FIELDS
+WITH KEY username = sy-uname.
+IF sy-subrc = 0.
+*** add menu "USER SPECIFIC" to toolbar
+CLEAR ls_toolbar.
+IF ls_variant-variant IS NOT INITIAL AND
+ls_variant-variant(1) &lt;&gt; '/'.
+*** If variant is actually set: Display name of variant
+READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY username = sy-uname
+variant  = ls_variant-variant.
+IF sy-subrc = 0.
+ls_toolbar-text = &lt;ltdxt&gt;-text.
+ENDIF.
+ENDIF.
+ls_toolbar-function  = 'USER'.
+ls_toolbar-icon      = icon_usergroup.
+ls_toolbar-butn_type = '2'.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+ENDIF.
+ENDIF.
+
+  ENDMETHOD.                    "handle_toolbar
+
+  METHOD handle_user_command.
+*** Set chosen variant
+
+    FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+*** data
+DATA lv_user_specific TYPE c.
+DATA ls_variant       TYPE disvariant.
+DATA ls_stable        TYPE lvc_s_stbl.
+DATA lt_fieldcat      TYPE  lvc_t_fcat.
+DATA lt_sort          TYPE  lvc_t_sort.
+DATA lt_filter        TYPE  lvc_t_filt.
+DATA ls_layout        TYPE  lvc_s_layo.
+
+*** Variant
+CLEAR ls_variant.
+ls_variant-variant = e_ucomm.
+SHIFT ls_variant-variant LEFT BY 1 PLACES.
+ls_variant-report    = gs_variant-report.
+ls_variant-handle    = gs_variant-handle.
+IF ls_variant-variant(1) &lt;&gt; '/'.
+ls_variant-username  = sy-uname.
+lv_user_specific     = 'X'.
+ENDIF.
+CALL METHOD sender-&gt;get_frontend_fieldcatalog
+IMPORTING
+et_fieldcatalog = lt_fieldcat.
+
+    CALL FUNCTION 'LVC_VARIANT_SELECT'
+EXPORTING
+i_dialog            = space
+i_user_specific     = lv_user_specific
+it_default_fieldcat = lt_fieldcat
+IMPORTING
+et_fieldcat         = lt_fieldcat
+et_sort             = lt_sort
+et_filter           = lt_filter
+CHANGING
+cs_variant          = ls_variant
+EXCEPTIONS
+wrong_input         = 1
+fc_not_complete     = 2
+not_found           = 3
+program_error       = 4
+data_missing        = 5
+OTHERS              = 6.
+IF sy-subrc = 0.
+CALL METHOD sender-&gt;set_variant( ls_variant ).
+CALL METHOD sender-&gt;set_frontend_fieldcatalog( lt_fieldcat ).
+CALL METHOD sender-&gt;set_filter_criteria( lt_filter ).
+CALL METHOD sender-&gt;set_sort_criteria( lt_sort ).
+ls_stable = 'XX'.
+CALL METHOD sender-&gt;refresh_table_display
+EXPORTING
+is_stable      = ls_stable
+i_soft_refresh = space.
+ENDIF.
+
+  ENDMETHOD.                           "handle_user_command
+
+  METHOD handle_menu_button.
+
+DATA lv_fcode         TYPE ui_func.
+DATA lv_text          TYPE gui_text.
+DATA lv_disable       TYPE c.
+DATA lv_checked       TYPE c.
+DATA lv_username      TYPE syuname.
+
+FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+CASE e_ucomm.
+WHEN 'GLOBAL'.
+lv_username = space.
+WHEN 'USER'.
+lv_username = sy-uname.
+WHEN OTHERS.
+EXIT.
+ENDCASE.
+
+*** Get actual variant
+CALL METHOD sender-&gt;get_variant
+IMPORTING
+es_variant = ls_variant.
+
+LOOP AT lt_ltdx ASSIGNING &lt;ltdx&gt; WHERE username = lv_username.
+*... get variant text
+READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY variant = &lt;ltdx&gt;-variant.
+
+*... set menu entry
+CLEAR ls_toolbar.
+lv_fcode  = '$'.
+lv_fcode+1 = &lt;ltdx&gt;-variant.
+
+*... set text
+      IF &lt;ltdxt&gt; IS ASSIGNED.
+lv_text      = &lt;ltdxt&gt;-text.
+ELSE.
+lv_text      = &lt;ltdx&gt;-variant.
+ENDIF.
+
+*... mark and disable actual variant
+IF ls_variant-variant = &lt;ltdx&gt;-variant.
+lv_disable = 'X'.
+lv_checked = 'X'.
+ELSE.
+lv_disable = space.
+lv_checked = space.
+ENDIF.
+
+*... add menu entry to menu
+CALL METHOD e_object-&gt;add_function
+EXPORTING
+disabled = lv_disable
+checked  = lv_checked
+fcode    = lv_fcode
+text     = lv_text.
+ENDLOOP.
+ENDMETHOD.                    "lcl_my_event_handler
+
+ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+
+*** _______________________________________________________ ***
+***                                                         ***
+***                 START OF PROGRAM
+*** _______________________________________________________ ***
+***                                                         ***
+
+START-OF-SELECTION.
+
+  SELECT * FROM mara INTO TABLE gt_mara UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+SELECT * FROM marc INTO TABLE gt_marc UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+SELECT * FROM mard INTO TABLE gt_mard UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+SELECT * FROM mvke INTO TABLE gt_mvke UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+
+CALL SCREEN 100.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  PBO  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE pbo OUTPUT.
+
+  SET PF-STATUS '100'.
+SET TITLEBAR '100'.
+CLEAR sy-ucomm.
+
+  IF gr_cc IS INITIAL.
+CREATE OBJECT gr_cc
+EXPORTING
+container_name = 'CONTAINER'.
+ENDIF.
+
+  IF gr_splitter IS INITIAL.
+CREATE OBJECT gr_splitter
+EXPORTING
+parent  = gr_cc
+rows    = 4
+columns = 1.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 1
+column    = 1
+RECEIVING
+container = gr_cont1.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 2
+column    = 1
+RECEIVING
+container = gr_cont2.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 3
+column    = 1
+RECEIVING
+container = gr_cont3.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 4
+column    = 1
+RECEIVING
+container = gr_cont4.
+ENDIF.
+
+IF gr_grid1 IS INITIAL.
+CREATE OBJECT gr_grid1
+EXPORTING
+i_handle    = 'MARA'
+i_container = gr_cont1
+i_title     = 'Materialstamm'
+i_table     = 'GT_MARA'.
+ENDIF.
+
+  IF gr_grid2 IS INITIAL.
+CREATE OBJECT gr_grid2
+EXPORTING
+i_handle    = 'MARD'
+i_container = gr_cont2
+i_title     = 'Tabelle MARD'
+i_table     = 'GT_MARD'.
+ENDIF.
+
+  IF gr_grid3 IS INITIAL.
+CREATE OBJECT gr_grid3
+EXPORTING
+i_handle    = 'MARC'
+i_container = gr_cont3
+i_title     = 'Tabelle MARC'
+i_table     = 'GT_MARC'.
+ENDIF.
+
+  IF gr_grid4 IS INITIAL.
+CREATE OBJECT gr_grid4
+EXPORTING
+i_handle    = 'MVKE'
+i_container = gr_cont4
+i_title     = 'Tabelle MVKE'
+i_table     = 'GT_MVKE'.
+ENDIF.
+
+ENDMODULE.                 " PBO  OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  PAI  INPUT
+*&amp;---------------------------------------------------------------------*
+MODULE pai INPUT.
+
+  CASE sy-ucomm.
+WHEN 'BACK'.
+SET SCREEN 0. LEAVE SCREEN.
+ENDCASE.
+
+ENDMODULE.                 " PAI  INPUT</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/grid-mit-variantenschnellzugriff-menue/">Grid mit Variantenschnellzugriff (Menü)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Vererbungsübersicht</title>
+		<link>/blog/vererbungsuebersicht/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 14:10:32 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[CL_GUI_SIMPLE_TREE]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[SE24]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[RS_TOOL_ACCESS]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=585</guid>
+
+					<description><![CDATA[<p>Folgendes kleines Programm zeigt die Vererbungshierarchien von Klassen auf. Die Root- oder Super-Klasse wird auf der obersten Ebene angezeigt. Darunter werden die von ihr erbenden Klassen aufgelistet. Mit einem Doppelklick auf eine Klasse wird in den Class Builder (SE24) verzweigt.</p>
+<p>Der Beitrag <a href="/blog/vererbungsuebersicht/">Vererbungsübersicht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Folgendes kleine Programm zeigt die Vererbungshierarchien von Klassen auf. Die Root- oder Super-Klasse wird auf der obersten Ebene angezeigt. Darunter werden die von ihr erbenden Klassen aufgelistet. Mit einem Doppelklick auf eine Klasse wird in den Class Builder (SE24) verzweigt.</p>
+
+
+
+<p>Beschreibung</p>
+
+
+
+<p>Die Vererbungsübersicht kann man sich normalerweise auch in der SE80 anschauen. Hier ist jedoch immer ein &#8220;Zwischenschritt&#8221; über den Punkt &#8220;Superklassen&#8221; oder &#8220;Subklassen&#8221; notwendig. Dieses Programm liefert eine direkt Übersicht:</p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td><img decoding="async" src="/wp-content/uploads/tt_images/Bild097.jpg" alt=""><br>Übersicht über alle Unterklassen von &#8220;CL_CI_TEST_ROOT&#8221;</td></tr></tbody></table></figure>
+
+
+
+<h2 class="wp-block-heading" id="features">Features</h2>
+
+
+
+<p>Kundeneigene Klassen (Z- und /-Namensraum) werden hervor gehoben.</p>
+
+
+
+<p>Doppelklick auf eine Klasse verzweigt in den Class Builder (Transaktion SE24).</p>
+
+
+
+<h2 class="wp-block-heading" id="interessante-klassen">Interessante Klassen</h2>
+
+
+
+<p>Folgende Klassen sind interessant, da sie eine große &#8220;Erbengemeinschaft&#8221; haben:</p>
+
+
+
+<ul><li><div class="text1">IF_CI_TEST (Interface von Code Inspector Prüfungen)</div></li><li>CL_GUI_OBJECT </li><li><div class="text1">CL_GUI_CONTROL</div></li><li>CL_GUI_CONTAINER</li><li>CL_ABAP_TYPEDESCR </li><li>Ausnahmeklassen <ul><li>CX_STATIC_CHECK</li><li>CX_DYNAMIC_CHECK</li><li>CX_NO_CHECK </li></ul></li></ul>
+
+
+
+<h2 class="wp-block-heading" id="coding">Coding</h2>
+
+
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*<br>*&amp; Report&nbsp; Z_INHERITING_CLASSES<br>*&amp;---------------------------------------------------------------------*<br>* displays all inheriting classes of a super class in simple tree.<br>* double click on class calls SE24 for this class in display mode.<br>*----------------------------------------------------------------------*<br></span>REPORT Z_INHERITING_CLASSES.</pre>
+
+
+
+<p>CLASS lcl_application DEFINITION DEFERRED.</p>
+
+
+
+<pre class="wp-block-preformatted">DATA go_application&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO lcl_application.<br>DATA gt_classes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF seoclsname.<br>DATA gt_metarel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF seometarel.<br>DATA gs_metarel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE seometarel.<br>DATA go_tree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO cl_gui_simple_tree.<br>DATA gt_nodes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF mtreesnode.<br>DATA gs_node&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE mtreesnode.<br>DATA gt_expand_nodes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF lvc_nkey.<br>DATA gv_top_node&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE lvc_nkey.<br>DATA gv_level&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE i.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*** SELECTION SCREEN ***<br>*==&gt; Super class name (root)<br></span>PARAMETERS p_class&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE seoclsname DEFAULT 'IF_CI_TEST'.<br><span style="color: #fb2412;">*==&gt; Expand up to this level<br></span>PARAMETERS p_level&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE i&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFAULT 3.</pre>
+
+
+
+<pre class="wp-block-preformatted">AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_class.<br>CALL FUNCTION 'F4_DD_ALLTYPES'<br>EXPORTING<br>object&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = p_class<br>suppress_selection&nbsp;&nbsp; = 'X'<br>display_only&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ' '<br>only_types_for_clifs = 'X'<br>IMPORTING<br>RESULT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = p_class.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*----------------------------------------------------------------------*<br>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS LCL_APPLICATION DEFINITION<br>*----------------------------------------------------------------------*<br></span>CLASS lcl_application DEFINITION.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; PUBLIC SECTION.<br>METHODS:<br>handle_node_double_click<br>FOR EVENT node_double_click<br>OF cl_gui_simple_tree<br>IMPORTING node_key.</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "LCL_APPLICATION DEFINITION</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*----------------------------------------------------------------------*<br>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS LCL_APPLICATION IMPLEMENTATION<br>*----------------------------------------------------------------------*<br></span>CLASS lcl_application IMPLEMENTATION.</pre>
+
+
+
+<pre class="wp-block-preformatted">  METHOD  handle_node_double_click.
+    DATA lv_classname TYPE seoclsname.
+    READ TABLE gt_classes INTO lv_classname INDEX node_key.</pre>
+
+
+
+<pre class="wp-block-preformatted">    CALL FUNCTION 'RS_TOOL_ACCESS'
+      EXPORTING
+        operation   = 'SHOW'
+        object_name = lv_classname
+        object_type = 'CLAS'.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; ENDMETHOD.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "HANDLE_NODE_DOUBLE_CLICK</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "LCL_APPLICATION IMPLEMENTATION</pre>
+
+
+
+<pre class="wp-block-preformatted">START-OF-SELECTION.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; PERFORM do_read USING p_class.</pre>
+
+
+
+<pre class="wp-block-preformatted">  CHECK gt_metarel IS NOT INITIAL.
+  cl_abap_list_layout=>suppress_toolbar( ).</pre>
+
+
+
+<pre class="wp-block-preformatted">  WRITE 1.
+  INSERT p_class INTO gt_classes INDEX 1.
+  PERFORM init_tree.
+  PERFORM add_node USING p_class space.
+  PERFORM display_tree.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*<br>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; do_read<br>*&amp;---------------------------------------------------------------------*<br></span>FORM do_read USING iv_classname TYPE seoclsname.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; DATA lt_metarel TYPE STANDARD TABLE OF seometarel.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*** Select all inheriting classes&nbsp;</span><br>SELECT * FROM seometarel INTO TABLE lt_metarel<br>WHERE refclsname = iv_classname.</pre>
+
+
+
+<pre class="wp-block-preformatted">  LOOP AT lt_metarel INTO gs_metarel.
+<span style="color: #fb2412;">    "collect class for having a node name later on (TABIX)</span>
+    COLLECT gs_metarel-clsname INTO gt_classes.
+    <span style="color: #fb2412;">"recursive call for class</span>
+    PERFORM do_read USING gs_metarel-clsname.
+  ENDLOOP.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; APPEND LINES OF lt_metarel TO gt_metarel.</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "do_read</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*<br>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; init_tree<br>*&amp;---------------------------------------------------------------------*<br></span>FORM init_tree.</pre>
+
+
+
+<pre class="wp-block-preformatted">  DATA events TYPE cntl_simple_events.
+  DATA event  TYPE cntl_simple_event.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "Create simple tree</span>
+  CREATE OBJECT go_tree
+    EXPORTING
+      parent              = cl_gui_container=>screen0
+      node_selection_mode = cl_gui_simple_tree=>node_sel_mode_single.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "Create application handler</span>
+  CREATE OBJECT go_application.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "define event "node double_click"
+</span>  event-eventid    = cl_gui_simple_tree=>eventid_node_double_click.
+  event-appl_event = 'X'. " process PAI if event occurs
+  APPEND event TO events.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "register event "Double click"
+</span>  go_tree->set_registered_events( events ).</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "assign event handlers in the application class
+</span>  SET HANDLER go_application->handle_node_double_click FOR go_tree.</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "init_tree</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  add_node
+*&amp;---------------------------------------------------------------------*
+</span>FORM add_node 
+  USING 
+    iv_classname TYPE seoclsname
+    iv_refclass  TYPE seoclsname.</pre>
+
+
+
+<pre class="wp-block-preformatted">  ADD 1 TO gv_level.
+  CLEAR gs_node.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "get key for node</span>
+  READ TABLE gt_classes TRANSPORTING NO FIELDS WITH KEY iv_classname.
+  gs_node-node_key = sy-tabix.</pre>
+
+
+
+<pre class="wp-block-preformatted">  IF iv_refclass IS INITIAL.
+    CLEAR gs_node-relatkey.
+    CLEAR gs_node-relatship.
+  ELSE.
+<span style="color: #fb2412;">  "get key of related class</span>
+    READ TABLE gt_classes TRANSPORTING NO FIELDS WITH KEY iv_refclass.
+    gs_node-relatkey = sy-tabix.
+    gs_node-relatship = cl_gui_simple_tree=>relat_last_child.
+  ENDIF.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; IF gv_level &lt;= p_level.<br><span style="color: #fb2412;">*** Expand this level</span><br>IF gt_expand_nodes IS INITIAL.<br><span style="color: #fb2412;">*** remember this node for&nbsp;setting the top node<br></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; gv_top_node = gs_node-node_key.<br>ENDIF.<br><span style="color: #fb2412;">*** remember this node for later expansion</span><br>APPEND gs_node-node_key TO gt_expand_nodes.<br>ENDIF.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*** add node "class"</span><br>gs_node-isfolder = 'X'.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " a folder.<br>gs_node-text = iv_classname.<br>CASE iv_classname(1).<br>WHEN 'Z'.<br><span style="color: #fb2412;">*** highlight customer classes (Z)</span><br>gs_node-style = cl_gui_simple_tree=&gt;style_emphasized_negative.<br>WHEN '/'.<br><span style="color: #fb2412;">*** highlight customer classes (/xyz/)</span><br>gs_node-style = cl_gui_simple_tree=&gt;style_emphasized_positive.<br>ENDCASE.<br>APPEND gs_node TO gt_nodes.</pre>
+
+
+
+<pre class="wp-block-preformatted">  LOOP AT gt_metarel INTO gs_metarel WHERE refclsname = iv_classname.
+    PERFORM add_node USING gs_metarel-clsname gs_metarel-refclsname.
+  ENDLOOP.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; SUBTRACT 1 FROM gv_level.</pre>
+
+
+
+<p>ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;add_node</p>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*<br>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; display_tree<br>*&amp;---------------------------------------------------------------------*<br></span>FORM display_tree.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "add nodes</span>
+  go_tree->add_nodes(
+    table_structure_name = 'MTREESNODE'
+    node_table           = gt_nodes ).</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "Expand up to desired level</span>
+  go_tree->expand_nodes(
+    EXPORTING
+      node_key_table = gt_expand_nodes
+    EXCEPTIONS
+     OTHERS         = 5).</pre>
+
+
+
+<pre class="wp-block-preformatted">  <span style="color: #fb2412;">"set top node</span>
+  go_tree->set_top_node( node_key = gv_top_node ).</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "display_tree</pre>
+</div></div>
+<p>Der Beitrag <a href="/blog/vererbungsuebersicht/">Vererbungsübersicht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

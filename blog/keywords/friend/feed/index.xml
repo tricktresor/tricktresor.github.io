@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Friend Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/friend/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 03 Mar 2023 16:52:17 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Friend Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Autosumme in ALV-Grid &#8211; Version 2</title>
+		<link>/blog/autosumme-in-alv-grid-version-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2016 18:16:47 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[interface]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Autosumme]]></category>
+		<category><![CDATA[Friend]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=861505</guid>
+
+					<description><![CDATA[<p>Im vorherigen Artikel&#160;Autosumme in ALV-Grid (Version 1)&#160;habe ich euch gezeigt, wie man das Ereignis&#160;set_delay_change_selection nutzen kann, um die Summe von markierten Zellen eines ALV-Grids herausfinden kann. Diese Methode hat leider zwei Nachteile: Wie kann man nun dieser Herausforderung begegnen? Es gibt zwei Varianten. Die erste Variante habe ich hier bereits beschrieben. Die Lösung ist in diesem Fall, dass man eine eigene Klasse von CL_GUI_ALV_GRID ableitet (erben lässt) und dann eine neue Methode erstellt, die diese...</p>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-2/">Autosumme in ALV-Grid &#8211; Version 2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Im vorherigen Artikel&nbsp;<a href="https://tricktresor.com/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid (Version 1)</a>&nbsp;habe ich euch gezeigt, wie man das Ereignis&nbsp;set_delay_change_selection nutzen kann, um die Summe von markierten Zellen eines ALV-Grids herausfinden kann. Diese Methode hat leider zwei Nachteile:</p>
+
+
+
+<ol>
+<li>Die Reaktionszeit&nbsp;des Ereignisses <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/ee/c8e068d52611d2b468006094192fe3/content.htm">Delayed_Changed_Sel_Callback</a>&nbsp;ist auf 1,5 Sekunden voreingestellt. Das ist viel zu lange, um schnell mal eben einige Werte zu prüfen</li>
+
+
+
+<li>Es funktioniert nur, wenn die Datentabelle bekannt ist, denn die Datentabelle des ALV-Grid MT_OUTTAB ist geschützt. Auf sie kann also nicht zugegriffen werden. Es ist demnach nicht möglich, eine Methode zu schreiben, die die Grid-Instanz einfach entgegen nimmt und darauf die Funktion Autosumme anwendet.</li>
+</ol>
+
+
+
+<p>Wie kann man nun dieser Herausforderung begegnen? Es gibt zwei Varianten. Die erste Variante habe ich <a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">hier</a> bereits beschrieben. Die Lösung ist in diesem Fall, dass man eine eigene Klasse von CL_GUI_ALV_GRID ableitet (erben lässt) und dann eine neue Methode erstellt, die diese geschützte Methode aufruft.</p>
+
+
+
+<p>Die andere Variante ist hier von Lukasz Pegiel beschrieben:&nbsp;http://abapblog.com/articles/tricks/105-how-to-access-private-or-protected-data-and-methods-of-cl-gui-alv-grid</p>
+
+
+
+<p>In dieser Variante wird einfach das Interface&nbsp;if_alv_rm_grid_friend eingebunden. Hierdurch wird die eigene Klasse als &#8220;Freund des ALV-Grid&#8221; bekannt gemacht. Und als Freund ist es möglich, auf die geschützten Attribute und Methoden zuzugreifen!</p>
+
+
+<p>[notice type=&#8217;info&#8217;]Vielen Dank an dieser Stelle an Lukasz, der mir sehr geholfen hat, diesen Trick Wirklichkeit werden zu lassen! Ich kann jedem nur empfehlen einen oder besser: mehrere Blicke auf seinen <a href="http://abapblog.com/">ABAPBlog</a> zu werfen.  Besonders hervorzuheben ist seine Entwicklung <a href="http://abapblog.com/falv">Fast ALV-Grid</a>. [/notice]</p>
+
+
+
+<figure class="wp-block-image"><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg"><img fetchpriority="high" decoding="async" width="856" height="274" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg" alt="2016-10-07_19-06-25" class="wp-image-861506" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg 856w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-300x96.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-768x246.jpg 768w" sizes="(max-width: 856px) 100vw, 856px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">1. Verbesserung:&nbsp;Änderung der Reaktionszeit</h2>
+
+
+
+<p>Um das Event zu behandeln und die markierten Zellen auszulesen, bedarf es keiner großen Tricks. Allerdings ist die Reaktionszeit Das ist deutlich zu lange. Mit Hilfe der Methode&nbsp;set_delay_change_selection kann die Reaktionszeit geändert werden. Diese Methode ist allerdings PROTECTED, also geschützt.</p>
+
+
+
+<p>Wir müssen also das oben genannte Interface einbinden und haben so Zugriff auf die Methode&nbsp;set_delay_change_selection mit der man die Reaktionszeit in Millisekunden einstellen kann.</p>
+
+
+
+<h2 class="wp-block-heading">2. Verbesserung: Zugriff auf die Datentabelle des ALV-Grid</h2>
+
+
+
+<p>Zusätzlich wollte ich an das geschützte Attribute MT_OUTTAB heran, um die aktuellen Daten auszulesen. Auf diese Weise ist es möglich, ein universelles Tool zu schreiben, dass mit jedem ALV-Grid zusammen arbeitet und nicht nur lokal.</p>
+
+
+
+<h2 class="wp-block-heading">Wie sieht&#8217;s aus?</h2>
+
+
+
+<p>Beide Verbesserungen sind in dieser Version 2 des Codes enthalten. Das Programm besteht nun aus zwei Klassen:</p>
+
+
+
+<ol>
+<li>Die Klasse, LCL_MAIN, die den Grid verwendet und darstellt.</li>
+
+
+
+<li>Die Klasse LCL_AUTOSUMME, die die eigentliche Funktionalität zur Verfügung stellt.</li>
+</ol>
+
+
+
+<p>LCL_AUTOSUMME kann nun also als globale Klasse universell eingesetzt werden. Jedes Grid, dass die Autosummenfunktion verwenden möchte, muss sich in der Klasse mit der Methode REGISTER registrieren. Und dann kann&#8217;s los gehen&#8230;!</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT.
+
+PARAMETERS p_total TYPE p DECIMALS 2.
+
+CLASS lcl_autosumme DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES if_alv_rm_grid_friend .
+    CLASS-METHODS register IMPORTING ir_grid TYPE REF TO cl_gui_alv_grid.
+  PROTECTED SECTION.
+    CLASS-METHODS handle_delayed_selection
+      FOR EVENT delayed_changed_sel_callback
+                  OF cl_gui_alv_grid
+      IMPORTING sender.
+ENDCLASS.
+
+CLASS lcl_autosumme IMPLEMENTATION.
+  METHOD register.
+    "Set handler
+    SET HANDLER handle_delayed_selection FOR ir_grid.
+    "set delayed selection time
+    ir_grid->set_delay_change_selection( time = 100 ).   " Time in Milliseconds
+    "register event for delayed selection
+    ir_grid->register_delayed_event( ir_grid->mc_evt_delayed_change_select ).
+
+  ENDMETHOD.
+
+  METHOD handle_delayed_selection.
+
+    "Local data
+    DATA lt_cells            TYPE lvc_t_cell.
+    DATA ls_cell             LIKE LINE OF lt_cells.
+    DATA lv_total            TYPE p DECIMALS 2.
+    DATA lv_val_type         TYPE c.
+    DATA lv_index            TYPE n LENGTH 2.
+    DATA lv_tablename        TYPE string.
+    DATA lt_grouplevels      TYPE lvc_t_grpl.
+    DATA ls_grouplevel       LIKE LINE OF lt_grouplevels.
+
+    FIELD-SYMBOLS &lt;ref_data> TYPE REF TO data.
+    FIELD-SYMBOLS &lt;table>    TYPE table.
+    FIELD-SYMBOLS &lt;warea>    TYPE any.
+    FIELD-SYMBOLS &lt;val>      TYPE any.
+
+    "data references to sub totals tables
+    DATA ld_ct01             TYPE REF TO data.
+    DATA ld_ct02             TYPE REF TO data.
+    DATA ld_ct03             TYPE REF TO data.
+    DATA ld_ct04             TYPE REF TO data.
+    DATA ld_ct05             TYPE REF TO data.
+    DATA ld_ct06             TYPE REF TO data.
+    DATA ld_ct07             TYPE REF TO data.
+    DATA ld_ct08             TYPE REF TO data.
+    DATA ld_ct09             TYPE REF TO data.
+
+    "get selected cells (selection via CTRL + Y)
+    sender->get_selected_cells( IMPORTING et_cell = lt_cells ).
+
+    "If there is only one cell selected, we do not need to sum that...
+    CHECK lines( lt_cells ) > 1.
+
+    "Read all cell values
+    LOOP AT lt_cells INTO ls_cell.
+
+      "in case of rowtype (normal cell, total or subtotal) assign correct data table
+      CASE ls_cell-row_id-rowtype(1).
+          "Total sum of all
+        WHEN 'T'.
+          ASSIGN sender->mt_ct00 TO &lt;ref_data>.
+          ls_cell-row_id-index = 1.
+          "subtotals
+        WHEN 'S'.
+          sender->get_subtotals( IMPORTING
+                                  ep_collect01 = ld_ct01
+                                  ep_collect02 = ld_ct02
+                                  ep_collect03 = ld_ct03
+                                  ep_collect04 = ld_ct04
+                                  ep_collect05 = ld_ct05
+                                  ep_collect06 = ld_ct06
+                                  ep_collect07 = ld_ct07
+                                  ep_collect08 = ld_ct08
+                                  ep_collect09 = ld_ct09
+                                  et_grouplevels = lt_grouplevels ).
+
+          lv_index = ls_cell-row_id-rowtype+4(2).
+          lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+          ASSIGN (lv_tablename) TO &lt;ref_data>.
+
+          READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+          IF sy-subrc = 0.
+            ls_cell-row_id-index = ls_grouplevel-cindx_from.
+          ENDIF.
+          "Normal cell value
+        WHEN space.
+          ASSIGN sender->mt_outtab TO &lt;ref_data>.
+      ENDCASE.
+
+      "assign specified data table
+      ASSIGN &lt;ref_data>->* TO &lt;table>.
+
+      "Only read table line when index changes
+      AT NEW row_id.
+        READ TABLE &lt;table> ASSIGNING &lt;warea> INDEX ls_cell-row_id-index.
+      ENDAT.
+      "Assign selected fieldname of workarea
+      ASSIGN COMPONENT ls_cell-col_id OF STRUCTURE &lt;warea> TO &lt;val>.
+      IF sy-subrc = 0.
+        "check correct type of field: Only numeric fields will be taken
+        DESCRIBE FIELD &lt;val> TYPE lv_val_type.
+        CASE lv_val_type.
+          WHEN 'P'  "Packed
+            OR 'N'  "Numchar
+            OR 'b'  "Integer
+            OR 'a'  "decfloat
+            OR 'e'  "decfloat
+            OR 'F'. "Float?
+            "add cell value to total
+            ADD &lt;val> TO lv_total.
+        ENDCASE.
+      ENDIF.
+    ENDLOOP.
+
+    IF lv_total IS NOT INITIAL.
+      "There were numeric fields selected and therefor we have a total to show:
+      MESSAGE s000(oo) WITH 'TOTAL:' space lv_total.
+      p_total = lv_total.
+    ENDIF.
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_main DEFINITION.
+
+  PUBLIC SECTION.
+*    INTERFACES if_alv_rm_grid_friend .
+    METHODS start.
+  PROTECTED SECTION.
+    DATA mr_grid TYPE REF TO cl_gui_alv_grid.
+    DATA mt_data TYPE STANDARD TABLE OF spfli.
+    DATA mv_data_table TYPE tabname VALUE 'SPFLI'.
+    DATA mr_dock TYPE REF TO cl_gui_docking_container.
+    METHODS create_docker.
+    METHODS create_grid.
+    METHODS select_data.
+    METHODS register_autosumme.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+  METHOD start.
+    select_data( ).
+    create_docker( ).
+    create_grid( ).
+    register_autosumme( ).
+  ENDMETHOD.
+
+  METHOD create_docker.
+    "Create Docking container at bottom
+    CREATE OBJECT mr_dock
+      EXPORTING
+        side                    = cl_gui_docking_container=>dock_at_bottom
+        ratio                   = 90
+        no_autodef_progid_dynnr = abap_false.
+
+  ENDMETHOD.
+
+  METHOD create_grid.
+    "Create ALV-Grid
+    CREATE OBJECT mr_grid
+      EXPORTING
+        i_appl_events = abap_true
+        i_parent      = mr_dock.
+
+    "and display data
+    mr_grid->set_table_for_first_display(
+      EXPORTING
+        i_structure_name = mv_data_table
+      CHANGING
+        it_outtab        = mt_data ).
+
+    "Set focus on grid so user can directly scroll and select cells via CTRL+Y
+    cl_gui_container=>set_focus( mr_grid ).
+
+  ENDMETHOD.
+
+  METHOD select_data.
+    "Select data
+    SELECT * FROM (mv_data_table) INTO TABLE mt_data UP TO 100 ROWS.
+  ENDMETHOD.
+
+  METHOD register_autosumme.
+    lcl_autosumme=>register( mr_grid ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+  DATA(gr_main) = NEW lcl_main( ).
+  gr_main->start( ).</pre>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-2/">Autosumme in ALV-Grid &#8211; Version 2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

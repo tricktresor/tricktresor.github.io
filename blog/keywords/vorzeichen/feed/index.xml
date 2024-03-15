@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>vorzeichen Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/vorzeichen/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:55 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>vorzeichen Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Recht so &#8211; Links rum!</title>
+		<link>/blog/recht-so-links-rum/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 Oct 2015 09:00:00 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Excel]]></category>
+		<category><![CDATA[makro]]></category>
+		<category><![CDATA[bereich]]></category>
+		<category><![CDATA[zellen]]></category>
+		<category><![CDATA[vorzeichen]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=279244</guid>
+
+					<description><![CDATA[<p>Ist das Vorzeichen nach dem Kopieren aus einem ALV-Grid an der falschen Stelle? Mit folgendem Visual-Basic-Makro "mivorenali - MInus VOn REchts NAch LInks" kannst du das Vorzeichen von rechts nach links setzen und das Feld wird wieder als Zahl formatiert. Einfach den gewünschten Zellenbereich markieren und das Makro starten.</p>
+<p>Der Beitrag <a href="/blog/recht-so-links-rum/">Recht so &#8211; Links rum!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wer aus dem ALV-Grid Zahlen kopieren möchte, der erlebt eine Überraschung, wenn im Grid negative Werte dargestellt werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/10/2015-10-05_19-53-12.jpg"><img fetchpriority="high" decoding="async" class="aligncenter size-medium wp-image-279245" src="https://tricktresor.com/wp-content/uploads/2015/10/2015-10-05_19-53-12-300x207.jpg" alt="2015-10-05_19-53-12" width="300" height="207" srcset="/wp-content/uploads/2015/10/2015-10-05_19-53-12-300x207.jpg 300w, /wp-content/uploads/2015/10/2015-10-05_19-53-12.jpg 417w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Copy&amp;Paste oder Export</h2>
+<p>Die Ausrichtung wird korrekt vorgenommen, wenn du das gesamte Grid exportierst oder Excel-Inplace öffnest.</p>
+<p>Manchmal möchte man aber nur einen markierten Teil kopieren (STRG+Y / Markieren / STRG+C).</p>
+<p>Mit folgendem Visual-Basic-Makro &#8220;mivorenali &#8211; MInus VOn REchts NAch LInks&#8221; kannst du das Vorzeichen von rechts nach links setzen und das Feld wird wieder als Zahl formatiert. Einfach den gewünschten Zellenbereich markieren und das Makro starten.</p>
+<p>Sollte es ein sehr großer Bereich sein, ist es evtl. sinnvoll, die Aktualisierung des Arbeitsblattes auszuschalten:</p>
+<pre>Application.ScreenUpdating = False</pre>
+<h2>Code</h2>
+<pre>Sub mivorenali()
+    
+   
+  Dim objCell As Range
+  Dim vntValue As Variant
+ 
+  If TypeOf Selection Is Excel.Range Then
+    'Application.ScreenUpdating = False
+    
+    'Durchlaufe alle markierten Zellen
+        For Each objCell In Selection
+
+            'Wert der Zelle an Variable übergeben
+            vntValue = objCell.Value
+            
+            'Wenn der Wert nicht leer ist
+            If Not IsEmpty(vntValue) Then
+            If Right(vntValue, 1) = "-" Then
+             objCell.Value = "-" &amp; Left(vntValue, Len(vntValue) - 1)
+             objCell.NumberFormat = "General"
+             objCell.Value = CDbl(objCell.Value)
+             End If
+            End If
+            
+        Next
+            
+    'Application.ScreenUpdating = True
+  End If
+    
+    
+End Sub</pre>
+<p>Der Beitrag <a href="/blog/recht-so-links-rum/">Recht so &#8211; Links rum!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

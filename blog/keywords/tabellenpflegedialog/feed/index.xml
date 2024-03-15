@@ -1,0 +1,1037 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Tabellenpflegedialog Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/tabellenpflegedialog/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 14 Nov 2022 14:18:40 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Tabellenpflegedialog Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Formelberechnung</title>
+		<link>/blog/formelberechnung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Jul 2014 17:51:11 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Formeln]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Schnell programmiert]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4942</guid>
+
+					<description><![CDATA[<p>Mit Computern kann man rechnen. Das ist toll und gut so. Wenn man allerdings Berechnungen Außerhalb eines Programms definieren möchte, dann kommt man schnell an die Grenzen. Einfache Operationen sind schnell programmiert und ausgewertet, bei komplexen Operationen kommt man jedoch schnell ins Schwitzen. Gottseidank besitzt SAP einen Formeleditor, den man sehr einfach für eigene Berechnungen verwenden kann. Mit entsprechenden Funktionsbausteinen oder einer Klasse kann eine Formel geprüft und ausgewertet werden.</p>
+<p>Der Beitrag <a href="/blog/formelberechnung/">Formelberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit Computern kann man rechnen. Das ist toll und gut so. Wenn man allerdings Berechnungen Außerhalb eines Programms definieren möchte, dann kommt man schnell an die Grenzen. Einfache Operationen sind schnell programmiert und ausgewertet, bei komplexen Operationen kommt man jedoch schnell ins Schwitzen. Gottseidank besitzt SAP einen Formeleditor, den man sehr einfach für eigene Berechnungen verwenden kann. Mit entsprechenden Funktionsbausteinen oder einer Klasse kann eine Formel geprüft und ausgewertet werden.</p>
+<h2>Funktionsbausteine</h2>
+<p>Es gibt zwei Funktionsbausteine: Einen für die Prüfung einer Formel und einer für die Berechnung:</p>
+<p>Prüfung: CHECK_FORMULA</p>
+<p>Berechnung: EVAL_FORMULA</p>
+<p>Beide Funktionsbausteine haben die folgenden Parameter:</p>
+<p>FORMULA: Enthält die Formel<br />
+PROGRAM: Programmname zur Wertzuweisung<br />
+ROUTINE: Name des Unterprogramms zur Wertzuweisung</p>
+<h3>Einfache Berechnung einer Formel</h3>
+<p>Der einfachste Aufruf zur Berechnung einer (fast) beliebigen Formel erfolgt mit dem Funktionsbaustein EVAL_FORMULA. Es reicht, wenn du diesem Baustein die Berechnung mitgibst, z.B. 10*3:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_170727.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-4943" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_170727.jpg" alt="Formel1" width="474" height="287" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_170727.jpg 474w, /wp-content/uploads/2014/07/Bild_2014_07_16_170727-300x181.jpg 300w" sizes="(max-width: 474px) 100vw, 474px" /></a></p>
+<h3>Berechnung mit Variablen</h3>
+<p>Nun möchte man natürlich nicht nur Werte berechnen, sondern auch mit Variablen arbeiten, wie zum Beispiel &#8220;A + B&#8221;. Das funktioniert mit den Funktionsbausteinen ebenfalls. Die Formel lautet: A+B. Allerdings müssen die Werte natürlich zugewiesen werden. Hierfür muss man den Programmnamen und den Namen des Unterprogramms angeben, in dem die Werte zugewiesen werden. Ein kleines Beispielprogramm lautet: RSCALC01. Die folgenden Berechnungen werden durchgeführt; die Wertezuweisung erfolgt im Programm.</p>
+<pre>FUESSE + AEDERCHEN + OEHRCHEN                        6,0000000000000000E+00
+(-B+SQRT(B**2-(4*A*C)))/(2*A)                        4,0000000000000000E+00
+0**0                                                 1,0000000000000000E+00
+-16**0.5                                            -4,0000000000000000E+00</pre>
+<h3>Formelspeicher</h3>
+<p>Formeln können zentral in der Tabelle TFKT abgelegt werden. Du kannst also eine Formel VOLUMEN hinterlegen: BREITE * HOEHE * LAENGE.</p>
+<p>In deinem Programm musst dann eine entsprechende Zuweisung zu diesen Variablen BREITE, HOEHE, LAENGE machen. Nun ändert sich so eine Volumenberechnung natürlich nicht. Es sei denn, man hinterlegt einen Sicherheitswert, um das Volumen etwas zu vergrößern, also z.B.: BREITE * HOEHE * LAENGE * 1,005</p>
+<p>In diesem Fall kann die Volumenberechnung in mehreren Applikationen verwendet werden und sobald der Sicherheitswert geändert wird, wird dies in allen Berechnungen berücksichtigt.</p>
+<p>Eine andere Variante wäre, dass jeder Dimension ein eigener Sicherheitswert zugewiesen wird:</p>
+<table>
+<tbody>
+<tr>
+<td>KEY</td>
+<td>Formeltext</td>
+</tr>
+<tr>
+<td>VOLUMEN</td>
+<td>TFKT:BREITE * TFKT:HOEHE * TFKT:LAENGE</td>
+</tr>
+<tr>
+<td>BREITE</td>
+<td>BREITE + 1</td>
+</tr>
+<tr>
+<td>HOEHE</td>
+<td>HOEHE + 1</td>
+</tr>
+<tr>
+<td>LAENGE</td>
+<td>LAENGE + 2</td>
+</tr>
+</tbody>
+</table>
+<p>Die Tabelleneinträge lassen sich mit Transaktion SE16N bearbeiten; es gibt keinen Tabellenpflegedialog dafür&#8230; Sollte die Benutzung mit SE16n nicht möglich sein, so kann jedoch schnell ein Tabellenpflegedialog für die Tabelle generiert werden.</p>
+<p>[notice type=&#8217;info&#8217;]<strong>Aus der Doku zum Funktionsbaustein CHECK_FORMULA</strong></p>
+<p>Wenn eine Benutzergruppe eine andere Tabelle als TFKT benötigt (um z.B. den Schlüsselteil zu strukturieren oder eigene Felder aufzunehmen), sollte die Referenztabelle TFKT zunächst kopiert werden. Eigene Funktionen können bei Bedarf ab Position 79 angefügt werden.</p>
+<p>Eine Tabelle, die zur Formelablage verwendet wird, muß eine Schlüssellänge von 13 und einen Funktionsteil der Länge 65 besitzen.[/notice]</p>
+<h3>Parameter</h3>
+<p>Formeln können auch Parameter enthalten, so dass du zum Beispiel die Formel VOLUMEN mit entsprechenden Werten aufrufen kannst:</p>
+<pre>VOLUMEN(10,20,30)</pre>
+<p>Die Parameter werden durch Komma getrennt. Die formalen Parameter in der Formel beginnen mit # und werden durchnummeriert. Die Berechnung für das Volumen sieht dann so aus:</p>
+<pre>VOLUMEN: #1*#2*#3</pre>
+<p>[notice type=&#8217;info&#8217;]SAP-Hinweis: 560672 &#8211; Selbstdefinierte Formeln in Tabelle TFKT[/notice]</p>
+<h3>Demoprogramm</h3>
+<pre>REPORT  zz_demo_formula.
+*== selection screen</pre>
+<pre>PARAMETERS p_formel TYPE char50       DEFAULT 'TFKT:VOLUMEN'.
+PARAMETERS p_breite TYPE p DECIMALS 2 DEFAULT 10.
+PARAMETERS p_hoehe  TYPE p DECIMALS 2 DEFAULT 10.
+PARAMETERS p_laenge TYPE p DECIMALS 2 DEFAULT 10.
+PARAMETERS p_result TYPE p DECIMALS 2 MODIF ID x.
+ 
+*== DATA
+DATA gv_retcode     TYPE i.
+DATA gv_repid       TYPE repid VALUE sy-repid.
+*== set result field to Display only
+AT SELECTION-SCREEN OUTPUT.
+  LOOP AT SCREEN.
+    IF screen-group1 = 'X'.
+      screen-input = '0'.
+      MODIFY SCREEN.
+    ENDIF.
+  ENDLOOP.
+ 
+AT SELECTION-SCREEN.
+*== check formula (Syntax check)
+   CALL FUNCTION 'CHECK_FORMULA'
+     EXPORTING
+       formula = p_formel
+       program = gv_repid
+       routine = 'CHECK_VALUES'
+     IMPORTING
+       subrc   = gv_retcode.
+*== compute formula
+   IF gv_retcode IS INITIAL.
+     CALL FUNCTION 'EVAL_FORMULA'
+       EXPORTING
+         formula = p_formel
+         program = gv_repid
+         routine = 'GET_VALUES'
+       IMPORTING
+         value   = p_result
+       EXCEPTIONS
+         OTHERS  = 1.
+   ENDIF.
+ 
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_VALUES
+*&amp;---------------------------------------------------------------------*
+FORM get_values USING parm CHANGING wert subrc.
+   CASE parm.
+     WHEN 'BREITE'.
+       wert = p_breite.
+       subrc = 0.
+     WHEN 'HOEHE'.
+       wert = p_hoehe.
+       subrc = 0.
+     WHEN 'LAENGE'.
+       wert = p_laenge.
+       subrc = 0.
+   ENDCASE.
+ENDFORM.                    "GET_VALUES
+ 
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CHECK_VALUES
+*&amp;---------------------------------------------------------------------*
+FORM check_values USING parm CHANGING subrc.
+   CASE parm.
+     WHEN 'BREITE'
+       OR 'HOEHE'
+       OR 'LAENGE'.
+       subrc = 0.
+   ENDCASE.
+ENDFORM.                    "CHECK_VALUES</pre>
+<h3>Bugs/ Probleme</h3>
+<p>Ich habe es nicht geschafft, den Parameter UNIT_OF_MEASURE sinnvoll einzusetzen. In obigem Beispiel mit der Volumenberechnung wäre es natürlich schön, wenn ich eine Berechnung in Metern durchführen möchte, jedoch immer genau 1 CM Sicherheitsabstand addiert werden soll. Es scheint jedoch so, als würde der Parameter komplett ignoriert werden. Eventuell habe ich aber die Verwendung nicht richtig verstanden&#8230;</p>
+<p>[notice type=&#8217;alert&#8217;]912586 &#8211; Formelinterpreter: geschachtelte Aufrufe mit Parametern<br />
+1324714 &#8211; Formelinterpreter: Fehlerhafte Berechnungen bei TFKT [/notice]</p>
+<p>Demoprogramm RSCALC10 funktioniert nicht.</p>
+<p>Der Beitrag <a href="/blog/formelberechnung/">Formelberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Änderung von Daten mit Hilfe desTabellenpflegedialogs</title>
+		<link>/blog/aenderung-von-daten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 21 Mar 2013 09:44:48 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[view]]></category>
+		<category><![CDATA[update]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=669</guid>
+
+					<description><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzuf&#252;gen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten m&#252;ssen zuvor gepr&#252;ft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugef&#252;gt wurden, durchlaufen.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzufügen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten müssen zuvor geprüft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugefügt wurden, durchlaufen.</p>
+<p>Folgendes &#8211; zugegebener Maßen durch Copy and Paste zusammengeschusterte Programm &#8211; demonstriert das Hinzufügen bzw. die Änderung eines Datensatzes in der Tabelle ZTEST1:</p>
+<p class="head1">Felder der Tabelle:</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>FELD1</li>
+<li>FELD2</li>
+</ul>
+<p class="head1">Anmerkungen</p>
+<p>Die Tabellendefinition mit OCCURS ist nicht mehr aktuell.</p>
+<p>Das Coding ist Halb-generisch&#8230; Wo es ohne viel Aufwand möglich war, habe ich versucht, die Tabelle ZTEST1 generisch zu verwenden</p>
+<ul>
+<li>Zuweisung der Werte in TOTAL</li>
+<li>SELECT</li>
+</ul>
+<p>Allerdings habe ich dies nicht stringent verfolgt:</p>
+<ul>
+<li>WHERE_Bedingung ist nicht generisch</li>
+<li>Struktur-Definition ist nicht dynamisch</li>
+</ul>
+<p>Dieses Programm soll auch in erster Linie die Verwendung des Bausteins VIEW_MAINTENANCE_LOW_LEVEL demonstrieren. Ich wollte jedoch darauf achten, dass die Verwendung auch einigermaßen variabel möglich ist.</p>
+<p class="head1">Coding</p>
+<p class="sap1">REPORT.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Selection Screen</span><br />
+PARAMETERS matnr TYPE ztest1-matnr DEFAULT &#8216;1234&#8217;.<br />
+PARAMETERS feld1 TYPE ztest1-feld1 DEFAULT &#8216;TESTFELD1&#8217;.<br />
+PARAMETERS feld2 TYPE ztest1-feld2 DEFAULT &#8216;Hier ist ein Test&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Macro für die Definition der notwendigen Tabellenstruktur</span><br />
+DEFINE _define_vim_tables.<br />
+data: begin of extract_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end   of extract_data.</p>
+<p class="sap1">  data: begin of total_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end of total_data.<br />
+END-OF-DEFINITION.</p>
+<p class="sap1">DATA:   sellist     LIKE vimsellist OCCURS 10 WITH HEADER LINE,<br />
+fu_to_excl  LIKE vimexclfun OCCURS 10 WITH HEADER LINE,<br />
+x_header    LIKE vimdesc    OCCURS 1,<br />
+x_namtab    LIKE vimnamtab  OCCURS 1,<br />
+hlp_sellist LIKE vimsellist OCCURS 0 WITH HEADER LINE,<br />
+corr_keytab LIKE e071k      OCCURS 0.</p>
+<p class="sap1">CONSTANTS viewname TYPE tabname VALUE &#8216;ZTEST1&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Definition der notwendigen Tabellen mit MARK- und ACTION-Flag</span><br />
+_define_vim_tables ztest1.</p>
+<p class="sap1">FIELD-SYMBOLS &lt;f&gt; TYPE ANY.</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufbau Selektionskriterien<br />
+</span>  CLEAR: sellist.<br />
+sellist-viewfield = &#8216;MATNR&#8217;.<br />
+sellist-operator  = &#8216;EQ&#8217;.<br />
+sellist-value     = matnr.<br />
+sellist-and_or    = space.<br />
+APPEND sellist.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Struktur der Tabelle ermitteln<br />
+</span>  CALL FUNCTION &#8216;VIEW_GET_DDIC_INFO&#8217;<br />
+EXPORTING<br />
+viewname        = viewname<br />
+TABLES<br />
+x_header        = x_header<br />
+x_namtab        = x_namtab<br />
+sellist         = hlp_sellist<br />
+EXCEPTIONS<br />
+no_tvdir_entry  = 3<br />
+table_not_found = 5.</p>
+<p class="sap1">  ASSIGN COMPONENT &#8216;MATNR&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = matnr.<br />
+ASSIGN COMPONENT &#8216;FELD1&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld1.<br />
+ASSIGN COMPONENT &#8216;FELD2&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld2.<br />
+ASSIGN COMPONENT &#8216;ACTION&#8217; OF STRUCTURE total_data TO &lt;f&gt;.<br />
+SELECT COUNT(*) FROM (viewname) WHERE matnr = matnr.<br />
+IF sy-subrc = 0.<br />
+<span style="color: #fb2412;">*== Satz ist vorhanden: Änderung</span><br />
+&lt;f&gt; = &#8216;U&#8217;.<br />
+ELSE.<br />
+<span style="color: #fb2412;">*== Satz ist neu<br />
+</span>    &lt;f&gt; = &#8216;N&#8217;.<br />
+ENDIF.<br />
+APPEND total_data.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufruf des Bausteins</span><br />
+CALL FUNCTION &#8216;VIEW_MAINTENANCE_LOW_LEVEL&#8217;<br />
+EXPORTING<br />
+corr_number               = &#8216; &#8216;<br />
+fcode                     = &#8216;SAVE&#8217;<br />
+view_action               = &#8216;U&#8217;<br />
+view_name                 = viewname<br />
+TABLES<br />
+corr_keytab               = corr_keytab<br />
+dba_sellist               = hlp_sellist<br />
+dpl_sellist               = hlp_sellist<br />
+excl_cua_funct            = fu_to_excl<br />
+extract                   = extract_data<br />
+total                     = total_data<br />
+x_header                  = x_header<br />
+x_namtab                  = x_namtab<br />
+EXCEPTIONS<br />
+function_not_found        = 1<br />
+missing_corr_number       = 2<br />
+no_value_for_subset_ident = 3<br />
+saving_correction_failed  = 4<br />
+OTHERS                    = 5.<br />
+IF sy-subrc = 0.<br />
+COMMIT WORK.<br />
+ENDIF.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Generell</title>
+		<link>/blog/generell/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=577</guid>
+
+					<description><![CDATA[<p>Wichtige Infos und generelle Funktionsweisen zu Tabellenpflegedialogen.</p>
+<p>Der Beitrag <a href="/blog/generell/">Generell</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wichtige Infos und generelle Funktionsweisen zu Tabellenpflegedialogen.<br /><P class="head1">Abgleichsf&auml;higkeit ermitteln</P><P>Mit Programm RSVIEWMOD l&auml;sst sich die &#8220;automatische Abgleichsf&auml;higkeit&#8221; von Tabellenpflegedialogen ermitteln. Das Programm ermittelt dabei alle modifizierten Tabellenpflegedialoge und listet die Modifikationen auf.</P><P>Aus der Doku:</P><P class="head2">Verwendung</P><P>Das Programm RSVIEWMOD ermittelt die Abgleichsf&auml;higkeit von generierten Pflegedialogen (View- und Viewclusterdialogen) und erm&ouml;glicht es, das&nbsp;Kennzeichen f&uuml;r die Abgleichsf&auml;higkeit zu &auml;ndern.</P><P class="head2">Voraussetzungen</P><P>Die Abgleichf&auml;higkeit wird &uuml;ber ein Kennzeichen gesteuert, das im Kopf der Pflegeobjektbeschreibung abgelegt ist und vom CCS Viewer und vom CTA ausgewertet wird. Das Kennzeichen kann die folgenden Werte annehmen:</P><UL><LI>keine Angabe</LI><LI>nicht abgleichf&auml;hig</LI><LI>abgleichf&auml;hig im Dialog</LI><LI>automatisch abgleichf&auml;hig</LI></UL><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/generell/">Generell</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Dokumentation anzeigen (2)</title>
+		<link>/blog/dokumentation-anzeigen-2/</link>
+					<comments>/blog/dokumentation-anzeigen-2/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 May 2010 13:15:43 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tools]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=543</guid>
+
+					<description><![CDATA[<p>Update f&#252;r die Anzeige der Dokumentation im Docking Container. Die Routine wurde erweitert und HTML so aufbereitet, dass die Doku wie die SAP-Dokumentation aussieht.</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen-2/">Dokumentation anzeigen (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Update für die Anzeige der Dokumentation im Docking Container. Die Routine wurde erweitert und HTML so aufbereitet, dass die Doku wie die SAP-Dokumentation aussieht.</p>
+<p>In dieser Version stelle ich Ihnen eine fertige Methode vor, die nur noch im Zeitpunkt 19 des Tabellenpflegedialoges oder in Zeitpunkt 03 des Viewclusters eingebunden werden muss.</p>
+<p>Die Aufbereitung erfolgt analog zu der SAP-Doku und sieht &#8220;etwas schicker&#8221; aus:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Tabellenpflegedialog/hc_328.jpg" /></p>
+<p>Zusätzlich kann eine alternative Dokumentation übergeben werden, die angezeigt wird, wenn die Doku zur Tabelle nicht vorhanden ist.</p>
+<h2 class="head1">Vorbereitungen</h2>
+<h3 class="head2">Methode anlegen</h3>
+<p>Legen Sie sich eine Klasse, wie z.B. ZCL_MAINTENANCE_TOOLS an und implementieren Sie die statische PUBLIC-Methode SHOW_DOCU:</p>
+<p>Importing-Parameter:</p>
+<ul>
+<li>IV_TABLE TYPE C &#8220;Tabellenname&#8221;</li>
+<li>IV_ALDOC  TYPE C &#8220;Alternative Dokumentation SE61&#8221;</li>
+</ul>
+<h3 class="head2">Globale Attribute</h3>
+<p>Legen Sie folgende statische private Attribute an:</p>
+<pre class="lang:abap decode:true ">GR_DOCK    Type Ref To CL_GUI_DOCKING_CONTAINER
+GR_HTML    Type Ref To CL_GUI_HTML_VIEWER
+GV_TABLE   Type C</pre>
+<h3 class="head1">Aufruf Tabellenpflegedialog</h3>
+<h3 class="text1">Zeitpunkt 19</h3>
+<p class="sap1">  CALL METHOD zcl_maintenance_tools=&gt;show_docu<br />
+EXPORTING<br />
+iv_table = vcl_akt_view<br />
+iv_aldoc = &#8216;ZZT_ALTDOC_TABLE_ZZABC&#8217;.</p>
+<h2 class="head1">Aufruf Viewcluster</h2>
+<h3 class="text1">Zeitpunkt 03</h3>
+<p class="sap1">  IF master_name = x_header-viewname.<br />
+CALL METHOD zcl_maintenance_tools=&gt;show_docu<br />
+EXPORTING<br />
+iv_table = x_header-viewname.<br />
+ENDIF.</p>
+<p class="text1"><strong><u>HINWEIS:<br />
+</u></strong>Die alternative Dokumentation muss in der SE61 als &#8220;Text im Dialog&#8221; angelegt werden.</p>
+<h2 class="head1">Eigene Anpassungen</h2>
+<p class="text1">Leider werden in den gerufenen Standard-Routinen nicht alle HTML-Tags &#8220;schön&#8221; angepasst. Die Tabellendefinitionen werden zum Beispiel nicht geändert.</p>
+<p class="text1">Hier kann man aber manuell einfach Abhilfe schaffen:</p>
+<pre class="lang:abap decode:true ">*** set table cells to size 2
+      REPLACE ALL  OCCURRENCES OF '&lt;td&gt;' IN TABLE lt_html
+         WITH '&lt;td&gt;&lt;font FACE="Arial" SIZE=2&gt;'.        
+*** set table border "dashed" and grey background
+      REPLACE ALL  OCCURRENCES OF '&lt;table&gt;' IN TABLE lt_html
+         WITH '&lt;table style="border:thin dashed blue" width="100%" cellpadding=3 bgcolor=#E0E0E0&gt;'.</pre>
+<p class="text1">Das Ergebnis sieht dann so aus:</p>
+<p class="text1"><img decoding="async" src="/wp-content/uploads/tt_images/table_doku.jpg" /></p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true ">METHOD show_docu.
+
+*** Local data
+  DATA lt_lines            TYPE STANDARD TABLE OF tline.
+  DATA ls_header           TYPE thead.
+  DATA lt_html             TYPE STANDARD TABLE OF  htmlline.
+  DATA lv_url              TYPE c LENGTH 500.
+  DATA lv_table            TYPE doku_obj.
+  DATA lv_spras            TYPE sylangu.
+  DATA lt_conv_charformats TYPE TABLE OF tline.
+  DATA lt_conv_parformats  TYPE TABLE OF tline.
+
+
+*** has anything changed??
+  CHECK gv_table &lt;&gt; iv_table.
+
+  lv_table = iv_table.
+
+***  Read table docu
+  CALL FUNCTION 'DOCU_GET'
+    EXPORTING
+      id     = 'TB'
+      langu  = sy-langu
+      object = lv_table
+    IMPORTING
+      head   = ls_header
+    TABLES
+      line   = lt_lines
+    EXCEPTIONS
+      OTHERS = 5.
+  IF sy-subrc &gt; 0.
+*** try other language
+    CASE sy-langu.
+      WHEN 'D'.
+        lv_spras = 'E'.
+      WHEN 'E'.
+        lv_spras = 'D'.
+      WHEN 'F'.
+        lv_spras = 'E'.
+    ENDCASE.
+*** read docu in other language
+    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'TB'
+        langu  = lv_spras
+        object = lv_table
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = lt_lines
+      EXCEPTIONS
+        OTHERS = 5.
+  ENDIF.
+
+***  Read alternative docu
+  IF lt_lines IS INITIAL AND iv_aldoc IS NOT INITIAL.
+*** read alternative docu (Dialog Text)
+    lv_table = iv_aldoc.
+    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'DT'
+        langu  = sy-langu
+        object = lv_table
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = lt_lines
+      EXCEPTIONS
+        OTHERS = 5.
+    IF sy-subrc &gt; 0.
+*** read alternative docu (Dialog Text) in different language
+      CALL FUNCTION 'DOCU_GET'
+        EXPORTING
+          id     = 'DT'
+          langu  = lv_spras
+          object = lv_table
+        IMPORTING
+          head   = ls_header
+        TABLES
+          line   = lt_lines
+        EXCEPTIONS
+          OTHERS = 5.
+
+    ENDIF.
+  ENDIF.
+
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Build controls
+*** _______________________________________________________________ ***
+***                                                                 ***
+
+  IF gr_dock IS INITIAL.
+*** create docking container
+    CREATE OBJECT gr_dock
+      EXPORTING
+        side                    = cl_gui_docking_container=&gt;dock_at_right
+        extension               = 400
+        no_autodef_progid_dynnr = 'X'.
+  ENDIF.
+
+
+  IF lt_lines IS INITIAL.
+*** No doku: Set controls to invisible
+    IF gr_html IS BOUND.
+      CALL METHOD gr_html-&gt;set_visible
+        EXPORTING
+          visible = space.
+    ENDIF.
+
+    IF gr_dock IS BOUND.
+      CALL METHOD gr_dock-&gt;set_visible
+        EXPORTING
+          visible = space.
+    ENDIF.
+  ELSE.
+*** Doku exists: Set controls visible
+    IF gr_html IS BOUND.
+      CALL METHOD gr_html-&gt;set_visible
+        EXPORTING
+          visible = 'X'.
+    ENDIF.
+    IF gr_dock IS BOUND.
+      CALL METHOD gr_dock-&gt;set_visible
+        EXPORTING
+          visible = 'X'.
+    ENDIF.
+  ENDIF.
+
+
+  IF lt_lines IS NOT INITIAL.
+*** doku exists:
+    IF gr_html IS INITIAL.
+*** Create HTML-Control
+      CREATE OBJECT gr_html
+        EXPORTING
+          parent = gr_dock.
+    ENDIF.
+
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Convert character and parameter formats
+*** _______________________________________________________________ ***
+***                                                                 ***
+    IF lt_conv_parformats IS INITIAL.
+      PERFORM build_mapping_tables   IN PROGRAM rshtmimg_2
+       TABLES lt_conv_charformats
+              lt_conv_parformats.
+    ENDIF.
+
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Convert Docu to HTML
+*** _______________________________________________________________ ***
+***                                                                 ***
+
+    CALL FUNCTION 'CONVERT_ITF_TO_HTML'
+      EXPORTING
+        i_header           = ls_header
+      TABLES
+        t_itf_text         = lt_lines
+        t_html_text        = lt_html
+        t_conv_charformats = lt_conv_charformats
+        t_conv_parformats  = lt_conv_parformats
+      EXCEPTIONS
+        syntax_check       = 1
+        replace            = 2
+        illegal_header     = 3
+        OTHERS             = 4.
+    IF sy-subrc = 0.
+
+*** Convert Tables
+      PERFORM convert_tables IN PROGRAM rshtmimg_2 TABLES lt_html.
+*** Set colours (Make text look like SAP documentation)
+      PERFORM set_colors     IN PROGRAM rshtmimg_2 TABLES lt_html.
+
+*** Push data to control
+      CALL METHOD gr_html-&gt;load_data
+        IMPORTING
+          assigned_url = lv_url
+        CHANGING
+          data_table   = lt_html
+        EXCEPTIONS
+          OTHERS       = 4.
+
+      IF sy-subrc = 0.
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Display HTML-Text
+*** _______________________________________________________________ ***
+***                                                                 ***
+
+        CALL METHOD gr_html-&gt;show_url
+          EXPORTING
+            url = lv_url.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+ENDMETHOD.
+
+</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen-2/">Dokumentation anzeigen (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokumentation-anzeigen-2/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dokumentation anzeigen</title>
+		<link>/blog/dokumentation-anzeigen/</link>
+					<comments>/blog/dokumentation-anzeigen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 06 May 2009 19:23:35 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Eigenes]]></category>
+		<category><![CDATA[Viewcluster]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[Editor]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=520</guid>
+
+					<description><![CDATA[<p>Der Tabellenpflegedialog hat einige kleine Ungereimtheiten. Dazu geh&#246;rt zum Beispiel auch, dass man keine M&#246;glichkeiten hat, die Dokumentation der Tabelle anzusehen. W&#228;re das so, so k&#246;nnte man hier den Zweck und Pflegehinweise hinterlegen. Mit einer kleinen Programmierung - die zwecks Mehrfachverwendung einfach in einer Methode gekapselt werden kann - wird dem Anwender die Hilfe in einem Docking-Fenster angezeigt.</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen/">Dokumentation anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der Tabellenpflegedialog hat einige kleine Ungereimtheiten. Dazu gehört zum Beispiel auch, dass man keine Möglichkeiten hat, die Dokumentation der Tabelle anzusehen. Wäre das so, so könnte man hier den Zweck und Pflegehinweise hinterlegen. Mit einer kleinen Programmierung &#8211; die zwecks Mehrfachverwendung einfach in einer Methode gekapselt werden kann &#8211; wird dem Anwender die Hilfe in einem Docking-Fenster angezeigt.</p>
+<p>So sieht das Ergebnis in etwa aus:<img decoding="async" src="/wp-content/uploads/tt_images/Tabellenpflegedialog/eck_135.jpg" width="519" height="241" /></p>
+<h2 class="head1">Vorgehen</h2>
+<p>Gehen Sie in den Tabellenpflegedialog und wählen Sie <em>Umfeld &#8211; Modifikation &#8211; Zeitpunkte</em>.</p>
+<p>Tragen Sie dann den Zeitpunkt &#8220;19&#8221; ein:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Tabellenpflegedialog/eck_134.jpg" /></p>
+<p>Springen Sie in den Editor und legen Sie das folgende Coding an:</p>
+<pre class="sap1"><span style="color: #fb2412;">*** GLOBALE DATEN
+</span>DATA gr_docking TYPE REF TO cl_gui_docking_container.
+DATA gr_control TYPE REF TO cl_gui_html_viewer.
+DATA gt_lines   TYPE STANDARD TABLE OF tline.
+
+<span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  zz_show_docu
+*&amp;---------------------------------------------------------------------*
+</span>FORM zz_show_docu.
+
+<span style="color: #fb2412;">*** LOKALE DATEN
+</span>  DATA lv_size     TYPE i.
+  DATA ls_header   TYPE thead.
+  DATA lt_html     TYPE STANDARD TABLE OF  htmlline.
+  DATA lv_url      TYPE c LENGTH 500.
+  DATA lv_viewname TYPE dokhl-object.
+
+<span style="color: #fb2412;">*** DOCKING CONTROL BEREITS ERZEUGT?</span>
+  IF gr_docking IS INITIAL.
+    MOVE x_header-viewname TO lv_viewname.
+
+<span style="color: #fb2412;">*** Lesen der Doku zur Tabelle
+</span>    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'TB'
+        langu  = sy-langu
+        object = lv_viewname
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = gt_lines
+      EXCEPTIONS
+        OTHERS = 5.
+
+    IF gt_lines IS INITIAL.
+<span style="color: #fb2412;">*** Keine Doku da: Control mit größe 0 erzeugen</span>
+      lv_size = 0.
+    ELSE.
+<span style="color: #fb2412;">*** Doku vorhanden: Breite 400 Pixel</span>
+      lv_size = 400.
+    ENDIF.
+
+<span style="color: #fb2412;">*** Dockingcontainer erzeugen</span>
+    CREATE OBJECT gr_docking
+      EXPORTING
+        side                    = cl_gui_docking_container=&gt;dock_at_right
+        extension               = lv_size
+        no_autodef_progid_dynnr = 'X'.
+
+    IF gt_lines IS NOT INITIAL.
+
+<span style="color: #fb2412;">*** HTML-Control erzeugen</span>
+      CREATE OBJECT gr_control
+        EXPORTING
+          parent = gr_docking.
+
+<span style="color: #fb2412;">*** Doku in HTML umwandeln</span>
+      CALL FUNCTION 'CONVERT_ITF_TO_HTML'
+        EXPORTING
+          i_header       = ls_header
+        TABLES
+          t_itf_text     = gt_lines
+          t_html_text    = lt_html
+        EXCEPTIONS
+          syntax_check   = 1
+          replace        = 2
+          illegal_header = 3
+          OTHERS         = 4.
+      IF sy-subrc = 0.
+<span style="color: #fb2412;">*** HTML-Daten ins Control schieben</span>
+        CALL METHOD gr_control-&gt;load_data
+          IMPORTING
+            assigned_url = lv_url
+          CHANGING
+            data_table   = lt_html
+          EXCEPTIONS
+            OTHERS       = 4.
+        IF sy-subrc = 0.
+<span style="color: #fb2412;">*** Und HTML-Text anzeigen</span>
+          CALL METHOD gr_control-&gt;show_url
+            EXPORTING
+              url = lv_url.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.</pre>
+<p><strong><u>Hinweis:</u><br />
+</strong>Wenn man in die Tabellenpflege mit SM30 einsteigt, dann bleibt der Dockingcontainer erhalten. Machen Sie am besten eine Transaktion daraus und dann sieht es wirklich professionell aus.</p>
+<h3 class="head1">Viewcluster</h3>
+<p>Bei der Verwendung in einem Viewcluster muss der Zeitpunkt 03 verwendet werden.</p>
+<p>Viewcluster benötigen ein eigenes Programm, in dem das Coding abgelegt wird. Hier muss das Include LSVCMCOD eingebunden werden, damit Sie Zugriff auf alle notwendigen Daten des Viewclusters haben.</p>
+<p><u><strong>Tipp:<br />
+</strong></u>Lagern Sie die Funktion in eine Methode aus und übergeben Sie den Namen der gerade aktiven Tabelle (VCL_AKT_VIEW). Dann können Sie in der Methode prüfen, ob die Tabelle gewechselt wurde und in diesem Fall die entsprechende Dokumentation nachlesen.</p>
+<h3>Tipps zur Formatierung</h3>
+<p>Das Layout des Textes ist nacktes HTML und entspricht so gar nicht dem der üblichen Hilfe in SAP. Wenn du die Formatierung anpassen möchtest, kannst du dir die Klasse CL_EPSS_SAPEVENT bzw. deren Methode LINES_DISPLAY mal ansehen. Hier wird der HTML-Text für die SAP Hilfe generiert. Verwendet werden hierfür die Funktiosnbausteine SE_CONVERT_ITF_TO_HTML und EPSS_STYLE_RECEIVE. Das Umwandeln von SAP-Ikonen wurde zwar auch versuchsweise nachgebaut, ist für die Anzeige aber eher nur nettes Beiwerk.</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen/">Dokumentation anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokumentation-anzeigen/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Tabelle EXTRACT (unicode)</title>
+		<link>/blog/tabelle-extract-unicode/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Unicode]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=504</guid>
+
+					<description><![CDATA[<p>Bei Unicode-Systemen gibt es Probleme bei dem Zugriff der unstrukturierten Tabelle EXTRACT (Kurzdump UC_OBJECTS_NOT_CONVERTIBLE). Hier zeigen wir, wie der Zugriff erfolgen muss.</p>
+<p>Der Beitrag <a href="/blog/tabelle-extract-unicode/">Tabelle EXTRACT (unicode)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei Unicode-Systemen gibt es Probleme bei dem Zugriff der unstrukturierten Tabelle EXTRACT (Kurzdump UC_OBJECTS_NOT_CONVERTIBLE). Hier zeigen wir, wie der Zugriff erfolgen muss.<br /><P>Wir wollen einen Eintrag aus der Tabelle EXTRACT lesen und die Daten (Workarea) vom Viewtyp ZZTEST_V einer Struktur zuweisen.</P><P class="sap1"><FONT color="#fb2412">*** Datentypen<BR></FONT>&nbsp; TYPES BEGIN OF ty_zztest_v.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INCLUDE STRUCTURE zztest_v.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INCLUDE STRUCTURE vimflagtab.<BR>&nbsp; TYPES END OF ty_zztest_v.</P><P class="sap1">&nbsp; DATA ls_tmpk&nbsp; TYPE ty_zztest_v.<BR>&nbsp; DATA lv_line&nbsp; TYPE i.</P><P class="sap1"><FONT color="#fb2412">*** Zeilennummer 1<BR></FONT>&nbsp; lv_line = 1.</P><P class="sap1"><FONT color="#fb2412">*** Erforderliche Feldsymbole</FONT><BR>&nbsp; FIELD-SYMBOLS:<BR>&nbsp;&nbsp;&nbsp; &lt;x1&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE x,<BR>&nbsp;&nbsp;&nbsp; &lt;x2&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE x,<BR>&nbsp;&nbsp;&nbsp; &lt;data&gt;&nbsp;&nbsp;&nbsp; TYPE ANY,<BR>&nbsp;&nbsp;&nbsp; &lt;extract&gt; TYPE table.</P><P class="sap1"><FONT color="#fb2412">*** Casting f&uuml;r EXTRACT durchf&uuml;hren</FONT><BR>&nbsp; ASSIGN (&#8216;EXTRACT[]&#8217;)&nbsp;&nbsp; TO &lt;extract&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Eintrag&nbsp;aus EXTRACT lesen<BR></FONT>&nbsp; READ TABLE &lt;extract&gt; ASSIGNING &lt;data&gt; INDEX lv_line.</P><P class="sap1"><FONT color="#fb2412">*** Casting der&nbsp;Workarea</FONT><BR>&nbsp; ASSIGN &lt;data&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;TO &lt;x1&gt; CASTING.<BR>&nbsp; ASSIGN (&#8216;LS_ZZTEST_V&#8217;) TO &lt;x2&gt; CASTING.</P><P class="sap1"><FONT color="#fb2412">*** Zuweisung &uuml;ber gecastete Strukturen: LS_ZZTEST_V ist nun gef&uuml;llt<BR></FONT>&nbsp; &lt;x2&gt; = &lt;x1&gt;.</P></p>
+<p>Der Beitrag <a href="/blog/tabelle-extract-unicode/">Tabelle EXTRACT (unicode)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Speichern per Pflegedialog</title>
+		<link>/blog/speichern-per-pflegedialog/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 21 Jul 2008 14:50:57 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=502</guid>
+
+					<description><![CDATA[<p>Mithilfe von Pflegeviews bietet sich auch die interessante M&#246;glichkeit, Daten vor der Speicherung dem Anwender zu pr&#228;sentieren. So k&#246;nnen Daten per Datei hochgeladen werden und im Pflegedialog angezeigt werden. Hier werden automatisch Fremdschl&#252;sselpr&#252;fungen durchgef&#252;hrt und die Daten k&#246;nnen vom Anwender gepr&#252;ft und gegebenenfalls nachbearbeitet werden.</p>
+<p>Der Beitrag <a href="/blog/speichern-per-pflegedialog/">Speichern per Pflegedialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Mithilfe von Pflegeviews bietet sich auch die interessante Möglichkeit, Daten vor der Speicherung dem Anwender zu präsentieren. So können Daten per Datei hochgeladen werden und im Pflegedialog angezeigt werden. Hier werden automatisch Fremdschlüsselprüfungen durchgeführt und die Daten können vom Anwender geprüft und gegebenenfalls nachbearbeitet werden.</p>
+
+
+
+<p>Mithilfe des folgenden Codings werden zwei Tabelleneinträge zum View ZXX generiert. Um zu verhindern, dass der Anwender eigene Zeile einfügt, werden die beiden Funktionscodes &#8220;New Line&#8221; und &#8220;Kopieren&#8221; ausgeblendet.</p>
+
+
+
+<p>Damit das Ganze funktioniert, muss&nbsp;zu dem View/ der Tabelle ein Tabellenpflegedialog vorhanden sein. Entgegen der Dokumentation wird kein Pflegedialog angelegt, wenn der Parameter GENERATE_MAINT_TOOL_IF_MISSING mitgegeben wird.</p>
+
+
+
+<p class="has-luminous-vivid-amber-background-color has-background has-medium-font-size"><u><strong>TIPP:<br></strong></u>Bereits auf der Datenbank vorhandene Daten müssen das ACTION-Kennzeichen &#8220;U&#8221; bekommen. Ansonsten gibt es einen Kurzdump (INSERT_DUPREC).</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<pre class="wp-block-code"><code>TYPES: BEGIN OF ty_xx.
+        INCLUDE STRUCTURE zxx.
+        INCLUDE STRUCTURE vimflagtab.
+TYPES: END OF ty_xx.
+
+DATA lt_xx TYPE STANDARD TABLE OF ty_xx.
+DATA ls_xx TYPE ty_xx.
+DATA lt_fc TYPE STANDARD TABLE OF vimexclfun.
+
+START-OF-SELECTION.
+
+*** Funktionen "Neue Zeile" und "Kopieren" deaktivieren
+  APPEND 'NEWL' TO lt_fc.
+  APPEND 'KOPE' TO lt_fc.
+
+*** 1. neue Zeile
+  ls_xx-mandt   = sy-mandt.
+  ls_xx-feld1   = 'A1000'.
+  ls_xx-action  = 'N'.
+  APPEND ls_xx TO lt_xx.
+
+*** 1. neue Zeile
+  ls_xx-mandt   = sy-mandt.
+  ls_xx-feld1   = 'B2000'.
+  ls_xx-action  = 'N'.
+  APPEND ls_xx TO lt_xx.
+
+*** Daten präsentieren
+  CALL FUNCTION 'VIEW_MAINTENANCE_GIVEN_DATA'
+    EXPORTING
+      action                         = 'U'
+      view_name                      = 'ZXX'
+    TABLES
+      data                           = lt_xx
+      excl_cua_funct                 = lt_fc
+    EXCEPTIONS
+      OTHERS                         = 13.</code></pre>
+</div></div>
+<p>Der Beitrag <a href="/blog/speichern-per-pflegedialog/">Speichern per Pflegedialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Suchfunktion</title>
+		<link>/blog/suchfunktion/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Jul 2008 11:51:08 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=499</guid>
+
+					<description><![CDATA[<p>Ein Tabellenpflegedialog besitzt leider zwei elementare Funktionen nicht: Sortieren und Suchen. Wie eine Suchfunktion eingebaut werden kann, zeigen wir Ihnen in diesem Beitrag!</p>
+<p>Der Beitrag <a href="/blog/suchfunktion/">Suchfunktion</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein Tabellenpflegedialog besitzt leider zwei elementare Funktionen nicht: Sortieren und Suchen. Wie eine Suchfunktion eingebaut werden kann, zeige  ich dir in diesem Beitrag!</p>
+<p>Um die Suchfunktion einzubauen, muss das generierte Pflegedynpro angepasst werden. <strong>Die Änderung ist also weg, sobald der Pflegedialog neu generiert wird!!</strong></p>
+<h2 class="head1">Vorbereitung</h2>
+<p>Zuerst muss ein Druckknopf zum Suchen eingebaut werden. Dies kann zum Einen über den Zeitpunkt &#8220;<strong>ST &#8211; Name des Trägerprogramms für das GUI-Menü</strong>&#8221; erreicht werden. Die einfachere Möglichkeit ist jedoch, einfach einen Druckknopf mit dem Fernglas auf das Dynpro zu bauen. Weisen Sie den Funktionscode <strong>&#8220;ZZFIND&#8221;</strong> zu.</p>
+<p>Dann muss in der Ablauflogik ein neues Modul angelegt werden:</p>
+<pre class="lang:abap decode:true ">      MODULE liste_update_liste.
+    ENDCHAIN.
+  ENDLOOP.
+  MODULE zz_usercommand.
+  MODULE liste_after_loop.</pre>
+<p>Wichtig ist, dass das Modul <strong>vor </strong>dem Modul LISTE_AFTER_LOOP steht!</p>
+<p>Ein Doppelklick auf zz_usercommand legt dieses an. Hier solltest du einen Unterroutinenaufruf gleichen Namens machen:</p>
+<pre class="lang:abap decode:true ">PERFORM zz_usercommand.</pre>
+<p>Nachdem du dies Routine angelegt hast, füge den folgenden Code ein:</p>
+<pre class="lang:abap decode:true ">FORM zz_usercommand .
+
+  DATA lv_searchtext TYPE text30.
+  DATA lv_action     TYPE c.
+  DATA ls_myview     LIKE zmyview_extract.
+
+  CASE sy-ucomm.
+    WHEN 'ZZFIND'.
+*** Ask for search string
+      CALL FUNCTION 'POPUP_TO_SEARCH_VALUE'
+        EXPORTING
+          textline1   = 'Suchtext'
+          titel       = 'Einträge suchen'
+          valuelength = 30
+        IMPORTING
+          action      = lv_action
+          value       = lv_searchtext
+        EXCEPTIONS
+          OTHERS      = 2.
+      IF lv_action = 'J'.
+*** search...
+        CLEAR mark_extract.
+*** each line
+        LOOP AT total INTO ls_myview.
+          IF ls_org CS lv_searchtext.
+*** and mark if found
+            ls_myview-mark = 'M'.
+            ADD 1 TO mark_extract.
+          ELSE.
+            ls_myview-mark = space.
+          ENDIF.
+          MODIFY total FROM ls_myview.
+        ENDLOOP.
+*** Display all marked entries
+        function = 'ALMK'.
+      ENDIF.
+  ENDCASE.
+
+ENDFORM.                    " zz_usercommand</pre>
+<p>Ersetze &#8220;MYVIEW&#8221; durch den Namen deines Views oder Tabelle.</p>
+<h2 class="head1">Ergebnis</h2>
+<p>Du hast nun einen Druckknopf zum Suchen auf Ihrem Pflegedynpro. Nach Drücken erscheint ein Popup, das nach einem Suchstring fragt.</p>
+<p>Alle gefundenen Einträge werden angezeigt.</p>
+<p>Der Beitrag <a href="/blog/suchfunktion/">Suchfunktion</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Breite des Navigationsfensters</title>
+		<link>/blog/breite-des-navigationsfensters/</link>
+					<comments>/blog/breite-des-navigationsfensters/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 20 Aug 2007 08:29:57 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[splitter]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[TableControl]]></category>
+		<category><![CDATA[Viewcluster]]></category>
+		<category><![CDATA[Container]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=425</guid>
+
+					<description><![CDATA[<p>Die Breite des Navigationsfensters ist leider fest eingestellt und meistens etwas zu schmal f&#252;r die meisten Beschreibungen. Hier zeigen wir Ihnen, wie Sie die Breite individuell einstellen k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/breite-des-navigationsfensters/">Breite des Navigationsfensters</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Breite des Navigationsfensters im Viewcluster ist leider fest eingestellt und meistens etwas zu schmal für die meisten Beschreibungen. Hier zeigen wir Ihnen, wie Sie die Breite des Splitters individuell einstellen können.</p>
+<p>Um die Breite des Navigationsfensters zu ändern sind die folgenden Schritte notwendig:</p>
+<ol>
+<li>Ablauflogik des ersten Pflegedialogs ändern</li>
+<li>PBO-Modul anlegen</li>
+<li>Unterroutine anlegen</li>
+</ol>
+<p>Mit den folgenden Änderungen wird die Größe des Navigationsfensters einmal angepasst und die Beschreibungen zu den einzelnen Pflegedialoges sind von Anfang an gut lesbar.</p>
+<h3 class="head1">1. Ablauflogik anpassen</h3>
+<p>Fügen Sie als letzte Anweisung im PBO die folgende Zeile ein:</p>
+<p class="sap1">MODULE ZZ_VIM_INFO.</p>
+<p class="text1"><strong><u>ACHTUNG:</u><br />
+</strong>Die Änderungen, die Sie in der Ablauflogik vornehmen werden mit einer Neugenerierung des Tabellenpflegedialogs gelöscht!</p>
+<h3 class="head1">2. PBO-Modul anlegen</h3>
+<p>Mit einem Doppelklick auf ZZ_VIM_INFO können Sie das PBO-Modul anlegen. Am besten rufen Sie darin die Unterroutine ZZ_VIM_INFO auf:</p>
+<p>PERFORM zz_vim_info.</p>
+<h3 class="head1">3. Unterroutine anlegen</h3>
+<p>Legen Sie &#8211; ebenfalls mit einem Doppelklick &#8211; die Unterroutine an:</p>
+<pre class="sap1"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  zz_vim_info
+*&amp;---------------------------------------------------------------------*
+* Set the width of the docking control to 300
+*----------------------------------------------------------------------*</span>
+FORM zz_vim_info .
+
+  DATA lv_width_act TYPE i.
+  DATA lv_width_new TYPE i VALUE 300.
+  FIELD-SYMBOLS &lt;navi&gt; TYPE REF TO cl_gui_docking_container.
+  ASSIGN ('(SAPLSVCM)DOCKING_CONTAINER') TO &lt;navi&gt;.
+  IF sy-subrc = 0 AND NOT &lt;navi&gt; IS INITIAL.
+<span style="color: #fb2412;">*** Get actual width</span>
+    CALL METHOD &lt;navi&gt;-&gt;get_width
+      IMPORTING
+        width = lv_width_act.
+
+    IF lv_width_act &lt;&gt; lv_width_new.
+<span style="color: #fb2412;">*** Set desired width</span>
+      CALL METHOD &lt;navi&gt;-&gt;set_width
+        EXPORTING
+          width = lv_width_new.
+<span style="color: #fb2412;">*** Refresh control to adjust dynpro size again</span>
+      CALL FUNCTION 'SAPGUI_SET_FUNCTIONCODE'
+        EXPORTING
+          functioncode = '=00'
+        EXCEPTIONS
+          OTHERS       = 2.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.                    " zz_vim_info</pre>
+<p>Nachdem die Breite gesetzt wurde, muss noch einmal der Bildschirm neu aufgebaut werden, denn das TableControl des Pflegedialoges wurde für die ursprüngliche Dynpro-Größe angepasst. Das heißt, durch das breitere Navigationsfenster, passt das TableControl evtl. nicht mehr auf das nun kleinere Dynpro. Indem einmal &#8220;Enter gedrückt&#8221; wird, wird der Bildschirm erneut aufgebaut.</p>
+<p>Der Beitrag <a href="/blog/breite-des-navigationsfensters/">Breite des Navigationsfensters</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/breite-des-navigationsfensters/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Anderen Pflegedialog aufrufen</title>
+		<link>/blog/anderen-pflegedialog-aufrufen/</link>
+					<comments>/blog/anderen-pflegedialog-aufrufen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Materialstamm]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<category><![CDATA[TableControl]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=396</guid>
+
+					<description><![CDATA[<p>Durch Zeitpunkte k&#246;nnen Sie in die Verarbeitung der Programmlogik eingreifen. Leider gibt es nur f&#252;r einige Funktionen die entsprechenden Zeitpunkte. In diesem Artikel zeigen wir Ihnen, wie Sie durch eine einfache Manipulation des Dynpros aus der View-Pflege den Aufruf eines anderen Pflegedialogs einbinden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/anderen-pflegedialog-aufrufen/">Anderen Pflegedialog aufrufen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Durch Zeitpunkte k&ouml;nnen Sie in die Verarbeitung der Programmlogik eingreifen. Leider gibt es nur f&uuml;r einige Funktionen die entsprechenden Zeitpunkte. In diesem Artikel zeigen wir Ihnen, wie Sie durch eine einfache Manipulation des Dynpros aus der View-Pflege den Aufruf eines anderen Pflegedialogs einbinden k&ouml;nnen.<br /><P class="head1">Anwendung</P><P>Einen Pflegedialog zu einer anderen Tabelle aufzurufen, kann recht n&uuml;tzlich sein. Zum Beispiel k&ouml;nnten Sie in einer Tabelle Daten mit verschieden &#8220;Typen&#8221; hinterlegen. Je &#8220;Typ&#8221; k&ouml;nnte es dann n&ouml;tig sein, zus&auml;tzlich eine andere Tabelle zu pflegen.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Pflegeview/00call_demo.jpg"><BR>Beispieltabelle mit Druckknopf</P></TD></TR></TBODY></TABLE></P><P class="head1">Beispiel</P><P>Nehmen wir an, Sie haben eine Tabelle mit dem Feld &#8220;Materialnummer&#8221;. Eine Materialnummer ist einer Materialart zugeordnet. In der Tabelle sollen Materialien hinterlegt werden, zu denen bei der Produktion spezielle Pr&uuml;fungen notwendig sind. Die Art der Pr&uuml;fungen sind in einer separaten Customizingtabelle hinterlegt. Da sich die Pr&uuml;fungen und Ausp&auml;gungen aber je Materialart unterscheiden, muss zu Fertigerzeugnissen eine andere Tabelle gepflegt werden als f&uuml;r Rohstoffe.</P><P>&Uuml;ber einen View k&ouml;nnen Sie die Materialtabelle &#8211; nennen wir sie ZMATPRUEF &#8211; mit dem Materialstamm (Tabelle MARA) verbinden. Als zus&auml;tzliches Viewfeld wird die Materialart aufgenommen.</P><P>Um die Materialart in den View aufnehmen zu k&ouml;nnen, m&uuml;ssen Sie in ZMATPRUEF den Fremdschl&uuml;ssel f&uuml;r Feld MATNR auf die Tabelle MARA definiert haben.</P><P>Sie k&ouml;nnen dann im Pflegeview &uuml;ber den Button [_Beziehungen_] die Tabelle MARA ausw&auml;hlen und das Feld MTART in die Feldliste aufnehmen.</P><P>Im angelegten View &#8211; er k&ouml;nnte ZMATPRUEF_V heissen &#8211; definieren Sie in den Feldeigenschaften, dass das Feld &#8220;Materialart&#8221; nur gelesen werden darf (Feld &#8220;P&#8221; [Pflegemerkmal] auf &#8220;R&#8221; setzen&#8221;).</P><P>Aufgrund dieses Feldes entscheiden wir hinterher, welche Pflegetabelle wir aufrufen.&nbsp;</P><P class="head1">Vorgehen</P><P class="head2">Drucktaste in den TableControl einf&uuml;gen</P><P>So gehen Sie vor, um einen Button in ein Dynpro hinzuzuf&uuml;gen um mit diesem einen anderen Pflegedialog aufzurufen:</P><P>Nachdem Sie den Pflegedialog f&uuml;r den View ZMATPRUEF_V angelegt haben, &auml;ndern Sie das generierte Dynpro:&nbsp;Men&uuml; <EM>Umfeld &#8211; Modifikation &#8211; Pflegebild</EM>.</P><P>Im Dynproeditor ziehen Sie einfach ein Feld vom Typ &#8220;Drucktaste&#8221; rechts neben die Felder <STRONG>im</STRONG> TableControl.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Pflegeview/00call_dynpro.jpg"><BR>Die neue Drucktaste</P></TD></TR></TBODY></TABLE></P><P>Die Attribute zur Drucktaste k&ouml;nnten so aussehen:</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Pflegeview/00call_attr.jpg"><BR>Attribute der Drucktaste</P></TD></TR></TBODY></TABLE></P><P>Wichtig hierbei ist der Funktionscode, der mit&nbsp;Prozentzeichen enden <STRONG>muss</STRONG>.&nbsp;Die Prozentzeichen werden beim Dr&uuml;cken in die aktuelle Zeile umgewandelt. Wird der Druckknopf in der dritten Zeile gedr&uuml;ckt, so hat der Funktionscode den Wert ZZCALL003.</P><P class="head2">Aufruf des Pflegedialogs</P><P>Es gibt leider keinen Zeitpunkt mit dem man auf das Dr&uuml;cken des Knopfes reagieren k&ouml;nnte. Deswegen implementieren wir ein neues MODUL in die Ablauflogik des Dynpros.</P><P>Es g&auml;be zwei M&ouml;glichkeiten, an welcher Stelle man auf den Tastendruck reagieren k&ouml;nnte: </P><OL><LI>innerhalb des LOOP &uuml;ber die Tabellenzeilen <LI>am Ende der Verarbeitung des PAI</LI></OL><P>Innerhalb des LOOP im TableControl muss man abfragen, ob die aktuell durchlaufene Zeile die ist, in der die Drucktaste bet&auml;tigt wurde.</P><P>Bei Variante (2) muss man die Zeilennummer&nbsp;im Funktionscode auswerten und den entsprechenden Tabelleneintrag nachlesen.</P><P>Hier habe ich mich f&uuml;r die erste Variante entschieden.</P><P>F&uuml;gen Sie in der Ablauflogik direkt nach &#8220;LOOP AT EXTRACT&#8221; die folgende Zeile ein:</P><P class="sap1">MODULE ZZ_USERCOMMAND.</P><P>Mit Doppelklick legen Sie das Modul an. Das Programm schl&auml;gt automatisch vor, dass das Modul in ein neues Include in der Funktionsgruppe des Pflegeviews angelegt wird. </P><P>So k&ouml;nnte das Coding des Moduls aussehen:</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Module&nbsp; ZZ_USERCOMMAND&nbsp; INPUT<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>MODULE zz_usercommand INPUT.<BR><BR>&nbsp; IF sy-ucomm(6) = &#8216;ZZCALL&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp; PERFORM zz_call_view_dialog USING sy-ucomm+6(3).&nbsp;&nbsp;<BR>&nbsp; ENDIF.<BR><BR>ENDMODULE.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ZZ_USERCOMMAND&nbsp; INPUT</P><P class="text1">Die Routine ZZ_CALL_VIEW_DIALOG enth&auml;lt das eigentliche Coding f&uuml;r den Aufruf des Pflegedialogs:</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; ZZ_CALL_VIEW_DIALOG<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM zz_call_view_dialog USING value(fi_row).<BR><BR><FONT color="#fb2412">*** Datendeklarationen</FONT><BR>&nbsp; DATA lv_tabname TYPE tabname.<BR>&nbsp; DATA ls_sellist TYPE vimsellist.<BR>&nbsp; DATA lt_sellist TYPE STANDARD TABLE OF vimsellist.<BR>&nbsp; DATA lv_row&nbsp;&nbsp;&nbsp;&nbsp; TYPE i.<BR><BR><FONT color="#fb2412">*** Die &uuml;bergebene Nummer aus der Drucktaste&nbsp;ist der aktuellen<BR>*** sichtbaren Zeile im TableControl. Um die richtige Position<BR>*** herauszubekommen, muss die&nbsp;erste im TableControl angezeigte<BR>*** Zeile addiert werden:</FONT><BR>&nbsp; lv_row = fi_row + tctrl_zmatpruef_v-top_line &#8211; 1.<BR><BR><FONT color="#fb2412">*** Hier pr&uuml;fen wir, ob die aktuell im LOOP durchlaufene&nbsp;Zeile<BR>*** auch die Zeile ist, in der der Druckknopf bet&auml;tigt wurde</FONT><BR>&nbsp; CHECK lv_row = tctrl_zmatpruef_v-current_line.<BR><BR><FONT color="#fb2412">*** &Uuml;bernahme der unstrukturierten Daten EXTRACT in die View-Struktur</FONT><BR>&nbsp; zmatpruef_v = extract.<BR><BR><FONT color="#fb2412">*** Hier entscheiden wir uns, welche Tabelle zur Materialart geh&ouml;rt:</FONT><BR>&nbsp; CASE zmatpruef_v-mtart.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;FERT&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_tabname = &#8216;ZMATPRUEF_FERT&#8217;.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;ROH&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_tabname = &#8216;ZMATPRUEF_ROH&#8217;.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;HALB&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_tabname = &#8216;ZMATPRUEF_HALB&#8217;.<BR>&nbsp;&nbsp;&nbsp; WHEN OTHERS.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE i000(vz) WITH &#8216;Kein Customizing n&ouml;tig&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp; ENDCASE.<BR><BR><FONT color="#fb2412">*** In der ermittelten Customizingtabelle sollte als Schl&uuml;sselfeld die <BR>*** Materialnummer vorhanden sein, da ja die Einstellungen zur <BR>*** Materialnummer vorgenommen werden m&uuml;ssen.<BR>*** Deswegen&nbsp;&uuml;bergeben wir dem Pflegeview die Materialnummer<BR></FONT>&nbsp; CLEAR lt_sellist.<BR>&nbsp; ls_sellist-viewfield = &#8216;MATNR&#8217;.<BR>&nbsp; ls_sellist-operator = &#8216;EQ&#8217;.<BR>&nbsp; ls_sellist-value = zmatpruef_v-matnr.<BR>&nbsp; APPEND ls_sellist TO lt_sellist.<BR><BR><BR><FONT color="#fb2412">*** Dies ist der Aufruf des Pflegedialoges zur ermittelten Tabelle</FONT><BR>&nbsp; CALL FUNCTION &#8216;VIEW_MAINTENANCE_CALL&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-action<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; view_name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lv_tabname<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dba_sellist&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_sellist<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; client_reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; foreign_lock&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invalid_action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_clientindependent_auth&nbsp;&nbsp;&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_database_function&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_editor_function&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_show_auth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 7<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_tvdir_entry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 8<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_upd_auth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 9<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; only_show_allowed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 10<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; system_failure&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 11<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unknown_field_in_dba_sellist = 12<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; view_not_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 13<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; maintenance_prohibited&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 14<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 15.<BR>&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** Falls der Pflegeview zur Tabelle ZMATPRUEF_V Teil eines <BR>*** Viewclusters ist, m&uuml;ssen Sie die folgenden beiden Zeilen<BR>*** aktivieren, um wieder auf dem Pflegeview zu landen&nbsp;</FONT><BR><FONT color="#008952">*&nbsp;&nbsp;&nbsp; CLEAR: vim_leave_screen, vim_act_dynp_view.<BR>*&nbsp;&nbsp;&nbsp; SET SCREEN 0. LEAVE SCREEN.<BR></FONT>&nbsp; ELSE.<BR><FONT color="#fb2412">*** Fehlermeldung,&nbsp;falls eine Pflege nicht m&ouml;glich war<BR></FONT>&nbsp;&nbsp;&nbsp; MESSAGE i000(vz) WITH &#8216;Pflege nicht m&ouml;glich; SUBRC=&#8217; sy-subrc.<BR>&nbsp; ENDIF.<BR><BR>ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ZZ_CALL_VIEW_DIALOG</P><P class="head2">&Auml;nderung der&nbsp;Feldeigenschaften</P><P>Als letztes bleibt uns noch die &Auml;nderung der Feldeigenschaften f&uuml;r den Druckknopf, denn im Anzeigemodus ist der Druckknopf nicht aktiv.</P><P>um den Druckknopf auch im Anzeigemodus zu aktivieren, m&uuml;ssen Sie im PBO innerhalb des LOOP AT EXTRACT ein Modul einf&uuml;gen:</P><P class="sap1">MODULE ZZ_SCREEN.</P><P>Coding in diesem Modul:</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Module&nbsp; ZZ_SCREEN&nbsp; OUTPUT<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>MODULE zz_screen OUTPUT.<BR><BR>&nbsp; LOOP AT SCREEN.<BR>&nbsp;&nbsp;&nbsp; IF screen-name = &#8216;ZZBUTTON_CALL&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; screen-input = &#8216;1&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY SCREEN.<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp; ENDLOOP.<BR><BR>ENDMODULE.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ZZ_SCREEN&nbsp; OUTPUT</P><P class="head1">Anmerkungen</P><P>Nachdem Sie nun alles aktiviert haben, k&ouml;nnen Sie die Funktionalit&auml;t nutzen.</P><P>Beachten Sie bitte, dass bei einer Neugenerierung die folgenden &Auml;nderungen &uuml;berschrieben werden und erneut angepasst werden m&uuml;ssen:</P><UL><LI>Druckknopf im Dynpro <LI>Ablauflogik im Dynpro</LI></UL><P>Diese &Auml;nderungen sind jedoch minimal, da das Coding der Module erhalten bleibt.</P></p>
+<p>Der Beitrag <a href="/blog/anderen-pflegedialog-aufrufen/">Anderen Pflegedialog aufrufen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/anderen-pflegedialog-aufrufen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

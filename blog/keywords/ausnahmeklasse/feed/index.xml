@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Ausnahmeklasse Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/ausnahmeklasse/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 23 Nov 2021 15:19:27 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Ausnahmeklasse Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Übersetzung von Ausnahmeklassen</title>
+		<link>/blog/uebersetzung-von-ausnahmeklassen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 23 Nov 2021 15:19:26 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Ausnahmeklasse]]></category>
+		<category><![CDATA[exception class]]></category>
+		<category><![CDATA[Übersetzung]]></category>
+		<guid isPermaLink="false">/?p=1032481</guid>
+
+					<description><![CDATA[<p>Ausnahmeklasse sind in vielerlei Hinsicht Ausnahme-Klassen. Es fängt mit der Generierung des CONSTRUCTORs an, geht über die unterschiedliche Behandlung in SE24 und Eclipse und endet bei der Übersetzung der Exception-ID&#8217;s der Ausnahmeklasse. Man könnte sich nun darüber streiten, ob die Ausnahme-ID&#8217;s der Ausnahmeklassen überhaupt übersetzt werden sollten oder ob sie eh nur technischen Charakter haben und nicht an die Oberfläche gelangen sollten. Das können wir allerdings an anderer Stelle tun. Ich bin der Meinung, dass...</p>
+<p>Der Beitrag <a href="/blog/uebersetzung-von-ausnahmeklassen/">Übersetzung von Ausnahmeklassen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Ausnahmeklasse sind in vielerlei Hinsicht Ausnahme-Klassen. Es fängt mit der Generierung des CONSTRUCTORs an, geht über die unterschiedliche Behandlung in SE24 und Eclipse und endet bei der Übersetzung der Exception-ID&#8217;s der Ausnahmeklasse.</p>
+
+
+
+<p>Man könnte sich nun darüber streiten, ob die Ausnahme-ID&#8217;s der Ausnahmeklassen überhaupt übersetzt werden sollten oder ob sie eh nur technischen Charakter haben und nicht an die Oberfläche gelangen sollten. Das können wir allerdings an anderer Stelle tun. Ich bin der Meinung, dass die Ausnahme-IDs&#8217;, die nicht mit einer SAP-Meldung erzeugt werden, regulär nutzbare Elemente sind. </p>
+
+
+
+<h2 class="wp-block-heading" id="ausnahme-id-s">Ausnahme-ID&#8217;s</h2>
+
+
+
+<p>Die Texte, bzw. Ausnahme-IDs von Ausnahmeklassen werden über einen sogenannten OTR-Text definiert. Für jeden <em>Text</em>, den du in der Ausnahmeklasse hinzufügst, wird eine Konstante vom Typ SOTR_CONC mit einer eindeutigen GUID angelegt. OTR steht für <em>Online Text Repository</em>. OTR-Texte können mit Transaktion SOTR_EDIT gepflegt werden. Allerdings können Sie auch aus dieser Transaktion heraus nicht übersetzt werden.</p>
+
+
+
+<h2 class="wp-block-heading" id="regulare-ubersetzung">Reguläre Übersetzung</h2>
+
+
+
+<p>In der Regel kann man ein Objekt in der SAPGUI &#8211; bis auf wenige Ausnahmen &#8211; über das Menü <em>Springen •</em> <em>Übersetzung</em> übersetzen. Ausnahmeklassen sind leider so eine Ausnahme.</p>
+
+
+
+<h2 class="wp-block-heading" id="ubersetzung-von-ausnahme-ids">Übersetzung von Ausnahme-IDs</h2>
+
+
+
+<p>Um eine Ausnahme-ID zu übersetzen, musst du wie folgt vorgehen:</p>
+
+
+
+<ol><li>Finde heraus, wie die ID des OTR-Objektes lautet. In der SE24 findest du die ID im Reiter &#8220;Attribute&#8221;. Es sind alle Attribute vom Typ SOTR_CONC. In Eclipse findest du die generierten Attribute in der PUBLIC SECTION. Auch hier sind es die Konstanten vom Typ SOTR_CONC.</li><li>Kopiere die OTR-ID</li><li>Starte Transaktion SE63 und klicke die Drucktaste &#8220;Kurztexte&#8221; an</li><li>Suche nach OTR oder öffne den Ordner 00 Meta Objects.</li><li>Wähle &#8220;OTRS &#8211; OTR Kurztext Meta&#8221; aus.</li><li>Gib die kopierte GUID in das Feld GUID ein. Achte darauf, dass Quell- und Zielsprache korrekt eingestellt sind.</li><li>Klicke auf die Drucktaste &#8220;Bearbeiten&#8221;</li></ol>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="532" height="577" src="/wp-content/uploads/2021/11/image.png" alt="" class="wp-image-1032497" srcset="/wp-content/uploads/2021/11/image.png 532w, /wp-content/uploads/2021/11/image-277x300.png 277w" sizes="(max-width: 532px) 100vw, 532px" /><figcaption>Auswahl Objekttyp OTRS</figcaption></figure>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="612" height="285" src="/wp-content/uploads/2021/11/image-1.png" alt="" class="wp-image-1032498" srcset="/wp-content/uploads/2021/11/image-1.png 612w, /wp-content/uploads/2021/11/image-1-300x140.png 300w" sizes="(max-width: 612px) 100vw, 612px" /><figcaption>OTR bearbeiten</figcaption></figure>
+
+
+
+<p>Du befindest dich nun im bekannten Dynpro zum Übersetzen der Texte. Leider müssen die Ausnahme-ID&#8217;s einzeln kopiert und bearbeitet werden. Es gibt meines Wissens nach keine Sammelfunktion zum Bearbeiten so wie bei den <a href="/blog/uebersetzung-einer-nachrichtenklasse/">Nachrichtenklassen</a>.</p>
+<p>Der Beitrag <a href="/blog/uebersetzung-von-ausnahmeklassen/">Übersetzung von Ausnahmeklassen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

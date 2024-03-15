@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Dynamische Dokumente Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/dynamische-dokumente/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 23 Feb 2023 15:44:14 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Dynamische Dokumente Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Application-Event stört gewaltig&#8230;</title>
+		<link>/blog/application-event-stoert-gewaltig/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 17 Feb 2017 17:53:43 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Planauftrag]]></category>
+		<category><![CDATA[CO41]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<category><![CDATA[Folgebildsteuerung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017905</guid>
+
+					<description><![CDATA[<p>Aufgabe: Transaktion CO41 - Umsetzung Planaufträge um ein paar Funktionen zu erweitern. Ich entschied mich dafür, an geeigneter Stelle einen Docking-Container mit einem Dynamischen Dokument anzubinden. Durch Drucktasten und Eingabefelder wollte ich die geforderte Funktionalität abbilden. Doch leider machte mir eine Fehlermeldung schwer zu schaffen...</p>
+<p>Der Beitrag <a href="/blog/application-event-stoert-gewaltig/">Application-Event stört gewaltig&#8230;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich bekam die Aufgabe, die Transaktion CO41 &#8211; Umsetzung Planaufträge um ein paar Funktionen zu erweitern. Nach einigem Hin- und Herüberlegen entschied ich mich dafür, an geeigneter Stelle (Include LCOUPF1N &#8211; Routine INIT_FBILD) mittels impliziter Erweiterung einen Docking-Container mit einem <a href="https://tricktresor.com/blog/dynamische-dokumente/">Dynamischen Dokument</a> anzubinden. Der Docking Container war schnell erstellt und auch die ersten Zeichen inklusive Drucktaste waren zügig gezaubert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-33-33.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017906 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-33-33.jpg" alt="" width="493" height="280" srcset="/wp-content/uploads/2017/02/2017-02-17_18-33-33.jpg 493w, /wp-content/uploads/2017/02/2017-02-17_18-33-33-300x170.jpg 300w, /wp-content/uploads/2017/02/2017-02-17_18-33-33-148x85.jpg 148w, /wp-content/uploads/2017/02/2017-02-17_18-33-33-71x40.jpg 71w" sizes="(max-width: 493px) 100vw, 493px" /></a></p>
+<p>Leider funktioniert dieser erste Wurf nicht, denn nach Drücken des Druckknopfes wurde nicht meine registrierte Methode angesprungen, sondern es kam die Meldung &#8220;Die angeforderte Funktion %_GC 1 ist hier nicht vorgesehen&#8221;.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-36-01.jpg"><img decoding="async" class="size-full wp-image-1017907 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-36-01.jpg" alt="" width="473" height="139" srcset="/wp-content/uploads/2017/02/2017-02-17_18-36-01.jpg 473w, /wp-content/uploads/2017/02/2017-02-17_18-36-01-300x88.jpg 300w" sizes="(max-width: 473px) 100vw, 473px" /></a></p>
+<p>Ich brauchte lange, um herauszufinden, dass die in einigen von der SAP verwendete <a href="https://tricktresor.com/blog/folgebildsteuerung/">FBS &#8211; Folgebildsteuerung</a> der Grund für die Meldung war (Funktionsbaustein SCREEN_SEQUENCE_CONTROL). Beziehungsweise war das nicht in erster Linie der Grund, sondern der Umstand, dass bei den Dynamischen Dokumenten die zugehörigen Events alle standardmäßig als &#8220;application events&#8221; registriert werden. Das hat zur Folge, dass die Ereignissteuerung nicht nur innerhalb der Klasse durchgeführt wird, sondern einen &#8220;Umweg&#8221; über das Dynpro macht. Es wird in dem Fall ein Funktionscode ausgelöst, bei dem das <em>PAI &#8211; Process After Input</em> durchlaufen wird.</p>
+<p>Meistens ist das egal, denn es werden vom Programm in der Regel nur die Funktionscodes abgeprüft, die auch definiert wurden. Man kann also in einer Transaktion &#8220;JIFDIJIFG&#8221; eingeben und es passiert nichts. In der CO41 kann man das jedoch nicht, da für jeden Funktionscode in einer Tabelle nachgeprüft wird, wie bei diesem Funktionscode verfahren werden soll. Findet der Funktionsbaustein SCREEN_SEQUENCE_CONTROL keinen Eintrag, dann kommt die oben genannte Meldung.</p>
+<h2>Lösung</h2>
+<p>Ich machte mich schon darauf gefasst, die Klasse CL_DD_DOCUMENT abzuleiten, um die Methode DISPLAY, in der die Ereignisregistrierung stattfindet, zu redefinieren. Glücklicherweise ist das HTML-Objekt, in dem das Dynamische Dokument angezeigt wird und für das die Ereignisse registriert werden, öffentlich. Dadurch konnte ich das Ereignis SAPEVENT erneut, aber diesmal <strong>ohne</strong> APPL_EVENT, registrieren:</p>
+<pre class="">document-&gt;merge_document( ).
+document-&gt;display_document( parent = docker ).
+DATA(html) = document-&gt;html_control.
+
+DATA: myevent_tab TYPE cntl_simple_events,
+myevent TYPE cntl_simple_event.
+myevent-eventid = html-&gt;m_id_sapevent.
+myevent-appl_event = ' '.
+APPEND myevent TO myevent_tab.
+html-&gt;set_registered_events( events = myevent_tab ).</pre>
+<p>Nun konnte ich endlich meine Tasten drücken, ohne dass mir die Folgebildsteuerung in die Quere kam.</p>
+<p>Der Beitrag <a href="/blog/application-event-stoert-gewaltig/">Application-Event stört gewaltig&#8230;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAP-Demoprogramme</title>
+		<link>/blog/sap-demoprogramme/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 31 May 2016 08:26:29 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[Demo-Programme]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=431</guid>
+
+					<description><![CDATA[<p>Demoprogramme der SAP. CALENDAR_CONTROL CONTEXT_MENU_DYNPR CONTEXT_MENU_LIST CUSTOM_CONTROL DIALOGBOX_CONTROL DOCKING_CONTROL DRAG_DROP_EDIT_TREE DRAG_DROP_TREE_MULTI  DROPDOWN_LISTBOX HTML_VIEWER HTML_VIEWER_WORKSHOP PICTURE_CONTROL SAP_LIST_TREE SPLITTER_CONTROL SUBSCREEN TABLE_CONTROL TOOLBAR_DIALOGBOX</p>
+<p>Der Beitrag <a href="/blog/sap-demoprogramme/">SAP-Demoprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Demoprogramme der SAP. CALENDAR_CONTROL CONTEXT_MENU_DYNPR CONTEXT_MENU_LIST CUSTOM_CONTROL DIALOGBOX_CONTROL DOCKING_CONTROL DRAG_DROP_EDIT_TREE DRAG_DROP_TREE_MULTI DROPDOWN_LISTBOX HTML_VIEWER HTML_VIEWER_WORKSHOP PICTURE_CONTROL SAP_LIST_TREE SPLITTER_CONTROL SUBSCREEN TABLE_CONTROL TOOLBAR_DIALOGBOX</p>
+<p>[notice type=&#8217;info&#8217;]Viele DEMO-Programme finden sich im Paket SLIS!</p>
+<p>Demoprogramme beginnen häufig mit DEMO* oder RSDEMO* [/notice]</p>
+<h2 class="head1">Toolbar</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_TOOLBAR_DIALOGBOX</div>
+</li>
+<li>SAPTOOLBAR_IN_SPLITTER</li>
+<li>SAPTOOLBAR_DEMO1</li>
+<li>BCALV_GRID_07</li>
+</ul>
+<h2 class="head1">ALV-Grid</h2>
+<ul>
+<li>BCALV*</li>
+<li><span style="color: #fb2412;"><strong>BCALV_VERIFY_DATATYPES</strong></span><br />
+Das Mega-Test-Programm für jegliche Optionen des ALV-Grid</li>
+<li><span style="color: #fb2412;"><strong>BCALV_TEST_SUITE</strong><br />
+</span>Viele Funktionen in einem Programm</li>
+</ul>
+<h2 class="head1">ALV-Tree</h2>
+<ul>
+<li>SAPSIMPLE_TREE_CONTROL_DEMO</li>
+<li>R_ALV_TREE_TOOLBAR_MANAGER</li>
+<li>BCALV_GRID_DND_TREE</li>
+<li>BCALV_GRID_DND_TREE_SIMPLE</li>
+<li>BCALV_TEST_COLUMN_TREE</li>
+<li>BCALV_TEST_SIMPLE_TREE</li>
+<li>BCALV_TREE_01</li>
+<li>BCALV_TREE_02</li>
+<li>BCALV_TREE_03</li>
+<li>BCALV_TREE_04</li>
+<li>BCALV_TREE_05</li>
+<li>BCALV_TREE_06</li>
+<li>BCALV_TREE_DEMO</li>
+<li>BCALV_TREE_DND</li>
+<li>BCALV_TREE_DND_MULTIPLE</li>
+<li>BCALV_TREE_EVENT_RECEIVER</li>
+<li>BCALV_TREE_EVENT_RECEIVER01</li>
+<li>BCALV_TREE_ITEMLAYOUT</li>
+<li>BCALV_TREE_MOVE_NODE_TEST</li>
+<li>BCALV_TREE_SIMPLE_DEMO</li>
+<li>Doku:<br />
+<a href="http://help.sap.com/printdocu/core/print46b/de/data/de/pdf/BCCITREE.pdf" target="_blank" rel="noopener noreferrer">http://help.sap.com/printdocu/core/print46b/de/<br />
+data/de/pdf/BCCITREE.pdf</a></li>
+</ul>
+<h2 class="head1">Dialogbox</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_DIALOGBOX_CONTROL</div>
+</li>
+<li>
+<div class="text1">RSDEMO_TOOLBAR_DIALOGBOX</div>
+</li>
+</ul>
+<h2 class="head1">Drawer (Vertikales Tabstrip)</h2>
+<ul>
+<li>
+<div class="text1">RSBPT_CONTAINER_BAR_3</div>
+</li>
+</ul>
+<h2 class="head1">Context Menu</h2>
+<ul>
+<li>RSDEMO_CONTEXT_MENU_DYNPR</li>
+<li>
+<div class="text1">RSDEMO_CONTEXT_MENU_LIST</div>
+</li>
+<li>
+<div class="text1">R_ALV_TREE_TOOLBAR_MANAGER</div>
+</li>
+</ul>
+<h2 class="head1">Grafik</h2>
+<ul>
+<li>
+<div class="text1">GRAPHICS_GUI_CE_DEMO</div>
+</li>
+</ul>
+<h2 class="head1">Drag and Drop</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_DRAG_DROP_EDIT_TREE</div>
+</li>
+<li>
+<div class="text1">RSDEMO_DRAG_DROP_TREE_MULTI</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_DRAGDROP</div>
+</li>
+<li>
+<div class="text1">BCALV_GRID_DND_TREE</div>
+</li>
+<li>
+<div class="text1">BCALV_GRID_DND_TREE_SIMPLE</div>
+</li>
+<li>
+<div class="text1">SAPCALENDAR_DRAG_DROP</div>
+</li>
+<li>
+<div class="text1">BCALV_TEST_DRAG_DROP_02</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_TEST_EVENTS</div>
+</li>
+</ul>
+<h2 class="head1">Textedit</h2>
+<ul>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_1</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_3</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_DRAGDROP</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_TEST_1</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_TEST_2</div>
+</li>
+<li>
+<div class="text1"><span style="line-height: 1.5em;">SAPTEXTEDIT_TEST_EVENTS</span></div>
+</li>
+<li>SAPBTFEDITOR_DEMO Demonstriert die Verwendung des BTF-Editors</li>
+<li>SAPBTFFRAMEWORK_DEMO</li>
+</ul>
+<h2 class="head2">HTML</h2>
+<ul>
+<li>
+<div class="text1">SAPHTML_SCRIPT_DEMO</div>
+<div class="text1"></div>
+</li>
+<li>
+<div class="text1">RSDEMO_HTML_VIEWER</div>
+</li>
+<li>
+<div class="text1">RSDEMO_HTML_VIEWER_WORKSHOP</div>
+</li>
+<li>RSTXHTML</li>
+<li>SAPHTML_DEMO_CN</li>
+<li>SAPHTML_DEMO1</li>
+<li>SAPHTML_EVENTS_DEMO</li>
+<li>SAPHTML_LONGTEXT_DEMO</li>
+<li>SAPHTML_R3HTTP_DEMO</li>
+<li>SAPHTML_R3HTTP_XML</li>
+<li>SAPHTML_SCRIPT_DEMO</li>
+<li>SAPHTML_SET_GUI_CHARSET</li>
+<li>SAPHTML_SSO_DEMO</li>
+<li>SAPHTML_UI_DEMO</li>
+<li>SAPHTML_USE_DEFAULT_CHARSET</li>
+<li>SAPHTMLPAGEEDITOR_DEMO1</li>
+</ul>
+<h2 class="head1">Dynamische Dokumente/ ABAP-Renderer</h2>
+<table style="height: 115px;" width="665">
+<tbody>
+<tr>
+<td>
+<ul>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_FLOW</span></li>
+</ul>
+</td>
+<td>Demonstriert die Verwendung der Element FLOW des Gestaltungsobjekts</td>
+</tr>
+<tr>
+<td>
+<ul>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_GRID</span></li>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_GRID_1</span></li>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_GRID_2</span></li>
+</ul>
+</td>
+<td style="vertical-align: top;">Demonstriert die Verwendung der Element GRID des Gestaltungsobjekts</td>
+</tr>
+<tr>
+<td>
+<ul>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_TEST</span></li>
+</ul>
+</td>
+<td> Testprogramm für das ALV Gestaltungsobjekt</td>
+</tr>
+</tbody>
+</table>
+<h2 class="head1">Mail</h2>
+<ul>
+<li>
+<div class="text1">RSSOHTMLGIF (Sehr schönen Beispiel, um eine HTML Seite mit eingebundenen Bildern zu versenden)</div>
+</li>
+</ul>
+<h2 class="head1">Calendar</h2>
+<ul>
+<li>RSDEMO_CALENDAR_CONTROL</li>
+<li>SAPCALENDAR_DRAG_DROP</li>
+</ul>
+<h2 class="head1">Sonstige</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_CUSTOM_CONTROL</div>
+</li>
+<li>
+<div class="text1">RSDEMO_EVENT_ON_FIELD</div>
+</li>
+<li>
+<div class="text1">RSDEMO_DOCKING_CONTROL</div>
+</li>
+<li>
+<div class="text1">RSDEMO_DROPDOWN_LISTBOX</div>
+</li>
+<li>
+<div class="text1">RSDEMO_EASY_SPLITTER_CONTROL</div>
+</li>
+<li>RSDEMO_PICTURE_CONTROL</li>
+<li>
+<div class="text1">RSDEMO_SAP_LIST_TREE</div>
+</li>
+<li>
+<div class="text1">RSDEMO_SPLITTER_CONTROL</div>
+</li>
+<li>TEST_FRONTEND_SERVICES</li>
+<li>DEMO_COLORSEL</li>
+</ul>
+<h2 class="head1">Old-Fashioned</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_SUBSCREEN</div>
+</li>
+<li>
+<div class="text1">RSDEMO_TABLE_CONTROL</div>
+</li>
+<li>RSDEOM02 (Table Control)</li>
+<li>DEMO_LIST_FORMAT_COLOR_1 Farben in Listen</li>
+<li>DEMO_LIST_FORMAT_COLOR_2 Verwendung von Farben in Listen</li>
+</ul>
+<h2>Grafik</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2007/08/2016-05-31_10-13-35.jpg"><img decoding="async" class="alignnone size-full wp-image-654991" src="https://tricktresor.com/wp-content/uploads/2007/08/2016-05-31_10-13-35.jpg" alt="2016-05-31_10-13-35" width="615" height="477" srcset="/wp-content/uploads/2007/08/2016-05-31_10-13-35.jpg 615w, /wp-content/uploads/2007/08/2016-05-31_10-13-35-300x233.jpg 300w" sizes="(max-width: 615px) 100vw, 615px" /></a></p>
+<p>Report RGRAPALL listet die folgenden Grafikbeispiele auf:</p>
+<ul>
+<li>BARCBO01 Demoprogramm: Balkenplan im Anzeigemodus</li>
+<li>BARCBO02 Demoprogramm: Balkenplan im Pflegemodus</li>
+<li>BARCBO03 Demoprogramm: Balkenplan im Pflegemodus (Plantafel)</li>
+<li>BARCBO04 Demoprogramm: Gegenseitiges Aktualisieren von Balkenplan und Dynpro</li>
+<li>BARCOCX1 Demoprogramm: Balkenplancontrol</li>
+<li>DEMO_GFW_PRES_SHOW Anwendungsbeispiel für den Funktionsbaustein GFW_PRES_SHOW</li>
+<li>DEMO_GFW_PRES_SHOW_MULT Anwendungsbeispiel für den Funktionsbaustein GFW_PRES_SHOW_MULT</li>
+<li>GFW_DEMO_HIER1 GFW: Demonstration einer einfachen Hierarchiegrafik mit SAP-Tree</li>
+<li>GFW_DEMO_HIER2 GFW: Demonstration einer Hierarchiegrafik (4 in Splitter, Drag&amp;Drop)</li>
+<li>GFW_DEMO_HIER3 GFW: Demonstration einer Hierarchie-/Präsentationsgrafik (Drag&amp;Drop)</li>
+<li>GFW_DEMO_PRES GFW: Demonstration von GFW mit sichtbarem Datencontainer</li>
+<li>GFW_DEMO_PRES1 GFW: Demonstration von Präsentationsgrafiken mit GFW</li>
+<li>GFW_PROG_BAR GFW: Programmierbeispiel für ein Balkendiagramm</li>
+<li>GFW_PROG_COLUMNS_AND_TI GFW: Programmierbeispiel für ein Balkendiagramm mit Zeitachse</li>
+<li>GFW_PROG_HISTOGRAM GFW: Programmierbeispiel für ein Histogramm</li>
+<li>GFW_PROG_LABELS GFW: Programmierbeispiel für dieselben Beschriftungen, lange Beschr.</li>
+<li>GFW_PROG_MTA GFW: Programmierbeispiel für eine Meilensteintrendanalyse</li>
+<li>GFW_PROG_PIE GFW: Programmierbeispiel für ein Kreisdiagramm</li>
+<li>GFW_PROG_POINT_WITH_LAB GFW: Programmierbeispiel für Diagramm mit gekennzeichnetem Punkt</li>
+<li>GFW_PROG_TIME_AXIS GFW: Programmierbeispiel für ein Punktdiagramm mit Zeitachse</li>
+<li>GFW_PROG_TUTORIAL GFW: Programmierbeispiel für eine einfache PräsGrafik = GFW-Tutorial</li>
+<li>GFW_PROG_SPEEDOMETER GFW: Programmierbeispiel für ein Balkendiagramm<br />
+<a href="https://tricktresor.com/wp-content/uploads/2016/05/SNAG-0001.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018035" src="https://tricktresor.com/wp-content/uploads/2016/05/SNAG-0001.png" alt="" width="531" height="417" srcset="/wp-content/uploads/2016/05/SNAG-0001.png 531w, /wp-content/uploads/2016/05/SNAG-0001-300x236.png 300w, /wp-content/uploads/2016/05/SNAG-0001-117x91.png 117w" sizes="(max-width: 531px) 100vw, 531px" /></a></li>
+<li>GRBMAT_1 Demoprogramm: Pushbuttongrafik</li>
+<li>GRBMAT_2 Demoprogramm: Pushbuttongrafik / 2</li>
+<li>GRBUSG_1 Demoprogramm: SAP-Präsentationsgrafik 2D</li>
+<li>GRBUSG_2 Demoprogramm: SAP-Präsentationsgrafik 3D</li>
+<li>GRBUSG_3 Demoprogramm: Präsentationsgrafik Umsatzvergleich</li>
+<li>GRBUSG_4 Demoprogramm: Präsentationsgrafik 2D &#8211; 3D &#8211; 4D</li>
+<li>GRCNETC1 Demoprogramm: Ansteuern des Clustereditors im Anzeigemodus</li>
+<li>GRCNETC2 Demoprogramm: Ansteuern des Clustereditors (erweiterte Version)</li>
+<li>GRGANT_2 Demoprogramm: Gantt-Diagramm / 2</li>
+<li>GRHIER_1 Demoprogramm: Hierarchiegrafik</li>
+<li>GRHIER_2 Demoprogramm: Hierarchie</li>
+<li>GRHPGL_1 Demoprogramm: HPGL-Display</li>
+<li>GRPORT_0 Demonstration Portfolio-Grafik</li>
+<li>GRSTAT_1 Demoprogramm: Trigonometrische Funktionen mit der Statistikgrafik</li>
+<li>GRSTAT_2 Demoprogramm: Funktionsdarstellung mit der Statistikgrafik</li>
+<li>HIER_BO1 Demoprogramm: Hierarchiegrafik im Anzeigemodus</li>
+<li>HIER_BO2 Demoprogramm: Hierarchiegrafik im Pflegemodus</li>
+<li>NETZOCX1 Demoprogramm: Netzplancontrol</li>
+<li>NETZOCX2 Demoprogramm: Netzplancontrol mit Callbackverarbeitung</li>
+<li>NETZ_BO1 Demoprogramm: Netzplangrafik im Anzeigemodus</li>
+<li>NETZ_BO2 Demoprogramm: Netzplangrafik im Pflegemodus</li>
+<li>NETZ_BO3 Demoprogramm: Netzplangrafik im Pflegemodus (erweiterte Form)</li>
+</ul>
+<p>Der Beitrag <a href="/blog/sap-demoprogramme/">SAP-Demoprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Focus auf Eingabefelder</title>
+		<link>/blog/focus-auf-eingabefelder/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 29 Feb 2008 13:38:08 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=463</guid>
+
+					<description><![CDATA[<p>Wenn ein HTML-Dokument angezeigt wird, das Eingabefelder enth&#228;lt, dann muss immer erst der Cursor in das Eingabefeld gesetzt werden. Erst dann k&#246;nnen Daten eingegeben werden. Praktischer w&#228;re es, wenn der Focus sofort auf dem Eingabefeld liegen w&#252;rde. SAP stellt daf&#252;r jedoch keine Methoden zur Verf&#252;gung. Mit ein bisschen HTML-Wissen geht es trotzdem...</p>
+<p>Der Beitrag <a href="/blog/focus-auf-eingabefelder/">Focus auf Eingabefelder</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wenn ein HTML-Dokument angezeigt wird, das Eingabefelder enth&auml;lt, dann muss immer erst der Cursor in das Eingabefeld gesetzt werden. Erst dann k&ouml;nnen Daten eingegeben werden. Praktischer w&auml;re es, wenn der Focus sofort auf dem Eingabefeld liegen w&uuml;rde. SAP stellt daf&uuml;r jedoch keine Methoden zur Verf&uuml;gung. Mit ein bisschen HTML-Wissen geht es trotzdem&#8230;<br /><P>Wenn Sie Ihr Dokument &auml;hnlich mit Eingabefeldern versehen haben, wie im Beispielprogramm DD_ADD_FORM_INPUT, dann k&ouml;nnen Sie mit folgendem Trick den Eingabefocus direkt auf das erste Eingabefeld im Dokument setzen:</P><P class="sap1">DATA position TYPE i.<BR>DATA wa&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; TYPE sdydo_html_line.<BR><BR>SEARCH do-&gt;html_table FOR &#8216;&lt;!%_BODYSTART&gt;&#8217;.<BR>IF sy-subrc EQ 0.<BR>&nbsp; position = sy-tabix.<BR>&nbsp; position = position &#8211; 1.<BR>&nbsp; CONCATENATE &#8216;onLoad=&#8221;&#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;parent.frames[0].document.&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;forms[0].&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; input1-&gt;id<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;.focus()&#8221;&#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INTO&nbsp; wa.<BR>&nbsp; INSERT wa INTO do-&gt;html_table INDEX position.<BR>ENDIF.<BR></P><P>&#8220;do&#8221; ist die Referenz auf CL_DD_DOCUMENT.</P><P>&#8220;input1&#8221; ist das Eingabefeld (CL_DD_INPUT_ELEMENT).</P><P>Das Einsetzen des &#8220;onLoad&#8221;-Befehls muss vor dem do-&gt;merge erfolgen.</P><P><STRONG><U>Hinweis:<BR></U></STRONG>Wenn es nicht das erste Eingabefeld sein soll, dann m&uuml;ssen Sie &#8216;forms[0]&#8217; anpassen. 0 ist das erste Eingabefeld, 1 das zweite und so weiter.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/focus-auf-eingabefelder/">Focus auf Eingabefelder</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Komprimierungslogik</title>
+		<link>/blog/komprimierungslogik/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 22 Nov 2007 11:04:29 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=445</guid>
+
+					<description><![CDATA[<p>Bei Dynpros wird eine Komprimierungslogik eingesetzt, die sicherstellen soll, dass keine Bereiche auf dem Dynpro unn&#246;tig leer bleiben. Hier gibt es jedoch einige T&#252;cken...</p>
+<p>Der Beitrag <a href="/blog/komprimierungslogik/">Komprimierungslogik</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei Dynpros wird eine Komprimierungslogik eingesetzt, die sicherstellen soll, dass keine Bereiche auf dem Dynpro unnötig leer bleiben. Hier gibt es jedoch einige Tücken&#8230;</p>
+<p>Normalerweise werden die Zeilen eines Dynpros komprimiert, also zusammen geschoben, wenn durch Programmlogik Felder ausgeblendet werden.</p>
+<p>Dies funktioniert bei unkomplizierten Dynpros auch gut. Sobald aber viele Elemente auf einem Dynpro sind, funktioniert die Logik eventuell nicht mehr so, wie man es sich wünscht.</p>
+<p>Im folgenden stellen wir Ihnen hierzu ein paar Tipps vor.</p>
+<h2 class="head1">SAP-Hinweis 203023</h2>
+<p>Im SAP-Hinweis <a href="https://launchpad.support.sap.com/#/notes/203023">203023</a> steht Grundsätzliches zu der Komprimierungslogik sowie viele Hilfestellungen:</p>
+<p>Hinweis als PDF-Dokument: <a href="https://tricktresor.com/wp-content/uploads/2007/11/SAP-Hinweis-203023_DE_Laufzeitkomprimierung_Dynpro.pdf">SAP-Hinweis-203023_DE_Laufzeitkomprimierung_Dynpro</a>.</p>
+<h2 class="head1">Rahmen</h2>
+<p>Die Komprimierungslogik funktioniert leider nicht in dem folgenden Fall, wenn z.B. Rahmen4 ausgeblendet wird:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Dynpro/Dynpro_1.jpg" /></p>
+<p>Im Ergebnis sieht es dann nämlich so aus:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Dynpro/Eck_011.jpg" /></p>
+<p>Mit einem Trick kann man diesen Verhalten aber wieder korrigieren: Setzen Sie einfach einen unsichtbaren Rahmen um die Rahmen im rechten Bereich:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Dynpro/Dynpro_2.jpg" /></p>
+<p>Den Rahmen sieht man nicht; er ist ja unsichtbar&#8230; Dadurch, dass die Elemente aber in dem Rahmen stehen, werden sie wieder zusammengefasst:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Dynpro/Eck_012.jpg" /></p>
+<p>Der Beitrag <a href="/blog/komprimierungslogik/">Komprimierungslogik</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Dynamische Dokumente</title>
+		<link>/blog/dynamische-dokumente/</link>
+					<comments>/blog/dynamische-dokumente/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 16 Dec 2004 13:18:14 +0000</pubDate>
+				<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=299</guid>
+
+					<description><![CDATA[<p>Mit "dynamischen Dokumenten" können sie Eingabefelder, Buttons und HTML-Listen an Docking-Container und andere Controls anbinden. Beispiele im SAP/Standard finden Sie in der SE80 oder im Quickviewer.</p>
+<p>Der Beitrag <a href="/blog/dynamische-dokumente/">Dynamische Dokumente</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit &#8220;dynamischen Dokumenten&#8221; k&ouml;nnen sie Eingabefelder, Buttons und HTML-Listen an Docking-Container und andere Controls anbinden. Beispiele im SAP/Standard finden Sie in der SE80 oder im Quickviewer.<br /><P><STRONG><A href="http://help.sap.com/saphelp_47x200/helpdata/de/f0/edd938d8dbe93de10000000a11405a/frameset.htm" Target="_blank">SAP-Dokumentation</STRONG><BR></A></P><P>In der Entwicklungsklasse <FONT size="2"><STRONG><FONT color="#fb2412">SDYNAMICDOCUMENTS </FONT></STRONG>finden Sie alle <STRONG>Beispielprogramme</STRONG>:</FONT></P><FONT size="2"><FONT size="2"><P><STRONG>DD_ADD_FORM_BUTTON </STRONG>interaktive Elemente: Forms mit Buttons<BR><STRONG>DD_ADD_FORM_INPUT </STRONG>interaktive Elemente: Forms mit Buttons<BR><STRONG>DD_ADD_LINK</STRONG>&nbsp;interaktive Elemente: Links<BR><STRONG>DD_ADD_LINK_SCROLLED </STRONG>interaktive Elemente: Links<BR><STRONG>DD_ADD_PICTURE </STRONG>Pictures<BR><STRONG>DD_ADD_STATIC_HTML</STRONG> test dynamic documents<BR><STRONG>DD_ADD_TABLE </STRONG>Tabellen<BR><STRONG>DD_ADD_TEXT</STRONG> Text<BR><STRONG>DD_ALV_FREE_TOP</STRONG> Testprogramm ALV: einfache Liste Flugmodell<BR><STRONG>DD_ALV_STANDARD_TOP </STRONG>Testprogramm ALV: einfache Liste Flugmodell<BR><STRONG>DD_SPLIT_DOCUMENT</STRONG> test dynamic documents<BR><STRONG>DD_STYLE_TABLE </STRONG>test dynamic documents</P></FONT></FONT></p>
+<p>Der Beitrag <a href="/blog/dynamische-dokumente/">Dynamische Dokumente</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dynamische-dokumente/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:series="https://publishpress.com/"
+	
+	>
+<channel>
+	<title>
+	Kommentare zu: Excel Datei aus R/3 erzeugen	</title>
+	<atom:link href="/blog/excel-datei-aus-r3-erzeugen/feed/" rel="self" type="application/rss+xml" />
+	<link>/blog/excel-datei-aus-r3-erzeugen/</link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 10 Jan 2018 23:55:14 +0000</lastBuildDate>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+	<item>
+		<title>
+		Von: chris009		</title>
+		<link>/blog/excel-datei-aus-r3-erzeugen/#comment-2655</link>
+
+		<dc:creator><![CDATA[chris009]]></dc:creator>
+		<pubDate>Fri, 15 Jan 2016 09:30:24 +0000</pubDate>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=177#comment-2655</guid>
+
+					<description><![CDATA[Hallo
+
+vielen Dank für das tolle Beispiel. Ich konnte es sehr gut verwenden.
+
+Ich habe ein Programm geschrieben, welches in einem Loop 150 Excel-Files schreibt. Mir ist aufgefallen, dass wenn ich untenstehenden Code 100x aufrufe, in der Win-Taskliste am Schluss Excel 150x aufgeführt ist. Diese verschwinden erst, wenn der Modus beendet wird.
+
+Wenn ich den Loop zwischen &quot;CREATE OBJECT Excel&quot; und &quot;FREE OBJECT excel&quot; setze, habe ich nur einen Task, aber der benötigt dann gegen 1 GB Memory. 
+
+Grundsätzlich funktioniert ja alles, aber mich würde interessieren, welches eine saubere :-) Lösung ist, da die eigentlichen Files recht schlank sind. Kann mir jemand helfen?
+
+Vielen Dank
+Chris
+
+
+
+CREATE OBJECT excel &#039;EXCEL.APPLICATION&#039;.
+...
+  SET PROPERTY OF excel   &#039;Visible&#039;   = 0.  &quot;nicht sichtbar
+  CALL METHOD OF excel    &#039;Workbooks&#039; = workbook.
+  CALL METHOD OF workbook &#039;Add&#039;       = map.
+....
+  CALL METHOD OF map &#039;SaveAs&#039; EXPORTING #1 = &#039;c:/temp/test1.xls&#039;.
+  CALL METHOD OF workbook &#039;CLOSE&#039;.
+  CALL METHOD OF excel &#039;QUIT&#039;.
+  FREE OBJECT workbook.
+  FREE OBJECT excel.]]></description>
+			<content:encoded><![CDATA[<p>Hallo</p>
+<p>vielen Dank für das tolle Beispiel. Ich konnte es sehr gut verwenden.</p>
+<p>Ich habe ein Programm geschrieben, welches in einem Loop 150 Excel-Files schreibt. Mir ist aufgefallen, dass wenn ich untenstehenden Code 100x aufrufe, in der Win-Taskliste am Schluss Excel 150x aufgeführt ist. Diese verschwinden erst, wenn der Modus beendet wird.</p>
+<p>Wenn ich den Loop zwischen &#8220;CREATE OBJECT Excel&#8221; und &#8220;FREE OBJECT excel&#8221; setze, habe ich nur einen Task, aber der benötigt dann gegen 1 GB Memory. </p>
+<p>Grundsätzlich funktioniert ja alles, aber mich würde interessieren, welches eine saubere 🙂 Lösung ist, da die eigentlichen Files recht schlank sind. Kann mir jemand helfen?</p>
+<p>Vielen Dank<br />
+Chris</p>
+<p>CREATE OBJECT excel &#8216;EXCEL.APPLICATION&#8217;.<br />
+&#8230;<br />
+  SET PROPERTY OF excel   &#8216;Visible&#8217;   = 0.  &#8220;nicht sichtbar<br />
+  CALL METHOD OF excel    &#8216;Workbooks&#8217; = workbook.<br />
+  CALL METHOD OF workbook &#8216;Add&#8217;       = map.<br />
+&#8230;.<br />
+  CALL METHOD OF map &#8216;SaveAs&#8217; EXPORTING #1 = &#8216;c:/temp/test1.xls&#8217;.<br />
+  CALL METHOD OF workbook &#8216;CLOSE&#8217;.<br />
+  CALL METHOD OF excel &#8216;QUIT&#8217;.<br />
+  FREE OBJECT workbook.<br />
+  FREE OBJECT excel.</p>
+]]></content:encoded>
+		
+			</item>
+	</channel>
+</rss>

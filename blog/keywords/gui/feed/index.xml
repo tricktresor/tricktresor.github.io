@@ -1,0 +1,1939 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>GUI Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/gui/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 10 Jun 2021 11:02:20 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>GUI Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Aufmerksamkeit erlangen &#8211; SAPGUI Modus in den Vordergrund</title>
+		<link>/blog/aufmerksamkeit-erlangen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 10 Jun 2021 11:01:27 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Modus]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">/?p=1029150</guid>
+
+					<description><![CDATA[<p>Obwohl der SAPGUI bereits als &#8220;tot&#8221; eingestuft wird, finden sich immer wieder neue Erkenntnisse&#8230; In diesem Beitrag zeige ich dir, wie du einen SAPGUI-Modus in den Vordergrund bringen kannst, um die Aufmerksamkeit des Anwenders zurückzuerlangen. Solange der Anwender nur SAPGUI-Modi anzeigt, wird der gewünschte SAPGUI-Modus in den Vordergrund kommen und die anderen Fenster überlagern. Sollte noch ein anderes Programm (Browser, Outlook, Excel etc.), dann wird der Wunsch nach Aufmerksamkeit durch ein Blinken des SAPGUI-Icons in...</p>
+<p>Der Beitrag <a href="/blog/aufmerksamkeit-erlangen/">Aufmerksamkeit erlangen &#8211; SAPGUI Modus in den Vordergrund</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Obwohl der SAPGUI bereits als &#8220;tot&#8221; eingestuft wird, finden sich immer wieder neue Erkenntnisse&#8230; In diesem Beitrag zeige ich dir, wie du einen SAPGUI-Modus in den Vordergrund bringen kannst, um die Aufmerksamkeit des Anwenders zurückzuerlangen. </p>
+
+
+
+<p>Solange der Anwender nur SAPGUI-Modi anzeigt, wird der gewünschte SAPGUI-Modus in den Vordergrund kommen und die anderen Fenster überlagern. Sollte noch ein anderes Programm (Browser, Outlook, Excel etc.), dann wird der Wunsch nach Aufmerksamkeit durch ein Blinken des SAPGUI-Icons in der Taskleiste angezeigt.</p>
+
+
+
+<p>Das folgende Programm kannst du in zwei verschiedenen Modi starten um den Effekt zu sehen. Die beiden Modi sollten möglichst übereinander (nicht nebeneinander) liegen, um den Effekt erkennen zu können.</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<pre class="wp-block-code"><code>REPORT zz_activate_gui_mode.
+
+*--------------------------------------------------------------------*
+* Programm in 2 verschiedenen Modi aufrufen und etwa 1 Sekunde versetzt starten!
+*--------------------------------------------------------------------*
+
+DO 10 TIMES.
+  CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+    EXPORTING
+      text = |Modus: { sy-modno }  Index: { sy-index }|.
+
+  CALL FUNCTION 'SAPGUI_SET_PROPERTY'
+    DESTINATION 'SAPGUI'
+    EXPORTING
+      property = 'ACTIVATE'
+      value    = 'X'
+    EXCEPTIONS
+      OTHERS   = 0.
+
+  WAIT UP TO 3 SECONDS.
+ENDDO.</code></pre>
+<p>Der Beitrag <a href="/blog/aufmerksamkeit-erlangen/">Aufmerksamkeit erlangen &#8211; SAPGUI Modus in den Vordergrund</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAP-Demoprogramme</title>
+		<link>/blog/sap-demoprogramme/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 31 May 2016 08:26:29 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[Demo-Programme]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=431</guid>
+
+					<description><![CDATA[<p>Demoprogramme der SAP. CALENDAR_CONTROL CONTEXT_MENU_DYNPR CONTEXT_MENU_LIST CUSTOM_CONTROL DIALOGBOX_CONTROL DOCKING_CONTROL DRAG_DROP_EDIT_TREE DRAG_DROP_TREE_MULTI  DROPDOWN_LISTBOX HTML_VIEWER HTML_VIEWER_WORKSHOP PICTURE_CONTROL SAP_LIST_TREE SPLITTER_CONTROL SUBSCREEN TABLE_CONTROL TOOLBAR_DIALOGBOX</p>
+<p>Der Beitrag <a href="/blog/sap-demoprogramme/">SAP-Demoprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Demoprogramme der SAP. CALENDAR_CONTROL CONTEXT_MENU_DYNPR CONTEXT_MENU_LIST CUSTOM_CONTROL DIALOGBOX_CONTROL DOCKING_CONTROL DRAG_DROP_EDIT_TREE DRAG_DROP_TREE_MULTI DROPDOWN_LISTBOX HTML_VIEWER HTML_VIEWER_WORKSHOP PICTURE_CONTROL SAP_LIST_TREE SPLITTER_CONTROL SUBSCREEN TABLE_CONTROL TOOLBAR_DIALOGBOX</p>
+<p>[notice type=&#8217;info&#8217;]Viele DEMO-Programme finden sich im Paket SLIS!</p>
+<p>Demoprogramme beginnen häufig mit DEMO* oder RSDEMO* [/notice]</p>
+<h2 class="head1">Toolbar</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_TOOLBAR_DIALOGBOX</div>
+</li>
+<li>SAPTOOLBAR_IN_SPLITTER</li>
+<li>SAPTOOLBAR_DEMO1</li>
+<li>BCALV_GRID_07</li>
+</ul>
+<h2 class="head1">ALV-Grid</h2>
+<ul>
+<li>BCALV*</li>
+<li><span style="color: #fb2412;"><strong>BCALV_VERIFY_DATATYPES</strong></span><br />
+Das Mega-Test-Programm für jegliche Optionen des ALV-Grid</li>
+<li><span style="color: #fb2412;"><strong>BCALV_TEST_SUITE</strong><br />
+</span>Viele Funktionen in einem Programm</li>
+</ul>
+<h2 class="head1">ALV-Tree</h2>
+<ul>
+<li>SAPSIMPLE_TREE_CONTROL_DEMO</li>
+<li>R_ALV_TREE_TOOLBAR_MANAGER</li>
+<li>BCALV_GRID_DND_TREE</li>
+<li>BCALV_GRID_DND_TREE_SIMPLE</li>
+<li>BCALV_TEST_COLUMN_TREE</li>
+<li>BCALV_TEST_SIMPLE_TREE</li>
+<li>BCALV_TREE_01</li>
+<li>BCALV_TREE_02</li>
+<li>BCALV_TREE_03</li>
+<li>BCALV_TREE_04</li>
+<li>BCALV_TREE_05</li>
+<li>BCALV_TREE_06</li>
+<li>BCALV_TREE_DEMO</li>
+<li>BCALV_TREE_DND</li>
+<li>BCALV_TREE_DND_MULTIPLE</li>
+<li>BCALV_TREE_EVENT_RECEIVER</li>
+<li>BCALV_TREE_EVENT_RECEIVER01</li>
+<li>BCALV_TREE_ITEMLAYOUT</li>
+<li>BCALV_TREE_MOVE_NODE_TEST</li>
+<li>BCALV_TREE_SIMPLE_DEMO</li>
+<li>Doku:<br />
+<a href="http://help.sap.com/printdocu/core/print46b/de/data/de/pdf/BCCITREE.pdf" target="_blank" rel="noopener noreferrer">http://help.sap.com/printdocu/core/print46b/de/<br />
+data/de/pdf/BCCITREE.pdf</a></li>
+</ul>
+<h2 class="head1">Dialogbox</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_DIALOGBOX_CONTROL</div>
+</li>
+<li>
+<div class="text1">RSDEMO_TOOLBAR_DIALOGBOX</div>
+</li>
+</ul>
+<h2 class="head1">Drawer (Vertikales Tabstrip)</h2>
+<ul>
+<li>
+<div class="text1">RSBPT_CONTAINER_BAR_3</div>
+</li>
+</ul>
+<h2 class="head1">Context Menu</h2>
+<ul>
+<li>RSDEMO_CONTEXT_MENU_DYNPR</li>
+<li>
+<div class="text1">RSDEMO_CONTEXT_MENU_LIST</div>
+</li>
+<li>
+<div class="text1">R_ALV_TREE_TOOLBAR_MANAGER</div>
+</li>
+</ul>
+<h2 class="head1">Grafik</h2>
+<ul>
+<li>
+<div class="text1">GRAPHICS_GUI_CE_DEMO</div>
+</li>
+</ul>
+<h2 class="head1">Drag and Drop</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_DRAG_DROP_EDIT_TREE</div>
+</li>
+<li>
+<div class="text1">RSDEMO_DRAG_DROP_TREE_MULTI</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_DRAGDROP</div>
+</li>
+<li>
+<div class="text1">BCALV_GRID_DND_TREE</div>
+</li>
+<li>
+<div class="text1">BCALV_GRID_DND_TREE_SIMPLE</div>
+</li>
+<li>
+<div class="text1">SAPCALENDAR_DRAG_DROP</div>
+</li>
+<li>
+<div class="text1">BCALV_TEST_DRAG_DROP_02</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_TEST_EVENTS</div>
+</li>
+</ul>
+<h2 class="head1">Textedit</h2>
+<ul>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_1</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_3</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_DRAGDROP</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_TEST_1</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_TEST_2</div>
+</li>
+<li>
+<div class="text1"><span style="line-height: 1.5em;">SAPTEXTEDIT_TEST_EVENTS</span></div>
+</li>
+<li>SAPBTFEDITOR_DEMO Demonstriert die Verwendung des BTF-Editors</li>
+<li>SAPBTFFRAMEWORK_DEMO</li>
+</ul>
+<h2 class="head2">HTML</h2>
+<ul>
+<li>
+<div class="text1">SAPHTML_SCRIPT_DEMO</div>
+<div class="text1"></div>
+</li>
+<li>
+<div class="text1">RSDEMO_HTML_VIEWER</div>
+</li>
+<li>
+<div class="text1">RSDEMO_HTML_VIEWER_WORKSHOP</div>
+</li>
+<li>RSTXHTML</li>
+<li>SAPHTML_DEMO_CN</li>
+<li>SAPHTML_DEMO1</li>
+<li>SAPHTML_EVENTS_DEMO</li>
+<li>SAPHTML_LONGTEXT_DEMO</li>
+<li>SAPHTML_R3HTTP_DEMO</li>
+<li>SAPHTML_R3HTTP_XML</li>
+<li>SAPHTML_SCRIPT_DEMO</li>
+<li>SAPHTML_SET_GUI_CHARSET</li>
+<li>SAPHTML_SSO_DEMO</li>
+<li>SAPHTML_UI_DEMO</li>
+<li>SAPHTML_USE_DEFAULT_CHARSET</li>
+<li>SAPHTMLPAGEEDITOR_DEMO1</li>
+</ul>
+<h2 class="head1">Dynamische Dokumente/ ABAP-Renderer</h2>
+<table style="height: 115px;" width="665">
+<tbody>
+<tr>
+<td>
+<ul>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_FLOW</span></li>
+</ul>
+</td>
+<td>Demonstriert die Verwendung der Element FLOW des Gestaltungsobjekts</td>
+</tr>
+<tr>
+<td>
+<ul>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_GRID</span></li>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_GRID_1</span></li>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_GRID_2</span></li>
+</ul>
+</td>
+<td style="vertical-align: top;">Demonstriert die Verwendung der Element GRID des Gestaltungsobjekts</td>
+</tr>
+<tr>
+<td>
+<ul>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_TEST</span></li>
+</ul>
+</td>
+<td> Testprogramm für das ALV Gestaltungsobjekt</td>
+</tr>
+</tbody>
+</table>
+<h2 class="head1">Mail</h2>
+<ul>
+<li>
+<div class="text1">RSSOHTMLGIF (Sehr schönen Beispiel, um eine HTML Seite mit eingebundenen Bildern zu versenden)</div>
+</li>
+</ul>
+<h2 class="head1">Calendar</h2>
+<ul>
+<li>RSDEMO_CALENDAR_CONTROL</li>
+<li>SAPCALENDAR_DRAG_DROP</li>
+</ul>
+<h2 class="head1">Sonstige</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_CUSTOM_CONTROL</div>
+</li>
+<li>
+<div class="text1">RSDEMO_EVENT_ON_FIELD</div>
+</li>
+<li>
+<div class="text1">RSDEMO_DOCKING_CONTROL</div>
+</li>
+<li>
+<div class="text1">RSDEMO_DROPDOWN_LISTBOX</div>
+</li>
+<li>
+<div class="text1">RSDEMO_EASY_SPLITTER_CONTROL</div>
+</li>
+<li>RSDEMO_PICTURE_CONTROL</li>
+<li>
+<div class="text1">RSDEMO_SAP_LIST_TREE</div>
+</li>
+<li>
+<div class="text1">RSDEMO_SPLITTER_CONTROL</div>
+</li>
+<li>TEST_FRONTEND_SERVICES</li>
+<li>DEMO_COLORSEL</li>
+</ul>
+<h2 class="head1">Old-Fashioned</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_SUBSCREEN</div>
+</li>
+<li>
+<div class="text1">RSDEMO_TABLE_CONTROL</div>
+</li>
+<li>RSDEOM02 (Table Control)</li>
+<li>DEMO_LIST_FORMAT_COLOR_1 Farben in Listen</li>
+<li>DEMO_LIST_FORMAT_COLOR_2 Verwendung von Farben in Listen</li>
+</ul>
+<h2>Grafik</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2007/08/2016-05-31_10-13-35.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-654991" src="https://tricktresor.com/wp-content/uploads/2007/08/2016-05-31_10-13-35.jpg" alt="2016-05-31_10-13-35" width="615" height="477" srcset="/wp-content/uploads/2007/08/2016-05-31_10-13-35.jpg 615w, /wp-content/uploads/2007/08/2016-05-31_10-13-35-300x233.jpg 300w" sizes="(max-width: 615px) 100vw, 615px" /></a></p>
+<p>Report RGRAPALL listet die folgenden Grafikbeispiele auf:</p>
+<ul>
+<li>BARCBO01 Demoprogramm: Balkenplan im Anzeigemodus</li>
+<li>BARCBO02 Demoprogramm: Balkenplan im Pflegemodus</li>
+<li>BARCBO03 Demoprogramm: Balkenplan im Pflegemodus (Plantafel)</li>
+<li>BARCBO04 Demoprogramm: Gegenseitiges Aktualisieren von Balkenplan und Dynpro</li>
+<li>BARCOCX1 Demoprogramm: Balkenplancontrol</li>
+<li>DEMO_GFW_PRES_SHOW Anwendungsbeispiel für den Funktionsbaustein GFW_PRES_SHOW</li>
+<li>DEMO_GFW_PRES_SHOW_MULT Anwendungsbeispiel für den Funktionsbaustein GFW_PRES_SHOW_MULT</li>
+<li>GFW_DEMO_HIER1 GFW: Demonstration einer einfachen Hierarchiegrafik mit SAP-Tree</li>
+<li>GFW_DEMO_HIER2 GFW: Demonstration einer Hierarchiegrafik (4 in Splitter, Drag&amp;Drop)</li>
+<li>GFW_DEMO_HIER3 GFW: Demonstration einer Hierarchie-/Präsentationsgrafik (Drag&amp;Drop)</li>
+<li>GFW_DEMO_PRES GFW: Demonstration von GFW mit sichtbarem Datencontainer</li>
+<li>GFW_DEMO_PRES1 GFW: Demonstration von Präsentationsgrafiken mit GFW</li>
+<li>GFW_PROG_BAR GFW: Programmierbeispiel für ein Balkendiagramm</li>
+<li>GFW_PROG_COLUMNS_AND_TI GFW: Programmierbeispiel für ein Balkendiagramm mit Zeitachse</li>
+<li>GFW_PROG_HISTOGRAM GFW: Programmierbeispiel für ein Histogramm</li>
+<li>GFW_PROG_LABELS GFW: Programmierbeispiel für dieselben Beschriftungen, lange Beschr.</li>
+<li>GFW_PROG_MTA GFW: Programmierbeispiel für eine Meilensteintrendanalyse</li>
+<li>GFW_PROG_PIE GFW: Programmierbeispiel für ein Kreisdiagramm</li>
+<li>GFW_PROG_POINT_WITH_LAB GFW: Programmierbeispiel für Diagramm mit gekennzeichnetem Punkt</li>
+<li>GFW_PROG_TIME_AXIS GFW: Programmierbeispiel für ein Punktdiagramm mit Zeitachse</li>
+<li>GFW_PROG_TUTORIAL GFW: Programmierbeispiel für eine einfache PräsGrafik = GFW-Tutorial</li>
+<li>GFW_PROG_SPEEDOMETER GFW: Programmierbeispiel für ein Balkendiagramm<br />
+<a href="https://tricktresor.com/wp-content/uploads/2016/05/SNAG-0001.png"><img decoding="async" class="alignnone size-full wp-image-1018035" src="https://tricktresor.com/wp-content/uploads/2016/05/SNAG-0001.png" alt="" width="531" height="417" srcset="/wp-content/uploads/2016/05/SNAG-0001.png 531w, /wp-content/uploads/2016/05/SNAG-0001-300x236.png 300w, /wp-content/uploads/2016/05/SNAG-0001-117x91.png 117w" sizes="(max-width: 531px) 100vw, 531px" /></a></li>
+<li>GRBMAT_1 Demoprogramm: Pushbuttongrafik</li>
+<li>GRBMAT_2 Demoprogramm: Pushbuttongrafik / 2</li>
+<li>GRBUSG_1 Demoprogramm: SAP-Präsentationsgrafik 2D</li>
+<li>GRBUSG_2 Demoprogramm: SAP-Präsentationsgrafik 3D</li>
+<li>GRBUSG_3 Demoprogramm: Präsentationsgrafik Umsatzvergleich</li>
+<li>GRBUSG_4 Demoprogramm: Präsentationsgrafik 2D &#8211; 3D &#8211; 4D</li>
+<li>GRCNETC1 Demoprogramm: Ansteuern des Clustereditors im Anzeigemodus</li>
+<li>GRCNETC2 Demoprogramm: Ansteuern des Clustereditors (erweiterte Version)</li>
+<li>GRGANT_2 Demoprogramm: Gantt-Diagramm / 2</li>
+<li>GRHIER_1 Demoprogramm: Hierarchiegrafik</li>
+<li>GRHIER_2 Demoprogramm: Hierarchie</li>
+<li>GRHPGL_1 Demoprogramm: HPGL-Display</li>
+<li>GRPORT_0 Demonstration Portfolio-Grafik</li>
+<li>GRSTAT_1 Demoprogramm: Trigonometrische Funktionen mit der Statistikgrafik</li>
+<li>GRSTAT_2 Demoprogramm: Funktionsdarstellung mit der Statistikgrafik</li>
+<li>HIER_BO1 Demoprogramm: Hierarchiegrafik im Anzeigemodus</li>
+<li>HIER_BO2 Demoprogramm: Hierarchiegrafik im Pflegemodus</li>
+<li>NETZOCX1 Demoprogramm: Netzplancontrol</li>
+<li>NETZOCX2 Demoprogramm: Netzplancontrol mit Callbackverarbeitung</li>
+<li>NETZ_BO1 Demoprogramm: Netzplangrafik im Anzeigemodus</li>
+<li>NETZ_BO2 Demoprogramm: Netzplangrafik im Pflegemodus</li>
+<li>NETZ_BO3 Demoprogramm: Netzplangrafik im Pflegemodus (erweiterte Form)</li>
+</ul>
+<p>Der Beitrag <a href="/blog/sap-demoprogramme/">SAP-Demoprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bankleitzahlen einlesen</title>
+		<link>/blog/bankleitzahlen-einlesen/</link>
+					<comments>/blog/bankleitzahlen-einlesen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 23 Jan 2015 10:40:43 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[bank]]></category>
+		<category><![CDATA[blz]]></category>
+		<category><![CDATA[bundesbank]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5224</guid>
+
+					<description><![CDATA[<p>Das Einlesen der Bankleitzahlen ist dabei gar nicht die größte Herausforderung, sondern das Finden der aktuellen Bankleitzahlendatei. Markus Völker hat hierfür eine kleine Klasse geschrieben, mit der 1.die URL der Bankleitzahlendatei ermittelt wird 2.Die Bankleitzahlen ins SAP-System eingelesen werden.</p>
+<p>Der Beitrag <a href="/blog/bankleitzahlen-einlesen/">Bankleitzahlen einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mal wieder ein Thema aus dem FI-Bereich. Diesmal geht es um die Aktualisierung der Bankleitzahlen. Die Bundesbank bietet die aktuellen Bankleitzahlen zum Download an. Weitere Infos gibt es <a title="Bankleitzahlen" href="http://www.bundesbank.de/Navigation/DE/Aufgaben/Unbarer_Zahlungsverkehr/Bankleitzahlen/bankleitzahlen.html">hier</a>.</p>
+<p>Das Einlesen der Bankleitzahlen ist dabei gar nicht die größte Herausforderung, sondern das Finden der aktuellen Bankleitzahlendatei. Markus Völker hat hierfür eine kleine Klasse geschrieben, mit der</p>
+<ol>
+<li>die URL der Bankleitzahlendatei ermittelt wird</li>
+<li>Die Bankleitzahlen ins SAP-System eingelesen werden</li>
+</ol>
+<h2>Verbesserungspotential</h2>
+<p>Die Klasse ermittelt und liest die Bankleitzahlen ein. Eventuelle wäre es jedoch wünschenswert zu sehen, welche und wie viele Debitoren von den Änderungen betroffen sind. Es müsste dafür eine Prüfung gegen die Tabelle KNBK gemacht werden.</p>
+<h2>Proxy</h2>
+<p>Falls du dich mit User und Kennwort am Proxy anmelden musst, dann muss du nach der Methode cl_http_client=&gt;create_by_url den folgenden Aufruf einbauen:</p>
+<pre>lo_client-&gt;propertytype_logon_popup = http_client-&gt;co_disabled.
+call method lo_client-&gt;authenticate
+     exporting
+        username  = 'myProxyUser'
+        password  = 'myProxyPassword'.</pre>
+<p>Dementsprechend muss der CONSTRUCTOR um die beiden Parameter username und password erweitert werden.</p>
+<h2>Coding</h2>
+<pre>REPORT  zrep_bbank_vs_bnka.
+**&amp;---------------------------------------------------------------------*
+**&amp; Report  ZREP_BBANK_VS_BNKA
+**&amp;
+**&amp;---------------------------------------------------------------------*
+**&amp; Dieser Report demonstriert die Benutzung der Klasse lcl_cmp_bnka_to_bbank
+**&amp; Author: Markus Völker
+**&amp;---------------------------------------------------------------------*
+
+
+PARAMETERS p_proxy TYPE string LOWER CASE DEFAULT '123.100.100.88'.
+PARAMETERS p_pport TYPE string            DEFAULT `80`.
+
+
+CLASS lcl_cmp_bnka_to_bbank DEFINITION.
+  PUBLIC SECTION.
+
+    TYPES:
+      BEGIN OF mts_bnka_result,
+             status TYPE char01,
+             bankl  TYPE bankl,
+      END OF mts_bnka_result .
+    TYPES:
+      mtt_bnka_result TYPE STANDARD TABLE OF mts_bnka_result WITH DEFAULT KEY .
+
+**Vergleiche:
+**http://www.bundesbank.de/Redaktion/DE/Downloads/Aufgaben/Unbarer_Zahlungsverkehr/Bankleitzahlen/merkblatt_bankleitzahlendatei.pdf?__blob=publicationFile
+    TYPES:
+      BEGIN OF mts_bundesbank,
+        blz(8), "Bankleitzahl
+        merkmal(1), "Merkmal, ob bankleitzahlführender Zahlungsdienstleister ("1") oder nicht ("2")
+        bezeichnung(58), "Bezeichnung des Zahlungsdienstleisters
+        plz(5), "Postleitzahl
+        ort(35), "Ort
+        kurzbezeichnung(27), "Kurzbezeichnung des Zahlungsdienstleisters mit Ort
+        pan(5), "Institutsnummer für PAN
+        bic(11), "Business Identifier Code (BIC)
+        pz(2), "Kennzeichen für Prüfzifferberechnungsmethode
+        datensatz(6), "Nummer des Datensatzes
+        aenderungs(1), "Änderungskennzeichen
+        blz_loesch(1), "Hinweis auf eine beabsichtigte Bankleitzahllöschung
+        nach_blz(8), "Hinweis auf Nachfolge-Bankleitzahl
+        knz_iban(6), "Kennzeichen für die IBAN-Regel
+      END OF mts_bundesbank .
+    TYPES:
+      mtt_bundesbank TYPE STANDARD TABLE OF mts_bundesbank WITH DEFAULT KEY .
+
+    CONSTANTS  mc_bank_changes  TYPE char01 VALUE 'C'.     "#EC NOTEXT "Die Bank ist zur Änderung vorgesehen
+    CONSTANTS  mc_bank_correct  TYPE char01 VALUE 'O'.     "#EC NOTEXT "Die Bank ist in Ordnung
+    CONSTANTS  mc_bank_missing  TYPE char01 VALUE 'M'.     "#EC NOTEXT "Die Bank existiert nicht mehr
+    CLASS-DATA mv_proxy_host    TYPE string .              "Proxy IP
+    CLASS-DATA mv_proxy_service TYPE string .              "Proxy Port
+    DATA       mt_bbank_datei   TYPE mtt_bundesbank .      "Datei der Bundesbank
+
+    METHODS constructor
+      IMPORTING
+        iv_proxy_host    TYPE string OPTIONAL
+        iv_proxy_service TYPE string OPTIONAL .
+    METHODS set_bbank_file
+      IMPORTING
+        iv_path        TYPE csequence OPTIONAL
+      EXPORTING
+        ev_subrc       TYPE sy-subrc
+        ev_err_message TYPE string.
+    TYPE-POOLS abap .
+    METHODS compare_bbank_with_bnka
+      IMPORTING
+        iv_with_missing      TYPE flag DEFAULT abap_true
+        iv_with_changes      TYPE flag DEFAULT abap_true
+        iv_with_correct      TYPE flag DEFAULT abap_true
+      RETURNING
+        VALUE(rt_result_tab) TYPE mtt_bnka_result .
+  PROTECTED SECTION.
+    METHODS get_bbank_file_from_web
+      EXPORTING
+        ev_subrc       TYPE sy-subrc
+        ev_err_message TYPE string
+        et_filetab     TYPE table .
+
+ENDCLASS.
+
+CLASS lcl_cmp_bnka_to_bbank IMPLEMENTATION.
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method COMPARE_BBANK_WITH_BNKA
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IV_WITH_MISSING                TYPE        FLAG (default =ABAP_TRUE)
+* | [---&gt;] IV_WITH_CHANGES                TYPE        FLAG (default =ABAP_TRUE)
+* | [---&gt;] IV_WITH_CORRECT                TYPE        FLAG (default =ABAP_TRUE)
+* | [&lt;-()] RT_RESULT_TAB                  TYPE        MTT_BNKA_RESULT
+* +--------------------------------------------------------------------------------------
+  METHOD compare_bbank_with_bnka.
+
+    DATA: lt_bnka  TYPE TABLE OF bnka,
+          lv_subrc TYPE sy-subrc.
+
+    FIELD-SYMBOLS: &lt;bnka&gt;   TYPE bnka,
+                   &lt;bbank&gt;  TYPE mts_bundesbank,
+                   &lt;result&gt; TYPE mts_bnka_result.
+
+    DEFINE append_result.
+      append initial line to rt_result_tab assigning &lt;result&gt;.
+      &lt;result&gt;-status = &amp;1.
+      &lt;result&gt;-bankl  = &amp;2.
+    END-OF-DEFINITION.
+
+* Wenn wir noch keine Daten haben, holen wir halt welche
+    IF mt_bbank_datei IS INITIAL.
+      set_bbank_file( IMPORTING ev_subrc = lv_subrc ).
+      IF lv_subrc &lt;&gt; 0.
+        RETURN.
+      ENDIF.
+    ENDIF.
+
+* Alle Banken holen
+    SELECT * FROM bnka INTO TABLE lt_bnka WHERE banks = 'DE'.
+
+* Vergleich der Daten
+*/--------------------------------------------------------------------------------\
+    LOOP AT lt_bnka ASSIGNING &lt;bnka&gt;.
+*   Lese die Vergleichsdaten
+      READ TABLE mt_bbank_datei ASSIGNING  WITH KEY blz = &lt;bnka&gt;-bnklz.  "#EC WARNOK.
+      IF sy-subrc &lt;&gt; 0.
+*     Die Bank existiert nicht mehr
+        append_result mc_bank_missing &lt;bnka&gt;-bankl.
+      ELSEIF -blz_loesch = '1'.
+*     Die Bank ist zum Löschen vorgemerkt
+        append_result mc_bank_changes &lt;bnka&gt;-bankl.
+      ELSE.
+*     Keine Veränderungen festzustellen
+        append_result mc_bank_correct &lt;bnka&gt;-bankl.
+      ENDIF.
+    ENDLOOP.
+*\--------------------------------------------------------------------------------/
+
+* Lösche ungewünschtes
+*/--------------------------------------------------------------------------------\
+    IF iv_with_missing = abap_false.
+      DELETE rt_result_tab WHERE status = mc_bank_missing.
+    ENDIF.
+    IF iv_with_changes = abap_false.
+      DELETE rt_result_tab WHERE status = mc_bank_changes.
+    ENDIF.
+    IF iv_with_correct = abap_false.
+      DELETE rt_result_tab WHERE status = mc_bank_correct.
+    ENDIF.
+*\--------------------------------------------------------------------------------/
+
+  ENDMETHOD.                                               "compare_bbank_with_bnka
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZZ_CMP_BNKA_TO_BBANK-&gt;CONSTRUCTOR
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IV_PROXY_HOST                  TYPE        STRING(optional)
+* | [---&gt;] IV_PROXY_SERVICE               TYPE        STRING(optional)
+* +--------------------------------------------------------------------------------------
+  METHOD constructor.
+* Das hier ist nur die Erinnerung, eventuell einen Proxy setzen zu müssen
+    mv_proxy_host    = iv_proxy_host .
+    mv_proxy_service = iv_proxy_service.
+  ENDMETHOD.                                               "constructor
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Protected Method GET_BBANK_FILE_FROM_WEB
+* +-------------------------------------------------------------------------------------------------+
+* | [&lt;---] EV_SUBRC                       TYPE        SY-SUBRC
+* | [&lt;---] EV_ERR_MESSAGE                 TYPE        STRING
+* | [&lt;---] ET_FILETAB                     TYPE        TABLE
+* +--------------------------------------------------------------------------------------
+  METHOD get_bbank_file_from_web.
+* Hole die Datei der Bundesbank per HTTP
+    DATA: lv_url     TYPE string,
+          lv_datvon  TYPE d,
+          lv_datbis  TYPE d,
+          lo_http    TYPE REF TO if_http_client,
+          lv_recdata TYPE xstring,
+          lt_tmpbin  TYPE TABLE OF raw256,
+          lv_tmplen  TYPE i.
+
+*******************
+* DATUMSBERECHNUNG
+*******************
+
+*     Monat/Jahr von:
+*/--------------------------------------------------------------------------------\
+    lv_datvon = sy-datum.
+    DO.
+      lv_datvon = cl_hrpad_date_computations=&gt;subtract_months_from_date( start_date = lv_datvon               " Datum von dem Monate subtrahiert werden
+                                                                         months     = 1  ).                   " Anzahl Monate
+      IF lv_datvon+4(2) MOD 3 = 0.
+        EXIT.
+      ENDIF.
+    ENDDO.
+*     Tag von ...
+    lv_datvon+6(2) = '01'.
+    DO.
+*      Finde den ersten Samstag im Monat ...
+      IF cl_hrpad_date_computations=&gt;get_weekday_number( lv_datvon ) = 6.            "Samstag
+        EXIT.
+      ENDIF.
+      lv_datvon = lv_datvon + 1.
+    ENDDO.
+    lv_datvon = lv_datvon + 2.                             "Wir brauchen aber den Montag
+*\--------------------------------------------------------------------------------/
+*     Monat/Jahr bis:
+*/--------------------------------------------------------------------------------\
+    lv_datbis = sy-datum.
+    DO.
+      IF lv_datbis+4(2) MOD 3 = 0.
+        EXIT.
+      ENDIF.
+      lv_datbis = cl_hrpad_date_computations=&gt;add_months_to_date( start_date = lv_datbis               " Datum von dem Monate subtrahiert werden
+                                                                  months     = 1  ).                   " Anzahl Monate
+    ENDDO.
+*     Tag von ...
+    lv_datbis+6(2) = '01'.
+    DO.
+*      Finde den ersten Samstag im Monat ...
+      IF cl_hrpad_date_computations=&gt;get_weekday_number( lv_datbis ) = 6.            "Samstag
+        EXIT.
+      ENDIF.
+      lv_datbis = lv_datbis + 1.
+    ENDDO.
+    lv_datbis = lv_datbis + 1.                             "geht bis Sonntag
+*\--------------------------------------------------------------------------------/
+
+* URL Zusammenbauen
+*/--------------------------------------------------------------------------------\
+    lv_url =    'http://www.bundesbank.de/Redaktion/DE/Downloads/Aufgaben/Unbarer_Zahlungsverkehr/Bankleitzahlen/' ##no_text
+             &amp;&amp; |{ lv_datbis(4) }_{ lv_datbis+4(2) }_{ lv_datbis+6(2) }/blz_{ lv_datvon(4) }_{ lv_datvon+4(2) }_{ lv_datvon+6(2) }_txt.txt?__blob=publicationFile|.
+*\--------------------------------------------------------------------------------/
+
+*******************
+* HTTP - Verbindung
+*******************
+* Erstellen des Verbindungsobjekts
+    cl_http_client=&gt;create_by_url( EXPORTING url           = lv_url
+                                             proxy_host    = mv_proxy_host               " logische Destination (Wird bei Funktionsaufruf angegeben)
+                                             proxy_service = mv_proxy_service            " Portnummer
+                                   IMPORTING
+                                             client        = lo_http ).             " HTTP Client Abstraction
+
+* Request senden
+    lo_http-&gt;send( EXCEPTIONS OTHERS = 1 ).
+    IF sy-subrc &lt;&gt; 0.
+      lo_http-&gt;get_last_error( IMPORTING code    = ev_subrc
+                                         message = ev_err_message ).
+      RETURN.
+    ENDIF.
+
+* Daten annehmen
+    lo_http-&gt;receive( EXCEPTIONS OTHERS = 1 ).
+    IF sy-subrc &lt;&gt; 0.
+      lo_http-&gt;get_last_error( IMPORTING code    = ev_subrc
+                                         message = ev_err_message ).
+      RETURN.
+    ENDIF.
+
+* Datei reinladen...
+    lv_recdata = lo_http-&gt;response-&gt;get_data( ).
+    IF lv_recdata IS INITIAL.
+      ev_subrc = 1024.
+      RETURN.
+    ENDIF.
+
+* Daten in eine "Datei" - Tabelle konvertieren
+*/--------------------------------------------------------------------------------\
+    CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
+      EXPORTING
+        buffer        = lv_recdata
+      IMPORTING
+        output_length = lv_tmplen
+      TABLES
+        binary_tab    = lt_tmpbin.
+
+    CALL FUNCTION 'SCMS_BINARY_TO_TEXT'
+      EXPORTING
+        input_length = lv_tmplen
+      TABLES
+        binary_tab   = lt_tmpbin
+        text_tab     = et_filetab.
+*\--------------------------------------------------------------------------------/
+
+  ENDMETHOD.                                               "GET_BBANK_FILE_FROM_HTML
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZZ_CMP_BNKA_TO_BBANK-&gt;SET_BBANK_FILE
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IV_PATH                        TYPE        CSEQUENCE(optional)
+* | [&lt;---] EV_SUBRC                       TYPE        SY-SUBRC
+* | [&lt;---] EV_ERR_MESSAGE                 TYPE        STRING
+* | [EXC!] FAILED_VIA_UPLOAD
+* +--------------------------------------------------------------------------------------
+  METHOD set_bbank_file.
+
+    DATA: lt_filetab TYPE TABLE OF char512.
+    FIELD-SYMBOLS:  &lt;file&gt;  TYPE char512,
+                    &lt;bbank&gt; TYPE mts_bundesbank.
+
+    IF iv_path IS NOT INITIAL AND cl_gui_frontend_services=&gt;file_exist( iv_path ) = abap_true.
+*   Datei einfach vom Frontend hochladen
+      cl_gui_frontend_services=&gt;gui_upload( EXPORTING
+                                              filename = iv_path               " Name der Datei
+                                            CHANGING
+                                              data_tab = lt_filetab            " Übergabetabelle für Datei-Inhalt
+                                            EXCEPTIONS
+                                              OTHERS   = 1 ).
+      ev_subrc = sy-subrc.
+    ELSE.
+*   Datei per HTTP holen
+      me-&gt;get_bbank_file_from_web( IMPORTING ev_subrc       = ev_subrc
+                                             ev_err_message = ev_err_message
+                                             et_filetab     = lt_filetab ).
+    ENDIF.
+
+* Wenn die Datei leer ist machen wir hier nichts
+    IF lt_filetab IS INITIAL.
+      RETURN.
+    ENDIF.
+
+* In die richtige Struktur kippen:
+    LOOP AT lt_filetab ASSIGNING &lt;file&gt;.
+      APPEND INITIAL LINE TO mt_bbank_datei ASSIGNING &lt;bbank&gt;.
+      &lt;bbank&gt; = &lt;file&gt;.
+    ENDLOOP.
+  ENDMETHOD.                                               "set_bbank_file
+ENDCLASS.
+
+DATA gr_bbank  TYPE REF TO lcl_cmp_bnka_to_bbank.
+DATA gv_subrc  TYPE sy-subrc.
+DATA gv_err    TYPE string.
+DATA gt_result TYPE lcl_cmp_bnka_to_bbank=&gt;mtt_bnka_result.
+FIELD-SYMBOLS  TYPE lcl_cmp_bnka_to_bbank=&gt;mts_bnka_result.
+
+
+START-OF-SELECTION.
+
+* Objekt instanziieren
+  CREATE OBJECT gr_bbank
+    EXPORTING
+      iv_proxy_host    = p_proxy                           " logische Destination
+      iv_proxy_service = p_pport.                          " Portnummer
+
+* Datei innerhalb der Klasse organisieren
+  gr_bbank-&gt;set_bbank_file( IMPORTING
+                             ev_subrc       = gv_subrc     " Rückgabewert von ABAP-Anweisungen
+                             ev_err_message = gv_err       " Error - Message
+                           ).
+  IF gv_subrc &lt;&gt; 0.
+    WRITE: / gv_err.
+    RETURN.
+  ENDIF.
+
+* Vergleich der Daten aus der Bundesbank und SAP holen
+  gt_result = gr_bbank-&gt;compare_bbank_with_bnka( ).
+
+* primitive Ausgabe... :)
+  LOOP AT gt_result ASSIGNING .
+    CASE -status.
+      WHEN lcl_cmp_bnka_to_bbank=&gt;mc_bank_missing.
+        WRITE: / 'MISSING'.
+      WHEN lcl_cmp_bnka_to_bbank=&gt;mc_bank_changes.
+        WRITE: / 'CHANGING'.
+      WHEN lcl_cmp_bnka_to_bbank=&gt;mc_bank_correct.
+        WRITE: /  'OK'.
+    ENDCASE.
+    WRITE: 12 '|', -bankl.
+  ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/bankleitzahlen-einlesen/">Bankleitzahlen einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bankleitzahlen-einlesen/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>SAP und bunte Bilder &#8211; geht das?</title>
+		<link>/blog/sap-und-bunte-bilder-cl_gui_html_viewer/</link>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Wed, 12 Nov 2014 13:54:52 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Entwurfsmuster]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[cl_gui_html_viewer]]></category>
+		<category><![CDATA[MM]]></category>
+		<category><![CDATA[Diagramme]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[google]]></category>
+		<category><![CDATA[Bilder]]></category>
+		<category><![CDATA[Charts]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5107</guid>
+
+					<description><![CDATA[<p>SAP ERP kann viel. Kleine Tabellen, große Tabellen ALV Tabellen und im NWBC auch neue PowerListen.<br />
+Sobald man Daten jedoch grafisch anzeigen möchte kommt recht schnell Ernüchterung ins Spiel. In diesem Artikel zeige ich, wie Daten einfach und trotzdem grafisch anspruchsvoll dargestellt werden können.</p>
+<p>Der Beitrag <a href="/blog/sap-und-bunte-bilder-cl_gui_html_viewer/">SAP und bunte Bilder &#8211; geht das?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>SAP ERP kann viel. Kleine Tabellen, große Tabellen ALV Tabellen und im NWBC auch neue PowerListen.<br />
+Sobald man Daten jedoch grafisch anzeigen möchte kommt recht schnell Ernüchterung ins Spiel.<br />
+Die Prognose bzw. MD04 Diagramme stammen wohl noch aus den frühen 90er Jahren.</p>
+<p>Im SAP Demo-Programm <strong>GRAPHICS_GUI_CE_DEMO </strong>sieht man ein Beispiel mit der Chart-Engine. Der Aufwand diese Diagramme richtig zu formatieren und einzubinden wird oftmals bei knappen Entwicklungsbudgets als erstes zusammengestrichen.</p>
+<p>Eine alternative Lösung um <em>unkritische</em> Daten optisch ansprechend zu verpacken ist die <a title="Google Charts" href="https://developers.google.com/chart/" target="_blank">Google-Chart API</a>.<br />
+Firmendaten an GOOGLE schicken?!? Es ist jedem selbst überlassen welche Daten wirklich übergeben werden.<br />
+01.01.2014 &#8211; 100<br />
+01.02.2014 &#8211; 80<br />
+01.03.2014 &#8211; 70<br />
+01.04.2014 &#8211; 100<br />
+01.05.2014 &#8211; 200<br />
+Datum + Zahl<br />
+Ob das Verkaufsmengen, Einkaufswerte,Anzahl  Mitarbeiter oder Umsatz in t€ ist kann man ja bequem über dem Diagramm im HTML ausgeben.<br />
+Google versichert zudem die übergebenen Daten nicht zu speichern oder auszuwerten. Wie weit man das glaubt sei wieder jedem selbst überlassen.</p>
+<p>Beispiele:</p>
+<p><figure id="attachment_5109" aria-describedby="caption-attachment-5109" style="width: 300px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/11/pie.png"><img decoding="async" class="size-medium wp-image-5109" src="https://tricktresor.com/wp-content/uploads/2014/11/pie-300x206.png" alt="Google Chart Pie Chart " width="300" height="206" srcset="/wp-content/uploads/2014/11/pie-300x206.png 300w, /wp-content/uploads/2014/11/pie.png 321w" sizes="(max-width: 300px) 100vw, 300px" /></a><figcaption id="caption-attachment-5109" class="wp-caption-text">Google Chart Pie Chart</figcaption></figure></p>
+<p><figure id="attachment_5110" aria-describedby="caption-attachment-5110" style="width: 300px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/11/line.png"><img loading="lazy" decoding="async" class="size-medium wp-image-5110" src="https://tricktresor.com/wp-content/uploads/2014/11/line-300x156.png" alt="Google Chart Line Chart" width="300" height="156" srcset="/wp-content/uploads/2014/11/line-300x156.png 300w, /wp-content/uploads/2014/11/line.png 381w" sizes="(max-width: 300px) 100vw, 300px" /></a><figcaption id="caption-attachment-5110" class="wp-caption-text">Google Chart Line Chart</figcaption></figure></p>
+<p><figure id="attachment_5108" aria-describedby="caption-attachment-5108" style="width: 300px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/11/geo.png"><img loading="lazy" decoding="async" class="size-medium wp-image-5108" src="https://tricktresor.com/wp-content/uploads/2014/11/geo-300x176.png" alt="Google Chart Geo-Chart" width="300" height="176" srcset="/wp-content/uploads/2014/11/geo-300x176.png 300w, /wp-content/uploads/2014/11/geo.png 445w" sizes="(max-width: 300px) 100vw, 300px" /></a><figcaption id="caption-attachment-5108" class="wp-caption-text">Google Chart Geo Chart</figcaption></figure></p>
+<h2><strong>Hier ein konkretes Beispiel Coding zum Nachbauen:</strong></h2>
+<p>Ziel die MM Bestände der einzelnen Werke als Tortendiagramm darstellen.<br />
+Datengrundlage: MM Bestandsstatistik &#8211;&gt;S032</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/bestand_werk.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5114" src="https://tricktresor.com/wp-content/uploads/2014/11/bestand_werk-300x220.png" alt="bestand_werk" width="300" height="220" srcset="/wp-content/uploads/2014/11/bestand_werk-300x220.png 300w, /wp-content/uploads/2014/11/bestand_werk.png 461w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Das HTML Coding findet man <a href="https://developers.google.com/chart/interactive/docs/gallery/piechart" target="_blank">hier</a>.<br />
+HTML Kenntnisse sind sicherlich hilfreich. Es muss jedoch lediglich der rot markierte Bereich angepasst werden.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/HTML.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5112" src="https://tricktresor.com/wp-content/uploads/2014/11/HTML-300x196.png" alt="HTML" width="300" height="196" srcset="/wp-content/uploads/2014/11/HTML-300x196.png 300w, /wp-content/uploads/2014/11/HTML-624x409.png 624w, /wp-content/uploads/2014/11/HTML.png 977w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT zz_google_chart.
+*&amp;---------------------------------------------------------------------*
+*&amp; Report ZMM_HTML_TEST
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp; Kleines Testprogramm als Demo für CL_GUI_HTML_VIEWER
+*&amp; Dieser Report selektiert alle Bestände aus der Tabellen S032 (MM Statitik) und gibt das Ergebnis als Google Chart aus.
+*&amp; M&amp;Mler (AWI) 11/2014
+*&amp; Keine Garantie, kein Support, keine Kosten.
+*&amp;---------------------------------------------------------------------*
+
+define html.
+ ls_html = &amp;1. "HTML schreiben
+ APPEND ls_html TO lt_html. "An HTML Ausgabetabelle hängen
+end-OF-DEFINITION.
+
+TABLES: s032.
+TYPES: BEGIN OF ty_s032,
+ werks TYPE werks_d,
+ wbwbest TYPE wbwbest,
+ END OF ty_s032.
+"Daten
+DATA: gt_data TYPE TABLE OF ty_s032.
+"Für HTML ausgabe
+DATA: lt_html TYPE TABLE OF char255, "hier landet der HTMl Code drin
+ ls_html LIKE LINE OF lt_html, "eine zeile HTML Code
+ lo_container TYPE REF TO cl_gui_custom_container, "für die Ausgabe
+ lo_html_control TYPE REF TO cl_gui_html_viewer, "für die Ausgabe
+ lf_url(1024),
+ lf_lines TYPE i, " Anzahl Zeilen
+ lf_komma(1). "letzter Datensatz darf kein Komma haben
+FIELD-SYMBOLS: &lt;fs_data&gt; TYPE ty_s032.
+SELECT-OPTIONS: s_werks FOR s032-werks.
+
+START-OF-SELECTION.
+  "Alle Bestände je Werk aus der S032 summieren
+  SELECT werks SUM( wbwbest ) AS wbwbest
+    FROM s032
+    INTO CORRESPONDING FIELDS OF TABLE gt_data
+   WHERE werks IN s_werks
+     AND vrsio = '000'
+     GROUP BY werks .
+ "Sodele, itab gt_data ist gefüllt --&gt; Ausgabe als Kuchendiagramm.
+ "Das folgende Coding füllt den HTML Code in eine interne Tabelle.
+ "per ABAP macro wird der Code deutlich leserlicher
+   html `&lt;html&gt;`. "HTML schreiben
+   html ` &lt;head&gt;`. "HTML schreiben
+   html ` &lt;script type="text/javascript" src="https://www.google.com/jsapi"&gt;&lt;/script&gt;`.
+   html ` &lt;script type="text/javascript"&gt;`.
+   html ` google.load("visualization", "1", {packages:["corechart"]});`.
+   html ` google.setOnLoadCallback(drawChart);`.
+   html ` function drawChart() {`.
+   html ` var data = google.visualization.arrayToDataTable([`.
+ "Hier kommt der spannende Teil, in dem die "Nutzdaten" gefüllt werden
+   html ` ['Werk', 'Bestand'],`.
+   lf_lines = lines( gt_data ).
+ "jetzt per Loop die itab in JavaScript "umbauen"
+ "Der letzte Datensatz darf nicht mit Komma abgeschlossen werden, daher lf_komma
+   lf_komma = ','.
+   LOOP AT gt_data ASSIGNING &lt;fs_data&gt;.
+     IF sy-tabix = lf_lines. "letzter Datensatz? Dann kein Komma
+       FREE: lf_komma.
+     ENDIF.
+     ls_html = ` ['` &amp;&amp; &lt;fs_data&gt;-werks &amp;&amp; `', ` &amp;&amp; &lt;fs_data&gt;-wbwbest &amp;&amp; `] ` &amp;&amp; lf_komma.
+     append ls_html to lt_html.
+   ENDLOOP.
+   html ` ]);`.
+   html ` var options = {`.
+   html ` title: 'Hier kann ein Titel eingegeben werden'`.
+   html ` };`.
+   html ` var chart = new google.visualization.PieChart(document.getElementById('piechart'));`.
+   html ` chart.draw(data, options);`.
+   html ` }`.
+   html ` &lt;/script&gt;`.
+   html ` &lt;/head&gt;`.
+ "Ab hier kommt der BODY des HTML Dokuments. Wenn man keinen TITLE an die Grafik schickt, kann man dies hier im HTML machen
+   html ` &lt;body&gt;`.
+   html ` &lt;div id="piechart" style="width: 900px; height: 500px;"&gt;&lt;/div&gt;`.
+   html ` &lt;/body&gt;`.
+   html `&lt;/html&gt;`.
+
+   CREATE OBJECT lo_html_control
+     EXPORTING
+       parent = cl_gui_container=&gt;screen0.
+       lf_url = 'AWI.html'.
+   CALL METHOD lo_html_control-&gt;load_data
+     EXPORTING
+       url = lf_url
+     IMPORTING
+       assigned_url = lf_url
+     CHANGING
+       data_table = lt_html[].
+* HTML im VIEWER anzeigen
+   lo_html_control-&gt;show_url( lf_url ).
+ 
+  write space. "Dummy für SCREEN0
+</pre>
+<h3>Weitere Hinweise und Anregungen:</h3>
+<p>&#8211; Mit den Geo-Charts kann man nur anhand einer Postleitzahl und eines Wertes schöne Kartendarstellungen erzeugen. Darstellung der Kunden, Lieferanten Verkaufsaktionen usw.<br />
+&#8211; Die Charts können auch interaktiv &#8220;eingestellt&#8221; werden. In ABAP kann man die Java-Script Events abfangen. (Wenn ein talentierterer Entwickler als ich es bin mir ein Beispiel zukommen lässt, ergänze ich das gerne in dieser Doku)</p>
+<p>12.11.2014 AWI</p>
+<p>Der Beitrag <a href="/blog/sap-und-bunte-bilder-cl_gui_html_viewer/">SAP und bunte Bilder &#8211; geht das?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Beliebige XML-Datei in interne Tabelle einlesen</title>
+		<link>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/</link>
+					<comments>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Sep 2014 17:05:16 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[itab]]></category>
+		<category><![CDATA[field-symbols]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[cl_xml_document]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[parser]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5081</guid>
+
+					<description><![CDATA[<p>Viele Daten werden im XML-Format ausgetauscht. Um die Daten in SAP verarbeiten zu können, muss man parsen oder eine entsprechende Transformation "programmieren". Mit XML tue ich mich manchmal etwas schwer und bin daher froh über jede Vereinfachung.</p>
+<p>Mithilfe eines kleinen generischen Programms ist es einfach möglich, die folgende XML-Datei in eine interne Tabelle zu laden.</p>
+<p>Der Beitrag <a href="/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/">Beliebige XML-Datei in interne Tabelle einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Viele Daten werden im XML-Format ausgetauscht. Um die Daten in SAP verarbeiten zu können, muss man parsen oder eine entsprechende Transformation &#8220;programmieren&#8221;. Mit XML tue ich mich manchmal etwas schwer und bin daher froh über jede Vereinfachung.</p>
+<p>Mithilfe eines kleinen generischen Programms ist es einfach möglich, die folgende XML-Datei in eine interne Tabelle zu laden:</p>
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;hierarchie1&gt;
+&lt;hierarchie2&gt;Beispiel XML&lt;/hierarchie2&gt;
+&lt;hierarchie2&gt;Tricktresor&lt;/hierarchie2&gt;
+&lt;hierarchie2&gt;Enno Wulff&lt;/hierarchie2&gt;
+&lt;/hierarchie1&gt;
+</pre>
+<p><figure id="attachment_5082" aria-describedby="caption-attachment-5082" style="width: 487px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/09/xml_itab.png"><img loading="lazy" decoding="async" class="wp-image-5082 size-full" src="https://tricktresor.com/wp-content/uploads/2014/09/xml_itab.png" alt="Interne Tabelle mit XML-Daten" width="487" height="110" srcset="/wp-content/uploads/2014/09/xml_itab.png 487w, /wp-content/uploads/2014/09/xml_itab-300x67.png 300w" sizes="(max-width: 487px) 100vw, 487px" /></a><figcaption id="caption-attachment-5082" class="wp-caption-text">Screenshot aus dem Debugger</figcaption></figure></p>
+<p>Man sieht deutlich, dass die einzelnen Tags der XML-Datei sequentiell in die Tabelle übernommen wurden. Für viele Anwendungsfälle dürfte das für die weitere Verarbeitung ausreichen.</p>
+<p>[notice type=&#8217;info&#8217;]Dieses Programm erzeugt lediglich die Transformation von der XML-Struktur in eine interne Tabelle. Es erfolgt keine Ausgabe![/notice]</p>
+<h2>Coding</h2>
+<pre>REPORT.
+TYPES tyt_tab_xml TYPE TABLE OF smum_xmltb.
+
+DATA: gv_xml_xstring  TYPE          xstring,
+      gt_xml_tab      TYPE TABLE OF smum_xmltb,
+      gv_filename     TYPE          localfile,
+      go_xml_document TYPE REF TO   cl_xml_document,
+      gv_subrc        TYPE          sy-subrc,
+      gv_size         TYPE          sy-tabix.
+
+
+START-OF-SELECTION.
+
+  PERFORM display_popup CHANGING gv_filename.
+
+  PERFORM upload_xml USING gv_filename
+                     CHANGING go_xml_document
+                              gv_subrc.
+  IF gv_subrc = 0.
+
+    PERFORM parse_to_xstring USING go_xml_document
+                             CHANGING gv_xml_xstring
+                                      gv_size
+                                      gv_subrc.
+    IF gv_subrc = 0.
+      PERFORM parse_xml_to_itab USING gv_xml_xstring
+                                CHANGING gt_xml_tab.
+
+    ELSE.
+      EXIT.
+    ENDIF.
+  ELSE.
+    EXIT.
+  ENDIF.
+
+END-OF-SELECTION.
+
+FORM display_popup CHANGING cv_filename TYPE localfile.
+
+  DATA: lt_filetable TYPE filetable,
+        lv_anz_dat   TYPE i.
+
+  cl_gui_frontend_services=&gt;file_open_dialog(
+    EXPORTING
+      window_title            =     'Wählen Sie eine XML.Datei aus'    " Titel des Datei-Öffnen Dialogs
+      default_filename        =     'C:\test.xml'
+      initial_directory       =     'C:\' " Ausgangsverzeichnis
+  CHANGING
+      file_table              = lt_filetable   " Tabelle, die selektierte Dateien enthält
+      rc                      = lv_anz_dat     " Rückgabewert: Anzahl Dateien oder -1 falls Fehler auftritt
+  EXCEPTIONS
+    OTHERS                  = 5
+    ).
+
+  READ TABLE lt_filetable INTO cv_filename INDEX 1.
+
+ENDFORM.
+
+FORM upload_xml USING iv_filename        TYPE localfile
+                CHANGING co_xml_document TYPE REF TO cl_xml_document
+                         cv_subrc        TYPE sy-subrc.
+*== create the object
+  CREATE OBJECT co_xml_document.
+
+*== Upload xml file
+  co_xml_document-&gt;import_from_file(
+  EXPORTING
+    filename = iv_filename
+    RECEIVING
+    retcode = cv_subrc  ).
+
+ENDFORM.
+
+FORM parse_to_xstring USING io_xml_document  TYPE REF TO cl_xml_document
+                      CHANGING cv_xml_string TYPE xstring
+                               cv_size       TYPE sy-tabix
+                               cv_subrc      TYPE sy-subrc.
+*== Convert to xstring
+  CALL METHOD io_xml_document-&gt;render_2_xstring
+    IMPORTING
+      retcode = cv_subrc      " Returncode
+      stream  = cv_xml_string " XString (STREAM)
+      size    = cv_size.      " Anzahl Zeichen
+ENDFORM.
+
+FORM parse_xml_to_itab USING iv_xml_string TYPE xstring
+                       CHANGING ct_xml_tab TYPE tyt_tab_xml.
+
+  DATA: lt_return TYPE TABLE OF bapiret2.
+
+*== Convert XML to itab
+  CALL FUNCTION 'SMUM_XML_PARSE'
+    EXPORTING
+      xml_input = iv_xml_string
+    TABLES
+      xml_table = ct_xml_tab
+      return    = lt_return.
+  BREAK-POINT.
+
+ENDFORM.</pre>
+<h2>Übertragen der generischen in eine interne Tabelle</h2>
+<p>In unserem Beispiel muss die interne Tabelle das Feld &#8220;HIERARCHIE2&#8221; besitzen. Die Zuweisung aller XML-Werte der &#8220;Hierarchiestufe 2&#8221; werden dann dem Feld &#8220;ITAB-HIERARCHIE2&#8221; zugewiesen.</p>
+<p>[notice type=&#8217;info&#8217;]Der Aufruf der Routine muss noch hinzugefügt werden. Die zu übergebene interne Tabelle kann jeden beliebigen Typ haben. In diesem Beispiel wird der Typ TYT_ITAB verwendet.[/notice]</p>
+<pre>FORM build_itab USING it_xml_tab     TYPE tyt_tab_xml
+             CHANGING itab TYPE tyt_itab.
+
+  FIELD-SYMBOLS: &lt;ls_data_tab&gt; LIKE LINE OF itab,
+                 &lt;ls_xml_tab&gt;  LIKE LINE OF it_xml_tab,
+                 &lt;lv_value&gt;    TYPE         data.
+
+  LOOP AT it_xml_tab ASSIGNING &lt;ls_xml_tab&gt; WHERE hier EQ 2.
+    TRANSLATE &lt;ls_xml_tab&gt;-cname TO UPPER CASE.
+    IF &lt;ls_xml_tab&gt;-cname = 'HIERARCHIE2'.
+      APPEND INITIAL LINE TO itab ASSIGNING &lt;ls_data_tab&gt;.
+    ENDIF.
+    ASSIGN COMPONENT &lt;ls_xml_tab&gt;-cname OF STRUCTURE &lt;ls_data_tab&gt; TO &lt;lv_value&gt;.
+    &lt;lv_value&gt; = &lt;ls_xml_tab&gt;-cvalue.
+  ENDLOOP.
+ENDFORM..</pre>
+<p>Der Beitrag <a href="/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/">Beliebige XML-Datei in interne Tabelle einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Formeleditor</title>
+		<link>/blog/formeleditor/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Jul 2014 18:30:52 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Formeleditor]]></category>
+		<category><![CDATA[Eigene Felder]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Eigenes]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[Formeln]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4946</guid>
+
+					<description><![CDATA[<p>Der Formeleditor ist ein mächtiges Werkzeug, der sich für viele Gelegenheiten nutzen lässt. Viele Beispielprogramme demonstrieren die Verwendung. Die hier vorgestellten Funktionen lösen die alten Funktionsbausteine EVAL_FORMULA und CHECK_FORMULA zum evaluieren einer Formel ab. </p>
+<p>Der Beitrag <a href="/blog/formeleditor/">Formeleditor</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im Beitrag <a title="Formelberechnung" href="https://tricktresor.com/blog/formelberechnung/">Formelberechnung </a>habe ich bereits gezeigt, wie man eigene Formeln verwenden kann. Für eine Anwendung wäre es jedoch schön, wenn der Anwender selbst Formeln erstellen könnte und zwar mit vorgegebenen Feldern und Operationen.</p>
+<p>Dies ist möglich mit dem Formeleditor. Gleichzeitig wird hier für die Prüfung und Evaluierung der Formeln keine Funktionsbausteine mehr verwendet, sondern Klassen. Aber der Reihe nach&#8230;</p>
+<h2>Formeleditor</h2>
+<p>Der Formeleditor wird durch den Funktionsbaustein <!--StartFragment -->FOBU_DIALOG_START aufgerufen. Die Verwendung wird in mehreren Beispielprogrammen gut demonstriert (siehe unten).</p>
+<p>In einem Eingabefeld kann man die Formel entweder direkt eingeben (Expertenmodus) oder man kann die einzelnen Komponenten per Drag and Drop oder Doppelklick einfügen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200715.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4951" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200715-300x144.jpg" alt="Formeleditor Eingabe" width="300" height="144" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_200715-300x144.jpg 300w, /wp-content/uploads/2014/07/Bild_2014_07_16_200715.jpg 510w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Elemente des Editors lassen sich gezielt steuern. In den Beispielprogrammen wird ersichtlich, was wie verwendet werden kann.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200704.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4950" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200704-300x85.jpg" alt="Formeleditor" width="300" height="85" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_200704-300x85.jpg 300w, /wp-content/uploads/2014/07/Bild_2014_07_16_200704-624x177.jpg 624w, /wp-content/uploads/2014/07/Bild_2014_07_16_200704.jpg 835w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Einige Formeln lassen sich mit einer Hilfefunktion einfügen (Kleines grünes PLUS-Icon rechts neben den Sortieren Buttons):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200725.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4957" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200725-300x81.jpg" alt="Formel einfügen" width="300" height="81" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_200725-300x81.jpg 300w, /wp-content/uploads/2014/07/Bild_2014_07_16_200725-624x169.jpg 624w, /wp-content/uploads/2014/07/Bild_2014_07_16_200725.jpg 758w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Klassen</h2>
+<h3>CL_FOBU_FORMULA</h3>
+<p>Um mit dem Editor kommunizieren zu können, wird diese Klasse benötigt.</p>
+<h3>CL_FOEV_FORMULA</h3>
+<p>Diese Klasse wird verwendet, um die Formeln zu speichern, zu laden, zu prüfen und auszuwerten.</p>
+<h3>CL_FOBU_CONNECTOR</h3>
+<p>Sobald eigene Felder verwendet werden sollen, müssen diese mithilfe der Klasse definiert und bekannt gemacht werden. Für jedes Feld kann ein eigenes Icon definiert werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200712.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4952 size-full" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200712.jpg" alt="Formeleditor eigene Felder" width="377" height="231" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_200712.jpg 377w, /wp-content/uploads/2014/07/Bild_2014_07_16_200712-300x183.jpg 300w" sizes="(max-width: 377px) 100vw, 377px" /></a></p>
+<h3>Demoprogramme</h3>
+<table>
+<tbody>
+<tr>
+<th> Programm</th>
+<th> Bezeichnung</th>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE1</td>
+<td>Beispielprogramme FoBuEv: Einfachst-Aufruf</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE2</td>
+<td>Beispielprogramme FoBuEv: Aufruf mit eigenen Feldern</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE3</td>
+<td>Beisp.Prog FoBuEv: Aufruf mitTypprüfung, eigenem GUI-Status und TraceDer Trace wird im Menü eingeschaltet!</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200706.jpg"><img loading="lazy" decoding="async" class="alignnone size-thumbnail wp-image-4949" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_200706-300x300.jpg" alt="Formel_trace" width="150" height="150" /></a></td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE4</td>
+<td>Beisp.Prog FoBuEv: Aufruf mit eigenen Funktionen</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE5</td>
+<td>Beisp.Prog FoBuEv: Implementierung einer Methode per FoBuEv</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE6</td>
+<td>Beisp.Prog FoBuEv: Aufruf mit eigenen Drucktasten und IF-Funktion</td>
+</tr>
+<tr>
+<td> SFBE_EXAMPLE8</td>
+<td>Beisp.Prog FoBuEv: Rechnen mit Währungsbeträgen, Mengen und Preisen</td>
+</tr>
+<tr>
+<td>RS_FOBU_METHOD_EXAMPLE</td>
+<td>Beispielprogramm für Formula Builder Methoden</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/formeleditor/">Formeleditor</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Flexible Erzeugung des Feldkataloges</title>
+		<link>/blog/flexible-erzeugung-des-feldkataloges/</link>
+		
+		<dc:creator><![CDATA[stefan]]></dc:creator>
+		<pubDate>Mon, 23 Jun 2014 16:56:06 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[feldkatalog]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[create data]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[cl_abap_structdescr]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[cl_abap_typedescr]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4862</guid>
+
+					<description><![CDATA[<p>In dem Artikel DATA ... RENAMING WITH SUFFIX wurde die Aussage gemacht: "Die ALVs haben Probleme mit komplexen Strukturen". Das stimmt so nicht. Natürlich ist es kein Problem des ALV sondern ein Problem bei der Erzeugung des Feldkatalogs. Ich habe mich darauf hin des Problems um die Erzeugung des Feldkatalogs zu einer komplexen Struktur angenommen und ein Programm entwickelt. Das Programm analysiert die komplexe Datenstruktur einer internen Tabelle und baut den Feldkatalog so auf, dass der ALV ihn zur Anzeige der Daten verwenden kann.</p>
+<p>Der Beitrag <a href="/blog/flexible-erzeugung-des-feldkataloges/">Flexible Erzeugung des Feldkataloges</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In dem Artikel <a title="DATA … RENAMING WITH SUFFIX" href="https://tricktresor.com/blog/data-renaming-with-suffix/">DATA &#8230; RENAMING WITH SUFFIX</a> macht Enno die Aussage &#8220;Die ALVs haben Probleme mit komplexen Strukturen&#8221;. Das stimmt so nicht. Natürlich ist es kein Problem des ALV sondern ein Problem bei der Erzeugung des Feldkatalogs. Ich habe mich deswegen einmal um die Erzeugung des Feldkatalogs zu einer komplexen Struktur gekümmert und ein Programm entwickelt, dass einen Feldkatalog zu einer tiefen Struktur aufbauen kann.</p>
+<h2>Arbeitsweise</h2>
+<p>Das Programm analysiert die komplexe Datenstruktur einer internen Tabelle und baut den Feldkatalog so auf, dass der ALV ihn zur Anzeige der Daten verwenden kann.</p>
+<p>Die Anzeige ist etwas bunter ausgefallen&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180623.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4863 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180623.jpg" alt="Bild_2014_06_23_180623" width="572" height="286" srcset="/wp-content/uploads/2014/06/Bild_2014_06_23_180623.jpg 572w, /wp-content/uploads/2014/06/Bild_2014_06_23_180623-300x150.jpg 300w" sizes="(max-width: 572px) 100vw, 572px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT .
+
+TYPES: BEGIN OF gts_data,
+*         mara TYPE mara,
+*         marc TYPE marc,
+         t005  TYPE t005,
+         t005t TYPE t005t,
+       END OF gts_data.
+
+
+DATA gt_data     TYPE STANDARD TABLE OF gts_data WITH NON-UNIQUE DEFAULT KEY.
+DATA gt_fieldcat TYPE lvc_t_fcat.
+DATA go_grid     TYPE REF TO cl_gui_alv_grid.
+DATA gv_style    TYPE i.
+
+*----------------------------------------------------------------------*
+*       CLASS lcx_general_exceptions DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcx_general_exceptions DEFINITION INHERITING FROM cx_static_check.
+ENDCLASS.                    "lcx_general_exceptions DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_alv_utilities DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_alv_utilities DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS create_fieldcat_lvc  IMPORTING i_data TYPE  any
+                                       RETURNING value(et_fieldcat) TYPE lvc_t_fcat
+                                       RAISING lcx_general_exceptions.
+  PRIVATE SECTION.
+    CLASS-METHODS create_fieldcat_line IMPORTING i_data TYPE  any
+                                       RETURNING value(et_fieldcat) TYPE lvc_t_fcat.
+ENDCLASS.                    "lcl_alv_utilities DEFINITION
+
+
+START-OF-SELECTION.
+  WRITE '.'.
+
+  SELECT * UP TO 100 ROWS
+    INTO TABLE gt_data
+*    FROM mara JOIN marc ON mara~matnr = marc~matnr.
+    FROM t005 JOIN t005t ON t005~land1 = t005t~land1.
+
+  CREATE OBJECT go_grid
+    EXPORTING
+      i_parent = cl_gui_container=&gt;screen0.
+  gt_fieldcat = lcl_alv_utilities=&gt;create_fieldcat_lvc( gt_data ).
+  go_grid-&gt;set_table_for_first_display( CHANGING
+                                          it_outtab       = gt_data
+                                          it_fieldcatalog = gt_fieldcat ).
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_alv_utilities IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_alv_utilities IMPLEMENTATION.
+
+  METHOD create_fieldcat_lvc.
+
+    FIELD-SYMBOLS: &lt;lt_data&gt; TYPE ANY TABLE,
+                   &lt;ls_line&gt; TYPE any,
+                   &lt;ls_dref&gt; TYPE any.
+
+    DATA lr_dref                 TYPE REF TO data.
+    data lo_descr                TYPE REF TO cl_abap_typedescr.
+    data lo_structdescr          TYPE REF TO cl_abap_structdescr.
+    DATA lt_components           TYPE cl_abap_structdescr=&gt;component_table.
+    FIELD-SYMBOLS &lt;ls_component&gt; LIKE LINE OF lt_components.
+
+    lo_descr = cl_abap_typedescr=&gt;describe_by_data( i_data ).
+
+    CASE lo_descr-&gt;kind.
+
+      WHEN cl_abap_typedescr=&gt;kind_elem.                   
+" Special case.  We see this when we have something like 
+"... type standard table of syucomm.
+* Tried various things but Grid won't show anything - 
+" no matter what I try to provide a faked fieldcat
+        RAISE EXCEPTION TYPE lcx_general_exceptions.       " Not foreseen yet
+
+      WHEN cl_abap_typedescr=&gt;kind_struct.                 
+        " Structure is fine --&gt; create fieldcat from this
+        et_fieldcat = create_fieldcat_line( i_data ).
+
+      WHEN cl_abap_typedescr=&gt;kind_table.                  
+        " Table --&gt; restart with linetype of table
+        ASSIGN i_data TO &lt;lt_data&gt;.
+        CREATE DATA lr_dref LIKE LINE OF &lt;lt_data&gt;.
+        ASSIGN lr_dref-&gt;* TO &lt;ls_line&gt;.
+        et_fieldcat = create_fieldcat_lvc( &lt;ls_line&gt; ).
+
+      WHEN cl_abap_typedescr=&gt;kind_ref.                    
+        " Reference --&gt; restart with dereferenced value
+        ASSIGN i_data-&gt;* TO &lt;ls_dref&gt;.
+        et_fieldcat = create_fieldcat_lvc( &lt;ls_dref&gt; ).
+
+*    when cl_abap_typedescr=&gt;KIND_CLASS.
+*    when cl_abap_typedescr=&gt;KIND_INTF  .
+      WHEN OTHERS.
+        BREAK-POINT.  " Ich will das vorher sehen
+        RAISE EXCEPTION TYPE lcx_general_exceptions.       " Not foreseen yet
+
+    ENDCASE.
+
+  ENDMETHOD.                                               "create_fieldcat_lvc
+
+
+  METHOD create_fieldcat_line.
+
+    DATA lr_dref               TYPE REF TO data.
+    data lo_salv               TYPE REF TO cl_salv_table.
+    data lo_salv_columns_table TYPE REF TO cl_salv_columns_table.
+    data lo_salv_aggregations  TYPE REF TO cl_salv_aggregations.
+    data lv_help_id            TYPE string.
+
+    FIELD-SYMBOLS &lt;ls_fc&gt;      LIKE LINE OF et_fieldcat.
+    FIELD-SYMBOLS &lt;lv_field&gt;   TYPE any.
+
+    FIELD-SYMBOLS &lt;lt_data&gt;    TYPE STANDARD TABLE.
+
+*--------------------------------------------------------------------*
+* Create standard table of input
+*--------------------------------------------------------------------*
+    CREATE DATA lr_dref LIKE STANDARD TABLE OF i_data.
+    ASSIGN lr_dref-&gt;* TO &lt;lt_data&gt;.
+    TRY.
+        cl_salv_table=&gt;factory( IMPORTING
+                                  r_salv_table   = lo_salv
+                                CHANGING
+                                  t_table        = &lt;lt_data&gt; ).
+        lo_salv_columns_table = lo_salv-&gt;get_columns( ).
+        lo_salv_aggregations  = lo_salv-&gt;get_aggregations( ).
+
+        et_fieldcat = cl_salv_controller_metadata=&gt;get_lvc_fieldcatalog(
+                            r_columns      = lo_salv_columns_table
+                            r_aggregations = lo_salv_aggregations ).
+*--------------------------------------------------------------------*
+* Internal fields w/o descriptions --&gt; set fieldname into header line
+*--------------------------------------------------------------------*
+        LOOP AT et_fieldcat ASSIGNING &lt;ls_fc&gt; WHERE scrtext_s = space
+                                                AND scrtext_m = space
+                                                AND scrtext_l = space.
+          &lt;ls_fc&gt;-scrtext_m = &lt;ls_fc&gt;-fieldname.
+        ENDLOOP.
+
+*--------------------------------------------------------------------*
+* Add F1 and F4-Help
+* Idea from http://wiki.scn.sap.com/wiki/display/Snippets/ALV+fieldcatalog+-+create+for+ANY+table
+*--------------------------------------------------------------------*
+        LOOP AT et_fieldcat ASSIGNING &lt;ls_fc&gt;.
+
+          ASSIGN COMPONENT &lt;ls_fc&gt;-fieldname OF STRUCTURE i_data TO &lt;lv_field&gt;.
+          CHECK sy-subrc = 0.
+          &lt;ls_fc&gt;-style     = gv_style.
+          ADD 1 TO gv_style.
+
+        TRY.
+          CLEAR lv_help_id.
+          DESCRIBE FIELD &lt;lv_field&gt; HELP-ID lv_help_id.
+          IF lv_help_id CA '-'.
+            SPLIT lv_help_id AT '-' INTO &lt;ls_fc&gt;-ref_table &lt;ls_fc&gt;-ref_field.
+          ENDIF.
+          CATCH cx_root.
+        ENDTRY.
+
+        ENDLOOP.
+
+      CATCH cx_salv_msg .
+    ENDTRY.
+
+  ENDMETHOD.                                               "create_fieldcat_line
+ENDCLASS.                    "lcl_alv_utilities IMPLEMENTATION</pre>
+<p>Der Beitrag <a href="/blog/flexible-erzeugung-des-feldkataloges/">Flexible Erzeugung des Feldkataloges</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>High Definition SAP? Ein Erfahrungsbericht</title>
+		<link>/blog/high-definition-sap-ein-erfahrungsbericht/</link>
+					<comments>/blog/high-definition-sap-ein-erfahrungsbericht/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 19 Jun 2014 19:14:57 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Hilfe]]></category>
+		<category><![CDATA[Generell]]></category>
+		<category><![CDATA[Materialstamm]]></category>
+		<category><![CDATA[Rahmen]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[auflösung]]></category>
+		<category><![CDATA[Performance]]></category>
+		<category><![CDATA[elemente]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Darstellung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[skalierung]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[Schriftgröße]]></category>
+		<category><![CDATA[Editor]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4819</guid>
+
+					<description><![CDATA[<p>Mehr ist besser. Das gilt für Geschwindigkeit, Speicher und auch die Auflösung. Dass dies jedoch im Falle der Auflösung nicht unbedingt der Fall ist, möchte ich dir in diesem Artikel zeigen. Ein Notebook mit der Auflösung von 2880x1620 Bildpunkten sollte ein scharfes Bild und gemütliches Arbeiten garantieren. Leider ist dem nicht so, denn nicht nur das Betriebssystem muss mitspielen, sondern auch alle anderen Programme. Wie auch der SAPGUI...</p>
+<p>Der Beitrag <a href="/blog/high-definition-sap-ein-erfahrungsbericht/">High Definition SAP? Ein Erfahrungsbericht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich habe ein neues Notebook: Lenovo T540p. Ein tolles Gerät! Schnell, lautlos und eine Auflösung von 2880&#215;1620 Bildpunkten. Bringt die hohe Auflösung etwas bei der Arbeit mit SAP? Um es gleich vorweg zu nehmen: Nein. Im Gegenteil, es bereitet eher Probleme, denn nicht alle GUI-Elemente werden entsprechend vergrößert.</p>
+<h2>Generell</h2>
+<p>Eine hohe Auflösung ist erst einmal toll, denn das Bild wird schärfer. Theoretisch jedenfalls, denn praktisch müssen alle beteiligten Komponenten mithelfen. Bei einer hohen Auflösung wird erst einmal alles kleiner, denn viele GUI-Elemente werden in Pixel gemessen und nicht in ihrer wahren Darstellungsgröße. Ein Desktopicon von Windows XP hat eine feste Größe von 32&#215;32 Pixeln. Moderne Betriebssysteme haben zwar inzwischen deutliche größere Icons, jedoch ist das gesamte Zusammenspiel zwischen Fenster, Fensterrahmen, Icons, GUI-Elementen (Dropdownboxen, Scrollbalken, Kontextmenus etc) und der Schrift wichtig. Nicht nur das Betriebssystem muss eine Skalierung der Darstellungsgröße unterstützen, sondern auch die Software. Meine Testsoftware ist in diesem Fall der SAPGUI.</p>
+<h2>SAPGUI 730</h2>
+<p>Den SAPGUI kann man skalieren indem man die Schriftgröße einstellt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190643.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4835 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190643-300x229.jpg" alt="Bild_2014_06_19_190643" width="300" height="229" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190643-300x229.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190643-1024x782.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190643-624x476.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190643.jpg 1604w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der Dialog sieht im Großen und Ganzen gut aus. Auffällig ist, dass die <em>Aufklapper</em> am TreeControl äußerst klein ausfallen. Dieser Umstand zieht sich leider durch den gesamten SAPGUI. Aus diesem Grund muss man bei der Arbeit mit einer hohen Auflösung auch bei einer großen Darstellung der Objekte eine ruhige Maushand haben.</p>
+<h2>Windows-Einstellungen</h2>
+<p>Im Folgenden möchte ich euch einfach mehr oder weniger kommentarlos ein paar Screenshots zeigen, die ich mit einer Windows-Skalierung von (meistens) 200% gemacht habe:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190619.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4823 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190619-300x184.jpg" alt="Bild_2014_06_19_190619" width="300" height="184" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190619-300x184.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190619-624x384.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190619.jpg 812w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Zum Angeben hier noch ein Screenshot meiner Auflösung:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190637.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4824 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190637-300x136.jpg" alt="Bild_2014_06_19_190637" width="300" height="136" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190637-300x136.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190637-624x283.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190637.jpg 908w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Icons und Fenster werden dadurch im Windows so dargestellt, dass ich nicht nach zwei Stunden Arbeit mit Augenkrebs rechnen muss.</p>
+<h2>Testen der SAPGUI-Elemente</h2>
+<p>Die folgenden Testst habe ich mit dem <a title="Signature Theme | SAP Design Guild" href="http://www.sapdesignguild.org/resources/visualdesign_mic.asp">Signature-Theme</a> gemacht. Um die einzelnen Controls auszuprobieren, habe ich die gängigen Entwicklungswerkzeuge geprüft und bin die SAP-Demoprogramme durchgegangen.</p>
+<p>Als erstes viel mir auf, dass die Standardicons leider alle unscharf dargestellt werden:</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4843" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190653.jpg" alt="Bild_2014_06_19_190653" width="145" height="55" /></p>
+<p>Auch die Suchhilfe sieht unschön aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190631.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4840 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190631-300x130.jpg" alt="Bild_2014_06_19_190631" width="300" height="130" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190631-300x130.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190631-1024x446.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190631-624x272.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190631.jpg 1552w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Im Startmenü sieht man deutlich, wie klein die <em>Baumaufklapper</em> sind. Auch ist gut zu erkennen, dass die Standardelemente unscharf sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190610.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4837 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190610-300x269.jpg" alt="Bild_2014_06_19_190610" width="300" height="269" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190610-300x269.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190610-624x560.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190610.jpg 760w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Hilfe zum SAPGUI ist okay:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190601.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4829 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190601-300x287.jpg" alt="Bild_2014_06_19_190601" width="300" height="287" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190601-300x287.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190601-624x597.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190601.jpg 972w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Eine Registerkarte verschluckt ein Teil der Beschriftung. Die Icons sowie die Schrift auf Drucktasten sieht sehr gequetscht aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190658.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4836 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190658-300x55.jpg" alt="Bild_2014_06_19_190658" width="300" height="55" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190658-300x55.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190658-624x115.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190658-800x148.jpg 800w, /wp-content/uploads/2014/06/Bild_2014_06_19_190658.jpg 803w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Icons im SAPLOGON werden nicht skaliert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190604.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4822 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190604-300x90.jpg" alt="Bild_2014_06_19_190604" width="300" height="90" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190604-300x90.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190604-624x188.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190604.jpg 752w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die F1-Hilfe im Performance-Assistant hat ein Problem mit dem Splitter:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190628.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4830 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190628-300x84.jpg" alt="Bild_2014_06_19_190628" width="300" height="84" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190628-300x84.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190628-1024x288.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190628-624x175.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190628.jpg 1100w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h3>Entwicklungswerkzeuge</h3>
+<p>Der Formulareditor sieht erstaunlicherweise sehr gut aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190659.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4847 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190659-300x68.jpg" alt="Bild_2014_06_19_190659" width="300" height="68" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190659-300x68.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190659-1024x233.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190659-624x142.jpg 624w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die grafische Tabellendarstellung ist okay (Transaktion SE11)</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190645.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4846 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190645-300x158.jpg" alt="Bild_2014_06_19_190645" width="300" height="158" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190645-300x158.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190645-1024x541.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190645-624x329.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190645.jpg 1302w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die SE80 hat große Probleme bei der Darstellung der Web-Elemente:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190645.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4820 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190651-300x148.jpg" alt="Bild_2014_06_19_190651" width="300" height="148" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190651-300x148.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-1024x507.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-624x308.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651.jpg 1036w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Schriftart im Editor lässt sich im übrigen einfach in der unteren rechten Ecke einstellen. Dies geht unabhängig von der Skalierung sehr gut:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_210641.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4848 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_210641-300x194.jpg" alt="Bild_2014_06_19_210641" width="300" height="194" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_210641-300x194.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_210641-624x404.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_210641.jpg 742w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Zum Vergleich: So sollte die SE80 aussehen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200629.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4827 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200629-300x184.jpg" alt="Bild_2014_06_19_200629" width="300" height="184" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_200629-300x184.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_200629-624x384.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_200629.jpg 710w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der grafische Dynproeditor sieht ebenfalls merkwürdig aus. Die Dynpro-Elemente sind deutlich größer als der Rest der Anwendung;</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190625.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4821 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190625-300x208.jpg" alt="Bild_2014_06_19_190625" width="300" height="208" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190625-300x208.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190625-1024x712.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190625-624x434.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190625.jpg 1299w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der Quickviewer sieht auf den ersten Blick gut aus. Auf den zweiten Blick fällt auf, dass die Schlüsselfelder mit einem äußerst kleinen Symbol gekennzeichnet sind. Die Überschrift in der Navigation passt nicht 100%ig. In der Drucktastenleiste sieht man wieder sehr schön, dass die Icons unscharf sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190602.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4845 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190602-300x253.jpg" alt="Bild_2014_06_19_190602" width="300" height="253" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190602-300x253.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190602-1024x866.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190602-624x527.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190602.jpg 1026w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h3>Controls</h3>
+<p>Als erstes habe ich das Calendar Control getestet. Gruselig und nicht zu verwenden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190651-2.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4844" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190651-2.jpg" alt="Bild_2014_06_19_190651 (2)" width="666" height="221" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190651-2.jpg 666w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-2-300x99.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-2-624x207.jpg 624w" sizes="(max-width: 666px) 100vw, 666px" /></a></p>
+<p>Dropdown-Listboxen werden gut dargestellt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190609.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4842 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190609-300x192.jpg" alt="Bild_2014_06_19_190609" width="300" height="192" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190609-300x192.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190609-624x399.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190609.jpg 687w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die HTML-Elemente auf Dynamischen Dokumenten sehen nicht wirklich gut aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190639.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4841 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190639-300x144.jpg" alt="Bild_2014_06_19_190639" width="300" height="144" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190639-300x144.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190639-1024x494.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190639-624x301.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190639.jpg 1129w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Das Text Control &#8211; hier ein Beispiel aus dem Materialstamm &#8211; sieht gut aus. Alle Elemente habe eine einheitliche Größe:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190654.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4839 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190654-300x140.jpg" alt="Bild_2014_06_19_190654" width="300" height="140" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190654-300x140.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190654-1024x480.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190654-624x292.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190654.jpg 1343w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Im ALV-Grid-Control fällt wieder auf, dass die Icons in der Toolbar unscharf sind. Das Element &#8220;Alle Einträge markieren&#8221; ist zu klein:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190616.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4838 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190616-300x102.jpg" alt="Bild_2014_06_19_190616" width="300" height="102" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190616-300x102.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190616-1024x348.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190616-624x212.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190616.jpg 1363w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Im Tree Control fallen erneut lediglich die kleinen Aufklapper auf (bzw. eigentlich fallen sie gar nicht auf, weil sie so klein sind&#8230;):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200604.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4828 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200604-300x87.jpg" alt="Bild_2014_06_19_200604" width="300" height="87" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_200604-300x87.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_200604-1024x298.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_200604-624x182.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_200604.jpg 1498w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der grafische Texteditor ist okay auch wenn die Listboxen zur Auswahl der Formate zu klein sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190618.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4833 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190618-300x80.jpg" alt="Bild_2014_06_19_190618" width="300" height="80" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190618-300x80.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190618-624x166.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190618.jpg 1016w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Druckansicht zeigt ein deutliches Missverhältnis zwischen Rahmen und Vorschautext:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190626-2.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4832 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190626-2.jpg" alt="Bild_2014_06_19_190626 (2)" width="290" height="309" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190626-2.jpg 290w, /wp-content/uploads/2014/06/Bild_2014_06_19_190626-2-281x300.jpg 281w" sizes="(max-width: 290px) 100vw, 290px" /></a></p>
+<h2>Fazit</h2>
+<p>Eine große Auflösung ist toll. Leider macht die Software noch nicht komplett mit. Das gilt nicht nur für den SAPGUI, auch andere Softwareprodukte haben Schwierigkeiten mit der hohen Auflösung. Die meisten Probleme sind eher kleiner Natur, jedoch stören sie für mein Empfinden den tollen Gesamteindruck eines so stark ausgestatteten Rechners. Immerhin möchte ich mit einem besseren Computer als vorher ein besseres Ergebnis haben und kein schlechteres. Ich kann also nicht empfehlen, einen Windows-Computer mit einer so hohen Auflösung zu kaufen. In vielen Fällen bringt dies Probleme mit sich. Es wird sicherlich noch ein paar Entwicklungszyklen brauchen, bis die Darstellung auf hochauflösenden Displays zufriedenstellend sein wird.</p>
+<p>Die Skalierung des SAPGUI funktioniert in den meisten Fällen gut. Anwender dürften wenig Probleme haben. Ich kann mir gut vorstellen, dass SAP in den nächsten SAPGUI-Updates die ärgerlichsten Fehler beheben wird und vielleicht gibt es demnächst auch ein High-Definition-Theme von SAP?</p>
+<p>Interessant wäre noch, wie sich das <a title="Corbu Design | SAP Design Guild" href="http://help.sap.com/saphelp_nw73ehp1/helpdata/de/13/20a20fb440434da696cb450d2a6bd3/content.htm">Corbu-Design</a> verhält.</p>
+<h2>Problemlösung</h2>
+<p>Nachdem die Darstellung des SAPGUI teilweise wirklich gruselig war und das Arbeiten im Falle der SE80 sogar stark behindert, habe ich mich entschieden, die Auflösung des Notebook-Displays einfach auf 1920&#215;1080 Pixel einzustellen. Die Auflösung des Bildschirms ist einerseits so hoch, dass ich keine Verzerrung und kein Verschwimmen bemerke und auf der anderen Seite ist sie hoch genug um viel Programm anzuzeigen. Es ist ein kleiner Wermutstropfen wenn ich meine Pferdestärken nicht ausfahren kann, aber das können mein Ego und ich verschmerzen&#8230;</p>
+<h2>Nachtrag</h2>
+<p>Wie bereits erwähnt wäre noch interessant, wie sich das Corbu-Theme verhält. Dies habe ich auch noch ausprobiert.</p>
+<p>Leider sind auch hier &#8211; wie zu erwarten &#8211; die Icons unscharf, da sie nur in einer geringen Auflösung vorliegen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180655.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4860 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180655-300x175.jpg" alt="Corbu-Theme groß" width="300" height="175" srcset="/wp-content/uploads/2014/06/Bild_2014_06_23_180655-300x175.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_23_180655-1024x598.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_23_180655-624x364.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_23_180655.jpg 1027w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Auch der SAPGUI in der Version 740 bringt leider keine Besserung&#8230;</p>
+<p>Der Beitrag <a href="/blog/high-definition-sap-ein-erfahrungsbericht/">High Definition SAP? Ein Erfahrungsbericht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/high-definition-sap-ein-erfahrungsbericht/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid-Erweiterung &#8220;Langtext&#8221;</title>
+		<link>/blog/alv-grid-erweiterung-langtext/</link>
+					<comments>/blog/alv-grid-erweiterung-langtext/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 13 Jun 2014 19:07:40 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[BAdI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4811</guid>
+
+					<description><![CDATA[<p>Immer mal wieder stolpere ich über kleine Perlen im SAP-Standard. Diese Perle ist evtl. in einem älteren System noch nicht vorhanden, aber die Funktionalität finde ich sehr nett. Gut zu wissen, dass es sowas gibt.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-erweiterung-langtext/">ALV-Grid-Erweiterung &#8220;Langtext&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute war Tag der Ablenkung. Nachdem ich in der CL_GUI_ALV_GRID-Klasse etwas herum experimentiert hatte, bin ich nun auch noch über eine Ableitung dieser Klasse mit der Erweiterung <em>Automatische Langtextermittlung</em> gestoßen: Die Klasse heißt CL_ALV_GRID_XT, das zugehörige Demoprogramm lautet R_ALV_GRID_XT.</p>
+<p>Um zu verstehen, was SAP in diesem Fall mit <em>Langtext</em> meint, habe ich eine abgespeckte Demoversion geschrieben. In diesem Programm wird die Tabelle TVKO, die die Definition der Verkaufsorganisationen enthält. Mit der automatischen Langtextermittlung  können Felder definiert werden, die entweder einen beschreibenden Text in einer zugehörigen Customizingtabelle haben, oder bei dem die Werte als Festwerte in der Domäne hinterlegt sind.</p>
+<p>Der Parameter <em>KEEP = X</em> bewirkt, dass das Schlüsselfeld angezeigt wird. Bei <em>KEEP = space</em> wird das Feld automatisch ausgeblendet und es wird nur das Feld mit dem Langtext angezeigt.</p>
+<p>[notice type = &#8216;info&#8217;]Zusätzlich gibt es die Option <em>Ausgabe optimieren</em>. Wird diese Option aktiviert, dann werden bei der Ausgabe alle komplett leeren Spalten ausgeblendet. Ein nettes Feature![/notice]</p>
+<h2>Beschreibung</h2>
+<p>Das Demoprogramm liest die Tabelle TVKO. Die Beschreibung der Verkaufsorganisationen stehen in der Texttabelle TVKOT. Um diese in einem ALV anzuzeigen müsste man entweder einen View bemühen oder die Texte aus der Tabelle manuell nachlesen. Diese Arbeit nimmt uns die Option <em>Automatische Langtextermittlung</em> ab. Um nicht extra eine neue Tabelle bzw. einen Feldkatalog aufbauen zu müssen, verwende ich vorhandene Felder, in die die Langtexte geschrieben werden. Der Name der VKORG kommt in das Feld TXNAM_KOP, der zugehörige Festwert zum Feld BSTYP ins Feld TXNAM_SDB.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_200629.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4812" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_200629.jpg" alt="Bild_2014_06_13_200629" width="724" height="126" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_200629.jpg 724w, /wp-content/uploads/2014/06/Bild_2014_06_13_200629-300x52.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_200629-624x108.jpg 624w" sizes="(max-width: 724px) 100vw, 724px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT.
+
+PARAMETER p_optim  TYPE xfeld DEFAULT 'X'.
+PARAMETER p_ltxt   TYPE xfeld DEFAULT 'X'.
+PARAMETER p_keep   TYPE xfeld DEFAULT 'X'.
+
+
+DATA gt_autotext   TYPE alv_auto_text_t.
+DATA gt_data       TYPE STANDARD TABLE OF tvko.
+DATA gr_alv        TYPE REF TO cl_alv_grid_xt.
+DATA gr_container  TYPE REF TO cl_gui_custom_container.
+
+
+START-OF-SELECTION.
+  PERFORM start_of_selection.
+
+*---------------------------------------------------------------------*
+*       Form  start_of_selection
+*---------------------------------------------------------------------*
+*       Start program execution
+*---------------------------------------------------------------------*
+FORM start_of_selection.
+
+  PERFORM get_data.
+
+  IF p_ltxt IS NOT INITIAL.
+    PERFORM prep_auto_text.
+  ENDIF.
+
+  CALL SCREEN 100.
+
+ENDFORM.                    "start_of_selection
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  prep_auto_text
+*&amp;---------------------------------------------------------------------*
+FORM prep_auto_text.
+
+  DATA ls_autotext LIKE LINE OF gt_autotext.
+
+  ls_autotext-keep_fieldname_visible = p_keep.
+  ls_autotext-fieldname              = 'VKORG'.
+  ls_autotext-fieldname_longtext     = 'TXNAM_KOP'.
+  INSERT ls_autotext INTO TABLE gt_autotext.
+
+  ls_autotext-keep_fieldname_visible = p_keep.
+  ls_autotext-fieldname              = 'BSTYP'.
+  ls_autotext-fieldname_longtext     = 'TXNAM_SDB'.
+  INSERT ls_autotext INTO TABLE gt_autotext.
+
+ENDFORM.                    "prep_auto_text
+*---------------------------------------------------------------------*
+*       Form  get_data
+*---------------------------------------------------------------------*
+*       Select application data (here SFLIGHT)
+*---------------------------------------------------------------------*
+FORM get_data.
+
+  FIELD-SYMBOLS &lt;data&gt; LIKE LINE OF gt_data.
+
+*== read all sales organizations
+  SELECT * FROM tvko INTO TABLE gt_data.
+
+*== clear fields that shall contain the long text
+  LOOP AT gt_data ASSIGNING <data>.
+    CLEAR &lt;data&gt;-txnam_kop.
+    CLEAR &lt;data&gt;-txnam_sdb.
+  ENDLOOP.
+
+ENDFORM.                    "get_data
+
+*----------------------------------------------------------------------*
+*       Module  d0100_init  OUTPUT
+*----------------------------------------------------------------------*
+*       Initialize ALV Grid screen
+*----------------------------------------------------------------------*
+MODULE d0100_init OUTPUT.
+
+  SET: PF-STATUS '100',
+       TITLEBAR  '100'.
+
+  CHECK gr_container IS INITIAL.
+
+
+*== Create ALV container
+  CREATE OBJECT gr_container
+    EXPORTING
+      container_name = 'ALV_GRID'.
+
+*== Create ALV grid
+  CREATE OBJECT gr_alv
+    EXPORTING
+      i_parent          = gr_container
+      i_optimize_output = p_optim
+      it_auto_text_det  = gt_autotext.
+
+
+* Display ALV data
+  CALL METHOD gr_alv-&gt;set_table_for_first_display
+    EXPORTING
+      i_save                        = 'A'
+      i_structure_name              = 'TVKO'
+    CHANGING
+      it_outtab                     = gt_data
+    EXCEPTIONS
+      invalid_parameter_combination = 1
+      program_error                 = 2
+      too_many_lines                = 3
+      OTHERS                        = 4.
+
+ENDMODULE.                 " d0100_init  OUTPUT
+
+*----------------------------------------------------------------------*
+*       Module  d0100_exit  INPUT
+*----------------------------------------------------------------------*
+MODULE d0100_exit INPUT.
+
+  CALL METHOD: gr_alv-&gt;free,
+               gr_container-&gt;free.
+
+  LEAVE TO SCREEN 0.
+ENDMODULE.                 " d0100_exit  INPUT</pre>
+<h2>Dynpro</h2>
+<p>Das Dynpro 100 muss angelegt werden und der GUI-Status &#8220;100&#8221; ebenfalls. Das PAI-Modul anzupassen, so dass es funktioniert, sollte ein Kinderspiel sein.</p>
+<p>[notice type=&#8217;info&#8217;]Der SAP-Demoreport bietet noch eine Funktionalität mit BAdI <em>BADI_ALV_GRID_XT </em>(Transaktion SE18). Diese werde ich mir evtl. demnächst noch einmal anschauen und berichten. Die Dokumentation verspricht einiges: &#8220;Es ist Ihnen mit Hilfe dieser Daten möglich, kundeneigene Felder im Grid zu füllen, den Feldkatalog zu ändern und sich auf Events des Grid<br />
+Controls zu registrieren, z.B. TOOLBAR oder USER_COMMAND.[/notice]</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/alv-grid-erweiterung-langtext/">ALV-Grid-Erweiterung &#8220;Langtext&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/alv-grid-erweiterung-langtext/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</title>
+		<link>/blog/dragndrop-framwork-alv-grid/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 13 Jun 2014 16:13:04 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Liste]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Zuordnung]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4805</guid>
+
+					<description><![CDATA[<p>Usability ist bei SAP ja so eine Sache... Heute habe ich eine Klasse gefunden, die Zuordnungen intuitiv und benutzerfreundlich macht. In diesem kleinen Demoprogramm zeige ich euch, wie man die Klassen benutzt.</p>
+<p>Der Beitrag <a href="/blog/dragndrop-framwork-alv-grid/">Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute bin ich beim Surfen im SAP-System über die Klasse CL_ALV_DD_LISTBOX gestolpert. Dolle Sache:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4806" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg" alt="Bild_2014_06_13_170651" width="729" height="351" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg 729w, /wp-content/uploads/2014/06/Bild_2014_06_13_170651-300x144.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_170651-624x300.jpg 624w" sizes="(max-width: 729px) 100vw, 729px" /></a></p>
+<p>&nbsp;</p>
+<p>Einfach zwei Datentabellen definieren, zwei Grids erzeugen, der Instanz von  cl_alv_dd_double_listbox übergeben und die zwei Funktionscodes zum Bewegen der Einträge definieren. Aufrufen und am Ende hat man in seinen zwei Datentabellen die vom Anwender definierten Einträge.</p>
+<p>Die Anregung stammt aus dem Report RSPLS_ENQUEUE_INFO.</p>
+<h2>Coding</h2>
+<pre>DATA gr_dd     TYPE REF TO cl_alv_dd_double_listbox.
+DATA gr_grid_s TYPE REF TO cl_alv_dd_listbox.              "source
+DATA gr_grid_t TYPE REF TO cl_alv_dd_listbox.              "target
+DATA gr_cont_s TYPE REF TO cl_gui_custom_container.        "source
+DATA gr_cont_t TYPE REF TO cl_gui_custom_container.        "target
+DATA gs_layo_s TYPE lvc_s_layo.
+DATA gs_layo_t TYPE lvc_s_layo.
+
+DATA gt_fcat   TYPE lvc_t_fcat.
+DATA gt_sort   TYPE lvc_t_sort.
+
+DATA gt_data_s TYPE STANDARD TABLE OF t006a.
+DATA gt_data_t TYPE STANDARD TABLE OF t006a.
+
+
+START-OF-SELECTION.
+
+  PERFORM init.
+
+  CALL SCREEN 100.
+
+
+*----------------------------------------------------------------------*
+*  MODULE pbo OUTPUT
+*----------------------------------------------------------------------*
+MODULE pbo OUTPUT.
+
+  SET PF-STATUS 'DD_GRID'.
+
+  PERFORM prepare_grid USING gr_grid_s
+                             gr_cont_s
+                             'CONT_SOURCE'
+                             gs_layo_s
+                             gt_data_s.
+
+  PERFORM prepare_grid USING gr_grid_t
+                             gr_cont_t
+                             'CONT_TARGET'
+                             gs_layo_t
+                             gt_data_t.
+
+  IF gr_dd IS INITIAL.
+    CREATE OBJECT gr_dd
+      EXPORTING
+        i_grid1 = gr_grid_s
+        i_grid2 = gr_grid_t.
+  ENDIF.
+
+ENDMODULE.                                                 "pbo OUTPUT
+
+
+*----------------------------------------------------------------------*
+*  MODULE pai INPUT
+*----------------------------------------------------------------------*
+MODULE pai INPUT.
+  CASE sy-ucomm.
+    WHEN 'BACK'.
+      SET SCREEN 0. LEAVE SCREEN.
+
+    WHEN 'MOVE_TO_TARGET'.
+      CALL METHOD gr_dd-&gt;movetogrid2
+        EXPORTING
+          i_ok_code = sy-ucomm.
+
+    WHEN 'MOVE_TO_SOURCE'.
+      CALL METHOD gr_dd-&gt;movetogrid1
+        EXPORTING
+          i_ok_code = sy-ucomm.
+  ENDCASE.
+
+*  IF NOT gr_dd IS INITIAL.
+*    CALL METHOD gr_dd-&gt;set_grids_state( abap_true ). "X = display/ space = edit
+*  ENDIF.
+
+ENDMODULE.                                                 "pai INPUT
+
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  prepare_grid
+*&amp;---------------------------------------------------------------------*
+FORM prepare_grid USING grid TYPE REF TO cl_alv_dd_listbox
+                        cont TYPE REF TO cl_gui_custom_container
+                        name TYPE        clike
+                        layo TYPE        lvc_s_layo
+                        data TYPE STANDARD TABLE.
+
+  IF cont IS INITIAL.
+*==   create container
+    CREATE OBJECT cont
+      EXPORTING
+        container_name = name.
+  ENDIF.
+
+  IF grid IS INITIAL.
+*== create grid
+    CREATE OBJECT grid
+      EXPORTING
+        i_parent     = cont
+        i_grid_style = 1.
+
+*== set  grid
+    CALL METHOD grid-&gt;set_table_for_first_display
+      EXPORTING
+        is_layout       = layo
+      CHANGING
+        it_outtab       = data
+        it_fieldcatalog = gt_fcat
+        it_sort         = gt_sort.
+  ELSE.
+*== refresh
+    CALL METHOD grid-&gt;set_frontend_fieldcatalog
+      EXPORTING
+        it_fieldcatalog = gt_fcat.
+    CALL METHOD grid-&gt;set_frontend_layout
+      EXPORTING
+        is_layout = gs_layo_s.
+    CALL METHOD grid-&gt;refresh_table_display.
+  ENDIF.
+
+ENDFORM.                    "prepare_grid
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  init
+*&amp;---------------------------------------------------------------------*
+FORM init.
+
+*== local data
+  FIELD-SYMBOLS  LIKE LINE OF gt_fcat.
+
+*== get source data
+  SELECT * FROM t006a INTO TABLE gt_data_s
+      UP TO 20 ROWS
+   WHERE spras = sy-langu.
+
+
+*== set title for source:
+  gs_layo_s-grid_title = text-003.
+  gs_layo_s-smalltitle = 'X'.
+  gs_layo_s-cwidth_opt = 'X'.
+  gs_layo_s-sel_mode   = 'A'.
+
+*== set title for target:
+  gs_layo_t-grid_title = text-004.
+  gs_layo_t-smalltitle = 'X'.
+  gs_layo_t-cwidth_opt = 'X'.
+  gs_layo_t-sel_mode   = 'A'.
+
+*== get fieldcatalog
+  CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_structure_name       = 'T006A'
+      i_client_never_display = 'X'
+    CHANGING
+      ct_fieldcat            = gt_fcat
+    EXCEPTIONS
+      OTHERS                 = 3.
+
+*== display only unit and text
+  LOOP AT gt_fcat ASSIGNING .
+    CASE -fieldname.
+      WHEN 'MSEHI' OR 'MSEH3' OR 'MSEH6'.
+        -tech = abap_true.
+    ENDCASE.
+  ENDLOOP.
+
+ENDFORM.                    "init</pre>
+<h2>Dynpro</h2>
+<h3>Ablauflogik</h3>
+<p>PROCESS BEFORE OUTPUT.<br />
+MODULE pbo.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE pai.</p>
+<h2><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4808" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg" alt="Bild_2014_06_13_180645" width="562" height="423" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg 562w, /wp-content/uploads/2014/06/Bild_2014_06_13_180645-300x225.jpg 300w" sizes="(max-width: 562px) 100vw, 562px" /></a></h2>
+<h2>GUI-Status</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4807" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg" alt="Bild_2014_06_13_180616" width="808" height="483" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg 808w, /wp-content/uploads/2014/06/Bild_2014_06_13_180616-300x179.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_180616-624x373.jpg 624w" sizes="(max-width: 808px) 100vw, 808px" /></a></p>
+<p>[notice type = &#8216;info&#8217;]Leider haben die Klassen eine kleine Macken. Sobald die ersten Einträge per Funktionstasten verschoben wurden, erscheint die Markierspalte und es ist kein Drag-and-Drop mehr möglich&#8230; :([/notice]</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/dragndrop-framwork-alv-grid/">Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

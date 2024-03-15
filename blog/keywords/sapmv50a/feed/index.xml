@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>SAPMV50A Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/sapmv50a/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 29 Nov 2013 16:59:41 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>SAPMV50A Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Zugriff auf Außenhandelsdaten beim Sichern</title>
+		<link>/blog/zugriff-auf-aussenhandelsdaten-beim-sichern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 31 Mar 2004 00:23:06 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<category><![CDATA[SAPMV50A]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=229</guid>
+
+					<description><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie beim Sichern der Lieferung Einflu&#223; auf die Au&#223;enhandelsdaten der Position nehmen k&#246;nnen. </p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-aussenhandelsdaten-beim-sichern/">Zugriff auf Außenhandelsdaten beim Sichern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie beim Sichern der Lieferung Einflu&szlig; auf die Au&szlig;enhandelsdaten der Position nehmen k&ouml;nnen. <br /><P class="text1">In dem folgenden Coding wird die statistische Warennummer der Lieferpositionen ge&auml;ndert. </P><P class="text1"><STRONG><U>Achtung:</U></STRONG> Es werden die Au&szlig;enhandelsdaten nur dann ge&auml;ndert, wenn w&auml;hrend der Lieferungsbearbeitung auf die Au&szlig;enhandelsdaten zugegriffen wurde!</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* <BR>* Aufruf aus USEREXIT_SAVE_DOCUMENT_PREPARE <BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* <BR>* &Auml;ndern der Statistischen Warennummer der&nbsp;Au&szlig;enhandelsdaten <BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* </FONT></P><P class="sap1"><FONT color="#fb2412">*&#8211; Datendeklaration<BR></FONT>DATA zxt_xlips&nbsp;&nbsp;&nbsp;&nbsp; LIKE xlips&nbsp; OCCURS 0 WITH HEADER LINE. <BR>DATA zxl_eipo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE eipovb. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Feldsymbole</FONT><BR>FIELD-SYMBOLS &lt;xeipo&gt; STRUCTURE eipovb DEFAULT zxl_eipo. <BR>FIELD-SYMBOLS &lt;teipo&gt; TYPE ANY TABLE. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Daten&auml;nderung nur beim Anlegen/ &Auml;ndern einer Lieferung</FONT><BR>IF t180-trtyp = &#8216;H&#8217; OR t180-trtyp = &#8216;V&#8217;. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Dirty Assign auf Aussenhandelspositionsdaten in FUGR V50E</FONT> <BR>&nbsp; UNASSIGN &lt;teipo&gt;. <BR>&nbsp; ASSIGN (&#8216;(SAPLV50E)XEIPO[]&#8217;) TO &lt;teipo&gt;. </P><P class="sap1">&nbsp; IF &lt;teipo&gt; IS ASSIGNED. <BR><FONT color="#fb2412">*&#8211; Au&szlig;enhandelsdaten bearbeiten<BR></FONT>&nbsp;&nbsp;&nbsp; LOOP AT &lt;teipo&gt; ASSIGNING &lt;xeipo&gt;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK &lt;xeipo&gt;-updkz &lt;&gt; &#8216;D&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READ TABLE xlips INTO zxt_xlips WITH KEY posnr = &lt;xeipo&gt;-expos. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK sy-subrc = 0. <BR><FONT color="#fb2412">*&#8211; &Auml;ndern der stat. Warennummer&nbsp;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF &lt;xeipo&gt;-stawn &lt;&gt; zxt_xlips-zz_nimex. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-stawn = &#8216;Tricktresor&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF &lt;xeipo&gt;-updkz = space.<BR><FONT color="#fb2412">*&#8211; Updatekennzeichen setzen<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-updkz = &#8216;U&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF. <BR>&nbsp;&nbsp;&nbsp; ENDLOOP. <BR>&nbsp; ENDIF. </P><P class="sap1">ENDIF. </P></p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-aussenhandelsdaten-beim-sichern/">Zugriff auf Außenhandelsdaten beim Sichern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Zugriff auf Außenhandelsdaten</title>
+		<link>/blog/zugriff-auf-aussenhandelsdaten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 31 Mar 2004 00:08:39 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV50A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=228</guid>
+
+					<description><![CDATA[<p>In der Lieferung haben Sie kaum M&#246;glichkeiten, auf die Au&#223;enhandelsdaten zuzugreifen. Wir zeigen Ihnen jedoch eine M&#246;glichkeit des Zugriffs. Das Lesen der Daten ist mittels Funktionsbaustein einfach, das Ver&#228;ndern erfordert jedoch ein trickreicheres Vorgehen...</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-aussenhandelsdaten/">Zugriff auf Außenhandelsdaten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In der Lieferung haben Sie kaum M&ouml;glichkeiten, auf die Au&szlig;enhandelsdaten zuzugreifen. Wir zeigen Ihnen jedoch eine M&ouml;glichkeit des Zugriffs. Das Lesen der Daten ist mittels Funktionsbaustein einfach, das Ver&auml;ndern erfordert jedoch ein trickreicheres Vorgehen&#8230;<br /><P>In diesem Fall stellen wir Ihnen Coding vor, mit dem Sie aus der Routine &nbsp;USEREXIT_MOVE_FIELD_TO_LIPS die Au&szlig;enhandelsdaten einer Position &auml;ndern k&ouml;nnen. Falls diese Position keine Au&szlig;enhandelsdaten haben sollte, so kann dies jedoch erzwungen werden.</P><P>Der Grund hierf&uuml;r k&ouml;nnte sein, dass die Ware nicht an den Warenempf&auml;nger verschickt wird, sondern ein Handelsb&uuml;ro im Inland, dass die Waren weiter ins Ausland versendet. Da der Warenempf&auml;nger im Inland ist, werden keine Au&szlig;enhandelsdaten angelegt.</P><P>Das folgende Coding gilt f&uuml;r das Release 4.6C.</P><P><STRONG><U>ACHTUNG:</U></STRONG> Bitte beachten Sie, dass wir keine Garantie f&uuml;r das hundertprozentige Funktionieren geben k&ouml;nnen und nicht f&uuml;r Fehler haften! Bitte testen Sie deswegen Ihre Prozesse ausreichend, um sicherzustellen, dass diese Routine in Ihrem System verwendet werden kann!!</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* * Aufruf aus USEREXIT_MOVE_FIELD_TO_LIPS <BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* <BR>* &Auml;ndern der Statistischen Warennummer der&nbsp;Au&szlig;enhandelsdaten <BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-* </FONT></P><P class="sap1"><FONT color="#fb2412">*&#8211; Variablendeklaration</FONT><BR>DATA zxt_xlips&nbsp;&nbsp;&nbsp;&nbsp; LIKE xlips&nbsp; OCCURS 0 WITH HEADER LINE. <BR>DATA zxl_eipo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE eipo. <BR>DATA zxl_xeipo&nbsp;&nbsp;&nbsp;&nbsp; LIKE eipovb. <BR>DATA zxt_xeipo&nbsp;&nbsp;&nbsp;&nbsp; LIKE eipovb OCCURS 0 WITH HEADER LINE. <BR>DATA zxv_exist&nbsp;&nbsp;&nbsp;&nbsp; TYPE c. <BR>DATA zxl_eipo_old&nbsp; LIKE eipo. <BR>DATA zxl_eipo_dl&nbsp;&nbsp; LIKE eipo. <BR>DATA zxl_item_exist. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Feldsymbole<BR></FONT>FIELD-SYMBOLS &lt;eipo&gt;&nbsp; STRUCTURE eipo&nbsp;&nbsp; DEFAULT zxl_eipo. <BR>FIELD-SYMBOLS &lt;xeipo&gt; STRUCTURE eipovb DEFAULT zxl_xeipo. <BR>FIELD-SYMBOLS &lt;teipo&gt; TYPE ANY TABLE. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Aufruf beim Anlegen oder &Auml;ndern einer Position<BR></FONT>IF ( t180-trtyp = &#8216;H&#8217; OR t180-trtyp = &#8216;V&#8217; ) AND NOT lips IS INITIAL. </P><P class="sap1">&nbsp; UNASSIGN &lt;teipo&gt;. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Lesend der Exportdaten </FONT><BR>&nbsp; CALL FUNCTION &#8216;EXPIMP_ITEM_DATA_READ&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exnum&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = likp-exnum <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; expos&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lips-posnr <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e_line_item_exists = zxl_item_exist. </P><P class="sap1">&nbsp; IF zxl_item_exist = space. <BR><FONT color="#fb2412">*&#8211; Keine Exportdaten vorhanden: F&uuml;llen <BR></FONT>&nbsp;&nbsp;&nbsp; PERFORM lips_fuellen_export(sapfv50p). <BR>&nbsp; ELSE. <BR><FONT color="#fb2412">*&#8211; Exportdaten sind vorhanden: Bereitstellen</FONT> <BR>&nbsp;&nbsp;&nbsp; PERFORM eipo_bereitstellen(saplv50e). <BR>&nbsp; ENDIF. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Dirty Assign auf Aussenhandelspositionsdaten in FUGR V50E</FONT> <BR>&nbsp; ASSIGN (&#8216;(SAPLV50E)XEIPO[]&#8217;) TO &lt;teipo&gt;. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Exportdaten bearbeiten</FONT> <BR>&nbsp; IF &lt;teipo&gt; IS ASSIGNED. <BR>&nbsp;&nbsp;&nbsp; LOOP AT &lt;teipo&gt; ASSIGNING &lt;xeipo&gt;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK &lt;xeipo&gt;-expos = lips-posnr. <BR><FONT color="#fb2412">*&#8211; setzen der Stat. Warennummer&nbsp;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-stawn = &#8216;Tricktresor&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-herkl = &#8216;FR&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-herkr = &#8217;02&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-exprf = &#8216;10000&#8217;. <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;xeipo&gt;-exart = &#8217;11&#8217;.&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT. <BR>&nbsp;&nbsp;&nbsp; ENDLOOP. <BR>&nbsp; ENDIF. </P><P class="sap1"><FONT color="#fb2412">*&#8211; Falls noch keine EXNUM im Lieferkopf steht, dies nun nachholen: </FONT><BR>&nbsp; READ TABLE xlikp WITH KEY vbeln = likp-vbeln. <BR>&nbsp; IF sy-subrc = 0 AND xlikp-exnum IS INITIAL. <BR>&nbsp;&nbsp;&nbsp; xlikp-exnum = likp-exnum. <BR>&nbsp;&nbsp;&nbsp; MODIFY xlikp INDEX sy-tabix. <BR>&nbsp; ENDIF. <BR>ENDIF. </P></p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-aussenhandelsdaten/">Zugriff auf Außenhandelsdaten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Save_Document</title>
+		<link>/blog/save_document/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 27 Aug 2003 13:24:24 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV50A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=128</guid>
+
+					<description><![CDATA[<p>Richtlinie zur Bearbeitung der Lieferpositionen im USEREXIT_SAVE_DOCUMENT.</p>
+<p>Der Beitrag <a href="/blog/save_document/">Save_Document</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Richtlinie zur Bearbeitung der Lieferpositionen im USEREXIT_SAVE_DOCUMENT.<br /><P class="sap1"><FONT color="#fb2412">*&#8211; Bearbeitung der Lieferpositionen</FONT><BR>loop at xlips where vbeln eq likp-vbeln<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and updkz ne updkz_delete.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Interne Indices setzen</FONT><BR>&nbsp;&nbsp;ilips-tabix = sy-tabix.<BR>&nbsp; slips-tabix = sy-tabix.<BR><FONT color="#fb2412">*&#8211; Bearbeiten vorbereiten</FONT><BR>&nbsp; perform lips_bearbeiten_vorbereiten(sapfv50p).<BR><BR><FONT color="#fb2412">*&#8211;&nbsp;Hier Felder der XLIPS &auml;ndern</FONT><BR>&nbsp; &#8230;<BR>&nbsp; &#8230;<BR><BR><FONT color="#fb2412">*&#8211; Bearbeitung abschliessen</FONT><BR>&nbsp; perform lips_bearbeiten(sapfv50p).</P><P class="sap1">endloop.<BR></P><P class="sap1">&nbsp;</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/save_document/">Save_Document</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

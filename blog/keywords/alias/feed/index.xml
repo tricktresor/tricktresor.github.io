@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ALIAS Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/alias/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:50 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ALIAS Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Feldname mit doppeltem Feldnamen</title>
+		<link>/blog/feldname-mit-doppeltem-feldnamen/</link>
+					<comments>/blog/feldname-mit-doppeltem-feldnamen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 29 Sep 2016 09:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Dynamische Struktur]]></category>
+		<category><![CDATA[Struktur]]></category>
+		<category><![CDATA[ALIAS]]></category>
+		<category><![CDATA[Gruppenname]]></category>
+		<category><![CDATA[Include]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[assign]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=843204</guid>
+
+					<description><![CDATA[<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt. Was aber, wenn sich die Feldnamen unterscheiden?</p>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hä?</p>
+<p>Die nordfriesisch höfliche Nachfrage ist berechtigt. Wie kann ein Feldname einen doppelten Feldnamen besitzen? Aber der Reihe nach. Erst das Problem, dann die Idee und zum Schluss die Lösung.</p>
+<h2>MOVE-CORRESPONDING</h2>
+<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt.</p>
+<p>&lt;offtopic&gt;Eigentlich müsste der Befehl dann ja COPY-CORRESPONDING heißen, denn der Feldinhalt wird ja nicht verschoben, sondern kopiert&#8230;&lt;/offtopic&gt;.</p>
+<p>Der Befehl birgt aber auch Tücken, denn die Feldnamen müssen immer gleich sein. Häufig hat man jedoch den Fall, dass Feldnamen &#8211; trotz gleicher Funktion und gleichem Datenelement &#8211; in verschiedenen Strukturen anders heißen. Zum Beispiel könnte das Feld in der Quellstruktur LIFNR heißen, in der Zielstruktur heißt es jedoch LIEFERANT.</p>
+<p>Ein nachträgliches MOVE ist in diesem Fall erforderlich:</p>
+<pre>MOVE quell_struktur-lifnr TO ziel_struktrur-lieferant.</pre>
+<p>Das ist nicht weiter schlimm. Wenn man jedoch eine dynamische Struktur als Quellstruktur hat, dann muss man umständlich mittels ASSIGN COMPONENT den Quellwert lesen und dann zuweisen. Das ist umständlich und gegebenenfalls auch zeitkritisch.</p>
+<pre>ASSIGN COMPONENT 'LIFNR' OF STRUCTURE dynamische_quell_struktur TO FIELD-SYMBOLS(&lt;lifnr&gt;).
+IF sy-subrc = 0.
+  ziel_struktur-lieferant = &lt;lifnr&gt;.
+ENDIF.</pre>
+<p>Sofern es sich um kundeneigene Tabellen handelt, kann man den folgenden Trick anwenden und quasi einen ALIAS vergeben:</p>
+<h2>ALIAS-Feldname</h2>
+<p>Stichwort: Benanntes Include. Wir machen uns den Umstand zu Nutze, dass man ein Include in eine Tabelle einbinden kann und dieses Include benennen kann. Das ist eigentlich für inkludierte Strukturen gedacht, um zum Beispiel die komplette Tabelle MARA per Include einbinden zu können und diese auch MARA benennen zu können. Die komplette Struktur MARA steht dann in der inkludierten Struktur zur Verfügung:</p>
+<pre>SELECT * FROM MARA INTO my_struc-mara WHERE...</pre>
+<p>Wir verwenden diese <em>Gruppe</em> nun nicht für eine inkludierte Struktur, sondern nur für ein inkludiertes <em>Feld</em>. Die Technik ist die gleiche.</p>
+<p>Die Tabelle bestand vorher aus den Feldern</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>KENNZ</li>
+</ul>
+<p>Ich möchte diese Tabelle nun so abändern, dass das Feld KENNZ auch unter dem Namen KENNZEICHEN ansprechbar ist. Dafür lege ich einen Include an, der nur das eine Feld KENNZ enthält. Dieses Include wird in die Tabelle eingebunden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-843270" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg" alt="2016-09-26_18-01-48" width="802" height="310" srcset="/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg 802w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-300x116.jpg 300w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-768x297.jpg 768w" sizes="(max-width: 802px) 100vw, 802px" /></a></p>
+<p>Die Struktur der Tabelle ist hinterher genau so, wie vorher:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg"><img decoding="async" class="alignnone size-full wp-image-843271" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg" alt="2016-09-26_18-02-48" width="441" height="224" srcset="/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg 441w, /wp-content/uploads/2016/09/2016-09-26_18-02-48-300x152.jpg 300w" sizes="(max-width: 441px) 100vw, 441px" /></a></p>
+<h2>Die richtige Ansprache</h2>
+<p>Den Vorteil, den ich jetzt habe: ich kann das Feld mit dem richtigen Namen KENNZ und mit dem <em>Alias KENNZEICHEN</em>, dem <em>Gruppennamen des Includes</em> ansprechen:</p>
+<pre>DATA lt_tt1 TYPE STANDARD TABLE OF ztt1.
+DATA ls_tt1 TYPE ztt1.
+
+
+SELECT * FROM ztt1 INTO TABLE lt_tt1.
+
+LOOP AT lt_tt1 INTO ls_tt1.
+ IF ls_tt1-kennz = 'X'.
+   ls_tt1-kennzeichen = 'F'.
+ ENDIF.
+ WRITE: / ls_tt1-matnr, ls_tt1-kennz.
+ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/feldname-mit-doppeltem-feldnamen/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

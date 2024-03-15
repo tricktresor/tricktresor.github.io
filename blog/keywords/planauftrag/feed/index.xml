@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Planauftrag Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/planauftrag/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:48 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Planauftrag Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Application-Event stört gewaltig&#8230;</title>
+		<link>/blog/application-event-stoert-gewaltig/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 17 Feb 2017 17:53:43 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<category><![CDATA[Folgebildsteuerung]]></category>
+		<category><![CDATA[Planauftrag]]></category>
+		<category><![CDATA[CO41]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017905</guid>
+
+					<description><![CDATA[<p>Aufgabe: Transaktion CO41 - Umsetzung Planaufträge um ein paar Funktionen zu erweitern. Ich entschied mich dafür, an geeigneter Stelle einen Docking-Container mit einem Dynamischen Dokument anzubinden. Durch Drucktasten und Eingabefelder wollte ich die geforderte Funktionalität abbilden. Doch leider machte mir eine Fehlermeldung schwer zu schaffen...</p>
+<p>Der Beitrag <a href="/blog/application-event-stoert-gewaltig/">Application-Event stört gewaltig&#8230;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich bekam die Aufgabe, die Transaktion CO41 &#8211; Umsetzung Planaufträge um ein paar Funktionen zu erweitern. Nach einigem Hin- und Herüberlegen entschied ich mich dafür, an geeigneter Stelle (Include LCOUPF1N &#8211; Routine INIT_FBILD) mittels impliziter Erweiterung einen Docking-Container mit einem <a href="https://tricktresor.com/blog/dynamische-dokumente/">Dynamischen Dokument</a> anzubinden. Der Docking Container war schnell erstellt und auch die ersten Zeichen inklusive Drucktaste waren zügig gezaubert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-33-33.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017906 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-33-33.jpg" alt="" width="493" height="280" srcset="/wp-content/uploads/2017/02/2017-02-17_18-33-33.jpg 493w, /wp-content/uploads/2017/02/2017-02-17_18-33-33-300x170.jpg 300w, /wp-content/uploads/2017/02/2017-02-17_18-33-33-148x85.jpg 148w, /wp-content/uploads/2017/02/2017-02-17_18-33-33-71x40.jpg 71w" sizes="(max-width: 493px) 100vw, 493px" /></a></p>
+<p>Leider funktioniert dieser erste Wurf nicht, denn nach Drücken des Druckknopfes wurde nicht meine registrierte Methode angesprungen, sondern es kam die Meldung &#8220;Die angeforderte Funktion %_GC 1 ist hier nicht vorgesehen&#8221;.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-36-01.jpg"><img decoding="async" class="size-full wp-image-1017907 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-36-01.jpg" alt="" width="473" height="139" srcset="/wp-content/uploads/2017/02/2017-02-17_18-36-01.jpg 473w, /wp-content/uploads/2017/02/2017-02-17_18-36-01-300x88.jpg 300w" sizes="(max-width: 473px) 100vw, 473px" /></a></p>
+<p>Ich brauchte lange, um herauszufinden, dass die in einigen von der SAP verwendete <a href="https://tricktresor.com/blog/folgebildsteuerung/">FBS &#8211; Folgebildsteuerung</a> der Grund für die Meldung war (Funktionsbaustein SCREEN_SEQUENCE_CONTROL). Beziehungsweise war das nicht in erster Linie der Grund, sondern der Umstand, dass bei den Dynamischen Dokumenten die zugehörigen Events alle standardmäßig als &#8220;application events&#8221; registriert werden. Das hat zur Folge, dass die Ereignissteuerung nicht nur innerhalb der Klasse durchgeführt wird, sondern einen &#8220;Umweg&#8221; über das Dynpro macht. Es wird in dem Fall ein Funktionscode ausgelöst, bei dem das <em>PAI &#8211; Process After Input</em> durchlaufen wird.</p>
+<p>Meistens ist das egal, denn es werden vom Programm in der Regel nur die Funktionscodes abgeprüft, die auch definiert wurden. Man kann also in einer Transaktion &#8220;JIFDIJIFG&#8221; eingeben und es passiert nichts. In der CO41 kann man das jedoch nicht, da für jeden Funktionscode in einer Tabelle nachgeprüft wird, wie bei diesem Funktionscode verfahren werden soll. Findet der Funktionsbaustein SCREEN_SEQUENCE_CONTROL keinen Eintrag, dann kommt die oben genannte Meldung.</p>
+<h2>Lösung</h2>
+<p>Ich machte mich schon darauf gefasst, die Klasse CL_DD_DOCUMENT abzuleiten, um die Methode DISPLAY, in der die Ereignisregistrierung stattfindet, zu redefinieren. Glücklicherweise ist das HTML-Objekt, in dem das Dynamische Dokument angezeigt wird und für das die Ereignisse registriert werden, öffentlich. Dadurch konnte ich das Ereignis SAPEVENT erneut, aber diesmal <strong>ohne</strong> APPL_EVENT, registrieren:</p>
+<pre class="">document-&gt;merge_document( ).
+document-&gt;display_document( parent = docker ).
+DATA(html) = document-&gt;html_control.
+
+DATA: myevent_tab TYPE cntl_simple_events,
+myevent TYPE cntl_simple_event.
+myevent-eventid = html-&gt;m_id_sapevent.
+myevent-appl_event = ' '.
+APPEND myevent TO myevent_tab.
+html-&gt;set_registered_events( events = myevent_tab ).</pre>
+<p>Nun konnte ich endlich meine Tasten drücken, ohne dass mir die Folgebildsteuerung in die Quere kam.</p>
+<p>Der Beitrag <a href="/blog/application-event-stoert-gewaltig/">Application-Event stört gewaltig&#8230;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

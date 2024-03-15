@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ZIP Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/zip/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:52 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ZIP Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Serialize me</title>
+		<link>/blog/serialize-me/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Dec 2015 17:42:33 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ZIP]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[call transformation]]></category>
+		<category><![CDATA[interface]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=368973</guid>
+
+					<description><![CDATA[<p>Serialisierung von Objekten. Was ist das? Wozu braucht man das? Wie kann man es sinnvoll nutzen? </p>
+<p>Der Beitrag <a href="/blog/serialize-me/">Serialize me</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Interface IF_SERIALIZABLE_OBJECT läuft einem hin und wieder in SAP-Standardklassen über den Weg.</p>
+<h2>Was ist Serialisierung?</h2>
+<p>Wikipedia sagt über <a href="https://de.wikipedia.org/wiki/Serialisierung">Serialisierung</a>:</p>
+<blockquote><p>Die <b>Serialisierung</b> ist in der Informatik eine Abbildung von strukturierten Daten auf eine sequenzielle Darstellungsform.</p></blockquote>
+<p>Eine der bekanntesten Anwendungen für die Serialisierung ist das JSON-Format, in dem komplexe Daten in einer lesbaren Form dargestellt werden können.</p>
+<p>Eine andere Form der Serialisierung lässt sich mit XML bewerkstelligen.</p>
+<h2>Interface IF_SERIALIZABLE_OBJECT</h2>
+<p>Damit ein Objekt (Klasse) serialisierbar ist, muss es das Interface IF_SERIALIZABLE_OBJECT implementieren:</p>
+<pre>CLASS lcl_serialize_me DEFINITION.
+ PUBLIC SECTION.
+ INTERFACES if_serializable_object.
+
+ DATA mt_t005  TYPE STANDARD TABLE OF t005.
+ DATA mt_t005t TYPE STANDARD TABLE OF t005t.
+
+ENDCLASS.</pre>
+<p>Zur Demonstration habe ich die zwei öffentlichen Attribute MT_T005 und MT_T005T hinzugefügt.</p>
+<p>Um die Klasse nutzen zu können, muss sie instantiiert werden:</p>
+<pre>DATA ref TYPE REF TO lcl_serialize_me.
+CREATE OBJECT ref.</pre>
+<p>In die Tabellen laden wir nun alle EG-Länder inklusive Texte:</p>
+<pre> SELECT * FROM t005 INTO TABLE ref-&gt;mt_t005 WHERE xegld = abap_true.
+ IF sy-subrc = 0.
+   SELECT * FROM t005t INTO TABLE ref-&gt;mt_t005t
+      FOR ALL ENTRIES IN ref-&gt;mt_t005
+    WHERE land1 = ref-&gt;mt_t005-land1
+      AND spras = sy-langu.
+ ENDIF.
+</pre>
+<p>Somit haben wir eine Objektreferenz erzeugt, die ein paar Daten enthält.</p>
+<p>Diese Daten sind auch serialisierbar. Andere Daten, wie zum Beispiel Attribute mit Referenzen zu anderen Klassen, sind nicht serialisierbar.</p>
+<p>Deswegen darf das Interface IF_SERIALIZABLE_OBJECT nur dann implementiert werden, wenn alle Attribute der Klasse für die Serialisierung geeignet sind.</p>
+<h2>Serialisierung</h2>
+<p>Nun soll das Objekt mittels XML serialisiert werden. Das geht schnell und einfach:</p>
+<pre>DATA ser TYPE string.</pre>
+<pre>CALL TRANSFORMATION id
+     SOURCE model = ref
+     RESULT XML ser.</pre>
+<p>Das Ergebnis ist ein lesbarer XML-String (Ausschnitt):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-20-37.png"><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-368974" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-20-37-300x168.png" alt="2015-12-02_18-20-37" width="300" height="168" srcset="/wp-content/uploads/2015/12/2015-12-02_18-20-37-300x168.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-20-37-1024x572.png 1024w, /wp-content/uploads/2015/12/2015-12-02_18-20-37.png 1145w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Tipp: Im Debugger ist es möglich, einen XML-String komplett darstellen zu lassen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-21-08.png"><img decoding="async" class="alignnone size-medium wp-image-368975" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-21-08-300x101.png" alt="2015-12-02_18-21-08" width="300" height="101" srcset="/wp-content/uploads/2015/12/2015-12-02_18-21-08-300x101.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-21-08.png 960w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Speicherplatz sparen</h2>
+<p>Da die Tabellen gefüllt sind, ist das Objekt recht groß geworden. Mit GZIP schrumpfen wir es auf eine kleinere Größe:</p>
+<pre>DATA zip TYPE xstring.
+cl_abap_gzip=&gt;compress_text(
+     EXPORTING text_in  = ser
+     IMPORTING gzip_out = zip ).</pre>
+<p>Dies aber nur nebenbei&#8230;</p>
+<h2>Deserialisierung</h2>
+<p>Nun möchten wir das serialisierte Objekt natürlich irgendwo speichern, ablegen oder verschicken.</p>
+<p>Das ist jedoch nur sinnvoll, wenn wir es auch wieder deserialisieren können&#8230;</p>
+<p>Die Objektreferenz ist in dem Fall natürlich leer:</p>
+<pre>CLEAR ref.
+</pre>
+<p>Die Deserialisierung funktioniert ebenfalls mittel CALL TRANSFORMATION in der Standardvariante:</p>
+<pre>CALL TRANSFORMATION id
+     SOURCE XML ser
+     RESULT model = ref.</pre>
+<p>Im Debugger kannst du überprüfen, dass die komplette Referenz wiederhergestellt wurde. Das ist fast schon Zauberei&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Vielen Dank an Haubi für diese Idee!</p>
+<h2>Nutzen</h2>
+<p>Wozu die Serialisierung und Deserialisierung tatsächlich nützlich ist, wird man wahrscheinlich erst wissen, wenn man es braucht. Daher ist es in jedem Fall gut zu wissen, dass es funktioniert.</p>
+<h2>DEMO</h2>
+<p>Ein einfaches Demoprogramm ist DEMO_SERIALIZABLE_OBJECT. Hier wird ebenfalls die Serialisierung demonstriert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-41-07.png"><img decoding="async" class="alignnone size-medium wp-image-368977" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-41-07-300x269.png" alt="2015-12-02_18-41-07" width="300" height="269" srcset="/wp-content/uploads/2015/12/2015-12-02_18-41-07-300x269.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-41-07-1024x917.png 1024w, /wp-content/uploads/2015/12/2015-12-02_18-41-07.png 1116w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Wer ein komplexes Demoprogramm zur Konvertierung von (Daten-) Typen sehen möchte, sollte sich das Programm STRANSDEMO_FLIGHTS anschauen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-37-23.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-368976" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-37-23-300x237.png" alt="2015-12-02_18-37-23" width="300" height="237" srcset="/wp-content/uploads/2015/12/2015-12-02_18-37-23-300x237.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-37-23-1024x810.png 1024w, /wp-content/uploads/2015/12/2015-12-02_18-37-23.png 1466w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Viel Spaß damit; mir ist es zu kompliziert!</p>
+<p>Der Beitrag <a href="/blog/serialize-me/">Serialize me</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

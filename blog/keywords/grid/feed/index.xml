@@ -1,0 +1,929 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>grid Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/grid/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:59 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>grid Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Gruppensummenstufenberechnung</title>
+		<link>/blog/gruppensummenstufenberechnung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 15 Dec 2015 22:06:40 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Gruppe]]></category>
+		<category><![CDATA[Gruppenstufe]]></category>
+		<category><![CDATA[refresh]]></category>
+		<category><![CDATA[soft-refresh]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=389721</guid>
+
+					<description><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten...</p>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten&#8230;</p>
+<p>Vielen Dank an Stefan, der sich die Mühe gemacht hat, ein Minimaldemo zu erstellen.</p>
+<h2>Gruppenstufen</h2>
+<p>Nach dem Start des Demoprogramms erscheint ein &#8220;normaler&#8221; ALV mit Daten aus der Flugdatenbank:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" rel="attachment wp-att-389724"><img fetchpriority="high" decoding="async" class="alignnone wp-image-389724 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" alt="2015-12-15_22-48-55" width="741" height="327" srcset="/wp-content/uploads/2015/12/2015-12-15_22-48-55.png 741w, /wp-content/uploads/2015/12/2015-12-15_22-48-55-300x132.png 300w" sizes="(max-width: 741px) 100vw, 741px" /></a></p>
+<p>Bei normaler Summierung und Bildung von Gruppenstufen, gibt es keine Bezeichnung der gebildeten Gruppen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" rel="attachment wp-att-389725"><img decoding="async" class="alignnone size-full wp-image-389725" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" alt="2015-12-15_22-50-50" width="740" height="285" srcset="/wp-content/uploads/2015/12/2015-12-15_22-50-50.png 740w, /wp-content/uploads/2015/12/2015-12-15_22-50-50-300x116.png 300w" sizes="(max-width: 740px) 100vw, 740px" /></a></p>
+<p>Die Bildung der Gruppenbezeichnung kann sehr komplex werden. Das Beispiel demonstriert die Bezeichnung der Gruppenstufen im Feld &#8220;PLANETYPE&#8221;:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" rel="attachment wp-att-389723"><img decoding="async" class="alignnone wp-image-389723 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" alt="2015-12-15_22-41-44" width="752" height="322" srcset="/wp-content/uploads/2015/12/2015-12-15_22-41-44.png 752w, /wp-content/uploads/2015/12/2015-12-15_22-41-44-300x128.png 300w" sizes="(max-width: 752px) 100vw, 752px" /></a></p>
+<p>&nbsp;</p>
+<h2>Code</h2>
+<pre>REPORT zdemo_alv_summenzeilen.
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_helper DEFINITION FINAL.
+ PUBLIC SECTION.
+
+ CLASS-METHODS: read_data,
+ display,
+ handle_after_user_command FOR EVENT after_user_command OF cl_gui_alv_grid,
+ summenzeilen_anpassen.
+
+ CLASS-DATA: mo_grid TYPE REF TO cl_gui_alv_grid,
+ mt_data TYPE STANDARD TABLE OF saplane WITH NON-UNIQUE DEFAULT KEY.
+ENDCLASS. "lcl_helper DEFINITION
+
+
+START-OF-SELECTION.
+ lcl_helper=&gt;read_data( ).
+
+END-OF-SELECTION.
+ lcl_helper=&gt;display( ).
+
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_helper IMPLEMENTATION.
+
+ METHOD read_data.
+
+ SELECT *
+ INTO TABLE mt_data
+ FROM saplane.
+
+ ENDMETHOD. "read_data
+
+ METHOD display.
+
+ DATA: ls_variant TYPE disvariant.
+ WRITE:/ 'Wenn man das hier liest, ist ein interner Fehler aufgetreten'. "#EC NOTEXT
+
+*--------------------------------------------------------------------*
+* ALV erzeugen
+*--------------------------------------------------------------------*
+ CREATE OBJECT mo_grid
+ EXPORTING
+ i_parent = cl_gui_container=&gt;screen0
+ EXCEPTIONS
+ OTHERS = 1.
+
+*--------------------------------------------------------------------*
+* Event AFTER_USER_COMMAND nutzbar machen
+* Da sehr viele Usercommands ( auch SAP-Usercommands ) implizit einen
+* full-refresh des Grid durchführen, müssen wir uns stets dahinter klemmen
+* um unsere eigene Zwischensummenzeilengenerierung zu erhalten
+*--------------------------------------------------------------------*
+ SET HANDLER handle_after_user_command FOR mo_grid.
+
+*--------------------------------------------------------------------*
+* Defaultlayouts ermöglichen, um Zwischensummen ohne Userinteraktion zu demonstrieren
+*--------------------------------------------------------------------*
+ ls_variant-handle = '0001'.
+ ls_variant-report = sy-repid.
+
+*--------------------------------------------------------------------*
+* Anzeigen des grid
+*--------------------------------------------------------------------*
+ mo_grid-&gt;set_table_for_first_display( EXPORTING
+ i_structure_name = 'SAPLANE'
+ is_variant = ls_variant
+ i_save = 'A'
+ i_default = 'X'
+ CHANGING
+ it_outtab = mt_data
+ EXCEPTIONS
+ OTHERS = 1 ).
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "display
+
+ METHOD handle_after_user_command.
+*--------------------------------------------------------------------*
+* SAP hat evtl. noch keinen Refresh gemacht.
+* Daher würden Änderungen, die in der Methode summenzeilen_anpassen
+* gemacht und dann mit soft-refresh an den Grid gereicht würden im
+* Nachgang durch den ausstehenden full-refresh zunichte gemacht, da
+* der Grid beim full refresh auch die Summen- und Zwischensummenzeilen
+* neu generiert
+* Daher wird der full-refresh jetzt explizit vor unserer Anpassung
+* ausgeführt und der nachfolgende soft_refresh lässt unsere
+* Summenzeilen stehen.
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = ' ' ).
+
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "handle_AFTER_USER_COMMAND
+
+ METHOD summenzeilen_anpassen.
+
+ DATA: lr_data_summe TYPE REF TO data,
+ lr_data_zwischensumme TYPE REF TO data,
+ lt_grouplevels TYPE lvc_t_grpl, "#EC NEEDED Normalerweise braucht man das um gezielt die Zwischensummen zu manipulieren
+ lv_tabix TYPE numc2.
+
+ FIELD-SYMBOLS: &lt;lt_data&gt; LIKE mt_data,
+ &lt;ls_data&gt; LIKE LINE OF &lt;lt_data&gt;.
+*--------------------------------------------------------------------*
+* Zwischensummenzeilen holen -
+*--------------------------------------------------------------------*
+ mo_grid-&gt;get_subtotals( IMPORTING
+ ep_collect00 = lr_data_summe " Summenzeile
+ ep_collect01 = lr_data_zwischensumme " Zwischensummenzeile - Stufe 1
+* EP_COLLECT02 - EP_COLLECT09 Zwischensummenzeilen - Stufe 2-9
+ et_grouplevels = lt_grouplevels ). " Informationen welche Zwischensummenzeile(n) zu welchen Gridzeilen gehören
+
+*--------------------------------------------------------------------*
+* Hier kann das jetzt hinreichend komplex werden
+* Zur Demo werde ich in alle Summen und Zwischensummen im Feld
+* "PLANETYPE" etwas einfüllen
+*--------------------------------------------------------------------*
+ IF lr_data_summe IS BOUND.
+ ASSIGN lr_data_summe-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe1-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+ IF lr_data_zwischensumme IS BOUND.
+ ASSIGN lr_data_zwischensumme-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe2-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+
+*--------------------------------------------------------------------*
+* ALV-Anzeige neu aufbauen lassen, ohne Zwischensummen vom ALV generieren zu lassen
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = 'X' ).
+
+ ENDMETHOD. "summenzeilen_anpassen
+ENDCLASS. "lcl_helper IMPLEMENTATION</pre>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Magic Filter</title>
+		<link>/blog/magic-filter/</link>
+					<comments>/blog/magic-filter/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sun, 10 May 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[Filter]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=75508</guid>
+
+					<description><![CDATA[<p>In Transaktionen mit mehreren ALV-Grids kann das Kontrollieren von Daten schwierig sein, wenn zwischen Grids hin- und her gesprungen werden muss und jedes Mal die Filter angepasst werden müssen.  Mit Magic Filter gehört das der Vergangenheit an. Mehr im Text.</p>
+<p>Der Beitrag <a href="/blog/magic-filter/">Magic Filter</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Vor kurzem war ich genervt von einer Anwendung, in der Daten in mehreren ALV-Grids angezeigt wurden. Die unterschiedlichen Grids haben teilweise gleiche Felder. Vielleicht ähnlich eines Cockpits in dem verschiedene Sichten zu Materialien angezeigt werden (Materialstamm, Werks-Sichten, Bestände auf Lagerortebene etc.)</p>
+<p>Bei der Analyse bzw. Fehlersuche musste ich in mehreren Grids einen Filter setzen, z.B. auf das Werk. Das bei verschiedenen Grids ist zwar recht schnell gemacht, aber als ich es öfters machen musste, nervte es schon ziemlich.</p>
+<h2>Magic Filter</h2>
+<p>Dabei hatte ich die Idee, einen Filter global über alle verwendeten Grids zu setzen. Die Idee hat sich in dem unten zur Verfügung gestellten Programm manifestiert. Die Funktionalität ist in der Klasse gekapselt. Der Rest des Codes dient nur dazu, einen dreigeteilten Splitter mit jeweils einem Grid darstellen zu können.</p>
+<p>Jedes Grid registriert sich am Magic-Filter-Controller. In P_FIELD kann ein Feldname gesetzt werden &#8211; z.B. WERKS &#8211; und in S_VALUES können die Werte eingeschränkt werden. Mit &lt;ENTER&gt; wird der Filter auf alle registrierten Grids angewendet.</p>
+<p>Sofern ein Feld nicht im Feldkatalog des Grids ist, wird es vor dem Setzen des Filters gelöscht.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/2015-05-08_18-51-36.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-75509" src="https://tricktresor.com/wp-content/uploads/2015/05/2015-05-08_18-51-36-300x181.png" alt="2015-05-08_18-51-36" width="300" height="181" srcset="/wp-content/uploads/2015/05/2015-05-08_18-51-36-300x181.png 300w, /wp-content/uploads/2015/05/2015-05-08_18-51-36.png 913w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zz_magic_filter.
+
+class lcl_magic_filter DEFINITION DEFERRED.
+DATA gr_gfil      TYPE REF TO lcl_magic_filter.
+DATA gv_value     TYPE c LENGTH 20.
+
+DATA gs_filter    TYPE lvc_s_filt.
+DATA gt_filter    TYPE lvc_t_filt.
+
+DATA gr_docker    TYPE REF TO cl_gui_docking_container.
+
+DATA gr_splitter1 TYPE REF TO cl_gui_easy_splitter_container.
+DATA gr_splitter2 TYPE REF TO cl_gui_easy_splitter_container.
+
+DATA gr_cont1     TYPE REF TO cl_gui_container.
+DATA gr_cont2     TYPE REF TO cl_gui_container.
+DATA gr_cont3     TYPE REF TO cl_gui_container.
+DATA gr_cont4     TYPE REF TO cl_gui_container.
+
+DATA gr_grid1     TYPE REF TO cl_gui_alv_grid.
+DATA gr_grid2     TYPE REF TO cl_gui_alv_grid.
+DATA gr_grid3     TYPE REF TO cl_gui_alv_grid.
+
+TYPES: BEGIN OF ty_1,
+         matnr TYPE matnr,
+         werks TYPE werks_d,
+         lgort TYPE lgort_d,
+         mtart TYPE mtart,
+       END OF ty_1.
+
+TYPES: BEGIN OF ty_2,
+         matnr TYPE matnr,
+         mtart TYPE mtart,
+       END OF ty_2.
+
+TYPES: BEGIN OF ty_3,
+         werks TYPE werks_d,
+         lgort TYPE lgort_d,
+       END OF ty_3.
+
+DATA gt_1 TYPE STANDARD TABLE OF ty_1.
+DATA gt_2 TYPE STANDARD TABLE OF ty_2.
+DATA gt_3 TYPE STANDARD TABLE OF ty_3.
+
+DATA gs_1 TYPE ty_1.
+DATA gs_2 TYPE ty_2.
+DATA gs_3 TYPE ty_3.
+
+
+CLASS lcl_magic_filter DEFINITION.
+
+  PUBLIC SECTION.
+
+    METHODS register
+      IMPORTING
+        ir_grid TYPE REF TO cl_gui_alv_grid .
+    METHODS set_filter
+      IMPORTING
+        filter TYPE lvc_t_filt .
+  PROTECTED SECTION.
+
+    TYPES:
+      BEGIN OF ty_object,
+        grid   TYPE REF TO cl_gui_alv_grid,
+        fcat   TYPE lvc_t_fcat,
+        filter TYPE lvc_t_filt,
+        status TYPE c LENGTH 1,
+      END OF ty_object .
+    TYPES:
+      ty_objects TYPE STANDARD TABLE OF ty_object .
+
+    DATA mt_objects TYPE ty_objects .
+    DATA mt_filter TYPE lvc_t_filt .
+
+    METHODS set_filter_on_objects .
+
+ENDCLASS.
+
+
+
+CLASS lcl_magic_filter IMPLEMENTATION.
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_GFIL_CONTROLLER-&gt;REGISTER
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IR_GRID                        TYPE REF TO CL_GUI_ALV_GRID
+* +--------------------------------------------------------------------------------------
+  METHOD register.
+
+    DATA ls_object LIKE LINE OF mt_objects.
+
+    READ TABLE mt_objects TRANSPORTING NO FIELDS WITH KEY grid = ir_grid.
+    IF sy-subrc &gt; 0.
+*== Objekt hinzufügen
+      ls_object-grid   = ir_grid.
+      ls_object-status = '1'.
+      ir_grid-&gt;get_frontend_fieldcatalog( IMPORTING et_fieldcatalog = ls_object-fcat ).
+      APPEND ls_object TO mt_objects.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_GFIL_CONTROLLER-&gt;SET_FILTER
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] FILTER                         TYPE        LVC_T_FILT
+* +--------------------------------------------------------------------------------------
+  METHOD set_filter.
+
+    mt_filter = filter.
+    set_filter_on_objects( ).
+
+  ENDMETHOD.
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_GFIL_CONTROLLER-&gt;SET_FILTER_ON_OBJECTS
+* +-------------------------------------------------------------------------------------------------+
+* +--------------------------------------------------------------------------------------
+  METHOD set_filter_on_objects.
+
+    DATA lt_filter TYPE lvc_t_filt.
+    DATA lv_index TYPE i.
+
+*== Set filter
+    LOOP AT mt_objects ASSIGNING FIELD-SYMBOL(&lt;object&gt;).
+      lt_filter = mt_filter.
+
+      LOOP AT lt_filter ASSIGNING FIELD-SYMBOL(&lt;filter&gt;).
+        lv_index = sy-tabix.
+        READ TABLE &lt;object&gt;-fcat TRANSPORTING NO FIELDS WITH KEY fieldname = &lt;filter&gt;-fieldname.
+        IF sy-subrc &gt; 0.
+          DELETE lt_filter INDEX lv_index.
+        ENDIF.
+        &lt;object&gt;-grid-&gt;set_filter_criteria( lt_filter ).
+      ENDLOOP.
+      &lt;object&gt;-grid-&gt;refresh_table_display( is_stable = VALUE #( col = 'X' row = 'X' )
+                                            i_soft_refresh = space ).
+    ENDLOOP.
+
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+PARAMETER p_field TYPE fieldname.
+SELECT-OPTIONS s_values FOR gv_value.
+
+INITIALIZATION.
+
+  CREATE OBJECT gr_gfil.
+
+  PERFORM create_base.
+  PERFORM create_1.
+  PERFORM create_2.
+  PERFORM create_3.
+
+
+
+AT SELECTION-SCREEN.
+
+  CLEAR gs_filter.
+  CLEAR gt_filter.
+  gs_filter-fieldname = p_field.
+  LOOP AT s_values.
+    gs_filter-low    = s_values-low.
+    gs_filter-sign   = s_values-sign.
+    gs_filter-option = s_values-option.
+    APPEND gs_filter TO gt_filter.
+  ENDLOOP.
+
+  gr_gfil-&gt;set_filter( gt_filter ).
+
+START-OF-SELECTION.
+
+FORM create_base.
+
+
+  CREATE OBJECT gr_docker
+    EXPORTING
+      side                    = cl_gui_docking_container=&gt;dock_at_bottom
+      ratio                   = 80
+      no_autodef_progid_dynnr = abap_true.
+
+
+  CREATE OBJECT gr_splitter1
+    EXPORTING
+      parent        = gr_docker
+      orientation   = 0
+      sash_position = 50.
+
+  gr_cont1 = gr_splitter1-&gt;top_left_container.
+  gr_cont4 = gr_splitter1-&gt;bottom_right_container.
+
+  CREATE OBJECT gr_splitter2
+    EXPORTING
+      parent        = gr_cont4
+      orientation   = 1
+      sash_position = 50.
+
+  gr_cont2 = gr_splitter2-&gt;top_left_container.
+  gr_cont3 = gr_splitter2-&gt;bottom_right_container.
+
+ENDFORM.
+
+FORM create_1.
+
+  DATA ls_fcat TYPE lvc_s_fcat.
+  DATA lt_fcat TYPE lvc_t_fcat.
+
+  gs_1-matnr = 'A'.
+  gs_1-werks = '1000'.
+  gs_1-lgort = 'A001'.
+  gs_1-mtart = 'FERT'.
+  APPEND gs_1 TO gt_1.
+
+  gs_1-matnr = 'B'.
+  gs_1-werks = '1000'.
+  gs_1-lgort = 'A001'.
+  gs_1-mtart = 'HALB'.
+  APPEND gs_1 TO gt_1.
+
+  gs_1-matnr = 'C'.
+  gs_1-werks = '2000'.
+  gs_1-lgort = 'B001'.
+  gs_1-mtart = 'FERT'.
+  APPEND gs_1 TO gt_1.
+
+  gs_1-matnr = 'C'.
+  gs_1-werks = '1000'.
+  gs_1-lgort = 'A001'.
+  gs_1-mtart = 'FERT'.
+  APPEND gs_1 TO gt_1.
+
+  gs_1-matnr = 'D'.
+  gs_1-werks = '1000'.
+  gs_1-lgort = 'B001'.
+  gs_1-mtart = 'HALB'.
+  APPEND gs_1 TO gt_1.
+
+  ls_fcat-fieldname = 'MATNR'.
+  ls_fcat-rollname  = 'MATNR'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'WERKS'.
+  ls_fcat-rollname  = 'WERKS_D'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'LGORT'.
+  ls_fcat-rollname  = 'LGORT_D'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'MTART'.
+  ls_fcat-rollname  = 'MTART'.
+  APPEND ls_fcat TO lt_fcat.
+
+  PERFORM create_grid USING gr_cont1 lt_fcat gt_1.
+
+ENDFORM.
+
+FORM create_2.
+
+  DATA ls_fcat TYPE lvc_s_fcat.
+  DATA lt_fcat TYPE lvc_t_fcat.
+
+  gs_2-matnr = 'A'.
+  gs_2-mtart = 'FERT'.
+  APPEND gs_2 TO gt_2.
+  gs_2-matnr = 'B'.
+  gs_2-mtart = 'HALB'.
+  APPEND gs_2 TO gt_2.
+  gs_2-matnr = 'C'.
+  gs_2-mtart = 'FERT'.
+  APPEND gs_2 TO gt_2.
+  gs_2-matnr = 'D'.
+  gs_2-mtart = 'HALB'.
+  APPEND gs_2 TO gt_2.
+
+
+  ls_fcat-fieldname = 'MATNR'.
+  ls_fcat-rollname  = 'MATNR'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'MTART'.
+  ls_fcat-rollname  = 'MTART'.
+  APPEND ls_fcat TO lt_fcat.
+
+  PERFORM create_grid USING gr_cont2 lt_fcat gt_2.
+
+ENDFORM.
+
+FORM create_3.
+
+  DATA ls_fcat TYPE lvc_s_fcat.
+  DATA lt_fcat TYPE lvc_t_fcat.
+
+
+  gs_3-werks = '1000'.
+  gs_3-lgort = 'A001'.
+  APPEND gs_3 TO gt_3.
+  gs_3-werks = '2000'.
+  gs_3-lgort = 'A001'.
+  APPEND gs_3 TO gt_3.
+  gs_3-werks = '1000'.
+  gs_3-lgort = 'B001'.
+  APPEND gs_3 TO gt_3.
+  gs_3-werks = '2000'.
+  gs_3-lgort = 'B001'.
+  APPEND gs_3 TO gt_3.
+
+
+
+  ls_fcat-fieldname = 'WERKS'.
+  ls_fcat-rollname  = 'WERKS_D'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'LGORT'.
+  ls_fcat-rollname  = 'LGORT_D'.
+  APPEND ls_fcat TO lt_fcat.
+
+  PERFORM create_grid USING gr_cont3 lt_fcat gt_3.
+
+ENDFORM.
+
+FORM create_grid USING ir_container TYPE REF TO cl_gui_container
+                       it_fcat      TYPE lvc_t_fcat
+                       it_table     TYPE table.
+
+  DATA lr_grid TYPE REF TO cl_gui_alv_grid.
+
+  CREATE OBJECT lr_grid
+    EXPORTING
+      i_parent = ir_container.
+
+  lr_grid-&gt;set_table_for_first_display(
+    CHANGING
+      it_outtab                     = it_table
+      it_fieldcatalog               = it_fcat ).
+
+  gr_gfil-&gt;register( lr_grid ).
+
+ENDFORM.
+
+</object></object></filter></object></filter></object></pre>
+<p>Der Beitrag <a href="/blog/magic-filter/">Magic Filter</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/magic-filter/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>SALV-Table mit &#8220;Grafik&#8221;</title>
+		<link>/blog/salv-table-mit-grafik/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Jun 2014 19:04:27 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[ascii]]></category>
+		<category><![CDATA[zeichensatz]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Sonderzeichen]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4891</guid>
+
+					<description><![CDATA[<p>Heute kam mir die Idee, Daten in einem ALV-Grid einmal grafisch darzustellen. Ich hatte eigentlich vor, die grafischen Zeichen aus dem DOS-Zeichensatz zu verwenden, aber diese stehen leider nicht zur Verfügung. Hier also eine Variante mit verfügbaren Sonderzeichen.</p>
+<p>Der Beitrag <a href="/blog/salv-table-mit-grafik/">SALV-Table mit &#8220;Grafik&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute kam mir die Idee, Daten in einem ALV-Grid einmal grafisch darzustellen. Ich hatte eigentlich vor, die grafischen Zeichen aus dem DOS-Zeichensatz zu verwenden:</p>
+<p><a href="http://www.torsten-horn.de/techdocs/ascii.htm"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4893" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_210631-300x179.jpg" alt="Bild_2014_06_26_210631" width="300" height="179" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_210631-300x179.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_26_210631-624x372.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_26_210631.jpg 626w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Leider war das nicht möglich. Ich habe mich dann für ein anderes Sonderzeichen entschieden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4892 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg" alt="Bild_2014_06_26_200626 (2)" width="588" height="330" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg 588w, /wp-content/uploads/2014/06/Bild_2014_06_26_200626-2-300x168.jpg 300w" sizes="(max-width: 588px) 100vw, 588px" /></a></p>
+<p>Die Länge des &#8220;Balkens&#8221; wird anhand der verwenden Feldgröße von 20 Zeichen berechnet.</p>
+<p>Das Pipe-Symbol | sieht auch gut aus. Nimmt nicht so viel Platz weg&#8230;</p>
+<p><img loading="lazy" decoding="async" class="alignnone wp-image-4894 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_210606.jpg" alt="Bild_2014_06_26_210606" width="484" height="193" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_210606.jpg 484w, /wp-content/uploads/2014/06/Bild_2014_06_26_210606-300x119.jpg 300w" sizes="(max-width: 484px) 100vw, 484px" /></p>
+<h2>Coding</h2>
+<pre>REPORT z.
+
+*== global data
+DATA:
+  BEGIN OF gs_data,
+    matnr   TYPE char10,
+    descr   TYPE text20,
+    amount  TYPE i,
+    camount TYPE char20,
+  END OF gs_data,
+  gt_data LIKE TABLE OF gs_data,
+  hex TYPE x VALUE 7.
+
+FIELD-SYMBOLS  TYPE c.
+
+*== start of program
+START-OF-SELECTION.
+  PERFORM main.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  main
+*&amp;---------------------------------------------------------------------*
+FORM main.
+
+*== local data
+  DATA lo_grid      TYPE REF TO cl_salv_table.
+  FIELD-SYMBOLS  LIKE LINE OF gt_data.
+
+*== assign special Character
+  ASSIGN hex TO  CASTING.
+
+*== Fill testdata
+  gs_data-matnr = '1000'. gs_data-descr = 'Screw'.      gs_data-amount = 120. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1300'. gs_data-descr = 'Nut 1"'.     gs_data-amount = 030. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1506'. gs_data-descr = 'Driver'.     gs_data-amount = 222. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1660'. gs_data-descr = 'Tool '.      gs_data-amount = 180. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2040'. gs_data-descr = 'Screw 0.4"'. gs_data-amount = 178. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2220'. gs_data-descr = 'Screw 0.6"'. gs_data-amount = 660. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2456'. gs_data-descr = 'Gripper'.    gs_data-amount = 066. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2660'. gs_data-descr = 'Nipper'.     gs_data-amount = 510. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2807'. gs_data-descr = 'Pincer'.     gs_data-amount = 790. APPEND gs_data TO gt_data.
+
+*== calc amount
+  LOOP AT gt_data ASSIGNING .
+    PERFORM calc CHANGING .
+  ENDLOOP.
+
+*== call SALV
+  TRY.
+      CALL METHOD cl_salv_table=&gt;factory
+        IMPORTING
+          r_salv_table = lo_grid
+        CHANGING
+          t_table      = gt_data.
+      lo_grid-&gt;display( ).
+
+    CATCH cx_salv_msg.
+      WRITE: / 'Error: ALV exception CX_SALV_MSG'.
+  ENDTRY.
+
+ENDFORM.                    "main
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  calc
+*&amp;---------------------------------------------------------------------*
+FORM calc CHANGING cs_data LIKE gs_data.
+
+*== local data
+  DATA number TYPE i.
+  DATA max TYPE i VALUE 1000.
+
+*== calculate bar
+  number = cs_data-amount * 100 / 1000 / 5.
+
+*== Fill bar
+  DO number TIMES.
+     CONCATENATE cs_data-camount  INTO cs_data-camount.
+  ENDDO.
+
+ENDFORM.                    "calc</pre>
+<p>Der Beitrag <a href="/blog/salv-table-mit-grafik/">SALV-Table mit &#8220;Grafik&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</title>
+		<link>/blog/dragndrop-framwork-alv-grid/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 13 Jun 2014 16:13:04 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Liste]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Zuordnung]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[style]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4805</guid>
+
+					<description><![CDATA[<p>Usability ist bei SAP ja so eine Sache... Heute habe ich eine Klasse gefunden, die Zuordnungen intuitiv und benutzerfreundlich macht. In diesem kleinen Demoprogramm zeige ich euch, wie man die Klassen benutzt.</p>
+<p>Der Beitrag <a href="/blog/dragndrop-framwork-alv-grid/">Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute bin ich beim Surfen im SAP-System über die Klasse CL_ALV_DD_LISTBOX gestolpert. Dolle Sache:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4806" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg" alt="Bild_2014_06_13_170651" width="729" height="351" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg 729w, /wp-content/uploads/2014/06/Bild_2014_06_13_170651-300x144.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_170651-624x300.jpg 624w" sizes="(max-width: 729px) 100vw, 729px" /></a></p>
+<p>&nbsp;</p>
+<p>Einfach zwei Datentabellen definieren, zwei Grids erzeugen, der Instanz von  cl_alv_dd_double_listbox übergeben und die zwei Funktionscodes zum Bewegen der Einträge definieren. Aufrufen und am Ende hat man in seinen zwei Datentabellen die vom Anwender definierten Einträge.</p>
+<p>Die Anregung stammt aus dem Report RSPLS_ENQUEUE_INFO.</p>
+<h2>Coding</h2>
+<pre>DATA gr_dd     TYPE REF TO cl_alv_dd_double_listbox.
+DATA gr_grid_s TYPE REF TO cl_alv_dd_listbox.              "source
+DATA gr_grid_t TYPE REF TO cl_alv_dd_listbox.              "target
+DATA gr_cont_s TYPE REF TO cl_gui_custom_container.        "source
+DATA gr_cont_t TYPE REF TO cl_gui_custom_container.        "target
+DATA gs_layo_s TYPE lvc_s_layo.
+DATA gs_layo_t TYPE lvc_s_layo.
+
+DATA gt_fcat   TYPE lvc_t_fcat.
+DATA gt_sort   TYPE lvc_t_sort.
+
+DATA gt_data_s TYPE STANDARD TABLE OF t006a.
+DATA gt_data_t TYPE STANDARD TABLE OF t006a.
+
+
+START-OF-SELECTION.
+
+  PERFORM init.
+
+  CALL SCREEN 100.
+
+
+*----------------------------------------------------------------------*
+*  MODULE pbo OUTPUT
+*----------------------------------------------------------------------*
+MODULE pbo OUTPUT.
+
+  SET PF-STATUS 'DD_GRID'.
+
+  PERFORM prepare_grid USING gr_grid_s
+                             gr_cont_s
+                             'CONT_SOURCE'
+                             gs_layo_s
+                             gt_data_s.
+
+  PERFORM prepare_grid USING gr_grid_t
+                             gr_cont_t
+                             'CONT_TARGET'
+                             gs_layo_t
+                             gt_data_t.
+
+  IF gr_dd IS INITIAL.
+    CREATE OBJECT gr_dd
+      EXPORTING
+        i_grid1 = gr_grid_s
+        i_grid2 = gr_grid_t.
+  ENDIF.
+
+ENDMODULE.                                                 "pbo OUTPUT
+
+
+*----------------------------------------------------------------------*
+*  MODULE pai INPUT
+*----------------------------------------------------------------------*
+MODULE pai INPUT.
+  CASE sy-ucomm.
+    WHEN 'BACK'.
+      SET SCREEN 0. LEAVE SCREEN.
+
+    WHEN 'MOVE_TO_TARGET'.
+      CALL METHOD gr_dd-&gt;movetogrid2
+        EXPORTING
+          i_ok_code = sy-ucomm.
+
+    WHEN 'MOVE_TO_SOURCE'.
+      CALL METHOD gr_dd-&gt;movetogrid1
+        EXPORTING
+          i_ok_code = sy-ucomm.
+  ENDCASE.
+
+*  IF NOT gr_dd IS INITIAL.
+*    CALL METHOD gr_dd-&gt;set_grids_state( abap_true ). "X = display/ space = edit
+*  ENDIF.
+
+ENDMODULE.                                                 "pai INPUT
+
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  prepare_grid
+*&amp;---------------------------------------------------------------------*
+FORM prepare_grid USING grid TYPE REF TO cl_alv_dd_listbox
+                        cont TYPE REF TO cl_gui_custom_container
+                        name TYPE        clike
+                        layo TYPE        lvc_s_layo
+                        data TYPE STANDARD TABLE.
+
+  IF cont IS INITIAL.
+*==   create container
+    CREATE OBJECT cont
+      EXPORTING
+        container_name = name.
+  ENDIF.
+
+  IF grid IS INITIAL.
+*== create grid
+    CREATE OBJECT grid
+      EXPORTING
+        i_parent     = cont
+        i_grid_style = 1.
+
+*== set  grid
+    CALL METHOD grid-&gt;set_table_for_first_display
+      EXPORTING
+        is_layout       = layo
+      CHANGING
+        it_outtab       = data
+        it_fieldcatalog = gt_fcat
+        it_sort         = gt_sort.
+  ELSE.
+*== refresh
+    CALL METHOD grid-&gt;set_frontend_fieldcatalog
+      EXPORTING
+        it_fieldcatalog = gt_fcat.
+    CALL METHOD grid-&gt;set_frontend_layout
+      EXPORTING
+        is_layout = gs_layo_s.
+    CALL METHOD grid-&gt;refresh_table_display.
+  ENDIF.
+
+ENDFORM.                    "prepare_grid
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  init
+*&amp;---------------------------------------------------------------------*
+FORM init.
+
+*== local data
+  FIELD-SYMBOLS  LIKE LINE OF gt_fcat.
+
+*== get source data
+  SELECT * FROM t006a INTO TABLE gt_data_s
+      UP TO 20 ROWS
+   WHERE spras = sy-langu.
+
+
+*== set title for source:
+  gs_layo_s-grid_title = text-003.
+  gs_layo_s-smalltitle = 'X'.
+  gs_layo_s-cwidth_opt = 'X'.
+  gs_layo_s-sel_mode   = 'A'.
+
+*== set title for target:
+  gs_layo_t-grid_title = text-004.
+  gs_layo_t-smalltitle = 'X'.
+  gs_layo_t-cwidth_opt = 'X'.
+  gs_layo_t-sel_mode   = 'A'.
+
+*== get fieldcatalog
+  CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_structure_name       = 'T006A'
+      i_client_never_display = 'X'
+    CHANGING
+      ct_fieldcat            = gt_fcat
+    EXCEPTIONS
+      OTHERS                 = 3.
+
+*== display only unit and text
+  LOOP AT gt_fcat ASSIGNING .
+    CASE -fieldname.
+      WHEN 'MSEHI' OR 'MSEH3' OR 'MSEH6'.
+        -tech = abap_true.
+    ENDCASE.
+  ENDLOOP.
+
+ENDFORM.                    "init</pre>
+<h2>Dynpro</h2>
+<h3>Ablauflogik</h3>
+<p>PROCESS BEFORE OUTPUT.<br />
+MODULE pbo.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE pai.</p>
+<h2><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4808" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg" alt="Bild_2014_06_13_180645" width="562" height="423" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg 562w, /wp-content/uploads/2014/06/Bild_2014_06_13_180645-300x225.jpg 300w" sizes="(max-width: 562px) 100vw, 562px" /></a></h2>
+<h2>GUI-Status</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4807" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg" alt="Bild_2014_06_13_180616" width="808" height="483" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg 808w, /wp-content/uploads/2014/06/Bild_2014_06_13_180616-300x179.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_180616-624x373.jpg 624w" sizes="(max-width: 808px) 100vw, 808px" /></a></p>
+<p>[notice type = &#8216;info&#8217;]Leider haben die Klassen eine kleine Macken. Sobald die ersten Einträge per Funktionstasten verschoben wurden, erscheint die Markierspalte und es ist kein Drag-and-Drop mehr möglich&#8230; :([/notice]</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/dragndrop-framwork-alv-grid/">Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

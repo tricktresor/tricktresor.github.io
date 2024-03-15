@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Redefnition Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/redefnition/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:54 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Redefnition Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Redefinierte Methoden?</title>
+		<link>/blog/redefinierte-methoden/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 09 Nov 2015 17:59:37 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[klasse]]></category>
+		<category><![CDATA[Redefnition]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=332915</guid>
+
+					<description><![CDATA[<p>Heute habe ich in einer Klassenhierarchie (Superklasse -> vererbte Klassen) eine Klasse gesucht habe, bei der ich eine bestimmte Methode redefiniert habe. Bei der Suche bin ich auf eine Tabelle gestossen, die die gewünschte Information liefert...</p>
+<p>Der Beitrag <a href="/blog/redefinierte-methoden/">Redefinierte Methoden?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute habe ich in einer Klassenhierarchie (Superklasse -&gt; vererbte Klassen) eine Klasse gesucht habe, bei der ich eine bestimmte Methode redefiniert habe.</p>
+<p>Als anständiger Programmierer war ich natürlich zu faul, mich auch nur durch drei vererbte Klassen durchzuklicken&#8230; Also bin ich auf die Suche nach einem passenden Funktionsbaustein gegangen und dabei auf SEO_INHERITANC_READ gestossen. Diesem Funktionsbaustein kannst du eine Klasse übergeben und erhältst alle redefinierten Methoden.</p>
+<p>Nicht ganz das, was ich gesucht habe, aber die verwendete Tabelle SEOREDEF lieferte mir die gewünschten Informationen im Handumdrehen.</p>
+<p>Hier ein Beispiel in dem du siehst, welche Methoden von CL_GUI_CONTAINER in direkt geerbten Klassen redefiniert wurden:</p>
+<p><img fetchpriority="high" decoding="async" class="aligncenter wp-image-332916 size-full" src="https://tricktresor.com/wp-content/uploads/2015/11/2015-11-09_18-17-16.png" alt="2015-11-09_18-17-16" width="577" height="530" srcset="/wp-content/uploads/2015/11/2015-11-09_18-17-16.png 577w, /wp-content/uploads/2015/11/2015-11-09_18-17-16-300x276.png 300w" sizes="(max-width: 577px) 100vw, 577px" /></p>
+<p>Allerdings ist diese Methode nicht 100%ig, denn es wird natürlich nur die direkte Vererbung gespeichert. Von der Klasse CL_GUI_DOCKING_CONTAINER zum Beispiel erben weitere Klassen. Deren Redefinitionen sind nur sichtbar, wenn du die Klasse CL_GUI_DOCKING_CONTAINER direkt eingibst.</p>
+<p>Um zu sehen, wo entlang einer Vererbungshierarchie welche Methoden redefiniert wurden, muss also noch ein Programm geschrieben werden.</p>
+<h2>Programm</h2>
+<p>Hier ist das kleine Programm. Quick and dirty. Methode GET_SUBCLASSES der Klasse CL_OO_CLASS gibt alle vererbten Klassen zurück.</p>
+<p>von diesen Klassen werden die redefinierten Methoden ermittelt.</p>
+<p>Um zu sehen, welche Methode in welcher Klasse redefiniert wurde, muss nach Methode gefiltert oder sortiert werden:</p>
+<p><img decoding="async" class="aligncenter wp-image-332984 size-full" src="https://tricktresor.com/wp-content/uploads/2015/11/2015-11-09_18-49-58.png" alt="2015-11-09_18-49-58" width="589" height="464" srcset="/wp-content/uploads/2015/11/2015-11-09_18-49-58.png 589w, /wp-content/uploads/2015/11/2015-11-09_18-49-58-300x236.png 300w" sizes="(max-width: 589px) 100vw, 589px" /></p>
+<h2>Code</h2>
+<pre>REPORT.
+
+PARAMETERS p_class TYPE seoclsname DEFAULT 'CL_GUI_CONTAINER'.
+
+DATA gt_redef TYPE STANDARD TABLE OF seoredef.
+
+START-OF-SELECTION.
+
+ PERFORM do USING p_class 'X'.
+ PERFORM display.
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form display
+*&amp;---------------------------------------------------------------------*
+FORM display.
+
+ DATA lr_table TYPE REF TO cl_salv_table.
+ DATA lr_funcs TYPE REF TO cl_salv_functions_list.
+
+ CALL METHOD cl_salv_table=&gt;factory
+ IMPORTING
+ r_salv_table = lr_table
+ CHANGING
+ t_table = gt_redef.
+
+ lr_funcs = lr_table-&gt;get_functions( ).
+ lr_funcs-&gt;set_all( ).
+
+ lr_table-&gt;display( ).
+ENDFORM. "display
+
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form do
+*&amp;---------------------------------------------------------------------*
+FORM do USING i_class TYPE seoclsname
+ i_start TYPE boolean.
+
+ DATA lr_class TYPE REF TO cl_oo_class.
+ DATA lt_subclasses TYPE seo_relkeys.
+ DATA ls_subclass LIKE LINE OF lt_subclasses.
+
+ TRY .
+ lr_class ?= cl_oo_class=&gt;get_instance( i_class ).
+
+ APPEND LINES OF lr_class-&gt;redefinitions TO gt_redef.
+ lt_subclasses = lr_class-&gt;get_subclasses( ).
+
+ IF i_start = abap_true.
+ LOOP AT lt_subclasses INTO ls_subclass.
+ PERFORM do USING ls_subclass-clsname space.
+ ENDLOOP.
+ ENDIF.
+
+ CATCH cx_class_not_existent.
+
+ ENDTRY.
+
+ENDFORM. "do</pre>
+<pre></pre>
+<p>Der Beitrag <a href="/blog/redefinierte-methoden/">Redefinierte Methoden?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

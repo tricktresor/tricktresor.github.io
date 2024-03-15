@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Übersetzung Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/uebersetzung/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 23 Nov 2021 15:19:27 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Übersetzung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Übersetzung von Ausnahmeklassen</title>
+		<link>/blog/uebersetzung-von-ausnahmeklassen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 23 Nov 2021 15:19:26 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[exception class]]></category>
+		<category><![CDATA[Übersetzung]]></category>
+		<category><![CDATA[Ausnahmeklasse]]></category>
+		<guid isPermaLink="false">/?p=1032481</guid>
+
+					<description><![CDATA[<p>Ausnahmeklasse sind in vielerlei Hinsicht Ausnahme-Klassen. Es fängt mit der Generierung des CONSTRUCTORs an, geht über die unterschiedliche Behandlung in SE24 und Eclipse und endet bei der Übersetzung der Exception-ID&#8217;s der Ausnahmeklasse. Man könnte sich nun darüber streiten, ob die Ausnahme-ID&#8217;s der Ausnahmeklassen überhaupt übersetzt werden sollten oder ob sie eh nur technischen Charakter haben und nicht an die Oberfläche gelangen sollten. Das können wir allerdings an anderer Stelle tun. Ich bin der Meinung, dass...</p>
+<p>Der Beitrag <a href="/blog/uebersetzung-von-ausnahmeklassen/">Übersetzung von Ausnahmeklassen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Ausnahmeklasse sind in vielerlei Hinsicht Ausnahme-Klassen. Es fängt mit der Generierung des CONSTRUCTORs an, geht über die unterschiedliche Behandlung in SE24 und Eclipse und endet bei der Übersetzung der Exception-ID&#8217;s der Ausnahmeklasse.</p>
+
+
+
+<p>Man könnte sich nun darüber streiten, ob die Ausnahme-ID&#8217;s der Ausnahmeklassen überhaupt übersetzt werden sollten oder ob sie eh nur technischen Charakter haben und nicht an die Oberfläche gelangen sollten. Das können wir allerdings an anderer Stelle tun. Ich bin der Meinung, dass die Ausnahme-IDs&#8217;, die nicht mit einer SAP-Meldung erzeugt werden, regulär nutzbare Elemente sind. </p>
+
+
+
+<h2 class="wp-block-heading" id="ausnahme-id-s">Ausnahme-ID&#8217;s</h2>
+
+
+
+<p>Die Texte, bzw. Ausnahme-IDs von Ausnahmeklassen werden über einen sogenannten OTR-Text definiert. Für jeden <em>Text</em>, den du in der Ausnahmeklasse hinzufügst, wird eine Konstante vom Typ SOTR_CONC mit einer eindeutigen GUID angelegt. OTR steht für <em>Online Text Repository</em>. OTR-Texte können mit Transaktion SOTR_EDIT gepflegt werden. Allerdings können Sie auch aus dieser Transaktion heraus nicht übersetzt werden.</p>
+
+
+
+<h2 class="wp-block-heading" id="regulare-ubersetzung">Reguläre Übersetzung</h2>
+
+
+
+<p>In der Regel kann man ein Objekt in der SAPGUI &#8211; bis auf wenige Ausnahmen &#8211; über das Menü <em>Springen •</em> <em>Übersetzung</em> übersetzen. Ausnahmeklassen sind leider so eine Ausnahme.</p>
+
+
+
+<h2 class="wp-block-heading" id="ubersetzung-von-ausnahme-ids">Übersetzung von Ausnahme-IDs</h2>
+
+
+
+<p>Um eine Ausnahme-ID zu übersetzen, musst du wie folgt vorgehen:</p>
+
+
+
+<ol><li>Finde heraus, wie die ID des OTR-Objektes lautet. In der SE24 findest du die ID im Reiter &#8220;Attribute&#8221;. Es sind alle Attribute vom Typ SOTR_CONC. In Eclipse findest du die generierten Attribute in der PUBLIC SECTION. Auch hier sind es die Konstanten vom Typ SOTR_CONC.</li><li>Kopiere die OTR-ID</li><li>Starte Transaktion SE63 und klicke die Drucktaste &#8220;Kurztexte&#8221; an</li><li>Suche nach OTR oder öffne den Ordner 00 Meta Objects.</li><li>Wähle &#8220;OTRS &#8211; OTR Kurztext Meta&#8221; aus.</li><li>Gib die kopierte GUID in das Feld GUID ein. Achte darauf, dass Quell- und Zielsprache korrekt eingestellt sind.</li><li>Klicke auf die Drucktaste &#8220;Bearbeiten&#8221;</li></ol>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="532" height="577" src="/wp-content/uploads/2021/11/image.png" alt="" class="wp-image-1032497" srcset="/wp-content/uploads/2021/11/image.png 532w, /wp-content/uploads/2021/11/image-277x300.png 277w" sizes="(max-width: 532px) 100vw, 532px" /><figcaption>Auswahl Objekttyp OTRS</figcaption></figure>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="612" height="285" src="/wp-content/uploads/2021/11/image-1.png" alt="" class="wp-image-1032498" srcset="/wp-content/uploads/2021/11/image-1.png 612w, /wp-content/uploads/2021/11/image-1-300x140.png 300w" sizes="(max-width: 612px) 100vw, 612px" /><figcaption>OTR bearbeiten</figcaption></figure>
+
+
+
+<p>Du befindest dich nun im bekannten Dynpro zum Übersetzen der Texte. Leider müssen die Ausnahme-ID&#8217;s einzeln kopiert und bearbeitet werden. Es gibt meines Wissens nach keine Sammelfunktion zum Bearbeiten so wie bei den <a href="/blog/uebersetzung-einer-nachrichtenklasse/">Nachrichtenklassen</a>.</p>
+<p>Der Beitrag <a href="/blog/uebersetzung-von-ausnahmeklassen/">Übersetzung von Ausnahmeklassen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Übersetzung einer Nachrichtenklasse</title>
+		<link>/blog/uebersetzung-einer-nachrichtenklasse/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 08 Sep 2020 10:44:36 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Übersetzung]]></category>
+		<category><![CDATA[SE63]]></category>
+		<guid isPermaLink="false">/?p=1024216</guid>
+
+					<description><![CDATA[<p>Übersetzen sind eine der schlimmsten Dinge für Entwickler. In der Regel kann man direkt in der zugehörigen Transaktion das bearbeitete Objekt übersetzen: Menü Springen &#8211; Übersetzung. Bei Nachrichten funktioniert das jedoch immer nur für eine einzelne Nachricht. Es ist nicht möglich, alle Meldungen der Nachrichtenklasse gesammelt zu übersetzen. Jedenfalls nicht aus der Transaktion SE91 heraus. Übersetzungsumgebung Mit folgendem Vorgehen ist es möglich, die Nachrichten einer Nachrichtenklasse nacheinander abzuarbeiten: Starten der Transaktion SE63 Drucktaste Transport Object...</p>
+<p>Der Beitrag <a href="/blog/uebersetzung-einer-nachrichtenklasse/">Übersetzung einer Nachrichtenklasse</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Übersetzen sind eine der schlimmsten Dinge für Entwickler. In der Regel kann man direkt in der zugehörigen Transaktion das bearbeitete Objekt übersetzen: Menü <em>Springen &#8211; Übersetzung</em>. </p>
+
+
+
+<p>Bei Nachrichten funktioniert das jedoch immer nur für eine einzelne Nachricht. Es ist nicht möglich, alle Meldungen der Nachrichtenklasse gesammelt zu übersetzen. Jedenfalls nicht aus der Transaktion SE91 heraus.</p>
+
+
+
+<h2 class="wp-block-heading">Übersetzungsumgebung</h2>
+
+
+
+<p>Mit folgendem Vorgehen ist es möglich, die Nachrichten einer Nachrichtenklasse nacheinander abzuarbeiten:</p>
+
+
+
+<h3 class="wp-block-heading">Starten der Transaktion SE63</h3>
+
+
+
+<p>Drucktaste <em>Transport Object</em> anklicken.</p>
+
+
+
+<figure class="wp-block-gallery columns-1 is-cropped wp-block-gallery-1 is-layout-flex wp-block-gallery-is-layout-flex"><ul class="blocks-gallery-grid"><li class="blocks-gallery-item"><figure><img decoding="async" width="675" height="170" src="/wp-content/uploads/2020/09/SNAG-00700-x.png" alt="" data-id="1024220" data-full-url="/wp-content/uploads/2020/09/SNAG-00700-x.png" data-link="/?attachment_id=1024220" class="wp-image-1024220" srcset="/wp-content/uploads/2020/09/SNAG-00700-x.png 675w, /wp-content/uploads/2020/09/SNAG-00700-x-300x76.png 300w" sizes="(max-width: 675px) 100vw, 675px" /></figure></li></ul></figure>
+
+
+
+<h3 class="wp-block-heading">Transportobjekt auswählen</h3>
+
+
+
+<p>Gin in der Eingabemaske die Objektkennung für die Nachrichtenklasse ein:</p>
+
+
+
+<pre class="wp-block-preformatted">R3TR MSAG &lt;Name der Nachrichtenklasse&gt;</pre>
+
+
+
+<p>In diesem Beispiel heißt die Nachrichtenklasse ZTT. Mit der Drucktaste &#8220;Source/ Target Language&#8221; kannst du Quell- und Zielsprache vertauschen. Merkwürdigerweise erkennt das System die Originalsprache nicht automatisch.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="614" height="264" src="/wp-content/uploads/2020/09/SNAG-00701.png" alt="" class="wp-image-1024219" srcset="/wp-content/uploads/2020/09/SNAG-00701.png 614w, /wp-content/uploads/2020/09/SNAG-00701-300x129.png 300w" sizes="(max-width: 614px) 100vw, 614px" /><figcaption>Einstiegsbild Übersetzungsumgebung Objekte</figcaption></figure>
+
+
+
+<p>Um die Übersetzung zu beginnen, klicke auf die Drucktaste &#8220;Edit&#8221;.</p>
+
+
+
+<h3 class="wp-block-heading">Nachrichten übersetzen</h3>
+
+
+
+<p>Mit einem Doppelklick auf die einzelnen Nachrichten kannst du diese direkt übersetzen. Der Trick besteht jedoch darin, die Drucktaste &#8220;Sequentially Process Objects&#8221; zu bemühen. </p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="872" height="360" src="/wp-content/uploads/2020/09/SNAG-00702-x.png" alt="" class="wp-image-1024218" srcset="/wp-content/uploads/2020/09/SNAG-00702-x.png 872w, /wp-content/uploads/2020/09/SNAG-00702-x-300x124.png 300w, /wp-content/uploads/2020/09/SNAG-00702-x-768x317.png 768w" sizes="(max-width: 872px) 100vw, 872px" /><figcaption>Nachrichtenübersicht</figcaption></figure>
+
+
+
+<p>Nun startest du mit der ersten Nachricht in der Nachrichtenklasse und kannst sie übersetzen.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="594" height="189" src="/wp-content/uploads/2020/09/SNAG-00703-x.png" alt="" class="wp-image-1024217" srcset="/wp-content/uploads/2020/09/SNAG-00703-x.png 594w, /wp-content/uploads/2020/09/SNAG-00703-x-300x95.png 300w" sizes="(max-width: 594px) 100vw, 594px" /><figcaption>Einzelne Nachricht übersetzen</figcaption></figure>
+
+
+
+<p>Mit F11 sichern und dann mit F8 zur nächsten Meldung springen.</p>
+
+
+
+<p>Danke an <a href="/blog/author/mludecke/">@mludecke</a> &#8211; <a href="https://www.ludecke.net/" target="_blank" rel="noreferrer noopener sponsored nofollow">https://www.ludecke.net/</a></p>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/uebersetzung-einer-nachrichtenklasse/">Übersetzung einer Nachrichtenklasse</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Customizing übersetzen</title>
+		<link>/blog/customizing-uebersetzen/</link>
+					<comments>/blog/customizing-uebersetzen/#comments</comments>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Sat, 29 Nov 2014 00:00:00 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<category><![CDATA[Übersetzung]]></category>
+		<category><![CDATA[Rollout]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5154</guid>
+
+					<description><![CDATA[<p>Neuer Rollout &#8211; Neues Glück. Spätestens beim ersten internationalen Rollout kommt die Frage auf welche Customizing Objekte zu übersetzen sind. In der SPRO ist &#8211; etwas versteckt &#8211; eine sehr nützliche Standard-Funktion. &#160; &#160;</p>
+<p>Der Beitrag <a href="/blog/customizing-uebersetzen/">Customizing übersetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Neuer Rollout &#8211; Neues Glück.<br />
+Spätestens beim ersten internationalen Rollout kommt die Frage auf welche Customizing Objekte zu übersetzen sind.<br />
+In der SPRO ist &#8211; etwas versteckt &#8211; eine sehr nützliche Standard-Funktion.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/Spro-übersetzung.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5155" src="https://tricktresor.com/wp-content/uploads/2014/11/Spro-übersetzung-259x300.png" alt="Spro übersetzung" width="259" height="300" srcset="/wp-content/uploads/2014/11/Spro-übersetzung-259x300.png 259w, /wp-content/uploads/2014/11/Spro-übersetzung-624x720.png 624w, /wp-content/uploads/2014/11/Spro-übersetzung.png 846w" sizes="(max-width: 259px) 100vw, 259px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/uebersetzung2.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5156" src="https://tricktresor.com/wp-content/uploads/2014/11/uebersetzung2-300x234.png" alt="uebersetzung2" width="300" height="234" srcset="/wp-content/uploads/2014/11/uebersetzung2-300x234.png 300w, /wp-content/uploads/2014/11/uebersetzung2-624x487.png 624w, /wp-content/uploads/2014/11/uebersetzung2.png 907w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/customizing-uebersetzen/">Customizing übersetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/customizing-uebersetzen/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

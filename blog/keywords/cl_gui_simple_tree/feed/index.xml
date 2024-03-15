@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>CL_GUI_SIMPLE_TREE Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_gui_simple_tree/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 04 Jan 2022 13:53:18 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>CL_GUI_SIMPLE_TREE Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Event NODE_KEYPRESS</title>
+		<link>/blog/event-node_keypress/</link>
+					<comments>/blog/event-node_keypress/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 19 Aug 2011 09:49:29 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[keypress]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[node]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[expand_root_nodes]]></category>
+		<category><![CDATA[Generell]]></category>
+		<category><![CDATA[CL_GUI_SIMPLE_TREE]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=612</guid>
+
+					<description><![CDATA[<p>Mit dem Ereignis NODE_KEYPRESS kann man im Programm auf verschiedene Tastendr&#252;cke reagieren: F1, F4, Enter, Einf&#252;gen, L&#246;schen, STRG+X, STRG+C, STRG+V.</p>
+<p>Der Beitrag <a href="/blog/event-node_keypress/">Event NODE_KEYPRESS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit dem Ereignis NODE_KEYPRESS kann man im Programm auf verschiedene Tastendrücke reagieren: F1, F4, Enter, Einfügen, Löschen, STRG+X, STRG+C, STRG+V.</p>
+<p class="head1">Beschreibung</p>
+<p>Das folgende Programm generiert einen kleinen Baum mithilfe des Control CL_GUI_SIMPLE_TREE. Bei Programmstart wird der Focus sofort auf das TreeControl gesetzt, so dass der Anwender mithilfe der Cursortasten in dem Baum navigieren kann.</p>
+<p>Steht der Cursor auf einem Eintrag, so können die Tasten &#8220;F1&#8221;, &#8220;Enter&#8221; oder &#8220;Löschen&#8221; gedrückt werden. Das Ereignis NODE_KEYPRESS muss dafür natürlich registriert werden.</p>
+<p>Zusätzlich müssen aber die Tasten, auf die der Tree reagieren soll auch noch bekannt gegeben werden. Das passiert mit der Methode ADD_KEY_STROKE der Klasse CL_GUI_SIMPLE_TREE.</p>
+<p class="head1">Tasten</p>
+<p>Folgende Tasten können registriert werden:</p>
+<ul>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>F1</strong>: Funktionstaste F1</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>F4</strong>: Funktionstaste F4</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>INSERT</strong>: Taste Einfügen</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>DELETE</strong>: Taste Entfernen</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>ENTER</strong>: Enter-Taste</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>CUT</strong>: Strg+X</li>
+<li>CL_TREE_CONTORL_BASE=&gt;KEY_<strong>COPY</strong>: Strg+C</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>PASTE</strong>: Strg+V</li>
+</ul>
+<p class="head1">Screenshot</p>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/Tree/Bild548.jpg" /><br />
+Der kleine Demo-Baum</td>
+</tr>
+</tbody>
+</table>
+<p class="head1">Code</p>
+<p class="sap1">REPORT  zz_tree_keypress_demo.<br />
+<span style="color: #fb2412;">*** we use icons&#8230;</span><br />
+TYPE-POOLS icon.</p>
+<p class="sap1"><span style="color: #fb2412;">*** global data:</span><br />
+<span style="color: #fb2412;">*== Custom Container</span><br />
+DATA gr_cuco TYPE REF TO cl_gui_custom_container.<br />
+<span style="color: #fb2412;">*== Simple Tree</span><br />
+DATA gr_tree TYPE REF TO cl_gui_simple_tree.</p>
+<p class="sap1"><span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*       CLASS lcl_event_handler_class DEFINITION<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</span><br />
+CLASS lcl_event_handler_class DEFINITION.<br />
+PUBLIC SECTION.<br />
+CLASS-METHODS handle_keypress<br />
+FOR EVENT node_keypress   OF cl_gui_simple_tree<br />
+IMPORTING node_key key.<br />
+ENDCLASS.                    &#8220;lcl_event_handler_class DEFINITION</p>
+<p class="sap1"><span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*       CLASS lcl_event_handler_class IMPLEMENTATION<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</span><br />
+CLASS lcl_event_handler_class IMPLEMENTATION.<br />
+METHOD handle_keypress.<br />
+IF node_key IS NOT INITIAL.<br />
+<span style="color: #fb2412;">*** we only get a node id for active nodes (not disabled):</span><br />
+MESSAGE i000(oo) WITH &#8216;Knoten:&#8217; node_key &#8216;- Taste:&#8217; key.<br />
+ENDIF.<br />
+ENDMETHOD.                    &#8220;message<br />
+ENDCLASS.                    &#8220;lcl_event_handler_class IMPLEMENTATION</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Call screen</span><br />
+CALL SCREEN 1.</p>
+<p class="sap1">
+<span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*  MODULE status_0001 OUTPUT<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</span><br />
+MODULE status_0001 OUTPUT.</p>
+<p class="sap1">*** Set status<br />
+SET PF-STATUS &#8216;STLI&#8217; OF PROGRAM &#8216;SAPMSSY0&#8217;.<br />
+*** Init Controls<br />
+PERFORM init_controls.</p>
+<p class="sap1">ENDMODULE.                 &#8221; STATUS_0100  OUTPUT</p>
+<p class="sap1"><span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*  MODULE user_command_0001 INPUT<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+</span>MODULE user_command_0001 INPUT.</p>
+<p class="sap1">  CASE sy-ucomm.<br />
+WHEN &#8216;BACK&#8217; OR &#8216;%EX&#8217; OR &#8216;RW&#8217;.<br />
+SET SCREEN 0.<br />
+LEAVE SCREEN.<br />
+ENDCASE.</p>
+<p class="sap1">ENDMODULE.                 &#8221; USER_COMMAND_0100  INPUT</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  init_controls<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+* &#8211; create custom container<br />
+* &#8211; create tree control<br />
+* &#8211; register events<br />
+* &#8211; build tree structure<br />
+* &#8211; set focus on tree control<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+</span>FORM init_controls.</p>
+<p class="sap1"><span style="color: #fb2412;">*** initial build up<br />
+</span>  CHECK gr_cuco IS INITIAL.</p>
+<p class="sap1"><span style="color: #fb2412;">*** create custom container</span><br />
+CREATE OBJECT gr_cuco<br />
+EXPORTING<br />
+container_name = &#8216;TREE&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Create simple tree; single node selection</span><br />
+CREATE OBJECT gr_tree<br />
+EXPORTING<br />
+parent              = gr_cuco<br />
+node_selection_mode = cl_gui_simple_tree=&gt;node_sel_mode_single.</p>
+<p class="sap1"><span style="color: #fb2412;">*** register events</span><br />
+PERFORM register_events.</p>
+<p class="sap1"><span style="color: #fb2412;">*** build tree structure</span><br />
+PERFORM build_tree.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Set focus on tree control so that user instantly can<br />
+*** navigate with cursor keys</span><br />
+cl_gui_control=&gt;set_focus( gr_tree ).</p>
+<p class="sap1">ENDFORM.                    &#8220;init_controls</p>
+<p class="sap1">
+<span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  register_events<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</span><br />
+FORM register_events.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Data</span><br />
+DATA: lt_events TYPE cntl_simple_events,<br />
+ls_event  TYPE cntl_simple_event.</p>
+<p class="sap1"><span style="color: #fb2412;">*** NODE_KEYPRESS-Event</span><br />
+ls_event-eventid = cl_gui_simple_tree=&gt;eventid_node_keypress.<br />
+APPEND ls_event TO lt_events.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Register Event</span><br />
+CALL METHOD gr_tree-&gt;set_registered_events<br />
+EXPORTING<br />
+events = lt_events.</p>
+<p class="sap1"><span style="color: #fb2412;">*** tell tree which keys to mention for NODE_KEPRESS:<br />
+*==&gt; ENTER</span><br />
+gr_tree-&gt;add_key_stroke( cl_gui_simple_tree=&gt;key_enter )  .<br />
+<span style="color: #fb2412;">*==&gt; F1</span><br />
+gr_tree-&gt;add_key_stroke( cl_gui_simple_tree=&gt;key_f1 )  .<br />
+<span style="color: #fb2412;">*==&gt; DELETE</span><br />
+gr_tree-&gt;add_key_stroke( cl_gui_simple_tree=&gt;key_delete )  .</p>
+<p class="sap1"><span style="color: #fb2412;">*** Set handler for registered events</span><br />
+SET HANDLER lcl_event_handler_class=&gt;handle_keypress FOR gr_tree.</p>
+<p class="sap1">ENDFORM.                    &#8220;register_events</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  build_tree<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+* Build static tree structure:<br />
+* Group<br />
+*  +- ONE<br />
+*  +- TWO<br />
+* THREE<br />
+* FOUR<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</span><br />
+FORM build_tree.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Data</span><br />
+DATA ls_node  TYPE mtreesnode.<br />
+DATA lt_nodes TYPE STANDARD TABLE OF mtreesnode.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;Group&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;GROUP1&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-disabled  = &#8216;X&#8217;.<br />
+ls_node-isfolder  = &#8216;X&#8217;.<br />
+ls_node-n_image   = icon_activity_group.<br />
+ls_node-exp_image = icon_activity_group.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_intensified.<br />
+ls_node-text      = &#8216;Gruppe&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;ONE&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;ONE&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-relatkey  = &#8216;GROUP1&#8217;.<br />
+ls_node-n_image   = icon_led_yellow.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_intensified.<br />
+ls_node-text      = &#8216;Eins&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;TWO&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;TWO&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-relatkey  = &#8216;GROUP1&#8217;.<br />
+ls_node-n_image   = icon_led_green.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_default.<br />
+ls_node-text      = &#8216;ZWEI&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;THREE&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;THREE&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-disabled  = &#8216;X&#8217;.<br />
+ls_node-n_image   = icon_led_inactive.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_inactive.<br />
+ls_node-text      = &#8216;DREI&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;FOUR&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;FOUR&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-disabled  = space.<br />
+ls_node-n_image   = icon_led_red.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_intensifd_critical.<br />
+ls_node-text      = &#8216;VIER&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Add nodes</span><br />
+CALL METHOD gr_tree-&gt;add_nodes<br />
+EXPORTING<br />
+table_structure_name = &#8216;MTREESNODE&#8217;<br />
+node_table           = lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Expand all root nodes</span><br />
+gr_tree-&gt;expand_root_nodes( ).</p>
+<p class="sap1">ENDFORM.                    &#8220;init_controls</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/event-node_keypress/">Event NODE_KEYPRESS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/event-node_keypress/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Vererbungsübersicht</title>
+		<link>/blog/vererbungsuebersicht/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 14:10:32 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[SE24]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[RS_TOOL_ACCESS]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[CL_GUI_SIMPLE_TREE]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=585</guid>
+
+					<description><![CDATA[<p>Folgendes kleines Programm zeigt die Vererbungshierarchien von Klassen auf. Die Root- oder Super-Klasse wird auf der obersten Ebene angezeigt. Darunter werden die von ihr erbenden Klassen aufgelistet. Mit einem Doppelklick auf eine Klasse wird in den Class Builder (SE24) verzweigt.</p>
+<p>Der Beitrag <a href="/blog/vererbungsuebersicht/">Vererbungsübersicht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Folgendes kleine Programm zeigt die Vererbungshierarchien von Klassen auf. Die Root- oder Super-Klasse wird auf der obersten Ebene angezeigt. Darunter werden die von ihr erbenden Klassen aufgelistet. Mit einem Doppelklick auf eine Klasse wird in den Class Builder (SE24) verzweigt.</p>
+
+
+
+<p>Beschreibung</p>
+
+
+
+<p>Die Vererbungsübersicht kann man sich normalerweise auch in der SE80 anschauen. Hier ist jedoch immer ein &#8220;Zwischenschritt&#8221; über den Punkt &#8220;Superklassen&#8221; oder &#8220;Subklassen&#8221; notwendig. Dieses Programm liefert eine direkt Übersicht:</p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td><img decoding="async" src="/wp-content/uploads/tt_images/Bild097.jpg" alt=""><br>Übersicht über alle Unterklassen von &#8220;CL_CI_TEST_ROOT&#8221;</td></tr></tbody></table></figure>
+
+
+
+<h2 class="wp-block-heading" id="features">Features</h2>
+
+
+
+<p>Kundeneigene Klassen (Z- und /-Namensraum) werden hervor gehoben.</p>
+
+
+
+<p>Doppelklick auf eine Klasse verzweigt in den Class Builder (Transaktion SE24).</p>
+
+
+
+<h2 class="wp-block-heading" id="interessante-klassen">Interessante Klassen</h2>
+
+
+
+<p>Folgende Klassen sind interessant, da sie eine große &#8220;Erbengemeinschaft&#8221; haben:</p>
+
+
+
+<ul><li><div class="text1">IF_CI_TEST (Interface von Code Inspector Prüfungen)</div></li><li>CL_GUI_OBJECT </li><li><div class="text1">CL_GUI_CONTROL</div></li><li>CL_GUI_CONTAINER</li><li>CL_ABAP_TYPEDESCR </li><li>Ausnahmeklassen <ul><li>CX_STATIC_CHECK</li><li>CX_DYNAMIC_CHECK</li><li>CX_NO_CHECK </li></ul></li></ul>
+
+
+
+<h2 class="wp-block-heading" id="coding">Coding</h2>
+
+
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*<br>*&amp; Report&nbsp; Z_INHERITING_CLASSES<br>*&amp;---------------------------------------------------------------------*<br>* displays all inheriting classes of a super class in simple tree.<br>* double click on class calls SE24 for this class in display mode.<br>*----------------------------------------------------------------------*<br></span>REPORT Z_INHERITING_CLASSES.</pre>
+
+
+
+<p>CLASS lcl_application DEFINITION DEFERRED.</p>
+
+
+
+<pre class="wp-block-preformatted">DATA go_application&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO lcl_application.<br>DATA gt_classes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF seoclsname.<br>DATA gt_metarel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF seometarel.<br>DATA gs_metarel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE seometarel.<br>DATA go_tree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO cl_gui_simple_tree.<br>DATA gt_nodes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF mtreesnode.<br>DATA gs_node&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE mtreesnode.<br>DATA gt_expand_nodes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF lvc_nkey.<br>DATA gv_top_node&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE lvc_nkey.<br>DATA gv_level&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE i.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*** SELECTION SCREEN ***<br>*==&gt; Super class name (root)<br></span>PARAMETERS p_class&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE seoclsname DEFAULT 'IF_CI_TEST'.<br><span style="color: #fb2412;">*==&gt; Expand up to this level<br></span>PARAMETERS p_level&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE i&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFAULT 3.</pre>
+
+
+
+<pre class="wp-block-preformatted">AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_class.<br>CALL FUNCTION 'F4_DD_ALLTYPES'<br>EXPORTING<br>object&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = p_class<br>suppress_selection&nbsp;&nbsp; = 'X'<br>display_only&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ' '<br>only_types_for_clifs = 'X'<br>IMPORTING<br>RESULT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = p_class.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*----------------------------------------------------------------------*<br>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS LCL_APPLICATION DEFINITION<br>*----------------------------------------------------------------------*<br></span>CLASS lcl_application DEFINITION.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; PUBLIC SECTION.<br>METHODS:<br>handle_node_double_click<br>FOR EVENT node_double_click<br>OF cl_gui_simple_tree<br>IMPORTING node_key.</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "LCL_APPLICATION DEFINITION</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*----------------------------------------------------------------------*<br>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS LCL_APPLICATION IMPLEMENTATION<br>*----------------------------------------------------------------------*<br></span>CLASS lcl_application IMPLEMENTATION.</pre>
+
+
+
+<pre class="wp-block-preformatted">  METHOD  handle_node_double_click.
+    DATA lv_classname TYPE seoclsname.
+    READ TABLE gt_classes INTO lv_classname INDEX node_key.</pre>
+
+
+
+<pre class="wp-block-preformatted">    CALL FUNCTION 'RS_TOOL_ACCESS'
+      EXPORTING
+        operation   = 'SHOW'
+        object_name = lv_classname
+        object_type = 'CLAS'.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; ENDMETHOD.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "HANDLE_NODE_DOUBLE_CLICK</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "LCL_APPLICATION IMPLEMENTATION</pre>
+
+
+
+<pre class="wp-block-preformatted">START-OF-SELECTION.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; PERFORM do_read USING p_class.</pre>
+
+
+
+<pre class="wp-block-preformatted">  CHECK gt_metarel IS NOT INITIAL.
+  cl_abap_list_layout=>suppress_toolbar( ).</pre>
+
+
+
+<pre class="wp-block-preformatted">  WRITE 1.
+  INSERT p_class INTO gt_classes INDEX 1.
+  PERFORM init_tree.
+  PERFORM add_node USING p_class space.
+  PERFORM display_tree.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*<br>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; do_read<br>*&amp;---------------------------------------------------------------------*<br></span>FORM do_read USING iv_classname TYPE seoclsname.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; DATA lt_metarel TYPE STANDARD TABLE OF seometarel.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*** Select all inheriting classes&nbsp;</span><br>SELECT * FROM seometarel INTO TABLE lt_metarel<br>WHERE refclsname = iv_classname.</pre>
+
+
+
+<pre class="wp-block-preformatted">  LOOP AT lt_metarel INTO gs_metarel.
+<span style="color: #fb2412;">    "collect class for having a node name later on (TABIX)</span>
+    COLLECT gs_metarel-clsname INTO gt_classes.
+    <span style="color: #fb2412;">"recursive call for class</span>
+    PERFORM do_read USING gs_metarel-clsname.
+  ENDLOOP.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; APPEND LINES OF lt_metarel TO gt_metarel.</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "do_read</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*<br>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; init_tree<br>*&amp;---------------------------------------------------------------------*<br></span>FORM init_tree.</pre>
+
+
+
+<pre class="wp-block-preformatted">  DATA events TYPE cntl_simple_events.
+  DATA event  TYPE cntl_simple_event.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "Create simple tree</span>
+  CREATE OBJECT go_tree
+    EXPORTING
+      parent              = cl_gui_container=>screen0
+      node_selection_mode = cl_gui_simple_tree=>node_sel_mode_single.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "Create application handler</span>
+  CREATE OBJECT go_application.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "define event "node double_click"
+</span>  event-eventid    = cl_gui_simple_tree=>eventid_node_double_click.
+  event-appl_event = 'X'. " process PAI if event occurs
+  APPEND event TO events.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "register event "Double click"
+</span>  go_tree->set_registered_events( events ).</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "assign event handlers in the application class
+</span>  SET HANDLER go_application->handle_node_double_click FOR go_tree.</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "init_tree</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  add_node
+*&amp;---------------------------------------------------------------------*
+</span>FORM add_node 
+  USING 
+    iv_classname TYPE seoclsname
+    iv_refclass  TYPE seoclsname.</pre>
+
+
+
+<pre class="wp-block-preformatted">  ADD 1 TO gv_level.
+  CLEAR gs_node.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "get key for node</span>
+  READ TABLE gt_classes TRANSPORTING NO FIELDS WITH KEY iv_classname.
+  gs_node-node_key = sy-tabix.</pre>
+
+
+
+<pre class="wp-block-preformatted">  IF iv_refclass IS INITIAL.
+    CLEAR gs_node-relatkey.
+    CLEAR gs_node-relatship.
+  ELSE.
+<span style="color: #fb2412;">  "get key of related class</span>
+    READ TABLE gt_classes TRANSPORTING NO FIELDS WITH KEY iv_refclass.
+    gs_node-relatkey = sy-tabix.
+    gs_node-relatship = cl_gui_simple_tree=>relat_last_child.
+  ENDIF.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; IF gv_level &lt;= p_level.<br><span style="color: #fb2412;">*** Expand this level</span><br>IF gt_expand_nodes IS INITIAL.<br><span style="color: #fb2412;">*** remember this node for&nbsp;setting the top node<br></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; gv_top_node = gs_node-node_key.<br>ENDIF.<br><span style="color: #fb2412;">*** remember this node for later expansion</span><br>APPEND gs_node-node_key TO gt_expand_nodes.<br>ENDIF.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*** add node "class"</span><br>gs_node-isfolder = 'X'.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " a folder.<br>gs_node-text = iv_classname.<br>CASE iv_classname(1).<br>WHEN 'Z'.<br><span style="color: #fb2412;">*** highlight customer classes (Z)</span><br>gs_node-style = cl_gui_simple_tree=&gt;style_emphasized_negative.<br>WHEN '/'.<br><span style="color: #fb2412;">*** highlight customer classes (/xyz/)</span><br>gs_node-style = cl_gui_simple_tree=&gt;style_emphasized_positive.<br>ENDCASE.<br>APPEND gs_node TO gt_nodes.</pre>
+
+
+
+<pre class="wp-block-preformatted">  LOOP AT gt_metarel INTO gs_metarel WHERE refclsname = iv_classname.
+    PERFORM add_node USING gs_metarel-clsname gs_metarel-refclsname.
+  ENDLOOP.</pre>
+
+
+
+<pre class="wp-block-preformatted">&nbsp; SUBTRACT 1 FROM gv_level.</pre>
+
+
+
+<p>ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;add_node</p>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*<br>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; display_tree<br>*&amp;---------------------------------------------------------------------*<br></span>FORM display_tree.</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "add nodes</span>
+  go_tree->add_nodes(
+    table_structure_name = 'MTREESNODE'
+    node_table           = gt_nodes ).</pre>
+
+
+
+<pre class="wp-block-preformatted"><span style="color: #fb2412;">  "Expand up to desired level</span>
+  go_tree->expand_nodes(
+    EXPORTING
+      node_key_table = gt_expand_nodes
+    EXCEPTIONS
+     OTHERS         = 5).</pre>
+
+
+
+<pre class="wp-block-preformatted">  <span style="color: #fb2412;">"set top node</span>
+  go_tree->set_top_node( node_key = gv_top_node ).</pre>
+
+
+
+<pre class="wp-block-preformatted">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "display_tree</pre>
+</div></div>
+<p>Der Beitrag <a href="/blog/vererbungsuebersicht/">Vererbungsübersicht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Verwendung SimpleTree</title>
+		<link>/blog/verwendung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Jun 2010 13:31:40 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[CL_GUI_SIMPLE_TREE]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=548</guid>
+
+					<description><![CDATA[<p>Anmerkungen zur Verwendung. Vorteile, Nachteile, Besonderheiten, Anwendungsm&#246;glichkeiten des SimpleTree</p>
+<p>Der Beitrag <a href="/blog/verwendung/">Verwendung SimpleTree</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Anmerkungen zur Verwendung. Vorteile, Nachteile, Besonderheiten, Anwendungsmöglichkeiten</p>
+<p>Der SimpleTree findet in der Regel Verwendung als Navigationshilfe oder auch zur Anzeige von einfachen hierarchischen Darstellungen.</p>
+<p>Es sollte genau überlegt werden, ob der SimpleTree für die Anforderung ausreicht. Es können in diesem Treemodel wirklich nur Ordner mit mit Knoten angezeigt werden, die ein Icon und einen Text enthalten. Es kann also das Icon geändert werden und der Text kann farblich angepasst werden. Zur Not bzw. als Unterstützung kann noch eine Quickinfo angezeigt werden.</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/Tree/hc_340.jpg" /></p>
+<p>Die Verwendung ist dadurch deutlich eingeschränkt!! Soll also z.B. eine weitere Information angezeigt werden, dann muss auf ein anderes Modell umgestiegen werden. Das bedeutet allerdings eine komplett neue Programmierung.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/verwendung/">Verwendung SimpleTree</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Beispielprogramme Baumdarstellung &#038; Drag&#8217;n&#8217;Drop</title>
+		<link>/blog/beispielprogramme-2/</link>
+					<comments>/blog/beispielprogramme-2/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Jun 2010 13:08:25 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[CL_GUI_SIMPLE_TREE]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=544</guid>
+
+					<description><![CDATA[<p>Beispielprogramme der SAP</p>
+<p>Der Beitrag <a href="/blog/beispielprogramme-2/">Beispielprogramme Baumdarstellung &#038; Drag&#8217;n&#8217;Drop</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2>Beispielprogramme der SAP</h2>
+<p>RSDEMO_DRAG_DROP_EDIT_TREE</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Tree/Bild546.jpg" /></p>
+<p>RSDEMO_DRAG_DROP_TREE_MULTI</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Tree/Bild545.jpg" /></p>
+<p>SAPSIMPLE_TREE_CONTROL_DEMO</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Tree/Bild544.jpg" /></p>
+<p>Der Beitrag <a href="/blog/beispielprogramme-2/">Beispielprogramme Baumdarstellung &#038; Drag&#8217;n&#8217;Drop</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/beispielprogramme-2/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

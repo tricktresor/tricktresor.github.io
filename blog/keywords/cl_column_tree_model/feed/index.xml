@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_column_tree_model Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_column_tree_model/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 27 Feb 2020 07:59:06 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_column_tree_model Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Hierarchiedarstellung von Controls</title>
+		<link>/blog/hierarchiedarstellung-von-controls/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 27 Feb 2020 07:59:04 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_column_tree_model]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[Hierarchie]]></category>
+		<guid isPermaLink="false">/?p=1023256</guid>
+
+					<description><![CDATA[<p>Hierarchien sind was Tolles! Controls sind auch toll! Wir sollten sie nutzen, so lange es sie noch gibt (Stichwort Fiori, ABAP in the Cloud etc.). Deswegen ein schönes Demoprogramm zur Analyse von GUI-Controls zur Laufzeit und Darstellung als Baumstruktur mit Hilfe der Klasse CL_COLUMN_TREE_MODEL. GUI-Elemente GUI-Controls sind ActiveX-Steuerlemente, die mit dem Stichwort EnjoySAP zu SAP Release 4.6C eingeführt wurden. Sie werden auch OCX-Controls genannt. Hier gibt es im Grunde zwei unterschiedliche Arten: Container Controls Sie...</p>
+<p>Der Beitrag <a href="/blog/hierarchiedarstellung-von-controls/">Hierarchiedarstellung von Controls</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Hierarchien sind was Tolles! Controls sind auch toll! Wir sollten sie nutzen, so lange es sie noch gibt (Stichwort Fiori, ABAP in the Cloud etc.). Deswegen ein schönes Demoprogramm zur Analyse von GUI-Controls zur Laufzeit und Darstellung als Baumstruktur mit Hilfe der Klasse CL_COLUMN_TREE_MODEL.</p>
+
+
+
+<h2 class="wp-block-heading">GUI-Elemente</h2>
+
+
+
+<p>GUI-Controls sind ActiveX-Steuerlemente, die mit dem Stichwort EnjoySAP  zu SAP Release 4.6C eingeführt wurden. Sie werden auch OCX-Controls genannt. Hier gibt es im Grunde zwei unterschiedliche Arten:</p>
+
+
+
+<ul><li>Container</li><li>Controls</li></ul>
+
+
+
+<p>Sie alle haben eine Gemeinsamkeit, sie erben nämlich alle von der Hauptklasse CL_GUI_CONTROL. Verwirrender Weise erbt CL_GUI_CONTAINER von CL_GUI_CONTROL.</p>
+
+
+
+<h3 class="wp-block-heading">Container</h3>
+
+
+
+<p>Typische Container sind:</p>
+
+
+
+<ul><li>CL_GUI_CUSTOM_CONTAINER Container for customer controls in the dynpro area</li><li>CL_GUI_DIALOGBOX_CONTAINER Container for customer controls in the dynpro area</li><li>CL_GUI_DOCKING_CONTAINER Docking Control Container</li><li>CL_GUI_EASY_SPLITTER_CONTAINER Reduced Version of Splitter Container Control</li><li>CL_GUI_SIMPLE_CONTAINER Anonymous Container</li><li>CL_GUI_SPLITTER_CONTAINER Splitter Control</li></ul>
+
+
+
+<p>Etwas ungewöhnlicher ist der CL_GUI_GOS_CONTAINER für Generic Objects. Wer sich ansehen möchte, was für Schweinereien man mit diesem machen kann, sollte sich <a href="/blog/hacking-sapgui/">Hacking SAPGUI</a> ansehen.</p>
+
+
+
+<p>Container haben die Besonderheit, dass sie weitere Container oder Controls enthalten können.</p>
+
+
+
+<h3 class="wp-block-heading">Controls</h3>
+
+
+
+<p>Die meistgebrauchten Controls sind sicherlich:</p>
+
+
+
+<ul><li>CL_GUI_ALV_GRID</li><li>CL_GUI_TEXTEDIT</li><li>CL_GUI_PICTURE</li><li>CL_GUI_HTML_VIEWER</li><li>CL_GUI_TOOLBAR</li></ul>
+
+
+
+<p>Sie alle benötigen einen CL_GUI_CONTAINER, in dem sie dargestellt werden.</p>
+
+
+
+<h2 class="wp-block-heading">Control-Hierarchie</h2>
+
+
+
+<p>Ich habe ein kleines Programm geschrieben, das eine einfache Anwendung aus zwei Splittern, zwei Textedit-Controls und einem Picture-Control erstellt.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="856" height="632" src="/wp-content/uploads/2020/02/container_tree_demo.png" alt="" class="wp-image-1023258" srcset="/wp-content/uploads/2020/02/container_tree_demo.png 856w, /wp-content/uploads/2020/02/container_tree_demo-300x221.png 300w, /wp-content/uploads/2020/02/container_tree_demo-768x567.png 768w" sizes="(max-width: 856px) 100vw, 856px" /><figcaption>Container und Controls</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Hierarchieanalyse</h2>
+
+
+
+<p>Die Klasse ZCL_TRCKTRSR_CONTAINER_TREE analysiert die Objektstruktur und stellt diese hierarchisch dar. </p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="700" height="329" src="/wp-content/uploads/2020/02/container_tree_vars.png" alt="" class="wp-image-1023260" srcset="/wp-content/uploads/2020/02/container_tree_vars.png 700w, /wp-content/uploads/2020/02/container_tree_vars-300x141.png 300w" sizes="(max-width: 700px) 100vw, 700px" /><figcaption>Hierarchiedarstellung der verwendeten GUI-Controls</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Objekt-ID</h3>
+
+
+
+<p>Im Debugger sieht man die Objekt-ID der erzeugten Objekte:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="422" height="128" src="/wp-content/uploads/2020/02/SNAG-00023.png" alt="" class="wp-image-1023259" srcset="/wp-content/uploads/2020/02/SNAG-00023.png 422w, /wp-content/uploads/2020/02/SNAG-00023-300x91.png 300w" sizes="(max-width: 422px) 100vw, 422px" /><figcaption>Objekt-ID von GO_PARENT</figcaption></figure>
+
+
+
+<p>Die Objekte werden bei Programmausführung durchnummeriert und erhalten so eine eindeutige Objekt-ID. Der folgende Code ermittelt die Objekt-ID zu einem Objekt:</p>
+
+
+
+<pre class="wp-block-preformatted">DATA lo_obj TYPE REF TO cl_abap_objectdescr.
+
+lo_obj ?= cl_abap_typedescr=>describe_by_object_ref( io_object ).
+
+DATA(lv_relname) = lo_obj->get_relative_name( ).
+DATA lv_object_id TYPE i.
+CALL 'OBJMGR_GET_INFO' ID 'OPNAME' FIELD 'GET_OBJID'
+                       ID 'OBJID'  FIELD lv_object_id
+                       ID 'OBJ'    FIELD io_object.
+rv_object_name = |\{O:{ lv_object_id }*{ 
+                 lo_obj->absolute_name }|.</pre>
+
+
+
+<h2 class="wp-block-heading">github</h2>
+
+
+
+<p>Das Demoprogramm liegt bei github und kann mit Hilfe von <a href="https://github.com/larshp/abapGit">abapGit </a>heruntergeladen werden:</p>
+
+
+
+<p><a href="https://github.com/tricktresor/container_hierarchy">https://github.com/tricktresor/container_hierarchy</a></p>
+
+
+
+<h2 class="wp-block-heading">guidrasil</h2>
+
+
+
+<p>Wenn du Lust bekommen hast, dich noch weiter mit Controls zu beschäftigen, dann schaue dir meinen Control-Designer <a href="/blog/gui-designer-guidrasil/">guidrasil</a> an.</p>
+<p>Der Beitrag <a href="/blog/hierarchiedarstellung-von-controls/">Hierarchiedarstellung von Controls</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

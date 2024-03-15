@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Include Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/include/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 14 Sep 2022 12:54:10 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Include Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Classname Utilities</title>
+		<link>/blog/classname-utilities/</link>
+					<comments>/blog/classname-utilities/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 08 Dec 2016 13:46:15 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[klasse]]></category>
+		<category><![CDATA[Include]]></category>
+		<category><![CDATA[Klassenname]]></category>
+		<category><![CDATA[Methodenname]]></category>
+		<category><![CDATA[Methode]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=962285</guid>
+
+					<description><![CDATA[<p>Klassen sind inzwischen von ABAP nicht mehr wegzudenken. Die Verwaltung der Klassen erfolgt jedoch immer noch in INCLUDES. Diese Includes interessieren in der Regel niemanden. Hin und wieder tauchen diese Klassen-Include jedoch in Shortdumps auf. Der Name der Klasse selbst ist eindeutig aus dem Includenamen zu erkennen. Der Name der Methode jedoch nicht. Häufig gibt es zwar auch die zusätzlich notwendige Information, um welche Methode es sich handelt, aber das ist nicht immer der Fall.</p>
+<p>Der Beitrag <a href="/blog/classname-utilities/">Classname Utilities</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Klassen sind inzwischen von ABAP nicht mehr wegzudenken. Die Verwaltung der Klassen erfolgt jedoch immer noch in INCLUDES. Diese Includes interessieren in der Regel niemanden. Hin und wieder tauchen diese Klassen-Include jedoch in Shortdumps auf. Der Name der Klasse selbst ist eindeutig aus dem Includenamen zu erkennen. Der Name der Methode jedoch nicht. Häufig gibt es zwar auch die zusätzlich notwendige Information, um welche Methode es sich handelt, aber das ist nicht immer der Fall.</p>
+
+
+
+<p>Einzelne Includes sehen zum Beispiel so aus:</p>
+
+
+
+<pre class="wp-block-preformatted">CL_OO_CLASSNAME_SERVICE=======CCDEF
+CL_OO_CLASSNAME_SERVICE=======CCMAC
+CL_OO_CLASSNAME_SERVICE=======CCIMP
+CL_OO_CLASSNAME_SERVICE=======CCAU
+CL_OO_CLASSNAME_SERVICE=======CU
+CL_OO_CLASSNAME_SERVICE=======CO
+CL_OO_CLASSNAME_SERVICE=======CI
+CL_OO_CLASSNAME_SERVICE=======CP
+CL_OO_CLASSNAME_SERVICE=======CT
+CL_OO_CLASSNAME_SERVICE=======CS
+CL_OO_CLASSNAME_SERVICE=======CM001
+CL_OO_CLASSNAME_SERVICE=======CM002
+CL_OO_CLASSNAME_SERVICE=======CM003
+CL_OO_CLASSNAME_SERVICE=======CM004</pre>
+
+
+
+<h2 class="wp-block-heading">CL_OO_CLASSNAME_SERVICE</h2>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-08_14-33-36.jpg"><img fetchpriority="high" decoding="async" width="709" height="392" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-08_14-33-36.jpg" alt="" class="wp-image-962286" srcset="/wp-content/uploads/2016/12/2016-12-08_14-33-36.jpg 709w, /wp-content/uploads/2016/12/2016-12-08_14-33-36-300x166.jpg 300w" sizes="(max-width: 709px) 100vw, 709px" /></a></figure>
+
+
+
+<p>Um die einzelnen intern verwendeten Objekte (Includes) verwalten zu können, gibt es die Klasse CL_OO_CLASSNAME_SERVICE. Mit dieser Klasse kannst du herausfinden, welche Methode zu welchem Include gehört und umgekehrt.</p>
+
+
+
+<p>GET_METHOD_INCLUDE liefert zum Beispiel für die gleichnamige Methode den Includenamen&nbsp;CL_OO_CLASSNAME_SERVICE=======CM00B.</p>
+
+
+
+<p>Umgekehrt liefert die Methode GET_METHOD_BY_INCLUDE die Methode zum Includenamen.</p>
+
+
+
+<p>die Methode&nbsp;GET_ALL_CLASS_INCLUDES liefert eine komplette Liste der verwendeten Klassen-Includes.</p>
+
+
+
+<h2 class="wp-block-heading">Nummerierung</h2>
+
+
+
+<p>Interessant finde ich, dass die Methodenincludes nicht numerisch hochgezählt werden, sondern erst numerisch (1-9) und dann alphabetisch (A-Z). Bei einem drei-stelligen numerischen Feld, wie das verwendete (==CMnnn) würden 999 Methoden in eine Klasse passen. Eigentlich mehr als ausreichend, sollte man meinen.</p>
+
+
+
+<p>Die Nummerierung erfolgt übrigens in Funktionsbaustein&nbsp;SEO_METHOD_GENERATE_INCLUDE mit Hilfe des folgenden System-Calls:</p>
+
+
+
+<pre class="wp-block-preformatted">system-call&nbsp;create&nbsp;method&nbsp;mtdkey-cpdname&nbsp;of&nbsp;class&nbsp;mtdkey-clsname
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;include&nbsp;into&nbsp;filename.</pre>
+
+
+
+<p>Die Struktur FILENAME hat dann zum Beispiel folgenden Wert:</p>
+
+
+
+<figure class="wp-block-table"><table><thead><tr><td><strong>Komponente</strong></td><td><strong>Wert</strong></td></tr></thead><tbody><tr><td>ROOTNAME</td><td>ZCL_ABC=======================</td></tr><tr><td>CATEGORYA</td><td>C</td></tr><tr><td>CODEA</td><td>M001</td></tr><tr><td>CATEGORYB</td><td>&nbsp;</td></tr><tr><td>CODEB</td><td>&nbsp;</td></tr></tbody></table></figure>
+
+
+
+<h2 class="wp-block-heading">Alternative</h2>
+
+
+
+<p>Ebenfalls möglich ist die Verwendung von Klasse CL_OO_INCLUDE_NAMING. Auch hier bekommt man Informationen zu den Includes einer Klasse:</p>
+
+
+
+<pre class="wp-block-code"><code>data(cifref) = cl_oo_include_naming=>get_instance_by_cifkey( class_interface_id ).</code></pre>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/classname-utilities/">Classname Utilities</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/classname-utilities/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Feldname mit doppeltem Feldnamen</title>
+		<link>/blog/feldname-mit-doppeltem-feldnamen/</link>
+					<comments>/blog/feldname-mit-doppeltem-feldnamen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 29 Sep 2016 09:00:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ALIAS]]></category>
+		<category><![CDATA[Gruppenname]]></category>
+		<category><![CDATA[Include]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[Dynamische Struktur]]></category>
+		<category><![CDATA[Struktur]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=843204</guid>
+
+					<description><![CDATA[<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt. Was aber, wenn sich die Feldnamen unterscheiden?</p>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hä?</p>
+<p>Die nordfriesisch höfliche Nachfrage ist berechtigt. Wie kann ein Feldname einen doppelten Feldnamen besitzen? Aber der Reihe nach. Erst das Problem, dann die Idee und zum Schluss die Lösung.</p>
+<h2>MOVE-CORRESPONDING</h2>
+<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt.</p>
+<p>&lt;offtopic&gt;Eigentlich müsste der Befehl dann ja COPY-CORRESPONDING heißen, denn der Feldinhalt wird ja nicht verschoben, sondern kopiert&#8230;&lt;/offtopic&gt;.</p>
+<p>Der Befehl birgt aber auch Tücken, denn die Feldnamen müssen immer gleich sein. Häufig hat man jedoch den Fall, dass Feldnamen &#8211; trotz gleicher Funktion und gleichem Datenelement &#8211; in verschiedenen Strukturen anders heißen. Zum Beispiel könnte das Feld in der Quellstruktur LIFNR heißen, in der Zielstruktur heißt es jedoch LIEFERANT.</p>
+<p>Ein nachträgliches MOVE ist in diesem Fall erforderlich:</p>
+<pre>MOVE quell_struktur-lifnr TO ziel_struktrur-lieferant.</pre>
+<p>Das ist nicht weiter schlimm. Wenn man jedoch eine dynamische Struktur als Quellstruktur hat, dann muss man umständlich mittels ASSIGN COMPONENT den Quellwert lesen und dann zuweisen. Das ist umständlich und gegebenenfalls auch zeitkritisch.</p>
+<pre>ASSIGN COMPONENT 'LIFNR' OF STRUCTURE dynamische_quell_struktur TO FIELD-SYMBOLS(&lt;lifnr&gt;).
+IF sy-subrc = 0.
+  ziel_struktur-lieferant = &lt;lifnr&gt;.
+ENDIF.</pre>
+<p>Sofern es sich um kundeneigene Tabellen handelt, kann man den folgenden Trick anwenden und quasi einen ALIAS vergeben:</p>
+<h2>ALIAS-Feldname</h2>
+<p>Stichwort: Benanntes Include. Wir machen uns den Umstand zu Nutze, dass man ein Include in eine Tabelle einbinden kann und dieses Include benennen kann. Das ist eigentlich für inkludierte Strukturen gedacht, um zum Beispiel die komplette Tabelle MARA per Include einbinden zu können und diese auch MARA benennen zu können. Die komplette Struktur MARA steht dann in der inkludierten Struktur zur Verfügung:</p>
+<pre>SELECT * FROM MARA INTO my_struc-mara WHERE...</pre>
+<p>Wir verwenden diese <em>Gruppe</em> nun nicht für eine inkludierte Struktur, sondern nur für ein inkludiertes <em>Feld</em>. Die Technik ist die gleiche.</p>
+<p>Die Tabelle bestand vorher aus den Feldern</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>KENNZ</li>
+</ul>
+<p>Ich möchte diese Tabelle nun so abändern, dass das Feld KENNZ auch unter dem Namen KENNZEICHEN ansprechbar ist. Dafür lege ich einen Include an, der nur das eine Feld KENNZ enthält. Dieses Include wird in die Tabelle eingebunden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg"><img decoding="async" class="alignnone size-full wp-image-843270" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg" alt="2016-09-26_18-01-48" width="802" height="310" srcset="/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg 802w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-300x116.jpg 300w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-768x297.jpg 768w" sizes="(max-width: 802px) 100vw, 802px" /></a></p>
+<p>Die Struktur der Tabelle ist hinterher genau so, wie vorher:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg"><img decoding="async" class="alignnone size-full wp-image-843271" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg" alt="2016-09-26_18-02-48" width="441" height="224" srcset="/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg 441w, /wp-content/uploads/2016/09/2016-09-26_18-02-48-300x152.jpg 300w" sizes="(max-width: 441px) 100vw, 441px" /></a></p>
+<h2>Die richtige Ansprache</h2>
+<p>Den Vorteil, den ich jetzt habe: ich kann das Feld mit dem richtigen Namen KENNZ und mit dem <em>Alias KENNZEICHEN</em>, dem <em>Gruppennamen des Includes</em> ansprechen:</p>
+<pre>DATA lt_tt1 TYPE STANDARD TABLE OF ztt1.
+DATA ls_tt1 TYPE ztt1.
+
+
+SELECT * FROM ztt1 INTO TABLE lt_tt1.
+
+LOOP AT lt_tt1 INTO ls_tt1.
+ IF ls_tt1-kennz = 'X'.
+   ls_tt1-kennzeichen = 'F'.
+ ENDIF.
+ WRITE: / ls_tt1-matnr, ls_tt1-kennz.
+ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/feldname-mit-doppeltem-feldnamen/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Aufrufhierarchie ermitteln</title>
+		<link>/blog/aktuelle-form-routine-ermitteln/</link>
+					<comments>/blog/aktuelle-form-routine-ermitteln/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 May 2003 00:17:37 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[class]]></category>
+		<category><![CDATA[program]]></category>
+		<category><![CDATA[Profitricks]]></category>
+		<category><![CDATA[Include]]></category>
+		<category><![CDATA[callstack]]></category>
+		<category><![CDATA[aufrufhierarchie]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=57</guid>
+
+					<description><![CDATA[<p>Beim Programmdebugging ist es manchmal sinnvoll, zu dokumentieren, welche Routine wann durchlaufen wird (SAPMV45A und die Userexits...). Die folgende Funktionen leisten das.</p>
+<p>Der Beitrag <a href="/blog/aktuelle-form-routine-ermitteln/">Aufrufhierarchie ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Beim Programmdebugging ist es manchmal sinnvoll, zu dokumentieren, welche Routine oder Methode von welchem Aufrufer gerufen wurde (SAPMV45A und die Userexits&#8230;). Die folgende Routine leistet das.</p>
+<p>Wird bei dem CALL-Befehl unter DEPTH die Zahl -1 angegeben, so wird die Tabelle TAB mit der gesamten Aufrufhierarchie gefüllt.</p>
+<p>Die folgende Routine können Sie in ein eigenes Programm setzen und dann aus jedem beliebigen anderen Programm heraus aufrufen.</p>
+<h2 class="head1">Die Routine</h2>
+<p class="sap1">
+<pre class="lang:abap decode:true ">FORM aktuelle_routine.
+
+  TYPES: 
+    begin of abap_call_stack_entry,
+      mainprogram  like sy-repid,
+      include      like sy-repid,
+      line         type i,
+      eventtype    like abdbg-leventtype,
+      event        like abdbg-levent,
+      flag_system  type c,
+    end of abap_call_stack_entry.
+ 
+  DATA: 
+    acse type abap_call_stack_entry,
+    tab  type table of abap_call_stack_entry.
+
+  CALL 'ABAP_CALLSTACK' ID 'DEPTH'     FIELD 2
+                        ID 'CALLSTACK' FIELD tab.
+
+    LOOP AT tab INTO acse FROM 2.
+*-- Der Start ab dem zweiten Eintrag ist notwendig, weil in
+*-- der ersten Tabellenzeile der aktuelle Eintrag steht, also
+*-- diese FORM-Routine. 
+      WRITE: 
+      / 'Mainprog:', acse-mainprogram,
+      / 'Include: ', acse-include,
+      / 'Event:   ', acse-eventtype,
+                     acse-event.
+
+    ENDLOOP.
+
+ENDFORM.</pre>
+<h2 class="head1">Funktionsbaustein</h2>
+<p class="text1">Hilfreich ist auch der Funktionsbaustein <strong>SYSTEM_CALLSTACK</strong>, der ebenfalls Informationen über die Aufrufhierarchie liefert!</p>
+<h2>Klasse</h2>
+<p>Die Klasse <strong>CL_ABAP_GET_CALL_STACK</strong> liefert mit Hilfe der Methode <strong>GET_CALL_STACK</strong> ebenfalls die aktuelle Aufrufhierarchie.</p>
+<p>Wahrscheinlich ist die aufbereitete Form des Aufrufstapels in der Regel nützlicher:</p>
+<pre class="lang:abap decode:true">DATA(stack) = cl_abap_get_call_stack=&gt;format_call_stack_with_struct( cl_abap_get_call_stack=&gt;get_call_stack( ) ).
+</pre>
+<p><figure id="attachment_1018064" aria-describedby="caption-attachment-1018064" style="width: 1013px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2003/05/callstack.png"><img loading="lazy" decoding="async" class="wp-image-1018064 size-full" src="https://tricktresor.com/wp-content/uploads/2003/05/callstack.png" alt="" width="1013" height="480" srcset="/wp-content/uploads/2003/05/callstack.png 1013w, /wp-content/uploads/2003/05/callstack-300x142.png 300w, /wp-content/uploads/2003/05/callstack-768x364.png 768w" sizes="(max-width: 1013px) 100vw, 1013px" /></a><figcaption id="caption-attachment-1018064" class="wp-caption-text">Ausgabe der Aufrufhierarchie aus der Testumgebung des Class Builders mit CL_DEMO_OUTPUT.</figcaption></figure></p>
+<p>Der Beitrag <a href="/blog/aktuelle-form-routine-ermitteln/">Aufrufhierarchie ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/aktuelle-form-routine-ermitteln/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

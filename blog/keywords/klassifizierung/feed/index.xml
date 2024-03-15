@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Klassifizierung Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/klassifizierung/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 18 Mar 2019 15:59:36 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Klassifizierung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>redirects [Plugin]</title>
+		<link>/blog/redirect/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 13 Jan 2014 17:15:33 +0000</pubDate>
+				<category><![CDATA[plugins]]></category>
+		<category><![CDATA[Wordpress]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4221</guid>
+
+					<description><![CDATA[<p>In diesem Artikel beschreibe ich, wie mithilfe von .htaccess und des Plugins "redirects" die alten Tricktresor-Links auf die Wordpress-URLs umgesetzt werden.</p>
+<p>Der Beitrag <a href="/blog/redirect/">redirects [Plugin]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><em>Redirect</em> bedeutet <em>Umleitung</em>. Also eine Umleitung von einer (alten) URL auf eine neue. Hierfür gibt es mehrere Wege. Umleitung sind auch nicht ganz ungefährlich, da hier evtl. Zirkelbezüge auftreten können und der Browser dann die Meldung &#8220;Zu viele Umleitungen&#8221; ausgibt.</p>
+<h2>.htaccess</h2>
+<p>Ein Weg, eine URL umzuleiten,  ist der über .htaccess. Hier werden jedoch Umleitungen verwendet, die nach einer <em>Regel</em> umgesetzt werden können. Diese Umleitung verwende ich zum Beispiel um alte Links, bei denen die Artikelnummer über die Variable aID in der URL vorhanden ist, auf die WordPress-Notation für einen Artikel umzusetzen.</p>
+<p>Aus dieser alten URL für den Artikel mit der ID 285</p>
+<pre>/wp-content/?navID=387&amp;aID=285</pre>
+<p>wird durch eine rewriteRule in der .htaccess die folgende URL:</p>
+<pre>https://tricktresor.com/?p=285</pre>
+<p>Diese interne Darstellung wird wiederum durch die Permalink-Einstellung im WordPress übersteuert:</p>
+<address>Beitragsname: https://tricktresor.com/blog/Beispielbeitrag/</address>
+<p>Es wird daraus die URL</p>
+<pre>https://tricktresor.com/blog/methoden-word/</pre>
+<p>[notice type=&#8217;info&#8217;]Die Umleitung funktioniert in diesem Fall natürlich nur, weil die alte Artikel-ID mit der WordPress-Beitrags-ID übereinstimmt.[/notice]</p>
+<p>Die Regel in der tricktresor-.htaccess lautet übrigens:</p>
+<pre>RewriteCond %{QUERY_STRING} .*aID=([0-9]+)$
+RewriteRule ^(.*) /?p=%1 [R=301,L]</pre>
+<h2>Definierte Umleitung</h2>
+<p>Diese Form der Umleitung funktioniert natürlich nicht, wenn sich die verwendete alte ID von der neuen unterscheidet. Genau diesen Fall habe ich jedoch bei den alten Links, die mittels Themen-ID gespeichert wurden. Diese Links zeigen auf ein Verzeichnis, wie zum Beispiel dieser hier:</p>
+<pre>https://tricktresor.com/content/index.php?navID=223&amp;tID=76</pre>
+<p><img fetchpriority="high" decoding="async" width="883" height="793" class="alignnone size-full wp-image-4222" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d41eba11f5b.png" srcset="/wp-content/uploads/2014/01/img_52d41eba11f5b.png 883w, /wp-content/uploads/2014/01/img_52d41eba11f5b-300x269.png 300w, /wp-content/uploads/2014/01/img_52d41eba11f5b-624x560.png 624w" sizes="(max-width: 883px) 100vw, 883px" /></p>
+<p>Wenn man auf diesen Link klickt, dann gibt es zurzeit keine Umleitung also keine entsprechende Seite und man landet auf &#8220;404 page not found&#8221;.</p>
+<p>Auf der Suche nach einer Lösung bin ich über das Plugin <a title="Plugin &quot;redirects&quot;" href="http://wordpress.org/plugins/redirects/" target="_blank">redirects</a> gestolpert. Hier können verschiedene URLs sowie eine Umleitung definiert werden.</p>
+<p>Die Themen des alten Content Management System wurden in WordPress umgesetzt in Schlagwörter (Tags). Dabei ist jedoch die ID des Schlagworts nicht erhalten geblieben. Aber ich habe die alte Zuordnung noch in einer Tabelle. Diese habe ich &#8211; entsprechend aufbereit &#8211; in das Plugin <a title="Plugin &quot;redirects&quot;" href="http://wordpress.org/plugins/redirects/" target="_blank">redirects </a>importieren können.</p>
+<p>Die Umsetzung der URLs mit &#8220;tID&#8221; ist ebenfalls in der .htaccess definiert:</p>
+<pre>RewriteCond %{QUERY_STRING} .*tID=([0-9]+)$ 
+RewriteRule ^(.*) /thema=%1? [R=301,L]</pre>
+<p>Die &#8220;Themen-URLs&#8221; wie folgt umgesetzt:</p>
+<pre>https://tricktresor.com/thema=76</pre>
+<p>den slug thema=76 habe ich in dem redirects-plugin umgesetzt auf</p>
+<pre>https://tricktresor.com/blog/keywords/klassifizierung/</pre>
+<p>Der Beitrag <a href="/blog/redirect/">redirects [Plugin]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bezeichnung zum Merkmalswert lesen</title>
+		<link>/blog/bezeichnung-zum-merkmalswert-lesen/</link>
+					<comments>/blog/bezeichnung-zum-merkmalswert-lesen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 27 Apr 2005 16:50:31 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=326</guid>
+
+					<description><![CDATA[<p>Hier ein kurzer Join, der zu einem Merkmal und einem Merkmalswert die Bezeichnung zum Merkmalswert liest.</p>
+<p>Der Beitrag <a href="/blog/bezeichnung-zum-merkmalswert-lesen/">Bezeichnung zum Merkmalswert lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier ein kurzer Join, der zu einem Merkmal und einem Merkmalswert die Bezeichnung zum Merkmalswert liest.<br /><P class="head1">Tabellen</P><P>Die zu verwendenden Tabellen sind:</P><UL><LI><STRONG>CAWNT </STRONG>&#8211; Hier stehen die Bezeichnungen zu den Merkmalswerten</LI><LI><STRONG>CAWN</STRONG> &#8211; Hier stehen die Merkmalswerte zu einem Merkmal</LI><LI><STRONG>CABN</STRONG> &#8211; Ist die Tabelle f&uuml;r die Merkmale selbst. Sie wird ben&ouml;tigt, um den internen Merkmalsz&auml;hler ATINN zu erhalten</LI></UL><P class="head1">Coding</P><P class="text1">Im folgenden Beispiel heisst das Merkmal &#8220;MERKMAL_1&#8221; und der Merkmalswert ist &#8220;A100&#8221;. </P><P class="sap1">DATA:<BR>&nbsp; lv_text TYPE atwtb.</P><P class="sap1">SELECT SINGLE atwtb FROM cawnt<BR>&nbsp;INNER JOIN cawn ON cawnt~atinn = cawn~atinn<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND cawnt~adzhl = cawn~adzhl<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND cawnt~atzhl = cawn~atzhl<BR>&nbsp;INNER JOIN cabn ON cabn~atinn = cawn~atinn<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND cabn~adzhl = cawn~adzhl<BR>&nbsp; INTO&nbsp;lv_text<BR>&nbsp;WHERE cabn~atnam = &#8216;MERKMAL_1&#8217;<BR>&nbsp;&nbsp; AND cawnt~spras =&nbsp;sy-langu<BR>&nbsp;&nbsp; AND cawn~atwrt&nbsp; = &#8216;A100&#8217;. </P></p>
+<p>Der Beitrag <a href="/blog/bezeichnung-zum-merkmalswert-lesen/">Bezeichnung zum Merkmalswert lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bezeichnung-zum-merkmalswert-lesen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Funktionsbausteine</title>
+		<link>/blog/funktionsbausteine-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 12 Jan 2005 12:16:41 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=306</guid>
+
+					<description><![CDATA[<p>Eine Sammlung von Funktionsbausteinen, die Sie im Umfeld der Klassifizierung verwenden k&#246;nnen. Da die Klassifizierung sehr komplex ist, sollten Sie immer Funktionsbausteine verwenden.</p>
+<p>Der Beitrag <a href="/blog/funktionsbausteine-2/">Funktionsbausteine</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine Sammlung von Funktionsbausteinen, die Sie im Umfeld der Klassifizierung verwenden können. Da die Klassifizierung sehr komplex ist, sollten Sie immer Funktionsbausteine verwenden.</p>
+<h3><strong>CARD_CHARACTERISTIC_READ</strong></h3>
+<p>sammelt etliche Informationen zu Merkmalen.</p>
+<h3><strong>CTHE_VALUE_F4</strong></h3>
+<p>gibt eine F4-Wertehilfe für Merkmale</p>
+<h3><strong>CTCV_CONVERT_FLOAT_TO_DATE<br />
+CTCV_CONVERT_DATE_TO_FLOAT</strong></h3>
+<p>Ein Datum wird in der Klassifizierung in dem Float-Feld gespeichert (AUSP-ATFLV) und muss erst umgerechnet werden. Das erledigen diese Bausteine.</p>
+<h2>CTBP_CONVERT_VALUE_INT_TO_EXT</h2>
+<p>Konvertiert einen Fließkommawert in die externe Darstellung, so wie in der Merkmalsdefinition angegeben. Die Ausgabe erfolgt inklusive Einheiten (°C, mm, g/l, &#8230;) im für den aktuellen Benutzer eingestellten Format.</p>
+<p>VALUE_RELATION ist bei Einzelwerten &#8220;1&#8221; und sollte bei Intervallen &#8220;3&#8221; sein. Die genaue Definition kann dem Quellcode des Bausteins CTCV_COMPARE_INTERVALS entnommen werden.</p>
+<pre>   1    =                single value
+   2    [)               interval
+   3    []               interval
+   4    ()               interval
+   5    (]               interval
+   6    &lt;                single value
+   7    &lt;=               single value
+   8    &gt;                single value
+   9    &gt;=               single value</pre>
+<h3>CLAF_CLASSIFICATION_OF_OBJECTS</h3>
+<p>Leist alle Merkmale und Merkmalsbewertungen zu einem Objekt. Es kann zwar die zu lesende Klasse angegeben werden, dies ist jedoch nicht erforderlich. Ohne Angabe der Klasse werden <strong>alle</strong> Bewertungen zu dem Objekt gelesen.</p>
+<p>Der Beitrag <a href="/blog/funktionsbausteine-2/">Funktionsbausteine</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Klassenart zu Objekt ermitteln</title>
+		<link>/blog/klassenart-zu-objekt-ermitteln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 09 Dec 2003 13:02:50 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=164</guid>
+
+					<description><![CDATA[<p>Um die Klassifizierung zu einem Objekt lesen zu k&#246;nnen, muss man wissen, mit welcher Klassenart das Objekt bewertet wurde. Mit dem folgenden Coding k&#246;nnen Sie die Klassenart ermitteln.</p>
+<p>Der Beitrag <a href="/blog/klassenart-zu-objekt-ermitteln/">Klassenart zu Objekt ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um die Klassifizierung zu einem Objekt lesen zu k&ouml;nnen, muss man wissen, mit welcher Klassenart das Objekt bewertet wurde. Mit dem folgenden Coding k&ouml;nnen Sie die Klassenart ermitteln.<br /><P class="sap1">data:<BR>&nbsp; lv_cuobj TYPE cuobj,<BR>&nbsp; lv_clnum TYPE klasse_d.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Klassenart zum Objekt&nbsp;ermitteln.<BR></FONT>&nbsp; SELECT klah~class&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp; FROM klah<BR>&nbsp;&nbsp; INNER JOIN kssk ON kssk~clint = klah~clint<BR>&nbsp;&nbsp;&nbsp; INTO lv_clnum<BR>&nbsp;&nbsp; WHERE kssk~objek = lv_cuobj.<BR>&nbsp; &nbsp; EXIT.<BR>&nbsp;&nbsp;ENDSELECT.</P></p>
+<p>Der Beitrag <a href="/blog/klassenart-zu-objekt-ermitteln/">Klassenart zu Objekt ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bewertung ändern</title>
+		<link>/blog/bewertung-aendern/</link>
+					<comments>/blog/bewertung-aendern/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 Nov 2003 16:04:51 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=151</guid>
+
+					<description><![CDATA[<p>Bei der &#196;nderung der Klassifizierung muss auf verschiedene Dinge geachtet werden; Wir sagen Ihnen, worauf.</p>
+<p>Der Beitrag <a href="/blog/bewertung-aendern/">Bewertung ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei der &Auml;nderung der Klassifizierung muss auf verschiedene Dinge geachtet werden; Wir sagen Ihnen, worauf.<br /><P>Um eine Bewertung zu &auml;ndern, verwenden Sie am besten einer der beiden Funktionsbausteine:</P><UL><LI>BAPI_OBJCL_CHANGE <LI>CACL_OBJECT_VALIDATION_MAINT</LI></UL><P class="head1">BAPI_OBJCL_CHANGE</P><P>Bei dem Funktionsbaustein <FONT>BAPI_OBJCL_CHANGE</FONT> mus am Ende des Programms ein <FONT>BAPI_TRANSACTION_COMMIT</FONT> ausgef&uuml;hrt werden.</P><P><STRONG>Achtung<BR></STRONG>Diesem BAPI m&uuml;ssen immer alle Bewertungen &uuml;bergeben werden! Ansonsten werden die Merkmale, die nicht &uuml;bergeben werden, aus der Bewertung gel&ouml;scht. Sie sollten also immer vorher den Funktionsbaustein BAPI_OBJCL_GETDETAIL aufrufen.</P><P class="head1">CACL_OBJECT_VALIDATION_MAINT</P><P>Wenn Sie den Baustein <FONT>CACL_OBJECT_VALIDATION_MAINT</FONT> verwenden, m&uuml;ssen Sie auf jeden Fall den Baustein <FONT>CACL_CLASSIFICATION_SAVE</FONT> am Ende der Bearbeitung aufrufen, um die Daten auch wirklich auf die Datenbank zu schreiben. Der Parameter I_COMMIT muss mitgegeben werden (X) oder Sie m&uuml;ssen den COMMIT WORK selbst ausf&uuml;hren.</P><P>Wenn Sie im weiteren Verlauf Ihres Programms auf diese Daten wieder zugreifen m&ouml;chten, sollten Sie den Parameter I_WAIT ebenfalls setzen. </P><P>Bei der Verwendung anderer BAPI&#8217;s, zum Beispiel &#8220;Charge anlegen&#8221;, dann sollten Sie auch den Verbuchungsmodus auf &#8220;lokal&#8221; stellen: &#8220;<FONT>SET UPDATE TASK LOCAL</FONT>&#8220;. Andernfalls kann es sein, dass Sie &#8212; um bei dem Beispiel zu bleiben&nbsp; &#8212; die Charge per BAPI anlegen und die Klassifizierung mit dem Klassifizierungs-BAPI &auml;ndern m&ouml;chten, obwohl die Charge noch nicht verbucht wurde.</P></p>
+<p>Der Beitrag <a href="/blog/bewertung-aendern/">Bewertung ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bewertung-aendern/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Bewertung lesen</title>
+		<link>/blog/bewertung-lesen/</link>
+					<comments>/blog/bewertung-lesen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 Nov 2003 15:59:59 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=150</guid>
+
+					<description><![CDATA[<p>Um die Bewertung zu einem Objekt zu lesen, gibt es mehrere Funktionsbausteine... Hier sehen Sie aber auch, wie die Merkmalsbewertungen &#252;ber die Tabellen gezielt gelesen werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/bewertung-lesen/">Bewertung lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um die Bewertung zu einem Objekt zu lesen, gibt es mehrere Funktionsbausteine&#8230; Hier sehen Sie aber auch, wie die Merkmalsbewertungen über die Tabellen gezielt gelesen werden können.</p>
+<p>Verwenden Sie einen der folgenden Bausteine zum Lesen der Klassifizierungsdaten:</p>
+<ul>
+<li>BAPI_OBJCL_GETDETAIL</li>
+<li>BAPI_OBJCL_GETCLASSES</li>
+<li>CACL_OBJECT_READ_VALIDATION</li>
+</ul>
+<h2>BAPI_OBJCL_GETDETAIL</h2>
+<p>Beispielaufruf für das Material MAT1234, Charge CH12345. Die Klasse heisst ZM_ZUSATZ.</p>
+<pre>OBJECTKEY                       MAT1234           CH12345 
+OBJECTTABLE                     MCH1 
+CLASSNUM                        ZM_ZUSATZ 
+CLASSTYPE                       023 
+KEYDATE                         08.12.2003 
+UNVALUATED_CHARS 
+LANGUAGE                        DE</pre>
+<p>In den Tabellen <strong>ALLOCVALUESNUM </strong>erhalten Sie die numerischen Werte zurück; in der Tabelle <strong>ALLOCVALUESCHAR</strong> die Zeichenartigen Merkmale und in der Tabelle <strong>ALLOCVALUESCURR</strong> die Währungsmerkmale.</p>
+<p>Informationen stehen in der Tabelle <strong>RETURN</strong>.</p>
+<p>[notice type=&#8217;info&#8217;]Wenn Sie nicht sicher sind, welche Klassennummer verwendet wurde &#8212; z.B. weil dem Material verschiedene Klassen zugeordnet werden können &#8211;, dann verwenden Sie bitte den Baustein <strong>BAPI_OBJCL_GETCLASSES!</strong>[/notice]</p>
+<h2>Zusammengesetzter Objektschlüssel</h2>
+<p>Bei Klassifizierungen für Tabellen mit mehreren Schlüsselfeldern muss der Objektschlüssel aus diesen zusammengesetzt werden. Eine einfache Methode bietet der Baustein BAPI_OBJCL_CONCATENATEKEY. Im Falle des oben genannten Beispiels müssen dem Baustein die Namen und Werte der Schlüsselfelder in einer Tabelle übergeben werden (Wie bei CACL_OBJECT_VALIDATION_READ). Übergeben wird dann der korrekt zusammengesetzte Schlüssel.</p>
+<h2>Vorhandene Bewertungen ermitteln</h2>
+<p>Falls ein Material, eine Charge etc. mehreren Klassen zugeordnet werden kann, so muss zuvor geprüft werden, zu welcher Klasse überhaupt Bewertungen vorhanden sind.</p>
+<p>Diese Arbeit übernimmt der Baustein <strong>BAPI_OBJCL_GETCLASSES</strong>. Er ist genau so &#8220;zu füttern&#8221;, wie BAPI_OBJCL_GETDETAIL.</p>
+<p>Bei Bedarf (Parameter READ_VALUATIONS) werden auch gleich die zugehörigen Bewertungen gelesen.</p>
+<h3>CACL_OBJECT_READ_VALIDATION</h3>
+<p>Beispiel zum Lesen einer Klassifizierung zum Kunden:</p>
+<pre class="sap1">OBJECT_TYPE               KNA1          
+CLASS_TYPE                011 
+CLASS                     Z_DEB_CLASS          
+WITH_UNASSIGNED_CHARACTS  
+WITH_INHERITED_CHARACTS   
+DATE                                
+LANGUAGE                  DE</pre>
+<p>Die Tabelle OBJECT_IDENTIFICATION muss mit dem oder den Feldnamen gefüllt werden und dem entsprechenden Wert des Objekts:</p>
+<pre>FIELD                     VALUE                     
+KUNNR                     784653
+CLAF_CLASSIFICATION_OF_OBJECTS
+CLASS                     Z_DEB_CLASS
+CLASSTEXT                 X
+CLASSTYPE                 011
+FEATURES                  X
+LANGUAGE                  DE
+OBJECT                    0000012345  "Kundennummer
+OBJECTTABLE               KNA1
+KEY_DATE                  11.04.2014
+INITIAL_CHARACT           X
+NO_VALUE_DESCRIPT   
+CHANGE_SERVICE_CLF        X</pre>
+<h3>Bewertung über Tabellen lesen</h3>
+<p>Das folgende Programm liest gezielt einzelne Merkmalsbewertungen zu einem Objekt &#8212; in diesem Fall eine Charge.</p>
+<pre>REPORT z_merkmale_lesen.
+DATA:
+  l_atwrt TYPE atwrt,
+  l_atflv TYPE atflv,
+  l_anzst TYPE anzst,
+  l_anzdz TYPE anzdz,
+  l_wert(30),
+  l_objek TYPE cuobn,
+  l_atfor TYPE atfor,   "Format
+  l_klart TYPE klassenart VALUE '023',
+  l_obtab TYPE tabelle    VALUE 'MCH1'.
+
+PARAMETERS: p_matnr TYPE matnr DEFAULT 'MAT123',
+            p_charg TYPE charg_d.
+
+START-OF-SELECTION.
+  PERFORM lies_merkmal USING 'ZM_LAENGE'. "Länge
+  PERFORM lies_merkmal USING 'ZM_ANZAHL'. "Anzahl je Einheit
+
+*---------------------------------------------------------------------*
+*       FORM lies_merkmal                                             *
+*---------------------------------------------------------------------*
+FORM lies_merkmal USING value(f_merkmal).
+*-- Objektnummer aus Materialnummer und Charge bauen
+  l_objek        = p_matnr.
+  l_objek+18(10) = p_charg.
+  WRITE: / f_merkmal COLOR COL_POSITIVE.
+  POSITION 20.
+
+  CLEAR: l_atwrt, l_atflv, l_atfor, l_anzst, l_anzdz.
+
+*-- Merkmalswert über Inner Join ermitteln
+  SELECT SINGLE ausp~atwrt
+                ausp~atflv
+                cabn~atfor
+                cabn~anzdz
+    FROM ausp
+   INNER JOIN inob ON inob~cuobj = ausp~objek
+   INNER JOIN cabn ON ausp~atinn = cabn~atinn
+    INTO (l_atwrt, l_atflv, l_atfor, l_anzdz)
+   WHERE inob~klart = l_klart
+     AND inob~obtab = l_obtab
+     AND inob~objek = l_objek
+     AND cabn~atnam = f_merkmal.
+  IF sy-subrc &gt; 0.
+    WRITE: 'nicht bewertet.'.
+  ELSE.
+
+*-- Je nach Merkmalsformat unterschiedliche Zuweisung
+    CASE l_atfor.
+      WHEN 'CHAR'.
+*-- Zeichenformat
+        WRITE: l_atwrt.  
+      WHEN 'NUM' OR 'DATE' OR 'TIME'.
+*-- Numerisches Format
+        WRITE l_atflv TO l_wert EXPONENT 0 NO-GROUPING NO-ZERO
+                                         LEFT-JUSTIFIED DECIMALS l_anzdz.
+        WRITE: l_wert.
+    ENDCASE.
+  ENDIF.
+
+ENDFORM.</pre>
+<p>Der Beitrag <a href="/blog/bewertung-lesen/">Bewertung lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bewertung-lesen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Tabellen</title>
+		<link>/blog/tabellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Oct 2003 18:36:35 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=140</guid>
+
+					<description><![CDATA[<p>Hier sind Tabellen aufgelistet, in denen sich die Klassifizierungsdaten "verstecken".</p>
+<p>Der Beitrag <a href="/blog/tabellen/">Tabellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier sind Tabellen aufgelistet, in denen sich die Klassifizierungsdaten &#8220;verstecken&#8221;.<br /><P class="head1">Merkmale</P><P>CABN: Merkmale (Merkmalstexte in der CABNT)<BR>CAWN: Merkmalswerte (Texte der Merkmalswerte in der CAWNT)</P><P>Texte zu den Merkmalswerten finden Sie &uuml;ber die folgende Textdefinition:</P><P>STXH-TDOBJECT: FEATURE<BR>STXH-TDID: VALU<BR>STXH-TDNAME: &lt;CAWN-ATINN&gt;&lt;CAWN-ATZHL&gt;</P><P>Angezeigt werden k&ouml;nnen die Texte mit dem Programm SDTEXTE.</P><P class="head1">Klassen</P><P>KLAH: Klassendefinition<BR>KSML: Zuordnung Klasse -&gt; Merkmal<BR>KSSK: Zuordnung Klasse -&gt; Objekte</P><P class="head1">Objekte</P><P>AUSP: Auspr&auml;gung der Merkmale <BR>INOB: Objektzuordnung</P></p>
+<p>Der Beitrag <a href="/blog/tabellen/">Tabellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

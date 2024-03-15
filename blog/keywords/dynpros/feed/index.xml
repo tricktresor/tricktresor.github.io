@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Dynpros Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/dynpros/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 23 Feb 2023 15:44:14 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Dynpros Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SimDia² &#8211; SAP-Datenimport einfach?</title>
+		<link>/blog/simdia2-sap-datenimport-einfach/</link>
+					<comments>/blog/simdia2-sap-datenimport-einfach/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 14 Apr 2014 15:24:30 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Scripting]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[LSMW]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Popups]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Batch Input]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[Viewcluster]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[color]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4659</guid>
+
+					<description><![CDATA[<p>Für die Datenmigration von Fremdsystemen oder Excel stehen in SAP viele Möglichkeiten offen. In diesem Artikel stelle ich euch SimDia² vor mit dem die Datenübernahme aus Exceldateien ein Kinderspiel wird. Die Übernahme der Felder wird durch einfaches Anklicken im SAPGUI definiert. Es können "Kopfdaten" und "Positionsdaten" übernommen werden. </p>
+<p>Der Beitrag <a href="/blog/simdia2-sap-datenimport-einfach/">SimDia² &#8211; SAP-Datenimport einfach?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><span style="line-height: 1.5em;">[pullquote float=&#8217;left&#8217; color=&#8217;#000000&#8242; bgcolor=&#8217;#ffffff&#8217;]Wir schärfen Ihre Axt, während Sie den Baum fällen.[/pullquote] So lautet das Motto von </span><a style="line-height: 1.5em;" title="ERSAsoft | Homepage" href="https://ersasoft.de/de?s=tt">ERSAsoft</a><span style="line-height: 1.5em;">.&nbsp;</span>Der Slogan ist eine Anspielung auf das Zitat „Ich hab keine Zeit meine Axt zu schärfen. Ich muss einen Baum fällen.“ aus der Erzählung „Komm, ich erzähl dir eine Geschichte“ von <a title="Jorge Bucay | Wikipedia" href="http://de.wikipedia.org/wiki/Jorge_Bucay">Jorge Bucay</a>.</p>
+<p>Er soll den Anspruch von ERSAsoft verdeutlichen, Tools zu entwickeln, die „den Umgang mit SAP so einfach und komfortabel wie möglich gestalten“. Ob das Datenimport-Tool SimDia²&nbsp; diesem Anspruch wirklich gerecht wird, wollte ich prüfen.</p>
+<h2>Was ist SimDia²?</h2>
+<p><a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist ein ein Tool, um Daten aus Excel nach SAP zu importieren. Dabei arbeitet das Programm direkt im SAPGUI-Dialog. Damit wird auch schnell klar, welche Zielrichtung SimDia² verfolgt: den Import kleinster bis mittlerer Datenmengen (von zwei bis &gt;10.000 Datensätzen). Für wirklich große Datenmigrationen mit mehreren 100.000 oder gar Millionen Datensätzen ist es nicht gedacht.</p>
+<p>Aufgaben, bei denen Daten von Excel in eine SAP-Transaktion übertragen werden, sollen mit SimDia² einfacher werden. Auf der&nbsp;<a title="Demo-Videos | SimDia²" href="https://ersasoft.de/de/videos/?s=tt">Video-Seite&nbsp;</a>werden deswegen auch typische Beispiele aus der täglichen Arbeit eines SAP-Fachanwenders vorgestellt: Personaldaten erfassen, Rechnungen buchen oder Materialstücklisten einpflegen.</p>
+<p>Diese Videos habe ich mir natürlich angesehen und war begeistert. Das Versprechen „Dateneingabe so einfach und komfortabel wie möglich“ war offensichtlich kein leeres. Und dass man damit wohl auch mehr machen kann, als Stamm- und Bewegungsdaten zu importieren, war mir schnell klar. Aber dazu später mehr.</p>
+<h2>Technik</h2>
+<p><span style="line-height: 1.5em;"><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_05_56.jpg"><img fetchpriority="high" decoding="async" class="alignright size-medium wp-image-4662" src="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_05_56-300x255.jpg" alt="simdia und se11" width="300" height="255" srcset="/wp-content/uploads/2014/03/03_21_17_05_56-300x255.jpg 300w, /wp-content/uploads/2014/03/03_21_17_05_56-624x531.jpg 624w, /wp-content/uploads/2014/03/03_21_17_05_56.jpg 861w" sizes="(max-width: 300px) 100vw, 300px" /></a>Nachdem ich mich in meinem SAP-Leben bereits häufiger mit den verschiedensten Tools zur Datenübernahme beschäftigt habe, war ich gespannt, was SimDia² zu bieten hat. Bei meinem ersten Kontakt mit dem Tool fand ich es spontan sehr innovativ und hilfreich, dass sich das SimDia²-Fenster in den SAP GUI integriert. Technisch stimmt das zwar nicht, denn SimDia²&nbsp; ist ein reines Windows-Programm mit einem eigenen Fenster, das sich über den SAP GUI legt, aber es sieht zuerst einmal so aus, als wäre das Tool nahtlos in SAP integriert.</span></p>
+<p>Das Programm verwendet die SAP GUI Scripting API, um Daten mit SAP GUI auszutauschen sowie VBA als Schnittstelle zu Excel. Ein gravierender Vorteil der Realisierung als Windows-Programm: außer einem aktivierten GUI-Scripting sind keinerlei Eingriffe in SAP erforderlich.</p>
+<p>Darüber hinaus ist SimDia² praktisch „out-of-the-box“ ablauffähig. Ausgeliefert wird es als ZIP-Archiv: nach dem Entpacken ist es <a href="https://ersasoft.de/de/videos/?s=tt#Video1">sofort startklar</a>.</p>
+<h2>Anwendung</h2>
+<p>Wie erwähnt, ist SimDia² als Datenimport-Tool konzipiert. Diese Aufgabe bewältigte es in den (wenigen) von mir durchgeführten Tests problemlos. Da ich aber aus der Entwicklung komme und eher selten (eigentlich: nie) typische Daten-Imports durchführen muss, habe ich überlegt, mit welcher Anwendung ich SimDia² noch testen könnte.</p>
+<p>Dabei stieß ich auf eine Tätigkeit, die mich jedes Mal schrecklich nervt: das Anlegen von Datenelementen und den dazugehörigen Domänen in ABAP. Da meine Entwicklungen in der Regel eher übersichtlich sind, kommt das massenweise Anlegen von Datenelementen und Domänen bei mir nicht häufig vor. Ich kann mir jedoch gut vorstellen, dass SimDia² bei größeren Projekten, in denen zuvor ein umfangreiches Datenmodell erstellt wird, gut zum Einsatz kommen kann.</p>
+<p>Hierfür könnten die Attribute von allen Datenelementen und Domänen in einer Excel-Datei einfach erfasst, diskutiert und gegebenenfalls noch geändert werden. Sobald die Entwicklung in SAP beginnt, lässt man die Repository Objekte durch SimDia²&nbsp;anlegen.</p>
+<p>Um zu prüfen, wie SimDia² mit Popups, Radiobuttons und Ankreuzfeldern klar kommt, wollte ich Datenelement und Domäne in einem Rutsch anlegen. Alle notwendigen Attribute hatte ich in einer Excel-Datei gespeichert und die Aufzeichnung gestartet.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/04_14_16_53_40.jpg"><img decoding="async" class="size-medium wp-image-4707 alignleft" src="https://tricktresor.com/wp-content/uploads/2014/03/04_14_16_53_40-300x158.jpg" alt="simdia Excel" width="300" height="158" srcset="/wp-content/uploads/2014/03/04_14_16_53_40-300x158.jpg 300w, /wp-content/uploads/2014/03/04_14_16_53_40-624x330.jpg 624w, /wp-content/uploads/2014/03/04_14_16_53_40.jpg 724w" sizes="(max-width: 300px) 100vw, 300px" /></a><span style="line-height: 1.5em;">Für die Aufzeichnung werden im SimDia²-Fenster die Daten aus der ersten Tabellenzeile als Druckknöpfe angezeigt.</span></p>
+<p>Zur programm-internen <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial1">Verknüpfung der Excel-Daten mit den jeweiligen SAP-Feldern</a> positioniert man einfach den Cursor im gewünschten SAP-Feld und klickt im SimDia²-Fenster auf den entsprechenden Button. Der Wert wird daraufhin übernommen und die Aktion aufgezeichnet. So verfährt man, bis alle erforderlichen Felder und Aktionen in SAP erfolgt und aufgezeichnet sind.&nbsp;Und das geht nun wirklich schnell, einfach und intuitiv.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_07_33.jpg"><img decoding="async" class="alignright size-medium wp-image-4664" src="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_07_33-236x300.jpg" alt="simdia_buttons" width="236" height="300" srcset="/wp-content/uploads/2014/03/03_21_17_07_33-236x300.jpg 236w, /wp-content/uploads/2014/03/03_21_17_07_33.jpg 415w" sizes="(max-width: 236px) 100vw, 236px" /></a></p>
+<p><b>Funktionalität</b></p>
+<p>SimDia² kann grundsätzlich mit allen SAP-Dynpros und Transaktionen arbeiten (einige Transaktionen sind allerdings zur Automatisierung nicht besonders gut geeignet; s.u.). Dabei ist es egal, ob es sich um Standard-, modifizierte oder kundeneigene Transaktionen handelt. Auch nachträgliche Dynpro-Änderungen sind unproblematisch &#8211; solange keine in der Aufzeichnung benutzte Datenfelder entfernt werden.</p>
+<p>Während des Imports werden alle SAP-Meldungen direkt in der Excel-Datei protokolliert, sodass alle innerhalb von SAP durchgeführten Verarbeitungsschritte nachvollzogen werden können.</p>
+<p>Darüber hinaus enthält SimDia² einige Funktionen, die ich in anderen Import-Tools noch nie gesehen habe. Hier nur zwei Beispiele:</p>
+<ul>
+<li>In Table Controls lassen sich nicht nur neue Sätze <span style="text-decoration: underline;">anlegen</span>. Auch bereits existierende Sätze können zielsicher identifiziert und <span style="text-decoration: underline;">geändert</span> werden.</li>
+<li>SimDia² kann nicht nur Daten aus Excel nach SAP übertragen, sondern auch umgekehrt. Aber nicht nur das. Die exportierten Daten können z.B. mit Excel-internen Funktionen beliebig modifiziert und sofort nach SAP zurück übertragen werden.</li>
+</ul>
+<p>Wie weiter oben bereits angedeutet, kann SimDia² aber auch noch mehr, als Daten zu importieren. Da das Programm alle in SAP vorgenommenen Aktionen aufzeichnen und später beliebig wiederholen kann, eignet es sich auch super als Automatisierungstool für SAP. Da ist es egal, ob man schnell mal ein paar hundert Datensätze in einem Testsystem löschen muss, ViewCluster in der Transaktion SM34 anlegen will oder regelmäßig ein paar dutzend Reports ausführen soll.</p>
+<h2>Pro und Contra</h2>
+<p>SimDia² ist darauf spezialisiert, <em>flache Daten</em> und dazugehörige <em>Positionsdaten</em> zu übernehmen. Es können keine Abfragen oder Verzweigungen programmiert werden. Das macht das Tool einerseits sehr interessant für Key- oder Poweruser, die „ihre“ Imports jetzt selbst vorbereiten und durchführen können.</p>
+<p>Gleichzeitig zeigen sich aber auch die Grenzen zur klassischen Programmierung. Sobald eine SAP-Anwendung auf einen Eingabewert mit unterschiedlichen Dynpros &#8220;antwortet&#8221;, muss der Anwender für jeden Eingabewert eine eigene Aufzeichnung erstellen.</p>
+<p>Dem steht jedoch der benötigte Zeitaufwand gegenüber: mit etwas Erfahrung (s.u.) braucht man für eine Aufzeichnung mit SimDia² nicht länger als 1-2 Minuten. Bei einem Import mit der LSMW sind dies wohl eher 1-2 Stunden. Und ganz zu schweigen natürlich von einer klassisch programmierten Lösung.</p>
+<p>Der Support von <a href="https://ersasoft.de/de/?s=tt">ERSAsoft</a> ist super. Probleme oder Fragen sind schnell per Mail, Telefon oder Teamviewer geklärt. Rüdiger Specht, Gründer und Inhaber, ist dabei stets ruhig, freundlich, geduldig und kompetent. Bei Problemen oder Schwierigkeiten redet er nicht um den heißen Brei herum, sondern sagt klar und deutlich, was Sache ist.</p>
+<h2>Fazit</h2>
+<p>Obwohl SimDia² sehr einfach zu bedienen ist, hatte ich die ersten Male das Gefühl, dass es &#8220;rum zickt&#8221;. Ich habe jedoch schnell gemerkt, dass die Zickerei an den unterschiedlich programmierten SAP-Programmen liegt. Bei der Aufzeichnung muss man sich an die Gegebenheiten der SAP-Transaktionen richten. Auch wenn SimDia² einfach zu bedienen und schnell zu erlernen ist, heißt es auch hier: Übung macht den Meister und SAP-Knowhow sollte vorhanden sein.</p>
+<p>Insgesamt ist SimDia² sehr innovativ, wirklich einfach zu bedienen und schnell zu erlernen. Das ist das riesengroße Plus. Das, was ich bei SimDia² vermisst habe, als negativ zu bewerten, wäre falsch, denn einem Porsche kreide ich auch nicht an, dass er zwar 260 km/h fährt, ich aber nicht gleichzeitig ein Klavier damit transportieren kann. SimDia² ist dafür konzipiert, bestimmte Aufgaben im Zusammenspiel mit Excel schnell und intuitiv zu lösen. Und das tut es.</p>
+<p>Damit ist das Programm SAP-internen Tools wie LSMW oder Batch Input haushoch überlegen.</p>
+<p>Ist eine Aufzeichnung erst einmal &#8220;im Kasten&#8221;, dann ist der Aufruf schnell möglich und die neuen Daten sind ratzfatz im SAP. Anwendern, die regelmäßig Daten von Excel nach SAP überführen müssen, kann ich SimDia² wirklich nur ans Herz legen.</p>
+<h2>Update</h2>
+<p>In diesem Artikel beschreibe ich die neue Version von SimDia²:</p>
+<p>https://tricktresor.com/blog/simdia2-neue-version-des-besten-sap-import-tools/</p>
+<br />
+[accordian]</p>
+<p>Und jetzt kommt das Beste: ERSAsoft bietet allen Tricktresor-Fans einen Nachlass von 5% an. Füllt einfach das unten stehende Formular aus und ihr bekommt den erwähnten Nachlass gewährt. So. Noch leichter kann ich euch den SAP-Datenimport wirklich nicht machen&#8230;!</p>
+<h2>Tricktresor- Bonus</h2>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>https://tricktresor.com/blog/simdia%C2%B2-als-alternative-zur-programmierung/</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p>
+<p>Der Beitrag <a href="/blog/simdia2-sap-datenimport-einfach/">SimDia² &#8211; SAP-Datenimport einfach?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/simdia2-sap-datenimport-einfach/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>screen0</title>
+		<link>/blog/screen0/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 07 Sep 2010 14:41:26 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=561</guid>
+
+					<description><![CDATA[<p>M&#246;chte man ein Control auf einem Dynpro verwenden, legt man normalerweise mit dem Screenpainter ein CustomControl an. Das ist jedoch nicht zwingend notwendig!</p>
+<p>Der Beitrag <a href="/blog/screen0/">screen0</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>M&ouml;chte man ein Control auf einem Dynpro verwenden, legt man normalerweise mit dem Screenpainter ein CustomControl an. Das ist jedoch nicht zwingend notwendig!<br /><P>Wenn keine anderen Elemente vorhanden sein sollen, dann kann man auch die Variable cl_gui_container=&gt;screen0 verwenden und seinen Container somit an das Dynpro direkt binden.</P><P class="sap1">DATA: l_alv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO&nbsp;&nbsp; cl_gui_alv_grid,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lt_sflight TYPE TABLE OF sflight.<BR><BR>SELECT * FROM sflight INTO TABLE lt_sflight.<BR>* automatically use the full screen to display the grid,<BR>* NO CONTAINER DEFINITION IS REQUIRED !<BR><BR>CREATE OBJECT l_alv<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; i_parent = <FONT color="#fb2412">cl_gui_container=&gt;screen0</FONT>.<BR><BR>CALL METHOD l_alv-&gt;set_table_for_first_display<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; i_structure_name = &#8216;SFLIGHT&#8217;<BR>&nbsp; CHANGING<BR>&nbsp;&nbsp;&nbsp; it_outtab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_sflight.<BR><BR>* You have to create an EMPTY screen<BR>CALL SCREEN 100.<BR></P><P>Quelle: <A href="http://mustafayalcin.com/blog/?p=141" Target="_blank">http://mustafayalcin.com/blog/?p=141</A></P></p>
+<p>Der Beitrag <a href="/blog/screen0/">screen0</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Inaktive Elemente</title>
+		<link>/blog/inaktive-elemente/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 25 Aug 2010 18:43:30 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=555</guid>
+
+					<description><![CDATA[<p>Wenn man einen GUI-Status definiert, dann werden normalerweise die Druckkn&#246;pfe eingeblendet oder sie sind komplett unsichtbar, wenn sie mittels EXCLUDING ausgeblendet werden. Es gibt aber auch eine M&#246;glichkeit, die Drucktasten als INAKTIV sichtbar stehen lassen. Wir zeigen, wie's geht...</p>
+<p>Der Beitrag <a href="/blog/inaktive-elemente/">Inaktive Elemente</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wenn man einen GUI-Status definiert, dann werden normalerweise die Druckkn&ouml;pfe eingeblendet oder sie sind komplett unsichtbar, wenn sie mittels EXCLUDING ausgeblendet werden. Es gibt aber auch eine M&ouml;glichkeit, die Drucktasten als INAKTIV sichtbar stehen lassen. Wir zeigen, wie&#8217;s geht&#8230;<br /><P>Wenn Sie einen GUI-Status anlegen, dann ist er in per Default so eingestellt, dass Funktionen, die per EXCLUDING ausgeblendet werden, auch nicht mehr sichtbar sind.</P><P>Sie k&ouml;nnen im Status jedoch aus dieser &#8220;variablen Drucktastenleiste&#8221; eine &#8220;ortskonstante Drucktastenleiste&#8221; machen. &#8220;Ortskonstant&#8221; heisst in dem Fall, dass die inaktiven Funktionen nicht ausgeblendet werden, sondern inaktiv an der gleichen Stelle bleiben; sie sind also &#8220;ortskonstant&#8221;.</P><P>&Auml;ndern Sie den Typ entweder im Men&uuml; &#8220;<EM>Springen &#8211; Eigenschaften &#8211; D-Tastenbelegungen</EM>&#8221; oder klicken Sie im &Auml;nderungsmodus auf das gr&uuml;ne Icon ganz rechts.</P><P><IMG src="/wp-content/uploads/tt_images/abap/hc_659.jpg"></P><P>Es erscheint ein Fenster, in dem Sie die Eigenschaften einstellen k&ouml;nnen:</P><P><IMG src="/wp-content/uploads/tt_images/abap/hc_004.jpg"></P><P>W&auml;hlen Sie &#8220;Alle anzeigen&#8221; und es werden alle Funktionen in der Drucktastenleiste angezeigt. Das Icon ist nun rot.</P><P><IMG src="/wp-content/uploads/tt_images/abap/hc_003.jpg" width="660" height="121"></P><P>Sie k&ouml;nnen auch nur bestimmte Funktionen w&auml;hlen, die als inaktiv sichtbar bleiben sollen. Dann ist das Icon gelb.</P><P>So sieht es aus, wenn eine inaktive Funktion eingeblendet wird:</P><P><IMG src="/wp-content/uploads/tt_images/abap/hc_661.jpg"></P><P>Das &#8220;Zielf&auml;hnchen&#8221; ist inaktiv und so kann diese Funktion nicht ausgew&auml;hlt werden. Leider wird allerdings keine Quickinfo f&uuml;r inaktive Funktionen angezeigt.</P></p>
+<p>Der Beitrag <a href="/blog/inaktive-elemente/">Inaktive Elemente</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Anzahl Zeilen im TableControl</title>
+		<link>/blog/anzahl-zeilen-im-tablecontrol/</link>
+					<comments>/blog/anzahl-zeilen-im-tablecontrol/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 13 Mar 2009 08:44:06 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=518</guid>
+
+					<description><![CDATA[<p>Manchmal m&#246;chte man gerne wissen, wieviele Zeilen eines TableControls auf dem Bildschirm tats&#228;chlich angezeigt werden. Leider gibt es kein Systemfeld, das diese Information liefert...</p>
+<p>Der Beitrag <a href="/blog/anzahl-zeilen-im-tablecontrol/">Anzahl Zeilen im TableControl</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Manchmal m&ouml;chte man gerne wissen, wieviele Zeilen eines TableControls auf dem Bildschirm tats&auml;chlich angezeigt werden. Leider gibt es kein Systemfeld, das diese Information liefert&#8230;<br /><P>Allerdings gibt es den Funktionsbaustein DYNP_VALUES_READ mit der undokumentierten Funktion &#8220;A&#8221; f&uuml;r Parameter REQUEST. Mit dieser Funktionalit&auml;t bekommen Sie alle auf dem Dynpro angezeigten Felder zur&uuml;ck geliefert. </P><P>Sie m&uuml;ssen dann nur noch ein Feld kennen, das auf dem Tablecontrol angezeigt wird und lesen den Tabelleneintrag f&uuml;r dieses Feld mit dem h&ouml;chsten Wert in STEPL&#8230;</P><P><U><STRONG>Hinweis:</STRONG></U><BR>Zudem bekommen Sie auch eine Information, ob ein Feld eingabebereit ist, oder nicht!!</P></p>
+<p>Der Beitrag <a href="/blog/anzahl-zeilen-im-tablecontrol/">Anzahl Zeilen im TableControl</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/anzahl-zeilen-im-tablecontrol/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Mussfelder</title>
+		<link>/blog/mussfelder/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Mar 2009 17:17:09 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[ABAP Profitricks]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<category><![CDATA[Transport]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=517</guid>
+
+					<description><![CDATA[<p>Ein h&#228;ufiger Wunsch ist die dynamische Aktivierung von Musseingabefeldern. Hierbei gibt es jedoch das Problem, dass die Mussfelder nicht beliebig hin- und hergeschaltet werden k&#246;nnen. Denn: Ist ein Mussfeld einmal aktiv, muss es auch gef&#252;llt werden. Andere Aktionen werden mit "Bitte erst alle Mussfelder ausf&#252;llen" quittiert.</p>
+<p>Der Beitrag <a href="/blog/mussfelder/">Mussfelder</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein häufiger Wunsch ist die dynamische Aktivierung von Musseingabefeldern. Hierbei gibt es jedoch das Problem, dass die Mussfelder nicht beliebig hin- und hergeschaltet werden können. Denn: Ist ein Mussfeld einmal aktiv, muss es auch gefüllt werden. Andere Aktionen werden mit &#8220;Bitte erst alle Mussfelder ausfüllen&#8221; quittiert.</p>
+<p>Um dieses &#8211; ansich ja gewollte Verhalten &#8211; zu umgehen, müssen wir uns einiger Tricks bedienen&#8230;</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/abap/Radiobutton/Radio_muss.gif" alt="" /></p>
+<p>Im folgenden wollen wir an einem Beispiel zeigen, wie die Mussfeldeigenschaft von Feldern geändert werden kann, sobald ein anderer Radiobutton aktiv ist.</p>
+<h2 class="head1">Trick 1</h2>
+<p>Wir hinterlegen beim Radiobutton einen Funktionscode und versehen ihn mit dem Funktionstyp &#8220;E&#8221; (Exit-Kommando).</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/abap/Radiobutton/eck_063.jpg" alt="" /></p>
+<p>Damit können wir im PAI des Dynpros das aktivieren der Radiobuttons mittels des folgenden Befehls abfangen:</p>
+<p>MODULE MyExitModule AT EXIT-COMMAND</p>
+<p>Nun brauchen wir in MyExitModule nur noch auf &#8220;RB&#8221; abzufragen, machen dann nix und&#8230; Wir kriegen die Meldung &#8220;Bitte alle Mussfelder ausfüllen&#8221;.</p>
+<p>Wir könnten nun zwar noch ein &#8220;LEAVE SCREEN&#8221; hinten dran hängen, aber dann erfolgt kein Transport der Feldwerte in die ABAP-Variablen, also wird auch unser Radiobutton auf dem alten Wert belassen.</p>
+<h2 class="head1">Trick 2</h2>
+<p>Wir simulieren den Feldtransport mit dem Funktionsbaustein &#8220;DYNP_VALUES_READ&#8221; und verlassen danach die Verarbeitung. Effekt: Die Radiobuttons werden korrekt gesetzt und auch alle bereits eingegebenen Werte bleiben erhalten.</p>
+<pre class="lang:abap decode:true ">CALL FUNCTION 'DYNP_VALUES_READ'
+  EXPORTING
+    dyname                   = repid
+    dynumb                   = dynnr
+    request                  = 'A'
+    perform_conversion_exits = 'X'
+    perform_input_conversion = ' '
+  TABLES
+    dynpfields               = t_fields
+  EXCEPTIONS
+    OTHERS                   = 11.</pre>
+<p>Normalerweise muss man dem Baustein alle zu lesenden Feldnamen übergeben. Wenn wir den Parameter REQUEST aber mit &#8220;A&#8221; füllen, dann liefert der Baustein alle auf dem Dynpro vorhandenen Felder zurück&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f600.png" alt="😀" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Wir müssen jetzt noch die Feldinhalte in die entsprechenden Felder stellen:</p>
+<pre class="lang:abap decode:true ">LOOP AT t_fields INTO wa_field.
+  ASSIGN (wa_field-fieldname) TO &lt;field&gt;.
+  CHECK sy-subrc = 0.
+  &lt;field&gt; = wa_field-fieldvalue.
+ENDLOOP.</pre>
+<p>Jetzt können wir schon mit den Radiobuttons hin- und herschalten und je nach Radiobutton ein anderes Feld zum Mussfeld machen.</p>
+<p>Wenn jedoch Datumsfelder, Uhrzeiten oder Dezimalzahlen auf dem Dynpro auftauchen, müssen wir diese auch selbst ins interne Format umwandeln.</p>
+<p>Deswegen:</p>
+<h2 class="head1">Trick 3</h2>
+<pre class="lang:abap decode:true">DESCRIBE FIELD &lt;field&gt; TYPE lv_field_type.
+CASE lv_field_type.
+  WHEN 'P'.
+*** Packed
+    CALL FUNCTION 'RS_CONV_EX_2_IN_DTEL'
+      EXPORTING
+        input_external  = wa_field-fieldvalue
+        dtel            = 'NETWR'
+      IMPORTING
+        output_internal = &lt;field&gt;
+      EXCEPTIONS
+        OTHERS          = 21.
+
+  WHEN 'T'.
+*** Time
+    CALL FUNCTION 'CONVERSION_EXIT_TIMLO_INPUT'
+      EXPORTING
+        input       = wa_field-fieldvalue
+      IMPORTING
+        output      = &lt;field&gt;
+      EXCEPTIONS
+        wrong_input = 1
+      OTHERS      = 2.
+
+  WHEN 'D'.
+*** Date
+    CALL FUNCTION 'CONVERSION_EXIT_SDATE_INPUT'
+      EXPORTING
+        input  = wa_field-fieldvalue
+      IMPORTING
+        output = &lt;field&gt;.
+
+  WHEN OTHERS.
+*** other fields
+    &lt;field&gt; = wa_field-fieldvalue.
+ENDCASE.</pre>
+<h2 class="head1">Beispielprogramm</h2>
+<p>Hier gibt es nochmal das ganze <a title="Mussfelder" href="https://tricktresor.com/wp-content/downloads/radiobuttons.txt" target="_blank" rel="noopener">Coding</a>.</p>
+<p>Hier die Ablauflogik vom Dynpro:</p>
+<pre class="lang:abap decode:true ">PROCESS BEFORE OUTPUT.
+MODULE status_0100.
+*
+PROCESS AFTER INPUT.
+MODULE exit_command_0100 AT EXIT-COMMAND.
+MODULE user_command_0100.</pre>
+<p>Der GUI-Status &#8216;100&#8217; muss natürlich noch angelegt werden. Es müssen nur die Tasten F3, SHIFT-F3 und F12 mit &#8220;EXIT&#8221; belegt werden (Exit-Code &#8220;E&#8221; nicht vergsessen!!).</p>
+<p>Der Beitrag <a href="/blog/mussfelder/">Mussfelder</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Komprimierungslogik</title>
+		<link>/blog/komprimierungslogik/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 22 Nov 2007 11:04:29 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=445</guid>
+
+					<description><![CDATA[<p>Bei Dynpros wird eine Komprimierungslogik eingesetzt, die sicherstellen soll, dass keine Bereiche auf dem Dynpro unn&#246;tig leer bleiben. Hier gibt es jedoch einige T&#252;cken...</p>
+<p>Der Beitrag <a href="/blog/komprimierungslogik/">Komprimierungslogik</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei Dynpros wird eine Komprimierungslogik eingesetzt, die sicherstellen soll, dass keine Bereiche auf dem Dynpro unnötig leer bleiben. Hier gibt es jedoch einige Tücken&#8230;</p>
+<p>Normalerweise werden die Zeilen eines Dynpros komprimiert, also zusammen geschoben, wenn durch Programmlogik Felder ausgeblendet werden.</p>
+<p>Dies funktioniert bei unkomplizierten Dynpros auch gut. Sobald aber viele Elemente auf einem Dynpro sind, funktioniert die Logik eventuell nicht mehr so, wie man es sich wünscht.</p>
+<p>Im folgenden stellen wir Ihnen hierzu ein paar Tipps vor.</p>
+<h2 class="head1">SAP-Hinweis 203023</h2>
+<p>Im SAP-Hinweis <a href="https://launchpad.support.sap.com/#/notes/203023">203023</a> steht Grundsätzliches zu der Komprimierungslogik sowie viele Hilfestellungen:</p>
+<p>Hinweis als PDF-Dokument: <a href="https://tricktresor.com/wp-content/uploads/2007/11/SAP-Hinweis-203023_DE_Laufzeitkomprimierung_Dynpro.pdf">SAP-Hinweis-203023_DE_Laufzeitkomprimierung_Dynpro</a>.</p>
+<h2 class="head1">Rahmen</h2>
+<p>Die Komprimierungslogik funktioniert leider nicht in dem folgenden Fall, wenn z.B. Rahmen4 ausgeblendet wird:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Dynpro/Dynpro_1.jpg" /></p>
+<p>Im Ergebnis sieht es dann nämlich so aus:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Dynpro/Eck_011.jpg" /></p>
+<p>Mit einem Trick kann man diesen Verhalten aber wieder korrigieren: Setzen Sie einfach einen unsichtbaren Rahmen um die Rahmen im rechten Bereich:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Dynpro/Dynpro_2.jpg" /></p>
+<p>Den Rahmen sieht man nicht; er ist ja unsichtbar&#8230; Dadurch, dass die Elemente aber in dem Rahmen stehen, werden sie wieder zusammengefasst:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Dynpro/Eck_012.jpg" /></p>
+<p>Der Beitrag <a href="/blog/komprimierungslogik/">Komprimierungslogik</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Screenvarianten</title>
+		<link>/blog/screenvarianten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 31 May 2007 22:16:23 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=420</guid>
+
+					<description><![CDATA[<p>Die Attribute der Dynprofelder werden in der Regel &#252;ber LOOP-AT-SCREEN bearbeitet. Die entsprechenden Attribute wie Eingabebereitschaft und Sichtbarkeit werden gesetzt und dann mit MODIFY SCREEN ge&#228;ndert. Es gibt aber auch eine elegante M&#246;glichkeit mithilfe der Screenvarianten!</p>
+<p>Der Beitrag <a href="/blog/screenvarianten/">Screenvarianten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Attribute der Dynprofelder werden in der Regel über <strong>LOOP-AT-SCREEN</strong> bearbeitet. Die entsprechenden Attribute wie <em>Eingabebereitschaft</em> und <em>Sichtbarkeit</em> werden gesetzt und dann mit <strong>MODIFY SCREEN</strong> geändert. Es gibt aber auch eine elegante Möglichkeit mithilfe der <em>Screenvarianten</em>!</p>
+<p>Um die Screenvarianten einsetzen zu können, benötigst du eine <strong>Dialogtransaktion</strong>, also ein Programm mit Dynpro (Kein Selektionsbild!!) das mittels einer Transaktion gestartet wird.</p>
+<p>Bei Aufruf des Dynpros im PBO kannst du anhand entsprechender Parameter bestimmen, welche Screenvariante gesetzt wird.</p>
+<p>In der Auftragsbearbeitung wird dies anhand des Auftragstypes gesteuert (Auftrag, Vertrag, Retoure etc).</p>
+<p>In der Screenvariante kannst du festlegen, welche Felder ausgeblendet und welche auf &#8220;nicht eingabebereit&#8221; gestellt werden sollen.</p>
+<h2 class="head1">Anlegen der Screenvarianten</h2>
+<p>Starte die Transaktion <strong>SHD0</strong> und trage die Transaktion ein. Wechsele dann auf den Reiter &#8220;Screenvarianten&#8221;.</p>
+<p>Trage den Variantennamen ein, z. B. &#8220;ZVAR_A&#8221;. Erfasse zudem das <em>Programm</em> und das <em>Dynpro</em>, für das du die Variante anlegen möchtest.</p>
+<p>Drücke auf den Knopf <span>[_Anlegen_]</span> (F5).</p>
+<p>Das System zeigt das Dynpro an und du kannst gleich wieder zurück gehen. Auf dem nächsten Bild siehst du dann alle Felder des Dynpros und du kannst die einzelnen Elemente &#8220;unsichtbar&#8221; schalten oder nur zur Anzeige freischalten.</p>
+<p>Sicher deine Variante mit einer sprechenden Bezeichnung.</p>
+<h2 class="head1">Aufruf der Screenvariante</h2>
+<p>Im PBO des Dynpros kannst du entscheiden, ob und welche Screenvariante du aufrufen möchtest:</p>
+<pre class="sap1">lv_variant = 'ZVAR_A'.
+CALL FUNCTION 'RS_HDSYS_SET_SC_VARIANT'
+     EXPORTING
+       progname                  = 'ZZMYPROG'
+       dynpro                    = '0100'
+       scvariant                 = lv_variant
+       set_immediately           = 'X'.</pre>
+<p>Die Variante wird aktiviert und der Benutzer sieht nur noch die eingestellten Felder.</p>
+<p><strong><u>Hinweis:<br />
+</u></strong>Die Attributänderung eines durch die Screenvariante ausgeblendeten Feldes auf &#8220;Obligatory&#8221; kann bewirken, dass der Anwender die Meldung bekommt &#8220;Bitte alle Mussfelder ausfüllen&#8221; obwohl er das Feld nicht sieht!!</p>
+<p>Der Beitrag <a href="/blog/screenvarianten/">Screenvarianten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Dynamisches Selektionsbild</title>
+		<link>/blog/dynamisches-selektionsbild/</link>
+					<comments>/blog/dynamisches-selektionsbild/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 20 Feb 2007 17:07:12 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<category><![CDATA[SELECT-OPTIONS]]></category>
+		<category><![CDATA[Free Selections Dialog]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=402</guid>
+
+					<description><![CDATA[<p>In diesem Artikel zeigen wir Ihnen, wie Sie dynamisch ein Selektionsbild erzeugen können und die eingegebenen Werte zur Selektion der Daten nutzen</p>
+<p>Der Beitrag <a href="/blog/dynamisches-selektionsbild/">Dynamisches Selektionsbild</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In diesem Artikel zeigen wir Ihnen, wie Sie dynamisch ein Selektionsbild erzeugen können und die eingegebenen Werte zur Selektion der Daten nutzen</p>
+
+
+
+<h2 class="wp-block-heading">Beschreibung</h2>
+
+
+
+<p>In diesem Beispielprogramm wird ein Selektionsbild zur Tabelle VBAK erzeugt und als Popup angezeigt.&nbsp;Der Benutzer kann nach belieben andere Felder ein- oder ausblenden.&nbsp;Aus den Selektionsoptionen zu den Feldern wird eine WHERE-Klausel für den Select-Befehl erzeugt, so dass die Daten einfach gelesen werden können.</p>
+
+
+
+<h2 class="wp-block-heading">Werte übergeben</h2>
+
+
+
+<p>Soll mehr als ein Wert übergeben werden, so muss die LT_EXPRESSIONS-Tabelle so aufgebaut werden, dass in der ersten Zeile steht</p>
+
+
+
+<p>LOGOP = &#8216;AND&#8217;.<br>ARITY&nbsp;= Anzahl der zu übergebenden Felder</p>
+
+
+
+<p>Danach kommen dann die Feldwerte, die vor geblendet werden sollen.</p>
+
+
+
+<figure class="wp-block-table"><table><thead><tr><th>LOGOP</th><th>ARITY</th><th>FIELDNAME</th><th>OPTION</th><th>LOW</th><th>HIGH</th></tr></thead><tbody><tr><td>AND</td><td>3</td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td>VBELN</td><td>BT</td><td>1000</td><td>2000</td></tr><tr><td></td><td></td><td>ERDAT</td><td>EQ</td><td>20070401</td><td></td></tr><tr><td></td><td></td><td>ERNAM</td><td>EQ</td><td>XK0945</td><td></td></tr></tbody></table><figcaption>Feldwerte</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Hinweis</h3>
+
+
+
+<p>Zur Erstellung einer WHERE-Bedingung aus RANGES-Tabellen bitte <a href="/blog/dynamische-where-bedingung/">hier</a> schauen.</p>
+
+
+
+<h3 class="wp-block-heading">Screenshot</h3>
+
+
+
+<p>Dynamisches Selektionsbild mit Einblendung der Felder</p>
+
+
+
+<figure class="wp-block-image alignnone"><img decoding="async" src="/wp-content/uploads/tt_images/abap/dyn.jpg" alt="Free Selections Dialog"/><figcaption>Free Selections Dialog</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Coding </h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT  zz_dynsel.
+
+*** Type-Pool für "Freie Abgrenzungen"
+TYPE-POOLS rsds.
+
+DATA:
+*** Datentabelle
+ lt_vbak              TYPE STANDARD TABLE OF vbak,
+*** Datenstruktur
+ ls_vbak              TYPE vbak,
+*** Selection-ID zur Unterscheidung mehrerer Sets
+ lv_selection_id      LIKE rsdynsel-selid,
+*** Anzahl der Felder
+ lv_number_of_fields  TYPE i,
+*** Tabellenname
+ lv_tablename         TYPE tablename,
+*** Init: Tabellen
+ lt_tables            TYPE STANDARD TABLE OF rsdstabs,
+*** Init: Felder
+ ls_fields            TYPE                   rsdsfields,
+ lt_fields            TYPE STANDARD TABLE OF rsdsfields,
+*** Daten für Where-Tabelle
+ lt_where_clauses     TYPE rsds_twhere,
+ ls_where_clause      TYPE rsds_where,
+*** Expressions
+ lt_expressions       TYPE rsds_texpr,
+ ls_expression        TYPE rsds_expr,
+ lt_expr              TYPE rsds_expr_tab,
+ ls_expr              TYPE rsdsexpr,
+*** Ranges
+ lt_field_ranges      TYPE rsds_trange,
+ ls_field_ranges      TYPE rsds_range,
+ lt_range             TYPE rsds_frange_t,
+ ls_range             TYPE rsds_frange,
+ lt_selopt            TYPE rsds_selopt_t,
+ ls_selopt            LIKE rsdsselopt.
+
+PARAMETERS:
+*** Anzeige der Feldauswahl im Tree?
+  p_tree AS CHECKBOX DEFAULT 'X',
+*** Vorgabe eines Selektionswertes?
+  p_vorg AS CHECKBOX DEFAULT 'X'.
+
+
+START-OF-SELECTION.
+*** Tabellenname vorgeben
+  lv_tablename = 'VBAK'.
+*** Tabelle im Dialog bekannt machen:
+  APPEND lv_tablename TO lt_tables.
+*** einzublendende Felder übergeben
+  ls_fields-tablename = lv_tablename.
+*** ...Dazu nehmen wir die ersten Felder der Tabelle
+  SELECT fieldname FROM dd03l INTO ls_fields-fieldname
+     WHERE tabname  = lv_tablename
+       AND as4local = 'A'
+       AND as4vers  = 0
+       AND position &lt; 15
+       AND datatype &lt;> 'CLNT'.
+    APPEND ls_fields TO lt_fields.
+  ENDSELECT.
+
+  IF p_vorg &lt;> space.
+*** Name des Erfassers mit SY-UNAME vorbelegen
+    ls_expr-fieldname = 'ERNAM'.
+    ls_expr-option    = 'EQ'.
+    ls_expr-low       = sy-uname.
+    APPEND ls_expr TO lt_expr.
+
+    ls_expression-tablename = lv_tablename.
+    ls_expression-expr_tab  = lt_expr.
+    APPEND ls_expression TO lt_expressions.
+  ENDIF.
+
+*** "Freie Abgrenzungen" initialisieren
+  CALL FUNCTION 'FREE_SELECTIONS_INIT'
+    EXPORTING
+      kind         = 'T'
+      expressions  = lt_expressions
+    IMPORTING
+      selection_id = lv_selection_id
+      field_ranges = lt_field_ranges
+    TABLES
+      tables_tab   = lt_tables
+      fields_tab   = lt_fields
+    EXCEPTIONS
+      OTHERS       = 20.
+  IF sy-subrc &lt;> 0.
+    WRITE: / sy-subrc.
+  ELSE.
+
+*** Dialog mit "freien Abgrenzungen" aufrufen
+    CALL FUNCTION 'FREE_SELECTIONS_DIALOG'
+      EXPORTING
+        selection_id            = lv_selection_id
+        title                   = 'Tricktresor'
+        frame_text              = 'Bitte Selektion eingeben'
+        as_window               = 'X'
+        start_row               = 3
+        start_col               = 3
+        tree_visible            = p_tree
+        no_frame                = 'X'
+      IMPORTING
+        where_clauses           = lt_where_clauses
+        expressions             = lt_expressions
+        field_ranges            = lt_field_ranges
+        number_of_active_fields = lv_number_of_fields
+      TABLES
+        fields_tab              = lt_fields
+      EXCEPTIONS
+        internal_error          = 1
+        no_action               = 2
+        selid_not_found         = 3
+        illegal_status          = 4
+        OTHERS                  = 5.
+    IF sy-subrc > 0.
+      IF sy-subrc = 2.
+*** Meldung "Auswahl wurde abgebrochen"
+        MESSAGE s000(oo) WITH 'Auswahl wurde abgebrochen'.
+      ELSE.
+*** Meldung "Fehler bei Funktionsbausteinaufruf"
+        MESSAGE i000(oo) DISPLAY LIKE 'E'
+           WITH 'Fehler bei FREE_SELECTIONS_DIALOG' sy-subrc.
+      ENDIF.
+    ELSE.
+*** vom Baustein generierte WHERE-Klausel zur Selektion lesen
+      READ TABLE lt_where_clauses INTO ls_where_clause
+            WITH KEY tablename = lv_tablename.
+*** Selektion durchführen
+      SELECT * FROM (lv_tablename) INTO TABLE lt_vbak
+       WHERE (ls_where_clause-where_tab).
+      IF sy-subrc > 0.
+        MESSAGE s000(oo) WITH 'Keine Daten zur Selektion vorhanden'.
+      ELSE.
+*** ...und ausgeben
+        LOOP AT lt_vbak INTO ls_vbak.
+          WRITE: / ls_vbak-vbeln.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/dynamisches-selektionsbild/">Dynamisches Selektionsbild</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dynamisches-selektionsbild/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Anderen Pflegedialog aufrufen</title>
+		<link>/blog/anderen-pflegedialog-aufrufen/</link>
+					<comments>/blog/anderen-pflegedialog-aufrufen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<category><![CDATA[TableControl]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Materialstamm]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=396</guid>
+
+					<description><![CDATA[<p>Durch Zeitpunkte k&#246;nnen Sie in die Verarbeitung der Programmlogik eingreifen. Leider gibt es nur f&#252;r einige Funktionen die entsprechenden Zeitpunkte. In diesem Artikel zeigen wir Ihnen, wie Sie durch eine einfache Manipulation des Dynpros aus der View-Pflege den Aufruf eines anderen Pflegedialogs einbinden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/anderen-pflegedialog-aufrufen/">Anderen Pflegedialog aufrufen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Durch Zeitpunkte k&ouml;nnen Sie in die Verarbeitung der Programmlogik eingreifen. Leider gibt es nur f&uuml;r einige Funktionen die entsprechenden Zeitpunkte. In diesem Artikel zeigen wir Ihnen, wie Sie durch eine einfache Manipulation des Dynpros aus der View-Pflege den Aufruf eines anderen Pflegedialogs einbinden k&ouml;nnen.<br /><P class="head1">Anwendung</P><P>Einen Pflegedialog zu einer anderen Tabelle aufzurufen, kann recht n&uuml;tzlich sein. Zum Beispiel k&ouml;nnten Sie in einer Tabelle Daten mit verschieden &#8220;Typen&#8221; hinterlegen. Je &#8220;Typ&#8221; k&ouml;nnte es dann n&ouml;tig sein, zus&auml;tzlich eine andere Tabelle zu pflegen.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Pflegeview/00call_demo.jpg"><BR>Beispieltabelle mit Druckknopf</P></TD></TR></TBODY></TABLE></P><P class="head1">Beispiel</P><P>Nehmen wir an, Sie haben eine Tabelle mit dem Feld &#8220;Materialnummer&#8221;. Eine Materialnummer ist einer Materialart zugeordnet. In der Tabelle sollen Materialien hinterlegt werden, zu denen bei der Produktion spezielle Pr&uuml;fungen notwendig sind. Die Art der Pr&uuml;fungen sind in einer separaten Customizingtabelle hinterlegt. Da sich die Pr&uuml;fungen und Ausp&auml;gungen aber je Materialart unterscheiden, muss zu Fertigerzeugnissen eine andere Tabelle gepflegt werden als f&uuml;r Rohstoffe.</P><P>&Uuml;ber einen View k&ouml;nnen Sie die Materialtabelle &#8211; nennen wir sie ZMATPRUEF &#8211; mit dem Materialstamm (Tabelle MARA) verbinden. Als zus&auml;tzliches Viewfeld wird die Materialart aufgenommen.</P><P>Um die Materialart in den View aufnehmen zu k&ouml;nnen, m&uuml;ssen Sie in ZMATPRUEF den Fremdschl&uuml;ssel f&uuml;r Feld MATNR auf die Tabelle MARA definiert haben.</P><P>Sie k&ouml;nnen dann im Pflegeview &uuml;ber den Button [_Beziehungen_] die Tabelle MARA ausw&auml;hlen und das Feld MTART in die Feldliste aufnehmen.</P><P>Im angelegten View &#8211; er k&ouml;nnte ZMATPRUEF_V heissen &#8211; definieren Sie in den Feldeigenschaften, dass das Feld &#8220;Materialart&#8221; nur gelesen werden darf (Feld &#8220;P&#8221; [Pflegemerkmal] auf &#8220;R&#8221; setzen&#8221;).</P><P>Aufgrund dieses Feldes entscheiden wir hinterher, welche Pflegetabelle wir aufrufen.&nbsp;</P><P class="head1">Vorgehen</P><P class="head2">Drucktaste in den TableControl einf&uuml;gen</P><P>So gehen Sie vor, um einen Button in ein Dynpro hinzuzuf&uuml;gen um mit diesem einen anderen Pflegedialog aufzurufen:</P><P>Nachdem Sie den Pflegedialog f&uuml;r den View ZMATPRUEF_V angelegt haben, &auml;ndern Sie das generierte Dynpro:&nbsp;Men&uuml; <EM>Umfeld &#8211; Modifikation &#8211; Pflegebild</EM>.</P><P>Im Dynproeditor ziehen Sie einfach ein Feld vom Typ &#8220;Drucktaste&#8221; rechts neben die Felder <STRONG>im</STRONG> TableControl.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Pflegeview/00call_dynpro.jpg"><BR>Die neue Drucktaste</P></TD></TR></TBODY></TABLE></P><P>Die Attribute zur Drucktaste k&ouml;nnten so aussehen:</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Pflegeview/00call_attr.jpg"><BR>Attribute der Drucktaste</P></TD></TR></TBODY></TABLE></P><P>Wichtig hierbei ist der Funktionscode, der mit&nbsp;Prozentzeichen enden <STRONG>muss</STRONG>.&nbsp;Die Prozentzeichen werden beim Dr&uuml;cken in die aktuelle Zeile umgewandelt. Wird der Druckknopf in der dritten Zeile gedr&uuml;ckt, so hat der Funktionscode den Wert ZZCALL003.</P><P class="head2">Aufruf des Pflegedialogs</P><P>Es gibt leider keinen Zeitpunkt mit dem man auf das Dr&uuml;cken des Knopfes reagieren k&ouml;nnte. Deswegen implementieren wir ein neues MODUL in die Ablauflogik des Dynpros.</P><P>Es g&auml;be zwei M&ouml;glichkeiten, an welcher Stelle man auf den Tastendruck reagieren k&ouml;nnte: </P><OL><LI>innerhalb des LOOP &uuml;ber die Tabellenzeilen <LI>am Ende der Verarbeitung des PAI</LI></OL><P>Innerhalb des LOOP im TableControl muss man abfragen, ob die aktuell durchlaufene Zeile die ist, in der die Drucktaste bet&auml;tigt wurde.</P><P>Bei Variante (2) muss man die Zeilennummer&nbsp;im Funktionscode auswerten und den entsprechenden Tabelleneintrag nachlesen.</P><P>Hier habe ich mich f&uuml;r die erste Variante entschieden.</P><P>F&uuml;gen Sie in der Ablauflogik direkt nach &#8220;LOOP AT EXTRACT&#8221; die folgende Zeile ein:</P><P class="sap1">MODULE ZZ_USERCOMMAND.</P><P>Mit Doppelklick legen Sie das Modul an. Das Programm schl&auml;gt automatisch vor, dass das Modul in ein neues Include in der Funktionsgruppe des Pflegeviews angelegt wird. </P><P>So k&ouml;nnte das Coding des Moduls aussehen:</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Module&nbsp; ZZ_USERCOMMAND&nbsp; INPUT<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>MODULE zz_usercommand INPUT.<BR><BR>&nbsp; IF sy-ucomm(6) = &#8216;ZZCALL&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp; PERFORM zz_call_view_dialog USING sy-ucomm+6(3).&nbsp;&nbsp;<BR>&nbsp; ENDIF.<BR><BR>ENDMODULE.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ZZ_USERCOMMAND&nbsp; INPUT</P><P class="text1">Die Routine ZZ_CALL_VIEW_DIALOG enth&auml;lt das eigentliche Coding f&uuml;r den Aufruf des Pflegedialogs:</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; ZZ_CALL_VIEW_DIALOG<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM zz_call_view_dialog USING value(fi_row).<BR><BR><FONT color="#fb2412">*** Datendeklarationen</FONT><BR>&nbsp; DATA lv_tabname TYPE tabname.<BR>&nbsp; DATA ls_sellist TYPE vimsellist.<BR>&nbsp; DATA lt_sellist TYPE STANDARD TABLE OF vimsellist.<BR>&nbsp; DATA lv_row&nbsp;&nbsp;&nbsp;&nbsp; TYPE i.<BR><BR><FONT color="#fb2412">*** Die &uuml;bergebene Nummer aus der Drucktaste&nbsp;ist der aktuellen<BR>*** sichtbaren Zeile im TableControl. Um die richtige Position<BR>*** herauszubekommen, muss die&nbsp;erste im TableControl angezeigte<BR>*** Zeile addiert werden:</FONT><BR>&nbsp; lv_row = fi_row + tctrl_zmatpruef_v-top_line &#8211; 1.<BR><BR><FONT color="#fb2412">*** Hier pr&uuml;fen wir, ob die aktuell im LOOP durchlaufene&nbsp;Zeile<BR>*** auch die Zeile ist, in der der Druckknopf bet&auml;tigt wurde</FONT><BR>&nbsp; CHECK lv_row = tctrl_zmatpruef_v-current_line.<BR><BR><FONT color="#fb2412">*** &Uuml;bernahme der unstrukturierten Daten EXTRACT in die View-Struktur</FONT><BR>&nbsp; zmatpruef_v = extract.<BR><BR><FONT color="#fb2412">*** Hier entscheiden wir uns, welche Tabelle zur Materialart geh&ouml;rt:</FONT><BR>&nbsp; CASE zmatpruef_v-mtart.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;FERT&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_tabname = &#8216;ZMATPRUEF_FERT&#8217;.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;ROH&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_tabname = &#8216;ZMATPRUEF_ROH&#8217;.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;HALB&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_tabname = &#8216;ZMATPRUEF_HALB&#8217;.<BR>&nbsp;&nbsp;&nbsp; WHEN OTHERS.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE i000(vz) WITH &#8216;Kein Customizing n&ouml;tig&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp; ENDCASE.<BR><BR><FONT color="#fb2412">*** In der ermittelten Customizingtabelle sollte als Schl&uuml;sselfeld die <BR>*** Materialnummer vorhanden sein, da ja die Einstellungen zur <BR>*** Materialnummer vorgenommen werden m&uuml;ssen.<BR>*** Deswegen&nbsp;&uuml;bergeben wir dem Pflegeview die Materialnummer<BR></FONT>&nbsp; CLEAR lt_sellist.<BR>&nbsp; ls_sellist-viewfield = &#8216;MATNR&#8217;.<BR>&nbsp; ls_sellist-operator = &#8216;EQ&#8217;.<BR>&nbsp; ls_sellist-value = zmatpruef_v-matnr.<BR>&nbsp; APPEND ls_sellist TO lt_sellist.<BR><BR><BR><FONT color="#fb2412">*** Dies ist der Aufruf des Pflegedialoges zur ermittelten Tabelle</FONT><BR>&nbsp; CALL FUNCTION &#8216;VIEW_MAINTENANCE_CALL&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-action<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; view_name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lv_tabname<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dba_sellist&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_sellist<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; client_reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; foreign_lock&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invalid_action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_clientindependent_auth&nbsp;&nbsp;&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_database_function&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_editor_function&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_show_auth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 7<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_tvdir_entry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 8<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_upd_auth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 9<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; only_show_allowed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 10<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; system_failure&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 11<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unknown_field_in_dba_sellist = 12<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; view_not_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 13<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; maintenance_prohibited&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 14<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 15.<BR>&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** Falls der Pflegeview zur Tabelle ZMATPRUEF_V Teil eines <BR>*** Viewclusters ist, m&uuml;ssen Sie die folgenden beiden Zeilen<BR>*** aktivieren, um wieder auf dem Pflegeview zu landen&nbsp;</FONT><BR><FONT color="#008952">*&nbsp;&nbsp;&nbsp; CLEAR: vim_leave_screen, vim_act_dynp_view.<BR>*&nbsp;&nbsp;&nbsp; SET SCREEN 0. LEAVE SCREEN.<BR></FONT>&nbsp; ELSE.<BR><FONT color="#fb2412">*** Fehlermeldung,&nbsp;falls eine Pflege nicht m&ouml;glich war<BR></FONT>&nbsp;&nbsp;&nbsp; MESSAGE i000(vz) WITH &#8216;Pflege nicht m&ouml;glich; SUBRC=&#8217; sy-subrc.<BR>&nbsp; ENDIF.<BR><BR>ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ZZ_CALL_VIEW_DIALOG</P><P class="head2">&Auml;nderung der&nbsp;Feldeigenschaften</P><P>Als letztes bleibt uns noch die &Auml;nderung der Feldeigenschaften f&uuml;r den Druckknopf, denn im Anzeigemodus ist der Druckknopf nicht aktiv.</P><P>um den Druckknopf auch im Anzeigemodus zu aktivieren, m&uuml;ssen Sie im PBO innerhalb des LOOP AT EXTRACT ein Modul einf&uuml;gen:</P><P class="sap1">MODULE ZZ_SCREEN.</P><P>Coding in diesem Modul:</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Module&nbsp; ZZ_SCREEN&nbsp; OUTPUT<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>MODULE zz_screen OUTPUT.<BR><BR>&nbsp; LOOP AT SCREEN.<BR>&nbsp;&nbsp;&nbsp; IF screen-name = &#8216;ZZBUTTON_CALL&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; screen-input = &#8216;1&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY SCREEN.<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp; ENDLOOP.<BR><BR>ENDMODULE.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ZZ_SCREEN&nbsp; OUTPUT</P><P class="head1">Anmerkungen</P><P>Nachdem Sie nun alles aktiviert haben, k&ouml;nnen Sie die Funktionalit&auml;t nutzen.</P><P>Beachten Sie bitte, dass bei einer Neugenerierung die folgenden &Auml;nderungen &uuml;berschrieben werden und erneut angepasst werden m&uuml;ssen:</P><UL><LI>Druckknopf im Dynpro <LI>Ablauflogik im Dynpro</LI></UL><P>Diese &Auml;nderungen sind jedoch minimal, da das Coding der Module erhalten bleibt.</P></p>
+<p>Der Beitrag <a href="/blog/anderen-pflegedialog-aufrufen/">Anderen Pflegedialog aufrufen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/anderen-pflegedialog-aufrufen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dynamische Funktion</title>
+		<link>/blog/dynamische-funktion/</link>
+					<comments>/blog/dynamische-funktion/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 13 Jan 2005 18:41:00 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=307</guid>
+
+					<description><![CDATA[<p>Eine kleine Demonstration, wie Funktionscodes dynamisch geändert werden können.</p>
+<p>Der Beitrag <a href="/blog/dynamische-funktion/">Dynamische Funktion</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine kleine Demonstration, wie Funktionscodes dynamisch ge&auml;ndert werden k&ouml;nnen.<br /><P class="text1">Das folgende Programm zeigt, wie Sie die Bezeichnung eines Funktionscodes im Programm definieren k&ouml;nnen.&nbsp;</P><P class="text1">Erstellen Sie durch Doppelklick auf den Status &#8216;TEST&#8217; den <STRONG>Dialog-Status </STRONG>und vergeben Sie eine Bezeichnung. </P><P class="text1">Kopieren Sie dann unter &#8220;<EM>Zus&auml;tze &#8211; Vorlage abgleichen</EM>&#8221; den <FONT color="#fb2412"><STRONG>List-Status</STRONG></FONT>. Dies ist nur f&uuml;r die Verwendung im Report notwendig, damit die &#8220;Zur&uuml;ck&#8221;- und &#8220;Exit&#8221;-Buttons in Standardleiste eine Funktion bekommen.</P><P class="text1">Klicken Sie die &#8220;<STRONG><FONT color="#008952">Drucktastenleiste</FONT></STRONG>&#8221; auf und tragen Sie einen Funktions-Code, z.B. DYN1, in ein freies Feld ein und dr&uuml;cken Sie &lt;Enter&gt;. </P><P class="text1">Markieren Sie in dem folgenden Popup den Radiobutton &#8220;Dynamischer Text&#8221;:</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/dynfunc1.gif"><BR>Eingabe des Funktionstextes</P></TD></TR></TBODY></TABLE></P><P class="text1">In dem darauf erscheinenden Popup tragen Sie den Namen der im Programm definierten Variable ein, in unserem Fall &#8220;L_TEST&#8221;:</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/dynfunc2.gif"><BR>Feldnamen vergeben</P></TD></TR></TBODY></TABLE></P><P class="text1">Nun m&uuml;ssen Sie noch eine Funktionstaste zuordnen.</P><P class="text1">Aktivieren Sie den Status.</P><P class="head1">Coding</P><P class="sap1">REPORT zz_dyn_func.</P><P class="sap1">DATA l_test LIKE smp_dyntxt.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1">&nbsp; l_test-text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;Dynamische Funktion&#8217;.<BR>&nbsp; l_test-icon_id&nbsp;&nbsp; = &#8216;@10@&#8217;.<BR>&nbsp; l_test-icon_text = &#8216;Dynamische Funktion&#8217;.<BR>&nbsp; l_test-quickinfo = &#8216;Quickinfo zur dynamischen Funktion&#8217;.<BR>&nbsp; l_test-path&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;D&#8217;.</P><P class="sap1">&nbsp; SET PF-STATUS &#8216;TEST&#8217;.</P><P class="sap1">&nbsp; WRITE: / &#8216;Demonstration eines dynamischen Funktionscodes&#8217;.</P></p>
+<p>Der Beitrag <a href="/blog/dynamische-funktion/">Dynamische Funktion</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dynamische-funktion/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

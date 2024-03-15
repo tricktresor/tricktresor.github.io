@@ -1,0 +1,2780 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>LINKS Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/links-2/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 10 Jan 2018 19:24:56 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>LINKS Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Speak!</title>
+		<link>/blog/speak/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 03 May 2016 09:53:55 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[set property]]></category>
+		<category><![CDATA[call method]]></category>
+		<category><![CDATA[get property]]></category>
+		<category><![CDATA[ole]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[Agenten]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=634</guid>
+
+					<description><![CDATA[<p>SAP kann sprechen. Mit der Microsoft Speech API 5.3</p>
+<p>Der Beitrag <a href="/blog/speak/">Speak!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>SAP kann sprechen. Mit der Microsoft Speech API 5.3</p>
+<figure id="attachment_608883" aria-describedby="caption-attachment-608883" style="width: 500px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2012/02/2016-05-03_11-51-10.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-608883" src="https://tricktresor.com/wp-content/uploads/2012/02/2016-05-03_11-51-10.jpg" alt="https://pixabay.com/de/sound-welle-stimme-h%C3%B6ren-856770/" width="500" height="300" srcset="/wp-content/uploads/2012/02/2016-05-03_11-51-10.jpg 500w, /wp-content/uploads/2012/02/2016-05-03_11-51-10-300x180.jpg 300w" sizes="(max-width: 500px) 100vw, 500px" /></a><figcaption id="caption-attachment-608883" class="wp-caption-text">https://pixabay.com/de/sound-welle-stimme-h%C3%B6ren-856770/</figcaption></figure>
+<p>Auf der Seite <a href="http://abapdn.blogspot.com/" target="_blank">http://abapdn.blogspot.com/</a> bin ich auf folgenden interessanten Code gestoßen:</p>
+<pre>INCLUDE ole2incl.
+DATA : v_objole      TYPE ole2_object,
+       v_objolevoice TYPE ole2_object,
+       v_strtotalk   TYPE string.
+
+CREATE OBJECT v_objolevoice 'SAPI.SpVoice'.
+
+SET PROPERTY OF v_objolevoice 'Volume' = 80.
+SET PROPERTY OF v_objolevoice 'Rate' = -1.
+
+v_strtotalk = 'This is great'.
+
+CALL METHOD OF v_objolevoice 'Speak' = v_objole
+EXPORTING #1 = v_strtotalk.
+
+FREE: v_objolevoice,v_objole.</pre>
+<p>Und SAP kann sprechen&#8230; Leider ist es mir nicht gelungen, andere Stimmen zu aktivieren. Es spricht standardmäßig &#8220;Anna&#8221; (&#8220;Mary&#8221; laut Doku). Es müsste aber auch noch &#8220;Mike&#8221; vorhanden sein.</p>
+<h2>Get Voice</h2>
+<p>Mit diesem Code-Schnipsel kann man die eingestellte Stimme ermitteln.</p>
+<pre>DATA v_voicename TYPE string.
+DATA v_voice     TYPE ole2_object.
+GET PROPERTY OF v_objolevoice 'Voice' = v_voice.
+CALL METHOD OF v_voice 'GetDescription' = v_voicename.</pre>
+<p>Umgestellt werden kann die Stimme leider nicht, denn dafür müsste man per OLE ein indiziertes Array ansprechen, was aber nicht geht. Aufgrund von Lizenzproblemen ist häufig aber auch nur eine Sprache (und Stimme) installiert.</p>
+<h2>Asynchrone Sprachausgabe</h2>
+<p>In der Defaulteinstellung wird die Verarbeitung erst fort gesetzt, wenn die Sprachausgabe beendet ist. Mit dem Parameter SVSFlagAsync der Methode SPEAK kann die Sprachausgabe jedoch auch asynchron erfolgen. Das ist beispielsweise dann sinnvoll, wenn eine per MESSAGE ausgegebene Meldung auch gesprochen werden soll. Die Meldung sollte dann natürlich nicht erst erscheinen, wenn sie bereits vorab einmal komplett gesprochen wurde&#8230;</p>
+<pre>CALL METHOD OF v_objolevoice 'Speak' = v_objolevoice
+EXPORTING #1 = v_strtotalk
+#2 = 1.  "SVSFlagsAsync</pre>
+<h2>Links</h2>
+<p>Hier der Link zum Artikel:<br />
+<a href="http://abapdn.blogspot.com/2010/09/sap-knows-how-to-speak.html" target="_blank">http://abapdn.blogspot.com/2010/09/sap-knows-how-to-speak.html</a></p>
+<p>Und hier der Link zur API-Dokumentation:<br />
+<a href="http://msdn.microsoft.com/en-us/library/ms723614(v=vs.85).aspx" target="_blank">http://msdn.microsoft.com/en-us/library/ms723614(v=vs.85).aspx</a></p>
+<h1>Kürzer!</h1>
+<p>Hier noch eine kürzere <a title="NES | code.google.com" href="https://code.google.com/p/nes-abapgames/wiki/Hello_World">Variante von Nalon</a>:</p>
+<pre>DATA ovoice TYPE ole2_object.
+CREATE OBJECT ovoice 'SAPI.SpVoice'.
+IF sy-subrc = 0.
+  CALL METHOD OF ovoice 'Speak'
+    EXPORTING #1 = 'Ich will sprechen'.
+ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/speak/">Speak!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Editor-Tastaturkommandos</title>
+		<link>/blog/editor-tastaturkommandos/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Jun 2014 12:32:45 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Eigenes]]></category>
+		<category><![CDATA[tastenkombination]]></category>
+		<category><![CDATA[tastenkürzel]]></category>
+		<category><![CDATA[Tastaturkürzel]]></category>
+		<category><![CDATA[Befehl]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4780</guid>
+
+					<description><![CDATA[<p>Im neuen ABAP-Editor, der mittlerweile auch einige Jahre auf dem Buckel hat, können Tastenkombinationen angepasst und neu hinzugefügt werden. Meiner Ansicht nach, sind die wichtigen Befehle bereits belegt. Einen Befehl, den ich sehr hilfreich finde, habe ich mir jedoch neu eingestellt. Ich gebe einen kurzen Überblick über weniger bekannte Funktionen und die Zuweisung neuer Tastaturkürzel.</p>
+<p>Der Beitrag <a href="/blog/editor-tastaturkommandos/">Editor-Tastaturkommandos</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im neuen ABAP-Editor, der mittlerweile auch einige Jahre auf dem Buckel hat, können Tastenkombinationen angepasst und neu hinzugefügt werden. Meiner Ansicht nach, sind die wichtigen Befehle bereits belegt. Einen Befehl, den ich sehr hilfreich finde, habe ich mir jedoch neu eingestellt. Aber dazu später mehr.</p>
+<p>Inzwischen bekannt sein dürfte, dass der Editor die Auswahl von Textblöcken beherrscht:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_11_140655.jpg"><img decoding="async" class="alignnone size-full wp-image-4785" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_11_140655.jpg" alt="Bild_2014_06_11_140655" width="438" height="248" srcset="/wp-content/uploads/2014/06/Bild_2014_06_11_140655.jpg 438w, /wp-content/uploads/2014/06/Bild_2014_06_11_140655-300x169.jpg 300w" sizes="(max-width: 438px) 100vw, 438px" /></a></p>
+<p>Hierzu muss vor der Auswahl mit der Maus die ALT-Taste gedrückt werden. Der Textblock kann dann markiert und ebenfalls als Block wieder eingefügt werden.</p>
+<h2>Hilfreiche unbekannte(?) Tastaturkürzel</h2>
+<table>
+<tbody>
+<tr>
+<td style="width: 30%;">STRG-SHIFT-L</td>
+<td>Aktuelle Zeile löschen</td>
+</tr>
+<tr>
+<td>STRG-SHIFT-T</td>
+<td>Aktuelle Zeile kopieren</td>
+</tr>
+<tr>
+<td>STRG-SHIFT-X</td>
+<td>Aktuelle Zeile ausschneiden</td>
+</tr>
+<tr>
+<td style="width: 30%;" scope="col">STRG-D</td>
+<td>Aktuelle Zeile verdoppeln</td>
+</tr>
+<tr>
+<td>STRG-U</td>
+<td>Upper case markierter Text</td>
+</tr>
+<tr>
+<td>STRG-L</td>
+<td>Lower case markierter Text</td>
+</tr>
+<tr>
+<td>STRG-ALT-CURSUP</td>
+<td>Aktuelle Zeile nach oben bewegen</td>
+</tr>
+<tr>
+<td>STRG-ALT-CURSDOWN</td>
+<td>Aktuelle Zeile nach unten bewegen</td>
+</tr>
+</tbody>
+</table>
+<h2>Weniger hilfreiche Tastaturkürzel</h2>
+<table>
+<tbody>
+<tr>
+<td style="width: 30%;" scope="col">STRG-ALT-T</td>
+<td>Aktuelle Zeile mit darüber liegender Zeile tauschen</td>
+</tr>
+<tr>
+<td>STRG-K</td>
+<td>Switch Case (Großbuchstaben werden klein und umgekehrt</td>
+</tr>
+<tr>
+<td>STRG-T</td>
+<td>Alle Anfangsbuchstaben klein</td>
+</tr>
+<tr>
+<td>STRG-J</td>
+<td>Alle Anfangsbuchstaben groß</td>
+</tr>
+</tbody>
+</table>
+<h2>Nicht zugewiesene Editorbefehle</h2>
+<p>Wenn ich das richtig gesehen habe, gibt es für jede Aktion im Editor ein eigenes Kommando, also auch für die &#8220;normalen&#8221; Aktionen, wie z.B. Cursor links, Cursor rechts, Seite hoch, Ende der Zeile usw. Die meisten Befehle sind bereits Tastaturkürzeln zugewiesen und in der <a title="SAPGUI | Tastaturkürzel" href="http://help.sap-ag.de/saphelp_crmhana/helpdata/de/4b/42dbcf01944ba2e10000000a42189c/content.htm">Hilfe </a>beschrieben.</p>
+<p>Neben fragwürdigen Befehlen, wie zum Beispiel dem Sortieren von Zeilen (Edit.SortLines) gibt es auch hilfreiche. Ich habe häufig den Fall, dass ich Code, der an mehreren Stellen verteilt ist, in ein anderes Programm kopieren möchte. Meistens sind es die DATA-Anweisung und der oder die zugehörigen Befehle. Bisher habe ich die Programmteile einzeln kopiert. Mit dem <strong>Editorbefehl Edit.CopyAppend</strong> ist es möglich, die aktuelle Selektion einfach an vorhandene im Zwischenspeicher befindliche Zeilen anzuhängen. Das finde ich sehr praktisch, denn nun kann ich die DATA-Anweisung kopieren und per STRG-ä (in meinem Fall) das Coding an die DATA-Anweisung im Zwischenspeicher anhängen, in die andere Anwendung wechseln und im gesamten wieder einfügen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_11_120614.jpg"><img decoding="async" class="alignnone wp-image-4784 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_11_120614.jpg" alt="Editor.CopyAppend" width="697" height="433" srcset="/wp-content/uploads/2014/06/Bild_2014_06_11_120614.jpg 697w, /wp-content/uploads/2014/06/Bild_2014_06_11_120614-300x186.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_11_120614-624x387.jpg 624w" sizes="(max-width: 697px) 100vw, 697px" /></a></p>
+<p>Einfach den gewünschten Befehl auswählen und <em>Neue Tastenkombination</em> zuweisen.</p>
+<p>[notice type=&#8217;info&#8217;]Wenn die Tastenkombination bereits zugewiesen wurde, erhalten Sie eine Meldung, dass diese nicht mehr verwendet werden kann. Sie müssen dann die alte Tastenkombination entfernen, <strong>sichern</strong> <strong>(!!)</strong> und können dann die Tastenkombination neu zuweisen.[/notice]</p>
+<p>Der Beitrag <a href="/blog/editor-tastaturkommandos/">Editor-Tastaturkommandos</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Repository-Objekte massenhaft löschen?</title>
+		<link>/blog/repository-objekte-massenhaft-loeschen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Feb 2014 08:58:02 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[klassen]]></category>
+		<category><![CDATA[löschen]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4460</guid>
+
+					<description><![CDATA[<p>Wenn du viele Repository-Objekte (Klassen, Programme, Tabellen, Datenelemente etc) löschen möchtest, dann geht dies sehr einfach. Man muss es nur wissen...</p>
+<p>Der Beitrag <a href="/blog/repository-objekte-massenhaft-loeschen/">Repository-Objekte massenhaft löschen?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hin und wieder müssen viele Objekte eines Programmierers oder eines Paketes gelöscht werden. Das massenhafte Löschen von zum Beispiel Klassen, Programmen, Tabellen, Datenelementen und so weiter ist dabei sehr einfach: Gehe in die entsprechende Transaktion und drücke STRG+F oder den Suchen-Druckknopf in der Buttonleiste. Grenze die Suchkriterien wie gewünscht ein und drücke <em>Ausführen</em>.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4461" alt="Suche Repository-Objekte" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_09_45_25-239x300.jpg" width="239" height="300" srcset="/wp-content/uploads/2014/02/02_20_09_45_25-239x300.jpg 239w, /wp-content/uploads/2014/02/02_20_09_45_25.jpg 471w" sizes="(max-width: 239px) 100vw, 239px" /></p>
+<p>Es erscheint die Liste der gefundenen Objekte.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4462" alt="Objektliste" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_09_46_11-300x126.jpg" width="300" height="126" srcset="/wp-content/uploads/2014/02/02_20_09_46_11-300x126.jpg 300w, /wp-content/uploads/2014/02/02_20_09_46_11.jpg 528w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<p>In dieser Liste gibt es immer ganz links einen Menüpunkt, der so heißt wie das entsprechende Repository-Objekt (Tabellen, Klassen etc.). Hier gibt es den Punkt <em>Löschen</em>.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4463" alt="Objekte löschen" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_09_46_31-300x229.jpg" width="300" height="229" srcset="/wp-content/uploads/2014/02/02_20_09_46_31-300x229.jpg 300w, /wp-content/uploads/2014/02/02_20_09_46_31.jpg 430w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<p>Hierzu müssen alle zu löschenden Einträge markiert werden. Es werden alle entsprechenden Prüfungen berücksichtigt (Verwendungsnachweise, Vererbung usw.).</p>
+<p>Der Beitrag <a href="/blog/repository-objekte-massenhaft-loeschen/">Repository-Objekte massenhaft löschen?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>redirects [Plugin]</title>
+		<link>/blog/redirect/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 13 Jan 2014 17:15:33 +0000</pubDate>
+				<category><![CDATA[plugins]]></category>
+		<category><![CDATA[Wordpress]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4221</guid>
+
+					<description><![CDATA[<p>In diesem Artikel beschreibe ich, wie mithilfe von .htaccess und des Plugins "redirects" die alten Tricktresor-Links auf die Wordpress-URLs umgesetzt werden.</p>
+<p>Der Beitrag <a href="/blog/redirect/">redirects [Plugin]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><em>Redirect</em> bedeutet <em>Umleitung</em>. Also eine Umleitung von einer (alten) URL auf eine neue. Hierfür gibt es mehrere Wege. Umleitung sind auch nicht ganz ungefährlich, da hier evtl. Zirkelbezüge auftreten können und der Browser dann die Meldung &#8220;Zu viele Umleitungen&#8221; ausgibt.</p>
+<h2>.htaccess</h2>
+<p>Ein Weg, eine URL umzuleiten,  ist der über .htaccess. Hier werden jedoch Umleitungen verwendet, die nach einer <em>Regel</em> umgesetzt werden können. Diese Umleitung verwende ich zum Beispiel um alte Links, bei denen die Artikelnummer über die Variable aID in der URL vorhanden ist, auf die WordPress-Notation für einen Artikel umzusetzen.</p>
+<p>Aus dieser alten URL für den Artikel mit der ID 285</p>
+<pre>/wp-content/?navID=387&amp;aID=285</pre>
+<p>wird durch eine rewriteRule in der .htaccess die folgende URL:</p>
+<pre>https://tricktresor.com/?p=285</pre>
+<p>Diese interne Darstellung wird wiederum durch die Permalink-Einstellung im WordPress übersteuert:</p>
+<address>Beitragsname: https://tricktresor.com/blog/Beispielbeitrag/</address>
+<p>Es wird daraus die URL</p>
+<pre>https://tricktresor.com/blog/methoden-word/</pre>
+<p>[notice type=&#8217;info&#8217;]Die Umleitung funktioniert in diesem Fall natürlich nur, weil die alte Artikel-ID mit der WordPress-Beitrags-ID übereinstimmt.[/notice]</p>
+<p>Die Regel in der tricktresor-.htaccess lautet übrigens:</p>
+<pre>RewriteCond %{QUERY_STRING} .*aID=([0-9]+)$
+RewriteRule ^(.*) /?p=%1 [R=301,L]</pre>
+<h2>Definierte Umleitung</h2>
+<p>Diese Form der Umleitung funktioniert natürlich nicht, wenn sich die verwendete alte ID von der neuen unterscheidet. Genau diesen Fall habe ich jedoch bei den alten Links, die mittels Themen-ID gespeichert wurden. Diese Links zeigen auf ein Verzeichnis, wie zum Beispiel dieser hier:</p>
+<pre>https://tricktresor.com/content/index.php?navID=223&amp;tID=76</pre>
+<p><img loading="lazy" decoding="async" width="883" height="793" class="alignnone size-full wp-image-4222" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d41eba11f5b.png" srcset="/wp-content/uploads/2014/01/img_52d41eba11f5b.png 883w, /wp-content/uploads/2014/01/img_52d41eba11f5b-300x269.png 300w, /wp-content/uploads/2014/01/img_52d41eba11f5b-624x560.png 624w" sizes="(max-width: 883px) 100vw, 883px" /></p>
+<p>Wenn man auf diesen Link klickt, dann gibt es zurzeit keine Umleitung also keine entsprechende Seite und man landet auf &#8220;404 page not found&#8221;.</p>
+<p>Auf der Suche nach einer Lösung bin ich über das Plugin <a title="Plugin &quot;redirects&quot;" href="http://wordpress.org/plugins/redirects/" target="_blank">redirects</a> gestolpert. Hier können verschiedene URLs sowie eine Umleitung definiert werden.</p>
+<p>Die Themen des alten Content Management System wurden in WordPress umgesetzt in Schlagwörter (Tags). Dabei ist jedoch die ID des Schlagworts nicht erhalten geblieben. Aber ich habe die alte Zuordnung noch in einer Tabelle. Diese habe ich &#8211; entsprechend aufbereit &#8211; in das Plugin <a title="Plugin &quot;redirects&quot;" href="http://wordpress.org/plugins/redirects/" target="_blank">redirects </a>importieren können.</p>
+<p>Die Umsetzung der URLs mit &#8220;tID&#8221; ist ebenfalls in der .htaccess definiert:</p>
+<pre>RewriteCond %{QUERY_STRING} .*tID=([0-9]+)$ 
+RewriteRule ^(.*) /thema=%1? [R=301,L]</pre>
+<p>Die &#8220;Themen-URLs&#8221; wie folgt umgesetzt:</p>
+<pre>https://tricktresor.com/thema=76</pre>
+<p>den slug thema=76 habe ich in dem redirects-plugin umgesetzt auf</p>
+<pre>https://tricktresor.com/blog/keywords/klassifizierung/</pre>
+<p>Der Beitrag <a href="/blog/redirect/">redirects [Plugin]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Daten einer Website per HTTP ermitteln</title>
+		<link>/blog/daten-einer-website/</link>
+					<comments>/blog/daten-einer-website/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Jul 2012 20:02:59 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Regex]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[cl_http_client]]></category>
+		<category><![CDATA[url]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=649</guid>
+
+					<description><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Mithilfe der Klasse CL_HTTP_CLIENT besorgen wir uns den Quelltext einer Internetseite. Die URL muss dabei komplett angegeben werden, also inklusive http://</p>
+<h2 class="head1">Coding</h2>
+<p class="sap1">
+<pre class="lang:abap decode:true ">*:: Selection screen
+PARAMETERS p_url TYPE string LOWER CASE
+DEFAULT '/wp-content/index.php?aID=0'.
+
+START-OF-SELECTION.
+
+  PERFORM get_urls USING p_url.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_URLS
+*&amp;---------------------------------------------------------------------*
+FORM get_urls  USING  iv_url TYPE clike.
+
+*:: local data
+  DATA lv_http_url     TYPE string.
+  DATA lr_http_client  TYPE REF TO if_http_client.
+  DATA lv_html_code    TYPE string.
+
+  DATA lt_urls         TYPE STANDARD TABLE OF string
+WITH NON-UNIQUE DEFAULT KEY.
+  DATA lt_new          LIKE lt_urls.
+  DATA lv_regex        TYPE string.
+
+  DATA lv_url          TYPE string.
+  DATA lv_dummy1       TYPE string.
+  DATA lv_dummy2       TYPE string.
+
+  STATICS lt_list      TYPE HASHED TABLE OF string
+WITH UNIQUE KEY table_line.
+
+*:: create url
+  CALL METHOD cl_http_client=&gt;create_by_url
+    EXPORTING
+      url                = iv_url
+    IMPORTING
+      client             = lr_http_client
+    EXCEPTIONS
+      argument_not_found = 1
+      plugin_not_active  = 2
+      internal_error     = 3
+      OTHERS             = 4.
+  IF sy-subrc &gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to create url, Sy-Subrc;', sy-subrc.
+    STOP.
+  ENDIF.
+
+*:: Send out request
+  lr_http_client-&gt;send( ).
+
+*:: Receive result as stream
+  CALL METHOD lr_http_client-&gt;receive
+    EXCEPTIONS
+      http_communication_failure = 1
+      http_invalid_state         = 2
+      http_processing_failed     = 3
+      OTHERS                     = 4.
+
+  IF sy-subrc &lt;&gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to read data, Sy-Subrc;', sy-subrc.
+  ELSE.
+*:: Get sourcecode
+    lv_html_code = lr_http_client-&gt;response-&gt;get_cdata( ).
+    WRITE:/ iv_url COLOR 5.
+
+*:: simple method - Find urls
+    SPLIT lv_html_code AT 'href=' INTO TABLE lt_urls.
+    LOOP AT lt_urls INTO lv_url.
+      FORMAT COLOR OFF.
+      CHECK lv_url IS NOT INITIAL.
+      CHECK lv_url(1) = `"`
+      OR lv_url(1) = `'`.
+      FIND lv_url(1) IN lv_url+1 MATCH OFFSET sy-fdpos.
+      CHECK sy-subrc = 0.
+      lv_url = lv_url+1(sy-fdpos).
+
+      IF lv_url IS INITIAL.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '#'.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '/'.  "Root
+        FORMAT COLOR COL_GROUP.
+
+      ELSEIF lv_url(1) = '?'.
+        SPLIT iv_url AT '?' INTO lv_dummy1 lv_dummy2.
+        IF sy-subrc = 0.
+          CONCATENATE lv_dummy1 lv_url INTO lv_url.
+        ELSE.
+        ENDIF.
+      ELSEIF lv_url(5) = 'https' OR lv_url(5) = 'HTTPS'.
+        FORMAT COLOR COL_POSITIVE.
+      ELSEIF lv_url(4) = 'http' OR lv_url(4) = 'HTTP'.
+        FORMAT COLOR COL_NORMAL.
+      ENDIF.
+
+*:: try to find main URL in link
+      CONCATENATE '^' iv_url INTO lv_regex.
+      FIND REGEX lv_regex IN lv_url.
+      IF sy-subrc = 0.
+        FORMAT INTENSIFIED ON.
+      ELSE.
+        FORMAT INTENSIFIED OFF.
+      ENDIF.
+      WRITE: /10 lv_url.
+
+    ENDLOOP.
+    ULINE.
+
+  ENDIF.
+
+ENDFORM.                    " GET_URLS</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/daten-einer-website/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>SAP-Icons</title>
+		<link>/blog/sap-icons/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 06 Jul 2012 18:24:10 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workflow]]></category>
+		<category><![CDATA[IDOCs]]></category>
+		<category><![CDATA[Lieferung]]></category>
+		<category><![CDATA[farbe]]></category>
+		<category><![CDATA[corbu]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[icons]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[icon]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[gif]]></category>
+		<category><![CDATA[Wizard]]></category>
+		<category><![CDATA[theme]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=648</guid>
+
+					<description><![CDATA[<p>SAP-Icons, alt und CORBU themen</p>
+<p>Der Beitrag <a href="/blog/sap-icons/">SAP-Icons</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine Auflistung der alten SAP-Icons und der neuen Icons aus dem CORBU Theme.</p>
+<p>Die Icons können auch auf der Website der <a title="Icons SAP Design Guild" href="http://www.sapdesignguild.org/resources/icons_sap/index.htm" target="_blank">SAP Design Guild </a>betrachtet werden.</p>
+<table>
+<tbody>
+<tr>
+<td></td>
+<td>
+<h3><span style="color: #ff9c00;">SAP GUI Ikonen Release 7.30</span></h3>
+<table>
+<tbody>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;">Icon</td>
+<td style="width: 40px;">Corbu</td>
+<td width="100px">Name</td>
+<td width="50px">ID</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ausschneiden" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_cuto.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ausschneiden" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_cuto.gif" /></td>
+<td width="100px">Ausschneiden</td>
+<td width="50px">@2T@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_copy.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_copy.gif" /></td>
+<td width="100px">Kopieren</td>
+<td width="50px">@2U@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Einsetzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_past.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Einsetzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_past.gif" /></td>
+<td width="100px">Einsetzen</td>
+<td width="50px">@2V@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Markiermodus; Markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_mark.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Markiermodus; Markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_mark.gif" /></td>
+<td width="100px">Markiermodus; Markieren</td>
+<td width="50px">@2X@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Alle markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_mrka.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Alle markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_mrka.gif" /></td>
+<td width="100px">Alle markieren</td>
+<td width="50px">@4B@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Block markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_mrkb.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Block markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_mrkb.gif" /></td>
+<td width="100px">Block markieren</td>
+<td width="50px">@4C@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Alle Mark. löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_mrkd.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Alle Mark. löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_mrkd.gif" /></td>
+<td width="100px">Alle Mark. löschen</td>
+<td width="50px">@4D@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Block deselektieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dmrk.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Block deselektieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dmrk.gif" /></td>
+<td width="100px">Block deselektieren</td>
+<td width="50px">@8J@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Spaltenmarkierung invertieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_invs.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Spaltenmarkierung invertieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_invs.gif" /></td>
+<td width="100px">Spaltenmarkierung invertieren</td>
+<td width="50px">@8K@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Zeilenmarkierung invertieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_invz.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeilenmarkierung invertieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_invz.gif" /></td>
+<td width="100px">Zeilenmarkierung invertieren</td>
+<td width="50px">@8L@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Agent" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_iagent.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Agent" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_iagent.gif" /></td>
+<td width="100px">Agent</td>
+<td width="50px">@VV@</td>
+</tr>
+</tbody>
+</table>
+<p><!---End of Part 1 --><!---Part 2 --></p>
+<p>&nbsp;</p>
+<table>
+<tbody>
+<tr bgcolor="white">
+<td style="width: 40px;">Icon</td>
+<td style="width: 40px;">Corbu</td>
+<td width="100px">Name</td>
+<td width="50px">ID</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ganz nach links; Erste(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_totl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ganz nach links; Erste(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_totl.gif" /></td>
+<td width="100px">Ganz nach links; Erste(r) &#8230;</td>
+<td width="50px">@0B@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ganz nach rechts; Letzte(r) .." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_totr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ganz nach rechts; Letzte(r) .." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_totr.gif" /></td>
+<td width="100px">Ganz nach rechts; Letzte(r) ..</td>
+<td width="50px">@0C@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Spalte links; Vorige(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_coll.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Spalte links; Vorige(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_coll.gif" /></td>
+<td width="100px">Spalte links; Vorige(r) &#8230;</td>
+<td width="50px">@0D@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Spalte rechts; Nächste(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_colr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Spalte rechts; Nächste(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_colr.gif" /></td>
+<td width="100px">Spalte rechts; Nächste(r) &#8230;</td>
+<td width="50px">@0E@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Seite rechts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pagr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Seite rechts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pagr.gif" /></td>
+<td width="100px">Seite rechts</td>
+<td width="50px">@0F@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Seite links" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pagl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Seite links" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pagl.gif" /></td>
+<td width="100px">Seite links</td>
+<td width="50px">@0G@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Voriger Wert; Nächst. Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_prvi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Voriger Wert; Nächst. Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_prvi.gif" /></td>
+<td width="100px">Voriger Wert; Nächst. Eintrag</td>
+<td width="50px">@0H@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Nächster Wert; Voriger Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_nxti.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Nächster Wert; Voriger Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_nxti.gif" /></td>
+<td width="100px">Nächster Wert; Voriger Eintrag</td>
+<td width="50px">@0I@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Okay; Weiter; auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_okay.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Okay; Weiter; auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_okay.gif" /></td>
+<td width="100px">Okay; Weiter; auswählen</td>
+<td width="50px">@0V@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Abbrechen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_canc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Abbrechen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_canc.gif" /></td>
+<td width="100px">Abbrechen</td>
+<td width="50px">@0W@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anderes " alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_oobj.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anderes " alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_oobj.gif" /></td>
+<td width="100px">Anderes</td>
+<td width="50px">@2Q@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Voriges Bild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_prvo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Voriges Bild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_prvo.gif" /></td>
+<td width="100px">Voriges Bild</td>
+<td width="50px">@2R@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Nächstes Bild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_nxto.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Nächstes Bild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_nxto.gif" /></td>
+<td width="100px">Nächstes Bild</td>
+<td width="50px">@2S@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Erste Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_fstp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Erste Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_fstp.gif" /></td>
+<td width="100px">Erste Seite</td>
+<td width="50px">@2Y@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Vorige Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_prvp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vorige Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_prvp.gif" /></td>
+<td width="100px">Vorige Seite</td>
+<td width="50px">@2Z@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Nächste Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_nxtp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Nächste Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_nxtp.gif" /></td>
+<td width="100px">Nächste Seite</td>
+<td width="50px">@30@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Letzte Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_lstp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Letzte Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_lstp.gif" /></td>
+<td width="100px">Letzte Seite</td>
+<td width="50px">@31@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Kopf; Grunddaten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_head.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kopf; Grunddaten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_head.gif" /></td>
+<td width="100px">Kopf; Grunddaten</td>
+<td width="50px">@3P@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Übersicht; Überblick; Listbild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_oviw.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Übersicht; Überblick; Listbild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_oviw.gif" /></td>
+<td width="100px">Übersicht; Überblick; Listbild</td>
+<td width="50px">@3Q@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Detailsicht" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dail.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Detailsicht" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dail.gif" /></td>
+<td width="100px">Detailsicht</td>
+<td width="50px">@3R@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Periodenbild; Zeitaufriß" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_peri.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Periodenbild; Zeitaufriß" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_peri.gif" /></td>
+<td width="100px">Periodenbild; Zeitaufriß</td>
+<td width="50px">@58@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Nächster Schritt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_sten.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Nächster Schritt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_sten.gif" /></td>
+<td width="100px">Nächster Schritt</td>
+<td width="50px">@B8@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Vorheriger Schritt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_step.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vorheriger Schritt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_step.gif" /></td>
+<td width="100px">Vorheriger Schritt</td>
+<td width="50px">@B9@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Eintrag ganz nach oben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_tot_up.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Eintrag ganz nach oben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_tot_up.gif" /></td>
+<td width="100px">Eintrag ganz nach oben</td>
+<td width="50px">@HF@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Eintrag ganz nach unten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_tot_do.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Eintrag ganz nach unten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_tot_do.gif" /></td>
+<td width="100px">Eintrag ganz nach unten</td>
+<td width="50px">@HG@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Eintrag eine Seite nach oben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_pageup.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Eintrag eine Seite nach oben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_pageup.gif" /></td>
+<td width="100px">Eintrag eine Seite nach oben</td>
+<td width="50px">@HH@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Eintrag eine Seite nach unten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_pagedo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Eintrag eine Seite nach unten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_pagedo.gif" /></td>
+<td width="100px">Eintrag eine Seite nach unten</td>
+<td width="50px">@HI@</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<table>
+<tbody>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;">Icon</td>
+<td style="width: 40px;">Corbu</td>
+<td width="100px">Name</td>
+<td width="50px">ID</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Drucken" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_prnt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Drucken" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_prnt.gif" /></td>
+<td width="100px">Drucken</td>
+<td width="50px">@0X@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_crea.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_crea.gif" /></td>
+<td width="100px">Anlegen</td>
+<td width="50px">@0Y@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ändern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_chng.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ändern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_chng.gif" /></td>
+<td width="100px">Ändern</td>
+<td width="50px">@0Z@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_disp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_disp.gif" /></td>
+<td width="100px">Anzeigen</td>
+<td width="50px">@10@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dele.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dele.gif" /></td>
+<td width="100px">Löschen</td>
+<td width="50px">@11@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Testen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_test.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Testen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_test.gif" /></td>
+<td width="100px">Testen</td>
+<td width="50px">@12@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Suchen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_srch.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Suchen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_srch.gif" /></td>
+<td width="100px">Suchen</td>
+<td width="50px">@13@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title=" kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_copy.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title=" kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_copy.gif" /></td>
+<td width="100px">kopieren</td>
+<td width="50px">@14@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title=" ausführen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_exec.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title=" ausführen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_exec.gif" /></td>
+<td width="100px">ausführen</td>
+<td width="50px">@15@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title=" auswählen; Detail" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_detl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title=" auswählen; Detail" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_detl.gif" /></td>
+<td width="100px">auswählen; Detail</td>
+<td width="50px">@16@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zeile einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_insr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeile einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_insr.gif" /></td>
+<td width="100px">Zeile einfügen</td>
+<td width="50px">@17@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Zeile löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_delr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeile löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_delr.gif" /></td>
+<td width="100px">Zeile löschen</td>
+<td width="50px">@18@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Rückgängig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_undo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Rückgängig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_undo.gif" /></td>
+<td width="100px">Rückgängig</td>
+<td width="50px">@2W@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ersetzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_repl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ersetzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_repl.gif" /></td>
+<td width="100px">Ersetzen</td>
+<td width="50px">@37@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Prüfen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_chck.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Prüfen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_chck.gif" /></td>
+<td width="100px">Prüfen</td>
+<td width="50px">@38@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Aktivieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_acti.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Aktivieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_acti.gif" /></td>
+<td width="100px">Aktivieren</td>
+<td width="50px">@3C@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Sortieren aufsteigend" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_srtu.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Sortieren aufsteigend" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_srtu.gif" /></td>
+<td width="100px">Sortieren aufsteigend</td>
+<td width="50px">@3E@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Sortieren absteigend" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_srtd.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Sortieren absteigend" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_srtd.gif" /></td>
+<td width="100px">Sortieren absteigend</td>
+<td width="50px">@3F@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Umrechnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_conv.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Umrechnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_conv.gif" /></td>
+<td width="100px">Umrechnen</td>
+<td width="50px">@3H@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anzeigen Ändern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dpch.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigen Ändern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dpch.gif" /></td>
+<td width="100px">Anzeigen Ändern</td>
+<td width="50px">@3I@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Expandieren, Vergrößern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_expa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Expandieren, Vergrößern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_expa.gif" /></td>
+<td width="100px">Expandieren, Vergrößern</td>
+<td width="50px">@3S@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Komprimieren; Verkleinern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cols.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Komprimieren; Verkleinern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cols.gif" /></td>
+<td width="100px">Komprimieren; Verkleinern</td>
+<td width="50px">@3T@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Positionieren; Anderer Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_posn.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Positionieren; Anderer Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_posn.gif" /></td>
+<td width="100px">Positionieren; Anderer Eintrag</td>
+<td width="50px">@3Y@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Summieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_summ.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Summieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_summ.gif" /></td>
+<td width="100px">Summieren</td>
+<td width="50px">@3Z@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Verschieben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_move.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Verschieben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_move.gif" /></td>
+<td width="100px">Verschieben</td>
+<td width="50px">@40@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Zurückholen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_retr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zurückholen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_retr.gif" /></td>
+<td width="100px">Zurückholen</td>
+<td width="50px">@41@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Auffrischen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_refr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Auffrischen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_refr.gif" /></td>
+<td width="100px">Auffrischen</td>
+<td width="50px">@42@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Überspringen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_skip.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Überspringen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_skip.gif" /></td>
+<td width="100px">Überspringen</td>
+<td width="50px">@43@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Vergleichen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_comp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vergleichen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_comp.gif" /></td>
+<td width="100px">Vergleichen</td>
+<td width="50px">@46@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Importieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_uplo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Importieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_uplo.gif" /></td>
+<td width="100px">Importieren</td>
+<td width="50px">@48@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Exportieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_down.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Exportieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_down.gif" /></td>
+<td width="100px">Exportieren</td>
+<td width="50px">@49@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Transportieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_trns.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Transportieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_trns.gif" /></td>
+<td width="100px">Transportieren</td>
+<td width="50px">@4A@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Weiter suchen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_srcc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Weiter suchen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_srcc.gif" /></td>
+<td width="100px">Weiter suchen</td>
+<td width="50px">@4E@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Umbenennen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_renm.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Umbenennen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_renm.gif" /></td>
+<td width="100px">Umbenennen</td>
+<td width="50px">@4F@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Filtern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_filt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Filtern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_filt.gif" /></td>
+<td width="100px">Filtern</td>
+<td width="50px">@4G@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Hervorheben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_inte.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Hervorheben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_inte.gif" /></td>
+<td width="100px">Hervorheben</td>
+<td width="50px">@4K@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zwischensumme" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_sump.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zwischensumme" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_sump.gif" /></td>
+<td width="100px">Zwischensumme</td>
+<td width="50px">@5V@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Alles expandieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_aexp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Alles expandieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_aexp.gif" /></td>
+<td width="100px">Alles expandieren</td>
+<td width="50px">@68@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Alles komprimieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_acom.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Alles komprimieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_acom.gif" /></td>
+<td width="100px">Alles komprimieren</td>
+<td width="50px">@69@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Selektion, Auswahl" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_selc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Selektion, Auswahl" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_selc.gif" /></td>
+<td width="100px">Selektion, Auswahl</td>
+<td width="50px">@7X@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Freie Abgrenzungen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_fenc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Freie Abgrenzungen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_fenc.gif" /></td>
+<td width="100px">Freie Abgrenzungen</td>
+<td width="50px">@7Z@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Menge A" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_aboa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Menge A" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_aboa.gif" /></td>
+<td width="100px">Menge A</td>
+<td width="50px">@89@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Menge B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abob.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Menge B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abob.gif" /></td>
+<td width="100px">Menge B</td>
+<td width="50px">@8A@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Menge A+B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abpl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Menge A+B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abpl.gif" /></td>
+<td width="100px">Menge A+B</td>
+<td width="50px">@8B@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Schnittmenge AB" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_absc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Schnittmenge AB" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_absc.gif" /></td>
+<td width="100px">Schnittmenge AB</td>
+<td width="50px">@8C@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Subtraktion A-B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abmb.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Subtraktion A-B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abmb.gif" /></td>
+<td width="100px">Subtraktion A-B</td>
+<td width="50px">@8D@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Subtraktion B-A" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abma.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Subtraktion B-A" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abma.gif" /></td>
+<td width="100px">Subtraktion B-A</td>
+<td width="50px">@8E@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="In Menge A kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abca.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="In Menge A kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abca.gif" /></td>
+<td width="100px">In Menge A kopieren</td>
+<td width="50px">@8F@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="In Menge B kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abcb.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="In Menge B kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abcb.gif" /></td>
+<td width="100px">In Menge B kopieren</td>
+<td width="50px">@8G@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Deaktivieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dact.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Deaktivieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dact.gif" /></td>
+<td width="100px">Deaktivieren</td>
+<td width="50px">@8I@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Weiterleiten zur Bearbeitung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_sumi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Weiterleiten zur Bearbeitung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_sumi.gif" /></td>
+<td width="100px">Weiterleiten zur Bearbeitung</td>
+<td width="50px">@8W@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Genehmigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_okye.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Genehmigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_okye.gif" /></td>
+<td width="100px">Genehmigen</td>
+<td width="50px">@8X@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ablehnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_okno.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ablehnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_okno.gif" /></td>
+<td width="100px">Ablehnen</td>
+<td width="50px">@8Y@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Simulieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_rksi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Simulieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_rksi.gif" /></td>
+<td width="100px">Simulieren</td>
+<td width="50px">@8Z@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Pfeil links" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_arle.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Pfeil links" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_arle.gif" /></td>
+<td width="100px">Pfeil links</td>
+<td width="50px">@9S@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Pfeil rechts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_arri.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Pfeil rechts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_arri.gif" /></td>
+<td width="100px">Pfeil rechts</td>
+<td width="50px">@9T@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Operation, Objekt verarbeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_oper.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Operation, Objekt verarbeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_oper.gif" /></td>
+<td width="100px">Operation, Objekt verarbeiten</td>
+<td width="50px">@9X@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Aktivität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_acty.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Aktivität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_acty.gif" /></td>
+<td width="100px">Aktivität</td>
+<td width="50px">@9Y@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Vertauschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_exch.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vertauschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_exch.gif" /></td>
+<td width="100px">Vertauschen</td>
+<td width="50px">@BB@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ablegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_stor.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ablegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_stor.gif" /></td>
+<td width="100px">Ablegen</td>
+<td width="50px">@C0@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zuordnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_link.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zuordnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_link.gif" /></td>
+<td width="100px">Zuordnen</td>
+<td width="50px">@C1@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Abgeschlossen; einwandfrei" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_comple.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Abgeschlossen; einwandfrei" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_comple.gif" /></td>
+<td width="100px">Abgeschlossen; einwandfrei</td>
+<td width="50px">@DF@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Partner aufrufen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_partne.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Partner aufrufen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_partne.gif" /></td>
+<td width="100px">Partner aufrufen</td>
+<td width="50px">@DG@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Protokoll aufrufen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_protok.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Protokoll aufrufen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_protok.gif" /></td>
+<td width="100px">Protokoll aufrufen</td>
+<td width="50px">@DH@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="XXL-Listviewer Aufruf" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_lisvie.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="XXL-Listviewer Aufruf" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_lisvie.gif" /></td>
+<td width="100px">XXL-Listviewer Aufruf</td>
+<td width="50px">@DJ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Aufruf Textverarbeitung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_textva.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Aufruf Textverarbeitung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_textva.gif" /></td>
+<td width="100px">Aufruf Textverarbeitung</td>
+<td width="50px">@DK@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="ABC-Analyse" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_abcana.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="ABC-Analyse" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_abcana.gif" /></td>
+<td width="100px">ABC-Analyse</td>
+<td width="50px">@DL@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anzeigevariante auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_varcho.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigevariante auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_varcho.gif" /></td>
+<td width="100px">Anzeigevariante auswählen</td>
+<td width="50px">@DM@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Anzeigevariante sichern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_varsav.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigevariante sichern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_varsav.gif" /></td>
+<td width="100px">Anzeigevariante sichern</td>
+<td width="50px">@DN@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Dezimalstellen vergrößern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_incdec.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Dezimalstellen vergrößern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_incdec.gif" /></td>
+<td width="100px">Dezimalstellen vergrößern</td>
+<td width="50px">@DP@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Dezimalstellen verkleinern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_decdec.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Dezimalstellen verkleinern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_decdec.gif" /></td>
+<td width="100px">Dezimalstellen verkleinern</td>
+<td width="50px">@DQ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Fehlerprotokoll" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_fehler.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Fehlerprotokoll" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_fehler.gif" /></td>
+<td width="100px">Fehlerprotokoll</td>
+<td width="50px">@DR@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Entfernen aus Favoritenliste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_delfav.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Entfernen aus Favoritenliste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_delfav.gif" /></td>
+<td width="100px">Entfernen aus Favoritenliste</td>
+<td width="50px">@ES@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Aufnehmen in Favoritenliste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_insfav.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Aufnehmen in Favoritenliste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_insfav.gif" /></td>
+<td width="100px">Aufnehmen in Favoritenliste</td>
+<td width="50px">@EV@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Anlegen mit Vorlage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_crecop.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anlegen mit Vorlage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_crecop.gif" /></td>
+<td width="100px">Anlegen mit Vorlage</td>
+<td width="50px">@EZ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Werte vorschlagen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_bwsuva.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Werte vorschlagen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_bwsuva.gif" /></td>
+<td width="100px">Werte vorschlagen</td>
+<td width="50px">@F6@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Anlage anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_attach.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anlage anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_attach.gif" /></td>
+<td width="100px">Anlage anzeigen</td>
+<td width="50px">@FM@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Mappeninhalt anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_clofol.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Mappeninhalt anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_clofol.gif" /></td>
+<td width="100px">Mappeninhalt anzeigen</td>
+<td width="50px">@FN@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Mappe öffnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_opfold.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Mappe öffnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_opfold.gif" /></td>
+<td width="100px">Mappe öffnen</td>
+<td width="50px">@FO@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Objectfolder öffnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_objfol.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Objectfolder öffnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_objfol.gif" /></td>
+<td width="100px">Objectfolder öffnen</td>
+<td width="50px">@FP@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ausgang anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_outbox.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ausgang anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_outbox.gif" /></td>
+<td width="100px">Ausgang anzeigen</td>
+<td width="50px">@FQ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Wiedervorlage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_resubm.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Wiedervorlage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_resubm.gif" /></td>
+<td width="100px">Wiedervorlage</td>
+<td width="50px">@FR@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Persönlich Ablage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_prifil.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Persönlich Ablage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_prifil.gif" /></td>
+<td width="100px">Persönlich Ablage</td>
+<td width="50px">@FS@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Allgemeine Ablage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_pubfil.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Allgemeine Ablage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_pubfil.gif" /></td>
+<td width="100px">Allgemeine Ablage</td>
+<td width="50px">@FT@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Abonnierte Mappen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_subscr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Abonnierte Mappen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_subscr.gif" /></td>
+<td width="100px">Abonnierte Mappen</td>
+<td width="50px">@FU@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ermittlung des Durchschnitts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_averag.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ermittlung des Durchschnitts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_averag.gif" /></td>
+<td width="100px">Ermittlung des Durchschnitts</td>
+<td width="50px">@FV@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Fettdruck" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_x_bold.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Fettdruck" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_x_bold.gif" /></td>
+<td width="100px">Fettdruck</td>
+<td width="50px">@FW@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kursivdruck" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_italic.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kursivdruck" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_italic.gif" /></td>
+<td width="100px">Kursivdruck</td>
+<td width="50px">@FX@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Unterstrichen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_underl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Unterstrichen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_underl.gif" /></td>
+<td width="100px">Unterstrichen</td>
+<td width="50px">@FY@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="linksbündig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_aligle.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="linksbündig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_aligle.gif" /></td>
+<td width="100px">linksbündig</td>
+<td width="50px">@FZ@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="rechtsbündig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_aligri.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="rechtsbündig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_aligri.gif" /></td>
+<td width="100px">rechtsbündig</td>
+<td width="50px">@G0@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="zentriert" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_aligce.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="zentriert" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_aligce.gif" /></td>
+<td width="100px">zentriert</td>
+<td width="50px">@G1@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Blocktext" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_justif.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Blocktext" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_justif.gif" /></td>
+<td width="100px">Blocktext</td>
+<td width="50px">@G2@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Farbe" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_xcolor.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Farbe" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_xcolor.gif" /></td>
+<td width="100px">Farbe</td>
+<td width="50px">@G3@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="alle Attribute löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_delatt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="alle Attribute löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_delatt.gif" /></td>
+<td width="100px">alle Attribute löschen</td>
+<td width="50px">@G4@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anzeigen von Idocs" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_xidocs.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigen von Idocs" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_xidocs.gif" /></td>
+<td width="100px">Anzeigen von Idocs</td>
+<td width="50px">@G5@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Verbindung aufbauen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_connec.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Verbindung aufbauen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_connec.gif" /></td>
+<td width="100px">Verbindung aufbauen</td>
+<td width="50px">@GB@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Verbindung trennen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_discon.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Verbindung trennen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_discon.gif" /></td>
+<td width="100px">Verbindung trennen</td>
+<td width="50px">@GC@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Filter zurücknehmen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_filtun.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Filter zurücknehmen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_filtun.gif" /></td>
+<td width="100px">Filter zurücknehmen</td>
+<td width="50px">@GD@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung zurücknehmen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_intund.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung zurücknehmen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_intund.gif" /></td>
+<td width="100px">Hervorhebung zurücknehmen</td>
+<td width="50px">@GF@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="mehrer Zeilen einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_inmali.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="mehrer Zeilen einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_inmali.gif" /></td>
+<td width="100px">mehrer Zeilen einfügen</td>
+<td width="50px">@GU@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Massenänderung durchführen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_massch.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Massenänderung durchführen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_massch.gif" /></td>
+<td width="100px">Massenänderung durchführen</td>
+<td width="50px">@HB@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung kritisch" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_intcri.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung kritisch" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_intcri.gif" /></td>
+<td width="100px">Hervorhebung kritisch</td>
+<td width="50px">@HC@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung unkritisch" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_intunc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung unkritisch" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_intunc.gif" /></td>
+<td width="100px">Hervorhebung unkritisch</td>
+<td width="50px">@HD@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Spalten auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_chocol.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Spalten auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_chocol.gif" /></td>
+<td width="100px">Spalten auswählen</td>
+<td width="50px">@HE@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Datei lesen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_readfi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Datei lesen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_readfi.gif" /></td>
+<td width="100px">Datei lesen</td>
+<td width="50px">@HJ@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Datei schreiben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_writfi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Datei schreiben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_writfi.gif" /></td>
+<td width="100px">Datei schreiben</td>
+<td width="50px">@HK@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Datei bearbeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_editfi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Datei bearbeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_editfi.gif" /></td>
+<td width="100px">Datei bearbeiten</td>
+<td width="50px">@HL@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Berichts-Berichtsaufruf" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_repcal.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Berichts-Berichtsaufruf" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_repcal.gif" /></td>
+<td width="100px">Berichts-Berichtsaufruf</td>
+<td width="50px">@I2@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Markieren mit Bedingung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_sewico.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Markieren mit Bedingung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_sewico.gif" /></td>
+<td width="100px">Markieren mit Bedingung</td>
+<td width="50px">@KG@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Anzeigevarianten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_varian.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigevarianten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_varian.gif" /></td>
+<td width="100px">Anzeigevarianten</td>
+<td width="50px">@LZ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Absatzzeichen ein/ausblenden" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_paragr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Absatzzeichen ein/ausblenden" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_paragr.gif" /></td>
+<td width="100px">Absatzzeichen ein/ausblenden</td>
+<td width="50px">@P2@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Werte löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_eraser.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Werte löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_eraser.gif" /></td>
+<td width="100px">Werte löschen</td>
+<td width="50px">@TS@</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<table>
+<tbody>
+<tr bgcolor="white">
+<td style="width: 40px;">icon</td>
+<td style="width: 40px;">Corbu</td>
+<td width="100px">Name</td>
+<td width="50px">ID</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Notiz; Notiz ändern; Anmerkung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_anno.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Notiz; Notiz ändern; Anmerkung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_anno.gif" /></td>
+<td width="100px">Notiz; Notiz ändern; Anmerkung</td>
+<td width="50px">@0J@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Notiz anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_nocr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Notiz anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_nocr.gif" /></td>
+<td width="100px">Notiz anlegen</td>
+<td width="50px">@0K@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Notiz anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_nodp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Notiz anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_nodp.gif" /></td>
+<td width="100px">Notiz anzeigen</td>
+<td width="50px">@0L@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Kalkulation" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_calc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kalkulation" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_calc.gif" /></td>
+<td width="100px">Kalkulation</td>
+<td width="50px">@0M@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Grafik" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_graf.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Grafik" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_graf.gif" /></td>
+<td width="100px">Grafik</td>
+<td width="50px">@0N@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Text anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_txcr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Text anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_txcr.gif" /></td>
+<td width="100px">Text anlegen</td>
+<td width="50px">@0O@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Text anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_txdp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Text anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_txdp.gif" /></td>
+<td width="100px">Text anzeigen</td>
+<td width="50px">@0P@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Text; Text ändern; Langtext" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_text.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Text; Text ändern; Langtext" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_text.gif" /></td>
+<td width="100px">Text; Text ändern; Langtext</td>
+<td width="50px">@0Q@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Varianten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_vari.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Varianten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_vari.gif" /></td>
+<td width="100px">Varianten</td>
+<td width="50px">@0R@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Information" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_info.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Information" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_info.gif" /></td>
+<td width="100px">Information</td>
+<td width="50px">@0S@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Adresse" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_addr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Adresse" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_addr.gif" /></td>
+<td width="100px">Adresse</td>
+<td width="50px">@0T@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Viewer optisches Archiv" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_opta.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Viewer optisches Archiv" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_opta.gif" /></td>
+<td width="100px">Viewer optisches Archiv</td>
+<td width="50px">@0U@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Seitenansicht" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_layt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Seitenansicht" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_layt.gif" /></td>
+<td width="100px">Seitenansicht</td>
+<td width="50px">@3G@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Status setzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_stat.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Status setzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_stat.gif" /></td>
+<td width="100px">Status setzen</td>
+<td width="50px">@3J@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Liste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_list.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Liste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_list.gif" /></td>
+<td width="100px">Liste</td>
+<td width="50px">@3W@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Werkzeuge, Fertigungshilfsmit." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_tool.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Werkzeuge, Fertigungshilfsmit." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_tool.gif" /></td>
+<td width="100px">Werkzeuge, Fertigungshilfsmit.</td>
+<td width="50px">@45@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Netzplangrafik" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_netg.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Netzplangrafik" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_netg.gif" /></td>
+<td width="100px">Netzplangrafik</td>
+<td width="50px">@56@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Balkenplangrafik; Plantafel" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_plan.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Balkenplangrafik; Plantafel" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_plan.gif" /></td>
+<td width="100px">Balkenplangrafik; Plantafel</td>
+<td width="50px">@57@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Mitarbeiter" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_empl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Mitarbeiter" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_empl.gif" /></td>
+<td width="100px">Mitarbeiter</td>
+<td width="50px">@5W@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zeitzone" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_timz.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeitzone" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_timz.gif" /></td>
+<td width="100px">Zeitzone</td>
+<td width="50px">@5X@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Historie" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_rkhi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Historie" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_rkhi.gif" /></td>
+<td width="100px">Historie</td>
+<td width="50px">@96@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zeit inaktiv" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_tina.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeit inaktiv" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_tina.gif" /></td>
+<td width="100px">Zeit inaktiv</td>
+<td width="50px">@9R@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="ABAP-Routine" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abap.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="ABAP-Routine" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abap.gif" /></td>
+<td width="100px">ABAP-Routine</td>
+<td width="50px">@9U@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Auftrag, Order" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_orda.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Auftrag, Order" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_orda.gif" /></td>
+<td width="100px">Auftrag, Order</td>
+<td width="50px">@9Z@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kunde" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cust.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kunde" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cust.gif" /></td>
+<td width="100px">Kunde</td>
+<td width="50px">@A0@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zentrallager" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cewa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zentrallager" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cewa.gif" /></td>
+<td width="100px">Zentrallager</td>
+<td width="50px">@A1@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Dispositionsebene" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dilo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Dispositionsebene" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dilo.gif" /></td>
+<td width="100px">Dispositionsebene</td>
+<td width="50px">@A2@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Distributionszentrum" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dice.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Distributionszentrum" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dice.gif" /></td>
+<td width="100px">Distributionszentrum</td>
+<td width="50px">@A3@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kundenlager" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cuwa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kundenlager" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cuwa.gif" /></td>
+<td width="100px">Kundenlager</td>
+<td width="50px">@A4@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Umlagerungspunkt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_trap.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Umlagerungspunkt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_trap.gif" /></td>
+<td width="100px">Umlagerungspunkt</td>
+<td width="50px">@A5@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Material" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_matl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Material" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_matl.gif" /></td>
+<td width="100px">Material</td>
+<td width="50px">@A6@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Modell" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_modl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Modell" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_modl.gif" /></td>
+<td width="100px">Modell</td>
+<td width="50px">@A7@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Werk" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_plnt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Werk" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_plnt.gif" /></td>
+<td width="100px">Werk</td>
+<td width="50px">@A8@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Produktgruppe" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_prog.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Produktgruppe" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_prog.gif" /></td>
+<td width="100px">Produktgruppe</td>
+<td width="50px">@A9@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Verbindung, Beziehung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_resh.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Verbindung, Beziehung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_resh.gif" /></td>
+<td width="100px">Verbindung, Beziehung</td>
+<td width="50px">@AA@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ressource" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_resu.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ressource" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_resu.gif" /></td>
+<td width="100px">Ressource</td>
+<td width="50px">@AB@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Lagerort" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_stol.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Lagerort" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_stol.gif" /></td>
+<td width="100px">Lagerort</td>
+<td width="50px">@AC@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Lieferant" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_supp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Lieferant" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_supp.gif" /></td>
+<td width="100px">Lieferant</td>
+<td width="50px">@AD@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Transportart" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_tram.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Transportart" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_tram.gif" /></td>
+<td width="100px">Transportart</td>
+<td width="50px">@AE@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ort" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_loca.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ort" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_loca.gif" /></td>
+<td width="100px">Ort</td>
+<td width="50px">@AF@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Arbeitsplan" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_plaa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Arbeitsplan" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_plaa.gif" /></td>
+<td width="100px">Arbeitsplan</td>
+<td width="50px">@AJ@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Wartungsplan" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_plaw.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Wartungsplan" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_plaw.gif" /></td>
+<td width="100px">Wartungsplan</td>
+<td width="50px">@AK@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Meldung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_repo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Meldung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_repo.gif" /></td>
+<td width="100px">Meldung</td>
+<td width="50px">@AL@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Arbeitsplatz" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_wopa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Arbeitsplatz" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_wopa.gif" /></td>
+<td width="100px">Arbeitsplatz</td>
+<td width="50px">@AM@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ausstattung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_equi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ausstattung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_equi.gif" /></td>
+<td width="100px">Ausstattung</td>
+<td width="50px">@AN@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Dokument" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_docu.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Dokument" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_docu.gif" /></td>
+<td width="100px">Dokument</td>
+<td width="50px">@AR@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Storno Zahlungsposten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_reve.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Storno Zahlungsposten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_reve.gif" /></td>
+<td width="100px">Storno Zahlungsposten</td>
+<td width="50px">@BA@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Kostenstelle" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cost.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kostenstelle" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cost.gif" /></td>
+<td width="100px">Kostenstelle</td>
+<td width="50px">@BL@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Query Tool" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_quer.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Query Tool" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_quer.gif" /></td>
+<td width="100px">Query Tool</td>
+<td width="50px">@BO@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Workflow Eingang" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_ibox.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Workflow Eingang" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_ibox.gif" /></td>
+<td width="100px">Workflow Eingang</td>
+<td width="50px">@BP@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Wizard" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_wiza.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Wizard" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_wiza.gif" /></td>
+<td width="100px">Wizard</td>
+<td width="50px">@BY@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Einmallieferung Wunschtermin" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_elie.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Einmallieferung Wunschtermin" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_elie.gif" /></td>
+<td width="100px">Einmallieferung Wunschtermin</td>
+<td width="50px">@CB@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Vollständige Lieferung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_klie.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vollständige Lieferung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_klie.gif" /></td>
+<td width="100px">Vollständige Lieferung</td>
+<td width="50px">@CC@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Liefervorschlag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_vlie.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Liefervorschlag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_vlie.gif" /></td>
+<td width="100px">Liefervorschlag</td>
+<td width="50px">@CD@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Planrichtung rückwärts (Umsch)" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pruu.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planrichtung rückwärts (Umsch)" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pruu.gif" /></td>
+<td width="100px">Planrichtung rückwärts (Umsch)</td>
+<td width="50px">@CE@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Planungsrichtung rückwärts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pruc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planungsrichtung rückwärts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pruc.gif" /></td>
+<td width="100px">Planungsrichtung rückwärts</td>
+<td width="50px">@CF@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Planungsrichtung vorwärts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pvor.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planungsrichtung vorwärts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pvor.gif" /></td>
+<td width="100px">Planungsrichtung vorwärts</td>
+<td width="50px">@CG@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Planrichtung vorwärts (Umsch)" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pvou.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planrichtung vorwärts (Umsch)" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pvou.gif" /></td>
+<td width="100px">Planrichtung vorwärts (Umsch)</td>
+<td width="50px">@CH@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Finite Kapazität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pfik.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Finite Kapazität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pfik.gif" /></td>
+<td width="100px">Finite Kapazität</td>
+<td width="50px">@CI@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Variationen Nichtarbeitszeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pnar.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Variationen Nichtarbeitszeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pnar.gif" /></td>
+<td width="100px">Variationen Nichtarbeitszeiten</td>
+<td width="50px">@CJ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Planmodus freie Kapazität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pfka.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planmodus freie Kapazität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pfka.gif" /></td>
+<td width="100px">Planmodus freie Kapazität</td>
+<td width="50px">@CK@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Planmodus Vorgang einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pvef.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planmodus Vorgang einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pvef.gif" /></td>
+<td width="100px">Planmodus Vorgang einfügen</td>
+<td width="50px">@CL@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Planmodus Vorgang einrütteln" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pver.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planmodus Vorgang einrütteln" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pver.gif" /></td>
+<td width="100px">Planmodus Vorgang einrütteln</td>
+<td width="50px">@CM@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Planmodus Reihenfolge beibehal" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pvre.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planmodus Reihenfolge beibehal" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pvre.gif" /></td>
+<td width="100px">Planmodus Reihenfolge beibehal</td>
+<td width="50px">@CN@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Profit Center Stammsatz" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_procen.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Profit Center Stammsatz" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_procen.gif" /></td>
+<td width="100px">Profit Center Stammsatz</td>
+<td width="50px">@D2@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Buchungskreis" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_comcod.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Buchungskreis" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_comcod.gif" /></td>
+<td width="100px">Buchungskreis</td>
+<td width="50px">@D9@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kostenrechnungskreis" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_conare.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kostenrechnungskreis" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_conare.gif" /></td>
+<td width="100px">Kostenrechnungskreis</td>
+<td width="50px">@DX@</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Der Beitrag <a href="/blog/sap-icons/">SAP-Icons</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Gamification</title>
+		<link>/blog/gamification/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 19 Aug 2011 15:11:42 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Spiele]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=615</guid>
+
+					<description><![CDATA[<p>Mit "Gamification" ist ein neues Schlagwort in der (SAP-) Welt aufgetaucht. Es gibt wohl zwei Grundgedanken. Erstens: Worin genau sind Gamer eigentlich gut? Zweitens: Wie kann man in der Gesch&#228;ftswelt diesen Spielegedanken umsetzen, so dass die Mitarbeiter Spa&#223; an der Arbeit haben und zudem hoch konzentriert sind?</p>
+<p>Der Beitrag <a href="/blog/gamification/">Gamification</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit &#8220;Gamification&#8221; ist ein neues Schlagwort in der (SAP-) Welt aufgetaucht. Es gibt wohl zwei Grundgedanken. Erstens: Worin genau sind Gamer eigentlich gut? Zweitens: Wie kann man in der Geschäftswelt diesen Spielegedanken umsetzen, so dass die Mitarbeiter Spaß an der Arbeit haben und zudem hoch konzentriert sind?</p>
+<p class="head1">Turning Work Into Play</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/blog/Bild554.jpg" alt="" /></p>
+<p>Heute bin ich über das Stichwort &#8220;Gamification&#8221; gestolpert. Und zwar auf der Internetseite von Anton Hartl. (Die Seite und Artikel sind leider nicht mehr online. Hier der Link auf die aktuelle Internetpräsenz: <a href="http://www.stacknoise.com/" target="_blank">http://www.stacknoise.com/</a>)</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/blog/Bild557.jpg" alt="" /></p>
+<p>Auf der Seite sind Links zu dem Thema &#8220;Gamification&#8221;. Ich habe mir mal die Präsentation von<strong> Jane McGonigal &#8220;Videospiele für eine bessere Welt&#8221;</strong> angeschaut &#8211; welche ich sehr spannend fand. Sie geht der Frage nach, warum verbringen Gamer so viel Zeit damit, virtuelle Aufgaben zu lösen? Wie kann man es schaffen, diese Energie, Hartnäckigkeit und Aufmerksamkeit in die Arbeitswelt zu übertragen? Könnte man dies nur ansatzweise schaffen, wäre das eine Produktivitätssteigerung sondergleichen. <strong>McGonigal </strong>erzählt, dass alle Spieler bei World of Warcraft bisher 5,93 Millionen Jahre damit zugebracht haben, die Fantasiewelt Azeroth zu beleben. In einem Land, in dem viel Videospiele gespielt werden, wird ein Spieler <strong>bis zum 21. Lebensjahr 10.000 Stunden</strong> mit Videospielen zugebracht haben. Das ist in etwa die gleiche Menge an Stunden, die dem Unterricht einer amerikanischen High School entspricht!</p>
+<p class="head1">UI &#8211; User Interface</p>
+<p>Anton Hartl beschäftigt sich mit der Implementierung einer visionären Benutzeroberfläche für SAP. Ziel ist es, ausgewählte SAP-Funktionalitäten in grafischen Benutzeroberflächen zu präsentieren, die man bisher nur aus CSI New York oder Avatar kannte.Danach einen kurzen Chat mit Anton Hartl gehabt, der mir ein bisschen über das Projekt erzählt hat.</p>
+<p>Er ist gerade dabei, mit Partnern Prototypen für so eine zukünftige UI zu erstellen. Den SAPGUI wird es allerdings wohl auch in Zukunft geben, denn die Visualisierung von Fakten und Bearbeitung auf 55&#8243; Touch Screens wird wohl nur bei einigen Spezialanwendungen Sinn machen.</p>
+<p class="head1">Turn User Into Fans</p>
+<p>Ich finde es schon interessant, wenn ich mir vorstelle, dass der Mitarbeiter meiner Lieblingstelefongesellschaft mich erst dann anruft, wenn er gegen seine Kollegen im Tarifdschungelmemory gewonnen hat oder erst, sobald er 7800 Telefongesprächserfahrungspunkte gesammelt hat!</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/blog/Bild559.jpg" alt="" /></p>
+<p>Nein, mal Ernst beiseite&#8230;</p>
+<p>Auf den ersten Blick betrachtet macht eine &#8220;spielerische Oberfläche&#8221; oder auch eine &#8220;Virtualisierung der Arbeit&#8221; wahrscheinlich keinen Sinn. Auf den zweiten Blick jedoch, macht es durchaus Sinn, die Benutzerfreundlichkeit und Intuitive Erfassung von Funktionalitäten an erste Stelle zu setzen. Und auch wenn eine bunte verspielte Oberfläche &#8211; bei der ich vielleicht noch meinen Avatar selbst gestalten kann &#8211; in einem ERP-System merkwürdig anmutet: Es wäre wirklich fahrlässig, das was auch immer die Jugend von heute beim Spielen mit der Wii oder der Playstation lernt, nicht zu nutzen.</p>
+<p>Ich kann mir gut vorstellen, dass Leute, die einen Kundenauftrag mit einer &#8220;Spiele-Oberfläche&#8221; eingeben müsssen wahrscheinlich eher noch nebenbei chatten und parallel dazu noch effektive Routenplanung machen können.</p>
+<p>Exceltabellen werden aber wohl so schnell nicht von der Bildfläche verschwinden&#8230;</p>
+<p>Ich bin jedenfalls gespannt, wie es weiter geht!</p>
+<p class="head1">Links</p>
+<p class="head2">Jane McGonigal (Deutsche Untertitel zuschaltbar!)</p>
+<p><a href="http://www.ted.com/talks/lang/eng/jane_mcgonigal_gaming_can_make_a_better_world.html" target="_blank">http://www.ted.com/talks/lang/eng/jane_mcgonigal_<br />
+gaming_can_make_a_better_world.html</a></p>
+<p class="head2">Homepage Anton Hartl</p>
+<p><a href="http://www.stacknoise.com/" target="_blank">http://www.stacknoise.com/</a></p>
+<p>Der Beitrag <a href="/blog/gamification/">Gamification</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Grid mit Variantenschnellzugriff (Menü)</title>
+		<link>/blog/grid-mit-variantenschnellzugriff-menue/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 16 Aug 2011 19:23:04 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[toolbar]]></category>
+		<category><![CDATA[sender]]></category>
+		<category><![CDATA[Layout]]></category>
+		<category><![CDATA[LVC_VARIANT_SELECT]]></category>
+		<category><![CDATA[set_variant]]></category>
+		<category><![CDATA[set_frontend_fieldcatalog]]></category>
+		<category><![CDATA[cl_gui_custom_container]]></category>
+		<category><![CDATA[set_filter_criteria]]></category>
+		<category><![CDATA[register events]]></category>
+		<category><![CDATA[set_sort_criteria]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[splitter]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[cl_gui_splitter_container]]></category>
+		<category><![CDATA[BW]]></category>
+		<category><![CDATA[cl_gui_container]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=611</guid>
+
+					<description><![CDATA[<p>Dies ist eine andere Version mit der ein Varianten-Schnellzugriff in einem ALV-Grid realisiert wurde. Dieses Programm verwaltet vier Grids und in jedem Grid werden die vorhandenen Varianten in zwei Men&#252;s angezeigt: System- und Benutzervarianten. Der Name der aktuell ausgew&#228;hlten Variante wird dabei im jeweiligen Men&#252; angezeigt. </p>
+<p>Der Beitrag <a href="/blog/grid-mit-variantenschnellzugriff-menue/">Grid mit Variantenschnellzugriff (Menü)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Dies ist eine andere Version mit der ein Varianten-Schnellzugriff in einem ALV-Grid realisiert wurde. Dieses Programm verwaltet vier Grids und in jedem Grid werden die vorhandenen Varianten in zwei Menüs angezeigt: System- und Benutzervarianten. Der Name der aktuell ausgewählten Variante wird dabei im jeweiligen Menü angezeigt.</p>
+<h2 class="head1">Screenshot</h2>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/ALV/Bild527.jpg" alt="" /></p>
+<h2 class="head1">Erklärung</h2>
+<p class="text1">Die beiden Events, die für die Umsetzung maßgeblich beteiligt sind: TOOLBAR und MENU_BUTTON.</p>
+<p class="text1">Im Event TOOLBAR werden die Menüs erstellt. In MENU_BUTTON werden die zugehörigen Untermenüs aufgebaut, wenn der Benutzer auf einen Menu-Button geklickt hat. Die Menüs in der Toolbar werden also erst zum Zeitpunkt des Anklickens aufgebaut.</p>
+<p class="text1"><img decoding="async" src="/wp-content/uploads/tt_images/ALV/Bild528.jpg" alt="" /></p>
+<p>Links die globalen Varianten, rechts Benutzervarianten</p>
+<h2>Coding</h2>
+<pre class="lang:abap decode:true ">*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZZ_GRID_VARIANT_MENU
+*&amp;---------------------------------------------------------------------*
+
+***_________________________________***
+***                                 ***
+***    https://tricktresor.com   / ***
+***_________________________________***
+***                                 ***
+
+* BESCHREIBUNG
+* ============
+* Das Programm enthält eine Klasse, mit deren Hilfe vier durch einen
+* Splitter getrennte ALV-Grids angezeigt werden
+* Es können Varianten abgespeichert werden, die dann als Schnellzugriff
+* mit einem Menü in der Toolbar aktiviert werden.
+
+* DYNPRO 100
+* ==========
+* Dynpro 100 muss angelegt werden.
+* Es muss einen CustomContainer mit Namen CONTAINER enthalten
+* Der Status "100" muss angelegt werden. Die Funktionstaste F3 muss
+* mit dem Funktionscode BACK belegt werden.
+
+* DYNPRO-ABLAUFLOGIK
+* ==================
+* PROCESS BEFORE OUTPUT.
+*   MODULE pbo.
+*
+* PROCESS AFTER INPUT.
+*   MODULE pai.
+
+REPORT zz_grid_variant.
+
+*** Class for event receiver
+CLASS lcl_event_receiver DEFINITION DEFERRED.
+
+*** global data
+DATA gr_grid1    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid2    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid3    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid4    TYPE REF TO            lcl_event_receiver.
+
+DATA gv_matnr    TYPE matnr.
+DATA gt_mara     TYPE STANDARD TABLE OF mara.
+DATA gt_marc     TYPE STANDARD TABLE OF marc.
+DATA gt_mard     TYPE STANDARD TABLE OF mard.
+DATA gt_mvke     TYPE STANDARD TABLE OF mvke.
+
+DATA gr_cc       TYPE REF TO            cl_gui_custom_container.
+DATA gr_splitter TYPE REF TO            cl_gui_splitter_container.
+
+DATA gr_cont1    TYPE REF TO            cl_gui_container.
+DATA gr_cont2    TYPE REF TO            cl_gui_container.
+DATA gr_cont3    TYPE REF TO            cl_gui_container.
+DATA gr_cont4    TYPE REF TO            cl_gui_container.
+
+SELECT-OPTIONS s_matnr FOR gv_matnr.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+
+  PUBLIC SECTION.
+
+    DATA gr_grid    TYPE REF TO            cl_gui_alv_grid.
+DATA gr_cont    TYPE REF TO            cl_gui_container.
+DATA gs_variant TYPE                   disvariant.
+DATA gs_layout  TYPE                   lvc_s_layo.
+DATA gv_table   TYPE                   text80.
+
+    DATA ls_toolbar       TYPE stb_button.
+DATA ls_variant       TYPE disvariant.
+
+*** Variants
+DATA lt_ltdx          TYPE STANDARD TABLE OF ltdx.
+
+*** Variant texts
+DATA lt_ltdxt         TYPE STANDARD TABLE OF ltdxt.
+
+METHODS:
+
+*** constructor
+constructor
+IMPORTING i_handle    TYPE c
+i_container TYPE REF TO cl_gui_container
+i_title     TYPE lvc_title
+i_table     TYPE c,
+
+*** event for menu button
+handle_menu_button
+FOR EVENT menu_button OF cl_gui_alv_grid
+IMPORTING e_object e_ucomm sender,
+
+*** event for double click
+handle_double_click
+FOR EVENT double_click OF cl_gui_alv_grid
+IMPORTING e_row e_column es_row_no sender,
+
+*** event for adding buttons to toolbar
+handle_toolbar
+FOR EVENT toolbar OF cl_gui_alv_grid
+IMPORTING e_object e_interactive sender,
+
+*** event for pressed buttons
+handle_user_command
+FOR EVENT user_command OF cl_gui_alv_grid
+IMPORTING e_ucomm sender.
+
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+
+  METHOD constructor.
+
+    FIELD-SYMBOLS &lt;outtab&gt; TYPE STANDARD TABLE.
+
+    gv_table = i_table.
+ASSIGN (gv_table) TO &lt;outtab&gt;.
+CHECK sy-subrc = 0.
+
+*** Create ALV Grid
+CREATE OBJECT gr_grid
+EXPORTING
+i_parent = i_container.
+
+*** Set variant
+CLEAR gs_variant.
+gs_variant-report    = sy-repid.
+gs_variant-handle    = i_handle.
+gs_variant-username  = sy-uname.
+
+*** Layout
+gs_layout-grid_title = i_title.
+gs_layout-no_toolbar = ' '.
+
+*** Set display
+CALL METHOD gr_grid-&gt;set_table_for_first_display
+EXPORTING
+i_structure_name = i_handle
+is_variant       = gs_variant
+i_save           = 'A'
+i_default        = 'X'
+is_layout        = gs_layout
+CHANGING
+it_outtab        = &lt;outtab&gt;
+EXCEPTIONS
+OTHERS           = 4.
+
+**** Create event handler for grid
+SET HANDLER handle_user_command
+handle_toolbar
+handle_double_click
+handle_menu_button
+FOR gr_grid.
+
+*** set toolbar interactive
+CALL METHOD gr_grid-&gt;set_toolbar_interactive.
+
+  ENDMETHOD.                    "constructor
+
+  METHOD handle_double_click.
+
+    FIELD-SYMBOLS &lt;outtab&gt; TYPE STANDARD TABLE.
+FIELD-SYMBOLS &lt;outwa&gt;  TYPE ANY.
+FIELD-SYMBOLS &lt;value&gt;  TYPE ANY.
+
+    ASSIGN (gv_table) TO &lt;outtab&gt;.
+CHECK sy-subrc = 0.
+
+    CASE e_column.
+WHEN 'MATNR'.
+READ TABLE &lt;outtab&gt; ASSIGNING &lt;outwa&gt; INDEX es_row_no-row_id.
+IF sy-subrc = 0.
+ASSIGN COMPONENT e_column OF STRUCTURE &lt;outwa&gt; TO &lt;value&gt;.
+IF sy-subrc = 0.
+SET PARAMETER ID 'MAT' FIELD &lt;value&gt;.
+CALL TRANSACTION 'MM03' AND SKIP FIRST SCREEN.
+ENDIF.
+ENDIF.
+ENDCASE.
+
+  ENDMETHOD.                    "handle_double_click
+
+  METHOD handle_toolbar.
+
+    FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+**** Get actual variant
+CALL METHOD sender-&gt;get_variant
+IMPORTING
+es_variant = ls_variant.
+
+*** Read existing variants
+SELECT * FROM ltdx INTO TABLE lt_ltdx UP TO 10 ROWS
+WHERE relid  = 'LT'
+AND report = gs_variant-report
+AND handle = gs_variant-handle
+AND srtf2  = 0
+AND ( username = space
+OR  username = sy-uname )
+ORDER BY username variant.
+
+    IF sy-subrc = 0.
+*** add Separator to toolbar
+ls_toolbar-function  = 'DUMMY'.
+ls_toolbar-butn_type = '3'.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+*** Get variant texts
+SELECT * FROM ltdxt INTO TABLE lt_ltdxt
+FOR ALL ENTRIES IN lt_ltdx
+WHERE relid  = 'LT'
+AND report = gs_variant-report
+AND handle = gs_variant-handle
+AND variant = lt_ltdx-variant
+AND langu = sy-langu.
+
+*** Check if there are global variants...
+READ TABLE lt_ltdx TRANSPORTING NO FIELDS
+WITH KEY username = space.
+IF sy-subrc = 0.
+*** add menu "GLOBAL" to toolbar
+CLEAR ls_toolbar.
+IF ls_variant-variant IS NOT INITIAL AND
+ls_variant-variant(1) = '/'.
+*** If variant is actually set: Display name of variant
+READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY username = space
+variant  = ls_variant-variant.
+IF sy-subrc = 0.
+ls_toolbar-text = &lt;ltdxt&gt;-text.
+ENDIF.
+ENDIF.
+ls_toolbar-function  = 'GLOBAL'.
+ls_toolbar-icon      = icon_bw_gis.
+ls_toolbar-butn_type = '2'.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+ENDIF.
+
+*** Check if there are user specific variants...
+READ TABLE lt_ltdx TRANSPORTING NO FIELDS
+WITH KEY username = sy-uname.
+IF sy-subrc = 0.
+*** add menu "USER SPECIFIC" to toolbar
+CLEAR ls_toolbar.
+IF ls_variant-variant IS NOT INITIAL AND
+ls_variant-variant(1) &lt;&gt; '/'.
+*** If variant is actually set: Display name of variant
+READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY username = sy-uname
+variant  = ls_variant-variant.
+IF sy-subrc = 0.
+ls_toolbar-text = &lt;ltdxt&gt;-text.
+ENDIF.
+ENDIF.
+ls_toolbar-function  = 'USER'.
+ls_toolbar-icon      = icon_usergroup.
+ls_toolbar-butn_type = '2'.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+ENDIF.
+ENDIF.
+
+  ENDMETHOD.                    "handle_toolbar
+
+  METHOD handle_user_command.
+*** Set chosen variant
+
+    FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+*** data
+DATA lv_user_specific TYPE c.
+DATA ls_variant       TYPE disvariant.
+DATA ls_stable        TYPE lvc_s_stbl.
+DATA lt_fieldcat      TYPE  lvc_t_fcat.
+DATA lt_sort          TYPE  lvc_t_sort.
+DATA lt_filter        TYPE  lvc_t_filt.
+DATA ls_layout        TYPE  lvc_s_layo.
+
+*** Variant
+CLEAR ls_variant.
+ls_variant-variant = e_ucomm.
+SHIFT ls_variant-variant LEFT BY 1 PLACES.
+ls_variant-report    = gs_variant-report.
+ls_variant-handle    = gs_variant-handle.
+IF ls_variant-variant(1) &lt;&gt; '/'.
+ls_variant-username  = sy-uname.
+lv_user_specific     = 'X'.
+ENDIF.
+CALL METHOD sender-&gt;get_frontend_fieldcatalog
+IMPORTING
+et_fieldcatalog = lt_fieldcat.
+
+    CALL FUNCTION 'LVC_VARIANT_SELECT'
+EXPORTING
+i_dialog            = space
+i_user_specific     = lv_user_specific
+it_default_fieldcat = lt_fieldcat
+IMPORTING
+et_fieldcat         = lt_fieldcat
+et_sort             = lt_sort
+et_filter           = lt_filter
+CHANGING
+cs_variant          = ls_variant
+EXCEPTIONS
+wrong_input         = 1
+fc_not_complete     = 2
+not_found           = 3
+program_error       = 4
+data_missing        = 5
+OTHERS              = 6.
+IF sy-subrc = 0.
+CALL METHOD sender-&gt;set_variant( ls_variant ).
+CALL METHOD sender-&gt;set_frontend_fieldcatalog( lt_fieldcat ).
+CALL METHOD sender-&gt;set_filter_criteria( lt_filter ).
+CALL METHOD sender-&gt;set_sort_criteria( lt_sort ).
+ls_stable = 'XX'.
+CALL METHOD sender-&gt;refresh_table_display
+EXPORTING
+is_stable      = ls_stable
+i_soft_refresh = space.
+ENDIF.
+
+  ENDMETHOD.                           "handle_user_command
+
+  METHOD handle_menu_button.
+
+DATA lv_fcode         TYPE ui_func.
+DATA lv_text          TYPE gui_text.
+DATA lv_disable       TYPE c.
+DATA lv_checked       TYPE c.
+DATA lv_username      TYPE syuname.
+
+FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+CASE e_ucomm.
+WHEN 'GLOBAL'.
+lv_username = space.
+WHEN 'USER'.
+lv_username = sy-uname.
+WHEN OTHERS.
+EXIT.
+ENDCASE.
+
+*** Get actual variant
+CALL METHOD sender-&gt;get_variant
+IMPORTING
+es_variant = ls_variant.
+
+LOOP AT lt_ltdx ASSIGNING &lt;ltdx&gt; WHERE username = lv_username.
+*... get variant text
+READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY variant = &lt;ltdx&gt;-variant.
+
+*... set menu entry
+CLEAR ls_toolbar.
+lv_fcode  = '$'.
+lv_fcode+1 = &lt;ltdx&gt;-variant.
+
+*... set text
+      IF &lt;ltdxt&gt; IS ASSIGNED.
+lv_text      = &lt;ltdxt&gt;-text.
+ELSE.
+lv_text      = &lt;ltdx&gt;-variant.
+ENDIF.
+
+*... mark and disable actual variant
+IF ls_variant-variant = &lt;ltdx&gt;-variant.
+lv_disable = 'X'.
+lv_checked = 'X'.
+ELSE.
+lv_disable = space.
+lv_checked = space.
+ENDIF.
+
+*... add menu entry to menu
+CALL METHOD e_object-&gt;add_function
+EXPORTING
+disabled = lv_disable
+checked  = lv_checked
+fcode    = lv_fcode
+text     = lv_text.
+ENDLOOP.
+ENDMETHOD.                    "lcl_my_event_handler
+
+ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+
+*** _______________________________________________________ ***
+***                                                         ***
+***                 START OF PROGRAM
+*** _______________________________________________________ ***
+***                                                         ***
+
+START-OF-SELECTION.
+
+  SELECT * FROM mara INTO TABLE gt_mara UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+SELECT * FROM marc INTO TABLE gt_marc UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+SELECT * FROM mard INTO TABLE gt_mard UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+SELECT * FROM mvke INTO TABLE gt_mvke UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+
+CALL SCREEN 100.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  PBO  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE pbo OUTPUT.
+
+  SET PF-STATUS '100'.
+SET TITLEBAR '100'.
+CLEAR sy-ucomm.
+
+  IF gr_cc IS INITIAL.
+CREATE OBJECT gr_cc
+EXPORTING
+container_name = 'CONTAINER'.
+ENDIF.
+
+  IF gr_splitter IS INITIAL.
+CREATE OBJECT gr_splitter
+EXPORTING
+parent  = gr_cc
+rows    = 4
+columns = 1.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 1
+column    = 1
+RECEIVING
+container = gr_cont1.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 2
+column    = 1
+RECEIVING
+container = gr_cont2.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 3
+column    = 1
+RECEIVING
+container = gr_cont3.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 4
+column    = 1
+RECEIVING
+container = gr_cont4.
+ENDIF.
+
+IF gr_grid1 IS INITIAL.
+CREATE OBJECT gr_grid1
+EXPORTING
+i_handle    = 'MARA'
+i_container = gr_cont1
+i_title     = 'Materialstamm'
+i_table     = 'GT_MARA'.
+ENDIF.
+
+  IF gr_grid2 IS INITIAL.
+CREATE OBJECT gr_grid2
+EXPORTING
+i_handle    = 'MARD'
+i_container = gr_cont2
+i_title     = 'Tabelle MARD'
+i_table     = 'GT_MARD'.
+ENDIF.
+
+  IF gr_grid3 IS INITIAL.
+CREATE OBJECT gr_grid3
+EXPORTING
+i_handle    = 'MARC'
+i_container = gr_cont3
+i_title     = 'Tabelle MARC'
+i_table     = 'GT_MARC'.
+ENDIF.
+
+  IF gr_grid4 IS INITIAL.
+CREATE OBJECT gr_grid4
+EXPORTING
+i_handle    = 'MVKE'
+i_container = gr_cont4
+i_title     = 'Tabelle MVKE'
+i_table     = 'GT_MVKE'.
+ENDIF.
+
+ENDMODULE.                 " PBO  OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  PAI  INPUT
+*&amp;---------------------------------------------------------------------*
+MODULE pai INPUT.
+
+  CASE sy-ucomm.
+WHEN 'BACK'.
+SET SCREEN 0. LEAVE SCREEN.
+ENDCASE.
+
+ENDMODULE.                 " PAI  INPUT</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/grid-mit-variantenschnellzugriff-menue/">Grid mit Variantenschnellzugriff (Menü)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bubble-la-Bap</title>
+		<link>/blog/bubble-la-bap/</link>
+					<comments>/blog/bubble-la-bap/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 17 Dec 2007 11:02:22 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Spiele]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=447</guid>
+
+					<description><![CDATA[<p>Das Spiel "Jawbreaker" mit neuer Grafik-Engine und kompletter Undo-Funktion. Bubble-La-Bap ist ein Wortspiel mit "Bubbles", dem Originalnamen auf Windows(R)-Mobile-Ger&#228;ten, "ABAP" und "Papperlapapp". Viel Spa&#223;! ACHTUNG: SUCHTGEFAHR!!!</p>
+<p>Der Beitrag <a href="/blog/bubble-la-bap/">Bubble-la-Bap</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Spiel &#8220;Jawbreaker&#8221; mit neuer Grafik-Engine und kompletter Undo-Funktion. Bubble-La-Bap ist ein Wortspiel mit &#8220;Bubbles&#8221;, dem Originalnamen auf Windows(R)-Mobile-Geräten, &#8220;ABAP&#8221; und &#8220;Papperlapapp&#8221;. Viel Spaß! ACHTUNG: SUCHTGEFAHR!!!</p>
+<h2 class="head1">Beschreibung</h2>
+<p class="text1">Bei &#8220;Bubble-La-Bap&#8221; müssen die &#8220;Bälle&#8221; zum platzen gebracht werden. Sobald mindestens zwei gleichfarbige Bälle neben- oder übereinander stehen, können diese angeklickt und &#8220;aufgelöst&#8221; werden. Die darüber liegenden Bälle rutschen nach unten und nach rechts nach. Beim Spielmodus &#8220;fortlaufend&#8221; werden leere Spalten von links wieder aufgefüllt.</p>
+<p class="text1">Je mehr Bälle zusammen aufgelöst werden, umso mehr Punkte gibt es. Für zwei Bälle gibt es nur vier Punkte, für neun Bälle schon 72&#8230;</p>
+<p class="text1">Das Spiel wurde unter Release ERP 5.0 geschrieben, sollte aber ab Version 4.6C lauffähig sein.</p>
+<h2 class="head1">Screenshot</h2>
+<p><img decoding="async" src="https://tricktresor.com/wp-content/uploads/tt_images/spiele/bubblelabap1.jpg" alt="" />  <img decoding="async" src="https://tricktresor.com/wp-content/uploads/tt_images/spiele/bubblelabap2.jpg" alt="" /></p>
+<h2 class="head1">Vorbereitungen</h2>
+<h3 class="head2">GUI-Status 0100</h3>
+<p class="text1">Der GUI-Status &#8216;0100&#8217; muss angelegt werden. Funktionstasten:</p>
+<ul>
+<li>
+<div class="text1"><strong>NEW</strong> &#8211; Neues Spiel &#8211; F8</div>
+</li>
+<li>
+<div class="text1"><strong>UNDO</strong> &#8211; Zug rückgängig &#8211; F5</div>
+</li>
+</ul>
+<h3 class="head2">Dynpro</h3>
+<p>Dynpro 100 muss angelegt werden mit dem CustomContainer &#8220;CC_FIELDS&#8221; der Größe 60 x 20.</p>
+<h3 class="head2">Ablauflogik</h3>
+<p class="sap1">PROCESS BEFORE OUTPUT.<br />
+MODULE STATUS_0100.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE USER_COMMAND_0100.</p>
+<h2 class="head1">Coding</h2>
+<p class="text1"><a title="Bubble-la-Bap | Games" href="https://tricktresor.com/wp-content/downloads/bubblelabap.txt" target="_blank">Der Quelltext zum Download hier</a></p>
+<p class="head1">Anpassungen an andere Releases</p>
+<p class="head2">Release 4.7</p>
+<p class="text1">Type-Pool WRFAC ist nicht vorhanden. Deswegen muss die dort verwendete Konstante WRFAC_STYLE_COLOR_NEGATIVE lokal definiert werden:</p>
+<p class="sap1">DATA wrfac_style_color_negative(4) TYPE x VALUE &#8216;00000007&#8217;.</p>
+<p class="text1">
+<p>Der Beitrag <a href="/blog/bubble-la-bap/">Bubble-la-Bap</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bubble-la-bap/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Weisheiten, die keiner braucht</title>
+		<link>/blog/weisheiten-die-keiner-braucht/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 14 Dec 2006 16:16:34 +0000</pubDate>
+				<category><![CDATA[Weisheiten]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[farbe]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=391</guid>
+
+					<description><![CDATA[<p>Das hawaiianische Alphabet hat nur zw&#246;lf Buchstaben. Tiger haben gestreifte Haut, nicht nur gestreiftes Fell. Die ersten Parkuhren der Welt wurden 1935 in Oklahoma aufgestellt. Der Mensch kann als einziges S&#228;ugetier l&#228;cheln. </p>
+<p>Der Beitrag <a href="/blog/weisheiten-die-keiner-braucht/">Weisheiten, die keiner braucht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das hawaiianische Alphabet hat nur zwölf Buchstaben. Tiger haben gestreifte Haut, nicht nur gestreiftes Fell. Die ersten Parkuhren der Welt wurden 1935 in Oklahoma aufgestellt. Der Mensch kann als einziges Säugetier lächeln.</p>
+<p>Das hawaiianische Alphabet hat nur zwölf Buchstaben.<br />
+Tiger haben gestreifte Haut, nicht nur gestreiftes Fell.<br />
+Die ersten Parkuhren der Welt wurden 1935 in Oklahoma aufgestellt.<br />
+Der Mensch kann als einziges Säugetier lächeln.<br />
+Die Vereinigten Staaten haben noch nie einen Krieg verloren, in dem Maultiere eingesetzt waren.<br />
+Das längste bekannte Spermium ist 10.000 mal länger als das menschliche und gehört der Fruchtfliege Dsosophila Bifurca.<br />
+1913 veröffentlichte die &#8220;New York World&#8221; das erste Kreuzworträtsel.<br />
+Zwei Drittel der Welternte an Auberginen wächst in New Jersey.<br />
+Bienenköniginnen legen bis zu 3.000 Eier pro Tag.<br />
+Jeder Elefant schläft pro Tag durchschnittlich 2 Stunden.<br />
+Die durchschnittliche Austrittsgeschwindigkeit von Ketchup aus der Flasche beträgt 40 Kilometer im Jahr.<br />
+16% aller Amerikanerinnen werden blond geboren, 33% sind derzeit blond. Von den TV-Sprecherinnen sind 64% blond, von den Miss Americas 65%.<br />
+Das menschliche Gehirn verbraucht 25% des Sauerstoffs, den der Mensch einatmet. Es besteht zu 80% aus Wasser und weist mehr Nachrichtenverbindungen auf, als nötig wären, um jeden Menschen auf Erden direkt mit jedem anderen zu verbinden.<br />
+Das Amazonas-Bassin versorgt die Welt mit rund 40% ihres Sauerstoffs &#8211; noch.<br />
+Die gewöhnliche Hausfliege kann bis zu 30 verschiedene Krankheiten übertragen.<br />
+Aus China ist seit 875 der Gebrauch von Toilettenpapier belegt.<br />
+Die Wissenschaft von der Dummheit heißt Morologie.<br />
+Vor 1800 gab es keine unterschiedlich gefertigten linken und rechten Schuhe.<br />
+Die beiden höchsten IQs, die je nach Standardtests ermittelt wurden, gehören Frauen.<br />
+1976 heiratete eine Frau aus Los Angeles im Beisein von 20 Gästen einen 50 Pfund schweren Felsen.<br />
+Süd Afrika hatte früher zwei offizielle Landessprachen. Jetzt hat es elf.<br />
+Sämtliche Schwäne in England sind Eigentum der Königin.<br />
+Kein noch so großes oder dünnes Stück Papier kann mehr als 7mal auf die Hälfte gefaltet werden.<br />
+Jährlich sterben mehr Menschen durch Esel als durch Flugzeugabstürze.<br />
+1891 wurden die erste Fußballtore mit Netzbespannung aufgestellt, in Nottingham.<br />
+&#8220;Tom Sawyer&#8221; war die erste Novelle, die auf einer Schreibmaschine getippt wurde.<br />
+Um 100 n.Chr. waren bereits 80 Weinsorten im Angebot der Weinschenken Italiens.<br />
+Rehe essen sehr gerne Bananen.<br />
+Das längste deutsche Wort, in dem sich kein Buchstabe wiederholt ist Heizölrückstoßabdämpfung.<br />
+Mit dem Kopf gegen die Wand schlagen verbraucht pro Stunde 150 Kalorien.<br />
+Die Auster kann ihr Geschlecht während ihres Lebens mehrmals ändern.<br />
+Eine Giraffe kann mit ihrer über einen Meter langen Zunge ihr Ohr putzen.<br />
+Skorpione können das 200fache an Radioaktivität ertragen als Menschen.<br />
+Der wüsteste Sturm, den Großbritannien je erlebte, tobte am 26. November 1764; er soll über 8.000 Menschenleben gefordert haben.<br />
+Kanada ist ein Indianerwort mit der Bedeutung &#8220;großes Dorf&#8221;. Kanada ist aber ungleich größer als die USA.<br />
+Ab einer Kälte von -90° Fahrenheit friert der Atem in der Luft und fällt zu Boden.<br />
+Anne Boleyn, die Mutter von Queen Elizabeth I., hatte drei Brüste.<br />
+Wenn sich ein Mann niemals rasieren würde, würde sein Bart im Laufe seines Lebens ca. 9 Meter lang werden.<br />
+Man verbrennt mehr Kalorien beim Schlafen als beim Fernsehen.<br />
+Der menschliche Schädel besteht aus 22 verschiedenen Knochen. Einen davon hat Goethe entdeckt.<br />
+Die Chance auf sechs Richtige im Lotto ist 1 zu 13.983.816.<br />
+Drei Viertel jeder Kartoffel sind Wasser.<br />
+1940 beurteilte man den Eichelkondom als museumsreif.<br />
+Die &#8220;Wölfin&#8221; im Dom zu Aachen ist in Wirklichkeit eine Bärin.<br />
+1550 spielte man in Italien erstmals Billard.<br />
+Das Jahr 11 v.Chr. war das letzte mit einem 30. Februar.<br />
+Erdnüsse sind einer der Bestandteile von Dynamit.<br />
+Die Chance zu sterben, indem man aus dem Bett fällt, liegt bei 1 : 2.000.000.<br />
+In Indien sind Spielkarten rund.<br />
+Es gibt über 30.000 Rosenarten.<br />
+Das Nashorn gehört zur selben Familie wie das Pferd.<br />
+Eine Katze hat 32 Muskeln in jedem Ohr.<br />
+Der Schmetterling hat 12.000 Augen.<br />
+1933 prägte die britische Königliche Münze lediglich vier Penny-Stücke.<br />
+Schlangen haben bis zu 300 Rippenpaare.<br />
+Gorillas schlafen bis zu 14 Stunden pro Tag.<br />
+Die Astronauten im Space-Shuttle schweben, weil sie sich im freien Fall um die Erde befinden.<br />
+Schafe trinken niemals aus fließenden Gewässern.<br />
+Mandeln gehören zur Familie der Pfirsiche.<br />
+In Peru gibt es keine öffentliche Toilette.<br />
+Krokodile töten pro Jahr etwa 2.000 Menschen.<br />
+&#8220;Stewardesses&#8221; ist das längste englische Wort, das nur mit den Tasten der linken Hand (nach dem Zehnfingersystem) getippt wird.<br />
+Der Atlantische Ozean ist salziger als der Pazifik.<br />
+Die Tragzeit einer Rhinozeros-Kuh dauert 560 Tage.<br />
+Das durchschnittliche Stachelschwein hat 30.000 Stacheln.<br />
+Es gibt auf der Welt mehr Hühner als Menschen.<br />
+Zikaden vibrieren mit ihrem Körper bis zu 500 mal pro Sekunde.<br />
+Die erste Bombe der Alliierten, die im 2. Weltkrieg über Berlin abgeworfen wurde, tötete den einzigen Elefanten im Berliner Zoo.<br />
+1997 hatte Microsoft über eine halbe Milliarde Dollar Telefonkosten, um Anfragen von Usern zu beantworten, die Probleme mit der Software hatten &#8211; mehr Geld, als für die Entwicklung der Software ausgegeben wurde, derentwegen die Leute anriefen.<br />
+1935 kam das erste Dosenbier auf den Markt.<br />
+Kung Fu heißt Freizeit.<br />
+Mexiko hatte einmal drei Presidenten an einem einzigen Tag.<br />
+Jede Zehe einer Mumien wurde einzeln eingewickelt.<br />
+Die Erde wiegt ungefähr 6.588.000.000.000.000.000.000.000.000 Tonnen.<br />
+Das arabische Zahlensystem wurde 1202 in Europa eingeführt, aber das römische System wurde noch ca. 300 Jahre lang weiterverwendet.<br />
+In Gefängnissen sitzen durchschnittlich 30 mal soviele Männer wie Frauen.<br />
+Fliegen springen rückwärts, wenn sie starten.<br />
+Die Bibel ist in mindestens 275 Sprachen gedruckt worden.<br />
+Die Wachstumsrate bei Massenmord im Büro lag in den USA in den Jahren 1988-1998 bei 200.000 Prozent.<br />
+In Iowa flog 1962 eine Kuh im Sog eines Tornados fast 1 km weit.<br />
+Die Chancen, von einem Hai angegriffen zu werden, stehen 1:30.000.000.<br />
+Eine Ameise riecht genauso gut wie ein Hund.<br />
+Der Durchschnittsmensch braucht sieben Minuten, um einzuschlafen.<br />
+Al Capones Visitenkarte wies ihn als Gebrauchtmöbelhändler aus.<br />
+Etwa 80% aller Tiere auf der Erde haben sechs Beine.<br />
+Ein Nilpferd kann schneller laufen als ein Mensch.<br />
+Ein Mann von 68 kg reicht gerade zu einer Mahlzeit für 40 Kannibalen.<br />
+Eine Milliarde Sekunden sind etwa 31,7 Jahre.<br />
+Frauen zwinkern ungefähr doppelt so oft wie Männer.<br />
+Küchenschaben gab es schon, ehe die Dinosaurier auf der Erde erschienen.<br />
+Wenn Schnecken mit zwei Köpfen geboren werden, kämpfen die beiden Köpfe gegeneinander um Futter.<br />
+Musiker in Kenia werden oft auf der Bühne in Käfige gesperrt, damit sie die Instrumente nicht stehlen, die meist den Clubbesitzern gehören.<br />
+Buzz Aldrin war der erste Mensch, der auf dem Mond Stuhlgang hatte.<br />
+Das Gedächtnis eines Goldfisches behält etwa eine Zeitspanne von drei Sekunden.<br />
+Beim Niesen werden alle Körperfunktionen ausgesetzt, sogar das Herz.<br />
+Die ersten Lochkarten gab es im Jahre 1801. Damals steuerten sie Webstühle.<br />
+In den USA gibt es mehr Plastikflamingos als echte.<br />
+Es gibt im Englischen nur vier Wörter, die auf &#8220;dous&#8221; enden: &#8220;tremendous&#8221;, &#8220;horrendous&#8221;, &#8220;stupendous&#8221; und &#8220;hazardous&#8221;.<br />
+Adolf ****** und Napoleon hatten beide nur jeweils einen Hoden.<br />
+1908 wurde die erste öffentliche Telefonzelle aufgestellt, in Nottingham.<br />
+Beim Sex verbrennt man pro Stunde 360 Kalorien.<br />
+Die Schnecke paart sich nur einmal in ihrem ganzen Leben.<br />
+Der Schwertfisch schafft eine Höchstgeschwindigkeit von 110 km/h.<br />
+Ameisenbären essen lieber Termiten als Ameisen.<br />
+Der menschliche Körper enthält genügend Kohlenstoff, um ca. 9.000 Bleistifte mit Minen zu versorgen.<br />
+1681 starb der letzte Dodo.<br />
+Die Bevölkerung der USA macht etwa 6% der Weltbevölkerung aus, verzehrt aber rund 60% aller Ressourcen.<br />
+Der Moskito hat 47 Zähne.<br />
+Das Gebrüll eines Löwen kann man aus 5 Meilen Entfernung hören.<br />
+Es gibt 318.979.564.000 verschiedene Möglichkeiten für die ersten vier Züge beim Schach.<br />
+Neuseeland ist das einzige Land der Welt, das jede Klimazone umfaßt.<br />
+Kermit der Frosch ist Linkshänder.<br />
+Die Amerikaner essen pro Tag im Durchschnitt etwa 73.000 Quadratmeter Pizza.<br />
+75% aller Norweger leben weniger als 15 km vom Meer entfernt.<br />
+Kein Franzose wohnt mehr als 500 km vom Meer entfernt.<br />
+1094 wurden in Venedig erstmals Gondeln erwähnt.<br />
+Wir atmen immer nur durch ein Nasenloch; etwa alle 15 Minuten findet der Wechsel statt.<br />
+Um aus dem Maul eines Krokodils zu kommen, drücke beide Daumen in seine Augen &#8211; es wird sofort loslassen.<br />
+Es wird pro Jahr mehr Monopoly-Geld gedruckt als echtes &#8211; weltweit.<br />
+Eulen sind die einzigen Vögel, die die Farbe Blau sehen können.<br />
+Das Wort &#8220;Manhattan&#8221; entstammt einer alten Indianersprache und bedeutet &#8220;der Ort, an dem wir betrunken waren&#8221;.<br />
+Als 1694 in England Königin Mary II. starb, legten die Rechtsanwänwälte schwarze Trauerroben an &#8211; und tragen sie bis heute.<br />
+Das Nilpferd gibt 80% seiner Laute unter Wasser von sich.<br />
+Das Jojo war ursprünglich eine Waffe der Philippinen.<br />
+Die Selbstmordrate unter Medizinerinnen liegt um 60% höher als die anderer Frauen.<br />
+Ein Viertel aller Knochen befinden sich im Fuß.<br />
+12% des Gewichts eines Hühnereis entfallen auf die Schale.<br />
+Napoleon hatte panische Angst vor Katzen.<br />
+Der Mensch wird mit 300 Knochen geboren, hat aber als Erwachsener nur noch 206.<br />
+Im Tierreich halten Schimpansen den Rekord für die schnellsten Quickies: drei Sekunden.<br />
+Die Durchschnittsperson macht ca. 1.140 Telefonanrufe pro Jahr.<br />
+Ein Elefantenrüssel hat ein Fassungsvermögen von rund sechs Litern.<br />
+Der Abstand zwischen den Augen eines Alligators ist direkt proportional zu seiner Länge.<br />
+In Texas ist es verboten, Graffiti auf fremde Kühe zu sprühen.<br />
+&#8220;Dreamt&#8221; ist das einzige englische Wort, das auf &#8220;mt&#8221; endet.<br />
+40% aller Säugetiere sind Nagetiere.<br />
+Ein Hai kann innerhalb einer Woche ein komplettes Gebiß nachwachsen lassen.<br />
+Der Azteken-Herrscher Montezuma hatte einen Neffen, Cuitlahac, dessen Name soviel wie &#8220;Ein großer Haufen Scheiße&#8221; bedeutete.<br />
+Alle Hühner dieser Erde legen pro Jahr etwa 400.000.000.000 Eier.<br />
+Der vollständige Name von Los Angeles ist &#8220;El Pueblo de Nuestra Senora la Reina de los Angeles de Porciuncula&#8221; &#8211; und kann auf 3.63% seiner Länge gekürzt werden: &#8220;L.A.&#8221;<br />
+Haie sind immun gegenüber Krebs.<br />
+1970 veröffentlichte eine US-Seifenfirma in der saudiarabischen Presse eine Anzeige, mit der für ein neues Seifenpulver geworben werden sollte. Links sah man einen Haufen schmutziger Wäsche, in der Mitte einen Waschbottich von Seifenschaum überkrönt, rechts einen Haufen strahlend weißer Wäsche. Da Araber von rechts nach links lesen, hatte die Anzeige keinen Erfolg.<br />
+Die Seidenspringerraupe hat 11 Gehirne.<br />
+Die Augen eines Esels sind so angeordnet, daß er alle vier Füße gleichzeitig sehen kann.<br />
+Etwa 70% aller Lebewesen sind Bakterien.<br />
+Würden die 100.000 Haare auf dem Kopf zu einem Seil geflochten, könnte das eine Last von zwölf Tonnen tragen.<br />
+Ein Golfball hat 336 Einkerbungen.<br />
+Der Dalmatiner ist der einzige Hund, der Gicht bekommen kann.<br />
+Das Wort &#8220;Samba&#8221; bedeutet soviel wie &#8220;Nabel zusammenreiben&#8221;.<br />
+Der letzte mohikanisch-sprechende Indianer starb 1933.<br />
+In Albanien bedeutet kopfnicken &#8220;nein&#8221; und kopfschütteln &#8220;ja&#8221;.<br />
+1877 wurde in Belgien eine Gesellschaft zur Steigerung der moralischen und geistigen Eigenschaften der Hauskatze gegründet.<br />
+In Japan wurde Karate erst 1916 bekannt.<br />
+77% aller Prominenten und Stars in den USA antworten auf Autogrammanfragen.<br />
+Ringo Starr wurde im 2. Weltkrieg während eines Luftangriffs geboren.<br />
+Man zwinkert ca. 84 Millionen mal im Jahr.<br />
+1956 überquerten zum letzten Mal mehr Passagiere den Atlantik zu Schiff als per Flugzeug.<br />
+Blondinen haben mehr Haar als Menschen mit dunkler Haarfarbe.<br />
+Thomas Edison, der Erfinder der Glühbirne, fürchtete sich im Dunkeln.<br />
+1988 wurde nach 446 Jahren ausschließlich männlicher Studentschaft mit Penelope Bell die erste Studentin zum Studium am Magdalene-College zu Cambridge zugelassen.<br />
+Beethoven tauchte seinen Kopf in kaltes Wasser, bevor er komponierte.<br />
+Eiscreme wurde 1620 erfunden.<br />
+&#8220;James Bond&#8221; wurde zusammengesetzt aus dem Vornamen eines und dem Nachnamen eines anderen Schulkameraden von Ian Fleming, dem Autor der James Bond Werke. Die Bezeichnung &#8220;007&#8221; sind die letzten drei Ziffern der Armee-Nummer eines Mannes, den Fleming in einer Bar kennenlernte.<br />
+Um ein Straußenei hartzukochen, braucht man 40 Minuten.<br />
+Das Geschlecht von Schildkröten kann man an ihren Lauten erkennen: das Männchen grunzt, das Weibchen zischt.<br />
+Der Gepard ist die einzige Katze, die ihre Krallen nicht einziehen kann.<br />
+Die Worte &#8220;assassination&#8221; (Meuchelmord) und &#8220;bump&#8221; (stoßen, anstoßen) wurden von Shakespeer erfunden.<br />
+Mexiko City versinkt pro Jahr um etwa einen Viertel Meter.<br />
+Der volle Name von Barbie ist Barbara Millicent Roberts.<br />
+In der Eskimosprache gibt es rund 200 Wörter, die verschiedene Arten von Schnee und seine Nutzung beschreiben.<br />
+Der Mensch geht in seinem Leben ca. 160.000 Kilometer, also vier mal den Äquator entlang.<br />
+Fledermäuse fliegen immer nach links, nachdem sie ihre Höhle verlassen haben.<br />
+Es gibt im Englischen keinen Reim auf die Wörter &#8220;month&#8221;, &#8220;orange&#8221;, &#8220;silver&#8221; und &#8220;purple&#8221;.<br />
+Tennis wurde im 11. Jahrhundert in französischen Klöstern erfunden.<br />
+Der Daumennagel wächst am langsamsten, der Nagel des Mittelfingers am schnellsten.<br />
+1876 starb der letzte reinrassige Tasmanier.<br />
+In Island ist es gegen das Gesetz, ein Haustier zu haben.<br />
+Im Laufe eines 60-jährigen Lebens hat ein Mann insgesamt fünf Jahre lang eine Erektion, während er schläft.<br />
+Es ist unmöglich, mit geöffneten Augen zu niesen.<br />
+Ein Känguruh kann nicht springen, solange sein Schwanz nicht den Boden berührt.<br />
+Jeder Kontinent weist mindestens eine Stadt mit dem Namen Rom auf.<br />
+Maine ist der einzige Stast der USA, der nur eine Silbe hat.<br />
+10% des jährlichen Salzabbaus der Welt werden für die Enteisung der Straßen in den USA verwendet.<br />
+Wenn sich die Weltbevölkerung uneingeschränkt mit der gegenwärtigen Wachstumsrate vermehrt, wird im Jahr 3530 die Gesamtmasse an Fleisch und Blut so groß sein wie die Gesamtmasse der Erde. Im Jahr 6826 würde sie der Gesamtmasse des derzeit bekannten Universums entsprechen.<br />
+Der häufigste Vorname der Welt ist Mohammed.<br />
+Schmetterlinge haben den Geschmackssinn in den Füßen.<br />
+Einstein hatte berechnet, daß sich das Universum ausdehnt, hielt das aber für einen Fehler und führte eine Konstante ein, die der Ausdehnung entgegenwirkt.<br />
+Der Geschwindigkeitsrekord auf dem Mond liegt bei 10,56 Meilen pro Stunde und wurde vom Lunar Rover aufgestellt.<br />
+Die Römer erfanden das Türkische Bad.<br />
+Brasilien hat seinen Namen von der &#8220;Brazilnut&#8221; (Paranuß), nicht andersherum.<br />
+Ein schwedischer Philologe des 17. Jahrhunderts behauptete, daß Gott im Paradies schwedisch sprach, Adam dänisch und die Schlange französisch.<br />
+Elefanten sind die einzigen Tiere, die nicht springen können.<br />
+Laut dem Oxford English Dictionary ist &#8220;pneumonoultramicroscopicsilicovolcanoconiosis&#8221; das längste Wort der englischen Sprache.<br />
+40% aller Schweden haben Familiennamen, die auf -son enden.<br />
+Im November 1923, auf dem Gipfel der Inflation in Deutschland, war 1 US-Dollar 4.000.000.000.000 Mark (4 Billionen) wert.<br />
+Im Amazonas leben rosa Delphine.<br />
+Eine Qualle besteht zu 95% aus Wasser.<br />
+Sieben Milliarden Nebelpartikel reichen gerade aus, um einen Teelöffel zu füllen.<br />
+Die erste Bibelausgabe in der Sprache der Eskimos wurde 1744 in Kopenhagen gedruckt.<br />
+Im alten China wurden Ärzte nur bezahlt, wenn der Patient gesund wurde.<br />
+Das deutsche Wort mit den meisten Konsonanten in Folge ist Angstschweiß.<br />
+Fingernägel wachsen mit 0,000000047 Zoll pro Sekunde.<br />
+Wenn ein Hai sein Maul zu lange offenhält, erstickt er.<br />
+Linkshänder können im allgemeinen besser mit der rechten Hand schreiben als Rechtshänder mit der linken.<br />
+Um 400 vor Christus lebten in Sparta 25.000 Bürger und 500.000 Sklaven.<br />
+Die Tür zu Downing Street 10 kann nur von innen geöffnet werden.<br />
+Der pH-Wert von Cola liegt zwischen 2 und 3.<br />
+Arles war die erste Kolonialstadt, die Caesar außerhalb Italiens gründete.<br />
+Im Lauf eines Jahres werden etwa 98 Prozent der Atome im menschlichen Körper ersetzt.<br />
+Alle Uhren im Film &#8220;Pulp Fiction&#8221; zeigen 4 Uhr 20 an.<br />
+Während des 1. Weltkrieges wurden an die deutschen Soldaten in Feldgrau Militärkondome in Hechtgrau ausgegeben.<br />
+&#8220;Amen&#8221; und &#8220;Hallelujah&#8221; sind bis zur Unkenntlichkeit verzerrte Echos ritualisierter Eselsschreie.<br />
+In der Bibel werden Katzen nicht erwähnt.<br />
+In Uruguay ist es verboten, sich zu duellieren, außer man ist registrierter Blutspender.<br />
+Innerhalb der letzten 3.500 Jahre gab es insgesamt nur 230 Jahre ohne Krieg in der zivilisierten Welt.<br />
+Im Durchschnitt hat man 1.460 Träme pro Jahr.<br />
+Relativ zu seiner Größe ist der stärkste Muskel im menschlichen Körper die Zunge.<br />
+James Doohan (&#8220;Scotty&#8221; aus StarTrek) fehlt ein halber Finger. In der Serie und den Filmen von StarTrek wurde dieses Manko aber durch geschickte Kameraführung perfekt überspielt.<br />
+1922 starb der letzte bekannte Sängerkastrat.<br />
+Die meisten tropischen Fische können in einem Aquarium überleben, das mit menschlichem Blut gefüllt ist.<br />
+Der Buckingham Palast hat 602 Räume.<br />
+Um 1400 war China größte Seemacht auf Erden, vor Venedig und Portugal.<br />
+Der menschliche Körper enthält genügend Eisen, um daraus eine Stange zu fertigen, die stark genung ist, um eben diesen Körper zu tragen.<br />
+Die Nationalhymne von Griechenland umfaßt 158 Strophen. Kein Grieche kennt alle.<br />
+Elvis Aron Presley hatte einen Zwillingsbruder namens Garon, der bei der Geburt starb. Elvis` zweiter Vorname ist in Gedenken an ihn.<br />
+Menschen und Delphine sind die einzigen Spezies, die Sex zum Vergnügen machen.<br />
+1740 wurde in Frankreich eine Kuh der Zauberei für schuldig befunden und gehenkt.<br />
+Der Durchschnittsmensch lacht 15 mal am Tag.<br />
+Erst 1949 erhielten Autos Zündschlüssel.<br />
+Durch ein Erdbeben am 16. Dezember 1811 floss der Mississippi rückwärts.<br />
+Die stärkste Festung der Christenheit, Graz, konnte 1809 nicht einmal von Napoleons Soldaten eingenommen werden.<br />
+Termiten fressen sich doppelt so schnell durch einen Baum, wenn sie Rockmusik hören.<br />
+1750 gab Mathias Etenhueber ein Blatt heraus, in dem sich alle Meldungen reimten.<br />
+1964 sprach ein US-Gericht einer Frau 50.000 Dollar Schmerzensgeld zu, die geklagt hatte, ein Unfall in einem öffentlichen Verkehrsmittel habe sie zur Nymphomanin gemacht.<br />
+Die elektrische Glühlampe hat vor Edison bereits der Deutsche Heinrich Goebel erfunden.<br />
+Die Große Oktoberrevolution in Rußland 1917 fand im November statt.<br />
+Sellerie hat negative Kalorien: Es kostet mehr Kalorien, eine Stange Sellerie zu essen, als es einbringt.<br />
+Ratten können sich nicht übergeben.<br />
+Fortschritt wäre, wenn aus Smog und Sex wieder Luft und Liebe würden.<br />
+Nach den Gewerben der Fernhändler und der Spione ist das der Freudenmädchen das drittälteste.<br />
+Die USA neigen dazu, alle Kommunismus-feindlichen Reden für demokratisch zu halten.<br />
+Die 10 Gebote zählen 279 Wörter, die Unabhängigkeitserklärung der 13 nordamerikanischen Staaten 1776 zählt 300 Wörter, die EU-Verordnung über den Import von Karamel-Bonbons 1981 besteht aus 25.911 Wörtern.<br />
+In Amerika verletzen sich jedes Jahr rund 55.700 Menschen an Schmuck.<br />
+Man kann eine Kuh die Treppen hoch führen, aber nicht runter.<br />
+1571 fand vor Lepanto die letzte Seeschlacht mit geruderten Schiffen statt.<br />
+Pro Woche werden 10.000 neue Chemikalien synthetisiert.<br />
+Verheiratete Männer, unabhängig von Rasse, Konfession und Alter, schlafen meist auf der rechten Seite des Bettes (vom Kopfende aus betrachtet). Geschiedene Männer wechseln oft auf die linke Seite.<br />
+Das längste einsilbige Wort der englischen Sprache ist &#8220;screeched&#8221;.<br />
+1896 waren Großbritannien und Sansibar für 38 Minuten im Krieg.<br />
+315 gab es in Rom 144 öffentliche Toiletten.<br />
+20% aller Autounfälle in Schweden werden durch Elche verursacht.<br />
+Zwei von drei Langstreckenläufern denken beim Laufen an Sex; nur einer von elf denkt beim Sex ans Laufen.<br />
+In Japan steht eine Nachbildung des Eiffelturms, die 34 Meter höher ist als das Original.<br />
+Der Ton, in dem die meisten amerikanischen Autohupen tuten, ist ein F.<br />
+Die meisten Giraffen sind bisexuell.<br />
+1973 wurde der schwedische Süßwarenfabrikant Roland Ohisson von Falkenberg in einem Sarg aus reiner Schokolade beerdigt.<br />
+Um 1800 stellte China rund 30% der gesamten Brutto-Weltproduktion her.<br />
+In der Geschichte der letzten 5000 Jahre sind rund 14.500 Kriege dokumentiert, darunter allein nach 1945 ca. 150, bei denen schätzungsweise 50 Millionen Menschen das Leben verloren, knapp 10% davon waren beteiligte Soldaten.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/weisheiten-die-keiner-braucht/">Weisheiten, die keiner braucht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

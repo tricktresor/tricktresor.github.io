@@ -1,0 +1,1028 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>DOI Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/doi/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 21 Jan 2019 15:13:48 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>DOI Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>OLE-Handle zu DOI-Objekt ermitteln</title>
+		<link>/blog/ole-handle-zu-doi-objekt-ermitteln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 21 Jan 2019 15:13:40 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[ole]]></category>
+		<category><![CDATA[Desktop-Office-Integration]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1020085</guid>
+
+					<description><![CDATA[<p>Word und Excel sind ein täglicher Begleiter im Berufsleben. Auch die Steuerung aus SAP heraus ist möglich und häufig sinnvoll. Allerdings gibt es manchmal ein paar Tücken, die ärgerlich sind. Hier zeige ich dir, wie du ein Excel-Dokument per Desktop Office Integration erzeugst und auch später an das OLE-Handle gelangst.</p>
+<p>Der Beitrag <a href="/blog/ole-handle-zu-doi-objekt-ermitteln/">OLE-Handle zu DOI-Objekt ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Für die Integration von Word und Excel gibt es nur zwei Möglichkeiten:</p>
+
+
+
+<ul><li>OLE &#8211; Object Linking and Embedding</li><li>DOI &#8211; Desktop Office Integration</li></ul>
+
+
+
+<p>Beide Varianten haben ihre Vor- und Nachteile. Ein Nachteil bei der Verwendung von DOI ist auf jeden Fall, dass die Methode CLOSE_DOCUMENT nicht zuverlässig funktioniert, wenn man Word oder Excel in einem separaten Fenster öffnet.</p>
+
+
+
+<h2 class="wp-block-heading">Beispiel</h2>
+
+
+
+<p>Zuerst jedoch ein Beispielcode, der zeigt, wie mittels DOI eine Excel-Instanz gestartet wird. Die Drucktaste &#8220;Create&#8221; startet Excel.</p>
+
+
+
+<figure class="wp-block-image"><img fetchpriority="high" decoding="async" width="508" height="373" src="https://tricktresor.com/wp-content/uploads/2019/01/doi2.png" alt="" class="wp-image-1020087" srcset="/wp-content/uploads/2019/01/doi2.png 508w, /wp-content/uploads/2019/01/doi2-300x220.png 300w" sizes="(max-width: 508px) 100vw, 508px" /><figcaption>Desktop Office Integration hat Excel gestartet</figcaption></figure>
+
+
+
+<p>Die Schaltfläche &#8220;Create&#8221; wird dann ausgeschaltet und die Schaltflächen &#8220;Destroy with &#8220;Close_Document&#8221; und &#8220;Destroy with OLE Quit&#8221; erscheinen. Mit diesen Drucktaste kann Excel wieder geschlossen werden. Das Beenden von Excel/ Word geschieht in der Regel über <em>document->close_document</em> und <em>document->close_activex_document</em>. Falls dies jedoch aus unerfindlichen Gründen nicht funktioniert, hilft vielleicht die Methode über das OLE-Objekt und die Methode &#8220;Quit&#8221;.</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<p></p>
+
+
+
+<pre class="wp-block-code"><code>REPORT LINE-SIZE 200.
+
+
+"Create Control
+SELECTION-SCREEN PUSHBUTTON /1(30) TEXT-cre USER-COMMAND create      MODIF ID cre.
+"Destroy Control with Close_Document
+SELECTION-SCREEN PUSHBUTTON /1(30) TEXT-dst USER-COMMAND destroy     MODIF ID dst.
+"Destrpy Control with OLE and method Quit
+SELECTION-SCREEN PUSHBUTTON /1(30) TEXT-dso USER-COMMAND destroy_ole MODIF ID dst.
+
+
+CLASS demo DEFINITION.
+  PUBLIC SECTION.
+    METHODS create.
+    METHODS destroy.
+    METHODS destroy_with_ole.
+    METHODS is_destroyed RETURNING VALUE(result) TYPE i.
+  PROTECTED SECTION.
+
+    DATA mr_control       TYPE REF TO i_oi_container_control." OIContainerCtrl
+    DATA mr_document      TYPE REF TO i_oi_document_proxy.   " Office Dokument
+    DATA mr_spreadsheet   TYPE REF TO i_oi_spreadsheet.      " Spreadsheet
+
+    METHODS set_data.
+    METHODS create_application.
+
+ENDCLASS.
+
+
+INITIALIZATION.
+  DATA(go_demo) = NEW demo( ).
+
+AT SELECTION-SCREEN.
+  CASE sy-ucomm.
+    WHEN 'CREATE'.
+      go_demo->create( ).
+    WHEN 'DESTROY'.
+      go_demo->destroy( ).
+    WHEN 'DESTROY_OLE'.
+      go_demo->destroy_with_ole( ).
+  ENDCASE.
+
+AT SELECTION-SCREEN OUTPUT.
+
+  LOOP AT SCREEN.
+    CASE screen-group1.
+      WHEN 'DST'.
+        IF go_demo->is_destroyed( ) = 0.
+          screen-active = '1'.
+        ELSE.
+          screen-active = '0'.
+        ENDIF.
+
+      WHEN 'CRE'.
+        IF go_demo->is_destroyed( ) = 0.
+          screen-active = '0'.
+        ELSE.
+          screen-active = '1'.
+        ENDIF.
+    ENDCASE.
+    MODIFY SCREEN.
+  ENDLOOP.
+
+CLASS demo IMPLEMENTATION.
+
+
+  METHOD create.
+
+    create_application( ).
+    set_data( ).
+
+  ENDMETHOD.
+
+  METHOD is_destroyed.
+
+    IF mr_document IS BOUND.
+      mr_document->is_destroyed(
+        IMPORTING
+          ret_value = result
+      ).
+    ELSE.
+      result = 1.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD create_application.
+
+    DATA lr_error         TYPE REF TO i_oi_error.
+
+    c_oi_container_control_creator=>get_container_control(
+        IMPORTING
+          control = mr_control
+          error   = lr_error ).
+
+** init control
+    mr_control->init_control(
+      EXPORTING
+        inplace_enabled       = abap_false
+        no_flush              = 'X'
+        r3_application_name   = 'Test DOI'
+        inplace_show_toolbars = abap_false
+        parent                = cl_gui_container=>screen9
+      IMPORTING
+        error                 = lr_error
+      EXCEPTIONS
+        OTHERS                = 2 ).
+
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+*** Get Documentproxy
+    CALL METHOD mr_control->get_document_proxy
+      EXPORTING
+        document_type  = soi_doctype_excel_sheet "'Excel.Sheet'
+        no_flush       = 'X'
+      IMPORTING
+        document_proxy = mr_document
+        error          = lr_error.
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+    mr_document->create_document(
+      EXPORTING
+       document_title   = 'Demo-Arbeitsblatt'
+        no_flush         = 'X'
+        open_inplace     = abap_false
+      IMPORTING
+       error = lr_error ).
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+    CALL METHOD mr_document->get_spreadsheet_interface
+      IMPORTING
+        sheet_interface = mr_spreadsheet
+        error           = lr_error.
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+  ENDMETHOD.
+
+  METHOD set_data.
+
+    DATA lt_values        TYPE soi_generic_table.
+    DATA lt_ranges        TYPE soi_range_list.
+    DATA ls_range         LIKE LINE OF lt_ranges.
+    DATA lr_error         TYPE REF TO i_oi_error.
+
+
+    "Demo-Daten
+    lt_values = VALUE #(
+        ( row = 1 column = 1 value = '1' )
+        ( row = 2 column = 1 value = '2' )
+        ( row = 3 column = 1 value = '3' ) ) .
+
+*== Neuen Bereich definieren
+    mr_spreadsheet->insert_range_dim(
+       EXPORTING name = 'myarea'
+                 top       = 1
+                 left      = 1
+                 rows      = lines( lt_values )
+                 columns   = 1
+                 no_flush  = abap_false ).
+    ls_range-columns = 1.
+    ls_range-rows    = lines( lt_values ).
+    ls_range-name    = 'myarea'.
+    APPEND ls_range TO lt_ranges.
+
+    "Daten übergeben
+    mr_spreadsheet->set_ranges_data(
+      EXPORTING
+        ranges    = lt_ranges
+        contents  = lt_values
+      IMPORTING
+        error     = lr_error
+    ).
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+  ENDMETHOD.
+
+  METHOD destroy.
+
+    mr_document->close_document( ).
+    mr_document->close_activex_document( ).
+    FREE mr_document.
+
+    mr_control->destroy_control( ).
+    FREE mr_control.
+
+  ENDMETHOD.
+
+  METHOD destroy_with_ole.
+
+    DATA lv_document_cntl_handle TYPE cntl_handle.
+    DATA lv_application          TYPE ole2_object.
+    DATA lv_oi_ret               TYPE soi_ret_string.
+    DATA lr_error                TYPE REF TO i_oi_error.
+
+    mr_document->get_document_handle(
+      IMPORTING
+        handle  = lv_document_cntl_handle
+        retcode = lv_oi_ret ).
+    GET PROPERTY OF lv_document_cntl_handle-obj 'Application' = lv_application.
+    CALL METHOD OF lv_application 'Quit'.
+    FREE OBJECT lv_application.
+    FREE mr_document.
+
+  ENDMETHOD.
+
+ENDCLASS.</code></pre>
+
+
+
+<h2 class="wp-block-heading">OLE-Objekt zu DOI-Dokument erhalten</h2>
+
+
+
+<p>Wenn die Methode <em>close_document</em> aus irgendwelchen Gründen nicht funktioniert, das Excel-Fenster also nicht geschlossen wird, oder du eine Methode anwenden möchtest, die das DOI-Interface nicht unterstützt, dann kannst du dir den OLE-Handle zur Applikation besorgen:</p>
+
+
+
+<pre class="wp-block-code"><code>    DATA lv_document_cntl_handle TYPE cntl_handle.
+    DATA lv_application          TYPE ole2_object.
+    DATA lv_oi_ret               TYPE soi_ret_string.
+    DATA lr_error                TYPE REF TO i_oi_error.
+
+    mr_document->get_document_handle(
+      IMPORTING
+        handle  = lv_document_cntl_handle
+        retcode = lv_oi_ret ).
+    GET PROPERTY OF lv_document_cntl_handle-obj 'Application' = lv_application.
+    CALL METHOD OF lv_application 'Quit'.
+    FREE OBJECT lv_application.
+    FREE mr_document.</code></pre>
+
+
+
+<h2 class="wp-block-heading">SAP-Demoprogramme</h2>
+
+
+
+<p>Folgende zwei Demoprogramme zeigen noch erweiterte Funktionen des DOI-Interfaces:</p>
+
+
+
+<ul><li>SAPRDEMO_FORM_INTERFACE</li><li>SAPRDEMO_SPREADSHEET_INTERFACE</li><li>SAPRDEMO_MAILMERGE_INTERFACE</li></ul>
+
+
+
+<p>Bei diesen drei Programmen lässt sich übrigens der Fehler, dass die Applikation nicht korrekt geschlossen wird, sehr gut nachstellen.</p>
+
+
+
+<p>Bei SAPRDEMO_MAILMERGE_INTERFACE wird beim Beenden des Programms zwar das Dokument geschlossen, aber die Word-Applikation bleibt bestehen. Bei SAPRDEMO_FORM_INTERFACE wird das Programm zwar beendet, doch obwohl Close_Document und Destroy_Control aufgerufen werden, bleibt das Excel-Fenster geöffnet. Im Programm SAPRDEMO_SPREADSHEET_INTERFACE funktioniert das Beenden von Excel wiederum perfekt.</p>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/ole-handle-zu-doi-objekt-ermitteln/">OLE-Handle zu DOI-Objekt ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Werte aus Excel per DOI (unsichtbar)</title>
+		<link>/blog/werte-aus-excel-per-doi-unsichtbar/</link>
+					<comments>/blog/werte-aus-excel-per-doi-unsichtbar/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 05 Feb 2016 16:46:22 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Office-Integration]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[zelle]]></category>
+		<category><![CDATA[screen0]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=471093</guid>
+
+					<description><![CDATA[<p>Desktop-Office-Integration - kurz DOI - ermöglicht das Bearbeiten von Office-Dokumenten innerhalb einer SAP-Anwendung. Auf Wunsch kann dies auch inplace passieren. Mit den von SAP zur Verfügung gestellten Klassen lassen sich die gängigsten Arbeiten erledigen. Allerdings erfordern diese auch immer eine Anzeige des Office-Dokumentes.<br />
+Ich möchte euch einen Trick vorstellen, bei dem zwar DOI verwendet wird, ihr aber nichts davon mitbekommt...</p>
+<p>Der Beitrag <a href="/blog/werte-aus-excel-per-doi-unsichtbar/">Werte aus Excel per DOI (unsichtbar)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Desktop-Office-Integration &#8211; kurz DOI &#8211; ermöglicht das Bearbeiten von Office-Dokumenten innerhalb einer SAP-Anwendung. Auf Wunsch kann dies auch <em>inplace</em> passieren. Mit den von SAP zur Verfügung gestellten Klassen lassen sich die gängigsten Arbeiten erledigen. Allerdings erfordern diese auch immer eine Anzeige des Office-Dokumentes.</p>
+<p>Ich möchte euch einen Trick vorstellen, bei dem zwar DOI verwendet wird, ihr aber nichts davon mitbekommt&#8230;</p>
+<h2>Bereichsleiter</h2>
+<p>Ich stelle euch unten ein Programm vor, das eine Excel-Datei einliest und die Daten abgreift. Der Zugriff erfolgt dabei über <em>Bereiche</em>. In meinem Beispiel-Excel habe ich ein paar Bereich benannt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-05_16-13-08.jpg" rel="attachment wp-att-471096"><img decoding="async" class="alignnone size-full wp-image-471096" src="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-05_16-13-08.jpg" alt="2016-02-05_16-13-08" width="764" height="538" srcset="/wp-content/uploads/2016/02/2016-02-05_16-13-08.jpg 764w, /wp-content/uploads/2016/02/2016-02-05_16-13-08-300x211.jpg 300w" sizes="(max-width: 764px) 100vw, 764px" /></a></p>
+<p>Gibt es in dem Excel keine Bereiche, so muss ein Bereich definiert werden.</p>
+<p>Die Daten werden in einer Tabelle geliefert mit den Feldern:</p>
+<ul>
+<li>ROW</li>
+<li>COLUMN</li>
+<li>VALUE</li>
+</ul>
+<p>Mit einem Zugriff können mehrere Bereiche angefordert werden. In der Bereichstabelle wird zwar übermittelt, wie viele Zeilen und Spalten je Bereich enthalten waren. Leider gibt es in der Wertetabelle keinen Bezug mehr zu den Bereichen.</p>
+<p>Hier die Rückgabe der Bereiche:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-05_16-19-26.jpg" rel="attachment wp-att-471094"><img decoding="async" class="alignnone size-full wp-image-471094" src="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-05_16-19-26.jpg" alt="2016-02-05_16-19-26" width="642" height="161" srcset="/wp-content/uploads/2016/02/2016-02-05_16-19-26.jpg 642w, /wp-content/uploads/2016/02/2016-02-05_16-19-26-300x75.jpg 300w, /wp-content/uploads/2016/02/2016-02-05_16-19-26-640x161.jpg 640w" sizes="(max-width: 642px) 100vw, 642px" /></a></p>
+<p>Und hier die Werte dazu:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-05_16-19-56.jpg" rel="attachment wp-att-471095"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-471095" src="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-05_16-19-56.jpg" alt="2016-02-05_16-19-56" width="560" height="557" srcset="/wp-content/uploads/2016/02/2016-02-05_16-19-56.jpg 560w, /wp-content/uploads/2016/02/2016-02-05_16-19-56-150x150.jpg 150w, /wp-content/uploads/2016/02/2016-02-05_16-19-56-300x298.jpg 300w" sizes="(max-width: 560px) 100vw, 560px" /></a></p>
+<p>Wenn du sicher gehen möchtest, welcher Bereich mit welchen Werten gefüllt ist, dann solltest du je Bereich eine Abfrage machen.</p>
+<p>[notice type=&#8217;alert&#8217;]Achtung! DOI kann nur maximal 9999 Spalten und Zeilen verwalten! Das liegt an der internen Verwendung von CHAR4-Typen für die Speicherung der Zeilen und Spalten.</p>
+<p>Wenn du also mehr benötigst, musst du mit mehreren Bereichen arbeiten. [/notice]</p>
+<h2>Ablauf</h2>
+<p>Die Desktop-Office-Integration wird über Interfaces abgebildet. Alles beginnt jedoch mit einem konkreten Erbauer:</p>
+<pre>c_oi_container_control_creator=&gt;get_container_control</pre>
+<p>Dieser erzeugt ein Container-Control für das Dokument. Das Control muss an einen Container gebunden werden. Das geschieht bei der Initialisierung:</p>
+<pre>lr_control-&gt;init_control( ... ).</pre>
+<p>Danach kann man sich das Dokument über eine allgemeine Dokumentenschnittstelle holen. Alle Funktionen, die hier angeboten sind, gelten für Excel- als auch für Word-Dokumente:</p>
+<pre>lr_control-&gt;get_document_proxy( ... ).</pre>
+<p>Um direkt auf Excel-Funktionen zugreifen zu können, müssen wir uns das konkrete Dokument-Objekt holen:</p>
+<pre>lr_document-&gt;get_spreadsheet_interface( IMPORTING sheet_interface = lr_spreadsheet ).</pre>
+<p>Mit dieser Klasse haben wir nun endlich Excel-spezifische Funktionen, wie zum Beispiel der Zugriff auf die Tabellenzellen:</p>
+<pre>lr_spreadsheet-&gt;get_ranges_data( ... ).</pre>
+<h2>Anzeige unterdrücken</h2>
+<p>Es gibt bei diesem Verfahren meines Wissens keine Möglichkeit, die Nutzung unsichtbar für den Benutzer ablaufen zu lassen. Mit einem Trick gelingt es dennoch&#8230;</p>
+<p>Das Dynpro, das in Listen Verwendet wird, ist normalerweise das Dynpro CL_GUI_CONTAINER=&gt;SCREEN0. Wenn du also etwas in diesen Container einhängst, dann wird er Bildschirmfüllend angezeigt: <a href="https://tricktresor.com/blog/screen0/">Beitrag SCREEN0</a>.</p>
+<p>Für verschiedene Anwendungsfälle gibt es jedoch weitere SCREENS. Ich glaube, mit jedem Popup-Level wird der SCREEN hochgezählt. Das können wir uns zu nutze machen, in dem wir das DOI-Control einfach an einen Screen hängen, der nicht angezeigt wird: CL_GUI_CONTAINER=&gt;SCREEN9</p>
+<pre class="">CALL METHOD lr_control-&gt;init_control
+  EXPORTING
+    inplace_enabled       = 'X'
+    no_flush              = 'X'
+    r3_application_name   = 'Test DOI'
+    parent                = cl_gui_container=&gt;screen9
+  IMPORTING
+    error                 = error
+  EXCEPTIONS
+    OTHERS                = 1.</pre>
+<p>Wir können also trotzdem eine WRITE-Ausgabe machen. Die Ausgabe erfolgt also quasi parallel.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-05_16-26-04.jpg" rel="attachment wp-att-471164"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-471164" src="https://tricktresor.com/wp-content/uploads/2016/02/2016-02-05_16-26-04.jpg" alt="2016-02-05_16-26-04" width="628" height="326" srcset="/wp-content/uploads/2016/02/2016-02-05_16-26-04.jpg 628w, /wp-content/uploads/2016/02/2016-02-05_16-26-04-300x156.jpg 300w" sizes="(max-width: 628px) 100vw, 628px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/doi_test.txt">Den kompletten Quelltext findest du hier</a>.</p>
+<h2></h2>
+<p>Der Beitrag <a href="/blog/werte-aus-excel-per-doi-unsichtbar/">Werte aus Excel per DOI (unsichtbar)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/werte-aus-excel-per-doi-unsichtbar/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>ABAP2XLS</title>
+		<link>/blog/abap2xls/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Feb 2014 17:00:52 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[farben]]></category>
+		<category><![CDATA[ole]]></category>
+		<category><![CDATA[sap]]></category>
+		<category><![CDATA[zelle]]></category>
+		<category><![CDATA[arbeitsblatt]]></category>
+		<category><![CDATA[spreadsheet]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[sheet]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[formatierung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4487</guid>
+
+					<description><![CDATA[<p>Eines der größten und beliebtesten Open Source Projekte für SAP ist zweifelsohne ABAP2XLS. Mit diesem kostenlosen Tool lassen sich einfach und im Hintergrund (!!) echte Excel-Dateien erstellen. Wer viel Excel-Dateien erstellen muss, sollte sich auf jeden Fall dieses geniale Tool anschauen!</p>
+<p>Der Beitrag <a href="/blog/abap2xls/">ABAP2XLS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Excel-Dateien lassen sich ohne weiteres aus SAP heraus erzeugen. Es gibt die Möglichkeit, dies per <a title="OLE &amp; Excel | Tricktresor" href="https://tricktresor.com/?s=ole+excel">OLE (Object Linking and Embedding)</a> oder mittels <a title="DOI &amp; Excel | Tricktresor" href="https://tricktresor.com/?s=doi+excel">DOI (Desktop Office Integration)</a> tun. Diese beiden Methoden haben jedoch zwei große Nachteile:</p>
+<ol>
+<li>Die Anwendung/ Erstellung von Excel-Dateien ist recht kompliziert und aufwändig</li>
+<li>Dateien können nur Online, also im Dialog mit dem Anwender erzeugt werden. Die Erzeugung von Excel-Dateien im Hintergrund ist nicht möglich.</li>
+</ol>
+<p><img loading="lazy" decoding="async" class="alignleft size-medium wp-image-4488" alt="ABAP2XLS - Angry Birds" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_17_41_32-300x165.jpg" width="300" height="165" srcset="/wp-content/uploads/2014/02/02_20_17_41_32-300x165.jpg 300w, /wp-content/uploads/2014/02/02_20_17_41_32.jpg 558w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<p><a title="ABAP2XLS | Homepage" href="http://ivanfemia.github.io/abap2xlsx/">ABAP2XLS</a> bildet die meisten Funktionen &#8211; und das sind sehr viele!! &#8211; mit eigenen Klassen und Methoden ab. Die Entwicklung wird von einer Gruppe sehr engagierter SAP-Programmierer stetig weiter geführt und verbessert.</p>
+<p>Eine kurze Übersicht über die Funktionen und das Entwicklerteam gibt es im <a title="ABAP2XLS | SCN" href="http://scn.sap.com/community/abap/blog/2010/07/12/abap2xlsx--generate-your-professional-excel-spreadsheet-from-abap">SCN &#8211; ABAP2XLS</a>. Die Möglichkeiten sind wirklich fantastisch. Es können jede Menge Funktionen und Formatierungen vorgenommen werden.</p>
+<h2>Demo-Programm</h2>
+<p>Folgendes Demo-Programm zeigt, wie einfach es ist, eine Excel-Datei mithilfe von ABAP2XLS zu erzeugen:</p>
+<pre>REPORT  zdemo_excel1.
+
+DATA: lo_excel                TYPE REF TO zcl_excel,
+      lo_worksheet            TYPE REF TO zcl_excel_worksheet,
+      lo_hyperlink            TYPE REF TO zcl_excel_hyperlink,
+      column_dimension        TYPE REF TO zcl_excel_worksheet_columndime.
+
+CONSTANTS: gc_save_file_name TYPE string VALUE '01_HelloWorld.xlsx'.
+INCLUDE zdemo_excel_outputopt_incl.
+
+START-OF-SELECTION.
+  " Creates active sheet
+  CREATE OBJECT lo_excel.
+
+  " Get active sheet
+  lo_worksheet = lo_excel-&gt;get_active_worksheet( ).
+  lo_worksheet-&gt;set_cell( ip_column = 'B' ip_row = 2 ip_value = 'Hello world' ).
+  lo_worksheet-&gt;set_cell( ip_column = 'B' ip_row = 3 ip_value = sy-datum ).
+  lo_worksheet-&gt;set_cell( ip_column = 'C' ip_row = 3 ip_value = sy-uzeit ).
+  lo_hyperlink = zcl_excel_hyperlink=&gt;create_external_link( iv_url = 'http://www.abap2xlsx.org/' ).
+  lo_worksheet-&gt;set_cell( ip_column = 'B' ip_row = 4 ip_value = 'Click here to visit abap2xlsx homepage' ip_hyperlink = lo_hyperlink ).
+
+  column_dimension = lo_worksheet-&gt;get_column_dimension( ip_column = 'B' ).
+  column_dimension-&gt;set_width( ip_width = 11 ).
+
+*** Create output
+  lcl_output=&gt;output( lo_excel ).</pre>
+<p>Die Umfangreiche Demo-Sammlung ist in einem eigenen Show-Center untergebracht, in dem der Quelltext als auch die Ausgabe angezeigt werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_17_56_18.jpg"><img decoding="async" class="alignnone  wp-image-4489" alt="ABAP2XLS Democenter" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_17_56_18.jpg" width="100%" srcset="/wp-content/uploads/2014/02/02_20_17_56_18.jpg 1176w, /wp-content/uploads/2014/02/02_20_17_56_18-300x105.jpg 300w, /wp-content/uploads/2014/02/02_20_17_56_18-768x269.jpg 768w, /wp-content/uploads/2014/02/02_20_17_56_18-1024x359.jpg 1024w" sizes="(max-width: 1176px) 100vw, 1176px" /></a></p>
+<p>Der Beitrag <a href="/blog/abap2xls/">ABAP2XLS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>DOI-Trace</title>
+		<link>/blog/doi-trace/</link>
+					<comments>/blog/doi-trace/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 09 Sep 2011 16:55:24 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Office-Integration]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=622</guid>
+
+					<description><![CDATA[<p>Mithilfe eines Programms kann ein Trace f&#252;r die Desktop-Office-Integration aktiviert oder deaktiviert werden. Der Trace kann bei der Fehlersuche behilflich sein.</p>
+<p>Der Beitrag <a href="/blog/doi-trace/">DOI-Trace</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mithilfe eines Programms kann ein Trace für die Desktop-Office-Integration aktiviert oder deaktiviert werden. Der Trace kann bei der Fehlersuche behilflich sein.</p>
+<p>Rufen Sie das Programm SAPR_OFFICE_INTEGRATION_TRACE in der Transaktion SE38 auf. Sie können dann einzelne Funktionen an- und ausschalten:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/DOI/Bild627.jpg" /></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/doi-trace/">DOI-Trace</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/doi-trace/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Beispielprogramme</title>
+		<link>/blog/beispielprogramme-5/</link>
+					<comments>/blog/beispielprogramme-5/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 27 May 2011 08:55:06 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=597</guid>
+
+					<description><![CDATA[<p>Hier finden Sie Beispielprogramme zum Thema Desktop Office Integration. </p>
+<p>Der Beitrag <a href="/blog/beispielprogramme-5/">Beispielprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier finden Sie Beispielprogramme zum Thema Desktop Office Integration. <br /><P class="head1">SAPRDEMOEXCEL_EXPORT</P><P>Ein Report, der mithilfe der Klasse i_oi_document_proxy ein Excel-Objekt inplace erzeugt und die&nbsp;Excel-Daten exportiert.&nbsp;</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/DOI/Bild297.jpg"><BR>Excel inplace</P></TD></TR></TBODY></TABLE></P><P>SAPRDEMODOCUMENTCONTAINER<BR>SAPRDEMODOCUMENTCONTAINER2<BR>SAPRDEMOEXCELINTEGRATION<BR>SAPRDEMOEXCELINTEGRATION2<BR>SAPRDEMOEXCEL_EXPORT<BR>SAPRDEMOLOTUS123INTEGRATION<BR>SAPRDEMOOFFICEINTEGRATION<BR>SAPRDEMORTFPROCESSING<BR>SAPRDEMOVISIO50INTEGRATION<BR>SAPRDEMOWORD97INTEGRATION<BR>SAPRDEMOWORDPROINTEGRATION<BR>SAPRDEMO_ACTIVEX_INTEGRATION<BR>SAPRDEMO_DOI_BDS<BR>SAPRDEMO_ESUITE_SPREADSHEET<BR>SAPRDEMO_ESUITE_WORDPROCESSOR<BR>SAPRDEMO_FORM_INTERFACE<BR>SAPRDEMO_MAILMERGE_INTERFACE<BR>SAPRDEMO_MS_DEMO<BR>SAPRDEMO_PIVOTINTERFACE<BR>SAPRDEMO_SPREADSHEETTOP<BR>SAPRDEMO_SPREADSHEET_INTERFAC<BR>SAPRDEMO_TABLES_IN_EXCEL<BR>SAPRDEMO_WORD_NOTEPAD<BR>SAPREDIT_PSTEXT_SOI<BR>SAPREDIT_TEXT_FORMAT_DOI<BR>SAPREDIT_TEXT_FORMAT_DOI_DOC<BR>SAPREDIT_TEXT_FORMAT_DOI_WPRO&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/beispielprogramme-5/">Beispielprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/beispielprogramme-5/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Kleinigkeiten</title>
+		<link>/blog/kleinigkeiten-6/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 26 Jul 2010 10:54:27 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=554</guid>
+
+					<description><![CDATA[<p>Hier sammeln wir kleine Infos, Hinweise auf Dokumentationen oder einzelen Programme oder Funktionsbausteine.</p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-6/">Kleinigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier sammeln wir kleine Infos, Hinweise auf Dokumentationen oder einzelnen Programme oder Funktionsbausteine.</p>
+<h1 class="head1">Funktionsbausteine</h1>
+<h2 class="head1">MS_WORD_OLE_FORMLETTER</h2>
+<p>Mit diesem Funktionsbaustein ist es möglich Serienbriefe zu erstellen. Der Baustein ist gut dokumentiert.</p>
+<h2 class="head1">TEXT_CONVERT_XLS_TO_SAP</h2>
+<p>Liefert die Zellen einer Excel-Tabelle zurück. Hier ein kleines Demo-Programm:</p>
+<p><a href="http://www.sapdev.co.uk/file/file_upexcel.htm" target="_blank">http://www.sapdev.co.uk/file/file_upexcel.htm</a></p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-6/">Kleinigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Dialog beim Beenden</title>
+		<link>/blog/dialog-beim-beenden/</link>
+					<comments>/blog/dialog-beim-beenden/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 21 Jul 2010 16:23:56 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=553</guid>
+
+					<description><![CDATA[<p>Sofern man in seinem OLE-Konstrukt die Methode "Copy" benutzt, erscheint ggfs. beim Beenden von Excel der Dialog "Es befinden sich Daten in der Zwischenablage. Sollen diese f&#252;r andere Programme erhalten bleiben?". Dieser Dialog ist nat&#252;rlich nicht unbedingt erw&#252;nscht...</p>
+<p>Der Beitrag <a href="/blog/dialog-beim-beenden/">Dialog beim Beenden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Sofern man in seinem OLE-Konstrukt die Methode &#8220;Copy&#8221; benutzt, erscheint ggfs. beim Beenden von Excel der Dialog &#8220;Es befinden sich Daten in der Zwischenablage. Sollen diese f&uuml;r andere Programme erhalten bleiben?&#8221;. Dieser Dialog ist nat&uuml;rlich nicht unbedingt erw&uuml;nscht&#8230;<br /><P>Beim Beenden kann dieser Dialog ausgeschaltet werden.</P><P>Hier die komplette Routine, die Excel ohne zu Sichern beendet:</P><P class="sap1"><FONT color="#fb2412">* Excel beenden<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>* see </FONT><A href="http://support.microsoft.com/default.aspx?scid=kb;de;503541" Target="_blank"><FONT color="#fb2412">http://support.microsoft.com/default.aspx?scid=kb;de;503541</FONT></A><BR><FONT color="#fb2412">* Close without saving<BR>* get active window<BR></FONT>&nbsp; CALL METHOD OF h_excel &#8216;ACTIVEWINDOW&#8217; = h_active_window.<BR><FONT color="#fb2412">* set active_window visible</FONT><BR>&nbsp; SET PROPERTY OF h_active_window &#8216;VISIBLE&#8217; = 1.<BR><BR><FONT color="#fb2412">* close active_window without saving<BR></FONT>&nbsp; CALL METHOD OF h_active_window &#8216;CLOSE&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING #1 = 0.<BR><BR><FONT color="#fb2412">* disable dialog </FONT><BR><FONT>&nbsp;&nbsp;CALL METHOD OF&nbsp;h_excel &#8216;CutCopyMode&#8217;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING #1 = 0.<BR></FONT><BR><FONT color="#fb2412">* close Excel<BR></FONT>&nbsp; CALL METHOD OF h_excel &#8216;QUIT&#8217;.<BR>&nbsp; FREE OBJECT: h_excel, h_active_window.</P></p>
+<p>Der Beitrag <a href="/blog/dialog-beim-beenden/">Dialog beim Beenden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dialog-beim-beenden/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>BOR-Integration</title>
+		<link>/blog/bor-integration/</link>
+					<comments>/blog/bor-integration/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Feb 2010 18:51:46 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Business Documents]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=539</guid>
+
+					<description><![CDATA[<p>In diesem Beispiel laden wir eine im BOR (Business Object Repository) gespeicherte Excel-Datei, ver&#228;ndern diese und Speichern sie als neues Dokument wieder im BOR ab. Dabei wird die Excel-Datei nicht auf dem PC zwischengespeichert. Stattdessen werden die entsprechenden Methoden der Desktop Office Integration verwendet.</p>
+<p>Der Beitrag <a href="/blog/bor-integration/">BOR-Integration</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beispiel laden wir eine im BOR (Business Object Repository) gespeicherte Excel-Datei, verändern diese und Speichern sie als neues Dokument wieder im BOR ab. Dabei wird die Excel-Datei nicht auf dem PC zwischengespeichert. Stattdessen werden die entsprechenden Methoden der Desktop Office Integration verwendet.</p>
+<p class="head1">Information</p>
+<p class="text1">Die in diesem Fall als Template verwendete Excel-Datei muss mithilfe der Transaktion <strong>OAER</strong> in das Business Objects Repository geladen werden!</p>
+<p class="text1"><strong><u>TIPP 1:</u></strong><br />
+Sie können auch eigene &#8220;Klassen&#8221; definieren. Um ZMYCLASS zu erstellen, rufen Sie die Transaktion <strong>SBDSV1</strong> auf und pflegen Sie den Eintrag ZMYCLASS und ordnen Sie den Objekttyp &#8220;OT&#8221; zu. Mit Transaktion <strong>SBDSV3 </strong>können Sie einen Text definieren.<br />
+<strong>Sie können auch einen Exit-Funktionsbaustein eintragen</strong>, wie z.B. DYNDOC_BDS_APPLICATION_EXIT, der bei PICTURES-OT hinterlegt ist. Wenn Sie Ihren eigenen Exit verwenden, können Sie z.B. das Hochladen bestimmter Dateitypen in bestimmten Klassen verhindern, automatisch Schlagworte hinzufügen oder zusätzlich wichtige Attribute abfragen.</p>
+<p class="text1"><strong><u>TIPP 2:</u></strong><br />
+In diesem Programmbeispiel wird die Exceldatei wieder unter dem Typ &#8220;BDS_SHEET &#8211; Tabellenvorlage&#8221; gespeichert. Sie können auch einen anderen Typen festlegen! Schauen Sie dazu in die Transaktion <strong>OAC2</strong>.</p>
+<p>&nbsp;</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true">REPORT ZZ_BOR_DOI_DEMO.
+
+*** Definition of Control references
+DATA cl_container   TYPE REF TO cl_gui_container.
+DATA cl_control     TYPE REF TO i_oi_container_control."OIContainerCtrl
+DATA cl_document    TYPE REF TO i_oi_document_proxy.   "Office Dokument
+DATA cl_spreadsheet TYPE REF TO i_oi_spreadsheet.       " Spreadsheet
+DATA gv_url         TYPE bds_uri.
+TYPE-POOLS: soi.
+
+*** Selection screen
+PARAMETER p_class  TYPE bds_clsnam DEFAULT 'ZMYCLASS'.
+PARAMETER p_cltyp  TYPE bds_clstyp DEFAULT 'OT'.
+PARAMETER p_tmpnam TYPE bds_typeid DEFAULT 'TEMPLATE'.
+PARAMETER p_newnam TYPE bds_typeid DEFAULT 'NewDocument_1'.
+
+START-OF-SELECTION.
+
+*** Get URL for desired template
+  PERFORM get_template_url CHANGING gv_url.
+
+*** Create document using DOI and load from BOR
+  PERFORM load_document USING gv_url.
+
+*** Save changed document as new document in BOR
+  PERFORM save_document_as.
+
+*** Clean up work
+  PERFORM cleanup.
+
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_template_url
+*&amp;---------------------------------------------------------------------*
+FORM get_template_url CHANGING cv_url.
+
+  DATA lt_uris TYPE STANDARD TABLE OF bapiuri.
+  DATA ls_uri  TYPE bapiuri.
+
+*** get URL for desired template
+  CALL FUNCTION 'BDS_BUSINESSDOCUMENT_GET_URL'
+    EXPORTING
+      classname       = p_class
+      classtype       = p_cltyp
+      object_key      = p_tmpnam
+    TABLES
+      uris            = lt_uris
+    EXCEPTIONS
+      OTHERS          = 7.
+
+*** if more versions exist, you might use the SIGNATURE parameter 
+*** to define the right version
+  READ TABLE lt_uris INTO ls_uri INDEX 1.
+  cv_url = ls_uri-uri.
+
+ENDFORM.                    "get_template_url
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  load_document
+*&amp;---------------------------------------------------------------------*
+FORM load_document USING iv_url.
+
+  TYPES: tyt_errors    TYPE STANDARD TABLE OF REF TO i_oi_error
+                             WITH NON-UNIQUE DEFAULT KEY.
+
+  DATA:  error         TYPE REF TO i_oi_error,
+         t_errors      TYPE tyt_errors,
+         ole_sheet     TYPE ole2_object,
+         ole_appl      TYPE ole2_object,
+         ole_cell      TYPE ole2_object,
+         lv_handle     TYPE cntl_handle.
+
+
+*** Create instance of OI
+  CALL METHOD c_oi_container_control_creator=&gt;get_container_control
+    IMPORTING
+      control = cl_control
+      error   = error.
+  APPEND error TO t_errors.
+
+*** init control
+  CALL METHOD cl_control-&gt;init_control
+    EXPORTING
+      inplace_enabled     = space
+      no_flush            = 'X'
+      r3_application_name = 'Demo BOR'
+      parent              = cl_container
+    IMPORTING
+      error               = error
+    EXCEPTIONS
+      OTHERS              = 2.
+  APPEND error TO t_errors.
+
+*** Get Documentproxy
+  CALL METHOD cl_control-&gt;get_document_proxy
+      EXPORTING
+          document_type      = 'Excel.Sheet'                " EXCEL
+*          document_type      = 'Word.Document'              " WORD
+          no_flush           = 'X'
+      IMPORTING
+          document_proxy     = cl_document
+          error              = error.
+  APPEND error TO t_errors.
+
+*** Load document from BOR
+  CALL METHOD cl_document-&gt;open_document
+    EXPORTING
+      document_title = 'Demo BOR'
+      document_url   = iv_url
+      no_flush       = 'X'
+      open_inplace   = space
+    IMPORTING
+      error          = error.
+  APPEND error TO t_errors.
+
+*** generate Spreadsheetinterface
+  CALL METHOD cl_document-&gt;get_spreadsheet_interface
+    EXPORTING
+      no_flush        = ' '
+    IMPORTING
+      error           = error
+      sheet_interface = cl_spreadsheet.
+  APPEND error TO t_errors.
+
+*** get handle of document for work with OLE
+  CALL METHOD cl_document-&gt;get_document_handle
+    EXPORTING
+      no_flush = 'X'
+    IMPORTING
+      error    = error
+      handle   = lv_handle.
+  APPEND error TO t_errors.
+
+*** get OLE application object
+  GET PROPERTY OF lv_handle-obj 'Application' = ole_appl.
+
+*** get OLE cell object
+  CALL METHOD OF ole_appl 'Cells' = ole_cell
+       EXPORTING
+          #1 = 1                                            "line
+          #2 = 5.                                           "column
+
+*** set cell value
+  SET PROPERTY OF ole_cell 'Value' = 'Document changed!'.
+
+*** get active sheet for other operations...
+  GET PROPERTY OF lv_handle-obj 'ActiveSheet' = ole_sheet.
+
+*** display errors
+  LOOP AT t_errors INTO error.
+    CALL METHOD error-&gt;raise_message
+      EXPORTING
+        type           = 'E'
+      EXCEPTIONS
+        message_raised = 1
+        flush_failed   = 2.
+  ENDLOOP.
+
+ENDFORM.                    " build_spreadsheet_interface
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  save_document_as
+*&amp;---------------------------------------------------------------------*
+FORM save_document_as .
+
+  DATA lt_uris       TYPE STANDARD TABLE OF bapiuri.
+  DATA ls_uri        TYPE bapiuri.
+  DATA lv_object_key TYPE bapibds01-objkey.
+  DATA lt_data       TYPE STANDARD TABLE OF bapiconten.
+  DATA lv_doc_size   TYPE i.
+  DATA lt_signature  TYPE STANDARD TABLE OF bapisignat.
+  DATA ls_signature  TYPE bapisignat.
+  DATA lt_components TYPE STANDARD TABLE OF bapicompon.
+  DATA ls_component  TYPE bapicompon.
+
+*** Save DOI document to internal table
+  CALL METHOD cl_document-&gt;save_document_to_table
+    CHANGING
+      document_size  = lv_doc_size
+      document_table = lt_data.
+
+*** fill signature
+  ls_signature-prop_name  = 'BDS_DOCUMENTTYPE'.           "#EC NOTEXT
+  ls_signature-prop_value = 'BDS_SHEET'.
+  APPEND ls_signature TO lt_signature.
+
+  ls_signature-prop_name  = 'BDS_DOCUMENTCLASS'.          "#EC NOTEXT
+  ls_signature-prop_value = 'XLS'.
+  APPEND ls_signature TO lt_signature.
+
+  ls_signature-prop_name  = 'DESCRIPTION'.                "#EC NOTEXT
+  ls_signature-prop_value = 'Tricktresor.de'.
+  APPEND ls_signature TO lt_signature.
+
+  ls_signature-prop_name  = 'LANGUAGE'.                   "#EC NOTEXT
+  ls_signature-prop_value = sy-langu.
+  APPEND ls_signature TO lt_signature.
+
+*** fill component info
+  CONCATENATE p_newnam '.xls' INTO ls_component-comp_id.
+  ls_component-mimetype    = 'application/vnd.ms-excel'.
+  ls_component-comp_size   = lv_doc_size.
+  APPEND ls_component TO lt_components.
+
+*** create new document from changed template
+  CALL FUNCTION 'BDS_BUSINESSDOCUMENT_CREA_TAB'
+    EXPORTING
+      classname       = p_class
+      classtype       = p_cltyp
+      client          = sy-mandt
+      object_key      = p_newnam
+    TABLES
+      signature       = lt_signature
+      components      = lt_components
+      content         = lt_data
+    EXCEPTIONS
+      OTHERS          = 7.
+  IF sy-subrc &lt;&gt; 0.
+    BREAK-POINT.
+  ENDIF.
+
+ENDFORM.                    " save_as
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  cleanup
+*&amp;---------------------------------------------------------------------*
+FORM cleanup.
+
+*** close document
+  CALL METHOD cl_document-&gt;close_document.
+
+*** destroy control
+  CALL METHOD cl_control-&gt;destroy_control
+    EXPORTING
+      no_flush = ' '.
+
+*** free objects
+  FREE cl_spreadsheet.
+  CLEAR: cl_spreadsheet.
+
+  IF NOT cl_document IS INITIAL.
+    CALL METHOD cl_document-&gt;release_document.
+  ENDIF.
+
+  FREE:  cl_document,
+         cl_control.
+
+  CLEAR: cl_document,
+         cl_control.
+
+ENDFORM.                    "cleanup</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/bor-integration/">BOR-Integration</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bor-integration/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dokumentation Kommunikationsschnittstellen</title>
+		<link>/blog/dokumentation-2/</link>
+					<comments>/blog/dokumentation-2/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 01 Jun 2005 21:18:34 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Generell]]></category>
+		<category><![CDATA[DOI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=335</guid>
+
+					<description><![CDATA[<p>Dokumentation</p>
+<p>Der Beitrag <a href="/blog/dokumentation-2/">Dokumentation Kommunikationsschnittstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2 class="head1">Tutorial: Kommunikationsschnittstellen</h2>
+<h3 class="head2">Themenübersicht</h3>
+<ul>
+<li>RFC-Clients in ABAP programmieren</li>
+<li>Mit SAP Assistant Funktionsbausteine auswerten</li>
+<li>MS-EXCEL als OLE Client</li>
+<li>ABAP als OLE2-Automation-Controller</li>
+<li>Mit Function OCX unter VB auf Funktionsbausteine zugreifen</li>
+<li>BAPIs mit BAPI Control aufrufen</li>
+</ul>
+<p><a href="http://help.sap.com/saphelp_webas620/helpdata/de/72/90fd343603c95ee10000009b38f844/frameset.htm" target="_blank" rel="noopener">http://help.sap.com/saphelp_webas620/helpdata/de/<br />
+72/90fd343603c95ee10000009b38f844/frameset.htm</a></p>
+<h3 class="head1">Desktop Office Integration  (BC-CI)</h3>
+<p class="text1"><a href="http://help.sap.com/printdocu/core/Print46c/de/data/pdf/BCCIOFFI/BCCIOFFI.pdf" target="_blank" rel="noopener">http://help.sap.com/printdocu/core/Print46c/de/data/pdf/BCCIOFFI/BCCIOFFI.pdf</a></p>
+<p class="head2">Inhalt</p>
+<ul>
+<li>
+<div class="text1">Desktop Office Integration</div>
+</li>
+<li>
+<div class="text1">Architektur der Desktop Office Integration</div>
+</li>
+<li>
+<div class="text1">Instanzen für die SAP Desktop Office Integration</div>
+</li>
+<li>
+<div class="text1">Programmierung der Desktop-Office-Anbindung</div>
+</li>
+<li>
+<div class="text1">Verwendung von Controls im WAN</div>
+</li>
+<li>
+<div class="text1">Fehlerbehandlung nach Methodenaufruf</div>
+</li>
+<li>
+<div class="text1">Zentrale Instanz zur Verwaltung der Desktop Office</div>
+</li>
+<li>
+<div class="text1">Dokumente</div>
+</li>
+<li>
+<div class="text1">Datenaustausch zwischen R/3 und Desktop-Anwendung</div>
+</li>
+<li>
+<div class="text1">Das Wordprocessor-Interface</div>
+</li>
+<li>
+<div class="text1">Das Form-Interface</div>
+</li>
+<li>
+<div class="text1">Die Serienbriefschnittstelle</div>
+</li>
+<li>
+<div class="text1">Die Script-Collection</div>
+</li>
+<li>
+<div class="text1">Die Tabellenkalkulationsschnittstelle</div>
+</li>
+<li>
+<div class="text1">Die Pivot-Schnittstelle</div>
+</li>
+<li>
+<div class="text1">Testwerkzeuge für die Desktop Office Integration</div>
+</li>
+<li>
+<div class="text1">Der Document Viewer</div>
+</li>
+<li>
+<div class="text1">Verwendung des Document Viewer</div>
+</li>
+<li>
+<div class="text1">Methoden des Document Viewer</div>
+</li>
+</ul>
+<h3 class="head1">Easy Reference for OLE Automation</h3>
+<p>Eine sehr ausführliche Doku aus dem SDN von Serdar Simsekler mit unmfangreichen Beispielen zu Word und Excel:</p>
+<p><a href="https://tricktresor.com/wp-content/downloads/DOI/An_Easy_Reference_for_OLE_Automation.zip" target="_blank" rel="noopener">PDF-Dokument als ZIP-Datei</a></p>
+<p>Hier der direkte Link im SDN</p>
+<p><a href="http://www.sdn.sap.com/irj/sdn/go/portal/prtroot/docs/library/uuid/204d1bb8-489d-2910-d0b5-cdddb3227820" target="_blank" rel="noopener">http://www.sdn.sap.com/irj/sdn/go/portal/prtroot/docs/library/<br />
+uuid/204d1bb8-489d-2910-d0b5-cdddb3227820</a></p>
+<p class="head2">TOC</p>
+<ul>
+<li>An Easy Reference for OLE Automation</li>
+<li>Purpose</li>
+<li>Prerequisites</li>
+<li>Basics</li>
+<li>Data Definitions</li>
+<li>Creating an OLE Object</li>
+<li>Calling a Method of an Object</li>
+<li>Setting a Property of an Object</li>
+<li>Getting a Property of an Object</li>
+<li>Freeing an Object</li>
+<li>NO FLUSH Addition</li>
+<li>Knowing About Methods and Properties of an OLE Object</li>
+<li>A General Scheme for Integration with MS Word</li>
+<li>A General Scheme for Integration with MS Excel</li>
+<li>Conclusion</li>
+<li>Disclaimer and Liability Notice</li>
+</ul>
+<p>Der Beitrag <a href="/blog/dokumentation-2/">Dokumentation Kommunikationsschnittstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokumentation-2/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Straight FLUSH</title>
+		<link>/blog/straight-flush/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 31 May 2005 14:41:04 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=334</guid>
+
+					<description><![CDATA[<p>Was macht der Flush? Was ist ein Automation Controller? Welche Vor- und Nachteile ergeben sich aus der Verwendung?</p>
+<p>Der Beitrag <a href="/blog/straight-flush/">Straight FLUSH</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Was macht der Flush? Was ist ein Automation Controller? Welche Vor- und Nachteile ergeben sich aus der Verwendung?</p>
+<p>Der Beitrag <a href="/blog/straight-flush/">Straight FLUSH</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>for Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/for/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 28 Dec 2020 16:56:05 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>for Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Aggregation mit VALUE, GROUPS und FOR</title>
+		<link>/blog/aggregation-mit-value-groups-und-for/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 17 Dec 2020 16:06:24 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[GROUP BY]]></category>
+		<category><![CDATA[groups]]></category>
+		<category><![CDATA[for]]></category>
+		<category><![CDATA[field-symbols]]></category>
+		<guid isPermaLink="false">/?p=1024772</guid>
+
+					<description><![CDATA[<p>Als SAP-Programmierer hat man häufig mit Datenstrukturen zu tun, die aus einer Belegnummer und einer Positionsnummer bestehen. Hieraus ergibt sich dann häufig die Aufgabenstellung, alle Belegnummern in einer separaten Tabelle zu sammeln, also auf Belegnummer zu aggregieren. Der folgende Code-Schnipsel erledigt das für eine Tabelle mit Hilfe der VALUE-Anweisung in Verbindung mit FOR und GROUPS. Zuerst die Datenstruktur der Tabelle, die aus Belegnummer (Document = D) und Position ( Item = IT) besteht. Zum Testen...</p>
+<p>Der Beitrag <a href="/blog/aggregation-mit-value-groups-und-for/">Aggregation mit VALUE, GROUPS und FOR</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Als SAP-Programmierer hat man häufig mit Datenstrukturen zu tun, die aus einer Belegnummer und einer Positionsnummer bestehen. Hieraus ergibt sich dann häufig die Aufgabenstellung, alle Belegnummern in einer separaten Tabelle zu sammeln, also auf Belegnummer zu aggregieren.</p>
+
+
+
+<p>Der folgende Code-Schnipsel erledigt das für eine Tabelle mit Hilfe der VALUE-Anweisung in Verbindung mit FOR und GROUPS.</p>
+
+
+
+<p>Zuerst die Datenstruktur der Tabelle, die aus Belegnummer (Document = D) und Position ( Item = IT) besteht. </p>
+
+
+
+<pre class="wp-block-code"><code>TYPES: BEGIN OF _dit,
+         doc TYPE n LENGTH 10,
+         itm TYPE posnr,
+       END OF _dit,
+       _dits TYPE SORTED TABLE OF _dit WITH UNIQUE KEY doc itm.</code></pre>
+
+
+
+<p>Zum Testen fülle ich die Tabelle mit ein paar Testdaten:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(dits) = VALUE _dits(
+ ( doc = 100 itm = 1 )
+ ( doc = 100 itm = 2 )
+ ( doc = 102 itm = 2 )
+ ( doc = 103 itm = 4 )
+ ( doc = 103 itm = 5 ) ).</code></pre>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow"><p>Die VALUE-Anweisung macht übrigens einen INSERT INTO TABLE, was bedeutet, dass die einzufügenden Werte nicht sortiert vorliegen müssen!</p><p>Die folgende Anweisung verursacht also keinen Shortdump:</p><p>DATA(dits) = VALUE _dits( ( doc = 200 ) ( doc = 100 ) ).</p><cite>Info zur Anwendung VALUE</cite></blockquote>
+
+
+
+<p>Die Zielstruktur, sieht wie folgt aus:</p>
+
+
+
+<pre class="wp-block-code"><code>TYPES: BEGIN OF _doc,
+         no TYPE n LENGTH 10,
+       END OF _doc,
+       _docs TYPE SORTED TABLE OF _doc WITH UNIQUE KEY no.
+</code></pre>
+
+
+
+<p>Das Coding für die Aggregation lautet folgendermaßen:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(docs) = VALUE _docs(
+    FOR GROUPS d OF line IN dits
+      GROUP BY line-doc ( no = d ) ).</code></pre>
+
+
+
+<p>Es ist so kompakt, dass man es auch noch vertretbar in einer Zeile stehen lassen kann.</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(docs) = VALUE _docs( FOR GROUPS d OF line IN dits GROUP BY line-doc ( no = d ) ).</code></pre>
+
+
+
+<h2 class="wp-block-heading">DATA vs. FIELD-SYMBOLS</h2>
+
+
+
+<p>Die Syntax lässt zwei Schreibweisen zu: einmal mit einer Workarea (DATA) und einmal mit Feldsymbolen. In meinem Beispiel unterscheidet sich die Schreibweise also nur für ein Element:</p>
+
+
+
+<ul><li> LINE (DATA) </li><li>&lt;LINE&gt; (Field-Symbols)</li></ul>
+
+
+
+<p>Die Verwendung von Field-Symbols ist generell schneller. Die Performance hängt stark davon ab, wie breit die Tabelle ist. Bei meinem Bespiel, das nur die beiden Felder DOC und ITM enthält, ist der Vorsprung von Field-Symbols nur minimal. Ändere ich die Breite der Struktur jedoch, indem ich z.B. die Tabelle VBAP einbinde (ca. 3700 Zeichen breit), dann verlängert sich die Laufzeit bei Field-Symbols um ca. 1/3. Bei DATA ist die Laufzeit mehr als drei Mal so hoch!</p>
+
+
+
+<p>Empfehlung also: Verwende immer die Variante mit Field-Symbols! Einen praktischen Nutzen habe ich bisher noch nicht finden können. Normalerweise kann man bei der Verwendung von Feldsymbolen mit ihrer Hilfe die zugrunde liegenden Daten direkt verändern. Bei dieser Variante mit GROUPS ist das meines Wissens jedoch nicht möglich.   </p>
+
+
+
+<h2 class="wp-block-heading">Gruppierung mit SELECT</h2>
+
+
+
+<p>Seit Release 7.52 ist es möglich, einen SELECT auf eine interne Tabelle abzusetzen. Und auch so kann man natürlich gruppieren:</p>
+
+
+
+<pre class="wp-block-code"><code>SELECT DISTINCT doc AS no
+  FROM @dits AS itab
+  INTO TABLE @DATA(docs).</code></pre>
+
+
+
+<h2 class="wp-block-heading">Gruppierung mit LOOP</h2>
+
+
+
+<p>In diesem Artikel habe ich beschrieben, wie die Gruppierung bei einer LOOP-Schleife funktioniert.</p>
+
+
+
+<figure class="wp-block-embed is-type-wp-embed is-provider-tricktresor wp-block-embed-tricktresor"><div class="wp-block-embed__wrapper">
+<blockquote hcb-fetch-image-from="/blog/loop-at-itab-group-by/" class="wp-embedded-content" data-secret="gU2ZtmeY9U"><a href="/blog/loop-at-itab-group-by/">Loop At ITAB Group By</a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" title="&#8222;Loop At ITAB Group By&#8220; &#8212; Tricktresor" src="/blog/loop-at-itab-group-by/embed/#?secret=gU2ZtmeY9U" data-secret="gU2ZtmeY9U" width="600" height="338" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+</div></figure>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/aggregation-mit-value-groups-und-for/">Aggregation mit VALUE, GROUPS und FOR</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

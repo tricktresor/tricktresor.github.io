@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Free Selections Dialog Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/free-selections-dialog/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 07 Mar 2022 13:26:45 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Free Selections Dialog Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Dynamisches Selektionsbild</title>
+		<link>/blog/dynamisches-selektionsbild/</link>
+					<comments>/blog/dynamisches-selektionsbild/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 20 Feb 2007 17:07:12 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[SELECT-OPTIONS]]></category>
+		<category><![CDATA[Free Selections Dialog]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=402</guid>
+
+					<description><![CDATA[<p>In diesem Artikel zeigen wir Ihnen, wie Sie dynamisch ein Selektionsbild erzeugen können und die eingegebenen Werte zur Selektion der Daten nutzen</p>
+<p>Der Beitrag <a href="/blog/dynamisches-selektionsbild/">Dynamisches Selektionsbild</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In diesem Artikel zeigen wir Ihnen, wie Sie dynamisch ein Selektionsbild erzeugen können und die eingegebenen Werte zur Selektion der Daten nutzen</p>
+
+
+
+<h2 class="wp-block-heading">Beschreibung</h2>
+
+
+
+<p>In diesem Beispielprogramm wird ein Selektionsbild zur Tabelle VBAK erzeugt und als Popup angezeigt.&nbsp;Der Benutzer kann nach belieben andere Felder ein- oder ausblenden.&nbsp;Aus den Selektionsoptionen zu den Feldern wird eine WHERE-Klausel für den Select-Befehl erzeugt, so dass die Daten einfach gelesen werden können.</p>
+
+
+
+<h2 class="wp-block-heading">Werte übergeben</h2>
+
+
+
+<p>Soll mehr als ein Wert übergeben werden, so muss die LT_EXPRESSIONS-Tabelle so aufgebaut werden, dass in der ersten Zeile steht</p>
+
+
+
+<p>LOGOP = &#8216;AND&#8217;.<br>ARITY&nbsp;= Anzahl der zu übergebenden Felder</p>
+
+
+
+<p>Danach kommen dann die Feldwerte, die vor geblendet werden sollen.</p>
+
+
+
+<figure class="wp-block-table"><table><thead><tr><th>LOGOP</th><th>ARITY</th><th>FIELDNAME</th><th>OPTION</th><th>LOW</th><th>HIGH</th></tr></thead><tbody><tr><td>AND</td><td>3</td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td>VBELN</td><td>BT</td><td>1000</td><td>2000</td></tr><tr><td></td><td></td><td>ERDAT</td><td>EQ</td><td>20070401</td><td></td></tr><tr><td></td><td></td><td>ERNAM</td><td>EQ</td><td>XK0945</td><td></td></tr></tbody></table><figcaption>Feldwerte</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Hinweis</h3>
+
+
+
+<p>Zur Erstellung einer WHERE-Bedingung aus RANGES-Tabellen bitte <a href="/blog/dynamische-where-bedingung/">hier</a> schauen.</p>
+
+
+
+<h3 class="wp-block-heading">Screenshot</h3>
+
+
+
+<p>Dynamisches Selektionsbild mit Einblendung der Felder</p>
+
+
+
+<figure class="wp-block-image alignnone"><img decoding="async" src="/wp-content/uploads/tt_images/abap/dyn.jpg" alt="Free Selections Dialog"/><figcaption>Free Selections Dialog</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Coding </h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT  zz_dynsel.
+
+*** Type-Pool für "Freie Abgrenzungen"
+TYPE-POOLS rsds.
+
+DATA:
+*** Datentabelle
+ lt_vbak              TYPE STANDARD TABLE OF vbak,
+*** Datenstruktur
+ ls_vbak              TYPE vbak,
+*** Selection-ID zur Unterscheidung mehrerer Sets
+ lv_selection_id      LIKE rsdynsel-selid,
+*** Anzahl der Felder
+ lv_number_of_fields  TYPE i,
+*** Tabellenname
+ lv_tablename         TYPE tablename,
+*** Init: Tabellen
+ lt_tables            TYPE STANDARD TABLE OF rsdstabs,
+*** Init: Felder
+ ls_fields            TYPE                   rsdsfields,
+ lt_fields            TYPE STANDARD TABLE OF rsdsfields,
+*** Daten für Where-Tabelle
+ lt_where_clauses     TYPE rsds_twhere,
+ ls_where_clause      TYPE rsds_where,
+*** Expressions
+ lt_expressions       TYPE rsds_texpr,
+ ls_expression        TYPE rsds_expr,
+ lt_expr              TYPE rsds_expr_tab,
+ ls_expr              TYPE rsdsexpr,
+*** Ranges
+ lt_field_ranges      TYPE rsds_trange,
+ ls_field_ranges      TYPE rsds_range,
+ lt_range             TYPE rsds_frange_t,
+ ls_range             TYPE rsds_frange,
+ lt_selopt            TYPE rsds_selopt_t,
+ ls_selopt            LIKE rsdsselopt.
+
+PARAMETERS:
+*** Anzeige der Feldauswahl im Tree?
+  p_tree AS CHECKBOX DEFAULT 'X',
+*** Vorgabe eines Selektionswertes?
+  p_vorg AS CHECKBOX DEFAULT 'X'.
+
+
+START-OF-SELECTION.
+*** Tabellenname vorgeben
+  lv_tablename = 'VBAK'.
+*** Tabelle im Dialog bekannt machen:
+  APPEND lv_tablename TO lt_tables.
+*** einzublendende Felder übergeben
+  ls_fields-tablename = lv_tablename.
+*** ...Dazu nehmen wir die ersten Felder der Tabelle
+  SELECT fieldname FROM dd03l INTO ls_fields-fieldname
+     WHERE tabname  = lv_tablename
+       AND as4local = 'A'
+       AND as4vers  = 0
+       AND position &lt; 15
+       AND datatype &lt;> 'CLNT'.
+    APPEND ls_fields TO lt_fields.
+  ENDSELECT.
+
+  IF p_vorg &lt;> space.
+*** Name des Erfassers mit SY-UNAME vorbelegen
+    ls_expr-fieldname = 'ERNAM'.
+    ls_expr-option    = 'EQ'.
+    ls_expr-low       = sy-uname.
+    APPEND ls_expr TO lt_expr.
+
+    ls_expression-tablename = lv_tablename.
+    ls_expression-expr_tab  = lt_expr.
+    APPEND ls_expression TO lt_expressions.
+  ENDIF.
+
+*** "Freie Abgrenzungen" initialisieren
+  CALL FUNCTION 'FREE_SELECTIONS_INIT'
+    EXPORTING
+      kind         = 'T'
+      expressions  = lt_expressions
+    IMPORTING
+      selection_id = lv_selection_id
+      field_ranges = lt_field_ranges
+    TABLES
+      tables_tab   = lt_tables
+      fields_tab   = lt_fields
+    EXCEPTIONS
+      OTHERS       = 20.
+  IF sy-subrc &lt;> 0.
+    WRITE: / sy-subrc.
+  ELSE.
+
+*** Dialog mit "freien Abgrenzungen" aufrufen
+    CALL FUNCTION 'FREE_SELECTIONS_DIALOG'
+      EXPORTING
+        selection_id            = lv_selection_id
+        title                   = 'Tricktresor'
+        frame_text              = 'Bitte Selektion eingeben'
+        as_window               = 'X'
+        start_row               = 3
+        start_col               = 3
+        tree_visible            = p_tree
+        no_frame                = 'X'
+      IMPORTING
+        where_clauses           = lt_where_clauses
+        expressions             = lt_expressions
+        field_ranges            = lt_field_ranges
+        number_of_active_fields = lv_number_of_fields
+      TABLES
+        fields_tab              = lt_fields
+      EXCEPTIONS
+        internal_error          = 1
+        no_action               = 2
+        selid_not_found         = 3
+        illegal_status          = 4
+        OTHERS                  = 5.
+    IF sy-subrc > 0.
+      IF sy-subrc = 2.
+*** Meldung "Auswahl wurde abgebrochen"
+        MESSAGE s000(oo) WITH 'Auswahl wurde abgebrochen'.
+      ELSE.
+*** Meldung "Fehler bei Funktionsbausteinaufruf"
+        MESSAGE i000(oo) DISPLAY LIKE 'E'
+           WITH 'Fehler bei FREE_SELECTIONS_DIALOG' sy-subrc.
+      ENDIF.
+    ELSE.
+*** vom Baustein generierte WHERE-Klausel zur Selektion lesen
+      READ TABLE lt_where_clauses INTO ls_where_clause
+            WITH KEY tablename = lv_tablename.
+*** Selektion durchführen
+      SELECT * FROM (lv_tablename) INTO TABLE lt_vbak
+       WHERE (ls_where_clause-where_tab).
+      IF sy-subrc > 0.
+        MESSAGE s000(oo) WITH 'Keine Daten zur Selektion vorhanden'.
+      ELSE.
+*** ...und ausgeben
+        LOOP AT lt_vbak INTO ls_vbak.
+          WRITE: / ls_vbak-vbeln.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/dynamisches-selektionsbild/">Dynamisches Selektionsbild</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dynamisches-selektionsbild/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

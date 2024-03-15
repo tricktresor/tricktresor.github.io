@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>update Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/update/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:03 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>update Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Änderung von Daten mit Hilfe desTabellenpflegedialogs</title>
+		<link>/blog/aenderung-von-daten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 21 Mar 2013 09:44:48 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[view]]></category>
+		<category><![CDATA[update]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=669</guid>
+
+					<description><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzuf&#252;gen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten m&#252;ssen zuvor gepr&#252;ft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugef&#252;gt wurden, durchlaufen.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzufügen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten müssen zuvor geprüft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugefügt wurden, durchlaufen.</p>
+<p>Folgendes &#8211; zugegebener Maßen durch Copy and Paste zusammengeschusterte Programm &#8211; demonstriert das Hinzufügen bzw. die Änderung eines Datensatzes in der Tabelle ZTEST1:</p>
+<p class="head1">Felder der Tabelle:</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>FELD1</li>
+<li>FELD2</li>
+</ul>
+<p class="head1">Anmerkungen</p>
+<p>Die Tabellendefinition mit OCCURS ist nicht mehr aktuell.</p>
+<p>Das Coding ist Halb-generisch&#8230; Wo es ohne viel Aufwand möglich war, habe ich versucht, die Tabelle ZTEST1 generisch zu verwenden</p>
+<ul>
+<li>Zuweisung der Werte in TOTAL</li>
+<li>SELECT</li>
+</ul>
+<p>Allerdings habe ich dies nicht stringent verfolgt:</p>
+<ul>
+<li>WHERE_Bedingung ist nicht generisch</li>
+<li>Struktur-Definition ist nicht dynamisch</li>
+</ul>
+<p>Dieses Programm soll auch in erster Linie die Verwendung des Bausteins VIEW_MAINTENANCE_LOW_LEVEL demonstrieren. Ich wollte jedoch darauf achten, dass die Verwendung auch einigermaßen variabel möglich ist.</p>
+<p class="head1">Coding</p>
+<p class="sap1">REPORT.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Selection Screen</span><br />
+PARAMETERS matnr TYPE ztest1-matnr DEFAULT &#8216;1234&#8217;.<br />
+PARAMETERS feld1 TYPE ztest1-feld1 DEFAULT &#8216;TESTFELD1&#8217;.<br />
+PARAMETERS feld2 TYPE ztest1-feld2 DEFAULT &#8216;Hier ist ein Test&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Macro für die Definition der notwendigen Tabellenstruktur</span><br />
+DEFINE _define_vim_tables.<br />
+data: begin of extract_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end   of extract_data.</p>
+<p class="sap1">  data: begin of total_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end of total_data.<br />
+END-OF-DEFINITION.</p>
+<p class="sap1">DATA:   sellist     LIKE vimsellist OCCURS 10 WITH HEADER LINE,<br />
+fu_to_excl  LIKE vimexclfun OCCURS 10 WITH HEADER LINE,<br />
+x_header    LIKE vimdesc    OCCURS 1,<br />
+x_namtab    LIKE vimnamtab  OCCURS 1,<br />
+hlp_sellist LIKE vimsellist OCCURS 0 WITH HEADER LINE,<br />
+corr_keytab LIKE e071k      OCCURS 0.</p>
+<p class="sap1">CONSTANTS viewname TYPE tabname VALUE &#8216;ZTEST1&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Definition der notwendigen Tabellen mit MARK- und ACTION-Flag</span><br />
+_define_vim_tables ztest1.</p>
+<p class="sap1">FIELD-SYMBOLS &lt;f&gt; TYPE ANY.</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufbau Selektionskriterien<br />
+</span>  CLEAR: sellist.<br />
+sellist-viewfield = &#8216;MATNR&#8217;.<br />
+sellist-operator  = &#8216;EQ&#8217;.<br />
+sellist-value     = matnr.<br />
+sellist-and_or    = space.<br />
+APPEND sellist.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Struktur der Tabelle ermitteln<br />
+</span>  CALL FUNCTION &#8216;VIEW_GET_DDIC_INFO&#8217;<br />
+EXPORTING<br />
+viewname        = viewname<br />
+TABLES<br />
+x_header        = x_header<br />
+x_namtab        = x_namtab<br />
+sellist         = hlp_sellist<br />
+EXCEPTIONS<br />
+no_tvdir_entry  = 3<br />
+table_not_found = 5.</p>
+<p class="sap1">  ASSIGN COMPONENT &#8216;MATNR&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = matnr.<br />
+ASSIGN COMPONENT &#8216;FELD1&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld1.<br />
+ASSIGN COMPONENT &#8216;FELD2&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld2.<br />
+ASSIGN COMPONENT &#8216;ACTION&#8217; OF STRUCTURE total_data TO &lt;f&gt;.<br />
+SELECT COUNT(*) FROM (viewname) WHERE matnr = matnr.<br />
+IF sy-subrc = 0.<br />
+<span style="color: #fb2412;">*== Satz ist vorhanden: Änderung</span><br />
+&lt;f&gt; = &#8216;U&#8217;.<br />
+ELSE.<br />
+<span style="color: #fb2412;">*== Satz ist neu<br />
+</span>    &lt;f&gt; = &#8216;N&#8217;.<br />
+ENDIF.<br />
+APPEND total_data.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufruf des Bausteins</span><br />
+CALL FUNCTION &#8216;VIEW_MAINTENANCE_LOW_LEVEL&#8217;<br />
+EXPORTING<br />
+corr_number               = &#8216; &#8216;<br />
+fcode                     = &#8216;SAVE&#8217;<br />
+view_action               = &#8216;U&#8217;<br />
+view_name                 = viewname<br />
+TABLES<br />
+corr_keytab               = corr_keytab<br />
+dba_sellist               = hlp_sellist<br />
+dpl_sellist               = hlp_sellist<br />
+excl_cua_funct            = fu_to_excl<br />
+extract                   = extract_data<br />
+total                     = total_data<br />
+x_header                  = x_header<br />
+x_namtab                  = x_namtab<br />
+EXCEPTIONS<br />
+function_not_found        = 1<br />
+missing_corr_number       = 2<br />
+no_value_for_subset_ident = 3<br />
+saving_correction_failed  = 4<br />
+OTHERS                    = 5.<br />
+IF sy-subrc = 0.<br />
+COMMIT WORK.<br />
+ENDIF.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

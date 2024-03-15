@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>import from database Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/import-from-database/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 19 Sep 2017 13:40:56 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>import from database Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Datenstrukturen EXPORT TO MEMORY</title>
+		<link>/blog/datenstrukturen-export-to-memory/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 19 Sep 2017 13:38:45 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[export to database]]></category>
+		<category><![CDATA[import from database]]></category>
+		<category><![CDATA[database]]></category>
+		<category><![CDATA[report]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018124</guid>
+
+					<description><![CDATA[<p>Die Befehle EXPORT TO MEMORY und IMPORT FROM MEMORY sind einfach zu benutzen und sind eine große Hilfe bei der Speicherung von Daten jeder Art. Bei der Verwendung solltest du dir jedoch über einige Dinge im Klaren sein. Ich beleuchte hier ein paar Aspekte der beiden mächtigen Befehle EXPORT und IMPORT.</p>
+<p>Der Beitrag <a href="/blog/datenstrukturen-export-to-memory/">Datenstrukturen EXPORT TO MEMORY</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Befehle EXPORT TO MEMORY und IMPORT FROM MEMORY sind einfach zu benutzen und sind eine große Hilfe bei der Speicherung von Daten jeder Art. Mit dem <em>Medium</em> DATABASE werden die Daten in einer <em>Clustertabelle</em> gespeichert. Die bekannteste ist INDX. Zusätzlich muss ein <em>Gebiet</em> angegeben werden (zweistelliges Kürzel) und eine <em>ID</em>.</p>
+<p>Mit folgendem kleinen Testprogramm zeige ich dir, wie du einen strukturierten Datensatz ablegen und wieder laden kannst.</p>
+<h2>Coding</h2>
+<pre class="lang:abap decode:true">REPORT.
+
+*== Typisierung der Datenstruktur
+TYPES: BEGIN OF ty_data,
+         key    TYPE matnr,
+         mara   TYPE mara,
+         t_mard TYPE STANDARD TABLE OF mard WITH DEFAULT KEY,
+         t_makt TYPE STANDARD TABLE OF makt WITH DEFAULT KEY,
+       END OF ty_data.
+
+*== Datenstruktur
+DATA s_data TYPE ty_data.
+
+*== Auswahl: Import oder Export der Daten
+PARAMETERS p_import RADIOBUTTON GROUP mode DEFAULT 'X'.
+PARAMETERS p_export RADIOBUTTON GROUP mode.
+*== Zu lesendes Element (MaterialnummeR)
+PARAMETERS p_matnr TYPE matnr DEFAULT '1000002'.
+
+START-OF-SELECTION.
+
+  CASE 'X'.
+    WHEN p_export.
+      "MARA-Daten lesen
+      SELECT SINGLE * FROM mara INTO @s_data-mara WHERE matnr = @p_matnr.
+      IF sy-subrc = 0.
+        "Schlüssel setzen
+        s_data-key = p_matnr.
+        "Zusätzliche Tabellen lesen
+        SELECT * FROM mard INTO TABLE @s_data-t_mard WHERE matnr = @p_matnr.
+        SELECT * FROM makt INTO TABLE @s_data-t_makt WHERE matnr = @p_matnr.
+        "Daten in INDX exportieren
+        EXPORT data FROM s_data TO DATABASE indx(z1) ID p_matnr.
+      ENDIF.
+
+    WHEN p_import.
+      "Exportierte Daten zum Schlüssel wieder einlesen
+      IMPORT data TO s_data FROM DATABASE indx(z1) ID p_matnr.
+  ENDCASE.
+
+  "Daten im Debugger überprüfen
+  BREAK-POINT.</pre>
+<p>Im Debugger sehen die Daten wie folgt aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/09/s_data.png"><img fetchpriority="high" decoding="async" class="alignnone wp-image-1018125 size-full" src="https://tricktresor.com/wp-content/uploads/2017/09/s_data.png" alt="" width="559" height="197" srcset="/wp-content/uploads/2017/09/s_data.png 559w, /wp-content/uploads/2017/09/s_data-300x106.png 300w" sizes="(max-width: 559px) 100vw, 559px" /></a></p>
+<h2>Vorteile</h2>
+<p>Die Handhabung der beiden Befehle zum Exportieren und Einlesen der Daten ist extrem einfach. Auf diese Weise können einfache Feldleisten, interne Tabellen oder auch komplexe Datenstrukturen unkompliziert in der Datenbank abgelegt werden.</p>
+<p>Die Testdaten zu Funktionsbausteinen werden übrigens auf diese Weise verwaltet (Clustertabelle EUFUNC und Gebiet FL).</p>
+<p>Die Technik gibt es bereits sehr lange und dürfte ausreichend schnell und sicher in der Anwendung sein.</p>
+<h2>Nachteile</h2>
+<h3>Änderbarkeit</h3>
+<p>Der große Nachteil bei der Verwendung: Die Datenstrukturen müssen immer gleich bleiben. Sobald sich die Datenstrukturen ändern, kann es sein, dass der Import alter Daten nicht mehr funktioniert. Die größte Chance auf alte Daten zuzugreifen hat man noch, wenn neue Felder ans Ende der Struktur gesetzt werden. Werden Objekte aus der Mitte der Struktur gelöscht oder eingefügt, kann die Zuordnung der Daten nicht mehr erfolgen. Es erfolgt der Laufzeitfehler CONNE_IMPORT_WRONG_COMP_TYPE. Die gute Nachricht: Du kannst den Laufzeitfehler mit der Ausnahme CX_SY_IMPORT_MISMATCH_ERROR abfangen. Die zweite gute Nachricht: es gibt eine ebenfalls recht komfortable Alternative: <a href="https://tricktresor.com/blog/daten-dynamisch-verwalten/">Daten dynamisch verwalten</a></p>
+<h3>Lesbarkeit</h3>
+<p>Die Daten werden in einem Datencluster abgespeichert. Dieser Cluster sieht in etwa folgendermaßen aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/09/indx.png"><img decoding="async" class="alignnone wp-image-1018126 size-large" src="https://tricktresor.com/wp-content/uploads/2017/09/indx-1024x500.png" alt="" width="640" height="313" srcset="/wp-content/uploads/2017/09/indx-1024x500.png 1024w, /wp-content/uploads/2017/09/indx-300x146.png 300w, /wp-content/uploads/2017/09/indx-768x375.png 768w, /wp-content/uploads/2017/09/indx.png 1047w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p>In der gespeicherten Tabelle kannst du also noch sehen, dass Einträge zu einer ID vorhanden sind, aber sie sind nicht mehr lesbar.</p>
+<h3>Typsisierung</h3>
+<p>Um die Daten aus der Clustertabelle wieder lesen zu können, musst du zwingend die Struktur der Daten kennen. Ansonsten wird es s o gut wie unmöglich, diese wieder sichtbar zu machen. Aber auch hier hilft der Tipp <a href="https://tricktresor.com/blog/daten-dynamisch-verwalten/">Daten dynamisch verwalten.</a></p>
+<h3>Aufruf der Befehle</h3>
+<p>Die Methode mit IMPORT TO DATABASE wird häufig in verschiedenen Programmen verwendet, um auf Daten zugreifen zu können, die eigentlich an anderer Stelle nicht mehr zur Verfügung stehen. Dadurch ist es häufig sehr schwer zu erkennen, wo das jeweilige Gegenstück des Befehls verwendet wird. Wenn du an einer Stelle über den IMPORT gestolpert bist, dann ist es eventuell sehr schwer, die Stelle zu finden, die den EXPORT macht und umgekehrt.</p>
+<p>Aber auch hier gibt es eine einfache Lösung. Sie bedeutet einen kleinen Aufwand, sollte aber in jedem Fall gemacht werden: Der EXPORT und IMPORT der Daten wird in eine eigene Klasse ausgelagert. Export und Import erfolgen jeweils über die gleichnamige Methode der Klasse. So sind EXPORT und IMPORT für ein Objekt an einer Stelle vorhanden. Zusätzlich kann über einen Verwendungsnachweis der Aufruf ermittelt werden.</p>
+<h2>Analyse</h2>
+<p>Der Grund für diesen Artikel ist allerdings, dass ich heute erst &#8211; nachdem ich den Befehl schon mehrere Jahre lang verwendet habe &#8211; erfahren habe, dass es einen Report gibt, der die Struktur der Daten ausgibt: RSINDX00</p>
+<p>Der Ausgabe des Reports sieht man sein Alter an&#8230; Erstellt wurde er vor über 15 Jahren. Aber, wenn alle Stricke reißen, so kann er eine gute Hilfe sein, um die gespeicherten Daten zu analysieren:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/09/rsindx00.png"><img decoding="async" class="alignnone size-full wp-image-1018127" src="https://tricktresor.com/wp-content/uploads/2017/09/rsindx00.png" alt="" width="662" height="728" srcset="/wp-content/uploads/2017/09/rsindx00.png 662w, /wp-content/uploads/2017/09/rsindx00-273x300.png 273w" sizes="(max-width: 662px) 100vw, 662px" /></a></p>
+<p>Der Beitrag <a href="/blog/datenstrukturen-export-to-memory/">Datenstrukturen EXPORT TO MEMORY</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

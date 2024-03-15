@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>control Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/control/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 29 Aug 2018 20:07:23 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>control Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Hacking SAPGUI</title>
+		<link>/blog/hacking-sapgui/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2018 18:10:48 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[event]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<category><![CDATA[control]]></category>
+		<category><![CDATA[cl_gui_picture]]></category>
+		<category><![CDATA[cl_gui_gos_container]]></category>
+		<category><![CDATA[Container]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019117</guid>
+
+					<description><![CDATA[<p>Heute bin ich zufällig auf etwas gestoßen, dass ich erst nicht glauben konnte. Aber eigentlich hätte es klar sein müssen. Ich zeige dir erst einmal ein Bild: Vielleicht ist deine erste Reaktion genauso wie meine: via GIPHY Folgende Controls verwende ich für diesen kleinen Hack: CL_GUI_PICTURE CL_GUI_GOS_CONTAINER Normalerweise wird der GOS-Container nicht explizit aufgerufen, sondern nur implizit von der Klasse CL_GOS_MANAGER verwendet. Container ist Container Im Generic Object Services Menü wird normalerweise ein Pull-Down-Menü angezeigt:...</p>
+<p>Der Beitrag <a href="/blog/hacking-sapgui/">Hacking SAPGUI</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Heute bin ich zufällig auf etwas gestoßen, dass ich erst nicht glauben konnte. Aber eigentlich hätte es klar sein müssen. Ich zeige dir erst einmal ein Bild:</p>
+
+
+
+<figure class="wp-block-image"><img fetchpriority="high" decoding="async" width="404" height="206" src="https://tricktresor.com/wp-content/uploads/2017/09/hacking_sapgui_0.png" alt="" class="wp-image-1019120" srcset="/wp-content/uploads/2017/09/hacking_sapgui_0.png 404w, /wp-content/uploads/2017/09/hacking_sapgui_0-300x153.png 300w" sizes="(max-width: 404px) 100vw, 404px" /><figcaption>Icon an ungewöhnlicher Stelle&#8230;</figcaption></figure>
+
+
+
+<p>Vielleicht ist deine erste Reaktion genauso wie meine:</p>
+
+
+
+<p><div style="width:80%;height:0;padding-bottom:74%;position:relative;"><iframe src="https://giphy.com/embed/glmRyiSI3v5E4" width="100%" height="100%" style="position:absolute" frameborder="0" class="giphy-embed" allowfullscreen></iframe></div><p><a href="https://giphy.com/gifs/glmRyiSI3v5E4">via GIPHY</a></p></p>
+
+
+
+<p>Folgende Controls verwende ich für diesen kleinen Hack:</p>
+
+
+
+<ul><li>CL_GUI_PICTURE</li><li>CL_GUI_GOS_CONTAINER</li></ul>
+
+
+
+<p>Normalerweise wird der GOS-Container nicht explizit aufgerufen, sondern nur implizit von der Klasse CL_GOS_MANAGER verwendet.</p>
+
+
+
+<h2 class="wp-block-heading">Container ist Container</h2>
+
+
+
+<p>Im Generic Object Services Menü wird normalerweise ein Pull-Down-Menü angezeigt:</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" width="320" height="289" src="https://tricktresor.com/wp-content/uploads/2018/08/gos1.png" alt="" class="wp-image-1019119" srcset="/wp-content/uploads/2018/08/gos1.png 320w, /wp-content/uploads/2018/08/gos1-300x271.png 300w" sizes="(max-width: 320px) 100vw, 320px" /><figcaption>Das GOS-Menü in Aktion</figcaption></figure>
+
+
+
+<p>In einem Menü können jedoch alle Controls angezeigt werden. Sinnvoll sind hier nur wenige, denn der GOS-Container ist ziemlich klein. Ein Menü passt dort gut hinein. Aber auch ein Bild oder Icon.</p>
+
+
+
+<h2 class="wp-block-heading">Anzeige Icon in Container</h2>
+
+
+
+<p>Die Anzeige eines Bildes oder Icons ist ziemlich simpel und schnell erledigt:</p>
+
+
+
+<pre class="wp-block-code"><code>REPORT.
+
+PARAMETERS p_test.
+
+INITIALIZATION.
+
+  DATA(picture) = NEW cl_gui_picture( parent = NEW cl_gui_gos_container( width = 38 ) ).
+  DATA url TYPE cndp_url.
+  CALL FUNCTION 'DP_PUBLISH_WWW_URL'
+    EXPORTING
+      objid                 = 'ACHTUNG'
+      lifetime              = cndp_lifetime_transaction
+    IMPORTING
+      url                   = url
+    EXCEPTIONS
+      dp_invalid_parameters = 1
+      no_object             = 2
+      dp_error_publish      = 3.
+  IF sy-subrc = 0.
+    picture->load_picture_from_url_async( url = url ).
+    picture->set_display_mode( picture->display_mode_fit ).
+  ENDIF.</code></pre>
+
+
+
+<h2 class="wp-block-heading">Da geht noch mehr&#8230;</h2>
+
+
+
+<p>Nachdem ich ein bisschen herumgespielt habe, ist mir eine Eigenschaft aufgefallen, die nicht ganz offensichtlich ist und die ich auch so nicht erwartet hätte. So, wie man mehrere Docking-Container an ein Dynpro andocken kann, so kann man auch den CL_GUI_GOS_CONTAINER mehrfach erzeugen.</p>
+
+
+
+<p>Zusätzlich können in einem Picture-Control auch die Klick- und Doppelklick-Ereignisse aktiviert und verwendet werden.</p>
+
+
+
+<p>Auch das Ein- und Ausblenden des Controls ist möglich (Methode SET_VISIBLE).</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<p>Folgendes kleine Programm zeigt die Möglichkeiten, die sich ergeben:</p>
+
+
+
+<figure class="wp-block-image"><img loading="lazy" decoding="async" width="418" height="203" src="https://tricktresor.com/wp-content/uploads/2018/08/hacking_sapgui_2.png" alt="" class="wp-image-1019121" srcset="/wp-content/uploads/2018/08/hacking_sapgui_2.png 418w, /wp-content/uploads/2018/08/hacking_sapgui_2-300x146.png 300w" sizes="(max-width: 418px) 100vw, 418px" /><figcaption>Mehrere GOS-Container</figcaption></figure>
+
+
+
+<p>Durch Klicken des Parameters P_SHOW wird das Bild &#8220;ACHTUNG&#8221; ein- und ausgeblendet. Ein Klick auf eines der Icons zeigt eine Info-Meldung. Ich nutze solch kleine Spielereien immer gerne, um mich an die neue Syntax zu gewöhnen und auszutesten, was möglich und sinnvoll ist. Hier habe ich die Gelegenheit am Schopfe gepackt und auch funktional programmiert, so dass Method-Chaining über mehrere Methoden hinweg auf ein und das selbe Objekt möglich ist. </p>
+
+
+
+<pre class="wp-block-code"><code>REPORT.
+
+PARAMETERS p_test.
+PARAMETERS p_show AS CHECKBOX DEFAULT 'X' USER-COMMAND dummy.
+
+CLASS info DEFINITION.
+  PUBLIC SECTION.
+    METHODS icon IMPORTING name TYPE clike RETURNING VALUE(info) TYPE REF TO info.
+    METHODS pic  IMPORTING name TYPE clike RETURNING VALUE(info) TYPE REF TO info.
+    METHODS constructor IMPORTING width TYPE i.
+    METHODS with_text IMPORTING text TYPE clike RETURNING VALUE(info) TYPE REF TO info..
+    METHODS hide.
+    METHODS show.
+  PROTECTED SECTION.
+    DATA picture TYPE REF TO cl_gui_picture.
+    METHODS handle_click FOR EVENT picture_click OF cl_gui_picture.
+    DATA text TYPE string.
+ENDCLASS.
+
+CLASS info IMPLEMENTATION.
+
+  METHOD constructor.
+    picture = NEW cl_gui_picture( parent = NEW cl_gui_gos_container( width = width ) ).
+    picture->set_registered_events( VALUE #(
+                ( eventid = cl_gui_picture=>eventid_picture_click )
+                ) ).
+    SET HANDLER handle_click FOR picture.
+  ENDMETHOD.
+  METHOD icon.
+
+    picture->load_picture_from_sap_icons( name ).
+    picture->set_display_mode( picture->display_mode_fit ).
+    info = me.
+  ENDMETHOD.
+  METHOD pic.
+    DATA url TYPE cndp_url.
+    CALL FUNCTION 'DP_PUBLISH_WWW_URL'
+      EXPORTING
+        objid                 = CONV w3objid( name )
+        lifetime              = cndp_lifetime_transaction
+      IMPORTING
+        url                   = url
+      EXCEPTIONS
+        dp_invalid_parameters = 1
+        no_object             = 2
+        dp_error_publish      = 3.
+    IF sy-subrc = 0.
+      picture->load_picture_from_url_async( url = url ).
+      picture->set_display_mode( picture->display_mode_fit ).
+    ENDIF.
+
+    info = me.
+
+  ENDMETHOD.
+
+  METHOD with_text.
+    me->text = text.
+    info = me.
+  ENDMETHOD.
+
+  METHOD handle_click.
+    CHECK text IS NOT INITIAL.
+    MESSAGE text TYPE 'I'.
+  ENDMETHOD.
+
+  METHOD hide.
+    picture->set_visible( space ).
+  ENDMETHOD.
+  METHOD show.
+    picture->set_visible( 'X' ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+INITIALIZATION.
+  DATA(info)   = NEW info( 38 )->pic( 'ACHTUNG' ).
+  DATA(green)  = NEW info( 39 )->icon( icon_led_green )->with_text( 'Alles ok' ).
+  DATA(yellow) = NEW info( 39 )->icon( icon_led_yellow )->with_text( 'hmpfffff' ).
+  DATA(red)    = NEW info( 39 )->icon( icon_led_red )->with_text( 'error. error. error.' ).
+
+
+AT SELECTION-SCREEN OUTPUT.
+  CASE p_show.
+    WHEN abap_true.
+      info->show( ).
+    WHEN abap_false.
+      info->hide( ).
+  ENDCASE.</code></pre>
+
+
+
+<h2 class="wp-block-heading">WTF?!</h2>
+
+
+
+<p>Man kann übrigens jedes Control in den Container packen! Auch Text-Edit-Controls und HTML-Viewer&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /> </p>
+
+
+
+<figure class="wp-block-image"><img loading="lazy" decoding="async" width="861" height="215" src="https://tricktresor.com/wp-content/uploads/2018/08/hacking_sapgui_text_and_html.png" alt="" class="wp-image-1019126" srcset="/wp-content/uploads/2018/08/hacking_sapgui_text_and_html.png 861w, /wp-content/uploads/2018/08/hacking_sapgui_text_and_html-300x75.png 300w, /wp-content/uploads/2018/08/hacking_sapgui_text_and_html-768x192.png 768w" sizes="(max-width: 861px) 100vw, 861px" /></figure>
+
+
+
+<pre class="wp-block-code"><code>REPORT.
+PARAMETERS p_test.
+INITIALIZATION.
+
+  DATA(html) = NEW cl_gui_html_viewer( parent = NEW cl_gui_gos_container( width = 400 ) ).
+
+  DATA url TYPE c LENGTH 100.
+  DATA data TYPE STANDARD TABLE OF w3_html.
+
+  data = VALUE #( ( '&lt;html>&lt;head>&lt;style>body { margin: 0; background-color: #f9f9f9; color: #666680; font: 20px "Arial"  }&lt;/style>'
+        &amp;&amp; '&lt;title>Hacking SAPGUI&lt;/title>&lt;/head>&lt;body background=#aabbcc>&lt;marquee behavior=alternate>tricktresor.com&lt;/marquee>&lt;/body>&lt;/html>' ) ).
+
+
+  html->load_data( IMPORTING assigned_url = url
+                    CHANGING data_table   = data ).
+  html->show_url( url ).
+
+  DATA(text) = NEW cl_gui_textedit( parent = NEW cl_gui_gos_container( width = 400 ) ).
+  text->set_statusbar_mode( 0 ).
+  text->set_toolbar_mode( 0 ).
+  text->set_textstream( `Enter your name` ).
+  text->select_lines( 1 ).
+  cl_gui_control=>set_focus( text ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">SALV-Grid</h3>
+
+
+
+<p>Für ein ALV ist sicherlich nicht genug Platz…? Denkste:</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="blob:https://tricktresor.com/1d0f4646-f08a-4d1f-8c1e-772edc0fba69" alt=""/></figure>
+
+
+
+<figure class="wp-block-image"><img loading="lazy" decoding="async" width="490" height="190" src="https://tricktresor.com/wp-content/uploads/2018/08/hacking_sapgui_salv.png" alt="" class="wp-image-1019129" srcset="/wp-content/uploads/2018/08/hacking_sapgui_salv.png 490w, /wp-content/uploads/2018/08/hacking_sapgui_salv-300x116.png 300w, /wp-content/uploads/2018/08/hacking_sapgui_salv-487x190.png 487w" sizes="(max-width: 490px) 100vw, 490px" /><figcaption>CL_SALV_TABLE in CL_GUI_GOS_CONTAINER</figcaption></figure>
+<p>Der Beitrag <a href="/blog/hacking-sapgui/">Hacking SAPGUI</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Controls stapeln</title>
+		<link>/blog/controls-stapeln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Mar 2017 19:56:15 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[cl_gui_control]]></category>
+		<category><![CDATA[control]]></category>
+		<category><![CDATA[sichtbarkeit]]></category>
+		<category><![CDATA[set_visible]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017943</guid>
+
+					<description><![CDATA[<p>Heute ist mir wieder eine kleine Spielerei unter die Finger gekommen, die einerseits wichtige Grundlagen zeigt und andererseits eine nette Spielerei ist, die durchaus einen Nutzwert hat. Es geht um die Anzeige und Steuerung von Controls.</p>
+<p>Der Beitrag <a href="/blog/controls-stapeln/">Controls stapeln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute ist mir wieder eine kleine Spielerei unter die Finger gekommen, die einerseits wichtige Grundlagen zeigt und andererseits eine nette Spielerei ist, die durchaus einen Nutzwert hat. Es geht um die Anzeige und Steuerung von Controls.</p>
+<p>Um ein Control anzeigen zu können, benötigt man einen Container. In diesem Beispiel verwende ich einen Docking-Container.</p>
+<pre class="">go_dock = NEW #( side = cl_gui_docking_container=&gt;dock_at_right ratio = 80 ).</pre>
+<p>In diesen Container hänge ich ein Text-Control.</p>
+<pre class="">go_text = NEW #( parent = go_dock ).</pre>
+<p>Allerdings ist das noch nichts Besonderes.</p>
+<h2>Controls stapeln</h2>
+<p>Besonders wird es, wenn ich noch ein ALV-Grid und noch ein Picture-Control in den gleichen Container packe.</p>
+<pre class="">" ALV-Grid
+go_grid = NEW #( i_parent = go_dock ).
+go_grid-&gt;set_table_for_first_display(
+  EXPORTING i_structure_name = 'T000'
+  CHANGING it_outtab = gt_data_alv ).
+
+" Picture
+go_pic = NEW cl_gui_picture( parent = go_dock ).</pre>
+<p>Die Controls sind nun gewissermaßen gestapelt. Sie liegen übereinander in dem Container. Das zuletzt instantiierte Control wird angezeigt. Die anderen Controls sind jedoch noch da! Und sie sind auch nutzbar. Man muss lediglich die jeweils darüber liegenden Controls auf &#8220;nicht sichtbar&#8221; stellen.</p>
+<p>Jedes Control hat die Methode SET_VISIBLE mit der man die Sichtbarkeit eines Controls steuern kann (Vererbung von CL_GUI_CONTROL). Jeder Container hat übrigens ebenfalls diese Eigenschaft (denn auch diese erben von CL_GUI_CONTROL)! Das heißt, es kann auch ein Docking-Container komplett ausgeblendet werden, ohne dass er wirklich &#8220;weg&#8221; ist.</p>
+<p>In seltenen Fällen kann man sich diesen Umstand zu Nutze machen. Bei diesem Trick verwende ich ein ähnliches Verfahren: Werte aus Excel per DOI (unsichtbar). Hier wird nur nicht der Container unsichtbar geschaltet, sondern das Control wird an ein Standard-Dynpro gehängt, dass nicht angezeigt wird.</p>
+<p>Man kann also dadurch, dass man nur das gewünschte Control auf &#8220;sichtbar&#8221; und alle anderen auf &#8220;unsichtbar&#8221; stellt, zwischen den einzelnen Control hin- und her schalten. Es ist dementsprechend nicht notwendig, das im Container befindliche Control zu zerstören und das neue aufzubauen um einen Wechsel zu realisieren.</p>
+<h2>Beliebter Fehler</h2>
+<p>Den Zustand, den ich hier bewusst und mit voller Absicht herbei führe, ist wahrscheinlich schon häufig die Ursache vieler verzweifelter Stunden im Debugger und einiger grauer Haare gewesen. Häufig passiert es nämlich (nicht nur Anfängern, sondern auch Profis!), dass man ein und dasselbe Control mehrfach instantiiert und dem gleichen Container zuordnet. Das macht SAP auch klaglos mit und stellt die neuen Control-Instanzen immer wieder in den Container hinein. Sichtbar ist einzig und allein das zuerst erzeugte Control.</p>
+<p>Das ist genau das tückische daran, denn durch diesen Umstand ergeben sich eine Vielzahl von Symptomen, die man sich auch nach stundenlangem Debugging häufig nicht erklären kann:</p>
+<ul>
+<li>Geänderte Daten werden nicht im ALV-Grid angezeigt</li>
+<li>Datenänderungen werden vom ALV nicht in die interne Tabelle übernommen</li>
+<li>Doppelklick funktioniert nicht mehr</li>
+<li>Änderungen am Control werden nicht sichtbar (geändertes Bild, Icon, aktualisierte Website, &#8230;)</li>
+</ul>
+<p>Sofern man daran denkt, dass der Fehler einer Mehrfach-Instantiierung vielleicht vorliegen könnte, kann man sehr leicht prüfen, ob das wirklich der Fall ist. Jeder Container hat das Attribut CHILDREN. In dieser Tabelle werden die dem Container zugeordneten Controls verwaltet:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-36-42.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017947 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-36-42.jpg" alt="" width="288" height="199" /></a></p>
+<p>Wenn man in seinem Programm zwar den Container nur einmal erzeugt, aber bei jedem Tastendruck (PAI) eventuell ein neues Control, dann könnte es so aussehen, wie hier:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-42-31.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017948 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-42-31.jpg" alt="" width="295" height="327" srcset="/wp-content/uploads/2017/03/2017-03-29_21-42-31.jpg 295w, /wp-content/uploads/2017/03/2017-03-29_21-42-31-271x300.jpg 271w" sizes="(max-width: 295px) 100vw, 295px" /></a></p>
+<p>[notice type=&#8217;info&#8217;]TIPP<br />
+In den meisten Fällen ist es sinnvoll und ausreichend, wenn man abfragt, ob der Container bereits erzeugt wurde. Falls er noch nicht erzeugt wurde (Programmstart etc.), dann erzeugt man den Container und auch gleich das Control.[/notice]</p>
+<p>Häufig treten solche Fehler auf, wenn man Codezeilen von einer Routine oder Methode in ein Programm-Ereignis kopiert oder umgekehrt. Auf einmal befindet sich der Codeabschnitt, der vorher nur einmal aufgerufen wurde, an einer Stelle im Programm, die mehrmals durchlaufen wird.</p>
+<h2>Screenshots</h2>
+<p>Die Anzeige wird über die entsprechenden Radiobuttons gesteuert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-17.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017946 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-17.jpg" alt="" width="690" height="525" srcset="/wp-content/uploads/2017/03/2017-03-29_21-37-17.jpg 690w, /wp-content/uploads/2017/03/2017-03-29_21-37-17-300x228.jpg 300w" sizes="(max-width: 690px) 100vw, 690px" /></a> <a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-37.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017945 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-37.jpg" alt="" width="690" height="525" srcset="/wp-content/uploads/2017/03/2017-03-29_21-37-37.jpg 690w, /wp-content/uploads/2017/03/2017-03-29_21-37-37-300x228.jpg 300w" sizes="(max-width: 690px) 100vw, 690px" /></a> <a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-48.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017944 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-48.jpg" alt="" width="690" height="525" srcset="/wp-content/uploads/2017/03/2017-03-29_21-37-48.jpg 690w, /wp-content/uploads/2017/03/2017-03-29_21-37-48-300x228.jpg 300w" sizes="(max-width: 690px) 100vw, 690px" /></a></p>
+<h2>Code</h2>
+<pre class="">REPORT zz_switch_controls.
+
+
+*== Data
+DATA gt_data_alv TYPE STANDARD TABLE OF t000 WITH NON-UNIQUE DEFAULT KEY.
+DATA go_dock TYPE REF TO cl_gui_docking_container.
+DATA go_text TYPE REF TO cl_gui_textedit.
+DATA go_grid TYPE REF TO cl_gui_alv_grid.
+DATA go_pic TYPE REF TO cl_gui_picture.
+
+*== Selektionsbild
+PARAMETERS: rb_text RADIOBUTTON GROUP rb1 DEFAULT 'X' USER-COMMAND space,
+ rb_grid RADIOBUTTON GROUP rb1,
+ rb_pic RADIOBUTTON GROUP rb1.
+
+AT SELECTION-SCREEN.
+ "steuern der controls
+  CASE 'X'.
+    WHEN rb_grid. 
+      go_text-&gt;set_visible( space ).
+      go_pic-&gt;set_visible( space ).
+      go_grid-&gt;set_visible( 'X' ).
+    WHEN rb_text.
+      go_text-&gt;set_visible( 'X' ).
+      go_pic-&gt;set_visible( space ).
+      go_grid-&gt;set_visible( space ).
+    WHEN rb_pic.
+      go_text-&gt;set_visible( space ).
+      go_pic-&gt;set_visible( 'X' ).
+      go_grid-&gt;set_visible( space ).
+  ENDCASE.
+
+INITIALIZATION.
+
+*== Docker
+ go_dock = NEW #( side = cl_gui_docking_container=&gt;dock_at_right ratio = 80 ).
+
+*== Textedit
+ go_text = NEW #( parent = go_dock ).
+
+*== ALV-Grid
+ SELECT *
+ INTO TABLE gt_data_alv
+ FROM t000.
+
+ go_grid = NEW #( i_parent = go_dock ).
+ go_grid-&gt;set_table_for_first_display(
+     EXPORTING i_structure_name = 'T000'
+     CHANGING it_outtab = gt_data_alv ).
+
+*== Picture
+ go_pic = NEW cl_gui_picture( parent = go_dock ).
+ go_pic-&gt;load_picture_from_sap_icons( icon_booking_ok ).
+ go_pic-&gt;set_display_mode( cl_gui_picture=&gt;display_mode_fit ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/controls-stapeln/">Controls stapeln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

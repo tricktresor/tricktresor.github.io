@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>GOS Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/gos/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 27 Feb 2018 17:09:29 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>GOS Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>GOS in eigenem Programm</title>
+		<link>/blog/gos-in-eigenem-programm/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 04 Mar 2010 11:51:06 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Generic Object Services]]></category>
+		<category><![CDATA[GOS]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=542</guid>
+
+					<description><![CDATA[<p>Mit einem einfachen Methodenaufruf ist es m&#246;glich, die generischen Objektdienste f&#252;r ein Objekt in eigene Programme einzubauen. In diesem Beispiel bieten wir in einem Report den Zugriff auf eine Materialnummer an.</p>
+<p>Der Beitrag <a href="/blog/gos-in-eigenem-programm/">GOS in eigenem Programm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit einem einfachen Methodenaufruf ist es möglich, die generischen Objektdienste für ein Objekt in eigene Programme einzubauen. In diesem Beispiel bieten wir in einem Report den Zugriff auf eine Materialnummer an.</p>
+<p>Der Service darf erst angeboten werden, wenn die Objektnummer feststeht. In unserem Beispiel also nicht auf dem Selektionsbild, sondern erst auf der Liste.</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true ">DATA gr_gos TYPE REF TO cl_gos_manager.
+DATA gs_object           TYPE borident.
+
+*** Selection screen
+PARAMETERS p_matnr TYPE matnr DEFAULT 'A100-100'.
+
+START-OF-SELECTION.
+
+*** assign BOR-key for material
+  MOVE  'BUS1001'  TO gs_object-objtype.
+  MOVE  p_matnr    TO gs_object-objkey.
+
+*** create service
+  CREATE OBJECT gr_gos
+    EXPORTING
+      is_object    = gs_object
+      ip_no_commit = space
+    EXCEPTIONS
+      OTHERS       = 1.
+
+*** Display list: GOS will be displayed
+  WRITE: / 'Tricktresor'.</pre>
+<p>&nbsp;</p>
+<p class="sap1">
+<p>Der Beitrag <a href="/blog/gos-in-eigenem-programm/">GOS in eigenem Programm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Generic Object Services</title>
+		<link>/blog/generic-object-services/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 17 Aug 2006 16:55:27 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Delta]]></category>
+		<category><![CDATA[GOS]]></category>
+		<category><![CDATA[Generic Object Services]]></category>
+		<category><![CDATA[Anhänge]]></category>
+		<category><![CDATA[attachments]]></category>
+		<category><![CDATA[cl_binary_relation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=374</guid>
+
+					<description><![CDATA[<p>Das Ablegen von Anh&#228;ngen an SAP-Standardtransaktionen hat sich zu Release 4.70 komplett ge&#228;ndert. Konnte man vorher die Anh&#228;nge mit dem Funktionsbaustein SREL_GET_NEXT_RELATIONS lesen, ist zu 4.70 eine andere Vorgensweise vonn&#246;ten.</p>
+<p>Der Beitrag <a href="/blog/generic-object-services/">Generic Object Services</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Ablegen von Anhängen an SAP-Standardtransaktionen hat sich zu Release 4.70 komplett geändert. Konnte man vorher die Anhänge mit dem Funktionsbaustein SREL_GET_NEXT_RELATIONS lesen, ist zu 4.70 eine andere Vorgehensweise vonnöten.</p>
+<p>In den meisten SAP-Standardtransaktionen können Anhänge angefügt werden. Dazu geht man unter Menü &#8220;System &#8211; Verknüpfungen&#8221; und kann Notizen, Bilder oder andere Dateien zuordnen.</p>
+<p>Gelesen werden diese im Release 4.5 z.B. mit dem Funktionsbaustein SREL_GET_NEXT_RELATIONS:</p>
+<pre class="lang:abap decode:true ">*** Anhänge zur Qualitätsmeldung lesen
+  gs_objects-objkey  = gv_qmnum.
+  gs_objects-objtype = 'BUS2078'.  "Q-Meldung
+  CALL FUNCTION 'SREL_GET_NEXT_RELATIONS'
+    EXPORTING
+      object         = gs_objects
+    TABLES
+      links          = gt_links
+      roles          = gt_roles
+    EXCEPTIONS
+      internal_error = 1
+      OTHERS         = 2.</pre>
+<p>&nbsp;</p>
+<p>Ab Release 4.70 (oder 4.6) erhält man aber keine Ergebnisse, wenn die Anhänge über den sogenannten &#8220;Generischen Objektdienst&#8221; (GOS) gespeichert wurden.</p>
+<p>Siehe Hierzu auch den Artikel &#8220;<a href="https://tricktresor.com/content/index.php?aID=294" target="_self">Generic Object Services</a>&#8220;.</p>
+<p>Die Anhänge müssen nun wie folgt ermittelt werden (Anregung aus dem OSS-Hinweis &#8220;632997 Belegfluß: Anlagen, Notizen, URLs nicht angezeigt&#8221;):</p>
+<pre class="lang:abap decode:true ">DATA: l_sysid             LIKE tbdls-logsys.
+DATA: lt_relation_options TYPE obl_t_relt.
+DATA: ls_relation_options TYPE obl_s_relt.
+DATA: l_object            TYPE sibflporb.
+DATA: lt_links            TYPE obl_t_link.
+DATA: ls_links            TYPE obl_s_link.
+DATA: lt_roles            TYPE obl_t_role.
+DATA: ls_roles            TYPE obl_s_role.
+
+*--- Beschaffung der "Logischen System-ID" für F-Leiste L_BORIDENT
+CALL FUNCTION 'OWN_LOGICAL_SYSTEM_GET'
+  IMPORTING
+    own_logical_system             = l_sysid
+  EXCEPTIONS
+    own_logical_system_not_defined = 0.
+
+*--- Ermitteln der Verknüpfungen, die über die neue Technik zugeordnet
+*--- wurden GOS Attachments, URLs und Notizen
+l_object-typeid = 'BUS2078'.
+l_object-instid = p_qmnum.
+l_object-catid  = 'BO'.
+ls_relation_options-sign   = 'I'.
+ls_relation_options-option = 'EQ'.
+ls_relation_options-low    = 'ATTA'.
+APPEND ls_relation_options TO lt_relation_options.
+ls_relation_options-low    = 'NOTE'.
+APPEND ls_relation_options TO lt_relation_options.
+ls_relation_options-low    = 'URL'.
+APPEND ls_relation_options TO lt_relation_options.
+
+TRY.
+*--- Lesen der Verknüpften Objekte
+    CALL METHOD cl_binary_relation=&gt;read_links_of_binrels
+      EXPORTING
+        is_object           = l_object
+        ip_logsys           = l_sysid
+        it_relation_options = lt_relation_options
+      IMPORTING
+        et_links            = lt_links
+        et_roles            = lt_roles.
+  CATCH cx_obl_parameter_error .
+  CATCH cx_obl_internal_error .
+  CATCH cx_obl_model_error .
+ENDTRY.</pre>
+<h2>Weiterführende Infos</h2>
+<p>Hilfreich ist eventuell auch die Klasse CL_ATTACHMENT_LIST.</p>
+<p>Mithilfe des Funktionsbausteins BDS_ALL_CONNECTIONS_GET kann ermittelt werden, wieviele Dokumente vorhanden sind.</p>
+<p>Weitere Doku im SDN &#8220;HOW TO ATTACH DOCUMENTS TO ANY CUSTOM PROGRAM USING GENERIC OBJECT SERVICES&#8221;:  <a href="http://www.sdn.sap.com/irj/scn/go/portal/prtroot/docs/library/uuid/0e6b0d95-0a01-0010-4696-ca0a48de5fb3" target="_blank" rel="noopener noreferrer">http://www.sdn.sap.com/irj/scn/go/portal/prtroot/docs/library/uuid/0e6b0d95-0a01-0010-4696-ca0a48de5fb3</a></p>
+<p>Der Beitrag <a href="/blog/generic-object-services/">Generic Object Services</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Generic Object Services</title>
+		<link>/blog/generic-object-services-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 25 Nov 2004 11:23:16 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Generic Object Services]]></category>
+		<category><![CDATA[GOS]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=294</guid>
+
+					<description><![CDATA[<p>Hier demonstrieren wir Ihnen, wie Sie den Knopf "Generische Objektdienste", der in einigen Standardtransaktionen verwendet wird, um Notizen oder den Workflow zu bearbeiten, in Ihre eigenen Programme einbauen k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/generic-object-services-2/">Generic Object Services</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier demonstrieren wir Ihnen, wie Sie den Knopf &#8220;Generische Objektdienste&#8221;, der in einigen Standardtransaktionen verwendet wird, um Notizen oder den Workflow zu bearbeiten, in Ihre eigenen Programme einbauen k&ouml;nnen.<br /><P>In diesem Beispiel beziehen sich die generischen Objektdienste auf das Eingabefeld &#8220;Materialnummer&#8221; im Programm. Das ist in diesem Sinne nat&uuml;rlich nicht &#8220;generisch&#8221;, verdeutlicht aber die Vorgehensweise.</P><P>Sie k&ouml;nnen die Objektdienste einfach in jedem Programm einbinden, indem Sie das Coding als Include in Ihre eigenen Programme einbinden. Achten Sie jedoch darauf, dass die Objekte zum Zeitpunkt &#8220;INITIALIZATION&#8221; erzeugt werden. Das bedeutet, dass Sie das Coding hierf&uuml;r eventuell in einen anderen Include packen sollten, um in Ihren Programmen auch weiterhin den Zeitpunkt &#8220;INITIALIZATION&#8221; verwenden k&ouml;nnen.</P><P>Vielen Dank an Haubi f&uuml;r das Coding!!</P><P>Weiterf&uuml;hrende Informationen stehen hier: <BR><A href="http://help.sap.com/printdocu/core/Print46c/de/data/pdf/BCSRVOBS/BCSRVOBS.pdf" Target="_blank">http://help.sap.com/printdocu/<BR>core/Print46c/de/data/pdf/BCSRVOBS/BCSRVOBS.pdf</A></P><P class="head1">Coding</P><P class="sap1">REPORT Z_GOS_CONTAINTER.<BR><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp; Report&nbsp; Z_GOS_CONTAINTER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>PARAMETERS: p_matnr TYPE matnr.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS lcl_event_receiver DEFINITION<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp; Handler fuer Events der Toolbar<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>CLASS lcl_event_receiver DEFINITION.</P><P class="sap1">&nbsp; PUBLIC SECTION.</P><P class="sap1">&nbsp;&nbsp;&nbsp; DATA<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Toolbar</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : x_tb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO cl_gui_toolbar</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Kontextmen&uuml;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , x_ctmenu&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO cl_ctmenu.</P><P class="sap1">&nbsp;&nbsp;&nbsp; METHODS<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Konstruktor</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : constructor<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ix_cont&nbsp;&nbsp; TYPE REF TO cl_gui_gos_container</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Handling des Dropdown-Men&uuml;s zum einzigen Button</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , eh_dropdown_clicked<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FOR EVENT dropdown_clicked OF cl_gui_toolbar<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fcode<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; posx<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; posy</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Handler f&uuml;r Funktionscodes zum Kontextmen&uuml;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , eh_function_selected<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FOR EVENT function_selected OF cl_gui_toolbar<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fcode.<BR>ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;lcl_event_receiver DEFINITION</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS lcl_event_receiver IMPLEMENTATION<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp; Handler fuer Events der Toolbar<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>CLASS lcl_event_receiver IMPLEMENTATION.</P><P class="sap1">&nbsp; METHOD constructor.</P><P class="sap1">&nbsp;&nbsp;&nbsp; DATA<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Feld f&uuml;r Icon-ID<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : l_id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE icon_d</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tabelle der zu behandelnden Events der Toolbar</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , lt_events TYPE cntl_simple_events<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , ls_events TYPE cntl_simple_event.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp; Toolbar erstellen</FONT><BR>&nbsp;&nbsp;&nbsp; CREATE OBJECT x_tb<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ix_cont<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntl_install_error = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntl_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntb_wrong_version = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4.</P><P class="sap1">&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE a001(00) WITH &#8216;Control-Fehler, SY-SUBRC=&#8217; sy-subrc.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp; Icon holen</FONT><BR>&nbsp;&nbsp;&nbsp; SELECT SINGLE id<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FROM&nbsp; icon<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INTO&nbsp; l_id<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHERE name EQ &#8216;ICON_ANNOTATION&#8217;.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp; Dropdown-Button zur Toolbar hinzuf&uuml;gen</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD x_tb-&gt;add_button<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fcode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;DROPDOWN&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icon&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = l_id<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; butn_type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntl_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntb_btype_error = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntb_error_fcode = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4.</P><P class="sap1">&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE a001(00) WITH &#8216;Control-Fehler, SY-SUBRC=&#8217; sy-subrc.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp; Tabelle der zu behandelnden Events f&uuml;llen</FONT><BR>&nbsp;&nbsp;&nbsp; MOVE: x_tb-&gt;m_id_dropdown_clicked&nbsp; TO ls_events-eventid.<BR>&nbsp;&nbsp;&nbsp; APPEND ls_events TO lt_events.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp; FUNCTION_SELECTED als Applikationsevent (damit PAI ausgef&uuml;hrt wird)</FONT><BR>&nbsp;&nbsp;&nbsp; MOVE: x_tb-&gt;m_id_function_selected TO ls_events-eventid<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , &#8216;X&#8217;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TO ls_events-appl_event.<BR>&nbsp;&nbsp;&nbsp; APPEND ls_events TO lt_events.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp; Events registrieren</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD x_tb-&gt;set_registered_events<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; events&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_events<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntl_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntl_system_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; illegal_event_combination = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE a001(00) WITH &#8216;Control-Fehler, SY-SUBRC=&#8217; sy-subrc.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp; Behandler setzen</FONT><BR>&nbsp;&nbsp;&nbsp; SET HANDLER me-&gt;eh_dropdown_clicked&nbsp; FOR me-&gt;x_tb.<BR>&nbsp;&nbsp;&nbsp; SET HANDLER me-&gt;eh_function_selected FOR me-&gt;x_tb.<BR>&nbsp; ENDMETHOD.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;constructor</P><P class="sap1">&nbsp; METHOD eh_dropdown_clicked.</P><P class="sap1">&nbsp;&nbsp;&nbsp; CASE fcode.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;DROPDOWN&#8217;.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Dropdown-Button geklickt<BR>*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Kontextmen&uuml; anlegen, sofern noch nicht geschehen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF x_ctmenu IS INITIAL.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CREATE OBJECT x_ctmenu.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Kontextmen&uuml; leeren</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL METHOD x_ctmenu-&gt;clear.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Neues Men&uuml; aufbauen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL METHOD x_ctmenu-&gt;add_function<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fcode = &#8216;CTMM03&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text&nbsp; = &#8216;Materialstamm&#8217;.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL METHOD x_ctmenu-&gt;add_function<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fcode = &#8216;CTCS03&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text&nbsp; = &#8216;St&uuml;ckliste&#8217;.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL METHOD x_ctmenu-&gt;add_separator.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL METHOD x_ctmenu-&gt;add_function<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fcode = &#8216;CTEXIT&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text&nbsp; = &#8216;Verlassen&#8217;.</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Handler zum Kontextmen&uuml; an Toolbar &uuml;bergeben. Die Funktions-<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; codes werden dann &uuml;ber FUNCTION_SELECTED gehandelt.<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL METHOD x_tb-&gt;track_context_menu<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; context_menu = x_ctmenu<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; posx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = posx<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; posy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = posy.</P><P class="sap1">&nbsp;&nbsp;&nbsp; ENDCASE.<BR>&nbsp; ENDMETHOD.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;eh_dropdown_clicked</P><P class="sap1">&nbsp; METHOD eh_function_selected.</P><P class="sap1">&nbsp;&nbsp;&nbsp; CASE fcode.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;CTMM03&#8217;.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Aufruf der Materialstammanzeige<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SET PARAMETER ID &#8216;MAT&#8217; FIELD p_matnr.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL TRANSACTION &#8216;MM03&#8217;.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;CTCS03&#8217;.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Aufruf der St&uuml;cklistenanzeige</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SET PARAMETER ID &#8216;MAT&#8217; FIELD p_matnr.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL TRANSACTION &#8216;CS03&#8217;.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;CTEXIT&#8217;.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Verlassen des Programms</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LEAVE PROGRAM.<BR>&nbsp;&nbsp;&nbsp; ENDCASE.</P><P class="sap1">&nbsp; ENDMETHOD.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;eh_FUNCTION_SELECTED</P><P class="sap1">ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;lcl_event_erceiver IMPLEMENTATION</P><P class="sap1">DATA<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Referenz auf den GOS-Container</FONT><BR>&nbsp;&nbsp;&nbsp; : gx_gos TYPE REF TO cl_gui_gos_container</P><P class="sap1"><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Referenz auf den lokalen Eventhandler</FONT><BR>&nbsp;&nbsp;&nbsp; , gx_er&nbsp; TYPE REF TO lcl_event_receiver.</P><P class="sap1">INITIALIZATION.</P><P class="sap1">&nbsp; CREATE OBJECT gx_gos<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntl_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cntl_system_error = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; create_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lifetime_error&nbsp;&nbsp;&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 5.</P><P class="sap1">&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp; MESSAGE a001(00) WITH &#8216;Control-Fehler, SY-SUBRC=&#8217; sy-subrc.<BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; CREATE OBJECT gx_er<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING ix_cont = gx_gos.</P></p>
+<p>Der Beitrag <a href="/blog/generic-object-services-2/">Generic Object Services</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Joins Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/joins/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 07 May 2020 16:32:34 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Joins Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Falle beim Left Outer Join</title>
+		<link>/blog/falle-beim-left-outer-join/</link>
+					<comments>/blog/falle-beim-left-outer-join/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 16 Jun 2017 13:26:48 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Joins]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[left outer join]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018037</guid>
+
+					<description><![CDATA[<p>Häufig sind es die Kleinigkeiten, die einem das Leben schwer machen. Die berühmten letzten 20%. Häufig bemerkt man jedoch gar nicht, dass man überhaupt ein Problem hat, weil alles scheinbar so funktioniert, wie man es sich vorstellt. Aufgabe: SELECT Die Aufgabe sollte sein: Selektiere aus Tabelle ZZT1 alle Einträge anhand der gegebenen Selektionskriterien (AREA). Lies zusätzlich mit einem LEFT OUTER JOIN alle Einträge aus Tabelle ZZT2, die über das Feld LINK verknüpft sind hinzu. Einträge...</p>
+<p>Der Beitrag <a href="/blog/falle-beim-left-outer-join/">Falle beim Left Outer Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Häufig sind es die Kleinigkeiten, die einem das Leben schwer machen. Die berühmten letzten 20%. Häufig bemerkt man jedoch gar nicht, dass man überhaupt ein Problem hat, weil alles scheinbar so funktioniert, wie man es sich vorstellt.</p>
+<h2>Aufgabe: SELECT</h2>
+<p>Die Aufgabe sollte sein: Selektiere aus Tabelle ZZT1 alle Einträge anhand der gegebenen Selektionskriterien (AREA). Lies zusätzlich mit einem LEFT OUTER JOIN alle Einträge aus Tabelle ZZT2, die über das Feld LINK verknüpft sind hinzu. Einträge aus Tabelle ZZT2 mit gesetztem Löschkennzeichen dürfen nicht berücksichtigt werden.</p>
+<h2>Demodaten</h2>
+<p>Die folgenden Demodaten stehen zur Verfügung:</p>
+<ul>
+<li>Tabelle ZZT1</li>
+<li>Tabelle ZZT2</li>
+</ul>
+<p>Selektionskriterium soll sein: AREA = TEST</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/06/SNAG-0002.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018041" src="https://tricktresor.com/wp-content/uploads/2017/06/SNAG-0002.png" alt="" width="558" height="310" srcset="/wp-content/uploads/2017/06/SNAG-0002.png 558w, /wp-content/uploads/2017/06/SNAG-0002-300x167.png 300w, /wp-content/uploads/2017/06/SNAG-0002-71x40.png 71w" sizes="(max-width: 558px) 100vw, 558px" /></a></p>
+<h3>Tabelle ZZT1 (links)</h3>
+<table border="1" cellpadding="4">
+<thead>
+<tr>
+<td style="text-align: center;" width="151"><strong>KEY1</strong></td>
+<td style="text-align: center;" width="151"><strong>TEXT</strong></td>
+<td style="text-align: center;" width="151"><strong>LINK</strong></td>
+<td style="text-align: center;" width="151"><strong>AREA</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;" width="151">1</td>
+<td style="text-align: center;" width="151">Eins</td>
+<td style="text-align: center;" width="151">A</td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">2</td>
+<td style="text-align: center;" width="151">Zwei</td>
+<td style="text-align: center;" width="151">B</td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">3</td>
+<td style="text-align: center;" width="151">Drei</td>
+<td style="text-align: center;" width="151">C</td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">4</td>
+<td style="text-align: center;" width="151">Vier</td>
+<td style="text-align: center;" width="151"></td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">5</td>
+<td style="text-align: center;" width="151">Fünf</td>
+<td style="text-align: center;" width="151">A</td>
+<td style="text-align: center;" width="151">NEU</td>
+</tr>
+</tbody>
+</table>
+<h3>Tabelle ZTT2 (rechts)</h3>
+<table border="1" cellpadding="4">
+<thead>
+<tr>
+<td style="text-align: center;" width="201"><strong>LINK</strong></td>
+<td style="text-align: center;" width="201"><strong>TEXT</strong></td>
+<td style="text-align: center;" width="201"><strong>LOEVM</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;" width="201">A</td>
+<td style="text-align: center;" width="201">Info A</td>
+<td style="text-align: center;" width="201"></td>
+</tr>
+<tr>
+<td style="text-align: center;" width="201">B</td>
+<td style="text-align: center;" width="201">Info B</td>
+<td style="text-align: center;" width="201">X</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="201">C</td>
+<td style="text-align: center;" width="201">Info C</td>
+<td style="text-align: center;" width="201"></td>
+</tr>
+</tbody>
+</table>
+<h2>Überlegungen</h2>
+<p>Wenn aus Tabelle ZZT1 alle Einträge selektiert werden, bei denen das Feld AREA mit &#8220;TEST&#8221; gefüllt ist, dann erwarte ich, dass die folgenden Einträge selektiert werden: 1, 2, 3 und 4.</p>
+<p>Zusätzlich muss bei den Einträgen 1 und 3 der LINK_TEXT gefüllt sein, denn diese Einträge verweisen auf Einträge in Tabelle ZZT2, die keine Löschvormerkung haben.</p>
+<h3>Erster Versuch</h3>
+<p>Der erste Wurf sieht folgendermaßen aus:</p>
+<pre class="lang:abap decode:true">SELECT z1~key1,
+       z1~text,
+       z1~link,
+       z1~area,
+       z2~text AS link_text
+  FROM zzt1 AS z1
+  LEFT OUTER JOIN zzt2 AS z2 ON z1~link = z2~link
+  INTO TABLE @DATA(t_data)
+ WHERE z1~area  = 'TEST'.
+   AND z2~loevm = @space.</pre>
+<p>Der SELECT ist syntaktisch (!) fehlerfrei, liefert jedoch leider ein falsches Ergebnis:</p>
+<table title="ABAP Data" border="1" summary="data display" cellpadding="4">
+<thead>
+<tr class="header">
+<td><strong>KEY1</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>LINK</strong></td>
+<td><strong>AREA</strong></td>
+<td><strong>LINK_TEXT</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr class="body">
+<td><span class="nowrap">1</span></td>
+<td><span class="nowrap">Eins</span></td>
+<td><span class="nowrap">A</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info A</span></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">3</span></td>
+<td><span class="nowrap">Drei</span></td>
+<td><span class="nowrap">C</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info C</span></td>
+</tr>
+</tbody>
+</table>
+<h3>Zweiter Versuch</h3>
+<p>Ohne die Einschränkung über die WHERE-Bedingung auf der rechten Seite (AND z2~loevm = @space) funktioniert die Selektion wie erwartet.</p>
+<p>Das ist nicht ganz das, was ich erwartet habe&#8230; Ich habe mich dann damit beschäftigt, warum das Ergebnis so aussieht und warum Ergebniszeilen fehlen. Beziehungsweise habe ich zuerst versucht, das richtige Ergebnis zu bekommen. Der richtige Select lautet so:</p>
+<pre class="lang:abap decode:true ">SELECT z1~key1,
+       z1~text,
+       z1~link,
+       z1~area,
+       z2~text AS link_text
+  FROM zzt1 AS z1
+  LEFT OUTER JOIN zzt2 AS z2 ON z1~link = z2~link
+                            AND z2~loevm = @space
+  INTO TABLE @DATA(t_data)
+ WHERE z1~area = 'TEST'.</pre>
+<p><strong>Ergebnis:</strong></p>
+<table title="ABAP Data" border="1" summary="data display" cellpadding="4">
+<thead>
+<tr class="header">
+<td><strong>KEY1</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>LINK</strong></td>
+<td><strong>AREA</strong></td>
+<td><strong>LINK_TEXT</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr class="body">
+<td><span class="nowrap">1</span></td>
+<td><span class="nowrap">Eins</span></td>
+<td><span class="nowrap">A</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info A</span></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">2</span></td>
+<td><span class="nowrap">Zwei</span></td>
+<td><span class="nowrap">B</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">3</span></td>
+<td><span class="nowrap">Drei</span></td>
+<td><span class="nowrap">C</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info C</span></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">4</span></td>
+<td><span class="nowrap">Vier</span></td>
+<td></td>
+<td><span class="nowrap">TEST</span></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>Lessons learned</h2>
+<p>Bei einem LEFT OUTER JOIN darf die WHERE-Bedingung keine Einschränkung auf die rechte Tabelle haben. In der <a href="https://help.sap.com/http.svc/rc/abapdocu_750_index_htm/7.50/de-DE/abapselect_join.htm">Hilfe zum JOIN</a> steht:</p>
+<blockquote><p>Eine WHERE-Bedingung für eine SELECT-Anweisung mit Joins wirkt auf die durch die Joins gebildete Ergebnismenge.</p></blockquote>
+<p>Ich deute das so, dass die WHERE-Bedingung sozusagen erst nachträglich angewendet wird. Wobei das für mich ein Zirkelschluss ist, den ich nicht verstehe. Zudem enthält die Ergebnismenge ja gar kein Feld &#8220;LOEVM&#8221;.</p>
+<p>Auf jeden Fall sollte man die Verwendung beziehungsweise die gesammelten Daten eines LEFT OUTER JOINS sehr genau prüfen. Schnell schleicht sich hier ein Fehler ein, mit dem man nicht gerechnet hat.</p>
+<p>Der Beitrag <a href="/blog/falle-beim-left-outer-join/">Falle beim Left Outer Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/falle-beim-left-outer-join/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Jobinformationen</title>
+		<link>/blog/jobinformationen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 15 Oct 2008 12:00:15 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<category><![CDATA[Joins]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=511</guid>
+
+					<description><![CDATA[<p>Um herauszufinden, ob ein Programm per Job ausgef&#252;hrt wird, ist nicht schwer: SY-BATCH ist gesetzt. Welcher Job das Programm ausf&#252;hrt ist auch nicht schwer herauszufinden...</p>
+<p>Der Beitrag <a href="/blog/jobinformationen/">Jobinformationen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um herauszufinden, ob ein Programm per Job ausgef&uuml;hrt wird, ist nicht schwer: SY-BATCH ist gesetzt. Welcher Job das Programm ausf&uuml;hrt ist auch nicht schwer herauszufinden&#8230;<br />Rufen Sie einfach den Funktionsbaustein GET_JOB_RUNTIME_INFO auf. Sie erhalten dann die Job-ID, den Jobnamen sowie den aktuellen Step des Jobs.</p>
+<p>Der Beitrag <a href="/blog/jobinformationen/">Jobinformationen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Join-Testprogramm</title>
+		<link>/blog/join-testprogramm/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 22 Oct 2007 19:32:35 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Joins]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=442</guid>
+
+					<description><![CDATA[<p>Jayanta Narayan Choudhuri aus Indien hat ein n&#252;tzliches Tool geschrieben, mit dem man Open-SQL als auch Native-SQL Select-Anweisungen testen kann. In einem Editor wird das SELECT-Statement eingegeben und das Ergebnis wird in einem ALV-Grid angezeigt. </p>
+<p>Der Beitrag <a href="/blog/join-testprogramm/">Join-Testprogramm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Jayanta Narayan Choudhuri aus Indien hat ein n&uuml;tzliches Tool geschrieben, mit dem man Open-SQL als auch Native-SQL Select-Anweisungen testen kann. In einem Editor wird das SELECT-Statement eingegeben und das Ergebnis wird in einem ALV-Grid angezeigt. <br /><P>In der neuen Version kann das Tool sogar als Mini-Reportwriter verwendet werden. </P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/abap/sql_1.jpg"><BR>So sieht ein Join aus</P></TD></TR></TBODY></TABLE></P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/abap/sql_2.jpg"><BR>Und das ist das Ergebnis dazu</P></TD></TR></TBODY></TABLE></P><P><A href="https://tricktresor.com/wp-content/downloads/Yes4SQL.zip" target="_blank" Target="_blank"><STRONG>Hier ist die Original ZIP-Datei mit Screenshot, Coding und Beispielen.</STRONG></A></P><P>Auf der&nbsp;der Homepage des Autors finden Sie eventuell noch weitere n&uuml;tzliche Tipps: <A href="http://www.geocities.com/ojnc" Target="_blank">http://www.geocities.com/ojnc</A></P><P>Wer die Kennwortabfrage aus dem Coding nicht selbst herausnimmt ist selber schuld und muss das Kennwort HLTHCHEK benutzen.</P></p>
+<p>Der Beitrag <a href="/blog/join-testprogramm/">Join-Testprogramm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Join über gleiche Tabelle</title>
+		<link>/blog/join-ueber-gleiche-tabelle/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 11 Oct 2007 12:59:40 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Joins]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=440</guid>
+
+					<description><![CDATA[<p>Normalerweise verwendet man einen Join, um mehrere Tabellen miteinander zu verbinden. Man kann ihn jedoch dazu missbrauchen, um unterschiedliche Eintr&#228;ge der gleichen Tabelle zu selektieren!</p>
+<p>Der Beitrag <a href="/blog/join-ueber-gleiche-tabelle/">Join über gleiche Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Normalerweise verwendet man einen Join, um mehrere Tabellen miteinander zu verbinden. Man kann ihn jedoch dazu missbrauchen, um unterschiedliche Einträge der gleichen Tabelle zu selektieren!</p>
+<p>Ein Anwendungsbeispiel wäre dieses hier: Sie haben einen Fertigungsauftrags und möchten alle Aufträge selektieren, die <strong>freigegeben</strong> und <strong>gedruckt</strong> sind.</p>
+<p>In der Tabelle JEST steht der Status zum Objekt &#8220;Auftrag&#8221;. Dabei stehen hier nicht die sprachspezifischen vierstelligen Kürzel <strong>FREI</strong> und <strong>DRUC</strong>, sondern die internen Bezeichner <strong>I0002</strong> und <strong>I0007</strong>. Die Umsetzung steht in Tabelle TJ02.</p>
+<p>Mithilfe des Alias-Zusatzes beim Join können wir die gleiche Tabelle unter verschiedenen Namen ansprechen:</p>
+<pre class="sap1">  SELECT aufk~aufnr aufk~objnr
+    INTO TABLE lt_aufnr
+    FROM aufk
+   INNER JOIN jest <span style="color: #fb2412;">AS s_frei</span> ON aufk~objnr = <span style="color: #fb2412;">s_frei</span>~objnr
+   INNER JOIN jest <span style="color: #fb2412;">AS s_druc</span> ON aufk~objnr = <span style="color: #fb2412;">s_druc</span>~objnr
+   WHERE aufk~auart   = 'ZV01'
+     AND <span style="color: #fb2412;">s_frei</span>~stat  = 'I0002' AND <span style="color: #fb2412;">s_frei</span>~inact = space
+     AND <span style="color: #fb2412;">s_druc</span>~stat  = 'I0007' AND <span style="color: #fb2412;">s_druc</span>~inact = space.
+  IF sy-subrc = 0.
+    WRITE: / sy-dbcnt, 'Aufträge mit Status FREI DRUC gefunden'.
+  ELSE.
+    WRITE: / 'Keine Aufträge gefunden mit Status FREI DRUC'.
+  ENDIF.</pre>
+<p><strong><u>Hinweis:</u></strong><br />
+In diesem speziellen Beispiel müssen Sie allerdings vorsichtig sein! Sie können den Fall nicht umkehren und alle freigegebenen Aufträge suchen, die <strong>noch nicht gedruckt wurden</strong>! In dem Fall ist nämlich der Status I0007-DRUC nicht zwingend in der Tabelle JEST vorhanden!</p>
+<p>Der Beitrag <a href="/blog/join-ueber-gleiche-tabelle/">Join über gleiche Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

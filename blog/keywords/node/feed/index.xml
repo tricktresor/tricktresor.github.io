@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>node Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/node/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 18 Feb 2014 08:46:32 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>node Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Event NODE_KEYPRESS</title>
+		<link>/blog/event-node_keypress/</link>
+					<comments>/blog/event-node_keypress/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 19 Aug 2011 09:49:29 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[CL_GUI_SIMPLE_TREE]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[keypress]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[node]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[expand_root_nodes]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=612</guid>
+
+					<description><![CDATA[<p>Mit dem Ereignis NODE_KEYPRESS kann man im Programm auf verschiedene Tastendr&#252;cke reagieren: F1, F4, Enter, Einf&#252;gen, L&#246;schen, STRG+X, STRG+C, STRG+V.</p>
+<p>Der Beitrag <a href="/blog/event-node_keypress/">Event NODE_KEYPRESS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit dem Ereignis NODE_KEYPRESS kann man im Programm auf verschiedene Tastendrücke reagieren: F1, F4, Enter, Einfügen, Löschen, STRG+X, STRG+C, STRG+V.</p>
+<p class="head1">Beschreibung</p>
+<p>Das folgende Programm generiert einen kleinen Baum mithilfe des Control CL_GUI_SIMPLE_TREE. Bei Programmstart wird der Focus sofort auf das TreeControl gesetzt, so dass der Anwender mithilfe der Cursortasten in dem Baum navigieren kann.</p>
+<p>Steht der Cursor auf einem Eintrag, so können die Tasten &#8220;F1&#8221;, &#8220;Enter&#8221; oder &#8220;Löschen&#8221; gedrückt werden. Das Ereignis NODE_KEYPRESS muss dafür natürlich registriert werden.</p>
+<p>Zusätzlich müssen aber die Tasten, auf die der Tree reagieren soll auch noch bekannt gegeben werden. Das passiert mit der Methode ADD_KEY_STROKE der Klasse CL_GUI_SIMPLE_TREE.</p>
+<p class="head1">Tasten</p>
+<p>Folgende Tasten können registriert werden:</p>
+<ul>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>F1</strong>: Funktionstaste F1</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>F4</strong>: Funktionstaste F4</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>INSERT</strong>: Taste Einfügen</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>DELETE</strong>: Taste Entfernen</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>ENTER</strong>: Enter-Taste</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>CUT</strong>: Strg+X</li>
+<li>CL_TREE_CONTORL_BASE=&gt;KEY_<strong>COPY</strong>: Strg+C</li>
+<li>CL_TREE_CONTROL_BASE=&gt;KEY_<strong>PASTE</strong>: Strg+V</li>
+</ul>
+<p class="head1">Screenshot</p>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/Tree/Bild548.jpg" /><br />
+Der kleine Demo-Baum</td>
+</tr>
+</tbody>
+</table>
+<p class="head1">Code</p>
+<p class="sap1">REPORT  zz_tree_keypress_demo.<br />
+<span style="color: #fb2412;">*** we use icons&#8230;</span><br />
+TYPE-POOLS icon.</p>
+<p class="sap1"><span style="color: #fb2412;">*** global data:</span><br />
+<span style="color: #fb2412;">*== Custom Container</span><br />
+DATA gr_cuco TYPE REF TO cl_gui_custom_container.<br />
+<span style="color: #fb2412;">*== Simple Tree</span><br />
+DATA gr_tree TYPE REF TO cl_gui_simple_tree.</p>
+<p class="sap1"><span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*       CLASS lcl_event_handler_class DEFINITION<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</span><br />
+CLASS lcl_event_handler_class DEFINITION.<br />
+PUBLIC SECTION.<br />
+CLASS-METHODS handle_keypress<br />
+FOR EVENT node_keypress   OF cl_gui_simple_tree<br />
+IMPORTING node_key key.<br />
+ENDCLASS.                    &#8220;lcl_event_handler_class DEFINITION</p>
+<p class="sap1"><span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*       CLASS lcl_event_handler_class IMPLEMENTATION<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</span><br />
+CLASS lcl_event_handler_class IMPLEMENTATION.<br />
+METHOD handle_keypress.<br />
+IF node_key IS NOT INITIAL.<br />
+<span style="color: #fb2412;">*** we only get a node id for active nodes (not disabled):</span><br />
+MESSAGE i000(oo) WITH &#8216;Knoten:&#8217; node_key &#8216;- Taste:&#8217; key.<br />
+ENDIF.<br />
+ENDMETHOD.                    &#8220;message<br />
+ENDCLASS.                    &#8220;lcl_event_handler_class IMPLEMENTATION</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Call screen</span><br />
+CALL SCREEN 1.</p>
+<p class="sap1">
+<span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*  MODULE status_0001 OUTPUT<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</span><br />
+MODULE status_0001 OUTPUT.</p>
+<p class="sap1">*** Set status<br />
+SET PF-STATUS &#8216;STLI&#8217; OF PROGRAM &#8216;SAPMSSY0&#8217;.<br />
+*** Init Controls<br />
+PERFORM init_controls.</p>
+<p class="sap1">ENDMODULE.                 &#8221; STATUS_0100  OUTPUT</p>
+<p class="sap1"><span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*  MODULE user_command_0001 INPUT<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+</span>MODULE user_command_0001 INPUT.</p>
+<p class="sap1">  CASE sy-ucomm.<br />
+WHEN &#8216;BACK&#8217; OR &#8216;%EX&#8217; OR &#8216;RW&#8217;.<br />
+SET SCREEN 0.<br />
+LEAVE SCREEN.<br />
+ENDCASE.</p>
+<p class="sap1">ENDMODULE.                 &#8221; USER_COMMAND_0100  INPUT</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  init_controls<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+* &#8211; create custom container<br />
+* &#8211; create tree control<br />
+* &#8211; register events<br />
+* &#8211; build tree structure<br />
+* &#8211; set focus on tree control<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+</span>FORM init_controls.</p>
+<p class="sap1"><span style="color: #fb2412;">*** initial build up<br />
+</span>  CHECK gr_cuco IS INITIAL.</p>
+<p class="sap1"><span style="color: #fb2412;">*** create custom container</span><br />
+CREATE OBJECT gr_cuco<br />
+EXPORTING<br />
+container_name = &#8216;TREE&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Create simple tree; single node selection</span><br />
+CREATE OBJECT gr_tree<br />
+EXPORTING<br />
+parent              = gr_cuco<br />
+node_selection_mode = cl_gui_simple_tree=&gt;node_sel_mode_single.</p>
+<p class="sap1"><span style="color: #fb2412;">*** register events</span><br />
+PERFORM register_events.</p>
+<p class="sap1"><span style="color: #fb2412;">*** build tree structure</span><br />
+PERFORM build_tree.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Set focus on tree control so that user instantly can<br />
+*** navigate with cursor keys</span><br />
+cl_gui_control=&gt;set_focus( gr_tree ).</p>
+<p class="sap1">ENDFORM.                    &#8220;init_controls</p>
+<p class="sap1">
+<span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  register_events<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</span><br />
+FORM register_events.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Data</span><br />
+DATA: lt_events TYPE cntl_simple_events,<br />
+ls_event  TYPE cntl_simple_event.</p>
+<p class="sap1"><span style="color: #fb2412;">*** NODE_KEYPRESS-Event</span><br />
+ls_event-eventid = cl_gui_simple_tree=&gt;eventid_node_keypress.<br />
+APPEND ls_event TO lt_events.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Register Event</span><br />
+CALL METHOD gr_tree-&gt;set_registered_events<br />
+EXPORTING<br />
+events = lt_events.</p>
+<p class="sap1"><span style="color: #fb2412;">*** tell tree which keys to mention for NODE_KEPRESS:<br />
+*==&gt; ENTER</span><br />
+gr_tree-&gt;add_key_stroke( cl_gui_simple_tree=&gt;key_enter )  .<br />
+<span style="color: #fb2412;">*==&gt; F1</span><br />
+gr_tree-&gt;add_key_stroke( cl_gui_simple_tree=&gt;key_f1 )  .<br />
+<span style="color: #fb2412;">*==&gt; DELETE</span><br />
+gr_tree-&gt;add_key_stroke( cl_gui_simple_tree=&gt;key_delete )  .</p>
+<p class="sap1"><span style="color: #fb2412;">*** Set handler for registered events</span><br />
+SET HANDLER lcl_event_handler_class=&gt;handle_keypress FOR gr_tree.</p>
+<p class="sap1">ENDFORM.                    &#8220;register_events</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  build_tree<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+* Build static tree structure:<br />
+* Group<br />
+*  +- ONE<br />
+*  +- TWO<br />
+* THREE<br />
+* FOUR<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</span><br />
+FORM build_tree.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Data</span><br />
+DATA ls_node  TYPE mtreesnode.<br />
+DATA lt_nodes TYPE STANDARD TABLE OF mtreesnode.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;Group&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;GROUP1&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-disabled  = &#8216;X&#8217;.<br />
+ls_node-isfolder  = &#8216;X&#8217;.<br />
+ls_node-n_image   = icon_activity_group.<br />
+ls_node-exp_image = icon_activity_group.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_intensified.<br />
+ls_node-text      = &#8216;Gruppe&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;ONE&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;ONE&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-relatkey  = &#8216;GROUP1&#8217;.<br />
+ls_node-n_image   = icon_led_yellow.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_intensified.<br />
+ls_node-text      = &#8216;Eins&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;TWO&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;TWO&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-relatkey  = &#8216;GROUP1&#8217;.<br />
+ls_node-n_image   = icon_led_green.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_default.<br />
+ls_node-text      = &#8216;ZWEI&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;THREE&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;THREE&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-disabled  = &#8216;X&#8217;.<br />
+ls_node-n_image   = icon_led_inactive.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_inactive.<br />
+ls_node-text      = &#8216;DREI&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Node &#8220;FOUR&#8221;</span><br />
+CLEAR ls_node.<br />
+ls_node-node_key  = &#8216;FOUR&#8217;.<br />
+ls_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<br />
+ls_node-disabled  = space.<br />
+ls_node-n_image   = icon_led_red.<br />
+ls_node-style     = cl_gui_simple_tree=&gt;style_intensifd_critical.<br />
+ls_node-text      = &#8216;VIER&#8217;.<br />
+APPEND ls_node TO lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Add nodes</span><br />
+CALL METHOD gr_tree-&gt;add_nodes<br />
+EXPORTING<br />
+table_structure_name = &#8216;MTREESNODE&#8217;<br />
+node_table           = lt_nodes.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Expand all root nodes</span><br />
+gr_tree-&gt;expand_root_nodes( ).</p>
+<p class="sap1">ENDFORM.                    &#8220;init_controls</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/event-node_keypress/">Event NODE_KEYPRESS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/event-node_keypress/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>HANA Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/hana/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 23 Nov 2017 23:33:47 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>HANA Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Data-Aging in S4/HANA</title>
+		<link>/blog/data-aging-in-s4-hana/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Nov 2017 23:33:47 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[HANA]]></category>
+		<category><![CDATA[Data Aging]]></category>
+		<category><![CDATA[S4/HANA]]></category>
+		<category><![CDATA[select]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018228</guid>
+
+					<description><![CDATA[<p>Daten mit einem Verfallsdatum sind keine neue Erfindung. Seit Google und Co. alles speichern, was jemals irgendwo auf einem Webserver verfügbar war, ist der Wunsch da, Daten nach einer bestimmten Zeit automatisch wieder zu löschen. Was im World-Wide-Web eher persönliche Gründe hat, hat bei HANA einen sehr praktischen und handfesten Hintergrund: Speicherplatz. Datenbankkonzept HANA Der große Geschwindigkeitsdurchbruch gelingt HANA durch die InMemory-Technik bei der alle notwendigen Daten im Hauptspeicher verwaltet werden. Für die Verarbeitung im...</p>
+<p>Der Beitrag <a href="/blog/data-aging-in-s4-hana/">Data-Aging in S4/HANA</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Daten mit einem Verfallsdatum sind keine neue Erfindung. Seit Google und Co. alles speichern, was jemals irgendwo auf einem Webserver verfügbar war, ist der Wunsch da, Daten nach einer bestimmten Zeit automatisch wieder zu löschen. Was im World-Wide-Web eher persönliche Gründe hat, hat bei HANA einen sehr praktischen und handfesten Hintergrund: Speicherplatz.</p>
+<h2>Datenbankkonzept HANA</h2>
+<p>Der große Geschwindigkeitsdurchbruch gelingt HANA durch die <em>InMemory-Technik</em> bei der alle notwendigen Daten im Hauptspeicher verwaltet werden. Für die Verarbeitung im Hauptspeicher werden die Spalten von der Festplatte komplett in den Hauptspeicher geladen. Es ist nämlich ein Irrglaube, dass HANA stets und ständig alle Daten im Hauptspeicher vorhält. Die Datenspeicherung erfolgt auch weiterhin auf der Festplatte. Um so wichtiger ist es bei einer HANA-Datenbank, dass nur die Felder selektiert werden, die auch wirklich für die Verarbeitung von Bedeutung sind.</p>
+<h2>Hauptspeicher</h2>
+<p>Auch bei großen Datenmengen hat HANA kaum Probleme, diese zu verarbeiten. Aber mit wachsenden Datenbeständen wird auch eine HANA-Datenbank an ihre Grenzen kommen. Da bei der Verarbeitung die komplette Spalte einer Tabelle geladen wird, kann man sich leicht vorstellen, dass auch HANA einmal Probleme bekommen wird, alle Daten vorzuhalten.</p>
+<p>Wer eine HANA-Datenbank einsetzt oder einsetzen möchte, muss sich mittelfristig mit dem Thema Data-Aging auseinander setzen.</p>
+<h2>Datenalterung</h2>
+<p>Um diesem Trend entgegen zu wirken, gibt es das Konzept der <em>Datenalterung</em>. Die Daten werden hierbei in Partitionen verteilt, die nicht standardmäßig selektiert werden. Es gibt dann für eine Datenbanktabelle mehrere Partitionen. Eine davon enthält nur die <em>aktuellen</em> Daten. Bei einem SELECT werden nur die Daten aus dieser Partition gelesen. Alle anderen Daten sind für den Anwender &#8211; und auch für den Entwickler! &#8211; unsichtbar.</p>
+<h2>Data-Aging-Objekte</h2>
+<p>Für die Datenalterung werden zusammengehörige Tabellen unter einem Data-Aging-Object zusammengefasst. Unter diesem DA-Objekt werden alle notwendigen Einstellungen verwaltet. Für dieses Objekt wird das Analyseprogramm gestartet um den Alterungsprozess anzustoßen.</p>
+<h2>Datentemperatur</h2>
+<p>Die aktuellen Daten sind <em>heiß</em>. Daten, die normalerweise nicht mehr benötigt werden, sind <em>kalt</em>. Auch wenn sich der Begriff Temperatur eingebürgert hat, gibt es keine <em>lauwarmen</em> Daten oder  Datensätze mit einer Temperatur von 12° Celsius. Die Temperatur wird in Tagen gemessen.</p>
+<h2>Technik</h2>
+<p>Alle Tabellen, die <em>gealtert</em> werden sollen, müssen ein Feld _DATAAGING besitzen. Ist dieses Feld leer, so gehört der Datensatz zum <em>heißen</em>, also aktuellen, Datenbestand. Die Analyseprogramme setzen für die Datensätze, die nicht mehr aktuell sind, das entsprechende Datum.</p>
+<p>Die Datenbanktabelle selbst besteht aus verschiedenen Partitionen. Wie diese Partitionen aufgeteilt werden sollen, kann je Data-Aging-Objekt definiert werden. Sinnvoll sind zum Beispiel Zwei-Jahres-Partitionen. Das bedeutet, dass Daten innerhalb dieses Zeitraums in diese Partition verlegt werden. Bei der Definition der Partitionszeiträume werden alle Partitionen bereits angelegt. Es bedeutet jedoch nicht, dass die Daten auch schon darin laden. Wenn für ein Objekt definiert wird, dass es nach 5 Jahren alt ist, dann landet es auch erst nach 5 Jahren in der entsprechenden Partition.</p>
+<h2>Archivierung</h2>
+<p>Welche Daten nicht mehr benötigt werden, wird durch eine Funktionalität abgebildet, die auch bei der Archivierung verwendet wird. Da ein Datensatz für sich nicht einfach als alt (oder kalt) definiert werden kann, sondern nur im Kontext, müssen bestimmte Logiken dafür sorgen, dass die Daten richtig interpretiert werden.</p>
+<p>Es gibt Daten, die gar nicht altern. Offen Posten zum Beispiel sind immer aktuell. Bei anderen Datenobjekten muss definiert werden, anhand welchen Datums das Objekt als alt klassifiziert werden kann und welche abhängigen Datensätze dazu gehören.</p>
+<p>Der Vorteil hierbei ist, dass die grundsätzlichen Logiken durch die Archivierungsprogramme bereits vorhanden sind. Der Nachteil ist, dass es nach wie vor Beziehungen zwischen Datenobjekten gibt, die sehr schwer zu fassen sind. Der komplette Belegfluss eines Dokumentes muss dafür analysiert und bewertet werden.</p>
+<h2>Konsequenzen für die Anwender</h2>
+<p>Der Anwender soll von dem Alterungsprozess möglichst nichts mitbekommen. Er soll seine Transaktionen wie gewohnt aufrufen und damit arbeiten. Nur sieht er eben nicht mehr die Daten, die von einem Analyseprogramm als <em>alt</em> eingestuft wurden. In der Praxis wird sich zeigen, wie gut das Data-Aging funktioniert bzw. wie zufrieden der Anwender damit ist. Wenn es gut läuft, sieht der Anwender weniger Daten, was in der Regel gut ist, sofern alle relevanten Daten auf dem Bildschirm erscheinen.</p>
+<h2>Konsequenzen für die Entwicklung</h2>
+<p>Im ersten Moment hört es sich etwas strange an, dass man als Entwickler keinen vollen Zugriff mehr auf die Daten in der Datenbank hat. Ich habe im Hands-On-Workshop ein mulmiges Gefühl gehabt, als nach dem Alterungsprozess die Daten aus der SE16n einfach weg waren. In der SE16h gibt es unter S4/HANA einen neuen Menüpunkt in dem man die <em>Temperatur</em> (also das die Anzahl der Tage) einstellen kann, mit der die Daten gelesen werden sollen.</p>
+<p>In der Programmierung hat man die Möglichkeit zu einem Data-Aging-Objekt die Selektion zu beeinflussen. Vor dem Select-Befehl muss das DA-Objekt angesprochen werden und das gewünschte Alter definiert werden.</p>
+<p>Die letzten Jahre ist der Umgang mit der Datenbank leichter geworden. Joins funktionieren besser und es ist über ein Jahrzehnt her, dass ich einen Oracle-Hint verwenden musste. Die Performance ist insgesamt besser geworden; SELECT INTO CORRESPONDING FIELDS ist nur unwesentlich langsamer als der direkte Select in eine Tabelle.</p>
+<p>Zuerst dachte ich, dass nun nach diesen Vereinfachungen wieder mehr Arbeit auf den Entwickler zukommt. Für den Großteil der Entwickler wird sich jedoch nichts ändern. Der Zugriff auf die Datenbank erfolgt weiterhin über die üblichen Open-SQL-Befehle.</p>
+<p>Es kommt nun lediglich ein neues, sehr spezielles Aufgabengebiet hinzu.</p>
+<p>Eine sehr gute und detaillierte Übersicht zeigt <a href="https://people.sap.com/bartosz.jarkowski4">Bartosz Jarkowki</a> in seinem SAP-Blog <a href="https://blogs.sap.com/2016/10/03/how-to-perform-data-aging-in-s4hana/">How To Perform Data Aging in S4/HANA</a>. Weitere technische Details kannst du in dem Blogbeitrag von <a href="https://people.sap.com/jens.gleichmann3">Jens Gleichmann</a> nachlesen: <a href="https://blogs.sap.com/2017/09/13/technical-details-about-data-aging/">Technical Details About Data Aging</a>.</p>
+<p>Der Beitrag <a href="/blog/data-aging-in-s4-hana/">Data-Aging in S4/HANA</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>CodeJam zum Thema ABAP on HANA</title>
+		<link>/blog/codejam-zum-thema-abap-on-hana/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 01 Sep 2014 14:59:01 +0000</pubDate>
+				<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[HANA]]></category>
+		<category><![CDATA[Codejam]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5023</guid>
+
+					<description><![CDATA[<p>Die SAP veranstaltet seit einiger Zeit sogenannte CodeJams. Bei diesen kostenlosen Veranstaltungen bekommen Entwickler die Möglichkeit, die neuesten Technologien eigenhändig unter Anleitung auszuprobieren.<br />
+Es ist uns nun gelungen, diese Veranstaltungsreihe nach Hannover zu holen. Am 16. Oktober 2014 wird die CodeJam mit dem Thema „ABAP on HANA“ bei Inwerken zu Gast sein. In der Zeit von 10:00 bis 16:00 Uhr werden die Teilnehmer die Möglichkeit haben, ihre ABAP Kenntnisse auf das HANA-Level zu heben. </p>
+<p>Der Beitrag <a href="/blog/codejam-zum-thema-abap-on-hana/">CodeJam zum Thema ABAP on HANA</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2>SAP CodeJam</h2>
+<p>Die SAP veranstaltet seit einiger Zeit sogenannte CodeJams. Bei diesen kostenlosen Veranstaltungen bekommen Entwickler die Möglichkeit, die neuesten Technologien eigenhändig unter Anleitung auszuprobieren.<br />
+Es ist Inwerken nun gelungen, diese Veranstaltungsreihe nach Hannover zu holen. Am 16. Oktober 2014 wird die CodeJam mit dem Thema „ABAP on HANA“ bei Inwerken zu Gast sein. In der Zeit von 10:00 bis 16:00 Uhr werden die Teilnehmer die Möglichkeit haben, ihre ABAP Kenntnisse auf das HANA-Level zu heben.</p>
+<p>Mehr unter <a title="ABAP on HANA" href="http://www.inwerken.de/codejam-zum-thema-abap-hana-16-oktober-2014-bei-der-inwerken-ag-hannover/">http://www.inwerken.de/codejam-zum-thema-abap-hana-16-oktober-2014-bei-der-inwerken-ag-hannover/</a></p>
+<p>Der Beitrag <a href="/blog/codejam-zum-thema-abap-on-hana/">CodeJam zum Thema ABAP on HANA</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

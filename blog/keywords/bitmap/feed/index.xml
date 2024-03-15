@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>bitmap Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/bitmap/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:02 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>bitmap Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Sag mir wo die Icons sind, wo sind sie geblieben?</title>
+		<link>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/</link>
+					<comments>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/#comments</comments>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Sun, 22 Dec 2013 08:20:20 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[OCX]]></category>
+		<category><![CDATA[icons]]></category>
+		<category><![CDATA[bitmap]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=4101</guid>
+
+					<description><![CDATA[<p>Eine kleine Information über die Speicherung der SAP-Icons in den Ressource-Files des SAPGUI. </p>
+<p>Der Beitrag <a href="/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/">Sag mir wo die Icons sind, wo sind sie geblieben?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der SAP GUI beinhaltet aktuell 926 Icons, die mit der Transaktion SE16 und der Tabelle ICONS angezeigt werden können. Diese reichen vom Platzhaltericon ICON_DUMMY mit der Ordnungsnummer @00@ bis zur inaktiven Datenbanktabelle ICON_DATABASE_TABLE_INA mit der Ordnungsnummer @PP@. Diese und weitere Informationen, wie z.B. Icon-Name, Beschreibung etc., sind auch in der Datei <strong>euspicld</strong> im SAP GUI für Windows Verzeichnis zu finden.</p>
+<p>Die Icons selbst sind als ImageList-Ressourcen in der Datei <strong>SAPguiRM.ocx</strong> des SAP GUI für Windows abgelegt. Die Ressourcen sind einfach nur nummeriert von 203 bis 210. Die 203 und 204 beinhalten das Standard-Design und die 207 und 208 das Corbu-Design. Mit dem <a title="Resource Hacker" href="http://www.angusj.com/" target="_blank">Resource Hacker</a> von Angus Johnson können die ImageLists einfach als binäre Dateien exportiert werden &#8211; Menü Action &gt; Save Resource as a binary file.</p>
+<figure id="attachment_4132" aria-describedby="caption-attachment-4132" style="width: 300px" class="wp-caption alignnone"><img decoding="async" class="size-medium wp-image-4132" alt="Save Icons as file" src="https://tricktresor.com/wp-content/uploads/2013/12/01_08_16_36_59-300x165.jpg" width="300" height="165" srcset="/wp-content/uploads/2013/12/01_08_16_36_59-300x165.jpg 300w, /wp-content/uploads/2013/12/01_08_16_36_59-624x343.jpg 624w, /wp-content/uploads/2013/12/01_08_16_36_59.jpg 890w" sizes="(max-width: 300px) 100vw, 300px" /><figcaption id="caption-attachment-4132" class="wp-caption-text">Save Icons as file</figcaption></figure>
+<p>Nach dem Export müssen einfach die ersten 28 Bytes dieser exportierten ImageLists gelöscht werden, um eine Windows Bitmap (BMP-Datei) zu erhalten. Das geht recht einfach mit <a title="Notepad++" href="http://notepad-plus-plus.org/" target="_blank">Notepad++</a>. Einfach die Datei mit diesem Programm öffnen und am Anfang der Datei 28 mal auf ENTF drücken&#8230;</p>
+<p>Die Extension dieser Datei ist dann natürlich in BMP umzubenennen.</p>
+<p>Auf diesem Wege erhält man Zugriff auf alle Icons des SAP GUI. Leider als Sprite-Image, das heißt, alle Icons sind in dieser Datei in einem Raster vorhanden:</p>
+<p><img fetchpriority="high" decoding="async" class="size-medium wp-image-4133 alignleft" alt="Icons" src="https://tricktresor.com/wp-content/uploads/2013/12/01_08_16_40_24-170x300.jpg" width="170" height="300" srcset="/wp-content/uploads/2013/12/01_08_16_40_24-170x300.jpg 170w, /wp-content/uploads/2013/12/01_08_16_40_24.jpg 222w" sizes="(max-width: 170px) 100vw, 170px" /></p>
+<p>Mit einem Online-Tool, wie zum Beispiel <a title="ImageSplitter" href="http://imagesplitter.net/" target="_blank">ImageSplitter</a> wäre es theoretisch möglich, die Datei in einzelne Dateien zu exportieren. Leider ist die Anzahl der Zeilen und Spalten auf 32 limitiert&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f641.png" alt="🙁" class="wp-smiley" style="height: 1em; max-height: 1em;" /> Wir benötigen aber 4 Spalten und 308 Zeilen&#8230;</p>
+<p>Der Beitrag <a href="/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/">Sag mir wo die Icons sind, wo sind sie geblieben?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

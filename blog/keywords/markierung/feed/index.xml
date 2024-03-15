@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Markierung Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/markierung/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 10 Jan 2018 17:49:02 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Markierung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Mehrfachselektion mit Menu</title>
+		<link>/blog/mehrfachselektion-mit-menu/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 09 Jan 2018 13:00:30 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[toolbar]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Mehrfachselektion]]></category>
+		<category><![CDATA[Menü]]></category>
+		<category><![CDATA[Markieren]]></category>
+		<category><![CDATA[abapGit]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018290</guid>
+
+					<description><![CDATA[<p>Möchte man dem Anwender die Möglichkeit geben, aus einer Liste mehrere Einträge auszuwählen, so fällt einem sicherlich zuerst das ALV-Grid ein, in dem man die Einträge per Zeilenmarkierung oder Checkbox markieren kann.  Eine Lösung mit der vertikalen Anordnung einer Toolbar (CL_GUI_TOOLBAR) und Menu (CL_CTMENU) käme auch in Frage, nähme jedoch genau so viel Platz ein, wie ein ALV-Grid. Letztendlich kam jedoch eine Variante mit dem CL_CTMENU und heraus.</p>
+<p>Der Beitrag <a href="/blog/mehrfachselektion-mit-menu/">Mehrfachselektion mit Menu</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Möchte man dem Anwender die Möglichkeit geben, aus einer Liste mehrere Einträge auszuwählen, so fällt einem sicherlich zuerst das ALV-Grid ein, in dem man die Einträge per Zeilenmarkierung oder Checkbox markieren kann. Etwas aufgepeppt könnte es so aussehen wie in diesem Beitrag: <a href="https://tricktresor.com/blog/moderne-ui-mit-altem-sapgui-und-alv-grid/">Moderne UI mit altem SAPGUI und ALV-Grid</a>. Diese Variante nimmt allerdings einiges an Platz ein. Eine Lösung mit der vertikalen Anordnung einer Toolbar (CL_GUI_TOOLBAR) und Menu (CL_CTMENU) käme auch in Frage, nähme jedoch genau so viel Platz ein, wie ein ALV-Grid. Vorteil wäre noch, dass man Drucktasten als &#8220;gedrückt&#8221; definieren und dem Anwender so eine gute Rückmeldung geben könnte.</p>
+<p>Das Demoprogramm SAPTOOLBAR_DEMO1 zeigt, wie es aussehen könnte (Drucktaste &#8220;+ check&#8221;):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/toolbar2.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018292" src="https://tricktresor.com/wp-content/uploads/2018/01/toolbar2.png" alt="" width="635" height="495" srcset="/wp-content/uploads/2018/01/toolbar2.png 635w, /wp-content/uploads/2018/01/toolbar2-300x234.png 300w, /wp-content/uploads/2018/01/toolbar2-117x91.png 117w" sizes="(max-width: 635px) 100vw, 635px" /></a></p>
+<h2>Menu</h2>
+<p>Bei der Anforderung, mehrere Einträge aus einer Liste von Optionen auswählen zu können, kam ich auf die Idee, das CL_CTMENU dafür zu verwenden. In einem Menü kann man nämlich einzelne Einträge so markieren, dass sie als &#8220;ausgewählt&#8221; zu erkennen sind. Sie haben dann einen &#8220;Punkt&#8221; vor dem Eintrag stehen. Den ersten Gedanken daran habe ich jedoch wieder verworfen, denn bei einer Liste mit mehreren Einträgen, kann es ziemlich mühselig sein, für jede zu wählende Option das Menü anzuklicken, die entsprechende Option zu wählen um dann das Menü erneut anzuklicken.</p>
+<p>Als zweiten Gedanken hatte ich jedoch die Idee, sofort nach Auswahl eines Eintrags das Ereignis &#8220;Dropdown ausgewählt&#8221; erneut zu feuern, so dass das &#8211; nun jedoch geänderte Menü &#8211; dem Anwender erneut angezeigt wird. Erfreulicherweise hat dies sogar funktioniert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/toolbar.png"><img decoding="async" class="alignnone size-full wp-image-1018291" src="https://tricktresor.com/wp-content/uploads/2018/01/toolbar.png" alt="" width="274" height="192" srcset="/wp-content/uploads/2018/01/toolbar.png 274w, /wp-content/uploads/2018/01/toolbar-200x140.png 200w" sizes="(max-width: 274px) 100vw, 274px" /></a></p>
+<h2>blogs.sap.com</h2>
+<p>Hier noch eine kleine Abhandlung auf <a href="https://blogs.sap.com/2018/01/09/variations-of-selecting-multiple-options-from-a-list/">blogs.sap.com</a> von mir, bei der ich noch andere Arten der Mehrfachselektion aufzeige.</p>
+<h2>abapGit</h2>
+<p><a href="https://github.com/tricktresor/multiple_selections">https://github.com/tricktresor/multiple_selections</a></p>
+<h2>Code</h2>
+<p>Das unten stehende Beispielprogramm demonstriert die Funktionsweise. Ich verwende an einigen Stellen die neuen Möglichkeiten von ABAP 7.40 und ABAP 7.50.</p>
+<p>Um das Modul auch sinnvoll einsetzen zu können, fehlen noch Methoden um die möglichen Optionen zu übergeben und die letztendlich gewählten Einträge wieder zurück zu liefern.</p>
+<pre class="lang:abap decode:true">PROGRAM zz_menu_demo.
+
+
+CLASS lcl_main DEFINITION.
+  PUBLIC SECTION.
+    METHODS display.
+
+  PROTECTED SECTION.
+    TYPES: BEGIN OF ty_option,
+             value   TYPE char10,
+             text    TYPE string,
+             checked TYPE boolean_flg,
+           END OF ty_option.
+    DATA: mytoolbar    TYPE REF TO cl_gui_toolbar,
+          menupos_x    TYPE i,
+          menupos_y    TYPE i,
+          options      TYPE STANDARD TABLE OF ty_option,
+          menu_dynamic TYPE REF TO cl_ctmenu.
+    METHODS build_menu.
+    METHODS on_function_selected FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING fcode sender.
+    METHODS on_dropdown_clicked  FOR EVENT dropdown_clicked OF cl_gui_toolbar
+      IMPORTING fcode posx posy sender.
+ENDCLASS.                    "lcl_my_event_handler DEFINITION
+
+
+
+CLASS lcl_main IMPLEMENTATION.
+
+  METHOD build_menu.
+
+    IF menu_dynamic IS INITIAL.
+      "Create menu
+      CREATE OBJECT menu_dynamic.
+    ELSE.
+      "Clear all entries before rebuild
+      menu_dynamic-&gt;clear( ).
+    ENDIF.
+
+    LOOP AT options ASSIGNING FIELD-SYMBOL(&lt;option&gt;).
+      "add menu entry with current status
+      menu_dynamic-&gt;add_function( fcode   = CONV #( &lt;option&gt;-value )
+                                  checked = &lt;option&gt;-checked
+                                  text    = CONV #( &lt;option&gt;-text ) ).
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD display.
+
+    "Create docker on Top of the screen
+    DATA(docker) = NEW cl_gui_docking_container( side = cl_gui_docking_container=&gt;dock_at_top extension = 30 ).
+
+    "create toolbar object
+    mytoolbar = NEW #( parent = docker ).
+
+    "register events
+    mytoolbar-&gt;set_registered_events( VALUE #( ( eventid = cl_gui_toolbar=&gt;m_id_function_selected )
+                                               ( eventid = cl_gui_toolbar=&gt;m_id_dropdown_clicked ) ) ).
+
+    "Set handler
+    SET HANDLER on_function_selected FOR mytoolbar.
+    SET HANDLER on_dropdown_clicked  FOR mytoolbar.
+
+    "set initial values
+    options = VALUE #( ( value = 'ONE'   text = 'Option One' )
+                       ( value = 'TWO'   text = 'Option Two' )
+                       ( value = 'THREE' text = 'Option Three' )
+                       ( value = 'FOUR'  text = 'Option Four' ) ).
+    "Build menu
+    build_menu( ).
+
+    "Add button for selecting options
+    mytoolbar-&gt;add_button( EXPORTING
+                             icon             = 'ICON_TOOL'
+                             fcode            = 'CHOOSE'
+                             butn_type        = '1'
+                             text             = 'Select options'
+                             quickinfo        = 'Select some options...'
+                           EXCEPTIONS
+                             cntb_error_fcode = 1 ).
+
+  ENDMETHOD.
+
+  METHOD on_function_selected.
+
+    "switch option entry
+    LOOP AT options ASSIGNING FIELD-SYMBOL(&lt;option&gt;).
+      IF &lt;option&gt;-value = fcode.
+        IF &lt;option&gt;-checked = abap_true.
+          &lt;option&gt;-checked = abap_false.
+        ELSE.
+          &lt;option&gt;-checked = abap_true.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+
+    "rebuild menu
+    build_menu( ).
+
+    "raise event dropdown clicked again
+    sender-&gt;dispatch( cargo = 'mytoolbar' eventid = cl_gui_toolbar=&gt;m_id_dropdown_clicked is_shellevent = abap_false ).
+
+    "Set coordinates of menu
+    sender-&gt;track_context_menu(
+         context_menu = menu_dynamic
+         posx         = menupos_x
+         posy         = menupos_y ).
+
+  ENDMETHOD.                    "lcl_my_event_handler
+
+  METHOD on_dropdown_clicked.
+
+    IF fcode = 'CHOOSE'.
+      "call of dropdown: remember current position for displaying menu
+      menupos_x = posx.
+      menupos_y = posy.
+    ENDIF.
+
+    "Set coordinates
+    mytoolbar-&gt;track_context_menu(
+        context_menu = menu_dynamic
+        posx         = posx
+        posy         = posy ).
+
+  ENDMETHOD.                    "lcl_my_event_handler
+
+ENDCLASS.                    "lcl_my_event_handler IMPLEMENTATION
+
+
+INITIALIZATION.
+
+  new lcl_main( )-&gt;display( ).
+
+
+  PARAMETERS p_test.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/mehrfachselektion-mit-menu/">Mehrfachselektion mit Menu</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</title>
+		<link>/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 10 Oct 2016 07:58:22 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=865485</guid>
+
+					<description><![CDATA[<p>Der SALV wird inzwischen gerne von Programmierern verwendet, da einiges einfacher und einleuchtender ist, als beim ALV-Grid. Allerdings ist auch vieles komplizierter und überhaupt nicht einleuchtend. Zudem hat der SALV einige Funktionen nicht, die der ALV-Grid schon lange zur Verfügung stellt, wie zum Beispiel Editierbarkeit. Ich brauchte neulich in einem Projekt das Ereignis "Verzögertes Reagieren auf Markierungen" in einem SALV-Grid. Leider bietet der SALV dieses Event nicht an.</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/">Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der SALV wird inzwischen gerne von Programmierern verwendet, da einiges einfacher und einleuchtender ist, als beim ALV-Grid. Allerdings ist auch vieles komplizierter und überhaupt nicht einleuchtend. Zudem hat der SALV einige Funktionen nicht, die der ALV-Grid schon lange zur Verfügung stellt, wie zum Beispiel Editierbarkeit. Ich brauchte neulich in einem Projekt das Ereignis &#8220;Verzögertes Reagieren auf Markierungen&#8221; in einem SALV-Grid. Leider bietet der SALV dieses Event nicht an. <a href="http://abapblog.com/articles/thoughts/109-sap-teched-developer-hero-2016">Developer Hero 2016 Łukasz Pęgiel</a> hat mir das unten stehende Coding zur Verfügung gestellt. <strong>Vielen Dank dafür!</strong></p>
+<h2>Was macht das Ereignis Delayed_Changed_Sel_Callback?</h2>
+<p>Das Ereignis wird immer dann &#8211; verzögert! &#8211; ausgelöst, wenn der Anwender die Markierung im Grid ändert, also zum Beispiel Zeilen, Spalten oder einzelne Zellen markiert. Standardmäßig ist die <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/ee/c8e068d52611d2b468006094192fe3/content.htm">Verzögerung von DELAYED_CHANGED_SEL_CALLBACK auf 1,5 Sekunden </a>eingestellt. Die Funktionalität kann dafür verwendet werden, um Daten anhand der markierten Zellen nachzulesen und anzuzeigen, ohne dass der Anwender eine weitere Taste drücken muss. 1,5 Sekunden sind allerdings häufig eine zu lange Zeit, denn häufig wechselt ein Anwender kurz vor dieser Zeitspanne die Markierung wieder, weil er der Meinung war, dass nun eh nichts mehr passiert. Wie diese Einstellung geändert werden kann, habe ich in dem Beispiel AUTOSUMME beschrieben.</p>
+<h2>Was ist nun der Trick?</h2>
+<p>Der Trick, um an die Events des unterliegenden ALV-Grids zu gelangen, liegt darin, das Ereignis AFTER_REFRESH FOR ALL INSTANCES zu registrieren, also auf alle aktuell instanziierten Grids anzuwenden. Zusätzlich muss der implizit immer vorhandene Importing-Parameter SENDER bei der Definition angegeben werden:</p>
+<pre> METHODS evh_refresh FOR EVENT after_refresh
+      OF cl_gui_alv_grid
+      IMPORTING sender.</pre>
+<p>In dem unten stehenden Programm wird ein einfacher SALV mit Daten aus der Flugdatenbank erzeugt. Es wird das Ereignis AFTER_REFRESH registriert um in diesem Ereignis für den SENDER &#8211; also das im SALV verwendete ALV-Grid &#8211; das eigentliche Ereignis Delayed_Change_Sel_Callback zu registrieren. Wird die Markierung im Grid geändert, so wird diese Meldung ausgegeben:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg"><img decoding="async" class="alignnone size-full wp-image-865553" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg" alt="2016-10-10_09-46-32" width="637" height="385" srcset="/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg 637w, /wp-content/uploads/2016/10/2016-10-10_09-46-32-300x181.jpg 300w" sizes="(max-width: 637px) 100vw, 637px" /></a></p>
+<p>[notice type=&#8217;info&#8217;]Wer eine Alternative zu SALV und ALV-Grid sucht, der sollte sich das Open-Source-Tool <a href="http://abapblog.com/falv">FALV</a> von Łukasz ansehen![/notice]</p>
+<h2>Achtung</h2>
+<p>Der Zusatz FOR ALL INSTANCES greift wirklich bei ALLEN Instanzen des ALV-Grid!! Deswegen sollte er wirklich nur mit Bedacht benutzt werden und du solltest dir der möglichen Seiteneffekte bewusst sein, denn viele interne Funktionen des SALV und ALV-Grids nutzen ebenfalls wieder ein Grid (Auswahl Feldkatalog, Auswahl Layout etc.). So kann es zu ungewollten Reaktionen &#8211; zum Beispiel bei der Änderung des Layouts &#8211; kommen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-865551" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg" alt="2016-10-10_09-11-13" width="829" height="556" srcset="/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg 829w, /wp-content/uploads/2016/10/2016-10-10_09-11-13-300x201.jpg 300w, /wp-content/uploads/2016/10/2016-10-10_09-11-13-768x515.jpg 768w" sizes="(max-width: 829px) 100vw, 829px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zsalv_grid_events.
+
+CLASS lcl_grid_trick DEFINITION.
+
+ PUBLIC SECTION.
+
+ DATA spfli TYPE STANDARD TABLE OF spfli.
+ DATA salv TYPE REF TO cl_salv_table.
+
+ METHODS create_salv.
+ METHODS evh_refresh FOR EVENT after_refresh
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ METHODS evh_delayed_selection
+ FOR EVENT delayed_changed_sel_callback
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ PRIVATE SECTION.
+ DATA mv_event_registered TYPE boolean.
+
+ENDCLASS.
+
+CLASS lcl_grid_trick IMPLEMENTATION.
+
+ METHOD create_salv.
+
+ SELECT * UP TO 100 ROWS
+ INTO CORRESPONDING FIELDS OF TABLE @spfli
+ FROM spfli.
+
+ cl_salv_table=&gt;factory(
+ IMPORTING
+ r_salv_table = salv
+ CHANGING
+ t_table = spfli ).
+
+ salv-&gt;get_functions( )-&gt;set_default( abap_true ).
+
+ SET HANDLER evh_refresh FOR ALL INSTANCES.
+
+ salv-&gt;display( ).
+
+ ENDMETHOD.
+
+ METHOD evh_refresh.
+
+ CHECK mv_event_registered = abap_false.
+ SET HANDLER evh_delayed_selection FOR sender.
+ sender-&gt;register_delayed_event( i_event_id = cl_gui_alv_grid=&gt;mc_evt_delayed_change_select ).
+ mv_event_registered = abap_true.
+
+ ENDMETHOD.
+
+ METHOD evh_delayed_selection.
+
+ DATA lr_type_description TYPE REF TO cl_abap_typedescr.
+ lr_type_description = cl_abap_typedescr=&gt;describe_by_object_ref( sender ).
+ MESSAGE i001(00)
+ WITH 'Delayed Selection; SENDER ist vom Typ '
+ lr_type_description-&gt;absolute_name.
+
+ ENDMETHOD.
+
+ENDCLASS.
+
+START-OF-SELECTION.
+
+ DATA(output) = NEW lcl_grid_trick( ).
+ output-&gt;create_salv( ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/">Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Autosumme in ALV-Grid &#8211; Version 1</title>
+		<link>/blog/autosumme-in-alv-grid-version-1/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2016 17:50:59 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=861138</guid>
+
+					<description><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&#038;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen...!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&amp;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen&#8230;!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Ich erinnerte mich an das Event delayed_changed_sel_callback, mit dem man eine Selektion im Grid verzögert auswerten konnte. Mit Hilfe der Tastenkombination STRG+Y kann man einzelne Zellen markieren. Diese Funktionen wollte ich nutzen, um die markierten Zellenwerte auszulesen und zu summieren.</p>
+<p>Herausgekommen ist das unten stehende Programm. Der eigentliche Teil, die Summierung der Zellen, steht komplett in der Methode HANDLE_DELAYED_SELECTION.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861506" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg" alt="2016-10-07_19-06-25" width="856" height="274" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg 856w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-300x96.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-768x246.jpg 768w" sizes="(max-width: 856px) 100vw, 856px" /></a></p>
+<h2>Vorgehen</h2>
+<p>Event delayed_changed_sel_callback registrieren und einen Eventhandler in der Klasse zuordnen (Handle_Delayed_Selection).</p>
+<p>Wie kommt man an die markierten Zellen heran? Dafür gibt es die Methode Get_Selected_Cells. Sie liefert eine Tabelle zurück, in der die markierten Feldnamen und der Zeilenindex stehen. Mittels READ TABLE und ASSIGN COMPONENT kann man also auf einen Zellwert zugreifen.</p>
+<p>Nun muss noch mittels DESCRIBE FIELD geprüft werden, ob es sich um ein Feld mit einem numerischen Wert handelt. Wenn das der Fall ist, kann der Wert der Zelle aufsummiert werden.</p>
+<p>&nbsp;</p>
+<h2>Normale Zellen vs. Summenzeilen</h2>
+<p>Das Vorgehen bei einem ALV-Grid, in dem keine Summen oder Zwischensummen gebildet wurden, ist einfach und erfolgt nach dem oben genannten Schema. Eine Herausforderung sind jedoch die (Zwischen-) Summenstufen gewesen. Diese werden im ALV-Grid in eigenen &#8211; geschützten &#8211; Tabellen verwaltet:</p>
+<table>
+<tbody>
+<tr>
+<td>Tabelle</td>
+<td>Bedeutung</td>
+<td>Bemerkung</td>
+</tr>
+<tr>
+<td>MT_CT00</td>
+<td>Summetabelle</td>
+<td>Sie enthält in der Regel nur einen Eintrag. Ausnahme: Es sind in der Summierung der Feldwerte unterschiedliche Einheiten vorhanden.</td>
+</tr>
+<tr>
+<td>MT_CT01</td>
+<td>Zwischensummentabelle 1</td>
+<td>Erste Zwischensummenstufe</td>
+</tr>
+<tr>
+<td>MT_CTnn</td>
+<td>Zwischensummentabelle n</td>
+<td>Tabellen für Zwischensummenstufe nn</td>
+</tr>
+<tr>
+<td>MT_CT09</td>
+<td>Zwischensummentabelle 9</td>
+<td>9 ist die höchste Stufe. Mehr Zwischensummen können nicht erstellt werden.</td>
+</tr>
+</tbody>
+</table>
+<p>Immerhin gibt es in diesem Fall eine Methode, mit der man sich die Zwischensummentabellen &#8211; bzw. eine Referenz auf diese &#8211; besorgen kann: <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/9e/2c7b38180fee45e10000009b38f8cf/content.htm">Get_Subtotals</a>. Im Feld ROW_ID-ROWTYPE der Zellen-Tabelle steht, ob es sich um die Totals-Tabelle handelt (1. Zeichen = T) oder eine Zwischensumme (1. Zeichen = S). Nicht gruppierte Zellen haben den Eintrag SPACE.</p>
+<p>Eine Selektion auf ein Summenfeld liefert zum Beispiel diesen ROWTYPE: S 0101X0000000001. Der Vierstellige Code nach dem S sagt aus, um welche Hierarchiestufe es sich handelt (Stellen 1 und 2 des Codes). Die Stellen 3 und 4 des Codes sagen aus, in welcher Tabelle das markierte Feld steht. In diesem Fall ist es Level 1 der Hierarchie und Tabelle MT_CT01.</p>
+<p>Anhand dieses Code kann man also herausfinden, in welcher Zwischensummentabelle nachgeschaut werden muss. Dies tue ich hier:</p>
+<pre>lv_index = ls_cell-row_id-rowtype+4(2).
+lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ASSIGN (lv_tablename) TO &lt;ref_data&gt;.</pre>
+<p>Nachdem wir nun wissen, in welcher Tabelle wir nachsehen müssen um den markierten Zellwert zu finden, müssen wir nun noch den richtigen Index ermitteln. Dieser wird leider nicht mitgegeben, sondern muss aus der Tabelle GROUPLEVELS, die über Get_Subtotals geliefert wird, ermittelt werden:</p>
+<pre>READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+IF sy-subrc = 0.
+  ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ENDIF.</pre>
+<h2></h2>
+<p><strong>Achtung!</strong> Das Programm funktioniert nur, wenn es sich um <em>reine</em> (Zwischen-) Summen handelt! Zwischensummen, die aus mehreren Zeilen bestehen weil sich die zugehörige Einheit unterscheidet, können (noch) nicht erkannt werden. Hier muss ich noch etwas forschen&#8230;</p>
+<h2>Zwischensummen bilden</h2>
+<p>Ein kurzer Hinweis, wie man im ALV-Grid Zwischensummen bildet:</p>
+<p>Wähle als erstes mindestens eine Spalte über die du dann mit Hilfe des Summenicons <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861510" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg" alt="2016-10-07_19-48-00" width="34" height="20" /></a> eine Summe bildest. Danach kannst du weitere Spalten markieren und mit dem Zwischensummenicon <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861511" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg" alt="2016-10-07_19-49-31" width="34" height="20" /></a> die Spalten definieren, über die zusätzlich eine Zwischensumme erstellt werden soll.</p>
+<h2>Aufrisssummenstufe</h2>
+<p>Über die Aufrisssummenstufe kannst du einfach festlegen, dass nur Zwischensummenzeilen einer bestimmten Hierarchie angezeigt werden sollen:</p>
+<p>Auswahl im Menü:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861508" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg" alt="2016-10-07_19-41-49" width="336" height="137" srcset="/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg 336w, /wp-content/uploads/2016/10/2016-10-07_19-41-49-300x122.jpg 300w" sizes="(max-width: 336px) 100vw, 336px" /></a></p>
+<p>Auswahl der Hierarchieebene:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861509" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg" alt="2016-10-07_19-06-45" width="364" height="208" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg 364w, /wp-content/uploads/2016/10/2016-10-07_19-06-45-300x171.jpg 300w" sizes="(max-width: 364px) 100vw, 364px" /></a></p>
+<p>Anzeige der gewählten Zwischensummen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861507" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg" alt="2016-10-07_19-22-39" width="847" height="139" srcset="/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg 847w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-300x49.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-768x126.jpg 768w" sizes="(max-width: 847px) 100vw, 847px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zz_alv_autosumme.
+
+PARAMETERS p_total TYPE p DECIMALS 2.
+
+CLASS lcl_main DEFINITION.
+
+ PUBLIC SECTION.
+ METHODS start.
+ PROTECTED SECTION.
+ DATA mr_grid TYPE REF TO cl_gui_alv_grid.
+ DATA mt_data TYPE STANDARD TABLE OF spfli.
+ DATA mv_data_table TYPE tabname VALUE 'SPFLI'.
+ DATA mr_dock TYPE REF TO cl_gui_docking_container.
+ METHODS create_docker.
+ METHODS create_grid.
+ METHODS handle_delayed_selection
+ FOR EVENT delayed_changed_sel_callback
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ METHODS register_events.
+ METHODS select_data.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+ METHOD start.
+ select_data( ).
+ create_docker( ).
+ create_grid( ).
+ register_events( ).
+ ENDMETHOD.
+
+ METHOD create_docker.
+ "Create Docking container at bottom
+ CREATE OBJECT mr_dock
+ EXPORTING
+ side = cl_gui_docking_container=&gt;dock_at_bottom
+ ratio = 90
+ no_autodef_progid_dynnr = abap_false.
+
+ ENDMETHOD.
+
+ METHOD create_grid.
+ "Create ALV-Grid
+ CREATE OBJECT mr_grid
+ EXPORTING
+ i_appl_events = abap_true
+ i_parent = mr_dock.
+
+ "and display data
+ mr_grid-&gt;set_table_for_first_display(
+ EXPORTING
+ i_structure_name = mv_data_table
+ CHANGING
+ it_outtab = mt_data ).
+
+ "Set focus on grid so user can directly scroll and select cells via CTRL+Y
+ cl_gui_container=&gt;set_focus( mr_grid ).
+
+ ENDMETHOD.
+ METHOD handle_delayed_selection.
+
+ "Local data
+ DATA lt_cells TYPE lvc_t_cell.
+ DATA ls_cell LIKE LINE OF lt_cells.
+ DATA lv_total TYPE p DECIMALS 2.
+ DATA lv_val_type TYPE c.
+ DATA lv_index TYPE n LENGTH 2.
+ DATA lv_tablename TYPE string.
+ DATA lt_grouplevels TYPE lvc_t_grpl.
+ DATA ls_grouplevel LIKE LINE OF lt_grouplevels.
+
+ FIELD-SYMBOLS &lt;ref_data&gt; TYPE REF TO data.
+ FIELD-SYMBOLS &lt;table&gt; TYPE table.
+ FIELD-SYMBOLS &lt;warea&gt; TYPE any.
+ FIELD-SYMBOLS &lt;val&gt; TYPE any.
+
+ "data references to sub totals tables
+ DATA ld_ct00 TYPE REF TO data.
+ DATA ld_ct01 TYPE REF TO data.
+ DATA ld_ct02 TYPE REF TO data.
+ DATA ld_ct03 TYPE REF TO data.
+ DATA ld_ct04 TYPE REF TO data.
+ DATA ld_ct05 TYPE REF TO data.
+ DATA ld_ct06 TYPE REF TO data.
+ DATA ld_ct07 TYPE REF TO data.
+ DATA ld_ct08 TYPE REF TO data.
+ DATA ld_ct09 TYPE REF TO data.
+
+ "get selected cells (selection via CTRL + Y)
+ sender-&gt;get_selected_cells( IMPORTING et_cell = lt_cells ).
+
+ "If there is only one cell selected, we do not need to sum that...
+ CHECK lines( lt_cells ) &gt; 1.
+
+ "Read all cell values
+ LOOP AT lt_cells INTO ls_cell.
+
+ "in case of rowtype (normal cell, total or subtotal) assign correct data table
+ CASE ls_cell-row_id-rowtype(1).
+ "Total sum of all
+ WHEN 'T'.
+ sender-&gt;get_subtotals( IMPORTING ep_collect00 = ld_ct00 ).
+
+ ASSIGN ld_ct00 TO &lt;ref_data&gt;.
+ ls_cell-row_id-index = 1.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "subtotals
+ WHEN 'S'.
+ sender-&gt;get_subtotals( IMPORTING
+ ep_collect01 = ld_ct01
+ ep_collect02 = ld_ct02
+ ep_collect03 = ld_ct03
+ ep_collect04 = ld_ct04
+ ep_collect05 = ld_ct05
+ ep_collect06 = ld_ct06
+ ep_collect07 = ld_ct07
+ ep_collect08 = ld_ct08
+ ep_collect09 = ld_ct09
+ et_grouplevels = lt_grouplevels ).
+
+ lv_index = ls_cell-row_id-rowtype+4(2).
+ lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ ASSIGN (lv_tablename) TO &lt;ref_data&gt;.
+
+ READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+ IF sy-subrc = 0.
+ ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ ENDIF.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "Normal cell value
+ WHEN space.
+ ASSIGN mt_data TO &lt;table&gt;.
+ ENDCASE.
+
+
+ "Only read table line when index changes
+ AT NEW row_id.
+ READ TABLE &lt;table&gt; ASSIGNING &lt;warea&gt; INDEX ls_cell-row_id-index.
+ ENDAT.
+ "Assign selected fieldname of workarea
+ ASSIGN COMPONENT ls_cell-col_id OF STRUCTURE &lt;warea&gt; TO &lt;val&gt;.
+ IF sy-subrc = 0.
+ "check correct type of field: Only numeric fields will be taken
+ DESCRIBE FIELD &lt;val&gt; TYPE lv_val_type.
+ CASE lv_val_type.
+ WHEN 'P' "Packed
+ OR 'N' "Numchar
+ OR 'b' "Integer
+ OR 'a' "decfloat
+ OR 'e' "decfloat
+ OR 'F'. "Float?
+ "add cell value to total
+ ADD &lt;val&gt; TO lv_total.
+ ENDCASE.
+ ENDIF.
+ ENDLOOP.
+
+ IF lv_total IS NOT INITIAL.
+ "There were numeric fields selected and therefor we have a total to show:
+ MESSAGE s000(oo) WITH 'TOTAL:' space lv_total.
+ "Parameterfeld ebenfalls füllen
+ p_total = lv_total.
+ ENDIF.
+ ENDMETHOD.
+
+ METHOD register_events.
+ "Set handler
+ SET HANDLER handle_delayed_selection FOR mr_grid.
+ "register event for delayed selection
+ mr_grid-&gt;register_delayed_event( mr_grid-&gt;mc_evt_delayed_change_select ).
+ ENDMETHOD.
+
+ METHOD select_data.
+ "Select data
+ SELECT * FROM (mv_data_table) INTO TABLE mt_data UP TO 100 ROWS.
+ ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+ DATA(gr_main) = NEW lcl_main( ).
+ gr_main-&gt;start( ).</pre>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

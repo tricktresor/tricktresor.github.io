@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Monitor Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/monitor/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 30 Oct 2017 10:19:04 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Monitor Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Bildschirmauflösung ermitteln mit VBScript</title>
+		<link>/blog/bildschirmaufloesung-ermitteln-mit-vbscript/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 27 Oct 2017 08:55:46 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Bildschirmauflösung]]></category>
+		<category><![CDATA[WMI]]></category>
+		<category><![CDATA[Monitor]]></category>
+		<category><![CDATA[VBScript]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018168</guid>
+
+					<description><![CDATA[<p>In diesem Artikel zeige ich dir, wie du die Bildschirmauflösung eines Monitors ermitteln kannst. Verwendet wird dazu VBScript eingebettet in ABAP. Um an die gewünschten Informationen zu gelangen, wird WMI &#8211; Windows Management Instrumentation bemüht. Die Ermittlung der Standardauflösung mit ABAP-Mitteln ist hier beschrieben: Bildschirmauflösung des Computers ermitteln Vielen Dank an Stefan Schnell, der wieder mal beweist, dass der SAPGUI nicht die Grenze ist&#8230; Win32_VideoController Das unten stehende Programm erzeugt ein VBScript mit dessen Hilfe Informationen...</p>
+<p>Der Beitrag <a href="/blog/bildschirmaufloesung-ermitteln-mit-vbscript/">Bildschirmauflösung ermitteln mit VBScript</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Artikel zeige ich dir, wie du die Bildschirmauflösung eines Monitors ermitteln kannst. Verwendet wird dazu VBScript eingebettet in ABAP. Um an die gewünschten Informationen zu gelangen, wird <a href="https://msdn.microsoft.com/de-de/library/aa394582.aspx"><em>WMI &#8211; Windows Management Instrumentation</em></a> bemüht.</p>
+<p>Die Ermittlung der Standardauflösung mit ABAP-Mitteln ist hier beschrieben: Bildschirmauflösung des Computers ermitteln</p>
+<p>Vielen Dank an <a href="https://tricktresor.com/blog/author/stschnell/">Stefan Schnell</a>, der wieder mal beweist, dass der SAPGUI nicht die Grenze ist&#8230;</p>
+<h2>Win32_VideoController</h2>
+<p>Das unten stehende Programm erzeugt ein VBScript mit dessen Hilfe Informationen des Windows-Videocontrollers ausgelesen werden. Für jedes gefundene Element wird ein Popup erzeugt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/wmi1.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018169" src="https://tricktresor.com/wp-content/uploads/2017/10/wmi1.png" alt="" width="350" height="155" srcset="/wp-content/uploads/2017/10/wmi1.png 350w, /wp-content/uploads/2017/10/wmi1-300x133.png 300w" sizes="(max-width: 350px) 100vw, 350px" /></a></p>
+<h2>Info</h2>
+<p>Leider berücksichtigt der Code nicht mehrere angeschlossene Monitore. Für weiterführende Hinweise diesbezüglich bin ich dankbar.</p>
+<p>Allerdings: Selbst wenn man weiß, wie viele Monitore, mit welcher Auflösung angeschlossen sind, weiß man immer noch nicht, auf welchem Monitor gerade der SAPGUI-Modus angezeigt wird.</p>
+<h2>Weiterführende Links</h2>
+<p><a href="https://blogs.sap.com/2013/12/15/how-to-use-windows-management-instrumentation-wmi-inside-abap/">How to use Windows Management Instrumentation (WMI) Inside ABAP</a></p>
+<p><a href="https://blogs.sap.com/2013/12/06/how-to-use-windows-powershell-script-inside-abap/">How to use Windows PowerShell Script inside ABAP</a></p>
+<p><a href="https://msdn.microsoft.com/de-de/library/aa394582.aspx"><em>WMI &#8211; Windows Management Instrumentation</em></a></p>
+<p><a href="https://msdn.microsoft.com/en-us/library/aa394512(v=vs.85).aspx">Win32_VideoController</a></p>
+<h2>Code</h2>
+<pre class="lang:abap decode:true ">CONSTANTS crlf(2) TYPE c VALUE cl_abap_char_utilities=&gt;cr_lf.
+DATA scriptctrl   TYPE ole2_object.
+DATA cmd          TYPE string.
+
+CREATE OBJECT scriptctrl 'MSScriptControl.ScriptControl'.
+IF sy-subrc = 0.
+  SET PROPERTY OF scriptctrl 'AllowUI' = 1.
+  SET PROPERTY OF scriptctrl 'Language' = 'VBScript'.
+  cmd = 'Set oWMI = GetObject("Winmgmts:\\.\root\cimv2")'                          &amp;&amp; crlf &amp;&amp;
+        'Set colItems = oWMI.ExecQuery("Select * from Win32_VideoController",,48)' &amp;&amp; crlf &amp;&amp;
+        'For Each oItem in colItems '                                              &amp;&amp; crlf &amp;&amp;
+        ' intHorizontal = oItem.CurrentHorizontalResolution'                       &amp;&amp; crlf &amp;&amp;
+        ' intVertical = oItem.CurrentVerticalResolution'                           &amp;&amp; crlf &amp;&amp;
+        ' chrCaption  = oItem.Caption'                                             &amp;&amp; crlf &amp;&amp;
+        ' chrDeviceID = oItem.DeviceID'                                            &amp;&amp; crlf &amp;&amp;
+        ' MsgBox chrDeviceID &amp; "/" &amp; chrCaption &amp; ": " &amp; intHorizontal &amp; ":" &amp; intVertical'            &amp;&amp; crlf &amp;&amp;
+        'Next'.
+  CALL METHOD OF scriptctrl 'ExecuteStatement' EXPORTING #1 = cmd.
+  FREE OBJECT scriptctrl.
+ENDIF.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/bildschirmaufloesung-ermitteln-mit-vbscript/">Bildschirmauflösung ermitteln mit VBScript</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

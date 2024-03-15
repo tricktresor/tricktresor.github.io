@@ -1,0 +1,1536 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Tabellenpflegedialog Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/programmierung/tabellenpflegedialog/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 16 Nov 2022 15:06:22 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Tabellenpflegedialog Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Einfügen von vielen Daten in Tabellenpflegedialog</title>
+		<link>/blog/einfuegen-von-vielen-daten-in-tabellenpflegedialog/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 14 Nov 2022 16:27:22 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<guid isPermaLink="false">/?p=1039755</guid>
+
+					<description><![CDATA[<p>Das Einfügen von Daten aus der Zwischenablage in einen Tabellenpflegedialog ist leider nur eingeschränkt möglich. Es können immer nur so viele Daten eingetragen werden, wie auf dem Bildschirm dargestellt werden. Möchte man von einem System in ein anderes Daten kopieren, dann geht man in der Regel wie folgt vor: Alternativ können die Daten &#8211; sofern sie die gleiche Struktur haben, wie der Pflegedialog &#8211; auch aus Excel kopiert werden. Allerdings auch immer nur so viele...</p>
+<p>Der Beitrag <a href="/blog/einfuegen-von-vielen-daten-in-tabellenpflegedialog/">Einfügen von vielen Daten in Tabellenpflegedialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Das Einfügen von Daten aus der Zwischenablage in einen Tabellenpflegedialog ist leider nur eingeschränkt möglich. Es können immer nur so viele Daten eingetragen werden, wie auf dem Bildschirm dargestellt werden. Möchte man von einem System in ein anderes Daten kopieren, dann geht man in der Regel wie folgt vor:</p>
+
+
+
+<ol>
+<li>Quell-Pflegedialog auswählen</li>
+
+
+
+<li>STRG -Y drücken um den Block-Markiermodus zu aktivieren</li>
+
+
+
+<li>Mit der Maus die Felder markieren, die kopiert werden sollen</li>
+
+
+
+<li>Mit STRG &#8211; C die ausgewählten Daten kopieren</li>
+
+
+
+<li>In den Ziel-Pflegedialog wechseln</li>
+
+
+
+<li>Kopierte Daten mit STRG &#8211; V einfügen</li>
+</ol>
+
+
+
+<p>Alternativ können die Daten &#8211; sofern sie die gleiche Struktur haben, wie der Pflegedialog &#8211; auch aus Excel kopiert werden. Allerdings auch immer nur so viele Zeilen, wie in den Pflegedialog eingefügt werden können.</p>
+
+
+
+<p>Möchte man also mehrere hundert oder sogar tausende von Einträgen kopieren, dann möchte man schnell eine andere Möglichkeit haben&#8230;</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="782" height="450" src="/wp-content/uploads/2022/11/image.png" alt="" class="wp-image-1039756" srcset="/wp-content/uploads/2022/11/image.png 782w, /wp-content/uploads/2022/11/image-300x173.png 300w, /wp-content/uploads/2022/11/image-768x442.png 768w, /wp-content/uploads/2022/11/image-265x153.png 265w, /wp-content/uploads/2022/11/image-148x85.png 148w, /wp-content/uploads/2022/11/image-193x112.png 193w, /wp-content/uploads/2022/11/image-71x40.png 71w" sizes="(max-width: 782px) 100vw, 782px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Alternative</h2>
+
+
+
+<p>Das folgende Programm zeigt auf, wie Daten auf zwei Möglichkeiten in einen Tabellenpflegedialog eingefügt werden können:</p>
+
+
+
+<ol>
+<li>Import als CSV (Comma-separated-values) mit einem Semikolon als Trennzeichen</li>
+
+
+
+<li>Import eines kopierten Bereiches aus Microsoft Excel mit einem Tabulator als Trennzeichen.</li>
+</ol>
+
+
+
+<p>Die Daten werden mit der korrekten Struktur der zu importierenden Tabelle an den Funktionsbaustein VIEW_MAINTENANCE_GIVEN_DATA übergeben, der diese dann im generierten Tabellenpflegedialog anzeigt. Sind alle Daten korrekt, können sie gespeichert werden. </p>
+
+
+
+<p>Das Verfahren habe ich bereits in dem Artikel <a class="keychainify-checked" href="/blog/speichern-per-pflegedialog/">Speichern per Pflegedialog</a> beschrieben.</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="wp-block-code"><code>TYPES: BEGIN OF _text,
+         line TYPE c LENGTH 1000,
+       END OF _text,
+       _text_tab TYPE STANDARD TABLE OF _text WITH DEFAULT KEY.
+
+PARAMETERS p_demo RADIOBUTTON GROUP a DEFAULT 'X'.
+PARAMETERS p_clpb RADIOBUTTON GROUP a.
+
+
+START-OF-SELECTION.
+
+  DATA(import_table) = CONV tabname( 'ZMVDIMP' ).
+  IF p_demo = abap_true.
+    DATA(import_data_csv) = VALUE _text_tab(
+        ( line = '100;123;1000;6600' )
+        ( line = '100;333;1000;6600' )
+        ( line = '100;56;3000;2200' )
+        ).
+    DATA(delimiter) = ';'.
+  ELSE.
+
+    cl_gui_frontend_services=&gt;clipboard_import(
+      IMPORTING
+        data  = import_data_csv ).
+    delimiter = cl_abap_char_utilities=&gt;horizontal_tab.
+  ENDIF.
+
+  FIELD-SYMBOLS &lt;import_data_line&gt; TYPE any.
+  FIELD-SYMBOLS &lt;import_data_tab&gt; TYPE table.
+
+  DATA import_data_table_ref TYPE REF TO data.
+  DATA import_data_struc_ref TYPE REF TO data.
+  DATA(import_data_struc) = CAST cl_abap_structdescr(      
+          cl_abap_structdescr=&gt;describe_by_name( 'ZMVDIMP' ) ).
+  DATA(vimflagtab_struc) = CAST cl_abap_structdescr( 
+          cl_abap_structdescr=&gt;describe_by_name( 'VIMFLAGTAB' ) ).
+
+  DATA(maint_struc_components) = import_data_struc-&gt;get_components( ).
+  APPEND LINES OF vimflagtab_struc-&gt;get_components( ) TO maint_struc_components.
+
+  DATA(import_maint_struc) = cl_abap_structdescr=&gt;create( maint_struc_components ).
+
+  DATA(import_data_table) = cl_abap_tabledescr=&gt;create( p_line_type = import_maint_struc ).
+
+  CREATE DATA import_data_struc_ref TYPE HANDLE import_maint_struc.
+  ASSIGN import_data_struc_ref-&gt;* TO &lt;import_data_line&gt;.
+
+
+  CREATE DATA import_data_table_ref TYPE HANDLE import_data_table.
+  ASSIGN import_data_table_ref-&gt;* TO &lt;import_data_tab&gt;.
+
+
+  LOOP AT import_data_csv INTO DATA(csv_line).
+    CLEAR &lt;import_data_line&gt;.
+    SPLIT csv_line AT delimiter INTO TABLE DATA(import_data_values).
+    LOOP AT import_data_values INTO DATA(value).
+      ASSIGN COMPONENT sy-tabix OF STRUCTURE &lt;import_data_line&gt; TO FIELD-SYMBOL(&lt;field&gt;).
+      &lt;field&gt; = value.
+    ENDLOOP.
+    ASSIGN COMPONENT 'ACTION' OF STRUCTURE &lt;import_data_line&gt; TO FIELD-SYMBOL(&lt;action&gt;).
+    &lt;action&gt; = 'N'.
+    APPEND &lt;import_data_line&gt; TO &lt;import_data_tab&gt;.
+  ENDLOOP.
+
+
+  CALL FUNCTION 'VIEW_MAINTENANCE_GIVEN_DATA'
+    EXPORTING
+      action                       = 'U'
+      view_name                    = import_table
+    TABLES
+      data                         = &lt;import_data_tab&gt;
+    EXCEPTIONS
+      client_reference             = 1   " View is tied to another client
+      foreign_lock                 = 2   " View/Table is locked by another user
+      invalid_action               = 3   " ACTION contains invalid values
+      no_clientindependent_auth    = 4   " no auth. for maintaining client-indep. tables/v
+      no_database_function         = 5   " Fct. mod. for data capture/disposal is missing
+      no_show_auth                 = 6   " no display authorization
+      no_tvdir_entry               = 7   " View/table is not entered in TVDIR
+      no_upd_auth                  = 8   " no maintenance or display authorization
+      only_show_allowed            = 9   " Display, but not maintain authorization
+      system_failure               = 10  " System locking error
+      unknown_field_in_dba_sellist = 11  " Selection table contains unknown field
+      view_not_found               = 12  " View/table not found in DDIC
+      OTHERS                       = 13.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE |Error: { sy-subrc }| TYPE 'I'.
+  ENDIF.</code></pre>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/einfuegen-von-vielen-daten-in-tabellenpflegedialog/">Einfügen von vielen Daten in Tabellenpflegedialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Popup nach verbuchten Daten</title>
+		<link>/blog/popup-nach-verbuchten-daten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Dec 2018 14:17:59 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[TH_POPUP]]></category>
+		<category><![CDATA[UPDATE TASK]]></category>
+		<category><![CDATA[Verbucher]]></category>
+		<category><![CDATA[Verbuchung]]></category>
+		<category><![CDATA[V1]]></category>
+		<category><![CDATA[V2]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019580</guid>
+
+					<description><![CDATA[<p>Verbuchungsbausteine gehören zu einem SAP-System dazu. In den meisten Anwendungen werden sie kaum noch benötigt oder verwendet. Wenn man sie jedoch verwendet, sollte man wissen, wie. Ich zeige dir hier, wie du den V2-Verbucher geschickt einsetzen kannst.</p>
+<p>Der Beitrag <a href="/blog/popup-nach-verbuchten-daten/">Popup nach verbuchten Daten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Trotz UI5, Webservices und HANA sind Verbuchungsbausteine nach wie vor ein wichtiger Bestandteil eines SAP-Systems. Ein Verbuchungsbaustein ist ein Funktionsbaustein mit der Eigenschaft &#8220;Verbucher&#8221;. </p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" width="438" height="419" src="https://tricktresor.com/wp-content/uploads/2018/12/th_popup2.png" alt="" class="wp-image-1019582" srcset="/wp-content/uploads/2018/12/th_popup2.png 438w, /wp-content/uploads/2018/12/th_popup2-300x287.png 300w" sizes="(max-width: 438px) 100vw, 438px" /><figcaption>Eigenschaften eines Funktionsbausteins</figcaption></figure>
+
+
+
+<p>Ein Verbuchungsbaustein kann wie ein ganz normaler Funktionsbaustein aufgerufen werden. Allerdings kann ein Verbuchungsbaustein keine Rückgabeparameter besitzen, denn mit Aufruf in der Verbuchung &#8211; Zusatz IN UPATE TASK &#8211; wird die Ausführung an einen anderen Prozess übergeben. Läuft bei einem Verbuchungsbaustein etwas schief, dann gibt es einen Kurzdump.</p>
+
+
+
+<h2 class="wp-block-heading">Verbucher</h2>
+
+
+
+<p>Die Verbucherfunktionalität wird in erster Linie dafür genutzt, um das aufwändige Speichern im Hintergrund durchführen zu lassen, so dass der Anwender schnell weiter arbeiten kann. Die Daten, die an die Verbuchung übergeben werden, müssen &#8220;wasserdicht&#8221;, also in sich stimmig und korrekt sein. Es geht also nicht mehr um Prüfungen, sondern um das reine Speichern der Daten. Je nach Prozess kann die Speicherung ziemlich lange dauern. In SAP-Standardanwendungen hat man manchmal das Phänomen, dass man einen Beleg speichert und ihn sofort wieder ändern möchte. Der Beleg befindet sich jedoch noch in der Verbuchung und ist noch gesperrt. </p>
+
+
+
+<h2 class="wp-block-heading">V1- und V2-Verbucher</h2>
+
+
+
+<p>Es gibt V1-Verbucher und V2-Verbucher. Die V1-Verbucher enthalten wichtige Daten, die in jedem Fall verbucht werden müssen und die auch schnellstmöglich verbucht werden sollen. V2-Verbucher werden eingesetzt für zum Beispiel das Fortschreiben von Statistikdaten. Wenn die Statistikdaten nicht vollständig sind, ist es nicht so schlimm. Es rechtfertigt zum Beispiel in keinem Fall, dass der zugehörige Beleg deswegen nicht verbucht werden kann.</p>
+
+
+
+<p>V1-Verbucher haben Vorrang vor V2-Verbuchern. Ein V2-Verbucher wird also erst dann ausgeführt, wenn alle zugehörigen V1-Verbucher erfolgreich verbucht worden sind. Bricht ein V1-Prozess ab, dann werden alle zugehörigen Bausteine, die sich in der Verbuchung befinden, ebenfalls abgebrochen.</p>
+
+
+
+<h2 class="wp-block-heading">V2-Verbucher missbrauchen</h2>
+
+
+
+<p>Bei einigen Prozessen kann das Verbuchen der Daten extrem lange dauern und deswegen sinnvoll sein, den Benutzer nach Beendigung des Buchungsprozesses zu informieren. </p>
+
+
+
+<p>Hierfür kann man den V2-Verbucher sozusagen missbrauchen. Man startet einfach die notwendigen V1-Verbucher und registriert am Ende noch einen V2-Verbucher, der mit Hilfe des Baustein TH_POPUP eine Meldung ausgibt. </p>
+
+
+
+<h3 class="wp-block-heading">TH_POPUP</h3>
+
+
+
+<p>Der Funktionsbaustein TH_POPUP ist ein kleines Systempopup, dass einen Benutzer sofort informiert. Der Benutzer muss dafür im SAP-System angemeldet sein.</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" width="239" height="172" src="https://tricktresor.com/wp-content/uploads/2018/12/th_popup1.png" alt="" class="wp-image-1019581"/><figcaption>TH_POPUP in Aktion</figcaption></figure>
+
+
+
+<p>Du kannst also diesen TH_POPUP in einem V2-Verbuchungsbaustein aufrufen:</p>
+
+
+
+<pre class="wp-block-preformatted">  CALL FUNCTION 'TH_POPUP'<br>    EXPORTING<br>      client  = sy-mandt<br>      user    = sy-uname<br>      message = 'Verbuchung beendet!'.</pre>
+
+
+
+<p>Durch die Reihenfolge ist sichergestellt, dass das Popup erst aufgerufen wird, nachdem alle V1-Verbucher, also der Verbuchungsprozess ansich, beendet wurde.</p>
+
+
+
+<h2 class="wp-block-heading">Aufruf</h2>
+
+
+
+<p>Um die Verbuchung anzustoßen, muss zwingend ein COMMIT WORK erfolgen. Der implizit am Ende eines Programms ausgeführte Commit ist nicht ausreichend!</p>
+
+
+
+<pre class="wp-block-preformatted">  CALL FUNCTION 'Z_TEST_BOOK' IN UPDATE TASK.<br>  CALL FUNCTION 'Z_TEST_BOOK_POPUP' IN UPDATE TASK.<br>  COMMIT WORK.</pre>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/popup-nach-verbuchten-daten/">Popup nach verbuchten Daten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Call Stack umgehen</title>
+		<link>/blog/call-stack-umgehen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 10 Jul 2018 21:55:14 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Events]]></category>
+		<category><![CDATA[Ereignisse]]></category>
+		<category><![CDATA[Exception-class]]></category>
+		<category><![CDATA[Call stack]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018959</guid>
+
+					<description><![CDATA[<p>In dem Artikel Pflegeview mit Datennavigation habe ich eine Möglichkeit vorgestellt, wie man Daten mit Hilfe einer Treedarstellung besser visualisieren und bearbeiten kann. Leider gab es hier Umstand, dass mit jedem Doppelklick auf einen Eintrag im Tree ein neuer Pflegedialog aufgerufen wurde (Call Stack). Mit jeder Navigation wird also ein CALL SCREEN gemacht und somit der Call Stack erhöht. Der Call Stack ist auf eine bestimmte Anzahl Aufrufe beschränkt (ca. 60).  Selbst wenn der Call Stack höher...</p>
+<p>Der Beitrag <a href="/blog/call-stack-umgehen/">Call Stack umgehen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In dem Artikel <a href="https://tricktresor.com/blog/pflegeview-mit-datennavigation/">Pflegeview mit Datennavigation</a> habe ich eine Möglichkeit vorgestellt, wie man Daten mit Hilfe einer Treedarstellung besser visualisieren und bearbeiten kann.</p>
+<p>Leider gab es hier Umstand, dass mit jedem Doppelklick auf einen Eintrag im Tree ein neuer Pflegedialog aufgerufen wurde (Call Stack). Mit jeder Navigation wird also ein CALL SCREEN gemacht und somit der Call Stack erhöht. Der Call Stack ist auf eine bestimmte Anzahl Aufrufe beschränkt (ca. 60).  Selbst wenn der Call Stack höher wäre und somit &#8220;anwendertauglich&#8221;, so wäre es doch irgendwie <em>falsch</em>, es so zu machen.</p>
+<p>Ein Freund hat dann den entscheidenden Hinweis gefunden, um den Call Stack zu durchbrechen.</p>
+<h2>Exception Class</h2>
+<p>Wir benötigen dazu eine eigene Ausnahmeklasse, die von CX_NO_CHECK erbt und die Parameter GROUPLEVEL und INDEX_OUTTAB als Parameter hat:</p>
+<pre class="lang:abap decode:true ">CLASS lcx_restart DEFINITION INHERITING FROM cx_no_check.
+  PUBLIC SECTION.
+    DATA grouplevel TYPE lvc_fname.
+    DATA index_outtab TYPE lvc_index.
+    METHODS constructor
+      IMPORTING
+        grouplevel   TYPE lvc_fname
+        index_outtab TYPE lvc_index.
+ENDCLASS.
+
+CLASS lcx_restart IMPLEMENTATION.
+  METHOD  constructor.
+    CALL METHOD super-&gt;constructor
+      EXPORTING
+        textid   = textid
+        previous = previous.
+    me-&gt;index_outtab = index_outtab .
+    me-&gt;grouplevel = grouplevel .
+  ENDMETHOD.
+ENDCLASS.</pre>
+<h2>Hilfsklasse</h2>
+<p>Wir benötigen eine Hilfsklasse, die die Ausnahme aufruft und den VIEW_MAINTENANCE_CALL beendet:</p>
+<pre class="lang:abap decode:true ">CLASS lcl_helper IMPLEMENTATION.
+  METHOD handle_item_double_click.
+    handle_node_double_click(
+      grouplevel   = grouplevel
+      index_outtab = index_outtab ).
+  ENDMETHOD.
+
+  METHOD handle_node_double_click.
+
+    RAISE EXCEPTION TYPE lcx_restart
+      EXPORTING
+        grouplevel   = grouplevel
+        index_outtab = index_outtab.
+  ENDMETHOD.
+
+  METHOD install_handler.
+    tree = i_tree.
+    SET HANDLER handle_node_double_click FOR tree.
+    SET HANDLER handle_item_double_click FOR tree.
+  ENDMETHOD.
+ENDCLASS.</pre>
+<h2>Ereignisregistrierung</h2>
+<p>Die Ereignisregistrierung kann weiterhin in der <em>Navigationsklasse</em> erfolgen. Die Handler müssen jedoch in der externen Klasse LCL_HELPER installiert werden:</p>
+<pre class="lang:abap decode:true "> METHOD register_events.
+
+    lcl_helper=&gt;install_handler( mo_tree ).
+
+    mo_tree-&gt;set_registered_events( VALUE #(
+          "Used here for applying current data selection
+          ( eventid = cl_gui_column_tree=&gt;eventid_node_double_click )
+          ( eventid = cl_gui_column_tree=&gt;eventid_item_double_click )
+          "Important! If not registered nodes will not expand -&gt;No data
+          ( eventid = cl_gui_column_tree=&gt;eventid_expand_no_children ) ) ) .
+
+  ENDMETHOD.</pre>
+<p>Zur Installation der Handler übergeben wir einfach die Instanz des Trees um in der Hilfsklasse auf die Ereignisse reagieren zu können.</p>
+<h2>View_Maintenance_Call</h2>
+<p>Der eigentliche Clou ist jedoch, dass wir den Aufruf des Funktionsbaustein VIEW_MAINTENANCE_CALL mit einem TRY-CATCH-Block kapseln:</p>
+<pre class="lang:abap decode:true ">  METHOD view_maintenance_call.
+    TRY.
+        CALL FUNCTION 'VIEW_MAINTENANCE_CALL'
+          EXPORTING
+            action      = 'S'
+            view_name   = ms_tvdir-tabname
+          TABLES
+            dba_sellist = it_sellist
+          EXCEPTIONS
+            OTHERS      = 15.
+      CATCH lcx_restart INTO DATA(restart).
+        handle_selection( EXPORTING
+          grouplevel   = restart-&gt;grouplevel
+          index_outtab = restart-&gt;index_outtab ).
+    ENDTRY.
+  ENDMETHOD.</pre>
+<p>Wir das Ereignis LCX_RESTART ausgelöst, dann starten wir den Pflegedialog einfach erneut. Allerdings nun mit einem abgebauten Call Stack.</p>
+<h2>Call Stack umgehen</h2>
+<p>Den Call Stack durch einen externen RAISE EXCEPTION abzubrechen könnte auch in anderen Fällen hilfreich sein. In welchen, das musst du selber herausfinden&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/call-stack-umgehen/">Call Stack umgehen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Pflegeview mit Datennavigation</title>
+		<link>/blog/pflegeview-mit-datennavigation/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 23 Apr 2018 19:08:50 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018434</guid>
+
+					<description><![CDATA[<p>Pflegeviews kennt jeder. Sie werden zu einer Tabelle oder einem View generiert und erlauben eine mehr oder weniger komfortable Dateneingabe. Mit Pflegeviews sind die meisten Customizingfunktionen realisiert worden. Da der Tabellenpflegedialog generiert wird und von SAP seit Jahren nicht weiterentwickelt wird &#8211; ich hätte eine Menge einfacher Verbesserungsvorschläge &#8211; muss man mit dem Leben, was vorhanden ist. Die Eingabe oder die Funktionen können durch Zeitpunkte angepasst werden. Ab einer bestimmten Größe, also wenn ziemlich viele...</p>
+<p>Der Beitrag <a href="/blog/pflegeview-mit-datennavigation/">Pflegeview mit Datennavigation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Pflegeviews kennt jeder. Sie werden zu einer Tabelle oder einem View generiert und erlauben eine mehr oder weniger komfortable Dateneingabe. Mit Pflegeviews sind die meisten Customizingfunktionen realisiert worden.</p>
+<p>Da der Tabellenpflegedialog generiert wird und von SAP seit Jahren nicht weiterentwickelt wird &#8211; ich hätte eine Menge einfacher Verbesserungsvorschläge &#8211; muss man mit dem Leben, was vorhanden ist. Die Eingabe oder die Funktionen können durch <a href="https://tricktresor.com/blog/zeitpunkte/">Zeitpunkte </a>angepasst werden.</p>
+<p>Ab einer bestimmten Größe, also wenn ziemlich viele Schlüsselfelder vorhanden sind, wird die Eingabe und die Kontrolle der vorhandenen Daten sehr mühselig.</p>
+<h2>Datennavigation</h2>
+<p>Um die Daten besser sichten zu können und sozusagen durch die Daten surfen zu können, hatte ich die Idee, einen ganz bestimmten Tree-Control anzubinden, der die Daten hierarchisch darstellt. Die Darstellung der Daten funktioniert natürlich mit allen Tree-Arten, aber es gibt eine Klasse, die eine ganz besondere <em>Fähigkeit</em> hat: Bei der Klasse CL_GUI_ALV_TREE_SIMPLE kann die Hierarchie zur Laufzeit geändert werden.</p>
+<p>Der Anwender kann sich so also eine ganz eigene Sicht auf die Tabelle zusammenklicken. Ein Klick auf den entsprechenden Knoten soll dann die SM30 aufrufen. Die Anzeige wird auf die Daten eingeschränkt, die durch die Hierarchie gegeben sind.</p>
+<p>Um das Ganze zu verdeutlichen, habe ich eine Demotabelle mit vielen Schlüsselfeldern gebaut und ein paar fiktive Daten eingefügt. Die Tabelle stellt eine typische Customizingtabelle dar, wo zu einer bestimmten Kombination von organisatorischen Werten Optionen aktiv sind oder nicht:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-06.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018440" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-06.png" alt="" width="453" height="277" srcset="/wp-content/uploads/2018/04/sm30-06.png 453w, /wp-content/uploads/2018/04/sm30-06-300x183.png 300w" sizes="(max-width: 453px) 100vw, 453px" /></a></p>
+<p>Wenn man sich hier mit ein paar tausend Einträgen, die durchaus realistisch sind, zurecht finden möchte, dann braucht man schon etwas Geduld und Wissen, wie man die einzelnen Einträge Filtern kann.</p>
+<h2>Vorbereitung</h2>
+<p>Um die Daten zu lesen und anzeigen zu können, musste ich zwei grundsätzliche Dinge tun, die, wenn man weiß wie, nicht schwer sind:</p>
+<ul>
+<li>Erzeugen einer Tabelle mit genau der Struktur der vorgegebenen Tabelle</li>
+<li>Daten zu einer beliebigen Tabelle/ View lesen</li>
+</ul>
+<h3>Dynamisch Tabelle erzeugen</h3>
+<p>Das Erzeugen der Tabelle geht extrem einfach:</p>
+<pre class="lang:abap decode:true ">DATA mr_data TYPE REF TO data.
+FIELD-SYMBOLS &lt;lt_data&gt; TYPE STANDARD TABLE.
+CREATE DATA mr_data TYPE STANDARD TABLE OF (tabellenname).
+ASSIGN mr_data-&gt;* TO &lt;lt_data&gt;.</pre>
+<p>In TABELLENNAME steht der Name des Views. Im Feldsymbol &lt;LT_DATA&gt; steht nun die Tabelle zur Verfügung, die genau die gleichen Eigenschaften hat, als hätte ich sie direkt im Programm angegeben:</p>
+<pre class="lang:abap decode:true ">DATA lt_data TYPE STANDARD TABLE OF tabellenname.</pre>
+<h3>Viewdaten lesen</h3>
+<p>Wenn es sich um eine Tabelle handelt, dann kann ich die Daten einfach mit SELECT ermitteln. Bei einem Tabellenpflegeview geht das nicht. Dieser ist nur für die Verwendung in der SM30 gedacht, nicht für die Datenselektion.</p>
+<p>Aber das Problem hatte wohl vor mir auch schon jemand und hat den Funktionsbaustein VIEW_GET_DATA geschrieben.</p>
+<pre class="lang:abap decode:true ">    CALL FUNCTION 'VIEW_GET_DATA'
+      EXPORTING
+        view_name = tabellenname
+      TABLES
+        data      = &lt;lt_data&gt;
+      EXCEPTIONS
+        OTHERS    = 6.</pre>
+<p>Die Selektion der Daten ist also auch kein Problem.</p>
+<h2>Klasse CL_GUI_ALV_TREE_SIMPLE</h2>
+<p>Kommen wir nun zu dem spannenden Teil und meiner eigentlichen Idee zur Navigation in den Daten. Die Darstellung der Daten aus dem Tabellenpflegeview möchte ich hierarchisch darstellen. Die Klasse CL_GUI_ALV_SIMPLE_TREE erstellt die Hierarchie fast automatisch.</p>
+<p>Die Klasse benötigt eine Tabelle und eine Information, nach welchen Tabellenfeldern der Aufriss erfolgen soll. Wie bereits erwähnt, hat die Klasse CL_GUI_ALV_TREE_SIMPLE die besondere Eigenschaft, dass der Aufriss zur Laufzeit geändert werden kann:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-05.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018435" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-05.png" alt="" width="315" height="144" srcset="/wp-content/uploads/2018/04/sm30-05.png 315w, /wp-content/uploads/2018/04/sm30-05-300x137.png 300w" sizes="(max-width: 315px) 100vw, 315px" /></a></p>
+<p>Wie bei einem normalen ALV üblich, kann das Layout auch gespeichert werden, so dass man sich häufig genutzte Hierarchien speichern und wieder laden kann.</p>
+<h2>Navigation</h2>
+<p>Nun ist die bloße Anzeige der Daten nicht sonderlich hilfreich. Deswegen habe ich einen Doppelklick auf die Knoten und Items des Baumes programmiert. Mit einem Doppelklick sollen die Daten bis zu dieser Hierarchiestufe angezeigt werden. Wenn ich also einen Doppelklick auf die oberste Ebene, die Verkaufsorganisation 1000 mache, dann sollen im View nur die Daten mit Verkaufsorganisation 1000 angezeigt werden. Wenn ich einen Doppelklick auf den untergeordneten Vertriebsweg 10 mache, sollen nur die Daten von VkOrg 1000 und Vertriebsweg 10 angezeigt werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-03.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018437" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-03.png" alt="" width="640" height="278" srcset="/wp-content/uploads/2018/04/sm30-03.png 982w, /wp-content/uploads/2018/04/sm30-03-300x130.png 300w, /wp-content/uploads/2018/04/sm30-03-768x334.png 768w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p>Das funktioniert auch ganz gut, denn den Tabellenpflegedialog kann man nicht nur über die Transaktion SM30 aufrufen, sondern auch über den Funktionsbaustein VIEW_MAINTENANCE_CALL. Diesem Funktionsbaustein gibt man grob die folgenden Daten mit:</p>
+<ul>
+<li>Tabellenname</li>
+<li>Aktion (Anzeige oder Ändern)</li>
+<li>Selektionstabelle</li>
+</ul>
+<p>Der Clou hierbei ist die Selektionstabelle, in der ich anhand der jeweiligen Doppelklick-Position im Baum genau die zugrunde liegenden Daten übergebe. Beim Doppelklick werden folgende beiden Werte geliefert:</p>
+<ul>
+<li>Die Hierarchiestufe</li>
+<li>Der Tabellenindex der zugrunde liegenden Datentabelle</li>
+</ul>
+<p>Ich ermittele dafür beim Doppelklick die aktuelle Hierarchiedefinition, lese den zugrunde liegenden Tabelleneintrag und nehme dann die Werte aus der aktuellen Hierarchiestufe in die Selektionstabelle auf.</p>
+<h3>Beispiel</h3>
+<p>Obige Hierarchie zeigt</p>
+<ul>
+<li>Verkaufsorganisation
+<ul>
+<li>Vertriebsweg
+<ul>
+<li>Sparte</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Ich mache einen Doppelklick auf den Eintrag Vertriebsweg 10 der VkOrg 1000. Das Doppelklickereignis des Trees sagt mir als Hierarchiestufe VTWEG und Tabellenzeile 2.</p>
+<p>Ich mache einen Loop über die aktuelle Hierarchie und weise per ASSIGN COMPONENT dieses Feld der Tabellenzeile einem weiteren Feldsymbol zu. Den Feldnamen und den Wert dieses Feldes wird an die Selektionstabelle angehängt. So lange, bis ich die aktuelle Hierarchiestufe erreicht habe.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-01.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018439" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-01.png" alt="" width="981" height="575" srcset="/wp-content/uploads/2018/04/sm30-01.png 981w, /wp-content/uploads/2018/04/sm30-01-300x176.png 300w, /wp-content/uploads/2018/04/sm30-01-768x450.png 768w, /wp-content/uploads/2018/04/sm30-01-193x112.png 193w" sizes="(max-width: 981px) 100vw, 981px" /></a></p>
+<h2>Hierarchie ändern</h2>
+<p>Wenn ich nun nicht über die Verkaufsorganisation an die Daten ran möchte, sondern zum Beispiel über das Material, dann kann ich einfach die Hierarchie ändern:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-02.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018438" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-02.png" alt="" width="640" height="379" srcset="/wp-content/uploads/2018/04/sm30-02.png 648w, /wp-content/uploads/2018/04/sm30-02-300x178.png 300w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p>Die Darstellung im Baum ist entsprechend und ich kann mit einem Doppelklick auf ein Material schnell alle Einträge auswählen, die dieses Material enthalten:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-07.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018441" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-07.png" alt="" width="800" height="293" srcset="/wp-content/uploads/2018/04/sm30-07.png 800w, /wp-content/uploads/2018/04/sm30-07-300x110.png 300w, /wp-content/uploads/2018/04/sm30-07-768x281.png 768w" sizes="(max-width: 800px) 100vw, 800px" /></a></p>
+<h2>Wo bin ich</h2>
+<p>Eine Schwäche der Baumdarstellung ist, dass ich nicht genau, bzw. nicht gut erkennen kann, wo ich mich gerade befinde. Leider sind die Methoden, die den Aufbau der Hierarchie steuern als PRIVATE Methoden angelegt. Es ist also nicht möglich, die Klasse zu beerben und entsprechend anzupassen.</p>
+<p>Ich fände es sinnvoll, wenn ich diesem Falle der Eintrag nicht 1000, 2000 usw. heißen würde, sondern &#8220;Verkaufsorganisation 1000&#8221; usw. Das würde deutlich machen, welche Hierarchiestufe es ist.</p>
+<p>Eine einfache Möglichkeit habe ich jedoch gefunden, um die Darstellung anzupassen. Es kann ein Gruppenstufen-Layout definiert werden. Hier ist es möglich, für jede Stufe der Hierarchie ein Icon zu definieren. Da man im Icon auch eine Quickinfo mitgeben kann, lässt sich folgende Ausgabe erzeugen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-04.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018436" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-04.png" alt="" width="205" height="125" /></a></p>
+<p>Wenn man im Layout des SAPGUI einstellt, dass die Quickinfo sofort angezeigt wird, ist das eine akzeptable Lösung.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-08.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018442" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-08.png" alt="" width="795" height="257" srcset="/wp-content/uploads/2018/04/sm30-08.png 795w, /wp-content/uploads/2018/04/sm30-08-300x97.png 300w, /wp-content/uploads/2018/04/sm30-08-768x248.png 768w" sizes="(max-width: 795px) 100vw, 795px" /></a></p>
+<h2>Doppelklick</h2>
+<p>Um die Navigation so einfach und intuitiv wie möglich zu machen, habe ich nicht nur NODE_DOUBLE_CLICK ausprogrammiert, sondern auch ITEM_DOUBLE_CLICK. Ich finde es immer nervig, wenn man irgendwo draufklickt und nichts passiert. Oder wenn man nur ein Element angeklickt hat und dann die Meldung kommt: &#8220;Bitte markieren Sie einen Knoten&#8221;.</p>
+<h2>Call Screen</h2>
+<p>Leider hat die Lösung eine große Macke: Da mit jedem Doppelklick der Tabellenpflegedialog erneut aufgerufen wird, wird mit jedem Aufruf ein CALL SCREEN ausgeführt. Das ist jedoch nur etwa 50 mal möglich.</p>
+<p>Ein LEAVE TO SCREEN 0 sorgt zwar dafür, dass die Aufrufhierarchie wieder abgebaut wird, allerdings gibt es bei der Verwendung von LEAVE TO SCREEN 0 in der Doppelklick-Eventhandlermethode merkwürdige Seiteneffekte beim Blättern im Pflegedialog.</p>
+<p>Ich habe leider keine Möglichkeit gefunden, um die Daten direkt im View zu aktualisieren, ohne den VIEW_MAINTENANCE_CALL erneut auszuführen.</p>
+<h2>Weitere Infos</h2>
+<p>Um möglichst viele Informationen über den Tabellenpflegedialog zu bekommen &#8211; und auch um zu wissen, ob überhaupt ein Pflegedialog existiert <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" /> &#8211; rufe ich den Baustein VIEW_GET_DDIC_INFO auf. In der Tabelle TVDIR, die der Baustein unter anderem liest, steht zum Beispiel, in welcher Funktionsgruppe der Pflegedialog erstellt wurde. Das ist wichtig für externe Perform-aufrufe, mit denen man evtl. Daten manipulieren möchte. Es gibt zum Beispiel die Routine VIM_SET_GLOBAL_FIELD_VALUE, mit der globale Felder geändert werden können:</p>
+<pre class="lang:abap decode:true">DATA(prog) = |SAPL{ ms_tvdir-area }|.
+DATA(rc) TYPE i.
+PERFORM vim_set_global_field_value 
+     IN PROGRAM (prog) 
+  USING 'VIM_NEXT_SCREEN' 
+        'N' 
+        '0' 
+         rc.</pre>
+<p>Das funktioniert aber nur, wenn auch der Aufruf &#8220;extern&#8221; erfolgt. Für einen externen Aufruf müssen ein paar sehr intime Infos übergeben werden, die aber fast alle vom VIEW_GET_DDIC_INFO ermittelt werden.</p>
+<p>Mit der Routine TABLE_CALL_INFO und der Funktion &#8220;READ&#8221; werden die Daten gelesen und mit der Funktion &#8220;EDIT&#8221; werden die Daten im Änderungsmodus dargestellt.</p>
+<pre class="lang:abap decode:true">    DATA(prog) = |SAPL{ ms_tvdir-area }|.
+    PERFORM table_call_function IN PROGRAM (prog)
+     TABLES lt_dba_sellist
+            lt_dpl_sellist
+            mt_x_header
+            mt_x_namtab
+            lt_excl_func
+      USING 'READ'
+            'VERY_SHORT'
+            lv_updflag.
+
+    PERFORM table_call_function IN PROGRAM (prog)
+     TABLES lt_dba_sellist
+            lt_dpl_sellist
+            mt_x_header
+            mt_x_namtab
+            lt_excl_func
+      USING 'EDIT'
+            'VERY_SHORT'
+            lv_updflag.</pre>
+<p>Ich habe es, wie gesagt, leider nicht geschafft, die Daten nur zu aktualisieren, nachdem der View einmal dargestellt wurde.</p>
+<h2>Filterung</h2>
+<p>Normalerweise kann man in einem ALV Daten filtern. Der CL_GUI_ALV_SIMPLE_TREE basiert auf einem ALV aber leider kann hier nicht gefiltert werden. Die Funktion müsste aber leicht nachgestellt werden können. Eventuell kümmere ich mich da später noch mal drum.</p>
+<h2>Select-Options</h2>
+<p>Sinnvoll wäre es natürlich auch, ein Selektionsbild für den View anzubieten, so dass der Anwender eine Vorauswahl treffen kann.</p>
+<p>Dies müsste mit den freien Selektionsbedingungen abbildbar sein, aber da hatte ich bisher noch keine Lust zu. In diesem Beitrag steht jedoch, wie diese zu verwenden sind: <a href="https://tricktresor.com/blog/dynamisches-selektionsbild/">Dynamisches Selektionsbild</a></p>
+<p>Mit dem Funktionsbaustein VIEW_RANGETAB_TO_SELLIST können die Selektionsoptionen einfach in die für den Pflegedialog notwendige Selektionstabelle überführt werden.</p>
+<h2>AbapGit</h2>
+<p>Der gesamte Code inklusive Tabellendefinition und Tabellenpflegedialog steht bei <a href="https://github.com/tricktresor">github.com</a>:</p>
+<p><a href="https://github.com/tricktresor/blog">https://github.com/tricktresor/blog</a></p>
+<h2>Coding</h2>
+<pre class="lang:abap decode:true ">REPORT ztrcktrsr_sm30_navigation.
+
+PARAMETERS p_table TYPE tabname DEFAULT 'ZTT_DEMO1'.
+
+CLASS lcl_tree DEFINITION.
+  PUBLIC SECTION.
+    TYPES tt_sellist           TYPE STANDARD TABLE OF vimsellist.
+
+    DATA mo_tree               TYPE REF TO cl_gui_alv_tree_simple.
+    DATA mt_sort               TYPE lvc_t_sort. "Sortiertabelle
+    DATA mr_data               TYPE REF TO data.
+    DATA ms_tvdir              TYPE tvdir.
+    DATA mv_callstack_counter  TYPE i.
+
+    DATA mt_sellist            TYPE STANDARD TABLE OF vimsellist.
+    DATA mt_x_header           TYPE STANDARD TABLE OF vimdesc.
+    DATA mt_x_namtab           TYPE STANDARD TABLE OF vimnamtab.
+
+    METHODS handle_node_double_click
+                  FOR EVENT node_double_click OF cl_gui_alv_tree_simple
+      IMPORTING grouplevel index_outtab.
+    METHODS handle_item_double_click
+                  FOR EVENT item_double_click OF cl_gui_alv_tree_simple
+      IMPORTING grouplevel index_outtab fieldname.
+    METHODS build_sort_table.
+    METHODS register_events.
+    METHODS set_view IMPORTING viewname TYPE clike RAISING cx_axt.
+    METHODS get_view_data.
+    METHODS init_tree.
+    METHODS constructor.
+    METHODS view_maintenance_call IMPORTING it_sellist TYPE tt_sellist.
+
+ENDCLASS.
+
+DATA main TYPE REF TO lcl_tree.
+
+CLASS lcl_tree IMPLEMENTATION.
+  METHOD constructor.
+  ENDMETHOD.
+
+  METHOD set_view.
+    SELECT SINGLE * FROM tvdir INTO ms_tvdir WHERE tabname = viewname.
+    IF sy-subrc &gt; 0.
+      RAISE EXCEPTION TYPE cx_axt.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD handle_item_double_click.
+    "Pass click on item to handle_node_double_click
+    handle_node_double_click(
+      grouplevel   = grouplevel
+      index_outtab = index_outtab ).
+
+  ENDMETHOD.
+
+  METHOD handle_node_double_click.
+
+    FIELD-SYMBOLS &lt;lt_data&gt;            TYPE STANDARD TABLE.
+    ASSIGN mr_data-&gt;* TO &lt;lt_data&gt;.
+    DATA lt_dba_sellist                TYPE STANDARD TABLE OF vimsellist.
+    DATA ls_dbasellist                 TYPE  vimsellist.
+
+    "Get current hierarchy
+    mo_tree-&gt;get_hierarchy( IMPORTING et_sort = DATA(lt_sort) ).
+
+    IF grouplevel = space.
+      "clicked on entry
+      ASSIGN &lt;lt_data&gt;[ index_outtab ] TO FIELD-SYMBOL(&lt;ls_data&gt;).
+      CHECK sy-subrc = 0.
+
+      LOOP AT lt_sort INTO DATA(ls_sort).
+        ASSIGN COMPONENT ls_sort-fieldname OF STRUCTURE &lt;ls_data&gt; TO FIELD-SYMBOL(&lt;lv_value&gt;).
+        IF sy-subrc &lt;&gt; 0.
+          EXIT.
+        ENDIF.
+        APPEND INITIAL LINE TO lt_dba_sellist ASSIGNING FIELD-SYMBOL(&lt;ls_sellist&gt;).
+        &lt;ls_sellist&gt;-viewfield = ls_sort-fieldname.
+        &lt;ls_sellist&gt;-operator  = 'EQ'.
+        &lt;ls_sellist&gt;-value     = &lt;lv_value&gt;.
+        &lt;ls_sellist&gt;-and_or    = 'AND'.
+        READ TABLE mt_x_namtab TRANSPORTING NO FIELDS WITH KEY viewfield = ls_sort-fieldname.
+        &lt;ls_sellist&gt;-tabix     = sy-tabix.
+      ENDLOOP.
+
+    ELSE.
+      "Clicked on hierarchy node
+      ASSIGN &lt;lt_data&gt;[ index_outtab ] TO &lt;ls_data&gt;.
+      IF sy-subrc = 0.
+        LOOP AT lt_sort INTO ls_sort.
+          "Fill up all field from start of hierarchy to clicked node
+          ASSIGN COMPONENT ls_sort-fieldname OF STRUCTURE &lt;ls_data&gt; TO &lt;lv_value&gt;.
+          IF sy-subrc &lt;&gt; 0.
+            EXIT.
+          ENDIF.
+          APPEND INITIAL LINE TO lt_dba_sellist ASSIGNING &lt;ls_sellist&gt;.
+          &lt;ls_sellist&gt;-viewfield = ls_sort-fieldname.
+          &lt;ls_sellist&gt;-operator  = 'EQ'.
+          &lt;ls_sellist&gt;-value     = &lt;lv_value&gt;.
+          &lt;ls_sellist&gt;-and_or    = 'AND'.
+          READ TABLE mt_x_namtab TRANSPORTING NO FIELDS WITH KEY viewfield = ls_sort-fieldname.
+          &lt;ls_sellist&gt;-tabix     = sy-tabix.
+          IF ls_sort-fieldname = grouplevel.
+            EXIT.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+
+    CHECK &lt;ls_data&gt; IS ASSIGNED.
+
+    IF mv_callstack_counter &gt; 50.
+      MESSAGE 'Navigation not possible anymore. Sorry' TYPE 'I'.
+      RETURN. "handle_double_click
+    ENDIF.
+
+    ADD 1 TO mv_callstack_counter.
+
+    view_maintenance_call( lt_dba_sellist ).
+
+  ENDMETHOD.
+
+
+  METHOD get_view_data.
+
+    FIELD-SYMBOLS &lt;lt_data&gt; TYPE STANDARD TABLE.
+    CREATE DATA mr_data TYPE STANDARD TABLE OF (ms_tvdir-tabname).
+    ASSIGN mr_data-&gt;* TO &lt;lt_data&gt;.
+
+
+    "Get info about table/ view
+    CALL FUNCTION 'VIEW_GET_DDIC_INFO'
+      EXPORTING
+        viewname        = ms_tvdir-tabname
+      TABLES
+        sellist         = mt_sellist
+        x_header        = mt_x_header
+        x_namtab        = mt_x_namtab
+      EXCEPTIONS
+        no_tvdir_entry  = 1
+        table_not_found = 2
+        OTHERS          = 3.
+    IF sy-subrc = 0.
+      "Get data of view
+      CALL FUNCTION 'VIEW_GET_DATA'
+        EXPORTING
+          view_name = ms_tvdir-tabname
+        TABLES
+          data      = &lt;lt_data&gt;
+        EXCEPTIONS
+          OTHERS    = 6.
+    ENDIF.
+
+  ENDMETHOD.                               " BUILD_OUTTAB
+
+  METHOD build_sort_table.
+
+    DATA ls_sort TYPE lvc_s_sort.
+    DATA lv_idx  TYPE i.
+
+    LOOP AT mt_x_namtab INTO DATA(ls_namtab)
+    WHERE keyflag   = abap_true
+      AND datatype &lt;&gt; 'CLNT'.
+      ADD 1 TO lv_idx.
+      ls_sort-fieldname = ls_namtab-viewfield.
+      ls_sort-seltext   = ls_namtab-scrtext_l.
+      ls_sort-spos      = lv_idx.
+      ls_sort-up        = abap_true.
+      APPEND ls_sort TO mt_sort.
+    ENDLOOP.
+
+  ENDMETHOD.                               " BUILD_SORT_TABLE
+
+
+  METHOD register_events.
+
+    mo_tree-&gt;set_registered_events( VALUE #(
+          "Used here for applying current data selection
+          ( eventid = cl_gui_column_tree=&gt;eventid_node_double_click )
+          ( eventid = cl_gui_column_tree=&gt;eventid_item_double_click )
+          "Important! If not registered nodes will not expand -&gt;No data
+          ( eventid = cl_gui_column_tree=&gt;eventid_expand_no_children ) ) ).
+
+    SET HANDLER handle_node_double_click FOR mo_tree.
+    SET HANDLER handle_item_double_click FOR mo_tree.
+
+  ENDMETHOD.                               " register_events
+
+
+  METHOD init_tree.
+
+    get_view_data( ).
+    build_sort_table( ).
+
+    DATA(docker) = NEW cl_gui_docking_container(
+                            ratio = 25
+                            side  = cl_gui_docking_container=&gt;dock_at_left
+                            dynnr = CONV #( ms_tvdir-liste )
+                            repid = |SAPL{ ms_tvdir-area }| "'SAPLSVIM'
+                            no_autodef_progid_dynnr = abap_false ).
+
+* create tree control
+    mo_tree = NEW #( i_parent              = docker
+                     i_node_selection_mode = cl_gui_column_tree=&gt;node_sel_mode_multiple
+                     i_item_selection      = 'X'
+                     i_no_html_header      = ''
+                     i_no_toolbar          = '' ).
+
+
+
+* register events
+    register_events( ).
+
+
+    FIELD-SYMBOLS &lt;lt_data&gt; TYPE STANDARD TABLE.
+    ASSIGN mr_data-&gt;* TO &lt;lt_data&gt;.
+
+    DATA lt_grouplevel        TYPE lvc_t_fimg.
+    DATA ls_grouplevel        TYPE lvc_s_fimg.
+    DATA lv_field_description TYPE text50.
+    DATA lt_dba_sellist       TYPE STANDARD TABLE OF vimsellist.
+
+    LOOP AT mt_sort INTO DATA(ls_sort).
+      ls_grouplevel-grouplevel = ls_sort-fieldname.
+      lv_field_description = mt_x_namtab[ viewfield = ls_sort-fieldname ]-scrtext_l.
+      CALL FUNCTION 'ICON_CREATE'
+        EXPORTING
+          name       = 'ICON_OPEN_FOLDER'
+          text       = ls_sort-fieldname
+          info       = lv_field_description
+          add_stdinf = ' '
+        IMPORTING
+          result     = ls_grouplevel-exp_image.
+      CALL FUNCTION 'ICON_CREATE'
+        EXPORTING
+          name       = 'ICON_CLOSED_FOLDER'
+          text       = ls_sort-fieldname
+          info       = lv_field_description
+          add_stdinf = ' '
+        IMPORTING
+          result     = ls_grouplevel-n_image.
+      APPEND ls_grouplevel TO lt_grouplevel.
+    ENDLOOP.
+
+* create hierarchy
+    CALL METHOD mo_tree-&gt;set_table_for_first_display
+      EXPORTING
+        i_save               = 'A'
+        is_variant           = value #( report = sy-repid username = sy-uname )
+        i_structure_name     = ms_tvdir-tabname
+        it_grouplevel_layout = lt_grouplevel
+      CHANGING
+        it_sort              = mt_sort
+        it_outtab            = &lt;lt_data&gt;.
+
+    "expand first level
+    mo_tree-&gt;expand_tree( 1 ).
+
+    " optimize column-width
+    CALL METHOD mo_tree-&gt;column_optimize
+      EXPORTING
+        i_start_column = mt_sort[ 1 ]-fieldname
+        i_end_column   = mt_sort[ lines( mt_sort ) ]-fieldname.
+
+    view_maintenance_call( lt_dba_sellist ).
+
+  ENDMETHOD.
+
+  METHOD view_maintenance_call.
+
+    CALL FUNCTION 'VIEW_MAINTENANCE_CALL'
+      EXPORTING
+        action      = 'S'
+        view_name   = ms_tvdir-tabname
+      TABLES
+        dba_sellist = it_sellist
+      EXCEPTIONS
+        OTHERS      = 15.
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+START-OF-SELECTION.
+  CHECK main IS INITIAL.
+  main = NEW #( ).
+  TRY.
+      main-&gt;set_view( viewname = p_table ).
+      main-&gt;init_tree( ).
+    CATCH cx_axt.
+  ENDTRY.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/pflegeview-mit-datennavigation/">Pflegeview mit Datennavigation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Änderung von Daten mit Hilfe desTabellenpflegedialogs</title>
+		<link>/blog/aenderung-von-daten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 21 Mar 2013 09:44:48 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[view]]></category>
+		<category><![CDATA[update]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=669</guid>
+
+					<description><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzuf&#252;gen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten m&#252;ssen zuvor gepr&#252;ft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugef&#252;gt wurden, durchlaufen.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzufügen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten müssen zuvor geprüft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugefügt wurden, durchlaufen.</p>
+<p>Folgendes &#8211; zugegebener Maßen durch Copy and Paste zusammengeschusterte Programm &#8211; demonstriert das Hinzufügen bzw. die Änderung eines Datensatzes in der Tabelle ZTEST1:</p>
+<p class="head1">Felder der Tabelle:</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>FELD1</li>
+<li>FELD2</li>
+</ul>
+<p class="head1">Anmerkungen</p>
+<p>Die Tabellendefinition mit OCCURS ist nicht mehr aktuell.</p>
+<p>Das Coding ist Halb-generisch&#8230; Wo es ohne viel Aufwand möglich war, habe ich versucht, die Tabelle ZTEST1 generisch zu verwenden</p>
+<ul>
+<li>Zuweisung der Werte in TOTAL</li>
+<li>SELECT</li>
+</ul>
+<p>Allerdings habe ich dies nicht stringent verfolgt:</p>
+<ul>
+<li>WHERE_Bedingung ist nicht generisch</li>
+<li>Struktur-Definition ist nicht dynamisch</li>
+</ul>
+<p>Dieses Programm soll auch in erster Linie die Verwendung des Bausteins VIEW_MAINTENANCE_LOW_LEVEL demonstrieren. Ich wollte jedoch darauf achten, dass die Verwendung auch einigermaßen variabel möglich ist.</p>
+<p class="head1">Coding</p>
+<p class="sap1">REPORT.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Selection Screen</span><br />
+PARAMETERS matnr TYPE ztest1-matnr DEFAULT &#8216;1234&#8217;.<br />
+PARAMETERS feld1 TYPE ztest1-feld1 DEFAULT &#8216;TESTFELD1&#8217;.<br />
+PARAMETERS feld2 TYPE ztest1-feld2 DEFAULT &#8216;Hier ist ein Test&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Macro für die Definition der notwendigen Tabellenstruktur</span><br />
+DEFINE _define_vim_tables.<br />
+data: begin of extract_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end   of extract_data.</p>
+<p class="sap1">  data: begin of total_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end of total_data.<br />
+END-OF-DEFINITION.</p>
+<p class="sap1">DATA:   sellist     LIKE vimsellist OCCURS 10 WITH HEADER LINE,<br />
+fu_to_excl  LIKE vimexclfun OCCURS 10 WITH HEADER LINE,<br />
+x_header    LIKE vimdesc    OCCURS 1,<br />
+x_namtab    LIKE vimnamtab  OCCURS 1,<br />
+hlp_sellist LIKE vimsellist OCCURS 0 WITH HEADER LINE,<br />
+corr_keytab LIKE e071k      OCCURS 0.</p>
+<p class="sap1">CONSTANTS viewname TYPE tabname VALUE &#8216;ZTEST1&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Definition der notwendigen Tabellen mit MARK- und ACTION-Flag</span><br />
+_define_vim_tables ztest1.</p>
+<p class="sap1">FIELD-SYMBOLS &lt;f&gt; TYPE ANY.</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufbau Selektionskriterien<br />
+</span>  CLEAR: sellist.<br />
+sellist-viewfield = &#8216;MATNR&#8217;.<br />
+sellist-operator  = &#8216;EQ&#8217;.<br />
+sellist-value     = matnr.<br />
+sellist-and_or    = space.<br />
+APPEND sellist.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Struktur der Tabelle ermitteln<br />
+</span>  CALL FUNCTION &#8216;VIEW_GET_DDIC_INFO&#8217;<br />
+EXPORTING<br />
+viewname        = viewname<br />
+TABLES<br />
+x_header        = x_header<br />
+x_namtab        = x_namtab<br />
+sellist         = hlp_sellist<br />
+EXCEPTIONS<br />
+no_tvdir_entry  = 3<br />
+table_not_found = 5.</p>
+<p class="sap1">  ASSIGN COMPONENT &#8216;MATNR&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = matnr.<br />
+ASSIGN COMPONENT &#8216;FELD1&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld1.<br />
+ASSIGN COMPONENT &#8216;FELD2&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld2.<br />
+ASSIGN COMPONENT &#8216;ACTION&#8217; OF STRUCTURE total_data TO &lt;f&gt;.<br />
+SELECT COUNT(*) FROM (viewname) WHERE matnr = matnr.<br />
+IF sy-subrc = 0.<br />
+<span style="color: #fb2412;">*== Satz ist vorhanden: Änderung</span><br />
+&lt;f&gt; = &#8216;U&#8217;.<br />
+ELSE.<br />
+<span style="color: #fb2412;">*== Satz ist neu<br />
+</span>    &lt;f&gt; = &#8216;N&#8217;.<br />
+ENDIF.<br />
+APPEND total_data.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufruf des Bausteins</span><br />
+CALL FUNCTION &#8216;VIEW_MAINTENANCE_LOW_LEVEL&#8217;<br />
+EXPORTING<br />
+corr_number               = &#8216; &#8216;<br />
+fcode                     = &#8216;SAVE&#8217;<br />
+view_action               = &#8216;U&#8217;<br />
+view_name                 = viewname<br />
+TABLES<br />
+corr_keytab               = corr_keytab<br />
+dba_sellist               = hlp_sellist<br />
+dpl_sellist               = hlp_sellist<br />
+excl_cua_funct            = fu_to_excl<br />
+extract                   = extract_data<br />
+total                     = total_data<br />
+x_header                  = x_header<br />
+x_namtab                  = x_namtab<br />
+EXCEPTIONS<br />
+function_not_found        = 1<br />
+missing_corr_number       = 2<br />
+no_value_for_subset_ident = 3<br />
+saving_correction_failed  = 4<br />
+OTHERS                    = 5.<br />
+IF sy-subrc = 0.<br />
+COMMIT WORK.<br />
+ENDIF.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Generell</title>
+		<link>/blog/generell/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=577</guid>
+
+					<description><![CDATA[<p>Wichtige Infos und generelle Funktionsweisen zu Tabellenpflegedialogen.</p>
+<p>Der Beitrag <a href="/blog/generell/">Generell</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wichtige Infos und generelle Funktionsweisen zu Tabellenpflegedialogen.<br /><P class="head1">Abgleichsf&auml;higkeit ermitteln</P><P>Mit Programm RSVIEWMOD l&auml;sst sich die &#8220;automatische Abgleichsf&auml;higkeit&#8221; von Tabellenpflegedialogen ermitteln. Das Programm ermittelt dabei alle modifizierten Tabellenpflegedialoge und listet die Modifikationen auf.</P><P>Aus der Doku:</P><P class="head2">Verwendung</P><P>Das Programm RSVIEWMOD ermittelt die Abgleichsf&auml;higkeit von generierten Pflegedialogen (View- und Viewclusterdialogen) und erm&ouml;glicht es, das&nbsp;Kennzeichen f&uuml;r die Abgleichsf&auml;higkeit zu &auml;ndern.</P><P class="head2">Voraussetzungen</P><P>Die Abgleichf&auml;higkeit wird &uuml;ber ein Kennzeichen gesteuert, das im Kopf der Pflegeobjektbeschreibung abgelegt ist und vom CCS Viewer und vom CTA ausgewertet wird. Das Kennzeichen kann die folgenden Werte annehmen:</P><UL><LI>keine Angabe</LI><LI>nicht abgleichf&auml;hig</LI><LI>abgleichf&auml;hig im Dialog</LI><LI>automatisch abgleichf&auml;hig</LI></UL><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/generell/">Generell</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Dokumentation anzeigen (2)</title>
+		<link>/blog/dokumentation-anzeigen-2/</link>
+					<comments>/blog/dokumentation-anzeigen-2/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 May 2010 13:15:43 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tools]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=543</guid>
+
+					<description><![CDATA[<p>Update f&#252;r die Anzeige der Dokumentation im Docking Container. Die Routine wurde erweitert und HTML so aufbereitet, dass die Doku wie die SAP-Dokumentation aussieht.</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen-2/">Dokumentation anzeigen (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Update für die Anzeige der Dokumentation im Docking Container. Die Routine wurde erweitert und HTML so aufbereitet, dass die Doku wie die SAP-Dokumentation aussieht.</p>
+<p>In dieser Version stelle ich Ihnen eine fertige Methode vor, die nur noch im Zeitpunkt 19 des Tabellenpflegedialoges oder in Zeitpunkt 03 des Viewclusters eingebunden werden muss.</p>
+<p>Die Aufbereitung erfolgt analog zu der SAP-Doku und sieht &#8220;etwas schicker&#8221; aus:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Tabellenpflegedialog/hc_328.jpg" /></p>
+<p>Zusätzlich kann eine alternative Dokumentation übergeben werden, die angezeigt wird, wenn die Doku zur Tabelle nicht vorhanden ist.</p>
+<h2 class="head1">Vorbereitungen</h2>
+<h3 class="head2">Methode anlegen</h3>
+<p>Legen Sie sich eine Klasse, wie z.B. ZCL_MAINTENANCE_TOOLS an und implementieren Sie die statische PUBLIC-Methode SHOW_DOCU:</p>
+<p>Importing-Parameter:</p>
+<ul>
+<li>IV_TABLE TYPE C &#8220;Tabellenname&#8221;</li>
+<li>IV_ALDOC  TYPE C &#8220;Alternative Dokumentation SE61&#8221;</li>
+</ul>
+<h3 class="head2">Globale Attribute</h3>
+<p>Legen Sie folgende statische private Attribute an:</p>
+<pre class="lang:abap decode:true ">GR_DOCK    Type Ref To CL_GUI_DOCKING_CONTAINER
+GR_HTML    Type Ref To CL_GUI_HTML_VIEWER
+GV_TABLE   Type C</pre>
+<h3 class="head1">Aufruf Tabellenpflegedialog</h3>
+<h3 class="text1">Zeitpunkt 19</h3>
+<p class="sap1">  CALL METHOD zcl_maintenance_tools=&gt;show_docu<br />
+EXPORTING<br />
+iv_table = vcl_akt_view<br />
+iv_aldoc = &#8216;ZZT_ALTDOC_TABLE_ZZABC&#8217;.</p>
+<h2 class="head1">Aufruf Viewcluster</h2>
+<h3 class="text1">Zeitpunkt 03</h3>
+<p class="sap1">  IF master_name = x_header-viewname.<br />
+CALL METHOD zcl_maintenance_tools=&gt;show_docu<br />
+EXPORTING<br />
+iv_table = x_header-viewname.<br />
+ENDIF.</p>
+<p class="text1"><strong><u>HINWEIS:<br />
+</u></strong>Die alternative Dokumentation muss in der SE61 als &#8220;Text im Dialog&#8221; angelegt werden.</p>
+<h2 class="head1">Eigene Anpassungen</h2>
+<p class="text1">Leider werden in den gerufenen Standard-Routinen nicht alle HTML-Tags &#8220;schön&#8221; angepasst. Die Tabellendefinitionen werden zum Beispiel nicht geändert.</p>
+<p class="text1">Hier kann man aber manuell einfach Abhilfe schaffen:</p>
+<pre class="lang:abap decode:true ">*** set table cells to size 2
+      REPLACE ALL  OCCURRENCES OF '&lt;td&gt;' IN TABLE lt_html
+         WITH '&lt;td&gt;&lt;font FACE="Arial" SIZE=2&gt;'.        
+*** set table border "dashed" and grey background
+      REPLACE ALL  OCCURRENCES OF '&lt;table&gt;' IN TABLE lt_html
+         WITH '&lt;table style="border:thin dashed blue" width="100%" cellpadding=3 bgcolor=#E0E0E0&gt;'.</pre>
+<p class="text1">Das Ergebnis sieht dann so aus:</p>
+<p class="text1"><img decoding="async" src="/wp-content/uploads/tt_images/table_doku.jpg" /></p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true ">METHOD show_docu.
+
+*** Local data
+  DATA lt_lines            TYPE STANDARD TABLE OF tline.
+  DATA ls_header           TYPE thead.
+  DATA lt_html             TYPE STANDARD TABLE OF  htmlline.
+  DATA lv_url              TYPE c LENGTH 500.
+  DATA lv_table            TYPE doku_obj.
+  DATA lv_spras            TYPE sylangu.
+  DATA lt_conv_charformats TYPE TABLE OF tline.
+  DATA lt_conv_parformats  TYPE TABLE OF tline.
+
+
+*** has anything changed??
+  CHECK gv_table &lt;&gt; iv_table.
+
+  lv_table = iv_table.
+
+***  Read table docu
+  CALL FUNCTION 'DOCU_GET'
+    EXPORTING
+      id     = 'TB'
+      langu  = sy-langu
+      object = lv_table
+    IMPORTING
+      head   = ls_header
+    TABLES
+      line   = lt_lines
+    EXCEPTIONS
+      OTHERS = 5.
+  IF sy-subrc &gt; 0.
+*** try other language
+    CASE sy-langu.
+      WHEN 'D'.
+        lv_spras = 'E'.
+      WHEN 'E'.
+        lv_spras = 'D'.
+      WHEN 'F'.
+        lv_spras = 'E'.
+    ENDCASE.
+*** read docu in other language
+    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'TB'
+        langu  = lv_spras
+        object = lv_table
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = lt_lines
+      EXCEPTIONS
+        OTHERS = 5.
+  ENDIF.
+
+***  Read alternative docu
+  IF lt_lines IS INITIAL AND iv_aldoc IS NOT INITIAL.
+*** read alternative docu (Dialog Text)
+    lv_table = iv_aldoc.
+    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'DT'
+        langu  = sy-langu
+        object = lv_table
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = lt_lines
+      EXCEPTIONS
+        OTHERS = 5.
+    IF sy-subrc &gt; 0.
+*** read alternative docu (Dialog Text) in different language
+      CALL FUNCTION 'DOCU_GET'
+        EXPORTING
+          id     = 'DT'
+          langu  = lv_spras
+          object = lv_table
+        IMPORTING
+          head   = ls_header
+        TABLES
+          line   = lt_lines
+        EXCEPTIONS
+          OTHERS = 5.
+
+    ENDIF.
+  ENDIF.
+
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Build controls
+*** _______________________________________________________________ ***
+***                                                                 ***
+
+  IF gr_dock IS INITIAL.
+*** create docking container
+    CREATE OBJECT gr_dock
+      EXPORTING
+        side                    = cl_gui_docking_container=&gt;dock_at_right
+        extension               = 400
+        no_autodef_progid_dynnr = 'X'.
+  ENDIF.
+
+
+  IF lt_lines IS INITIAL.
+*** No doku: Set controls to invisible
+    IF gr_html IS BOUND.
+      CALL METHOD gr_html-&gt;set_visible
+        EXPORTING
+          visible = space.
+    ENDIF.
+
+    IF gr_dock IS BOUND.
+      CALL METHOD gr_dock-&gt;set_visible
+        EXPORTING
+          visible = space.
+    ENDIF.
+  ELSE.
+*** Doku exists: Set controls visible
+    IF gr_html IS BOUND.
+      CALL METHOD gr_html-&gt;set_visible
+        EXPORTING
+          visible = 'X'.
+    ENDIF.
+    IF gr_dock IS BOUND.
+      CALL METHOD gr_dock-&gt;set_visible
+        EXPORTING
+          visible = 'X'.
+    ENDIF.
+  ENDIF.
+
+
+  IF lt_lines IS NOT INITIAL.
+*** doku exists:
+    IF gr_html IS INITIAL.
+*** Create HTML-Control
+      CREATE OBJECT gr_html
+        EXPORTING
+          parent = gr_dock.
+    ENDIF.
+
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Convert character and parameter formats
+*** _______________________________________________________________ ***
+***                                                                 ***
+    IF lt_conv_parformats IS INITIAL.
+      PERFORM build_mapping_tables   IN PROGRAM rshtmimg_2
+       TABLES lt_conv_charformats
+              lt_conv_parformats.
+    ENDIF.
+
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Convert Docu to HTML
+*** _______________________________________________________________ ***
+***                                                                 ***
+
+    CALL FUNCTION 'CONVERT_ITF_TO_HTML'
+      EXPORTING
+        i_header           = ls_header
+      TABLES
+        t_itf_text         = lt_lines
+        t_html_text        = lt_html
+        t_conv_charformats = lt_conv_charformats
+        t_conv_parformats  = lt_conv_parformats
+      EXCEPTIONS
+        syntax_check       = 1
+        replace            = 2
+        illegal_header     = 3
+        OTHERS             = 4.
+    IF sy-subrc = 0.
+
+*** Convert Tables
+      PERFORM convert_tables IN PROGRAM rshtmimg_2 TABLES lt_html.
+*** Set colours (Make text look like SAP documentation)
+      PERFORM set_colors     IN PROGRAM rshtmimg_2 TABLES lt_html.
+
+*** Push data to control
+      CALL METHOD gr_html-&gt;load_data
+        IMPORTING
+          assigned_url = lv_url
+        CHANGING
+          data_table   = lt_html
+        EXCEPTIONS
+          OTHERS       = 4.
+
+      IF sy-subrc = 0.
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Display HTML-Text
+*** _______________________________________________________________ ***
+***                                                                 ***
+
+        CALL METHOD gr_html-&gt;show_url
+          EXPORTING
+            url = lv_url.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+ENDMETHOD.
+
+</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen-2/">Dokumentation anzeigen (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokumentation-anzeigen-2/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dokumentation anzeigen</title>
+		<link>/blog/dokumentation-anzeigen/</link>
+					<comments>/blog/dokumentation-anzeigen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 06 May 2009 19:23:35 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Eigenes]]></category>
+		<category><![CDATA[Viewcluster]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=520</guid>
+
+					<description><![CDATA[<p>Der Tabellenpflegedialog hat einige kleine Ungereimtheiten. Dazu geh&#246;rt zum Beispiel auch, dass man keine M&#246;glichkeiten hat, die Dokumentation der Tabelle anzusehen. W&#228;re das so, so k&#246;nnte man hier den Zweck und Pflegehinweise hinterlegen. Mit einer kleinen Programmierung - die zwecks Mehrfachverwendung einfach in einer Methode gekapselt werden kann - wird dem Anwender die Hilfe in einem Docking-Fenster angezeigt.</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen/">Dokumentation anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der Tabellenpflegedialog hat einige kleine Ungereimtheiten. Dazu gehört zum Beispiel auch, dass man keine Möglichkeiten hat, die Dokumentation der Tabelle anzusehen. Wäre das so, so könnte man hier den Zweck und Pflegehinweise hinterlegen. Mit einer kleinen Programmierung &#8211; die zwecks Mehrfachverwendung einfach in einer Methode gekapselt werden kann &#8211; wird dem Anwender die Hilfe in einem Docking-Fenster angezeigt.</p>
+<p>So sieht das Ergebnis in etwa aus:<img loading="lazy" decoding="async" src="/wp-content/uploads/tt_images/Tabellenpflegedialog/eck_135.jpg" width="519" height="241" /></p>
+<h2 class="head1">Vorgehen</h2>
+<p>Gehen Sie in den Tabellenpflegedialog und wählen Sie <em>Umfeld &#8211; Modifikation &#8211; Zeitpunkte</em>.</p>
+<p>Tragen Sie dann den Zeitpunkt &#8220;19&#8221; ein:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Tabellenpflegedialog/eck_134.jpg" /></p>
+<p>Springen Sie in den Editor und legen Sie das folgende Coding an:</p>
+<pre class="sap1"><span style="color: #fb2412;">*** GLOBALE DATEN
+</span>DATA gr_docking TYPE REF TO cl_gui_docking_container.
+DATA gr_control TYPE REF TO cl_gui_html_viewer.
+DATA gt_lines   TYPE STANDARD TABLE OF tline.
+
+<span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  zz_show_docu
+*&amp;---------------------------------------------------------------------*
+</span>FORM zz_show_docu.
+
+<span style="color: #fb2412;">*** LOKALE DATEN
+</span>  DATA lv_size     TYPE i.
+  DATA ls_header   TYPE thead.
+  DATA lt_html     TYPE STANDARD TABLE OF  htmlline.
+  DATA lv_url      TYPE c LENGTH 500.
+  DATA lv_viewname TYPE dokhl-object.
+
+<span style="color: #fb2412;">*** DOCKING CONTROL BEREITS ERZEUGT?</span>
+  IF gr_docking IS INITIAL.
+    MOVE x_header-viewname TO lv_viewname.
+
+<span style="color: #fb2412;">*** Lesen der Doku zur Tabelle
+</span>    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'TB'
+        langu  = sy-langu
+        object = lv_viewname
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = gt_lines
+      EXCEPTIONS
+        OTHERS = 5.
+
+    IF gt_lines IS INITIAL.
+<span style="color: #fb2412;">*** Keine Doku da: Control mit größe 0 erzeugen</span>
+      lv_size = 0.
+    ELSE.
+<span style="color: #fb2412;">*** Doku vorhanden: Breite 400 Pixel</span>
+      lv_size = 400.
+    ENDIF.
+
+<span style="color: #fb2412;">*** Dockingcontainer erzeugen</span>
+    CREATE OBJECT gr_docking
+      EXPORTING
+        side                    = cl_gui_docking_container=&gt;dock_at_right
+        extension               = lv_size
+        no_autodef_progid_dynnr = 'X'.
+
+    IF gt_lines IS NOT INITIAL.
+
+<span style="color: #fb2412;">*** HTML-Control erzeugen</span>
+      CREATE OBJECT gr_control
+        EXPORTING
+          parent = gr_docking.
+
+<span style="color: #fb2412;">*** Doku in HTML umwandeln</span>
+      CALL FUNCTION 'CONVERT_ITF_TO_HTML'
+        EXPORTING
+          i_header       = ls_header
+        TABLES
+          t_itf_text     = gt_lines
+          t_html_text    = lt_html
+        EXCEPTIONS
+          syntax_check   = 1
+          replace        = 2
+          illegal_header = 3
+          OTHERS         = 4.
+      IF sy-subrc = 0.
+<span style="color: #fb2412;">*** HTML-Daten ins Control schieben</span>
+        CALL METHOD gr_control-&gt;load_data
+          IMPORTING
+            assigned_url = lv_url
+          CHANGING
+            data_table   = lt_html
+          EXCEPTIONS
+            OTHERS       = 4.
+        IF sy-subrc = 0.
+<span style="color: #fb2412;">*** Und HTML-Text anzeigen</span>
+          CALL METHOD gr_control-&gt;show_url
+            EXPORTING
+              url = lv_url.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.</pre>
+<p><strong><u>Hinweis:</u><br />
+</strong>Wenn man in die Tabellenpflege mit SM30 einsteigt, dann bleibt der Dockingcontainer erhalten. Machen Sie am besten eine Transaktion daraus und dann sieht es wirklich professionell aus.</p>
+<h3 class="head1">Viewcluster</h3>
+<p>Bei der Verwendung in einem Viewcluster muss der Zeitpunkt 03 verwendet werden.</p>
+<p>Viewcluster benötigen ein eigenes Programm, in dem das Coding abgelegt wird. Hier muss das Include LSVCMCOD eingebunden werden, damit Sie Zugriff auf alle notwendigen Daten des Viewclusters haben.</p>
+<p><u><strong>Tipp:<br />
+</strong></u>Lagern Sie die Funktion in eine Methode aus und übergeben Sie den Namen der gerade aktiven Tabelle (VCL_AKT_VIEW). Dann können Sie in der Methode prüfen, ob die Tabelle gewechselt wurde und in diesem Fall die entsprechende Dokumentation nachlesen.</p>
+<h3>Tipps zur Formatierung</h3>
+<p>Das Layout des Textes ist nacktes HTML und entspricht so gar nicht dem der üblichen Hilfe in SAP. Wenn du die Formatierung anpassen möchtest, kannst du dir die Klasse CL_EPSS_SAPEVENT bzw. deren Methode LINES_DISPLAY mal ansehen. Hier wird der HTML-Text für die SAP Hilfe generiert. Verwendet werden hierfür die Funktiosnbausteine SE_CONVERT_ITF_TO_HTML und EPSS_STYLE_RECEIVE. Das Umwandeln von SAP-Ikonen wurde zwar auch versuchsweise nachgebaut, ist für die Anzeige aber eher nur nettes Beiwerk.</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen/">Dokumentation anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokumentation-anzeigen/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Tabelle EXTRACT (unicode)</title>
+		<link>/blog/tabelle-extract-unicode/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Unicode]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=504</guid>
+
+					<description><![CDATA[<p>Bei Unicode-Systemen gibt es Probleme bei dem Zugriff der unstrukturierten Tabelle EXTRACT (Kurzdump UC_OBJECTS_NOT_CONVERTIBLE). Hier zeigen wir, wie der Zugriff erfolgen muss.</p>
+<p>Der Beitrag <a href="/blog/tabelle-extract-unicode/">Tabelle EXTRACT (unicode)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei Unicode-Systemen gibt es Probleme bei dem Zugriff der unstrukturierten Tabelle EXTRACT (Kurzdump UC_OBJECTS_NOT_CONVERTIBLE). Hier zeigen wir, wie der Zugriff erfolgen muss.<br /><P>Wir wollen einen Eintrag aus der Tabelle EXTRACT lesen und die Daten (Workarea) vom Viewtyp ZZTEST_V einer Struktur zuweisen.</P><P class="sap1"><FONT color="#fb2412">*** Datentypen<BR></FONT>&nbsp; TYPES BEGIN OF ty_zztest_v.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INCLUDE STRUCTURE zztest_v.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INCLUDE STRUCTURE vimflagtab.<BR>&nbsp; TYPES END OF ty_zztest_v.</P><P class="sap1">&nbsp; DATA ls_tmpk&nbsp; TYPE ty_zztest_v.<BR>&nbsp; DATA lv_line&nbsp; TYPE i.</P><P class="sap1"><FONT color="#fb2412">*** Zeilennummer 1<BR></FONT>&nbsp; lv_line = 1.</P><P class="sap1"><FONT color="#fb2412">*** Erforderliche Feldsymbole</FONT><BR>&nbsp; FIELD-SYMBOLS:<BR>&nbsp;&nbsp;&nbsp; &lt;x1&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE x,<BR>&nbsp;&nbsp;&nbsp; &lt;x2&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE x,<BR>&nbsp;&nbsp;&nbsp; &lt;data&gt;&nbsp;&nbsp;&nbsp; TYPE ANY,<BR>&nbsp;&nbsp;&nbsp; &lt;extract&gt; TYPE table.</P><P class="sap1"><FONT color="#fb2412">*** Casting f&uuml;r EXTRACT durchf&uuml;hren</FONT><BR>&nbsp; ASSIGN (&#8216;EXTRACT[]&#8217;)&nbsp;&nbsp; TO &lt;extract&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Eintrag&nbsp;aus EXTRACT lesen<BR></FONT>&nbsp; READ TABLE &lt;extract&gt; ASSIGNING &lt;data&gt; INDEX lv_line.</P><P class="sap1"><FONT color="#fb2412">*** Casting der&nbsp;Workarea</FONT><BR>&nbsp; ASSIGN &lt;data&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;TO &lt;x1&gt; CASTING.<BR>&nbsp; ASSIGN (&#8216;LS_ZZTEST_V&#8217;) TO &lt;x2&gt; CASTING.</P><P class="sap1"><FONT color="#fb2412">*** Zuweisung &uuml;ber gecastete Strukturen: LS_ZZTEST_V ist nun gef&uuml;llt<BR></FONT>&nbsp; &lt;x2&gt; = &lt;x1&gt;.</P></p>
+<p>Der Beitrag <a href="/blog/tabelle-extract-unicode/">Tabelle EXTRACT (unicode)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Speichern per Pflegedialog</title>
+		<link>/blog/speichern-per-pflegedialog/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 21 Jul 2008 14:50:57 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=502</guid>
+
+					<description><![CDATA[<p>Mithilfe von Pflegeviews bietet sich auch die interessante M&#246;glichkeit, Daten vor der Speicherung dem Anwender zu pr&#228;sentieren. So k&#246;nnen Daten per Datei hochgeladen werden und im Pflegedialog angezeigt werden. Hier werden automatisch Fremdschl&#252;sselpr&#252;fungen durchgef&#252;hrt und die Daten k&#246;nnen vom Anwender gepr&#252;ft und gegebenenfalls nachbearbeitet werden.</p>
+<p>Der Beitrag <a href="/blog/speichern-per-pflegedialog/">Speichern per Pflegedialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Mithilfe von Pflegeviews bietet sich auch die interessante Möglichkeit, Daten vor der Speicherung dem Anwender zu präsentieren. So können Daten per Datei hochgeladen werden und im Pflegedialog angezeigt werden. Hier werden automatisch Fremdschlüsselprüfungen durchgeführt und die Daten können vom Anwender geprüft und gegebenenfalls nachbearbeitet werden.</p>
+
+
+
+<p>Mithilfe des folgenden Codings werden zwei Tabelleneinträge zum View ZXX generiert. Um zu verhindern, dass der Anwender eigene Zeile einfügt, werden die beiden Funktionscodes &#8220;New Line&#8221; und &#8220;Kopieren&#8221; ausgeblendet.</p>
+
+
+
+<p>Damit das Ganze funktioniert, muss&nbsp;zu dem View/ der Tabelle ein Tabellenpflegedialog vorhanden sein. Entgegen der Dokumentation wird kein Pflegedialog angelegt, wenn der Parameter GENERATE_MAINT_TOOL_IF_MISSING mitgegeben wird.</p>
+
+
+
+<p class="has-luminous-vivid-amber-background-color has-background has-medium-font-size"><u><strong>TIPP:<br></strong></u>Bereits auf der Datenbank vorhandene Daten müssen das ACTION-Kennzeichen &#8220;U&#8221; bekommen. Ansonsten gibt es einen Kurzdump (INSERT_DUPREC).</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<pre class="wp-block-code"><code>TYPES: BEGIN OF ty_xx.
+        INCLUDE STRUCTURE zxx.
+        INCLUDE STRUCTURE vimflagtab.
+TYPES: END OF ty_xx.
+
+DATA lt_xx TYPE STANDARD TABLE OF ty_xx.
+DATA ls_xx TYPE ty_xx.
+DATA lt_fc TYPE STANDARD TABLE OF vimexclfun.
+
+START-OF-SELECTION.
+
+*** Funktionen "Neue Zeile" und "Kopieren" deaktivieren
+  APPEND 'NEWL' TO lt_fc.
+  APPEND 'KOPE' TO lt_fc.
+
+*** 1. neue Zeile
+  ls_xx-mandt   = sy-mandt.
+  ls_xx-feld1   = 'A1000'.
+  ls_xx-action  = 'N'.
+  APPEND ls_xx TO lt_xx.
+
+*** 1. neue Zeile
+  ls_xx-mandt   = sy-mandt.
+  ls_xx-feld1   = 'B2000'.
+  ls_xx-action  = 'N'.
+  APPEND ls_xx TO lt_xx.
+
+*** Daten präsentieren
+  CALL FUNCTION 'VIEW_MAINTENANCE_GIVEN_DATA'
+    EXPORTING
+      action                         = 'U'
+      view_name                      = 'ZXX'
+    TABLES
+      data                           = lt_xx
+      excl_cua_funct                 = lt_fc
+    EXCEPTIONS
+      OTHERS                         = 13.</code></pre>
+</div></div>
+<p>Der Beitrag <a href="/blog/speichern-per-pflegedialog/">Speichern per Pflegedialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

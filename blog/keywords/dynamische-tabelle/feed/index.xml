@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>dynamische Tabelle Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/dynamische-tabelle/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 15 Mar 2018 15:46:16 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>dynamische Tabelle Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Interne Tabelle zur Laufzeit generieren</title>
+		<link>/blog/interne-tabelle-zur-laufzeit-generieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Aug 2007 13:27:37 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[feldkatalog]]></category>
+		<category><![CDATA[create_dynamic_table]]></category>
+		<category><![CDATA[dynamische Tabelle]]></category>
+		<category><![CDATA[interne Tabelle]]></category>
+		<category><![CDATA[Generierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=426</guid>
+
+					<description><![CDATA[<p>Manchmal ist es notwendig und sinnvoll, eine interne Tabelle erst zur Laufzeit zu generieren. Wenn beispielsweise Berichtsdaten aus verschiedenen Jahren gegliedert ausgegeben werden sollen und f&#252;r jedes Jahr eine eigene Spalte ben&#246;tigt wird. </p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-zur-laufzeit-generieren/">Interne Tabelle zur Laufzeit generieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Manchmal ist es notwendig und sinnvoll, eine interne Tabelle erst zur Laufzeit zu generieren. Wenn beispielsweise Berichtsdaten aus verschiedenen Jahren gegliedert ausgegeben werden sollen und für jedes Jahr eine eigene Spalte benötigt wird.</p>
+<p>Sicherlich kann man eine bestimmte Anzahl von Spalten vorsehen und nicht benötigte Spalten bei der Ausgabe ausblenden&#8230; Eleganter ist jedoch die Verwendung der Methode<span class="Apple-converted-space"> </span><span style="color: #fb2412;"><strong>cl_alv_table_create=&gt;create_dynamic_table</strong></span>.</p>
+<p>Mit ihre kann man anhand eines Feldkataloges eine interne Tabelle aufbauen:</p>
+<pre class="lang:abap decode:true sap1 ">CALL METHOD cl_alv_table_create=&gt;create_dynamic_table 
+     EXPORTING 
+        it_fieldcatalog           = gt_fieldcatalog 
+     IMPORTING 
+        ep_table                  = gz_table 
+     EXCEPTIONS 
+        generate_subpool_dir_full = 1 
+        OTHERS                    = 2.</pre>
+<p>Die Bearbeitung der Tabelle ist hinterher allerdings nicht mehr ganz einfach, da nicht mit Spaltennamen gearbeitet werden kann, denn die dynamisch zu generierenden Tabellenspalten kennt der Compiler ja noch nicht.</p>
+<p>Es muss hier mit Feldsymbolen gearbeitet werden. Die einzelnen Felder des Arbeitsbereiches werden über den Index (ASSIGN COMPONENT &lt;index&gt;&#8230;) des Feldes oder über den Namen (ASSIGN COMPONENT &#8216;fieldname&#8217;&#8230;) angesprochen.</p>
+<h2 class="head1">Beispiel-Coding</h2>
+<pre class="lang:abap decode:true sap1">*** Feldkatalog
+DATA gt_fcat             TYPE lvc_t_fcat.
+*** Datenreferenz für interne Tabelle
+DATA gz_table            TYPE REF TO data.
+*** Feld-Symbole für:
+*&gt;&gt; Zeile des Feldkatalogs
+FIELD-SYMBOLS &lt;fcat&gt;     TYPE lvc_s_fcat.
+*&gt;&gt; interne Tabelle
+FIELD-SYMBOLS &lt;table&gt;    TYPE STANDARD TABLE.
+*&gt;&gt; Arbeitsbereich der internen Tabelle
+FIELD-SYMBOLS &lt;workarea&gt; TYPE ANY.
+*&gt;&gt; Feld des Arbeitsbereiches
+FIELD-SYMBOLS &lt;field&gt;    TYPE ANY.
+
+*** Feldkatalog der internen Tabelle aufbauen:
+*1* VBELN
+APPEND INITIAL LINE TO gt_fcat ASSIGNING &lt;fcat&gt;.
+&lt;fcat&gt;-fieldname = 'VBELN'.
+&lt;fcat&gt;-tabname   = 'GZ_TABLE'.
+&lt;fcat&gt;-ref_field = 'VBELN'.
+&lt;fcat&gt;-ref_table = 'VBAK'.
+
+*2* ERDAT
+APPEND INITIAL LINE TO gt_fcat ASSIGNING &lt;fcat&gt;.
+&lt;fcat&gt;-fieldname = 'ERDAT'.
+&lt;fcat&gt;-tabname   = 'GZ_TABLE'.
+&lt;fcat&gt;-ref_field = 'ERDAT'.
+&lt;fcat&gt;-ref_table = 'VBAK'.
+
+START-OF-SELECTION.
+*** Interne Tabelle aus Feldkatalog generieren
+  CALL METHOD cl_alv_table_create=&gt;create_dynamic_table
+    EXPORTING
+      it_fieldcatalog           = gt_fcat
+    IMPORTING
+      ep_table                  = gz_table
+    EXCEPTIONS
+      generate_subpool_dir_full = 1
+      OTHERS                    = 2.
+
+*** Datenreferenz dem Feldsymbol &lt;TABLE&gt; zuweisen
+  ASSIGN gz_table-&gt;* TO &lt;table&gt;.
+
+*** Testdaten in interne Tabelle einfügen
+  APPEND '000001234520070107' TO &lt;table&gt;.
+  APPEND '112233445520050608' TO &lt;table&gt;.
+
+*** Testdaten auslesen und als Liste ausgeben:
+  LOOP  AT &lt;table&gt; ASSIGNING &lt;workarea&gt;.
+
+*** Neue Zeile für jeden Tabelleneintrag
+    NEW-LINE.
+
+*** Felder des Arbeitsbereiches ausgeben
+    DO.
+      ASSIGN COMPONENT sy-index OF STRUCTURE &lt;workarea&gt; TO &lt;field&gt;.
+      IF sy-subrc &gt; 0.
+*** Kein Feld mehr vorhanden
+        EXIT. "from do
+      ELSE.
+*** Feldwert ausgeben
+        WRITE: &lt;field&gt; COLOR COL_TOTAL.
+      ENDIF.
+    ENDDO.
+
+  ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/interne-tabelle-zur-laufzeit-generieren/">Interne Tabelle zur Laufzeit generieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

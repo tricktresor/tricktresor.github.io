@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Design Pattern Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/design-pattern/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:52 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Design Pattern Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Iterator [Design Pattern]</title>
+		<link>/blog/iterator-design-pattern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 02 Feb 2016 22:21:45 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Entwurfsmuster]]></category>
+		<category><![CDATA[Design Pattern]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=466738</guid>
+
+					<description><![CDATA[<p>Design Pattern. Da hilft nur: Selber machen. Dieses Mal stelle ich euch den Iterator vor. Auf Deutsch hört es sich etwas blöd an: Der Wiederholer. Nicht sehr geläufig, aber wenn man den Iterator braucht, ist es gut zu wissen, wie er funktioniert.</p>
+<p>Der Beitrag <a href="/blog/iterator-design-pattern/">Iterator [Design Pattern]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Es bleibt mir eigentlich nur das Abschreiben von ABAP-Guru Naimesh: <a href="http://zevolving.com/2012/01/abap-objects-design-patterns-iterator/">Iterator Pattern</a></p>
+<p>Ich kann kein UML, deswegen verweise ich auf die exzellent aufbereitete Seite von Naimesh.</p>
+<p>Aber damit ich auch was dazu lerne, habe ich mit <a href="https://www.yworks.com/products/yed">yEd</a> das Diagramm einfach mal abgezeichnet:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/dp_iterator.jpg" rel="attachment wp-att-466805"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-466805" src="https://tricktresor.com/wp-content/uploads/2016/02/dp_iterator.jpg" alt="dp_iterator" width="926" height="305" srcset="/wp-content/uploads/2016/02/dp_iterator.jpg 926w, /wp-content/uploads/2016/02/dp_iterator-300x99.jpg 300w, /wp-content/uploads/2016/02/dp_iterator-768x253.jpg 768w" sizes="(max-width: 926px) 100vw, 926px" /></a></p>
+<h2>Was macht der Iterator?</h2>
+<p>Der Iterator &#8211; Wiederholer &#8211; ist ein Entwurfsmuster, das dazu verwendet werden kann, mehrere identische Objekte zu verwalten. Der Zugang zu den einzelnen Objekten erfolgt inder Regel über die Methode GET_NEXT in einer Schleife um alle Elemente abzuarbeiten. Der Zugriff kann ebenfalls über eine Index erfolgen. Ob ein Iterator noch zu bearbeitende Elemente hat, wird über die Methode HAS_NEXT abgefragt.</p>
+<h2>Verwendungsmöglichkeiten</h2>
+<p>Das Iterator-Pattern lässt sich immer dann gut verwenden, wenn ein Objekte mehrere Unterobjekte enthält, deren Anzahl unterschiedlich sein kann. Das Open-Source-Projekt ABAP2XLS verwendet den Iterator beispielsweise für die Verwaltung von Sheets, Styles oder Ranges.</p>
+<p>Der Iterator lässt sich also immer dann gut benutzen, wenn ein Objekt eine unterschiedliche Anzahl von Objekten hat. Neue Objekte werden dann mittels <em>add( object )</em> zu einer <em>Collection</em> hinzugefügt.</p>
+<h2>Unterstützung durch SAP</h2>
+<p>SAP unterstützt die Verwendung des Iterator Pattern durch die Klassen CL_OBJECT_COLLECTION_ITERATOR und CL_OBJECT_COLLECTION. Die beiden Klassen werden in dem Beispielprogramm verwendet.</p>
+<p>Im Gegensatz zu Naimesh denke ich jedoch nicht, dass die von SAP zur Verfügung gestellten Klassen nutzlos sind. Sie lassen sich sehr gut verwenden, wie das unten gezeigte Beispiel beweist.</p>
+<h2>Beispiel</h2>
+<p>In dem folgenden Beispiel habe ich ein Objekt für einen Buchungskreis definiert (LCL_BUKRS) und alle Buchungskreise aus der Tabelle T001 eingelesen und zu einer Collection hinzugefügt. Die Abarbeitung erfolgt dann über eine Schleife, die Abfragt, ob noch Elemente vorhanden sind.</p>
+<p>Der Iterator besitzt keine Methode um den Index wieder auf &#8220;1&#8221; zu setzen. Um das zu erreichen, muss ein aktuelles ITERATOR-Objekt geholt werden.</p>
+<h2>Weitere Informationen</h2>
+<p>Ein Beispiel im SAP-Standard ist das Programm TCL_ITERATOR_EXAMPLE</p>
+<p>Das Beispiel benutzt eigene Klassen für die Iteratoren.</p>
+<pre>*&amp;---------------------------------------------------------------------*
+*&amp; This program is a short introduction in using the ABAP Foundation
+*&amp; classes CL_TCL_AGGREGATE and CL_TCL_ITERATOR.
+*&amp; The development of this classes was inspired by the book
+*&amp; "Design Patterns, Elements of Reusable Object-Oriented Software".
+*&amp; This example demonstrates the power of the Iterator design pattern
+*&amp; (and ABAP Objects too :-). Using the Iterator design pattern you are
+*&amp; able to design and develop robust programs with ability of easy
+*&amp; functionalty improvements. High performance programms with the main
+*&amp; focus to save every possible microsecond should use other concepts,
+*&amp; if the OOO (Object Orientation Overhead ;-) is an issue.
+*&amp;---------------------------------------------------------------------*</pre>
+<h2>Code</h2>
+<pre>REPORT zz_dp_iterator.
+
+CLASS lcl_bukrs DEFINITION.
+
+ PUBLIC SECTION.
+ DATA ms_t001 TYPE t001.
+ METHODS constructor IMPORTING bukrs TYPE bukrs.
+ METHODS get_info RETURNING VALUE(t001) TYPE t001.
+
+ENDCLASS.
+
+CLASS lcl_bukrs IMPLEMENTATION.
+ METHOD constructor.
+ SELECT SINGLE * FROM t001 INTO ms_t001 WHERE bukrs = bukrs.
+ ENDMETHOD.
+ METHOD get_info.
+ t001 = ms_t001.
+ ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_main DEFINITION.
+ PUBLIC SECTION.
+ METHODS start.
+ METHODS get_iterator RETURNING VALUE(itERATOR) TYPE REF TO CL_OBJECT_COLLECTION_ITERATOR.
+ METHODS GET_OBJECT IMPORTING INDEX TYPE I
+ RETURNING VALUE(OBJECT) TYPE REF TO OBJECT .
+
+ PROTECTED SECTION.
+ DATA MR_OBJECT_COLLECTION TYPE REF TO CL_OBJECT_COLLECTION.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+ METHOD start.
+ DATA lr_bukrs TYPE REF TO lcl_bukrs.
+ DATA lt_bukrs TYPE STANDARD TABLE OF bukrs.
+ DATA lv_bukrs TYPE bukrs.
+ SELECT bukrs FROM t001 INTO TABLE lt_bukrs.
+ CREATE OBJECT mr_object_collection.
+
+ LOOP AT lt_bukrs INTO lv_bukrs.
+ CREATE OBJECT lr_bukrs EXPORTING bukrs = lv_bukrs.
+ mr_object_collection-&gt;add( lr_bukrs ).
+
+ ENDLOOP.
+ ENDMETHOD.
+
+ METHOD get_iterator.
+ iterator = mr_object_collection-&gt;if_object_collection~get_iterator( ).
+ ENDMETHOD.
+
+ METHOD get_object.
+ object = mr_object_collection-&gt;get( index ).
+ ENDMETHOD.
+
+ENDCLASS.
+
+DATA gr_main TYPE REF TO lcl_main.
+
+START-OF-SELECTION.
+ CREATE OBJECT gr_main.
+
+ DATA gr_iterator TYPE REF TO cl_object_collection_iterator.
+ DATA gr_bukrs TYPE REF TO lcl_bukrs.
+ DATA gv_butxt TYPE string.
+ DATA gv_index TYPE i.
+ DATA gv_bukrs TYPE bukrs.
+
+ gr_main-&gt;start( ).
+ gr_iterator = gr_main-&gt;get_iterator( ).
+ WHILE gr_iterator-&gt;has_next( ).
+ gr_bukrs ?= gr_iterator-&gt;get_next( ).
+ gv_butxt = gr_bukrs-&gt;get_info( )-butxt.
+ WRITE: / gv_butxt.
+ IF gv_butxt = 'SAP A.G.'.
+ gv_index = gr_iterator-&gt;get_index( ).
+ ENDIF.
+ ENDWHILE.
+
+
+ IF gv_index IS NOT INITIAL.
+ gr_bukrs ?= gr_main-&gt;get_object( gv_index ).
+ gv_bukrs = gr_bukrs-&gt;get_info( )-bukrs.
+ WRITE: / gv_bukrs COLOR COL_GROUP.
+ ENDIF.
+
+ gr_iterator = gr_main-&gt;get_iterator( ).
+
+ WHILE gr_iterator-&gt;has_next( ).
+ gr_bukrs ?= gr_iterator-&gt;get_next( ).
+ gv_butxt = gr_bukrs-&gt;get_info( )-butxt.
+ WRITE: / gv_butxt.
+ IF gv_butxt = 'SAP A.G.'.
+ gv_index = gr_iterator-&gt;get_index( ).
+ ENDIF.
+ ENDWHILE.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/iterator-design-pattern/">Iterator [Design Pattern]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

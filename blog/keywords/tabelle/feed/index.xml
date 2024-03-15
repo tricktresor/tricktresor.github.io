@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>tabelle Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/tabelle/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 28 Mar 2019 14:18:12 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>tabelle Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Ist das gültig?</title>
+		<link>/blog/ist-das-gueltig/</link>
+					<comments>/blog/ist-das-gueltig/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 01 Dec 2016 13:55:19 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[subquery]]></category>
+		<category><![CDATA[Gültigkeit]]></category>
+		<category><![CDATA[Zeitraum]]></category>
+		<category><![CDATA[MAX]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=950065</guid>
+
+					<description><![CDATA[<p>Das fragt man sich als Programmierer häufig. Speziell dann, wenn man aus zeitlich abgegrenzten Datensätzen den richtigen Datensatz herausfinden muss. Hier zeige ich dir, wie man einfach aber sicher ans Ziel kommt.</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig/">Ist das gültig?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das fragt man sich als Programmierer häufig. Speziell dann, wenn man aus zeitlich abgegrenzten Datensätzen den richtigen Datensatz herausfinden muss. Hier zeige ich dir, wie man einfach aber sicher ans Ziel kommt.</p>
+<h2>Gültigkeitszeitraum vs. Gültig ab</h2>
+<p>Wenn Datensätze zeitlich voneinander abgegrenzt werden sollen, hat man in der Regel die folgenden zwei Möglichkeiten:</p>
+<ol>
+<li>Exakte zeitliche Abgrenzung mit &#8220;Gültig ab&#8221; und &#8220;Gültig bis&#8221;</li>
+<li>Abgrenzung mit &#8220;Gültig ab&#8221;</li>
+</ol>
+<p>Bei Variante (1) hat man den Vorteil, dass man einen Zeitraum auch &#8220;schließen&#8221; kann. Beziehungsweise im Umkehrschluss: Man <strong>muss</strong> den Zeitraum auch begrenzen. Anders bei Variante (2): Hier gibt es <strong>immer</strong> einen gültigen Eintrag (sofern mindestens ein Eintrag vorhanden ist).</p>
+<p>Der große Nachteil bei Variante (1) ist ebenfalls, dass eine exakte zeitliche Abgrenzung schwer zu administrieren und zu programmieren ist. Besonders dann, wenn Zeiträume in einen oder zwei vorhandene Zeiträume eingefügt werden sollen. Hier ist Variante (2) deutlich einfacher und pflegeleichter.</p>
+<p>Variante (2) eignet sich also besonders dann sehr gut, wenn zu einem &#8220;Objekt&#8221; immer ein gültiger Eintrag vorhanden sein soll. Deshalb werden wir uns diese Variante genauer ansehen.</p>
+<h2>Gültig ab-Tabelle<a href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-01_14-51-58.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-950141 alignright" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-01_14-51-58.jpg" alt="2016-12-01_14-51-58" width="329" height="442" srcset="/wp-content/uploads/2016/12/2016-12-01_14-51-58.jpg 329w, /wp-content/uploads/2016/12/2016-12-01_14-51-58-223x300.jpg 223w" sizes="(max-width: 329px) 100vw, 329px" /></a></h2>
+<p>Als einfaches Beispiel habe ich mir eine Tabelle erstellt, die ein Gültig-Ab-Datum und eine Monatsbezeichnung hat. Es kann also für jedes Datum eine Bezeichnung vergeben werden.</p>
+<p>Diese Tabelle ist zugegebener Weise einigermaßen Sinn frei, verdeutlicht aber sehr gut das Verfahren.</p>
+<h2>Ermittlung des gültigen Eintrags &#8211; herkömmlich</h2>
+<p>Um aus der vorgestellten Tabelle zu einem Datum den jeweils gültigen Eintrag zu lesen, geht man normalerweise folgendermaßen vor:</p>
+<ol>
+<li>Lies alle Einträge, deren Gültigkeit kleiner gleich dem gewünschten Datum ist.</li>
+<li>Sortiere die Einträge nach GUELTIG_AB absteigend, so dass der aktuellste Eintrag an erster Stelle steht</li>
+<li>Lies den Eintrag an erster Stelle</li>
+</ol>
+<pre class="">SELECT * FROM ztt_datum INTO TABLE lt_datum 
+ WHERE gueltig_ab &lt;= mein_datum
+ ORDER BY gueltig_ab DESCENDING.
+READ TABLE lt_datum INTO DATA(ls_datum) INDEX 1.</pre>
+<p>Der Nachteil von dieser Variante ist, dass man alle jemals gültig gewesenen Einträge lesen muss.</p>
+<h2>Ermittlung des gültigen Eintrags &#8211; Tricktresor-Style</h2>
+<p>Mithilfe eines Subqueries ist es möglich, exakt den einen richtigen Eintrag zu finden. Ein Code-Snippet sagt mehr als tausend Worte:</p>
+<pre class="">SELECT single * FROM ztt_datum INTO @DATA(ls_datum)
+ WHERE datab = ( SELECT MAX( datab )
+                   FROM ztt_datum
+                  WHERE datab &lt;= @p_datum ).</pre>
+<h2></h2>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig/">Ist das gültig?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ist-das-gueltig/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Feldname mit doppeltem Feldnamen</title>
+		<link>/blog/feldname-mit-doppeltem-feldnamen/</link>
+					<comments>/blog/feldname-mit-doppeltem-feldnamen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 29 Sep 2016 09:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[Dynamische Struktur]]></category>
+		<category><![CDATA[Struktur]]></category>
+		<category><![CDATA[ALIAS]]></category>
+		<category><![CDATA[Gruppenname]]></category>
+		<category><![CDATA[Include]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=843204</guid>
+
+					<description><![CDATA[<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt. Was aber, wenn sich die Feldnamen unterscheiden?</p>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hä?</p>
+<p>Die nordfriesisch höfliche Nachfrage ist berechtigt. Wie kann ein Feldname einen doppelten Feldnamen besitzen? Aber der Reihe nach. Erst das Problem, dann die Idee und zum Schluss die Lösung.</p>
+<h2>MOVE-CORRESPONDING</h2>
+<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt.</p>
+<p>&lt;offtopic&gt;Eigentlich müsste der Befehl dann ja COPY-CORRESPONDING heißen, denn der Feldinhalt wird ja nicht verschoben, sondern kopiert&#8230;&lt;/offtopic&gt;.</p>
+<p>Der Befehl birgt aber auch Tücken, denn die Feldnamen müssen immer gleich sein. Häufig hat man jedoch den Fall, dass Feldnamen &#8211; trotz gleicher Funktion und gleichem Datenelement &#8211; in verschiedenen Strukturen anders heißen. Zum Beispiel könnte das Feld in der Quellstruktur LIFNR heißen, in der Zielstruktur heißt es jedoch LIEFERANT.</p>
+<p>Ein nachträgliches MOVE ist in diesem Fall erforderlich:</p>
+<pre>MOVE quell_struktur-lifnr TO ziel_struktrur-lieferant.</pre>
+<p>Das ist nicht weiter schlimm. Wenn man jedoch eine dynamische Struktur als Quellstruktur hat, dann muss man umständlich mittels ASSIGN COMPONENT den Quellwert lesen und dann zuweisen. Das ist umständlich und gegebenenfalls auch zeitkritisch.</p>
+<pre>ASSIGN COMPONENT 'LIFNR' OF STRUCTURE dynamische_quell_struktur TO FIELD-SYMBOLS(&lt;lifnr&gt;).
+IF sy-subrc = 0.
+  ziel_struktur-lieferant = &lt;lifnr&gt;.
+ENDIF.</pre>
+<p>Sofern es sich um kundeneigene Tabellen handelt, kann man den folgenden Trick anwenden und quasi einen ALIAS vergeben:</p>
+<h2>ALIAS-Feldname</h2>
+<p>Stichwort: Benanntes Include. Wir machen uns den Umstand zu Nutze, dass man ein Include in eine Tabelle einbinden kann und dieses Include benennen kann. Das ist eigentlich für inkludierte Strukturen gedacht, um zum Beispiel die komplette Tabelle MARA per Include einbinden zu können und diese auch MARA benennen zu können. Die komplette Struktur MARA steht dann in der inkludierten Struktur zur Verfügung:</p>
+<pre>SELECT * FROM MARA INTO my_struc-mara WHERE...</pre>
+<p>Wir verwenden diese <em>Gruppe</em> nun nicht für eine inkludierte Struktur, sondern nur für ein inkludiertes <em>Feld</em>. Die Technik ist die gleiche.</p>
+<p>Die Tabelle bestand vorher aus den Feldern</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>KENNZ</li>
+</ul>
+<p>Ich möchte diese Tabelle nun so abändern, dass das Feld KENNZ auch unter dem Namen KENNZEICHEN ansprechbar ist. Dafür lege ich einen Include an, der nur das eine Feld KENNZ enthält. Dieses Include wird in die Tabelle eingebunden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg"><img decoding="async" class="alignnone size-full wp-image-843270" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg" alt="2016-09-26_18-01-48" width="802" height="310" srcset="/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg 802w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-300x116.jpg 300w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-768x297.jpg 768w" sizes="(max-width: 802px) 100vw, 802px" /></a></p>
+<p>Die Struktur der Tabelle ist hinterher genau so, wie vorher:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg"><img decoding="async" class="alignnone size-full wp-image-843271" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg" alt="2016-09-26_18-02-48" width="441" height="224" srcset="/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg 441w, /wp-content/uploads/2016/09/2016-09-26_18-02-48-300x152.jpg 300w" sizes="(max-width: 441px) 100vw, 441px" /></a></p>
+<h2>Die richtige Ansprache</h2>
+<p>Den Vorteil, den ich jetzt habe: ich kann das Feld mit dem richtigen Namen KENNZ und mit dem <em>Alias KENNZEICHEN</em>, dem <em>Gruppennamen des Includes</em> ansprechen:</p>
+<pre>DATA lt_tt1 TYPE STANDARD TABLE OF ztt1.
+DATA ls_tt1 TYPE ztt1.
+
+
+SELECT * FROM ztt1 INTO TABLE lt_tt1.
+
+LOOP AT lt_tt1 INTO ls_tt1.
+ IF ls_tt1-kennz = 'X'.
+   ls_tt1-kennzeichen = 'F'.
+ ENDIF.
+ WRITE: / ls_tt1-matnr, ls_tt1-kennz.
+ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/feldname-mit-doppeltem-feldnamen/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Tabellen grafisch darstellen</title>
+		<link>/blog/tabellen-grafisch-darstellen/</link>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Sun, 31 Jan 2016 15:34:48 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[SE11]]></category>
+		<category><![CDATA[grafisch]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=91898</guid>
+
+					<description><![CDATA[<p>Jeder ABAP Entwickler hegt und pflegt wohl seine kleine SAP Tabellen-Liste. Trotzdem ist man immer wieder auf der Suche nach der einen oder anderen Tabelle.<br />
+Ein Ansatz um Zusammenhänge einfacher zu finden, sieht man in der SE11.</p>
+<p>Der Beitrag <a href="/blog/tabellen-grafisch-darstellen/">Tabellen grafisch darstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Jeder ABAP Entwickler hegt und pflegt wohl seine kleine SAP Tabellen-Liste. Trotzdem ist man immer wieder auf der Suche nach der einen oder anderen Tabelle.<br />
+In der SE11 versteckt sich ein nettes Werkzeug mit dessen Hilfe man sich die Zusammenhänge der Tabellen grafisch darstellen lassen kann.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/se11_1.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91904" src="https://tricktresor.com/wp-content/uploads/2015/05/se11_1-300x214.jpg" alt="se11_1" width="300" height="214" srcset="/wp-content/uploads/2015/05/se11_1-300x214.jpg 300w, /wp-content/uploads/2015/05/se11_1.jpg 535w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Zuerst springt man in der SE11 in die Datenbanktabelle.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/se11_2.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91903" src="https://tricktresor.com/wp-content/uploads/2015/05/se11_2-300x100.jpg" alt="se11_2" width="300" height="100" srcset="/wp-content/uploads/2015/05/se11_2-300x100.jpg 300w, /wp-content/uploads/2015/05/se11_2-1024x342.jpg 1024w, /wp-content/uploads/2015/05/se11_2.jpg 1144w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Dort dann die grafische Darstellung auswählen</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/SE11_3.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91902" src="https://tricktresor.com/wp-content/uploads/2015/05/SE11_3-300x150.jpg" alt="SE11_3" width="300" height="150" srcset="/wp-content/uploads/2015/05/SE11_3-300x150.jpg 300w, /wp-content/uploads/2015/05/SE11_3.jpg 907w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Und irgend eine bekannte Tabelle im Umfeld auswählen</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/Se11_4.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91901" src="https://tricktresor.com/wp-content/uploads/2015/05/Se11_4-300x205.jpg" alt="Se11_4" width="300" height="205" srcset="/wp-content/uploads/2015/05/Se11_4-300x205.jpg 300w, /wp-content/uploads/2015/05/Se11_4.jpg 731w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Über den Button &#8220;Fremdschlüssel&#8221; gelangt man endlich zu den Tabellen die irgendwie mit der ausgewählten Tabelle in Verbindung stehen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/Se11_5.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91900" src="https://tricktresor.com/wp-content/uploads/2015/05/Se11_5-300x268.jpg" alt="Se11_5" width="300" height="268" srcset="/wp-content/uploads/2015/05/Se11_5-300x268.jpg 300w, /wp-content/uploads/2015/05/Se11_5.jpg 842w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>In diesem Beispiel findet man anhand der Liste schon alle relevanten Tabellen. EKKN, EKET, EKPO, EBAN usw.<br />
+Um die Beziehung näher zu untersuchen, werden wieder die gewünschten Elemente ausgewählt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/SE11_6.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91899" src="https://tricktresor.com/wp-content/uploads/2015/05/SE11_6-300x181.jpg" alt="SE11_6" width="300" height="181" srcset="/wp-content/uploads/2015/05/SE11_6-300x181.jpg 300w, /wp-content/uploads/2015/05/SE11_6-1024x617.jpg 1024w, /wp-content/uploads/2015/05/SE11_6.jpg 1515w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>und grafisch dargestellt. Per Doppelklick auf die Beziehung zwischen den Tabellen, sieht man die verwendeten Schlüsselfelder.</p>
+<p>&nbsp;</p>
+<p>AWI, 19.05.2015</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/tabellen-grafisch-darstellen/">Tabellen grafisch darstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Table Scanner</title>
+		<link>/blog/table-scanner/</link>
+					<comments>/blog/table-scanner/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 09 Jul 2014 09:32:57 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Tabelleneintrag]]></category>
+		<category><![CDATA[Suche]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4920</guid>
+
+					<description><![CDATA[<p>Es gibt einige Funktionen, die braucht man selten, aber wenn man sie braucht, ist es aufwändig, sie zu bekommen. Eine dieser Informationen ist zum Beispiel: In welchen Tabellen gibt es Einträge für die Verkaufsorganisation ABCD oder in welchen Tabellen wird das Werk XYZ1 verwendet. Mit einem SAP-Standardprogramm bekommst du die Informationen.</p>
+<p>Der Beitrag <a href="/blog/table-scanner/">Table Scanner</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Es gibt einige Funktionen, die braucht man selten, aber wenn man sie braucht, ist es aufwändig, sie zu bekommen. Eine dieser Informationen ist zum Beispiel: In welchen Tabellen gibt es Einträge für die Verkaufsorganisation ABCD oder in welchen Tabellen wird das Werk XYZ1 verwendet. Mit dem SAP-Standardprogramm TABLE_SCANNER bekommst du die Informationen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_09_110750.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4922" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_09_110750.jpg" alt="TABLE_SCANNER SelScreen" width="671" height="395" srcset="/wp-content/uploads/2014/07/Bild_2014_07_09_110750.jpg 671w, /wp-content/uploads/2014/07/Bild_2014_07_09_110750-300x176.jpg 300w, /wp-content/uploads/2014/07/Bild_2014_07_09_110750-624x367.jpg 624w" sizes="(max-width: 671px) 100vw, 671px" /></a></p>
+<p>Die Auswertung zeigt alle Tabellen im Suchbereich sowie deren Einträge an:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_09_110700.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4923" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_09_110700.jpg" alt="TABLE_SCANNER Result" width="627" height="485" srcset="/wp-content/uploads/2014/07/Bild_2014_07_09_110700.jpg 627w, /wp-content/uploads/2014/07/Bild_2014_07_09_110700-300x232.jpg 300w, /wp-content/uploads/2014/07/Bild_2014_07_09_110700-624x482.jpg 624w" sizes="(max-width: 627px) 100vw, 627px" /></a></p>
+<p>Viel Spaß damit!</p>
+<h2>Code</h2>
+<p>Zu Dokumentations- und Recherchezwecken hier der Quelltext: <a href="https://tricktresor.com/wp-content/uploads/2014/07/table_scanner.abap_.txt">table_scanner.abap</a></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/table-scanner/">Table Scanner</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/table-scanner/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Kaskadiertes Lesen von Einträgen</title>
+		<link>/blog/kaskadiertes-lesen-von-eintraegen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 21 Jan 2014 17:14:25 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Generell]]></category>
+		<category><![CDATA[Auftragserfassung]]></category>
+		<category><![CDATA[selektion]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4283</guid>
+
+					<description><![CDATA[<p>Customizingtabellen werden häufig für einen kaskadierten Zugriff aufgebaut. Das bedeutet, dass Steuereinträge keinen vollständigen Schlüssel besitzen müssen, sondern auch mit einem Teil des Schlüssels gepflegt werden können. In diesem Artikel beleuchte ich die einzelnen Möglichkeiten des kaskadierten Lesens dieser Einträge.</p>
+<p>Der Beitrag <a href="/blog/kaskadiertes-lesen-von-eintraegen/">Kaskadiertes Lesen von Einträgen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Viele Prozesse und Funktionen werden im SAP über Customizingtabellen gesteuert. Bei Tabellen mit mehreren Schlüsselfeldern wird häufig eine stufenweise Verarbeitung zugelassen. Das bedeutet, dass nicht der komplette Schlüssel definiert werden muss, sondern es reichen Teile des Schlüssels. In der Regel wird der Lesezugriff so lange mit weniger qualifiziertem Zugriff erfolgen, bis ein Eintrag gefunden wurde.</p>
+<p>Nehmen wir an, in einem Prozess soll anhand von Werk. Lagerort und Material gesteuert werden, ob bei der Auftragserfassung für ein Material eine bestimmte Prüfung erfolgen soll. Die Tabelle wird dann folgendermaßen aussehen:</p>
+<table border="0">
+<tbody>
+<tr>
+<td style="border: 1px solid #000000;"><strong>Feldname</strong></td>
+<td style="border: 1px solid #000000;"><strong>Beschreibung</strong></td>
+</tr>
+<tr>
+<td style="border: 1px solid #000000;">WERKS</td>
+<td style="border: 1px solid #000000;">Werk</td>
+</tr>
+<tr>
+<td style="border: 1px solid #000000;">LGORT</td>
+<td style="border: 1px solid #000000;">Lagerort</td>
+</tr>
+<tr>
+<td style="border: 1px solid #000000;">MATNR</td>
+<td style="border: 1px solid #000000;">Material</td>
+</tr>
+</tbody>
+</table>
+<p>[notice type=&#8217;info&#8217;]Der Mandant gehört (fast) immer in die Tabelle. Da er hier jedoch keine Bedeutung hat, betrachte ich ihn nicht.[/notice]</p>
+<p><img loading="lazy" decoding="async" width="318" height="181" class="alignnone size-full wp-image-4288" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52deab5b8ca15.png" srcset="/wp-content/uploads/2014/01/img_52deab5b8ca15.png 318w, /wp-content/uploads/2014/01/img_52deab5b8ca15-300x170.png 300w" sizes="(max-width: 318px) 100vw, 318px" /></p>
+<h2>Tabellenpflege</h2>
+<p>Die Einträge in der Tabelle sollen bewirken, dass für verschiedene Kombinationen eine Prüfung ausgeführt wird. Dabei muss nicht der vollständige Schlüssel &#8211; also Werk und Lagerort und Materialnummer &#8211; eingegeben werden, sondern es reicht, wenn auch zum Beispiel nur die Materialnummer eingetragen wird. Die Spalte Index dient lediglich der Orientierung, um in der weiteren Beschreibung eindeutig sagen zu können, welcher Eintrag gemeint ist.</p>
+<table style="border-color: #000000; border-width: 0px;" border="0" frame="border">
+<tbody>
+<tr>
+<td style="background-color: #989590;" align="center" valign="middle"><strong>Index</strong></td>
+<td><strong>Werk</strong></td>
+<td><strong>Lagerort</strong></td>
+<td><strong>Materialnummer</strong></td>
+<td><strong>Prüfung ja / nein</strong></td>
+<td><strong>Beschreibung</strong></td>
+</tr>
+<tr>
+<td style="background-color: #989590;" align="center" valign="middle">1</td>
+<td>1000</td>
+<td>A100</td>
+<td>CONTROLLER</td>
+<td>nein</td>
+<td>Gebrauchte Controller aus Lager A100 nicht prüfen</td>
+</tr>
+<tr>
+<td style="background-color: #989590;" align="center" valign="middle">2</td>
+<td>1000</td>
+<td>A100</td>
+<td></td>
+<td>ja</td>
+<td>Gebrauchtes Material aus Lager A100 immer prüfen</td>
+</tr>
+<tr>
+<td style="background-color: #989590;" align="center" valign="middle">3</td>
+<td>1000</td>
+<td></td>
+<td></td>
+<td>nein</td>
+<td>Generell braucht Material aus Werk &#8220;Süd&#8221; nicht geprüft werden</td>
+</tr>
+<tr>
+<td style="background-color: #989590;" align="center" valign="middle">4</td>
+<td></td>
+<td></td>
+<td>TELEFON</td>
+<td>ja</td>
+<td>Telefone immer prüfen!</td>
+</tr>
+<tr>
+<td style="background-color: #989590;" align="center" valign="middle">5</td>
+<td>2000</td>
+<td></td>
+<td>TELEFON</td>
+<td>nein</td>
+<td>außer Sie kommen aus Werk &#8220;Nord&#8221;</td>
+</tr>
+<tr>
+<td style="background-color: #989590;" align="center" valign="middle">6</td>
+<td></td>
+<td>RET1</td>
+<td></td>
+<td>ja</td>
+<td>Materialien aus dem Retourenlager immer prüfen</td>
+</tr>
+<tr>
+<td style="background-color: #989590;" align="center" valign="middle">7</td>
+<td></td>
+<td>RET1</td>
+<td>SOFTWARE</td>
+<td>nein</td>
+<td>Ausnahme: Software aus Retourenlager nicht prüfen</td>
+</tr>
+</tbody>
+</table>
+<p>Einträge der Tabelle ZPRUEF1</p>
+<h2>Kaskadierter Zugriff</h2>
+<p>Bei einem kaskadierten Zugriff auf die Tabelle muss genau definiert werden, in welche Reihenfolge und mit welchen Feldern der Zugriff erfolgen soll. In der Regel ist der vollqualifizierte Zugriff immer der erste:</p>
+<pre>SELECT SINGLE pruefung FROM zpruef1 INTO TABLE lt_zpruef1
+ WHERE werks = i_werks
+   AND lgort = i_lgort
+   AND matnr = i_matnr.</pre>
+<p>Der nächste Zugriff wäre dann ein Zugriff ohne die Materialnummer:</p>
+<pre>SELECT SINGLE pruefung FROM zpruef1 INTO TABLE lt_zpruef1
+ WHERE werks = i_werks
+   AND lgort = i_lgort
+   AND matnr = space.</pre>
+<p>Wurde dann immer noch kein Eintrag gefunden, so wird ausschließlich mit WERKS gelesen:</p>
+<pre>SELECT SINGLE pruefung FROM zpruef1 INTO TABLE lt_zpruef1
+ WHERE werks = i_werks
+   AND lgort = space
+   AND matnr = space.</pre>
+<p>Das Programm enthält nun bereits drei SELECT-Anweisungen. Und wir haben noch gar nicht die Zugriffe auf die anderen Tabelleneinträge (4-7) codiert. Bei diesen Tabelleneinträgen müssen wir uns entscheiden, in welcher Reihenfolge diese gelesen werden sollen.</p>
+<p>Wenn wir hier alle Kombinationen betrachten, dann haben wir zusätzlich zu den bisherigen drei Zugriffen noch die folgenden vier (auf nicht genannte Felder wird mit SPACE zugegriffen):</p>
+<ul>
+<li>WERKS &#8211; MATNR</li>
+<li>LGORT &#8211; MATNR</li>
+<li>LGORT</li>
+<li>MATNR</li>
+</ul>
+<p>Der Vorteil bei diesem Verfahren ist, dass jede benötigte Kombination gezielt programmiert werden kann.</p>
+<p>Nachteil ist die große Menge an verschiedenen Zugriffen, die programmiert werden müssen.</p>
+<h2>Alternative zum kaskadierten Zugriff</h2>
+<p>Das Lesen der Tabelle mit ODER-Bedingung ist eine andere Möglichkeit, den gewünschten Eintrag zu lesen.</p>
+<p>Hierfür lesen wir alle Einträge, bei denen mindestens einer der Felder den gewünschten Werten entspricht:</p>
+<pre>SELECT * FROM zpruef1 INTO TABLE lt_pruef1
+ WHERE ( werks = i_werks OR werks = space )
+   AND ( lgort = i_lgort OR lgort = space )
+   AND ( matnr = i_matnr OR matnr = space ).</pre>
+<p>Um den am meisten qualifizierten Tabelleneintrag zu erhalten, sortieren wir dies Tabelle absteigend. Das bewirkt, dass die Einträge, bei denen die Felder mit Werten gefüllt sind, oben stehen.</p>
+<pre>SORT lt_pruef1 DESCENDING.</pre>
+<p>Nun müssen wir nur den obersten Eintrag lesen und haben den passenden gefunden:</p>
+<pre>READ TABLE lt_pruef1 INTO ls_pruef1 INDEX 1.</pre>
+<p>Vorteile dieses Verfahrens: Das Coding ist kürzer und es muss nicht angepasst werden, wenn ein neues Schlüsselfeld dazu kommt.</p>
+<p>Der Beitrag <a href="/blog/kaskadiertes-lesen-von-eintraegen/">Kaskadiertes Lesen von Einträgen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Änderung von Daten mit Hilfe desTabellenpflegedialogs</title>
+		<link>/blog/aenderung-von-daten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 21 Mar 2013 09:44:48 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[update]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[view]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=669</guid>
+
+					<description><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzuf&#252;gen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten m&#252;ssen zuvor gepr&#252;ft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugef&#252;gt wurden, durchlaufen.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzufügen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten müssen zuvor geprüft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugefügt wurden, durchlaufen.</p>
+<p>Folgendes &#8211; zugegebener Maßen durch Copy and Paste zusammengeschusterte Programm &#8211; demonstriert das Hinzufügen bzw. die Änderung eines Datensatzes in der Tabelle ZTEST1:</p>
+<p class="head1">Felder der Tabelle:</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>FELD1</li>
+<li>FELD2</li>
+</ul>
+<p class="head1">Anmerkungen</p>
+<p>Die Tabellendefinition mit OCCURS ist nicht mehr aktuell.</p>
+<p>Das Coding ist Halb-generisch&#8230; Wo es ohne viel Aufwand möglich war, habe ich versucht, die Tabelle ZTEST1 generisch zu verwenden</p>
+<ul>
+<li>Zuweisung der Werte in TOTAL</li>
+<li>SELECT</li>
+</ul>
+<p>Allerdings habe ich dies nicht stringent verfolgt:</p>
+<ul>
+<li>WHERE_Bedingung ist nicht generisch</li>
+<li>Struktur-Definition ist nicht dynamisch</li>
+</ul>
+<p>Dieses Programm soll auch in erster Linie die Verwendung des Bausteins VIEW_MAINTENANCE_LOW_LEVEL demonstrieren. Ich wollte jedoch darauf achten, dass die Verwendung auch einigermaßen variabel möglich ist.</p>
+<p class="head1">Coding</p>
+<p class="sap1">REPORT.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Selection Screen</span><br />
+PARAMETERS matnr TYPE ztest1-matnr DEFAULT &#8216;1234&#8217;.<br />
+PARAMETERS feld1 TYPE ztest1-feld1 DEFAULT &#8216;TESTFELD1&#8217;.<br />
+PARAMETERS feld2 TYPE ztest1-feld2 DEFAULT &#8216;Hier ist ein Test&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Macro für die Definition der notwendigen Tabellenstruktur</span><br />
+DEFINE _define_vim_tables.<br />
+data: begin of extract_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end   of extract_data.</p>
+<p class="sap1">  data: begin of total_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end of total_data.<br />
+END-OF-DEFINITION.</p>
+<p class="sap1">DATA:   sellist     LIKE vimsellist OCCURS 10 WITH HEADER LINE,<br />
+fu_to_excl  LIKE vimexclfun OCCURS 10 WITH HEADER LINE,<br />
+x_header    LIKE vimdesc    OCCURS 1,<br />
+x_namtab    LIKE vimnamtab  OCCURS 1,<br />
+hlp_sellist LIKE vimsellist OCCURS 0 WITH HEADER LINE,<br />
+corr_keytab LIKE e071k      OCCURS 0.</p>
+<p class="sap1">CONSTANTS viewname TYPE tabname VALUE &#8216;ZTEST1&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Definition der notwendigen Tabellen mit MARK- und ACTION-Flag</span><br />
+_define_vim_tables ztest1.</p>
+<p class="sap1">FIELD-SYMBOLS &lt;f&gt; TYPE ANY.</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufbau Selektionskriterien<br />
+</span>  CLEAR: sellist.<br />
+sellist-viewfield = &#8216;MATNR&#8217;.<br />
+sellist-operator  = &#8216;EQ&#8217;.<br />
+sellist-value     = matnr.<br />
+sellist-and_or    = space.<br />
+APPEND sellist.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Struktur der Tabelle ermitteln<br />
+</span>  CALL FUNCTION &#8216;VIEW_GET_DDIC_INFO&#8217;<br />
+EXPORTING<br />
+viewname        = viewname<br />
+TABLES<br />
+x_header        = x_header<br />
+x_namtab        = x_namtab<br />
+sellist         = hlp_sellist<br />
+EXCEPTIONS<br />
+no_tvdir_entry  = 3<br />
+table_not_found = 5.</p>
+<p class="sap1">  ASSIGN COMPONENT &#8216;MATNR&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = matnr.<br />
+ASSIGN COMPONENT &#8216;FELD1&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld1.<br />
+ASSIGN COMPONENT &#8216;FELD2&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld2.<br />
+ASSIGN COMPONENT &#8216;ACTION&#8217; OF STRUCTURE total_data TO &lt;f&gt;.<br />
+SELECT COUNT(*) FROM (viewname) WHERE matnr = matnr.<br />
+IF sy-subrc = 0.<br />
+<span style="color: #fb2412;">*== Satz ist vorhanden: Änderung</span><br />
+&lt;f&gt; = &#8216;U&#8217;.<br />
+ELSE.<br />
+<span style="color: #fb2412;">*== Satz ist neu<br />
+</span>    &lt;f&gt; = &#8216;N&#8217;.<br />
+ENDIF.<br />
+APPEND total_data.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufruf des Bausteins</span><br />
+CALL FUNCTION &#8216;VIEW_MAINTENANCE_LOW_LEVEL&#8217;<br />
+EXPORTING<br />
+corr_number               = &#8216; &#8216;<br />
+fcode                     = &#8216;SAVE&#8217;<br />
+view_action               = &#8216;U&#8217;<br />
+view_name                 = viewname<br />
+TABLES<br />
+corr_keytab               = corr_keytab<br />
+dba_sellist               = hlp_sellist<br />
+dpl_sellist               = hlp_sellist<br />
+excl_cua_funct            = fu_to_excl<br />
+extract                   = extract_data<br />
+total                     = total_data<br />
+x_header                  = x_header<br />
+x_namtab                  = x_namtab<br />
+EXCEPTIONS<br />
+function_not_found        = 1<br />
+missing_corr_number       = 2<br />
+no_value_for_subset_ident = 3<br />
+saving_correction_failed  = 4<br />
+OTHERS                    = 5.<br />
+IF sy-subrc = 0.<br />
+COMMIT WORK.<br />
+ENDIF.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAP-Projektgesetze</title>
+		<link>/blog/sap-projektgesetze/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 25 Feb 2008 17:30:26 +0000</pubDate>
+				<category><![CDATA[Weisheiten]]></category>
+		<category><![CDATA[gesetz]]></category>
+		<category><![CDATA[axiom]]></category>
+		<category><![CDATA[analyse]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[fehler]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[sap]]></category>
+		<category><![CDATA[projekt]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=460</guid>
+
+					<description><![CDATA[<p>Die vollst&#228;ndigen SAP-Projektgesetze in freier Anlehnung an Murphys Gesetze von Joachim Graf, von M. Treder. Viel Spa&#223;!</p>
+<p>Der Beitrag <a href="/blog/sap-projektgesetze/">SAP-Projektgesetze</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die vollständigen SAP-Projektgesetze in freier Anlehnung an Murphys Gesetze von Joachim Graf, von M. Treder. Viel Spaß!</p>
+<p>In freier Anlehnung an Murphys Gesetze von Joachim Graf, von M. Treder.</p>
+<h2 class="head1">Generelles</h2>
+<h3 class="head2">Projektplanung</h3>
+<p class="text1">Durch Planung wird der Zufall zum Irrtum gemacht, d.h. glaube nicht an Wunder, verlaß dich auf sie.<br />
+Schlecht geplante Projekte brauchen dreimal so lange wie geplant.<br />
+Gut geplante Projekte benötigt nur viermal so lange.</p>
+<h3 class="head2">SPJ-Wahn</h3>
+<p>Mit genau geplanten Aktivitäten und Aufwänden, gepflegten Ressourcen- und Projektkalendern errechnet SPJ über Ausgleichsfunktionen den Projektendtermin.<br />
+Gesetz der Wichtigkeit: Ein Gramm schönere Planung ist wichtiger als ein Kilo Arbeitsergebnisse.</p>
+<h3 class="head2">Projektverlauf</h3>
+<p>Wenn sich irgend etwas bewegt, dann in die falsche Richtung.<br />
+Alles was sich nicht bewegt steht am falschen Platz.<br />
+Seelenlose Dinge entziehen sich grundsätzlich jedem Zugriff.<br />
+Wenn irgend etwas beschleunigt werden soll, beschleunigt sich nur das Auftreten von Problemen und Systemabstürzen.</p>
+<h3 class="head2">Gestaltung systemgestützter betriebswirtschaftlicher Funktionen und<br />
+Ablauforganisation</h3>
+<p>Betriebswirtschaft ist die Lehre vom Geld und wie es die Gesetze der Informatik und gesundem Menschenverstand mißachtet.<br />
+Informatik ist die Lehre vom Computer und wie es die Gesetze der Betriebswirtschaft und gesundem Menschenverstand mißachtet.<br />
+Logik ist das Bindeglied, um mit richtigen betriebswirtschaftlichen Überlegungen zu falschen Schlußfolgerungen in der Informatik zu gelangen.</p>
+<h3 class="head2">Die 80% Regeln für Geschäftsvorfälle</h3>
+<p>80% der Anwender werden nur 20% der Funktionen aus den Geschäftsvorfällen anwenden.<br />
+20% der Anwender benötigen die 80% der Funktionen, die die Geschäftsvorfälle nicht abdecken.<br />
+Alle Teilnehmer deiner Schulung gehören mit hundertprozentiger Sicherheit zu den 20%.<br />
+Die ersten 80% der Geschäftsvorfälle benötigen 80 % der eingeplanten Zeit.<br />
+Die anderen 20% brauchen die restlichen 80%.<br />
+Mit SAP dauert beides doppelt so lang und kostet viermal so viel.</p>
+<h3 class="head2">Oktal-Erkenntnis</h3>
+<p>Von je 10 Geschäftsvorfällen werden nur 8 fertiggestellt werden.</p>
+<h3 class="head2">Achills-Erkenntnis</h3>
+<p>Egal wie langsam sich der Endpunkt der Fertigstellung deiner Geschäftsvorfälle bewegt, du kannst den Vorsprung nicht einholen.</p>
+<h3 class="head2">Axiom der Problemvermehrung</h3>
+<p>In jedem Geschäftsvorfall steckt ein kleines Problem, das gerne raus will.<br />
+In jedem kleinen Problem steckt ein großes, das gerne raus will.<br />
+Wo überhaupt kein Problem ist, steckt ein großes, das gerne raus will.<br />
+Alle Probleme bestehen aus n Gleichungen und haben n+1 Unbekannte.<br />
+Folgerung: Wenn irgend jemand sagt: &#8220;Kein Problem&#8221;, dann hast du eines.</p>
+<p>Erkenntnis: Mißtraue jedem, der erzählt, etwas wäre leicht zu realisieren. Es ist entweder ein Irrer, Ignorant oder Verkäufer der Software.</p>
+<h3 class="head2">Dokumentation</h3>
+<p>Mündliche Erklärungen von Funktionen und Abläufen sind das Papier nicht wert, auf dem sie nicht geschrieben sind.</p>
+<h3 class="head2">Tautologie der Dokumentationsstandards</h3>
+<p>Wenn du nicht weißt, wie dokumentiert werden soll, lies die Dokumentationsstandards</p>
+<h3 class="head2">Widerlegung der Tautologie</h3>
+<p>Die Dokumentationsstandards werden nicht gelesen.</p>
+<h2 class="head1">ABC-FlowChart</h2>
+<p>Der Unterschied zwischen Lineal mit Bleistift und ABC-FlowChart ist, daß du beide nicht vernünftig einsetzen kannst.<br />
+Klickst du auf einen Kasten, um ihn zu verschieben, so wird sich seine Größe ändern.<br />
+Kannst du den Kasten verschieben, dann bewegen sich auch alle anderen Symbole mit.<br />
+Keiner der Vorgänge ist zu widerrufen.<br />
+Kann der Vorgang widerrufen werden, so hast du zwischenzeitlich eine unsinnige Funktion ausgeführt, die widerrufen werden kann.<br />
+Mit der Kurztaste ALT-D-S, an die du aus dem Winword gewöhnt bist, wolltest du Schließen, um noch einmal mit dem alten Dokument zu beginnen.<br />
+Wenn du das ABC-FlowChartdiagramm ausgedruckt hast, wirst du feststellen, daß es noch nicht alles korrigiert ist.</p>
+<h2 class="head1">Projektorganisation</h2>
+<p>Die Summe der Intelligenz im Projekt ist konstant, die Beteiligung steigt.<br />
+Die Summe des eingesetzten Organisations-Knowhows ist umgekehrt proportional zu der Zahl der den Anwendern verständlichen Abläufen und Funktionen.<br />
+Die Wahrscheinlichkeit etwas zu vergessen ist direkt proportional zu &#8230;, äh,&#8230;.zu&#8230;.</p>
+<h3 class="head1">Erkenntnis</h3>
+<p>Inkompetenz kennt keine Grenzen von Raum und Zeit.</p>
+<h3 class="head1">Postulat der Zusammenarbeit</h3>
+<p>Anwender und Systementwickler werden erst vernünftig miteinander umgehen, wenn alle anderen Methoden versagt haben.</p>
+<h3 class="head2">Steigerung</h3>
+<p>Anwender und Systementwickler werden auch dann nicht vernünftig miteinander umgehen, wenn alle anderen Methoden versagt haben.</p>
+<h3 class="head2">1. Folgerung</h3>
+<p>Systementwickler sind sich darüber einig, daß ihr Leben ohne Anwender und deren unverständliche Wünsche sehr viel leichter wäre, d.h. gesegnet sei der Anwender, der nichts erwartet. Er soll nicht enttäuscht werden.</p>
+<h3 class="head2">2. Folgerung</h3>
+<p>Anwender sind sich darüber einig, daß ihr Leben ohne Systementwickler und deren Einwände über die Umsetzbarkeit von Systemanforderungen sehr viel leichter wäre.</p>
+<h3 class="head2">Finale Ableitung</h3>
+<p>Da sich also alle einig darüber sind, daß sie überflüssig sind, ist die konsequente Einführung eines computergestützten IMW der einzige Weg das System so einzustellen, daß es in der richtigen Art mißverstanden werden kann.</p>
+<h3 class="head2">Definition der Arbeitsteilung</h3>
+<p>Die, die können, tun<br />
+Die, die nicht können, schulen<br />
+Die, die nicht schulen können, planen<br />
+Die, die nicht schulen oder planen können, entwickeln<br />
+Die, die nicht entwickeln können, erarbeiten Richtlinien für die Entwickler</p>
+<h3 class="head2">Erkenntnis aus der Arbeitsteilung</h3>
+<p>Tu etwas zur Lösung der Probleme und man wird sich an dich erinnern, wenn es wieder Probleme gibt. Vorher wirst du nicht gefragt werden.</p>
+<h2 class="head1">SAP-Standardsoftware</h2>
+<p>SAP setzt sich aus 5% Fehlfunktionen und 95% in ABAP/4 und Assembler codierter Heimtücke zusammen.<br />
+Die Möglichkeit SAP über Tabellen falsch einzustellen optimiert dieses Verhältnis zu 95% Fehlfunktionen und 95% Heimtücke.<br />
+Die verbleibenden 10%, die zu einer zweihundertprozentigen Fehlersicherheit fehlen, werden durch unvollständige oder falsche Dokumentation wettgemacht.</p>
+<h3 class="head1">Gesetz der komplexen Systeme</h3>
+<p>SAP ist ein komplexes System.<br />
+Komplexe Systeme neigen zu komplexen Fehlern.<br />
+Einfache Systeme hingegen neigen zu komplexen Fehlern.<br />
+In komplexen Systemen gibt es keine Relation zwischen Daten und anwendbaren Funktionen.</p>
+<h3 class="head1">Analyse</h3>
+<p>Was wäre, wenn Gott wirklich gewollt hätte, das SAP einfach einzuführen ist.</p>
+<h3 class="head1">Das Tabellen-Axiom</h3>
+<p>Jede Tabelle, die richtig eingestellt ist, wird früher oder später verstellt.</p>
+<h3 class="head1">Verschärfung des Tabellen-Axioms</h3>
+<p>Alles wird früher verstellt.<br />
+Die Tabelle ist nicht über die 990t geschützt und wird zum ungünstigsten Zeitpunkt verstellt.<br />
+Die alte Tabelleneinstellung ist entweder gelöscht oder überschrieben und nicht im F-Dokument oder FB90 dokumentiert.<br />
+Jede unsinnige Einstellung wurde sofort dokumentiert.<br />
+Die Entwickler, die die Tabelle eingestellt oder verstellt haben, erinnern sich nicht mehr an die richtigen Einstellungen.<br />
+Wenn sie sich doch erinnern, ist die Erinnerung falsch und es kostet einen Manntag dies festzustellen. Damit hat man aber immer noch nicht die richtige Einstellung.</p>
+<h3 class="head1">Übergang zum großen Funktionsschwindel</h3>
+<p>Der Fehler wird sofort als neue Funktion verkauft.</p>
+<h2 class="head1">Realisierung</h2>
+<h3 class="head2">Das Programmier-Paradigma</h3>
+<p>Durch den Einsatz von Standardsoftware erübrigen sich Eigenentwicklungen.</p>
+<h3 class="head2">Ableitung</h3>
+<p>Systementwickler sind für die Einführung von Standardsoftware überflüssig.</p>
+<h3 class="head2">1. Folgerung</h3>
+<p>SAP liefert den Quellcode und eine Entwicklungsumgebung aus.</p>
+<h3 class="head2">2. Folgerung</h3>
+<p>SAP bietet Kurse zur Ausbildung von Systementwicklern an.</p>
+<h3 class="head2">Erkenntnis</h3>
+<p>Jede Firma ist gleich oder die reale Welt ist nur ein Spezialfall des SAP-Modells.</p>
+<p>Systementwickler wären die letzten, die ihre Systeme einsetzen.</p>
+<p>Wenn ein Fehler entdeckt und beseitigt wurde, wird festgestellt, daß es kein Fehler war.</p>
+<p>Anwenderfreundlichkeit ist das entgegenkommende, höfliche und duldsame Verhalten des Anwenders gegenüber dem unflexiblen und rätselhaften Verhalten von IV-Systemen.</p>
+<p>Der Beitrag <a href="/blog/sap-projektgesetze/">SAP-Projektgesetze</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SE16 austricksen</title>
+		<link>/blog/se16-austricksen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 05 May 2003 22:49:52 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[se16n]]></category>
+		<category><![CDATA[tabelle editieren]]></category>
+		<category><![CDATA[&sap_edit]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Debugging]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[se16]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=34</guid>
+
+					<description><![CDATA[<p>In der SE16 k&#246;nnen eigentlich keine Eintr&#228;ge ge&#228;ndert werden, wenn ein Pflegedialog f&#252;r die Tabelle existiert oder die Tabellenklasse ein &#228;ndern nicht zul&#228;sst. Mit Debugging-BErechtigung geht das aber doch!</p>
+<p>Der Beitrag <a href="/blog/se16-austricksen/">SE16 austricksen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In der SE16 können eigentlich keine Einträge geändert werden, wenn ein Pflegedialog für die Tabelle existiert oder die Tabellenklasse ein ändern nicht zulässt. Mit Debugging-BErechtigung geht das aber doch!</p>
+<p>Wenn Sie die Berechtigung zum Debuggen und Feldinhalte ändern haben, dann können Sie relativ einfach Tabelleneinträge ändern.</p>
+<p>Starten Sie die Tabellenanzeige mit <strong>SE16</strong>, geben Ihre Selektionskriterien ein und führen die Suche aus. In der Übersicht markieren Sie die Einträge, die Sie ändern möchten.</p>
+<p>Geben Sie nun in der OK-Code-Zeile &#8220;<span style="color: #fb2412;">/h</span>&#8221; ein, drücken Sie &lt;Enter&gt;  und machen dann einen Doppelklick auf einen markierten Eintrag.</p>
+<p>Sie gelangen in den Debug-Modus. Drücken Sie hier einmal F7 für die Funktion &#8220;Return&#8221;, geben dann in der Feldzeile die Variable &#8220;CODE&#8221; ein. Der Inhalt ist bisher &#8220;SHOW&#8221;. Ändern Sie ihn in &#8220;<span style="color: #fb2412;">EDIT</span>&#8221; und führen das Programm mit F8 weiter aus.</p>
+<p>Sie können nun die markierten Einträge nach belieben ändern.</p>
+<p>Einziger Wermutstropfen: <span style="color: #f49047;">Die Fremdschlüsselprüfung ist aktiv.</span> Sie können also nur Einträge in die Felder schreiben, die durch eine eventuell aktivierte Fremdschlüsselprüfung aktivert sind.</p>
+<h2 class="head2">Nachtrag</h2>
+<p>In neueren Releases muss folgendermaßen vorgegangen werden:</p>
+<p>Um den Edit Mode der SE16 herbei zu führen muss im Unterprogramm  SET_STATUS_VAL ein Breakpoint gesetzt werden: in Zeile 34 &#8211; if code = &#8216;SHOW&#8217;</p>
+<p>Hier kann dann wie gehabt der CODE auf EDIT oder INSR gesetzt werden.</p>
+<h2 class="head1">Einträge editieren mit SE16n</h2>
+<p><a class="hoverZoomLink" href="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130602.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4879 hoverZoomLink" src="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130602-300x125.jpg" alt="Bild_2014_06_25_130602" width="300" height="125" srcset="/wp-content/uploads/2003/05/Bild_2014_06_25_130602-300x125.jpg 300w, /wp-content/uploads/2003/05/Bild_2014_06_25_130602.jpg 343w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Das Ändern von Einträgen mit der <strong>SE16N</strong> ist ebenfalls sehr einfach: Geben Sie einfach, nachdem Sie die zu ändernde Tabelle eingetragen haben, den Funktionscode</p>
+<p class="sap1">&amp;SAP_EDIT</p>
+<p>in die OK-Code-Zeile ein. Es wird dann die Meldung &#8220;SAP-Editierfunktion wurde aktiviert&#8221; ausgegeben und Sie können die Einträge berabeiten.</p>
+<p><span style="color: #fb2412;">Auch in der SE16N ist die Fremdschlüsselprüfung aktiv.</span> Diese kann aber ausgeschaltet werden: Im Selektionsbild der SE16N geben Sie den Funktionscode</p>
+<p class="sap1">&amp;SAP_NO_CHECK</p>
+<p>ein. Dann ist die Fremdschlüsselprüfung deaktiviert. <strong>Diese Funktion ist natürlich mit Vorsicht zu genießen, denn in der Regel haben Fremdschlüsselprüfungen ihren Sinn!!</strong></p>
+<h2 class="head1">Protokoll</h2>
+<p>Die Änderungen, die mit der Transaktion SE16N gemacht werden, werden protokolliert. Diese Änderungen können mit dem <strong>Programm RKSE16N_CD</strong><br />
+ausgewertet werden.</p>
+<h2>Hinweis 1420281</h2>
+<p>In diesem Hinweis ist beschrieben, wie die Editierfunktionalität &amp;sap_edit wieder abgeschaltet werden kann. Ab Release 6.00 wird diese Änderung mit Support Packages 17 &amp; 18 ausgeliefert. Eine Nutzung der funktion &amp;sap_edit ist dann nicht mehr möglich.</p>
+<p>Um trotzdem eine Tabellen ändern zu können, kann man sich &#8211; Feldänderungen im Debugging erlaubt vorausgesetzt &#8211; wie folgt behelfen:</p>
+<ol>
+<li>Aufruf der Transaktion SE16N</li>
+<li>Eingabe des Tabellennamens</li>
+<li>Einschränkung der Werte im Selektionsbild</li>
+<li>/h in OK-Codezeile eingeben (Debugging aktiveren) und Enter drücken</li>
+<li>Selektion ausführen (Funktionstaste F8)</li>
+<li>Im Debugger die Felder gd-edit und gd-sapedit auf X ändern (Siehe Screenshot)</li>
+<li>F8 drücken um fortzufahren</li>
+</ol>
+<p><a href="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130639.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4878 size-full" src="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130639.jpg" alt="Bild_2014_06_25_130639" width="483" height="128" srcset="/wp-content/uploads/2003/05/Bild_2014_06_25_130639.jpg 483w, /wp-content/uploads/2003/05/Bild_2014_06_25_130639-300x79.jpg 300w" sizes="(max-width: 483px) 100vw, 483px" /></a></p>
+<h2>Funktionsbaustein SE16N_INTERFACE</h2>
+<p>Noch einfacher lässt sich die Transaktion SE16n &#8220;austricksen&#8221;, indem du gleich den zu Grunde liegenden Funktionsbaustein SE16N_INTERFACE in der SE37 im Testmodus aufrufst.</p>
+<p>Hier kannst du die beiden Parameter I_EDIT und I_SAPEDIT direkt mit einem X vorbelegen.</p>
+<p>Nachteil bei dieser Variante: Es wird sofort die Ergebnisliste ausgegeben, du kannst also keine Vorselektion machen. Das heißt, <em>machen</em> kannst du sie schon, jedoch nur einigermaßen umständlich über den Parameter IT_AND_SELFIELDS.</p>
+<p>Der Beitrag <a href="/blog/se16-austricksen/">SE16 austricksen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

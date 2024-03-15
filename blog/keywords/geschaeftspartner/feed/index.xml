@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Geschäftspartner Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/geschaeftspartner/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 06 May 2021 16:25:10 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Geschäftspartner Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</title>
+		<link>/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 24 Apr 2021 21:35:23 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Aufzeichnung]]></category>
+		<category><![CDATA[Geschäftspartner]]></category>
+		<guid isPermaLink="false">/?p=1027590</guid>
+
+					<description><![CDATA[<p>Seit einiger Zeit beschäftige ich mich mit den Geschäftspartnern in S/4HANA und deren programmatischer Anlage, Änderung sowie der Erweiterung der einzelnen Sichten. In meinem aktuellen Projekt führt kein Weg an der Anlage der Business Partner per Programm vorbei, da die Daten über eine Schnittstelle kommen und verarbeitet werden müssen. Wie sieht es aber aus, wenn Geschäftspartner zwar massenhaft aber nicht automatisch geändert werden müssen, zum Beispiel durch den Fachbereich? In der aktuellen Situation, in der...</p>
+<p>Der Beitrag <a href="/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/">Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Seit einiger Zeit beschäftige ich mich mit den Geschäftspartnern in S/4HANA und deren programmatischer Anlage, Änderung sowie der Erweiterung der einzelnen Sichten. In meinem aktuellen Projekt führt kein Weg an der Anlage der Business Partner per Programm vorbei, da die Daten über eine Schnittstelle kommen und verarbeitet werden müssen. </p>
+
+
+
+<p>Wie sieht es aber aus, wenn Geschäftspartner zwar massenhaft aber nicht automatisch geändert werden müssen, zum Beispiel durch den Fachbereich? In der aktuellen Situation, in der wir uns befinden, müssen Stammdatenänderungen mitunter schnell erfolgen können. Die IT kann dies oftmals nicht leisten, denn der Aufwand ist erheblich und die Vorlaufzeit mitunter katastrophal. Und wenn dann noch regelmäßige, weit auseinander liegende Releasezyklen dazu kommen (also Produktivsetzung nur alle drei Monate), dann kann locker ein dreiviertel Jahr ins Land gehen, bis der Anwender sein Programm hat.</p>
+
+
+
+<p>Mit der Software <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> können viele Aufgaben vom Anwender selbst erledigt werden. Die Einarbeitungszeit für <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist gering, die Möglichkeiten sind vielfältig.</p>
+
+
+
+<p>Ich möchte heute einmal vergleichen, wie sich meine Programmierung und Simdia² im Vergleich schlagen. </p>
+
+
+
+<h2 class="wp-block-heading">Disziplin: Geschäftszeiten ändern</h2>
+
+
+
+<p>Die Änderung von Geschäftspartnern in S/4HANA ist eine sehr anspruchsvolle Aufgabe. Das Objekt &#8220;Business Partner&#8221; ist komplex und sehr variabel. Es gibt für einzelne Funktionen entsprechende Funktionsbausteine (die man jedoch erst einmal finden muss) oder die zentrale Funktion CL_MD_BP_MAINTAIN=&gt;MAINTAIN, die mit einem komplexen Datentypen <em>gefüttert </em>werden muss. </p>
+
+
+
+<p>Aktuell und wohl auch noch viele Monate später sind die genauen Öffnungszeiten von Partnern wichtig. Kunden haben eventuell eingeschränkte und häufig wechselnde Warenannahmezeiten und auch Lieferanten sind nicht ständig zu den <em>normalen</em> Geschäftszeiten erreichbar.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="604" height="893" src="/wp-content/uploads/2021/04/SNAG-01504.png" alt="" class="wp-image-1027604" srcset="/wp-content/uploads/2021/04/SNAG-01504.png 604w, /wp-content/uploads/2021/04/SNAG-01504-203x300.png 203w" sizes="(max-width: 604px) 100vw, 604px" /><figcaption>Geschäftszeiten eines Geschäftspartners</figcaption></figure>
+
+
+
+<p>Aus diesem Grund denke ich, dass die Funktion der Geschäftszeiten eine sehr wichtige Rolle spielt oder spielen kann. Der Fachbereich erfragt die Geschäftszeiten seiner Partner jedoch in der Regel nicht einzeln um sie dann in den Geschäftspartner einzutragen, sondern erfragt diese eventuell über ein Online-Formular. Oder die Daten werden von Kollegen und Kolleginnen gesammelt, die diese dann in eine Excel-Tabelle eintragen. Am Ende wäre es also für den Fachbereich sehr hilfreich, wenn er ein Programm hätte, mit dem die aktuellen Geschäftszeiten automatisiert in die betroffenen Partner eingetragen werden könnte.</p>
+
+
+
+<h2 class="wp-block-heading">Ablauf in der IT</h2>
+
+
+
+<p>Auch wenn inzwischen viel über Continuous Integration und Continuous Delivery geredet wird, sieht der Alltag in der SAP-IT immer noch anders aus. Natürlich muss der Fachbereich eine Anforderung stellen. Alleine das ist häufig nicht ganz einfach. Die Anforderung muss geprüft und die technische Umsetzung geplant werden. Wenn dann irgendwann ein Programmierer für die Entwicklung eingeplant wurde, müssen weitere Hürden genommen werden:</p>
+
+
+
+<ul><li>Es müssen die richtigen Bausteine für die Aufgabe gefunden werden</li><li>Selbst wenn die programmierende Person sich mit der Programmierung der Geschäftspartner auskennt, muss eventuell erst einmal recherchiert werden</li><li>Dann muss die Excel-Datei eingelesen werden<ul><li>entweder wird tatsächlich eine recht aufwendige Programmierung zum Einlesen der Excel-Datei entwickelt</li><li>oder man macht es sich leicht und liest eine CSV-Datei ein. Dann muss der Fachbereich die Datei erst als CSV speichern, bevor die Datei verarbeitet werden kann</li></ul></li><li>Es müssen eventuell Berechtigungen für die neue Transaktion beantragt und zugeordnet werden</li></ul>
+
+
+
+<p>Sobald das Programm fertiggestellt wurde, muss der Fachbereich testen. Meiner Erfahrung nach funktioniert ein Programm selten nach dem ersten <em>Wurf</em>.</p>
+
+
+
+<p>Häufig kommen noch Urlaub oder Krankheit entweder aus dem Fachbereich oder in der IT hinzu, was die Fertigstellung des Programms verzögert&#8230;</p>
+
+
+
+<p>Und wenn dann noch lange Releasezyklen dazu kommen, dann ist in manchen Firmen die Pandemie bereits vorbei, bevor der Fachbereich das Programm zur Arbeitserleichterung erhalten hat.</p>
+
+
+
+<h2 class="wp-block-heading">Änderung der Geschäftszeiten in S4/HANA mit der Business-Partner-API</h2>
+
+
+
+<p>Da ich mich in letzter Zeit öfters mit der API zu den Geschäftspartnern beschäftigt habe (Klasse CL_MD_BP_MAINTAIN), wollte ich wissen, wie lange ich alleine für die Programmierung zur Änderung der Geschäftszeiten benötige.</p>
+
+
+
+<p>Etwa vier Stunden waren alleine schon nötig, nur um herauszufinden, welche Parameter bei den Geschäftszeiten überhaupt benötigt werden. Viele Parameter gingen häufig nicht aus den definierten Datenelementen hervor und auch nicht aus der Anwendung selbst.</p>
+
+
+
+<p>Beispielsweise ist der Typ (Feldname TYPE), der definiert, welche Regel für die Geschäftszeiten gilt (Täglich, Wöchentlich, Monatlich) vom Typ CHAR2. Ich musste also erst herausfinden, was mit TYPE eigentlich gemeint ist. Welche Id für die Art der Geschäftszeiten (Anrufzeiten, Warenannahmezeiten, Besuchszeiten) verwendet werden muss, habe ich eher durch Zufall herausgefunden. Der SCHEDULE_TYPE hat zwar ein eigenes Datenelement, das jedoch weder Festwerte hat noch auf eine Prüftabelle verweist.</p>
+
+
+
+<p>Durch meine Arbeit mit den Geschäftspartnern, beziehungsweise mit der Klasse CL_MD_BP_MAINTAIN, hatte ich bereits eine passende Fehlerbehandlung. </p>
+
+
+
+<h3 class="wp-block-heading">Coding</h3>
+
+
+
+<p>Der folgende Quelltext legt zu einem Business Partner die Warenannahmezeiten für Montag bis Freitag mit den jeweils übergebenen Von- und Bis-Zeiten an. </p>
+
+
+
+<pre class="wp-block-code"><code>    SELECT SINGLE partner_guid FROM but000 INTO @DATA(guid) WHERE partner = @partner.
+
+    CHECK sy-subrc = 0.
+
+    "fill data structure with relevant customer data
+    DATA(bp_data) = VALUE cvis_ei_extern(
+      partner-header-object_task     = 'M'
+      partner-header-object          = 'BUS1006' "Business Partner
+      partner-header-object_instance = VALUE #(
+      bpartner = partner
+        bpartnerguid           = guid )
+        partner-central_data-business_hour = VALUE #( current_state = ' '
+          business_hours = VALUE #(
+            task = 'M'
+            data_key-schedule_type = 'B' "Warenannahme TAB TB049
+            data-weekly = VALUE #(
+              ( weeks      = 1
+                fcalid     = '01' "Deutschland
+                conflicts  = '0' "Keine Ausnahmen
+                type       = 'W'
+                start_date = sy-datum
+                end_date   = sy-datum + 365
+                monday     = 'X' monda_from = time_from  monday_to  = time_to    mond_tzone = 'CET'
+                tuesday    = 'X' tuesd_from = time_from  tuesday_to = time_to    tues_tzone = 'CET'
+                wednesday  = 'X' wedne_from = time_from  wednesd_to = time_to    wedn_tzone = 'CET'
+                thursday   = 'X' thurs_from = time_from  thursda_to = time_to    thur_tzone = 'CET'
+                friday     = 'X' frida_from = time_from  friday_to  = time_to    frid_tzone = 'CET'
+                saturday   = ' ' satur_from = VALUE #( ) saturda_to = VALUE #( ) satu_tzone = ''
+                sunday     = ' ' sunda_from = VALUE #( ) sunday_to  = VALUE #( ) sund_tzone = '' )
+                )
+                 ( ) ) ) ) .
+
+    TRY.
+
+        SET UPDATE TASK LOCAL.
+        cl_md_bp_maintain=&gt;maintain(
+          EXPORTING
+            i_data     = VALUE #( ( bp_data ) )
+          IMPORTING
+            e_return   = DATA(lt_return)   ).
+
+        IF lt_return IS INITIAL.
+          sy-subrc = 1.
+        ELSE.
+          READ TABLE lt_return&#091; 1 ]-object_msg INTO ls_return WITH KEY type = 'A'.
+          IF sy-subrc &gt; 0.
+            READ TABLE lt_return&#091; 1 ]-object_msg INTO ls_return WITH KEY type = 'E'.
+          ENDIF.
+        ENDIF.
+
+        IF sy-subrc &lt;&gt; 0.
+          CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+        ENDIF.
+      CATCH zcx_bc_bp.
+        RETURN.
+    ENDTRY.</code></pre>
+
+
+
+<p>In meinem Beispiel habe ich noch nicht das Einlesen und Prüfen der Excel-Tabelle programmiert, keine Darstellung der eingelesenen Daten und keine Fehlerbehandlung für den Anwender. </p>
+
+
+
+<p>Deswegen würde ich schätzen, dass die Entwicklung eines ordentlichen Programms, das die Geschäftszeiten anlegt und entsprechend Anwenderfreundlich ist, <strong>mindestens eine Woche Entwicklungszeit </strong>benötigt.</p>
+
+
+
+<h2 class="wp-block-heading">Und was ist jetzt mit SimDia²?</h2>
+
+
+
+<p>Das Tool <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> von Ersasoft, das als Windowsprogramm auf dem PC des Anwenders vorhanden sein muss, wird vom SAP-Anwender bedient. Im Grunde führt der Anwender dabei die gleichen Schritte aus, wie bei einer normalen manuellen Eingabe in der Transaktion, die er gerade benötigt. In unserem Fall ist es die Transaktion &#8220;BP &#8211; Geschäftspartner&#8221;. Diese Arbeitsschritte werden aufgezeichnet und können beliebig oft wiederholt werden.</p>
+
+
+
+<p>Der Anwender legt eine Excel-Datei mit den Daten an, die für die Transaktion benötigt werden. Dabei ist es wichtig, dass die Feldnamen eindeutig sind, damit <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> die Felder eindeutig zuordnen kann. Die Erstellung der Excel-Datei kann ebenfalls durch <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> mit Hilfe des integrierten Vorlagen-Generators erfolgen.</p>
+
+
+
+<h3 class="wp-block-heading">Eingabedatei</h3>
+
+
+
+<p>In unserem Fall benötigen wir eine Datei mit Spalten für die Felder Geschäftspartnernummer und jeweils drei Felder für jeden Tag:</p>
+
+
+
+<ul><li>Tag auswählen (X/space)</li><li>Uhrzeit von</li><li>Uhrzeit bis</li></ul>
+
+
+
+<p>Nach einer kurzen Einführung in die Funktionen und die Arbeitsweise von <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist der Anwender in der Lage, die Transaktion mit den Daten aus der Excel-Datei zu befüllen. Der große Vorteil ist, dass der Anwender seine Transaktion genau kennt und genau weiß, welche Daten benötigt werden.</p>
+
+
+
+<p>Bei der Aufzeichnung muss man sich nach den Besonderheiten der Transaktion richten. Bei der Transaktion BP ist zum Beispiel eine Besonderheit, dass die jeweils letzte Sicht des Geschäftspartners bei Auswahl eines anderen Geschäftspartners erneut präsentiert wird. </p>
+
+
+
+<h3 class="wp-block-heading">Aufzeichnung</h3>
+
+
+
+<p>Die Aufzeichnung ist sehr einfach und intuitiv. <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> und die gewünschte Transaktion müssen gestartet werden. Danach muss die Excel-Datei mit den Daten ausgewählt werden. Mit dem Aufzeichungsassistenten von <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> wird die Aufzeichnung gestartet. Alle Felder der Excel-Tabelle werden im <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a>-Fenster als Drucktaste dargestellt. Der Anwender muss dann nur noch die einzelnen Sichten auswählen, die zu belegenden Felder anklicken und mit einem Klick auf die dazugehörige Drucktaste im <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a>-Fenster die Daten übertragen. Die Aufzeichnung kann natürlich gespeichert und jederzeit wiederverwendet werden.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="530" height="725" src="/wp-content/uploads/2021/04/SNAG-01507.png" alt="" class="wp-image-1027611" srcset="/wp-content/uploads/2021/04/SNAG-01507.png 530w, /wp-content/uploads/2021/04/SNAG-01507-219x300.png 219w" sizes="(max-width: 530px) 100vw, 530px" /><figcaption>Felder aus der Excel-Tabelle</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Daten importieren</h3>
+
+
+
+<p>Zum Import der Daten aus einer Excel-Tabelle müssen die Excel-Datei und die passende Aufzeichnung geladen werden. Die passende Transaktion startet <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> selbstständig und schon können die Daten importiert werden. Am Anfang kann man den Import Schritt für Schritt überwachen um sicher zu gehen, dass die Aufzeichnung wirklich korrekt ist.</p>
+
+
+
+<p>Wenn alles passt, dann kann der Turbo eingeschaltet werden und die Daten werden in Windeseile importiert.  </p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="/wp-content/uploads/2021/04/SNAG-01506-1024x616.png" alt="" class="wp-image-1027610" width="NaN" height="NaN" srcset="/wp-content/uploads/2021/04/SNAG-01506-1024x616.png 1024w, /wp-content/uploads/2021/04/SNAG-01506-300x181.png 300w, /wp-content/uploads/2021/04/SNAG-01506-768x462.png 768w, /wp-content/uploads/2021/04/SNAG-01506.png 1268w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Simdia² integriert in den SAPGUI</figcaption></figure>
+
+
+
+<p>Die importierten Daten werden protokolliert. Kann ein Datensatz nicht gespeichert werden, dann wird dies im Protokoll festgehalten.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="163" src="/wp-content/uploads/2021/04/SNAG-01505-1024x163.png" alt="" class="wp-image-1027609" srcset="/wp-content/uploads/2021/04/SNAG-01505-1024x163.png 1024w, /wp-content/uploads/2021/04/SNAG-01505-300x48.png 300w, /wp-content/uploads/2021/04/SNAG-01505-768x123.png 768w, /wp-content/uploads/2021/04/SNAG-01505.png 1109w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Excel-Datei mit Geschäftszeiten und Protokoll aus Simdia²</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Bei der ABAP-Programmierung habe ich dir eine ungefähre Zeitangabe gegeben, wie lange die Vorarbeit für ein <em>richtiges </em>Programm gedauert hat (Zur Erinnerung: ca. eine Woche). Jetzt bist du sicherlich gespannt, wie lange die Aufzeichnung mit Simdia² gedauert hat? Nun, während ich diesen Artikel schreibe, habe ich die Aufzeichnung erstellt und ein paar Datensätze importiert und ein paar Screenshots gemacht. Ich musste die Aufzeichnung mehrere Male machen, weil ich erst später darüber gestolpert bin, dass ich für das Aktivieren der einzelnen Tage ein separates Feld benötige. Das alles hat insgesamt circa <strong>zwei Stunden </strong>gedauert. Mit etwas Übung ist man mit <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> innerhalb von <strong>10 Minuten</strong> mit einer Aufzeichnung fertig.</p>
+
+
+
+<p><a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist also auf jeden Fall eine Alternative zur ABAP-Programmierung. Besonders dann, wenn die IT überlastet ist und der Fachbereich dringend eine Lösung für zeitraubende, wiederkehrende Arbeiten benötigt.</p>
+
+
+
+<h2 class="wp-block-heading">Sicherheit</h2>
+
+
+
+<p>Sicherheit und Sicherheitslücken sind ein wichtiges Thema in der IT. <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> hat diesbezüglich einen enormen Vorteil: Der Anwender kann nur die Daten ändern, für die er auch die Berechtigung hat. Das ist bei SAP-Programmen nicht immer der Fall und wird gerne übersehen.</p>
+
+
+
+<h2 class="wp-block-heading">Weitere Artikel zu SimDia²</h2>
+
+
+            <div id="post-grid-lazy-1028358" class="post-grid-lazy"><img decoding="async" alt="" src="" /></div>
+        <script>
+            jQuery('#post-grid-lazy-1028358').ready(function($) {
+                $('#post-grid-lazy-1028358').fadeOut();
+                $('#post-grid-1028358   ').fadeIn();
+            })
+        </script>
+        <style type="text/css">
+            #post-grid-1028358 {
+                display: none;
+            }
+
+            .post-grid-lazy {
+                text-align: center;
+            }
+        </style>
+        <div data-options='{&quot;page_type&quot;:&quot;taxonomy&quot;,&quot;page_taxonomy&quot;:&quot;post_tag&quot;,&quot;page_tax_term&quot;:1566,&quot;id&quot;:&quot;1028358&quot;,&quot;lazy_load&quot;:&quot;yes&quot;,&quot;masonry_enable&quot;:&quot;no&quot;,&quot;view_type&quot;:&quot;grid&quot;}' id="post-grid-1028358" class="post-grid grid">
+                <div class="grid-items">
+            <div class="item item-1043503 skin flat even 0 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/abap-und-stellenanzeigen/"><img loading="lazy" decoding="async" width="500" height="500" src="/wp-content/uploads/2020/09/abap-magician-turnbeutel.jpg" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2020/09/abap-magician-turnbeutel.jpg 500w, /wp-content/uploads/2020/09/abap-magician-turnbeutel-300x300.jpg 300w, /wp-content/uploads/2020/09/abap-magician-turnbeutel-150x150.jpg 150w, /wp-content/uploads/2020/09/abap-magician-turnbeutel-83x83.jpg 83w" sizes="(max-width: 500px) 100vw, 500px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/abap-und-stellenanzeigen/">ABAP und Stellenanzeigen</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Den Tricktresor gibt es nun seit über zwanzig Jahren. Am 17.4.2003 habe ich meinen ersten Beitrag verfasst: Drucktaste neben AUSFÜHREN-Button.                    <a target="_self" href="/blog/abap-und-stellenanzeigen/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div><div class="item item-1045109 skin flat odd 1 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/img-struktur-anzeigen/"><img loading="lazy" decoding="async" width="640" height="228" src="/wp-content/uploads/2024/03/image-9.png" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2024/03/image-9.png 739w, /wp-content/uploads/2024/03/image-9-300x107.png 300w" sizes="(max-width: 640px) 100vw, 640px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/img-struktur-anzeigen/">IMG-Struktur anzeigen</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Für den ein oder anderen Fall kann es sinnvoll sein, eine Unternehmensstruktur (IMG) direkt anzeigen oder sogar editieren zu können.                    <a target="_self" href="/blog/img-struktur-anzeigen/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div><div class="item item-1045045 skin flat even 2 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/alv-grid-und-dropdown/"><img loading="lazy" decoding="async" width="332" height="364" src="/wp-content/uploads/2024/03/image-8.png" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2024/03/image-8.png 332w, /wp-content/uploads/2024/03/image-8-274x300.png 274w" sizes="(max-width: 332px) 100vw, 332px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/alv-grid-und-dropdown/">ALV-Grid und Dropdown</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Es gibt einige Verhaltensweise in SAP-Objekten, bei denen ich einfach nicht verstehe, warum diese nicht schon seit langer Zeit behoben                    <a target="_self" href="/blog/alv-grid-und-dropdown/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div><div class="item item-1044885 skin flat odd 3 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/finden-%e2%94%80-nicht-suchen/"><img loading="lazy" decoding="async" width="533" height="179" src="/wp-content/uploads/2024/02/SNAG-0290.jpg" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2024/02/SNAG-0290.jpg 533w, /wp-content/uploads/2024/02/SNAG-0290-300x101.jpg 300w" sizes="(max-width: 533px) 100vw, 533px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/finden-%e2%94%80-nicht-suchen/">Finden ─ nicht suchen</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Ich denke, nach beinahe 30 Jahren Erfahrung mit SAP-Systemen kann ich mich als alten Fuchs bezeichnen und es gibt wenig                    <a target="_self" href="/blog/finden-%e2%94%80-nicht-suchen/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div>        </div>
+            <style type="text/css">
+            .layout-1028386 .element_1587187627902 {
+                            }
+
+                    </style>
+        <style type="text/css">
+        .layout-1028386 .element_1587190790308 {
+            overflow: hidden;
+                    }
+
+        .layout-1028386 .element_1587190790308 img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        @media only screen and (min-width: 1024px) {
+            .layout-1028386 .element_1587190790308 {
+                height: auto;
+                            }
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 1023px) {
+            .layout-1028386 .element_1587190790308 {
+                height: auto;
+                            }
+        }
+
+        @media only screen and (min-width: 0px) and (max-width: 767px) {
+            .layout-1028386 .element_1587190790308 {
+                height: auto;
+                            }
+        }
+    </style>
+        <style type="text/css">
+            .layout-1028386 .element_1587187714568 {
+                margin: 10px;
+                            }
+
+                    </style>
+        <style type="text/css">
+        .layout-1028386 .element_1587187895341 {
+            font-size: 18px;
+            margin: 5px 0px;
+            text-align: left;
+                    }
+
+        .layout-1028386 .element_1587187895341 a {
+            font-size: 18px;
+            margin: 5px 0px;
+            text-align: left;
+                    }
+    </style>
+    <style type="text/css">
+        .layout-1028386 .element_1587187729822 {
+            font-size: 13px;
+            margin: 0px 0px;
+            text-align: left;
+                    }
+
+        .layout-1028386 .element_1587187729822 a {
+            font-size: 13px;
+                    }
+    </style>
+
+
+    
+
+            <style type="text/css">
+            .layout-1028386 a{text-decoration:none}.layout-1028386{vertical-align:top}.layout-1028386 .layer-content{padding:10px}        </style>
+        <script>
+                    </script>
+        <style type="text/css">
+        #post-grid-1028358 {
+            padding: 10px;
+                    }
+
+        #post-grid-1028358 .item {
+            padding: 0px;
+            background: #fff;
+                    }
+
+        #post-grid-1028358 .item .layer-media {
+            height:auto;        }
+
+        @media only screen and (min-width: 0px) and (max-width: 767px) {
+            #post-grid-1028358 .grid-items {
+                text-align: center;
+                            }
+
+            #post-grid-1028358 .item {
+                width: 90%;
+                margin: 10px;
+                display: inline-block;
+                vertical-align: top;
+                height:auto;            }
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 1023px) {
+            #post-grid-1028358 .grid-items {
+                text-align: center;
+                            }
+
+            #post-grid-1028358 .item {
+                width: 250px;
+                margin: 10px;
+                display: inline-block;
+                vertical-align: top;
+                max-height:auto;            }
+        }
+
+        @media only screen and (min-width: 1024px) {
+            #post-grid-1028358 .grid-items {
+                text-align: center;
+                            }
+
+            #post-grid-1028358 .item {
+                width: 250px;
+                display: inline-block;
+                margin: 10px;
+                vertical-align: top;
+                height:auto;            }
+        }
+
+            </style>
+    </div>
+
+<p>Der Beitrag <a href="/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/">Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

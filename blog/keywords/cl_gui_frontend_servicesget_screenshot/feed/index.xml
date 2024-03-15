@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_gui_frontend_services=&gt;get_screenshot Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_gui_frontend_servicesget_screenshot/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 09 Sep 2020 08:11:57 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_gui_frontend_services=&gt;get_screenshot Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Screenshot zur Fehlermeldung erstellen</title>
+		<link>/blog/screenshot-zur-fehlermeldung-erstellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 09 Sep 2020 08:11:55 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[cl_gui_frontend_services=>get_screenshot]]></category>
+		<category><![CDATA[screenshot]]></category>
+		<guid isPermaLink="false">/?p=1024245</guid>
+
+					<description><![CDATA[<p>Fehlermeldungen sind eine wichtige Sache in der Programmierung. Sie geben Auskunft darüber, was schief gelaufen ist und im besten Fall noch, was erwartet wurde. Ich habe gerade gelesen, dass Fehlermeldungen die beste Art der Dokumentation sind, denn diese würden aufmerksam gelesen. Nun ja&#8230; Meine Erfahrungen sind andere. Häufig sind allein stehende Fehlermeldungen nicht aussagekräftig genug. Fehlermeldung 2.0 Wie wäre es denn, wenn man die Fehlermeldung mit einem Screenshot der aktuellen Transaktion verbinden würde? Es ist...</p>
+<p>Der Beitrag <a href="/blog/screenshot-zur-fehlermeldung-erstellen/">Screenshot zur Fehlermeldung erstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Fehlermeldungen sind eine wichtige Sache in der Programmierung. Sie geben Auskunft darüber, was schief gelaufen ist und im besten Fall noch, was erwartet wurde. </p>
+
+
+
+<p>Ich habe gerade gelesen, dass Fehlermeldungen die beste Art der Dokumentation sind, denn diese würden aufmerksam gelesen. Nun ja&#8230; Meine Erfahrungen sind andere.</p>
+
+
+
+<p>Häufig sind allein stehende Fehlermeldungen nicht aussagekräftig genug. </p>
+
+
+
+<h2 class="wp-block-heading">Fehlermeldung 2.0</h2>
+
+
+
+<p>Wie wäre es denn, wenn man die Fehlermeldung mit einem Screenshot der aktuellen Transaktion verbinden würde?</p>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow"><p>Es ist leider der Fehler XYZ aufgetreten. Zu Dokumentationszwecken wird ein Screenshot erstellt, den du an den Verantwortliche:n weiterleiten kannst.</p><cite>Beispielhafte Fehlerpräsentation</cite></blockquote>
+
+
+
+<p>Leider &#8211; oder zum Glück(?) &#8211; wird die Aktion &#8220;Screenshot erstellen&#8221; von einer Sicherheitsabfrage des SAPGUI begleitet. Deswegen ist es sinnvoll den Anwender vor dem Erstellen des Screenshots zu informieren.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="606" height="167" src="/wp-content/uploads/2020/09/SNAG-00712.png" alt="" class="wp-image-1024246" srcset="/wp-content/uploads/2020/09/SNAG-00712.png 606w, /wp-content/uploads/2020/09/SNAG-00712-300x83.png 300w" sizes="(max-width: 606px) 100vw, 606px" /><figcaption>Sicherheitsabfrage vor Erstellen des Screenshots</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Fehlermeldung 3.0</h2>
+
+
+
+<p>Die Krönung wäre es natürlich, wenn der Anwender alles zusammen per Mail an den zuständigen Personenkreis schicken könnte&#8230;</p>
+
+
+
+<h2 class="wp-block-heading">Generelle Hilfestellung</h2>
+
+
+
+<p>Eine andere Möglichkeit, das Tool einzubinden, wäre als direkt Funktion in Transaktionen. Der Anwender könnte in einem Dialog vielleicht eine Frage stellen oder einen Fehler melden, automatisch einen aktuellen Screenshot hinzufügen und dies dann an eine zentrale Stelle oder ausgewählte Key-user oder Verantwortliche schicken.</p>
+
+
+
+<h2 class="wp-block-heading">Quelltext</h2>
+
+
+
+<p>Das folgende Coding ruft die Methode <em>cl_gui_frontend_services=>get_screenshot</em> auf, um einen Screenshot vom aktuellen SAPGUI zu erstellen. Die Daten werden so umgewandelt, dass sie als PNG-Datei gespeichert werden können.</p>
+
+
+
+<pre class="wp-block-code"><code>DATA mime_type  TYPE string.
+DATA image      TYPE xstring.
+DATA tabimg     TYPE STANDARD TABLE OF x.
+DATA path       TYPE string.
+DATA full_path  TYPE string.
+DATA useraction TYPE i.
+DATA name       TYPE string.
+
+cl_gui_frontend_services=>get_screenshot(
+  IMPORTING
+    mime_type_str        = mime_type
+    image                = image
+  EXCEPTIONS
+    access_denied        = 1
+    cntl_error           = 2
+    error_no_gui         = 3
+    not_supported_by_gui = 4
+    OTHERS               = 5 ).
+IF sy-subrc &lt;> 0.
+  RETURN.
+ENDIF.
+
+cl_gui_frontend_services=>file_save_dialog(
+  EXPORTING
+    window_title              = 'save screenshot'
+    default_extension         = 'png'
+    default_file_name         = 'screenshot'
+    prompt_on_overwrite       = 'X'
+  CHANGING
+    path                      = path
+    filename                  = name
+    fullpath                  = full_path
+    user_action               = useraction
+  EXCEPTIONS
+    cntl_error                = 1
+    error_no_gui              = 2
+    not_supported_by_gui      = 3
+    invalid_default_file_name = 4
+    OTHERS                    = 5 ).
+
+IF sy-subrc &lt;> 0.
+  RETURN.
+ENDIF.
+
+IF useraction = cl_gui_frontend_services=>action_ok.
+
+  CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
+    EXPORTING
+      buffer     = image
+    TABLES
+      binary_tab = tabimg.
+
+  cl_gui_frontend_services=>gui_download(
+    EXPORTING
+      filename                  = full_path
+      filetype                  = 'BIN'
+    CHANGING
+      data_tab                  = tabimg
+    EXCEPTIONS
+      OTHERS                    = 99 ).
+
+ENDIF.</code></pre>
+<p>Der Beitrag <a href="/blog/screenshot-zur-fehlermeldung-erstellen/">Screenshot zur Fehlermeldung erstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

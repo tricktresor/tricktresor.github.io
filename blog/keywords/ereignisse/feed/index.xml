@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Ereignisse Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/ereignisse/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 10 Jul 2018 21:55:14 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Ereignisse Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Call Stack umgehen</title>
+		<link>/blog/call-stack-umgehen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 10 Jul 2018 21:55:14 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Events]]></category>
+		<category><![CDATA[Ereignisse]]></category>
+		<category><![CDATA[Exception-class]]></category>
+		<category><![CDATA[Call stack]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018959</guid>
+
+					<description><![CDATA[<p>In dem Artikel Pflegeview mit Datennavigation habe ich eine Möglichkeit vorgestellt, wie man Daten mit Hilfe einer Treedarstellung besser visualisieren und bearbeiten kann. Leider gab es hier Umstand, dass mit jedem Doppelklick auf einen Eintrag im Tree ein neuer Pflegedialog aufgerufen wurde (Call Stack). Mit jeder Navigation wird also ein CALL SCREEN gemacht und somit der Call Stack erhöht. Der Call Stack ist auf eine bestimmte Anzahl Aufrufe beschränkt (ca. 60).  Selbst wenn der Call Stack höher...</p>
+<p>Der Beitrag <a href="/blog/call-stack-umgehen/">Call Stack umgehen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In dem Artikel <a href="https://tricktresor.com/blog/pflegeview-mit-datennavigation/">Pflegeview mit Datennavigation</a> habe ich eine Möglichkeit vorgestellt, wie man Daten mit Hilfe einer Treedarstellung besser visualisieren und bearbeiten kann.</p>
+<p>Leider gab es hier Umstand, dass mit jedem Doppelklick auf einen Eintrag im Tree ein neuer Pflegedialog aufgerufen wurde (Call Stack). Mit jeder Navigation wird also ein CALL SCREEN gemacht und somit der Call Stack erhöht. Der Call Stack ist auf eine bestimmte Anzahl Aufrufe beschränkt (ca. 60).  Selbst wenn der Call Stack höher wäre und somit &#8220;anwendertauglich&#8221;, so wäre es doch irgendwie <em>falsch</em>, es so zu machen.</p>
+<p>Ein Freund hat dann den entscheidenden Hinweis gefunden, um den Call Stack zu durchbrechen.</p>
+<h2>Exception Class</h2>
+<p>Wir benötigen dazu eine eigene Ausnahmeklasse, die von CX_NO_CHECK erbt und die Parameter GROUPLEVEL und INDEX_OUTTAB als Parameter hat:</p>
+<pre class="lang:abap decode:true ">CLASS lcx_restart DEFINITION INHERITING FROM cx_no_check.
+  PUBLIC SECTION.
+    DATA grouplevel TYPE lvc_fname.
+    DATA index_outtab TYPE lvc_index.
+    METHODS constructor
+      IMPORTING
+        grouplevel   TYPE lvc_fname
+        index_outtab TYPE lvc_index.
+ENDCLASS.
+
+CLASS lcx_restart IMPLEMENTATION.
+  METHOD  constructor.
+    CALL METHOD super-&gt;constructor
+      EXPORTING
+        textid   = textid
+        previous = previous.
+    me-&gt;index_outtab = index_outtab .
+    me-&gt;grouplevel = grouplevel .
+  ENDMETHOD.
+ENDCLASS.</pre>
+<h2>Hilfsklasse</h2>
+<p>Wir benötigen eine Hilfsklasse, die die Ausnahme aufruft und den VIEW_MAINTENANCE_CALL beendet:</p>
+<pre class="lang:abap decode:true ">CLASS lcl_helper IMPLEMENTATION.
+  METHOD handle_item_double_click.
+    handle_node_double_click(
+      grouplevel   = grouplevel
+      index_outtab = index_outtab ).
+  ENDMETHOD.
+
+  METHOD handle_node_double_click.
+
+    RAISE EXCEPTION TYPE lcx_restart
+      EXPORTING
+        grouplevel   = grouplevel
+        index_outtab = index_outtab.
+  ENDMETHOD.
+
+  METHOD install_handler.
+    tree = i_tree.
+    SET HANDLER handle_node_double_click FOR tree.
+    SET HANDLER handle_item_double_click FOR tree.
+  ENDMETHOD.
+ENDCLASS.</pre>
+<h2>Ereignisregistrierung</h2>
+<p>Die Ereignisregistrierung kann weiterhin in der <em>Navigationsklasse</em> erfolgen. Die Handler müssen jedoch in der externen Klasse LCL_HELPER installiert werden:</p>
+<pre class="lang:abap decode:true "> METHOD register_events.
+
+    lcl_helper=&gt;install_handler( mo_tree ).
+
+    mo_tree-&gt;set_registered_events( VALUE #(
+          "Used here for applying current data selection
+          ( eventid = cl_gui_column_tree=&gt;eventid_node_double_click )
+          ( eventid = cl_gui_column_tree=&gt;eventid_item_double_click )
+          "Important! If not registered nodes will not expand -&gt;No data
+          ( eventid = cl_gui_column_tree=&gt;eventid_expand_no_children ) ) ) .
+
+  ENDMETHOD.</pre>
+<p>Zur Installation der Handler übergeben wir einfach die Instanz des Trees um in der Hilfsklasse auf die Ereignisse reagieren zu können.</p>
+<h2>View_Maintenance_Call</h2>
+<p>Der eigentliche Clou ist jedoch, dass wir den Aufruf des Funktionsbaustein VIEW_MAINTENANCE_CALL mit einem TRY-CATCH-Block kapseln:</p>
+<pre class="lang:abap decode:true ">  METHOD view_maintenance_call.
+    TRY.
+        CALL FUNCTION 'VIEW_MAINTENANCE_CALL'
+          EXPORTING
+            action      = 'S'
+            view_name   = ms_tvdir-tabname
+          TABLES
+            dba_sellist = it_sellist
+          EXCEPTIONS
+            OTHERS      = 15.
+      CATCH lcx_restart INTO DATA(restart).
+        handle_selection( EXPORTING
+          grouplevel   = restart-&gt;grouplevel
+          index_outtab = restart-&gt;index_outtab ).
+    ENDTRY.
+  ENDMETHOD.</pre>
+<p>Wir das Ereignis LCX_RESTART ausgelöst, dann starten wir den Pflegedialog einfach erneut. Allerdings nun mit einem abgebauten Call Stack.</p>
+<h2>Call Stack umgehen</h2>
+<p>Den Call Stack durch einen externen RAISE EXCEPTION abzubrechen könnte auch in anderen Fällen hilfreich sein. In welchen, das musst du selber herausfinden&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/call-stack-umgehen/">Call Stack umgehen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

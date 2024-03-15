@@ -1,0 +1,1735 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Tricktresor</title>
+	<atom:link href="/feed/" rel="self" type="application/rss+xml" />
+	<link>/</link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 11 Mar 2024 17:26:54 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Tricktresor</title>
+	<link>/</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>IMG-Struktur anzeigen</title>
+		<link>/blog/img-struktur-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 11 Mar 2024 17:10:33 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[einführungsleitfaden]]></category>
+		<category><![CDATA[unternehmens-img]]></category>
+		<category><![CDATA[img-struktur]]></category>
+		<category><![CDATA[Knoten]]></category>
+		<category><![CDATA[img]]></category>
+		<guid isPermaLink="false">/?p=1045109</guid>
+
+					<description><![CDATA[<p>Für den ein oder anderen Fall kann es sinnvoll sein, eine Unternehmensstruktur (IMG) direkt anzeigen oder sogar editieren zu können. Hintergrundinfo Die IMG-Struktur wird hauptsächlich in den Tabellen TTREE und TTREET verwaltet. Eine IMG-Struktur hat eine GUID und kann über den Kurztext in Tabelle TTREET ermittelt werden. IMG steht übrigens für Implementation Guide (Einführungsleitfaden). Die Knoten einer Unternehmensstruktur kannst du im SAP-Customizing über Transaktion SPRO einsehen und aufrufen. Einzelne Knoten werden mit Transaktion SIMGH angezeigt....</p>
+<p>Der Beitrag <a href="/blog/img-struktur-anzeigen/">IMG-Struktur anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Für den ein oder anderen Fall kann es sinnvoll sein, eine Unternehmensstruktur (IMG) direkt anzeigen oder sogar editieren zu können. </p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="739" height="263" src="/wp-content/uploads/2024/03/image-9.png" alt="" class="wp-image-1045110" srcset="/wp-content/uploads/2024/03/image-9.png 739w, /wp-content/uploads/2024/03/image-9-300x107.png 300w" sizes="(max-width: 739px) 100vw, 739px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Hintergrundinfo</h2>
+
+
+
+<p>Die IMG-Struktur wird hauptsächlich in den Tabellen TTREE und TTREET verwaltet. Eine IMG-Struktur hat eine GUID und kann über den Kurztext in Tabelle TTREET ermittelt werden. IMG steht übrigens für <em>Implementation Guide</em> (Einführungsleitfaden).</p>
+
+
+
+<p>Die Knoten einer Unternehmensstruktur kannst du im SAP-Customizing über Transaktion SPRO einsehen und aufrufen.</p>
+
+
+
+<p>Einzelne Knoten werden mit Transaktion SIMGH angezeigt. Erweiterungen zur Unternehmensstruktur kannst du mit Transaktion S_IMG_EXTENSION verwalten.</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<p>Das folgende Programm bietet die Möglichkeit, eine IMG-Struktur direkt anzuzeigen oder zu bearbeiten.</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="generic" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">
+PARAMETERS: 
+  p_struct TYPE ttree-id OBLIGATORY,
+  p_edit   TYPE xfeld.
+
+START-OF-SELECTION.
+  IF NOT p_struct IS INITIAL.
+    CALL FUNCTION 'STREE_EXTERNAL_EDIT'
+      EXPORTING
+        structure_id   = p_struct
+        language       = sy-langu
+        edit_structure = 'X' 
+        activity       = COND char1( WHEN p_edit = 'X' THEN 'E' ELSE 'D' ).
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/img-struktur-anzeigen/">IMG-Struktur anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid und Dropdown</title>
+		<link>/blog/alv-grid-und-dropdown/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 08 Mar 2024 21:09:41 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<guid isPermaLink="false">/?p=1045045</guid>
+
+					<description><![CDATA[<p>Es gibt einige Verhaltensweise in SAP-Objekten, bei denen ich einfach nicht verstehe, warum diese nicht schon seit langer Zeit behoben wurden. Eine dieser Missstände ist, dass im Eingabebereiten ALV-Grid Felder nicht leer gelassen werden können, wenn an der Domäne Festwerte definiert sind und zu den Festwerten kein SPACE gehört. Dann sieht es so aus: Ein anderes Phänomen sind für mich die Drop-Down-Listen, oder auch Listboxen oder Auswahllisten. Hier gibt es zwei Varianten: Variante A ist...</p>
+<p>Der Beitrag <a href="/blog/alv-grid-und-dropdown/">ALV-Grid und Dropdown</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Es gibt einige Verhaltensweise in SAP-Objekten, bei denen ich einfach nicht verstehe, warum diese nicht schon seit langer Zeit behoben wurden. Eine dieser Missstände ist, dass im Eingabebereiten ALV-Grid Felder nicht leer gelassen werden können, wenn an der Domäne Festwerte definiert sind und zu den Festwerten kein SPACE gehört. Dann sieht es so aus:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="421" height="187" src="/wp-content/uploads/2024/03/image.png" alt="" class="wp-image-1045074" srcset="/wp-content/uploads/2024/03/image.png 421w, /wp-content/uploads/2024/03/image-300x133.png 300w" sizes="(max-width: 421px) 100vw, 421px" /></figure>
+
+
+
+<p>Ein anderes Phänomen sind für mich die Drop-Down-Listen, oder auch Listboxen oder Auswahllisten. Hier gibt es zwei Varianten:</p>
+
+
+
+<ul>
+<li>Variante A: nur mit dem internen Feldwert</li>
+
+
+
+<li>Variante B: Alias, die einen internen Feldwert und eine Bezeichnung erlaubt</li>
+</ul>
+
+
+
+<p>Variante A ist fast immer nutzlos, denn in den seltensten Fällen möchte man nur den internen Wert in der Auswahlhilfe sehen. Hier ein Beispiel im Feld &#8220;Status&#8221;:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="793" height="216" src="/wp-content/uploads/2024/03/image-1.png" alt="" class="wp-image-1045075" srcset="/wp-content/uploads/2024/03/image-1.png 793w, /wp-content/uploads/2024/03/image-1-300x82.png 300w, /wp-content/uploads/2024/03/image-1-768x209.png 768w" sizes="(max-width: 793px) 100vw, 793px" /></figure>
+
+
+
+<p>Variante B mit dem Alias ist bereits hilfreicher, denn der Anwender kann bei der Auswahl der Werte erkennen, was der Wert bedeutet. Hier ein Beispiel im Feld &#8220;Fruit&#8221;:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="793" height="216" src="/wp-content/uploads/2024/03/image-2.png" alt="" class="wp-image-1045076" srcset="/wp-content/uploads/2024/03/image-2.png 793w, /wp-content/uploads/2024/03/image-2-300x82.png 300w, /wp-content/uploads/2024/03/image-2-768x209.png 768w" sizes="(max-width: 793px) 100vw, 793px" /></figure>
+
+
+
+<p>Hier ist für mich jedoch das Manko, dass nach Auswahl der Bezeichner nicht mehr zu sehen ist. Zudem wird der interne Wert in der Drop-Down-Liste nicht angezeigt, wenn man ihn nicht explizit mit einprogrammiert. </p>
+
+
+
+<p>Beide Varianten unterscheiden sich somit von den Listboxen, die man vom Dynpro kennt. Hier kann man den beschreibenden Text nicht nur bei der Eingabe sehen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="543" height="178" src="/wp-content/uploads/2024/03/image-6.png" alt="" class="wp-image-1045080" srcset="/wp-content/uploads/2024/03/image-6.png 543w, /wp-content/uploads/2024/03/image-6-300x98.png 300w" sizes="(max-width: 543px) 100vw, 543px" /></figure>
+
+
+
+<p>Sondern auch <strong>nach </strong>der Auswahl:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="535" height="47" src="/wp-content/uploads/2024/03/image-5.png" alt="" class="wp-image-1045079" srcset="/wp-content/uploads/2024/03/image-5.png 535w, /wp-content/uploads/2024/03/image-5-300x26.png 300w" sizes="(max-width: 535px) 100vw, 535px" /></figure>
+
+
+
+<p>Im SAPGUI kannst du noch einstellen, ob du den Schlüsselwert sehen möchtest oder nicht:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="922" height="638" src="/wp-content/uploads/2024/03/image-7.png" alt="" class="wp-image-1045081" srcset="/wp-content/uploads/2024/03/image-7.png 922w, /wp-content/uploads/2024/03/image-7-300x208.png 300w, /wp-content/uploads/2024/03/image-7-768x531.png 768w" sizes="(max-width: 922px) 100vw, 922px" /></figure>
+
+
+
+<p>Das ist eine sinnvolle Darstellung von Listboxen.</p>
+
+
+
+<h2 class="wp-block-heading">Drop-Down-Liste und Festwerte</h2>
+
+
+
+<p>Für das ALV-Grid gibt es meines Wissens keine einfache Alternative um ein Feld als Listbox im Feldkatalog zu definieren, so dass vorhandene Festwerte direkt und ohne weiteres Zutun in der Drop-Down-Liste angezeigt werden.</p>
+
+
+
+<h2 class="wp-block-heading">Alternativen</h2>
+
+
+
+<p>Jedes Mal auf&#8217;s Neue kann ich nicht glaube, dass es im ALV-Grid keine andere Möglichkeit gibt, also habe ich mir folgende Alternativen überlegt. Beide Alternativen arbeiten mit einem zusätzlichen Feld.</p>
+
+
+
+<ol>
+<li>Auswahl Schlüsselfeld und Beschreibung in separates Feld</li>
+
+
+
+<li>Auswahl Textfeld und Ermittlung der ID</li>
+</ol>
+
+
+
+<p>Beide Varianten bedeuten mehr Aufwand, denn du musst das Ereignis DATA_CHANGED registrieren und ausprogrammieren. Sie bedeuten jedoch für den Anwender auch einen größeren Bedienkomfort.</p>
+
+
+
+<p>Leider habe ich noch keine Möglichkeit gefunden, dass der Text sofort nach Auswahl aktualisiert wird. Der Anwender muss in jedem Fall eine Taste drücken oder in ein anderes Feld klicken.</p>
+
+
+
+<h3 class="wp-block-heading">Auswahl Schlüsselfeld</h3>
+
+
+
+<p>Ich definiere für die Ausgabe ein separates Feld, das den Bezeichner des zugehörigen Feldes aufnimmt. In diesem Beispiel das Feld &#8220;Hardware-ID&#8221;:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="793" height="216" src="/wp-content/uploads/2024/03/image-3.png" alt="" class="wp-image-1045077" srcset="/wp-content/uploads/2024/03/image-3.png 793w, /wp-content/uploads/2024/03/image-3-300x82.png 300w, /wp-content/uploads/2024/03/image-3-768x209.png 768w" sizes="(max-width: 793px) 100vw, 793px" /></figure>
+
+
+
+<p>Ich verwende die Drop-Down-Alias-Variante. Zusätzlich wird im Ereignis CL_GUI_ALV_GRID-DATA_CHANGED der Feldwert ausgelesen und mittels MODIFY_CELL in das zugehöriger Bezeichnerfeld geschrieben. </p>
+
+
+
+<h3 class="wp-block-heading">Auswahl Textfeld</h3>
+
+
+
+<p>In dieser Variante definiere ich die Drop-Drown-Liste für das Beschreibungsfeld und ermittle aus der Beschreibung den internen Schlüssel:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="332" height="364" src="/wp-content/uploads/2024/03/image-8.png" alt="" class="wp-image-1045082" srcset="/wp-content/uploads/2024/03/image-8.png 332w, /wp-content/uploads/2024/03/image-8-274x300.png 274w" sizes="(max-width: 332px) 100vw, 332px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Welche Variante du verwendest, musst du selbst entscheiden. Meiner Meinung nach ist die erste Variante einen Tick einfacher, da hier bei dem internen Feldwert der <em>richtige</em> interne Wert direkt mitgegeben werden kann und so der Text zur ID ermittelt wird. Bei der zweiten Variante wird die ID zum Text ermittelt, was eher ungewöhnlich ist.</p>
+
+
+
+<p>Vorteil der zweiten Variante ist, dass das Schlüsselfeld mit dem internen Wert einfach versteckt werden kann und so für den Benutzer gar nicht sichtbar ist. Der Benutzer sieht also nur den Wert, der in der Regel auch sprechend und sinnvoll für ihn ist.</p>
+
+
+
+<p>In beiden Fällen muss sichergestellt werden, dass interner Wert und externe Beschreibung immer zueinander passen und korrekt ermittelt werden.</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT.
+
+PARAMETERS p_hwid TYPE c LENGTH 1 AS LISTBOX VISIBLE LENGTH 20.
+
+
+CLASS main DEFINITION.
+  PUBLIC SECTION.
+    TYPES: BEGIN OF _line,
+             id   TYPE c LENGTH 1,
+             text TYPE c LENGTH 20,
+           END OF _line,
+           _tab TYPE SORTED TABLE OF _line WITH UNIQUE KEY id.
+
+    TYPES: BEGIN OF _data_line,
+             key         TYPE c LENGTH 2,
+             status      TYPE c LENGTH 1, "Dropdown
+             fruit       TYPE c LENGTH 1, "Dropdown Alias
+             hardware    TYPE c LENGTH 1, "Dropdown Alias + separate text field
+             hw_text     TYPE c LENGTH 20,
+             weekday_id  TYPE c LENGTH 1,
+             weekday_txt TYPE c LENGTH 20,
+           END OF _data_line,
+           _data_table TYPE STANDARD TABLE OF _data_line WITH EMPTY KEY.
+
+    CLASS-DATA hw_ids TYPE _tab.
+    CLASS-DATA weekday_ids TYPE _tab.
+
+    METHODS constructor.
+    CLASS-METHODS class_constructor.
+
+    METHODS display
+      IMPORTING
+        container TYPE REF TO cl_gui_container.
+
+  PRIVATE SECTION.
+    DATA datatable TYPE _data_table.
+    DATA grid TYPE REF TO cl_gui_alv_grid.
+
+    DATA dropdown       TYPE lvc_t_drop.
+    DATA dropdown_alias TYPE lvc_t_dral.
+
+    CONSTANTS dd_handle_status  TYPE i VALUE 1.
+    CONSTANTS dd_handle_fruit   TYPE i VALUE 2.
+    CONSTANTS dd_handle_hw      TYPE i VALUE 3.
+    CONSTANTS dd_handle_weekday TYPE i VALUE 4.
+
+    METHODS on_data_changed FOR EVENT data_changed
+      OF cl_gui_alv_grid
+      IMPORTING
+        e_onf4
+        e_onf4_after
+        e_onf4_before
+        e_ucomm
+        er_data_changed.
+
+    METHODS get_fcat
+      RETURNING VALUE(result) TYPE lvc_t_fcat.
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+  METHOD class_constructor.
+
+    hw_ids = VALUE #(
+      ( id = 'X' text = 'Tablet' )
+      ( id = 'Y' text = 'Personal Computer' )
+      ( id = 'Z' text = 'Laptop' ) ).
+
+    weekday_ids = VALUE #(
+      ( id = '1' text = 'Monday' )
+      ( id = '2' text = 'Tuesday' )
+      ( id = '3' text = 'Wednesday' )
+      ( id = '4' text = 'Thursday' )
+      ( id = '5' text = 'Friday' )
+      ( id = '6' text = 'Saturday' )
+      ( id = '7' text = 'Sunday' ) ).
+
+  ENDMETHOD.
+
+  METHOD constructor.
+
+    "Simple Dropdown: STATUS
+    dropdown = VALUE #( handle = dd_handle_status
+      ( value = '1' )
+      ( value = '2' )
+      ( value = '3' ) ).
+
+    "Dropdown-Alias: FRUITS
+    dropdown_alias = VALUE #( handle = dd_handle_fruit
+      ( int_value = 'A' value = 'Apple' )
+      ( int_value = 'B' value = 'Banana' )
+      ( int_value = 'C' value = 'Coconut' ) ).
+
+    "Dropdown-Alias with description field: HARDWARE
+    APPEND LINES OF VALUE lvc_t_dral(
+      FOR l_hw IN hw_ids (
+        handle = dd_handle_hw
+        int_value = l_hw-id
+        value = l_hw-text ) )
+          TO dropdown_alias.
+
+    "Dropdown-Alias with description selection: WEEKDAY
+    APPEND LINES OF VALUE lvc_t_dral(
+      FOR l_wd IN weekday_ids (
+        handle = dd_handle_weekday
+        int_value = l_wd-text
+        value = l_wd-text ) )
+          TO dropdown_alias.
+
+    "fill demo data in internal table
+    datatable = VALUE #(
+       ( key = '10' status = '1' fruit = 'A' hardware = 'X' weekday_id = '3' )
+       ( key = '20' )
+       ( key = '30' ) ).
+
+  ENDMETHOD.
+
+  METHOD display.
+
+    grid = NEW #( i_parent = container ).
+
+    DATA(fcat) = get_fcat( ).
+
+    LOOP AT datatable ASSIGNING FIELD-SYMBOL(&lt;data>).
+      IF &lt;data>-hardware IS NOT INITIAL.
+        &lt;data>-hw_text = dropdown_alias[ handle = dd_handle_hw int_value = &lt;data>-hardware ]-value.
+        &lt;data>-weekday_txt = weekday_ids[ id = &lt;data>-weekday_id ]-text.
+      ENDIF.
+    ENDLOOP.
+
+    grid->set_drop_down_table(
+      it_drop_down       = dropdown
+      it_drop_down_alias = dropdown_alias ).
+
+    grid->set_table_for_first_display(
+      CHANGING
+        it_outtab                     = datatable
+        it_fieldcatalog               = fcat
+      EXCEPTIONS
+        OTHERS                        = 4 ).
+    IF sy-subrc > 0.
+      RETURN.
+    ENDIF.
+
+    SET HANDLER on_data_changed FOR grid.
+    grid->register_edit_event( cl_gui_alv_grid=>mc_evt_modified ).
+
+  ENDMETHOD.
+
+  METHOD get_fcat.
+
+      result = VALUE #( tabname = '1' datatype = 'CHAR'
+      ( fieldname = 'KEY'         outputlen = 10 intlen =  2 drdn_hndl = 0                 drdn_alias = ' ' reptext = 'Key'             edit = ' ' )
+      ( fieldname = 'STATUS'      outputlen = 10 intlen =  1 drdn_hndl = dd_handle_status  drdn_alias = ' ' reptext = 'Status'          edit = 'X' )
+      ( fieldname = 'FRUIT'       outputlen = 10 intlen =  1 drdn_hndl = dd_handle_fruit   drdn_alias = 'X' reptext = 'Fruit'           edit = 'X' )
+      ( fieldname = 'HARDWARE'    outputlen = 10 intlen =  1 drdn_hndl = dd_handle_hw      drdn_alias = 'X' reptext = 'Hardware-ID'     edit = 'X' )
+      ( fieldname = 'HW_TEXT'     outputlen = 30 intlen = 20 drdn_hndl = 0                 drdn_alias = ' ' reptext = 'Hardware descr.' edit = ' ' )
+      ( fieldname = 'WEEKDAY_ID'  outputlen = 10 intlen =  1 drdn_hndl = 0                 drdn_alias = ' ' reptext = 'Weekday ID'      edit = ' ' )
+      ( fieldname = 'WEEKDAY_TXT' outputlen = 20 intlen = 20 drdn_hndl = dd_handle_weekday drdn_alias = 'X' reptext = 'Weekday'         edit = 'X' lowercase = 'X')
+        ).
+
+  ENDMETHOD.
+
+  METHOD on_data_changed.
+    DATA text TYPE string.
+
+    LOOP AT er_data_changed->mt_good_cells INTO DATA(cell).
+      CASE cell-fieldname.
+        WHEN 'HARDWARE'.
+          text = COND #( WHEN cell-value IS INITIAL THEN `` ELSE dropdown_alias[ handle = dd_handle_hw int_value = cell-value ]-value ).
+          er_data_changed->modify_cell(
+            i_row_id    = cell-row_id
+            i_tabix     = cell-tabix
+            i_fieldname = 'HW_TEXT'
+            i_value     = text ).
+        WHEN 'WEEKDAY_TXT'.
+          text = COND #( WHEN cell-value IS INITIAL THEN `` ELSE weekday_ids[ text = cell-value ]-id ).
+          er_data_changed->modify_cell(
+            i_row_id    = cell-row_id
+            i_tabix     = cell-tabix
+            i_fieldname = 'WEEKDAY_ID'
+            i_value     = text ).
+      ENDCASE.
+    ENDLOOP.
+  ENDMETHOD.
+ENDCLASS.
+
+
+INITIALIZATION.
+  DATA(docker) = NEW cl_gui_docking_container( side = cl_gui_docking_container=>dock_at_bottom ratio = 80 ).
+  DATA(app) = NEW main( ).
+  app->display( docker ).
+
+  CALL FUNCTION 'VRM_SET_VALUES'
+    EXPORTING
+      id     = 'P_HWID'
+      values = CORRESPONDING vrm_values( main=>hw_ids MAPPING key = id text = text ).</pre>
+<p>Der Beitrag <a href="/blog/alv-grid-und-dropdown/">ALV-Grid und Dropdown</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Finden ─ nicht suchen</title>
+		<link>/blog/finden-%e2%94%80-nicht-suchen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 28 Feb 2024 15:21:13 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Cross Applications]]></category>
+		<guid isPermaLink="false">/?p=1044885</guid>
+
+					<description><![CDATA[<p>Ich denke, nach beinahe 30 Jahren Erfahrung mit SAP-Systemen kann ich mich als alten Fuchs bezeichnen und es gibt wenig im ABAP-Umfeld, das ich noch nicht kenne (RAP und CAP und UI5 und so&#8217;n neumodischen Kram mal außen vor gelassen&#8230; 🙂 ). Diesen Monat sind mir jedoch bereits zwei Dinge begegnet, dir mir wirklich absolut neu sind. Das erste ist die Möglichkeit, einen Doppelklick in der Code-Vervollständigung von TYPES machen zu können. Das zweite ist...</p>
+<p>Der Beitrag <a href="/blog/finden-%e2%94%80-nicht-suchen/">Finden ─ nicht suchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Ich denke, nach beinahe 30 Jahren Erfahrung mit SAP-Systemen kann ich mich als alten Fuchs bezeichnen und es gibt wenig im ABAP-Umfeld, das ich noch nicht kenne (RAP und CAP und UI5 und so&#8217;n neumodischen Kram mal außen vor gelassen&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" /> ). Diesen Monat sind mir jedoch bereits zwei Dinge begegnet, dir mir wirklich absolut neu sind. Das erste ist die Möglichkeit, einen <a href="https://www.linkedin.com/posts/enno-wulff_sapabap-sapdeveloper-sapabaponhana-activity-7166471749868453888-TEKv?utm_source=share&amp;utm_medium=member_desktop">Doppelklick in der Code-Vervollständigung von TYPES</a> machen zu können. Das zweite ist ein Programm, über das ich heute gestolpert bin und das mir in Zukunft viel Sucharbeit ersparen wird: </p>
+
+
+
+<p class="has-text-align-left has-pale-cyan-blue-background-color has-background has-medium-font-size"><strong>RDOCFINDER</strong> &#8211; Full Text Search for Short and Long Texts</p>
+
+
+
+<p>Bilder sagen mehr, als tausend Worte. Also bitteschön:</p>
+
+
+
+<h2 class="wp-block-heading">Selektionsbild</h2>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="558" src="/wp-content/uploads/2024/02/image-1-1024x558.png" alt="" class="wp-image-1044886" srcset="/wp-content/uploads/2024/02/image-1-1024x558.png 1024w, /wp-content/uploads/2024/02/image-1-300x163.png 300w, /wp-content/uploads/2024/02/image-1-768x418.png 768w, /wp-content/uploads/2024/02/image-1-1536x836.png 1536w, /wp-content/uploads/2024/02/image-1-71x40.png 71w, /wp-content/uploads/2024/02/image-1.png 1552w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Ergebnisliste</h2>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="539" src="/wp-content/uploads/2024/02/image-2-1024x539.png" alt="" class="wp-image-1044887" srcset="/wp-content/uploads/2024/02/image-2-1024x539.png 1024w, /wp-content/uploads/2024/02/image-2-300x158.png 300w, /wp-content/uploads/2024/02/image-2-768x404.png 768w, /wp-content/uploads/2024/02/image-2-1536x809.png 1536w, /wp-content/uploads/2024/02/image-2.png 1538w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Unterstützte Objekte</h2>
+
+
+
+<pre class="wp-block-preformatted">Suche nach Terminologie-Begriffen in folgenden Objekten:<br>- DDIC-Objekte     "Datenelemente (F1)                  DE   +<br>                   "Datenelementzusätze (F1)            DZ   +<br>                   "Schlüsselwörter der Datenelemente   DS   +<br>                   "Kurztext der Datenelemente          DK   +<br>                   "Reportüberschrift Datenelement      DR   +<br>                   "Domänen (F1)                        DO   +<br>                   "Kurztext der Domänen                DK   +<br>                   "Domänen-Festwerte (F1)              DV   +<br>                   "Tabellen/Strukturen (F1)            TB   +<br>                   "Kurztext der Tabellen               TK   +<br>                   "Feld/Komponente der Tabellen        TF   +<br>                   "Indizes der Tabellen                TX   +<br>                   "Kurztext der Tabellentypen          TT   +<br>                   "Kurztext der Views                  TV   +<br>                   "Kurztext der Suchhilfen             SH   +<br>                   "Kurztext der Sperrobjekte           EQ   +<br>- Benutzerstamm    "Benutzerstamm Objekte (F1)          UO   +<br>                   "Kurztext der Objekte                OK   +<br>                   "Benutzerstamm Profile (F1)          UP   +<br>                   "Kurztext der Profile                PK   +<br>- Nachrichten      "Nachrichten (F1)                    NA   +<br>                   "Kurztext der Nachrichten            NK   +<br>                   "Kurztext der Nachrichtenklassen     NN   +<br>                   "Syslog-Meldungen (F1)               SL   +<br>                   "Kurztext der Syslog-Meldung         SK   +<br>- Reports          "Reports (F1)                        RE   +<br>                   "numerierte Texte usw.               R... +<br>                   "Dynpro-Texte                        DY   +<br>                   "Dynpro-Titel                        DX   +<br>- Klassenbibliotheken                                   CL/IF<br>                   "Klassen - Kurztext                  KT   +<br>                   "Klassen - Langtext                  CL   +<br>                   "Klassen Attribute - Kurztext        KT   +<br>                   "Klassen Attribute - Langtext        CA   +<br>                   "Klassen Methoden - Kurztext         KT   +<br>                   "Klassen Methoden - Langtext         CO   +<br>                   "Klassen Ereignisse - Kurztext       KT   +<br>                   "Klassen Ereignisse - Langtext       CE   +<br>                   "Klassen Typen - Kurztext            KT   +<br>                   "Klassen Typen - Langtext            CT   +<br>                   "Interface - Kurztext                KT   +<br>                   "Interface - Langtext                IF   +<br>                   "Interface Attribute - Kurztext      KT   +<br>                   "Interface Attribute - Langtext      IA   +<br>                   "Interface Methoden - Kurztext       KT   +<br>                   "Interface Methoden - Langtext       IO   +<br>                   "Interface Ereignisse - Langtext     IE   +<br>                   "Interface Typen - Kurztext          KT   +<br>                   "Meth. Parameter/Ausnahmen- Kurztext SC   +<br>- Oberfläche       "Oberfläche (F1)                     CF<br>                   "Titel                               TI   +<br>                   "Funktionstastentext                 FM   +<br>                   "Ikonentext                          FI   +<br>                   "Quickinfo Ikone                     FQ   +<br>                   "Menüleiste                          MA   +<br>                   "Drucktastenbelegung                 MB   +<br>                   "GUI-Status                          MC   +<br>                   "Funktionstext                       MM   +<br>                   "Funktionstastenbelegung             MP   +<br>- Modellierungsobjekte                                  IM<br>                   "Entitätstypen - Kurztext            ET   +<br>                   "Entitätstypen - Langtext            UE   +<br>                   "Entitätstypen - Aliasname           EA   +<br>                   "Datenmodelle - Kurztext             DM   +<br>                   "Datenmodelle - Langtext             UD   +<br>                   "Beziehung - Kurztext                ER   +<br>                   "Beziehung - Langtext          UH/UR/UK   +<br>                   "Spezialisierungsart - Kurztext      ES   +<br>                   "Spezialisierungsart - Langtext      US   +<br>                   "Entitätstyp Kommentare - Langtext   UC   +<br>                   "Entitätstyp Beispiel - Langtext     UB   +<br>- IMG<br>                   "IMG-Struktur                        I    +<br>                   "IMG-Aktivität                       I0   +<br>                   "IMG-Pflegeobjekt                    I1   +<br>                   "IMG-Attribute                       I2   +<br>                   "IMG-Doku                            IG   +<br>- Test-Objekte<br>                   "CATT-Testfall - Kurztext            GK   +<br>                   "CATT-Testfall - Langtext            GT   +<br>                   "eCATT-Testskript - Titel            E0   +<br>                   "eCATT-Testskript - Par./Kommandosch.E5   +<br>                   "eCATT-Testskript - Langtext         E    +<br>                   "eCATT-Testkonfig. - Titel           E1   +<br>                   "eCATT-Testkonfig. - Variante        E6   +<br>                   "eCATT-Testkonfig. - Langtext        E    +<br>                   "eCATT-Testdaten - Titel             E2   +<br>                   "eCATT-Testdaten - Param./Variante   E7   +<br>                   "eCATT-Testdaten - Langtext          E    +<br>                   "eCATT-Systemdaten - Titel           E3   +<br>                   "eCATT-Systemdaten - Zielsystem      E8   +<br>                   "eCATT-Systemdaten - Langtext        E    +<br>                   "eCATT-Validierungsobjekt - Titel    E4   +<br>                   "eCATT-Validierungsobjekt - Langtext E    +<br>- Erweiterungen<br>                   "SAP-Erweiterung (Modifik.) - Kurzt. MK   +<br>                   "SAP-Erweiterung (Modifik.) - Langt. MO   +<br>                   "Klassisches BAdI                    BA   +<br>                   "Implementierung Klassisches BAdI    BI   +<br>                   "Zusammengesetzter Erweiterungsspot  BJ   +<br>                   "Impl. Zusammenges. Erweiterungsspot BK   +<br>                   "Erweiterungsspot                    BS   +<br>                   "Erweiterungsspot - BAdI             B0   +<br>                   "Erweiterungsspot - BAdI TechDoku    B1   +<br>                   "Erweiterungsspot - BAdI - Filter    B2   +<br>                   "Erweiterungsspot - BAdI - Menü-Erw. B3   +<br>                   "Erweiterungsspot - BAdI - Scr.-Erw. B4   +<br>                   "Impl. Erweiterungsspot              BT   +<br>                   "Impl. Erweiterungsspot - BAdI       B5   +<br>                   "Impl. Erweiterungsspot - BAdI TechD.B6   +<br>- allg. Text (TX)                                       TX   +<br>- Migrationstext (nur Langtext)                         MG   +<br>- Release-Infos (IN RELN) (nur Langtext)                IN   +<br>- SAPscript-Formulare (Langtext + Kurztext)             SF   +-<br>- SAPscript-Stile     (Kurztext)                        SS    -<br>- Funktionsbaustein-Doku (FU)                           FU   +<br>- Funktionsbaustein-Ausnahme-Doku (FX)                  FX   +<br>- Funktionsbaustein-Parameter/Ausnahme-Kurztext         FP   +<br>- Dialogbaustein-Doku<br>                   "Kurztext der Dialogbausteine        DB   +<br>                   "Langtext Dialogbaustein             DI   +<br>- Syntax-Doku (SD)<br>                   "ABAP                                S0   +<br>                   "Umgebung ABAP                       S1   +<br>                   "CONT                                S2   +<br>                   "Dynpro                              S3   +<br>                   "Editor                              S4   +<br>                   "RSYN                                S5   +<br>- Texte im Dialog (DT)                                  DT   +<br>- Kurzdump                                              KD   +<br>- SET/GET-Parameter                                     SG   +<br>- Bereichsmenüs                                         AM   +<br>- verschiedene Kurztexte<br>                   "Kurztext der Transaktionen          TA   +<br>                   "Kurztext der log. Datenbank         LD   +<br>- Gateway texts<br>                   "Data Object Hierarchy  - long text  GH<br>                   "Data Object Hierarchy  - short text GJ<br>                   "Data Object            - long text  GD<br>                   "Data Object            - short text GE<br>                   "Operation              - long text  GO<br>                   "Operation              - short text GP<br>                   "Consumption Model      - long text  GS<br>                   "Consumption Model      - short text GU</pre>
+<p>Der Beitrag <a href="/blog/finden-%e2%94%80-nicht-suchen/">Finden ─ nicht suchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Übersicht Code-Inspector-Prüfungen</title>
+		<link>/blog/uebersicht-code-inspector-pruefungen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 16 Feb 2024 09:40:06 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code-Inspector]]></category>
+		<guid isPermaLink="false">/?p=1044656</guid>
+
+					<description><![CDATA[<p>Code-Inspector Prüfungen werden zu Varianten mit Hilfe der Transaktion SCI ein- und ausgeschaltet. Wenn du wissen möchtest, welche technische Klasse hinter der jeweiligen Prüfung steht, dann kannst du im Menü Check Variant • Display • Technical names aufrufen, aber dann siehst du alle nicht markierten Prüfungen ebenfalls. Aus diesem Grund existiert das folgende Programm. Es listet die technischen Namen der aktiven Prüfungen einer Variante auf. Default-Varianten Es gibt in der Regel zwei Default-Varianten: Die Variante...</p>
+<p>Der Beitrag <a href="/blog/uebersicht-code-inspector-pruefungen/">Übersicht Code-Inspector-Prüfungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Code-Inspector Prüfungen werden zu Varianten mit Hilfe der <em>Transaktion SCI</em> ein- und ausgeschaltet. Wenn du wissen möchtest, welche technische Klasse hinter der jeweiligen Prüfung steht, dann kannst du im Menü <em>Check Variant  • Display • Technical names</em> aufrufen, aber dann siehst du alle nicht markierten Prüfungen ebenfalls. Aus diesem Grund existiert das folgende Programm. Es listet die technischen Namen der aktiven Prüfungen einer Variante auf.</p>
+
+
+
+<h2 class="wp-block-heading">Default-Varianten</h2>
+
+
+
+<p>Es gibt in der Regel zwei Default-Varianten:</p>
+
+
+
+<ul>
+<li>DEFAULT</li>
+
+
+
+<li>TRANSPORT</li>
+</ul>
+
+
+
+<p>Die Variante DEFAULT wird verwendet, wenn die Code-Inspector-Prüfung aus dem Sourcecode heraus aufgerufen wird. Die Variante TRANSPORT wird bei Freigabe eines Transportauftrags verwendet.</p>
+
+
+
+<p>Du kannst die eingestellte DEFAULT-Variante aus Tabelle SCICHKV_ALTER lesen oder die folgende Methode verwenden:</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">cl_ci_checkvariant=>get_chkv_alter(  
+  EXPORTING
+    p_checkvname_default = 'DEFAULT'
+  IMPORTING
+    p_checkvname_new     = DATA(default_config) ).</pre>
+
+
+
+<p>Meines Wissens gibt es keine Möglichkeit, die DEFAULT-Variante im Standard zu setzen. Du musst also einen Pflegedialog für die Tabelle SCICHKV_ALTER generieren oder den Eintrag mittels SE16N in die Tabelle schreiben.</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="363" height="444" src="/wp-content/uploads/2024/02/image.png" alt="" class="wp-image-1044663" srcset="/wp-content/uploads/2024/02/image.png 363w, /wp-content/uploads/2024/02/image-245x300.png 245w" sizes="(max-width: 363px) 100vw, 363px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">PARAMETERS name  TYPE scichkv_hd-checkvname DEFAULT 'DEFAULT'.
+PARAMETERS owner TYPE scichkv_hd-ciuser     DEFAULT space.
+
+START-OF-SELECTION.
+
+  SELECT SINGLE * FROM scichkv_hd
+      WHERE checkvname = @name     ##WARN_OK
+        AND ciuser     = @owner    "#EC CI_NOORDER
+       INTO @DATA(variant_header).
+
+  DATA(main) =  cl_ci_checkvariant=>get_ref(
+       p_user                   = owner
+       p_name                   = name ).
+  CHECK main IS BOUND.
+
+  main->get_info(
+    EXCEPTIONS
+      could_not_read_variant = 1
+      OTHERS                 = 2 ).
+
+  IF sy-subrc = 0.
+    cl_demo_output=>display_data(
+      VALUE string_table(
+        FOR variant IN main->variant (
+          CONV #( variant-testname ) ) ) ).
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/uebersicht-code-inspector-pruefungen/">Übersicht Code-Inspector-Prüfungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Auftragskonsistenz prüfen</title>
+		<link>/blog/auftragskonsistenz-pruefen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 02 Nov 2023 10:29:14 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">/?p=1044057</guid>
+
+					<description><![CDATA[<p>Transportaufträge und das Transportmanagementsystem sind ein zentraler Bestandteil einer SAP-Systemlandschaft. In der Regel werden erstelle oder geänderte Objekte automatisch in einen Transportauftrag aufgenommen und gesperrt. Nach erfolgreichem Test werden die beteiligten Transportaufträge in das Produktivsystem transportiert. Prüfungen Eine Aufgabe oder Transportauftrag kann auf folgende zwei Dinge überprüft werden: Die Prüfungen rufst du im Menü Auftrag/ Aufgabe • Prüfen auf Konsistenzprüfung Die Konsistenzprüfung prüft zum Beispiel, ob die Transportschicht der den Objekten zugeordneten Pakete mit dem...</p>
+<p>Der Beitrag <a href="/blog/auftragskonsistenz-pruefen/">Auftragskonsistenz prüfen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Transportaufträge und das Transportmanagementsystem sind ein zentraler Bestandteil einer SAP-Systemlandschaft. In der Regel werden erstelle oder geänderte Objekte automatisch in einen Transportauftrag aufgenommen und gesperrt. Nach erfolgreichem Test werden die beteiligten Transportaufträge in das Produktivsystem transportiert. </p>
+
+
+
+<h2 class="wp-block-heading">Prüfungen</h2>
+
+
+
+<p>Eine Aufgabe oder Transportauftrag kann auf folgende zwei Dinge überprüft werden:</p>
+
+
+
+<ul>
+<li>Konsistenz</li>
+
+
+
+<li>Objektsyntax</li>
+</ul>
+
+
+
+<p>Die Prüfungen rufst du im Menü <em>Auftrag/ Aufgabe • Prüfen</em> auf</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="684" height="196" src="/wp-content/uploads/2023/11/image.png" alt="" class="wp-image-1044074" srcset="/wp-content/uploads/2023/11/image.png 684w, /wp-content/uploads/2023/11/image-300x86.png 300w" sizes="(max-width: 684px) 100vw, 684px" /></figure>
+
+
+
+<h3 class="wp-block-heading">Konsistenzprüfung</h3>
+
+
+
+<p>Die Konsistenzprüfung prüft zum Beispiel, ob die Transportschicht der den Objekten zugeordneten Pakete mit dem Transportziel des Auftrags übereinstimmt oder dass sich in einer Reparaturaufgabe auch nur reparierte Objekte befinden. </p>
+
+
+
+<p>Solche Fehler können auftreten, wenn Objekte nach der Aufnahme in den Transportauftrag geändert werden.</p>
+
+
+
+<h3 class="wp-block-heading">Syntaxprüfung der Objekte</h3>
+
+
+
+<p>Diese Prüfung stellt sicher, dass alle Objekte syntaktisch fehlerfrei sind.</p>
+
+
+
+<h2 class="wp-block-heading">Massenprüfungen</h2>
+
+
+
+<p>Wenn es in einer Systemlandschaft zu umfangreichen oder elementaren Änderungen kommt, dann kann es sein, dass Transportaufträge vieler Leute betroffen sind. Ich habe keine Möglichkeit gefunden, Transportaufträge massenhaft zu prüfen. Aber zum Glück kann ich ja programmieren&#8230; </p>
+
+
+
+<p>Der folgende Report übernimmt die Konsistenzprüfung aller selektieren Aufträge und deren Aufgaben. Die Meldungen werden in einer SALV-Liste ausgegeben.</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<p>Den Sourcecode gibt es Dank <a href="https://abapgit.org/">abapGit</a> auch auf <a href="https://github.com/tricktresor/request-consistency-check">github</a>. </p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT zt9r_request_consistency_check.
+
+DATA request TYPE e070.
+
+SELECT-OPTIONS so_nam FOR request-as4user    DEFAULT sy-uname.
+SELECT-OPTIONS so_dat FOR request-as4date    DEFAULT '20200101' TO sy-datum.
+SELECT-OPTIONS so_req FOR request-trkorr.
+SELECT-OPTIONS so_fnc FOR request-trfunction DEFAULT 'K'.
+SELECT-OPTIONS so_sta FOR request-trstatus   DEFAULT 'D'.
+
+CLASS app DEFINITION.
+  PUBLIC SECTION.
+    METHODS start.
+  PRIVATE SECTION.
+    TYPES: BEGIN OF _data,
+             trkorr   TYPE trkorr,
+             as4user  TYPE e070-as4user,
+             as4date  TYPE e070-as4date,
+             as4text  TYPE e07t-as4text,
+             strkorr  TYPE strkorr,
+             message  TYPE text100,
+             pgmid    TYPE e071-pgmid,
+             object   TYPE e071-object,
+             obj_name TYPE e071-obj_name,
+           END OF _data,
+           _data_tab TYPE STANDARD TABLE OF _data WITH DEFAULT KEY.
+    DATA result_table TYPE _data_tab.
+    DATA requests TYPE SORTED TABLE OF e070 WITH UNIQUE KEY trkorr.
+    DATA tasks TYPE SORTED TABLE OF e070 WITH UNIQUE KEY trkorr.
+    DATA messages TYPE ctsgerrmsgs.
+    METHODS select.
+    METHODS prepare.
+    METHODS display.
+ENDCLASS.
+
+
+CLASS app IMPLEMENTATION.
+  METHOD start.
+    select( ).
+    prepare( ).
+    display( ).
+  ENDMETHOD.
+  METHOD select.
+    SELECT * FROM e070 INTO TABLE @requests
+      WHERE trkorr     IN @so_req
+        AND trfunction IN @so_fnc
+        AND trstatus   IN @so_sta
+        AND as4user    IN @so_nam
+        AND as4date    IN @so_dat
+      ORDER BY PRIMARY KEY.
+
+    IF sy-subrc = 0 AND lines( requests  ) > 0.
+      SELECT * FROM e070 INTO TABLE @tasks
+         FOR ALL ENTRIES IN @requests
+        WHERE strkorr = @requests-trkorr
+        ORDER BY PRIMARY KEY.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD prepare.
+
+    DATA full_request  TYPE trwbo_request.
+
+    LOOP AT requests INTO DATA(request).
+
+      LOOP AT tasks INTO DATA(task) WHERE strkorr = request-trkorr.
+        CLEAR full_request.
+        full_request-h = CORRESPONDING #( task ).
+
+        CALL FUNCTION 'TR_READ_REQUEST'
+          EXPORTING
+            iv_read_e070       = 'X'
+            iv_read_e07t       = 'X'
+            iv_read_e070c      = ' '
+            iv_read_e070m      = ' '
+            iv_read_objs_keys  = 'X'
+            iv_read_attributes = ' '
+            iv_trkorr          = task-trkorr
+          CHANGING
+            cs_request         = full_request
+          EXCEPTIONS
+            error_occured      = 1
+            no_authorization   = 2
+            OTHERS             = 3.
+        IF sy-subrc &lt;> 0.
+          APPEND VALUE #(
+            trkorr   = request-trkorr
+            as4user  = request-as4user
+            as4date  = request-as4date
+            as4text  = full_request-h-as4text
+            strkorr  = task-trkorr
+            message  = 'Error TR_READ_REQUEST' ##no_Text
+           ) TO result_table.
+          CONTINUE.
+        ENDIF.
+
+        CLEAR messages.
+        CALL FUNCTION 'TR_CHECK_REQUEST'
+          EXPORTING
+            is_request           = full_request
+            iv_check_lockability = space
+            iv_collect_mode      = 'X'
+          IMPORTING
+            et_messages          = messages.
+
+        LOOP AT messages INTO DATA(message).
+          MESSAGE ID message-msgid
+                TYPE message-msgty
+              NUMBER message-msgno
+                WITH message-msgv1 message-msgv2 message-msgv3 message-msgv4
+                INTO DATA(message_text).
+          DATA(err) = VALUE #( full_request-objects[ message-pos ] OPTIONAL ).
+          APPEND VALUE #(
+            trkorr   = request-trkorr
+            as4user  = request-as4user
+            as4date  = request-as4date
+            as4text  = full_request-h-as4text
+            strkorr  = task-trkorr
+            pgmid    = err-pgmid
+            object   = err-object
+            obj_name = err-obj_name
+            message  = message_text
+           ) TO result_table.
+        ENDLOOP.
+      ENDLOOP.
+    ENDLOOP.
+
+  ENDMETHOD.
+  METHOD display.
+
+    IF result_table IS INITIAL.
+      MESSAGE s477(tk) WITH 'selected'.
+    ELSE.
+
+      TRY.
+          cl_salv_table=>factory(
+            IMPORTING
+              r_salv_table   = DATA(salv)
+            CHANGING
+              t_table        = result_table ).
+          salv->get_functions( )->set_all( ).
+          salv->get_columns( )->set_optimize( ).
+          salv->display( ).
+        CATCH cx_salv_msg INTO DATA(salv_error).
+          MESSAGE salv_error TYPE 'I'.
+      ENDTRY.
+    ENDIF.
+
+  ENDMETHOD.
+ENDCLASS.
+
+START-OF-SELECTION.
+
+  NEW app( )->start( ).</pre>
+<p>Der Beitrag <a href="/blog/auftragskonsistenz-pruefen/">Auftragskonsistenz prüfen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ABAP und Stellenanzeigen</title>
+		<link>/blog/abap-und-stellenanzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 17 Oct 2023 07:32:15 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">/?p=1043503</guid>
+
+					<description><![CDATA[<p>Den Tricktresor gibt es nun seit über zwanzig Jahren. Am 17.4.2003 habe ich meinen ersten Beitrag verfasst: Drucktaste neben AUSFÜHREN-Button. Anhand des Screenshots kann man das Alter erahnen&#8230; Seit ich angefangen habe, den Tricktresor zu betreiben, habe ich darüber nachgedacht, wie ich mit der Arbeit und der Mühe, die ich investiere, auch Geld verdienen kann. Die erste Idee war, Werbung zu schalten. Da ich selber jedoch Webseiten, die in erster Linie aus Werbung bestehen, hasse...</p>
+<p>Der Beitrag <a href="/blog/abap-und-stellenanzeigen/">ABAP und Stellenanzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Den Tricktresor gibt es nun seit über zwanzig Jahren. Am 17.4.2003 habe ich meinen ersten Beitrag verfasst: <a href="/blog/drucktaste-neben-ausfuehren-button/">Drucktaste neben AUSFÜHREN-Button</a>. Anhand des Screenshots kann man das Alter erahnen&#8230; </p>
+
+
+
+<p>Seit ich angefangen habe, den Tricktresor zu betreiben, habe ich darüber nachgedacht, wie ich mit der Arbeit und der Mühe, die ich investiere, auch Geld verdienen kann. Die erste Idee war, Werbung zu schalten. Da ich selber jedoch Webseiten, die in erster Linie aus Werbung bestehen, hasse wie die Pest, habe ich nur ausgewählte Werbebanner aus einem Affiliate-Programm aufgenommen. Dadurch ist die Reichweite jedoch stark eingeschränkt und meine Interessen entsprechen nicht unbedingt deinen Interessen. Zudem wurde mir auch klar, dass Werbung mit Bannern nicht gut funktioniert. Der Grund ist ziemlich einfach: Wenn du durch die Suche in einer Suchmaschine auf meiner Seite landest, dann hast wahrscheinlich gerade ein Problem, das du Lösen musst. Dementsprechend schnell verlässt du meine Seite wieder. Und ziemlich wahrscheinlich wirst du in dieser Situation nicht die Muße haben, auf irgendwelche Banner zu achten, geschweige denn, eines anzuklicken. Zudem funktionieren Banner in der Regel nur dann gut, wenn man sich in einem Blogeintrag zu etwas informiert und dann Werbung angezeigt wird, die zum Thema passt. Naja, was soll ich sagen: Willst du ein SAP-System kaufen? </p>
+
+
+
+<p>Ich habe es also relativ schnell wieder aufgegeben, Werbeanzeigen anzuzeigen. Im Laufe der Zeit wurde mir klar, dass ich froh sein kann, wenn ich die Betriebskosten hereinbekomme. Aber auch da war mir dann der Aufwand für buchstäblich EUR 12,40 pro Quartal zu groß und ich sah den Tricktresor in erster Linie als Werbung für mich und meine Fähigkeiten sowie für meine eigene Wissensspeicherung. Es passiert durchaus mal, dass ich nach einer Lösung suche, die mich dann zu meinem Artikel im Tricktresor führt. Sehr häufig weiß ich, dass ich etwas im Tricktresor finde und suche gezielt danach. </p>
+
+
+
+<p>Ich komme ohne weitere Umschweife zum Hauptthema dieses Artikels: den</p>
+
+
+
+<h2 class="wp-block-heading">ABAP Stellenanzeigen</h2>
+
+
+
+<p>Das Schlagwort <em>ABAP</em>, das ich – wahrscheinlich genau wie du auch – in den verschiedenen Internet-Profilen stehen habe, reicht für viele RecruiterInnen aus, mir ein <em>tolles Jobangebot</em> anzubieten, das mich auf den <em>nächsten Karrierelevel</em> heben wird. Ich finde das sehr nervig, da ich nicht auf Stellensuche bin. Glücklicherweise schreiben die meisten: &#8220;Wenn ich Ihr Interesse geweckt habe, melden Sie sich&#8221;. Deswegen muss ich nicht mal ein schlechtes Gewissen haben, wenn ich mich nicht melde.</p>
+
+
+
+<p>Und natürlich bin ich mir bewusst, dass es viele Firmen gibt, die mehr oder weniger händeringend SAP-Entwicklerinnen und -Entwickler suchen. Deswegen kam einem Kollegen, der seit Jahren das ABAP-Forum betreut, und mir die Idee, dass wir unsere Seiten, die sich wirklich fast ausschließlich mit ABAP-Entwicklung beschäftigen, für maßgeschneiderte Stellenanzeigen nutzen.</p>
+
+
+
+<p>Vielleicht ist dir bereits aufgefallen, dass Inwerken seit einiger Zeit ABAP-EntwicklerInnen sucht?</p>
+
+
+
+<p>Die Anzeigen tauchen seit ein paar Wochen im Tricktresor und dem ABAP-Forum zwischen den Beiträgen und im Seitenrand auf.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="290" src="/wp-content/uploads/2023/09/image-5-1024x290.png" alt="" class="wp-image-1043501" srcset="/wp-content/uploads/2023/09/image-5-1024x290.png 1024w, /wp-content/uploads/2023/09/image-5-300x85.png 300w, /wp-content/uploads/2023/09/image-5-768x217.png 768w, /wp-content/uploads/2023/09/image-5.png 1068w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="964" height="172" src="/wp-content/uploads/2023/09/image-6.png" alt="" class="wp-image-1043502" srcset="/wp-content/uploads/2023/09/image-6.png 964w, /wp-content/uploads/2023/09/image-6-300x54.png 300w, /wp-content/uploads/2023/09/image-6-768x137.png 768w" sizes="(max-width: 964px) 100vw, 964px" /></figure>
+
+
+
+<p>Wir erhoffen uns damit, dass wir dich als Zielgruppe unaufgeregt und dezent erreichen können, wenn du als ABAP-EntwicklerIn gerade auf Jobsuche bist. Beziehungsweise hoffen wir, dass Firmen auf unseren Plattformen mit dem richtigen Publikum mehr Erfolg haben dich zu finden, als auf anderen Jobbörsen.</p>
+
+
+
+<p>Wenn du selber eine – oder auch mehrere – Anzeigen schalten möchtest, weil du Mitarbeiter und Mitarbeiterinnen suchst, die dein Team in der ABAP-Entwicklung unterstützen, dann lade ich dich herzlich ein, unser <a href="https://recruit.beraterloesung.de/produkte.html" target="_blank" rel="noreferrer noopener">spezialisiertes Angebot</a> zu besuchen (<a href="https://recruit.beraterloesung.de/produkte.html" target="_blank" rel="noreferrer noopener">Preisliste</a>).</p>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-width wp-block-button__width-100 has-custom-font-size ttbutton has-medium-font-size"><a class="wp-block-button__link has-white-color has-luminous-vivid-orange-background-color has-text-color has-background has-link-color wp-element-button" href="https://recruit.beraterloesung.de/produkte.html" target="_blank" rel="noreferrer noopener">JETZT STELLENANGEBOT SCHALTEN</a></div>
+</div>
+
+
+
+<h2 class="wp-block-heading">Die Geschichte der letzten 20 Jahre&#8230;</h2>
+
+
+
+<p>Wenn du wissen möchtest, was ich die letzten zwei Jahrzehnte noch unternommen habe, um mit dem Tricktresor ein paar Mark nebenbei zu verdienen, dann lies gerne weiter.</p>
+
+
+
+<figure class="wp-block-table has-medium-font-size"><table class="has-white-color has-luminous-vivid-orange-background-color has-text-color has-background has-link-color"><tbody><tr><td class="has-text-align-center" data-align="center"><strong><span style="text-decoration: underline;">ACHTUNG:</span></strong> Dieser Artikel enthält ungewöhnlich viele Affiliate-Links!</td></tr></tbody></table></figure>
+
+
+
+<h2 class="wp-block-heading">T-Shirts</h2>
+
+
+
+<p>Eine Zeitlang fand ich es cool, ABAP-spezifische Designs und Sprüche zu entwerfen, die du dir bei Spreadshirt auf alle möglichen T-Shirts, Hoodies oder Caps hättest drucken lassen können. Diese &#8220;Sparte&#8221; habe ich dann jedoch irgendwann eingestellt. Die Gründe findest du im Artikel <a href="/blog/warum-ich-meinen-spreadshirt-shop-geloescht-habe/">Warum ich meinen Spreadshirt-Shop gelöscht habe</a></p>
+
+
+
+<p>Eines der meistverkauften Motive war der <em><a href="/wp-content/uploads/2020/09/abap-magician-big-magic-wand-turnbeutel.jpg">ABAP-Magician</a></em>. Wobei &#8220;meistverkauft&#8221; eventuell irreführend ist; wir sprechen hier über maximal 10 T-Shirts&#8230; Ich schätze mal, dass man so viele <em>ABAP&#8217;s NOT DEAD</em> T-Shirts bereits auf jeder kleineren SAP-Veranstaltung sieht. Du kannst das T-Shirt übrigens bei Uwe im Spreadshirt-Shop kaufen: <a href="https://www.spreadshirt.de/shop/user/se38/" target="_blank" rel="noreferrer noopener">SE38</a>.</p>
+
+
+
+<p>Zudem scheine ich von meinen eigenen Designs deutlich mehr überzeugt gewesen zu sein, als du. Vielleicht hast du die Entwürfe und meinen Shop aber auch nicht gefunden, weil ich zu wenig Werbung dafür gemacht habe? Ich werde es nicht mehr erfahren.</p>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-width wp-block-button__width-100 ttbutton"><a class="wp-block-button__link has-white-color has-luminous-vivid-orange-background-color has-text-color has-background has-link-color wp-element-button" href="https://se38.myspreadshop.de/abapsnotdead+light+blue-A5d82e0205fd3e43e9d14d482?productType=686&amp;sellable=QzEzzMmV9Aswe7v0dgDx-686-12&amp;appearance=348">Jetzt ABAPsNotDead-T-Shirt kaufen</a></div>
+</div>
+
+
+
+<h2 class="wp-block-heading">Das ABAP-Kochbuch &#8211; Erfolgsrezepte für Entwickler</h2>
+
+
+
+<figure class="wp-block-image size-full"><a href="https://www.amazon.de/Das-ABAP-Kochbuch-Erfolgsrezepte-Entwickler-Programmierbeispiele/dp/3836241072/?&amp;_encoding=UTF8&amp;tag=tricktresor07-21&amp;linkCode=ur2&amp;linkId=e9bcea1026d689f95c3350cbdcf7afd9&amp;camp=1638&amp;creative=6742" target="_blank" rel="noreferrer noopener"><img loading="lazy" decoding="async" width="500" height="404" src="/wp-content/uploads/2016/10/ABAP-Kochbuch2_500.png" alt="" class="wp-image-869629" srcset="/wp-content/uploads/2016/10/ABAP-Kochbuch2_500.png 500w, /wp-content/uploads/2016/10/ABAP-Kochbuch2_500-300x242.png 300w" sizes="(max-width: 500px) 100vw, 500px" /></a></figure>
+
+
+
+<p>Dass man mit einem Fachbuch nicht reich wird, war uns ziemlich klar. Trotzdem waren meine Kollegen Maic, Dennis, Udo und Sascha und ich fasziniert von der Idee, ein Buch zu schreiben, in dem wir unsere Erfahrungen zur ABAP-Programmierung kund tun konnten.</p>
+
+
+
+<p>Ursprünglich sollte das Buch <em>ABAP &#8211; Jetzt helfe ich mir selbst</em> heißen. Angelehnt an die legendäre <a href="https://www.amazon.de/Golf-Jetta-Jetzt-helfe-selbst/dp/3613010321?&amp;_encoding=UTF8&amp;tag=tricktresor07-21&amp;linkCode=ur2&amp;linkId=4da62ea96b9e4615ccdcf01eca5a840b&amp;camp=1638&amp;creative=6742" target="_blank" rel="noreferrer noopener">Buchreihe</a> mit der wahrscheinlich viele Tausend Menschen ihre Autos repariert haben.</p>
+
+
+
+<p>Herausgekommen ist letztlich ein Kochbuch, über dessen Titel ich nur bedingt glücklich war. Einerseits ist die Assoziation <em>Programmieren &#8211; Kochen</em> ziemlich abgedroschen und zweitens gab es bereits das <em><a href="https://www.amazon.de/ABAP-Cookbook-Programming-Everyday-Solutions/dp/1592293263?&amp;_encoding=UTF8&amp;tag=tricktresor07-21&amp;linkCode=ur2&amp;linkId=e2c5a41bc152d9783991512ece355321&amp;camp=1638&amp;creative=6742">ABAP Cookbook</a></em>, das es inzwischen jedoch nur noch im Antiquariat gibt. Das <em>ABAP Cookbook </em>war bereits in englischer Sprache erschienen und hatte mit unserem <em>ABAP Kochbuch</em> wirklich gar nichts zu tun. Der <a href="https://www.rheinwerk-verlag.de/sap/sap-programmierung/?GPP=trtrsr" target="_blank" rel="noreferrer noopener">Rheinwerk-Verlag</a> hat sich letztendlich durchgesetzt und mit deren professionellen und geduldigen Unterstützung ist auch ein tolles Buch dabei heraus gekommen.</p>
+
+
+
+<p>Es ist ein schönes Gefühl, als Programmierer mal etwas <em>handfestes </em>produziert zu haben. Auch wenn SAPGUI-Programmierung nicht mehr up-to-date sind und die neuen ABAP-Features gänzlich fehlen, weil es sie damals einfach noch nicht gab, enthält das Buch meiner Meinung nach viele tolle Hinweise und Anleitungen, die immer noch relevant sind. </p>
+
+
+
+<p>Aber, wie gesagt, zur Finanzierung des Tricktresors taugte diese Aktion wenig bis gar nicht. </p>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-width wp-block-button__width-100 ttbutton"><a class="wp-block-button__link has-white-color has-luminous-vivid-orange-background-color has-text-color has-background has-link-color wp-element-button" href="https://www.rheinwerk-verlag.de/das-abap-kochbuch-erfolgsrezepte-fuer-entwickler/?GPP=trtrsr" target="_blank" rel="noreferrer noopener">Jetzt Das ABAP-Kochbuch kaufen</a></div>
+</div>
+
+
+
+<h2 class="wp-block-heading">SimDia²</h2>
+
+
+
+<figure class="wp-block-image size-full"><a href="https://ersasoft.de/de/simdia/?s=tt"><img loading="lazy" decoding="async" width="960" height="400" src="/wp-content/uploads/2017/02/BANNER_ERSAsoft_Tricktresor.png" alt="" class="wp-image-1017823" srcset="/wp-content/uploads/2017/02/BANNER_ERSAsoft_Tricktresor.png 960w, /wp-content/uploads/2017/02/BANNER_ERSAsoft_Tricktresor-300x125.png 300w, /wp-content/uploads/2017/02/BANNER_ERSAsoft_Tricktresor-768x320.png 768w" sizes="(max-width: 960px) 100vw, 960px" /></a></figure>
+
+
+
+<p>Die Firma <a href="https://ersasoft.de/de/?s=tt">ERSAsoft Gmbh</a> aus Maisach ist einer der wenigen Partner mit denen die Zusammenarbeit aus verschiedenen Gründen wirklich viel Spaß macht. Als Programmierer sollte ich ein Tool, das den Datenimport aus Excel in das SAP-System für AnwenderInnen sehr vereinfacht eigentlich nicht mögen, denn wenn ein Kunde das im Einsatz hat, darf ich mit Sicherheit keine Programme für den Import schreiben. Aber gerade deswegen mag ich das Produkt <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a>, denn gerade das Schreiben von Importprogrammen gehört für mich eher zu den nervigeren Arbeiten, denen man als Programmierer begegnet:</p>
+
+
+
+<ul>
+<li>Es fehlen häufig genaue Definitionen für den Import oder die Verbuchung.</li>
+
+
+
+<li>Daten sind nicht korrekt.</li>
+
+
+
+<li>Fehler müssen penibel abgefangen und kundenfreundlich präsentiert werden.</li>
+
+
+
+<li>Entwicklertests sind umständlich weil viele Objekte mit dem Import genau definiert werden. Hat man also einen Fehler, müssen eventuell die Daten manipuliert werden, damit man erneut buchen kann.</li>
+
+
+
+<li>Durch Tests der AnwenderInnen und häufige Testzyklen dauert die Entwicklung lange.</li>
+</ul>
+
+
+
+<p>Zusätzlich gibt es auch Nachteile für die AnwenderInnen, die das Programm verwenden müssen:</p>
+
+
+
+<ul>
+<li>Die Bedienung ist evtl. nicht intuitiv und anwenderfreundlich, da mehr Wert auf andere Aspekte gelegt wurde.</li>
+
+
+
+<li>Wenn sich Daten oder Anforderungen ändern, muss die IT-Abteilung mit einer Programmänderung beauftragt werden, die in der Regel lange dauert.</li>
+
+
+
+<li>Das Programm ist unflexibel und kann nur für genau den Zweck verwendet werden, für den es konzipiert wurde. Schon leichte Abweichungen führen zu einem hohen nachträglichen Aufwand.</li>
+</ul>
+
+
+
+<p>Ich persönlich bin also froh, wenn AnwenderInnen ihre Daten selber &#8220;ins System kloppen&#8221; können. Und <a href="https://ersasoft.de/de/simdia/?s=tt" target="_blank" rel="noreferrer noopener">SimDia²</a> ist wirklich leicht zu erlernen, hochflexibel und vielseitig anwendbar. Die Arbeitsweise und einige Anwendungsmöglichkeiten kannst du gut in den <a href="https://ersasoft.de/de/videos/#einfuehrung" target="_blank" rel="noreferrer noopener">Videos</a> sehen.</p>
+
+
+
+<p>Auch im Tricktresor gibt es einige Artikel, in denen ich auf die Funktionsweise von <a href="https://ersasoft.de/de/simdia/?s=tt" target="_blank" rel="noreferrer noopener">SimDia²</a> eingehe:</p>
+
+
+
+<ul>
+<li><a href="/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/">Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</a></li>
+
+
+
+<li><a href="/blog/simdia%c2%b2-als-alternative-zur-programmierung/">SimDia² als Alternative zur Programmierung?</a></li>
+
+
+
+<li><a href="/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</a></li>
+</ul>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-width wp-block-button__width-100 ttbutton"><a class="wp-block-button__link has-white-color has-luminous-vivid-orange-background-color has-text-color has-background has-link-color wp-element-button" href="https://ersasoft.de/de/simdia/?s=tt" target="_blank" rel="noreferrer noopener">Jetzt SimDia² ausprobieren</a></div>
+</div>
+
+
+
+<h2 class="wp-block-heading">Espresso-Tutorials</h2>
+
+
+
+<p>Da ich zusammen mit meinen Kollegen selbst das <a href="https://www.amazon.de/Das-ABAP-Kochbuch-Erfolgsrezepte-Entwickler-Programmierbeispiele/dp/3836241072/?&amp;_encoding=UTF8&amp;tag=tricktresor07-21&amp;linkCode=ur2&amp;linkId=e9bcea1026d689f95c3350cbdcf7afd9&amp;camp=1638&amp;creative=6742">ABAP-Kochbuch</a> geschrieben habe, unterstütze ich die Idee der <a href="https://www.espresso-tutorials.de/?ref=4">Espresso-Tutorials</a>. Die Fachbücher, die hauptsächlich auf den SAP-Kosmos abzielen, haben eine hohe Qualität und decken Bereiche ab, die in herkömmlichen SAP-Fachbüchern häufig zu kurz kommen. Die Bücher sind deutlich &#8220;leichter&#8221; als die Exemplare des <a href="https://www.rheinwerk-verlag.de/das-abap-kochbuch-erfolgsrezepte-fuer-entwickler/" target="_blank" rel="noreferrer noopener">Rheinwerk-Verlages</a>, in dem unser Kochbuch erschienen ist. Die Bücher sind also nicht so umfangreich (maximal 120 Seiten), bieten aber gerade zu speziellen Themen einen tollen Mehrwert. Du kannst die Bücher einzeln kaufen oder eine <a href="https://www.espresso-tutorials.de/digital-abo/?ref=4" target="_blank" rel="noreferrer noopener">Flatrate </a>buchen. Mit der Flatrate hast du für den Bezahlzeitraum Zugriff auf alle Inhalte. Und das ist inzwischen eine Menge! Neben Büchern kannst du auch Videos und Kurse ansehen. Wenn du die <a href="https://www.espresso-tutorials.de/?ref=4" target="_blank" rel="noreferrer noopener">Bibliothek von Espresso-Tutorials</a> noch nicht kennst, solltest du unbedingt einen Blick riskieren!</p>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-width wp-block-button__width-100 ttbutton"><a class="wp-block-button__link has-white-color has-luminous-vivid-orange-background-color has-text-color has-background has-link-color wp-element-button" href="https://www.espresso-tutorials.de/digital-abo/?ref=4" target="_blank" rel="noreferrer noopener">Jetzt Espresso-Tutorials Flaterate buchen</a></div>
+</div>
+
+
+
+<h2 class="wp-block-heading">Webhosting all-inkl</h2>
+
+
+
+<p>Der Tricktresor läuft seit einigen Jahren problemlos und günstig bei <a href="https://all-inkl.com/PA610ED340E829D" target="_blank" rel="noreferrer noopener">all-inkl.com</a>. Wenn ich mal ein Problem hatte, hat der Support zeitnah, persönlich und kompetent geholfen. Insgesamt bin ich sehr zufrieden mit diesem Webhoster. Die Weboberfläche wirkt altbacken, ist jedoch funktionabel. Es gibt viele andere Webhoster, die vielleicht für WordPress schneller sind, aber dann sind sie in der Regel teurer. Oder sie sind noch günstiger, aber dann reicht die Leistung nicht.</p>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-width wp-block-button__width-100 ttbutton"><a class="wp-block-button__link has-white-color has-luminous-vivid-orange-background-color has-text-color has-background has-link-color wp-element-button" href="https://all-inkl.com/webhosting/premium/bestellung/?session_id=8302b20167c9adecf52b91b782c9fc44">Jetzt Webspace-Paket PREMIUM mit 10 Domains bestellen</a></div>
+</div>
+
+
+
+<h2 class="wp-block-heading">Inwerken</h2>
+
+
+
+<p>Die Firma Inwerken, bei der ich seit inzwischen 15 Jahren als Entwickler tätig bin, unterstützt mich in vielen Dingen. Eine Zeitlang hat die Firma die Serverkosten für den Tricktresor übernommen, wofür ich sehr dankbar bin. Der Tricktresor wäre kaum möglich, wenn ich nicht das interne SAP-System von Inwerken nutzen könnte. Auf diese Weise kann ich viele Dinge entwickeln und prüfen und zusätzlich haben meine Kolleginnen und Kollegen eine stetig wachsende Programmsammlung für verschiedenste Problemlösungen &#8220;griffbereit&#8221;. </p>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-width wp-block-button__width-100 ttbutton"><a class="wp-block-button__link has-white-color has-text-color has-background has-link-color wp-element-button" href="https://www.inwerken.de/sap-beratung-und-entwicklung/" style="background-color:#e94f35" target="_blank" rel="noreferrer noopener">Jetzt bei Inwerken über S/4HANA informieren</a></div>
+</div>
+<p>Der Beitrag <a href="/blog/abap-und-stellenanzeigen/">ABAP und Stellenanzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Termin an Outlook versenden</title>
+		<link>/blog/termin-an-outlook-versenden/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Sep 2023 12:01:14 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">/?p=1043455</guid>
+
+					<description><![CDATA[<p>In einem Projekt entstand die Idee, einen Termin, den eine SAP-Applikation ermittelt hat, als Termin an die verantwortliche Person zu schicken. Technisch muss man hierzu eine ICS-Datei erstellen und diese per E-Mail versenden. Wie ich gehofft hatte, hatte jemand bei SAP auch vorher schon eine ähnliche Idee und hat die Klasse CL_APPOINTMENT programmiert. Das folgende Beispielprogramm ist eine Abwandlung des Demo-Reports RSSC_DEMO_CL_APPOINTMENT_APPL mit dem Zusatz, den erstellten Termin zu versenden. Termintyp Mit der Methode SET_TYPE...</p>
+<p>Der Beitrag <a href="/blog/termin-an-outlook-versenden/">Termin an Outlook versenden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In einem Projekt entstand die Idee, einen Termin, den eine SAP-Applikation ermittelt hat, als Termin an die verantwortliche Person zu schicken. Technisch muss man hierzu eine <a href="https://praxistipps.chip.de/ics-datei-erstellen-das-muessen-sie-beim-aufbau-beachten_98011" target="_blank" rel="noreferrer noopener">ICS-Datei</a> erstellen und diese per E-Mail versenden. Wie ich gehofft hatte, hatte jemand bei SAP auch vorher schon eine ähnliche Idee und hat die Klasse CL_APPOINTMENT programmiert. </p>
+
+
+
+<p>Das folgende Beispielprogramm ist eine Abwandlung des Demo-Reports RSSC_DEMO_CL_APPOINTMENT_APPL mit dem Zusatz, den erstellten Termin zu versenden. </p>
+
+
+
+<h2 class="wp-block-heading">Termintyp</h2>
+
+
+
+<p>Mit der Methode SET_TYPE kannst du den <em>Termintypen</em> setzen. In meinem Beispiel nutze ich den Wert &#8220;MEETING&#8221;. Die möglichen Termintypen stehen in Tabelle SCAPPTTYPE. Ich schätze, dass dieser Termintyp in erster Linie für die Speicherung im SAP-Office notwendig ist. </p>
+
+
+
+<p>In meinem System habe ich den Termintyp ZREMINDER angelegt. Dieser wird in dem Termin entsprechend angezeigt:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="494" src="/wp-content/uploads/2023/09/image-3-1024x494.png" alt="" class="wp-image-1043478" srcset="/wp-content/uploads/2023/09/image-3-1024x494.png 1024w, /wp-content/uploads/2023/09/image-3-300x145.png 300w, /wp-content/uploads/2023/09/image-3-768x370.png 768w, /wp-content/uploads/2023/09/image-3.png 1087w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<p>Das Icon, das man auswählen kann (in meinem Fall die Alarm-Glocke), wird nur im SAP-Office angezeigt:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="666" height="531" src="/wp-content/uploads/2023/09/image-4.png" alt="" class="wp-image-1043479" srcset="/wp-content/uploads/2023/09/image-4.png 666w, /wp-content/uploads/2023/09/image-4-300x239.png 300w" sizes="(max-width: 666px) 100vw, 666px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Termin senden</h2>
+
+
+
+<p>Die Methode CREATE_SEND_REQUEST liefert eine Klasse vom Typ <a href="https://codezentrale.de/abap-html-email-versenden/" target="_blank" rel="noreferrer noopener">CL_BCS</a> zurück. Das bedeutet, das Versenden sowie weitere Parameter können wie gewohnt verwendet werden.</p>
+
+
+
+<h2 class="wp-block-heading">Erinnerung oder Meeting?</h2>
+
+
+
+<p>Das Programm ermöglicht es, bis zu zwei Teilnehmende zu definieren. Ein Teilnehmer muss vorhanden sein; denn einer soll schließlich den Termin auf jeden Fall bekommen. Die Person, an die die Erinnerung gesendet wird, hat dann die Möglichkeit, den Termin (unter Vorbehalt) anzunehmen oder abzusagen. Sind mehrere Personen im Termin definiert, dann muss ausgewählt werden, ob die Antwort jeweils gesendet, nicht gesendet oder vor dem Senden bearbeitet werden soll. </p>
+
+
+
+<h2 class="wp-block-heading">HTML-Body</h2>
+
+
+
+<p>Der Informationstext im Mailbody ist reiner Text. Mit Methode SET_TEXT kannst du diesen einfachen Text hinzufügen. Leider habe ich es nicht geschafft, einen Termin mit HTML-Text auszustatten. Wenn du mit SET_DOCUMENT der Klasse CL_BCS einen HTML-Text hinzufügst, dann wird das erzeugte ICS-Dokument ersetzt und du versendest am Ende eine normale E-Mail. Eventuell ist es möglich, wenn man eine <a href="https://blogs.sap.com/2014/03/11/multipart-emails/">Multipart-E-Mail</a> erzeugt, bei der das ICS-Dokument eben ein Part der Nachricht ist.</p>
+
+
+
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-luminous-vivid-amber-color">Wenn du einen Tipp hast, wie das funktioniert, schreib mir gerne eine E-Mail.</mark></p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<p>Der folgende Code zeigt exemplarisch die notwendigen Methodenaufrufe. Der Code ist ebenfalls im <a href="https://github.com/tricktresor/appointment">Github-Projek Appointment</a> zu finden.</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT zt9tr_send_appointment.
+
+INCLUDE &lt;cntn01>.
+TYPE-POOLS: sccon.
+
+PARAMETERS p_orga  TYPE xubname    DEFAULT sy-uname OBLIGATORY.
+PARAMETERS p_mail  TYPE ad_smtpadr DEFAULT 'ewf@inwerken.de' OBLIGATORY.
+PARAMETERS p_mail2 TYPE ad_smtpadr DEFAULT 'lmr@inwerken.de'.
+PARAMETERS p_title TYPE sc_txtshor DEFAULT 'Geschäftsessen'.
+PARAMETERS p_loc   TYPE sc_room    DEFAULT 'La Civetta'.
+PARAMETERS p_date  TYPE sy-datum   DEFAULT sy-datum.
+PARAMETERS p_from  TYPE sc_timefro DEFAULT '120000'.
+PARAMETERS p_to    TYPE sc_timeto  DEFAULT '130000'.
+SELECTION-SCREEN BEGIN OF BLOCK body WITH FRAME TITLE TEXT-bdy.
+PARAMETERS p_line1 TYPE so_text255 DEFAULT 'Wichtiges Essen'.
+PARAMETERS p_line2 TYPE so_text255 DEFAULT 'Schickes Hemd anziehen'.
+PARAMETERS p_line3 TYPE so_text255 DEFAULT 'Blumen mitbringen'.
+SELECTION-SCREEN END OF BLOCK body.
+
+CLASS main DEFINITION.
+  PUBLIC SECTION.
+
+    CONSTANTS c_status_confirmation_never    TYPE bcs_rqst VALUE 'N'.  "Never
+    CONSTANTS c_status_confirmation_on_error TYPE bcs_rqst VALUE 'E'.  "Only if errors occur
+    CONSTANTS c_status_confirmation_if_sent  TYPE bcs_rqst VALUE 'D'.  "If sent
+    CONSTANTS c_status_confirmation_if_read  TYPE bcs_rqst VALUE 'R'.  "If read
+    CONSTANTS c_status_confirmation_always   TYPE bcs_rqst VALUE 'A'.  "Always
+
+    METHODS start.
+  PRIVATE SECTION.
+    DATA appointment       TYPE REF TO cl_appointment.
+    DATA participant       TYPE scspart.
+
+    METHODS add_participant IMPORTING i_mail_address TYPE clike.
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+  METHOD start.
+    appointment = NEW #( ).
+
+    "MEETING, VACATION, CUSTOMER, ABSENT
+    appointment->set_type( 'ZREMINDER' ).
+
+    appointment->set_organizer( organizer = p_orga ).
+
+    add_participant( p_mail ).
+    IF p_mail2 IS NOT INITIAL.
+      add_participant( p_mail2 ).
+    ENDIF.
+
+    " add detail body text
+    appointment->set_text( VALUE #(
+     ( line = p_line1 ) ( line = cl_abap_char_utilities=>cr_lf )
+     ( line = p_line2 ) ( line = cl_abap_char_utilities=>cr_lf )
+     ( line = p_line3 )
+     ) ).
+
+    " set title and location
+    appointment->set_title( p_title ).
+    appointment->set_location( p_loc ).
+
+    " set date and time using default settings
+    " date_to will be the same as date_from
+    " time zone will be the one from the user master records settings
+    appointment->set_date( date_from = p_date
+                           time_from = p_from
+                           time_to   = p_to ).
+    " set it to a high priority meeting
+    appointment->set_priority( sccon_prio_very_high ).
+
+    " this meeting is not yet confirmed
+    appointment->set_status( sccon_status_planned ).
+    " Important to set this one to space. Otherwise SAP will send a not user-friendly e-mail
+    appointment->save( send_invitation = space ).
+
+    TRY.
+        " Now that we have the appointment, we can send a good one for outlook by switching to BCS
+        DATA(send_request) = appointment->create_send_request( ).
+        DATA(recipient) = cl_cam_address_bcs=>create_internet_address( p_mail ).
+        send_request->add_recipient(
+          i_recipient = recipient
+          i_copy = abap_true ).
+        IF p_mail2 IS NOT INITIAL.
+          DATA(recipient2) = cl_cam_address_bcs=>create_internet_address( p_mail2 ).
+          send_request->add_recipient(
+            i_recipient = recipient2
+            i_copy = abap_true ).
+        ENDIF.
+      CATCH cx_address_bcs INTO DATA(error_address).
+        MESSAGE error_address TYPE 'I'.
+        RETURN.
+      CATCH cx_send_req_bcs INTO DATA(error_add_recipient).
+        MESSAGE error_add_recipient TYPE 'I'.
+        RETURN.
+      CATCH cx_bcs INTO DATA(error_create_send_request).
+        MESSAGE error_create_send_request TYPE 'I'.
+        RETURN.
+    ENDTRY.
+
+    TRY.
+        " don't request read/delivery receipts
+        send_request->set_status_attributes(
+          i_requested_status = c_status_confirmation_never
+          i_status_mail      = c_status_confirmation_never ).
+        "sent mail immediately
+        send_request->set_send_immediately( abap_true ).
+        " Send it to the world
+        DATA(appointment_sent) = send_request->send( i_with_error_screen = abap_true ).
+        IF appointment_sent = abap_true.
+          COMMIT WORK AND WAIT.
+          MESSAGE 'Einladung verschickt' TYPE 'S'.
+        ELSE.
+          MESSAGE 'Fehler beim Senden der Einladung' TYPE 'I'.
+        ENDIF.
+      CATCH cx_send_req_bcs INTO DATA(error_send).
+        MESSAGE error_send TYPE 'I'.
+    ENDTRY.
+
+  ENDMETHOD.
+
+  METHOD add_participant.
+
+    DATA address           TYPE swc_object.
+    DATA address_container TYPE STANDARD TABLE OF swcont.
+
+    "set an internet address as a second partcipant of that appointment
+    swc_create_object address 'ADDRESS' space.
+    swc_set_element address_container 'AddressString'  i_mail_address.
+    swc_set_element address_container 'TypeId' 'U'.
+    swc_set_element address_container 'NoAdradmi' 'X'.
+    swc_set_element address_container 'NoIntern' 'X'.
+    swc_call_method address 'Create' address_container.
+    CHECK sy-subrc = 0.
+    "get key and type of object
+    swc_get_object_key address participant-objkey.
+    CHECK sy-subrc = 0.
+    swc_get_object_type address participant-objtype.
+    CHECK sy-subrc = 0.
+    participant-send_mail = abap_true.
+    appointment->add_participant( participant = participant ).
+
+  ENDMETHOD.
+ENDCLASS.
+
+START-OF-SELECTION.
+
+  NEW main( )->start( ).</pre>
+<p>Der Beitrag <a href="/blog/termin-an-outlook-versenden/">Termin an Outlook versenden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Code-Inspector-Prüfungen auflisten</title>
+		<link>/blog/code-inspector-pruefungen-auflisten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 01 Sep 2023 14:51:12 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">/?p=1043422</guid>
+
+					<description><![CDATA[<p>Heute stand ich vor der Herausforderung, dass ich alle Code-Inspector-Prüfungen herausfinden wollte, die in einer Prüfvariante aktiv sind. Natürlich kann man sich diese über die Pflege der Varianten im Code-Inspector über Transaktion SCI anzeigen lassen. Allerdings wird hier der gesamte Baum der verfügbaren Prüfungen aufgelistet und man muss sich die heraussuchen, die aktiviert sind. Eine nervige und Fehleranfällige Aufgabe, wenn man die aktiven Prüfungen irgendwie dokumentieren möchte. So sieht die Baumstruktur der Prüfungen aus: Um...</p>
+<p>Der Beitrag <a href="/blog/code-inspector-pruefungen-auflisten/">Code-Inspector-Prüfungen auflisten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Heute stand ich vor der Herausforderung, dass ich alle Code-Inspector-Prüfungen herausfinden wollte, die in einer Prüfvariante aktiv sind. Natürlich kann man sich diese über die Pflege der Varianten im Code-Inspector über Transaktion SCI anzeigen lassen. Allerdings wird hier der gesamte Baum der verfügbaren Prüfungen aufgelistet und man muss sich die heraussuchen, die aktiviert sind. Eine nervige und Fehleranfällige Aufgabe, wenn man die aktiven Prüfungen irgendwie dokumentieren möchte.</p>
+
+
+
+<p>So sieht die Baumstruktur der Prüfungen aus:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="778" height="201" src="/wp-content/uploads/2023/09/image.png" alt="" class="wp-image-1043423" srcset="/wp-content/uploads/2023/09/image.png 778w, /wp-content/uploads/2023/09/image-300x78.png 300w, /wp-content/uploads/2023/09/image-768x198.png 768w" sizes="(max-width: 778px) 100vw, 778px" /></figure>
+
+
+
+<p>Um die technischen Texte anstelle der Beschreibungen anzuzeigen, gehe über das Menü <em>Prüfvariante • Anzeigen • Technische Namen</em>.</p>
+
+
+
+<h2 class="wp-block-heading">Auflistung der aktiven Prüfvarianten</h2>
+
+
+
+<p>Mit dem folgenden Code werden die aktiven Prüfungen zu einer Prüfvariante ermittelt und ausgegeben. </p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="725" height="270" src="/wp-content/uploads/2023/09/image-2.png" alt="" class="wp-image-1043426" srcset="/wp-content/uploads/2023/09/image-2.png 725w, /wp-content/uploads/2023/09/image-2-300x112.png 300w" sizes="(max-width: 725px) 100vw, 725px" /></figure>
+
+
+
+<p>Wenn du die Prüfungen einer <em>globalen Prüfvariante</em> ermitteln möchtest, dann muss OWNER leer bleiben. Für eine <em>lokale Prüfvariante </em>setze den entsprechenden User ein.</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="526" height="365" src="/wp-content/uploads/2023/09/image-1.png" alt="" class="wp-image-1043425" srcset="/wp-content/uploads/2023/09/image-1.png 526w, /wp-content/uploads/2023/09/image-1-300x208.png 300w, /wp-content/uploads/2023/09/image-1-200x140.png 200w" sizes="(max-width: 526px) 100vw, 526px" /></figure>
+
+
+
+<p></p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">PARAMETERS name  TYPE scichkv_hd-checkvname DEFAULT 'DEFAULT'.
+PARAMETERS owner TYPE scichkv_hd-ciuser     DEFAULT space.
+
+START-OF-SELECTION.
+
+  SELECT SINGLE * FROM scichkv_hd
+      WHERE checkvname = @name     ##WARN_OK
+        AND ciuser     = @owner                         "#EC CI_NOORDER
+       INTO @DATA(variant_header).
+
+  DATA(main) =  cl_ci_checkvariant=>get_ref(
+     p_user                   = owner
+     p_name                   = name ).
+  CHECK main IS BOUND.
+
+  main->get_info(
+    EXCEPTIONS
+      could_not_read_variant = 1
+      OTHERS                 = 2 ).
+
+  IF sy-subrc = 0.
+    cl_demo_output=>display_data(
+      VALUE string_table(
+        FOR variant IN main->variant (
+          CONV #( variant-testname ) ) ) ).
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/code-inspector-pruefungen-auflisten/">Code-Inspector-Prüfungen auflisten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAP-Entwickler (m/w/d)</title>
+		<link>/blog/sap-entwickler-m-w-d/</link>
+		
+		<dc:creator><![CDATA[John Job]]></dc:creator>
+		<pubDate>Thu, 22 Jun 2023 16:53:28 +0000</pubDate>
+				<category><![CDATA[Stellenanzeigen]]></category>
+		<guid isPermaLink="false">/?p=1042735</guid>
+
+					<description><![CDATA[<p>Gemeinsam einzigartig mit Ihnen als SAP-Entwickler (m/w/d)?</p>
+<p>Inwerken AG stellt ein.</p>
+<p>Der Beitrag <a href="/blog/sap-entwickler-m-w-d/">SAP-Entwickler (m/w/d)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2><strong>Gemeinsam einzigartig mit Ihnen als SAP-Entwickler (m/w/d)?</strong></h2>
+<div> </div>
+<div> </div>
+<h3>Das macht uns als Ihren Arbeitgeber einzigartig:</h3>
+<ul>
+<li>flexible Arbeitszeitgestaltung, durch Gleitzeitregelungen und mobilem Arbeiten bspw. von zu Hause aus</li>
+<li>eine auf Ihre Bedürfnisse zugeschnittene Weiterentwicklung</li>
+<li>einen großen eigenverantwortlichen Handlungsspielraum</li>
+<li>eine herausragende Teamatmosphäre, in der gegenseitige Unterstützung selbstverständlich ist</li>
+<li>unbefristeter Arbeitsvertrag in einem wachstumsstarken Unternehmen</li>
+<li>aktives Gesundheitsmanagement durch bspw. Inhouse-Physiotherapie und ergonomisch sowie modern eingerichtete Arbeitsplätze</li>
+<li>viele Zusatzleistungen wie ein mehrstufiges Prämiensystem und eine jährliche Erholungspauschale stocken das Gehalt auf</li>
+<li>Firmenevents, zu denen wir oft auch die ganze Familie einladen sowie viele weitere Benefits</li>
+</ul>
+<h3><strong><br /></strong>Bringen Sie sich bei uns ein:<strong><br /></strong></h3>
+<ul>
+<li>bei SAP-Kunden- und Entwicklungsprojekte mitwirken und diese durchführen</li>
+<li>gemeinsam mit unseren Kunden neue Lösungsansätze entwickeln</li>
+<li>technische Konzepte erstellen und effizientere Prozesse modellieren</li>
+<li>setzen Sie Entwicklungen im SAP-System um</li>
+<li>Leisten von Support und Fehleranalysen für bestehende Lösungen</li>
+<li>Weiterentwicklung der Inwerken-Produktpalette</li>
+</ul>
+<h3><strong><br /></strong>Was Sie einzigartig macht:<strong><br /></strong></h3>
+<ul>
+<li>ein abgeschlossenes Studium der Wirtschaftswissenschaften, Informatik oder eine vergleichbare Qualifikation</li>
+<li>mindestens 2 Jahre Erfahrung in der ABAP-OO-Entwicklung</li>
+<li>Know-how in Konzeption und Implementierung von SAP-Lösungen</li>
+<li>analytisches und strukturiertes Denkvermögen</li>
+<li>eine hohe Bereitschaft zur Eigeninitiative, Kommunikations- und Teamfähigkeit</li>
+<li>eine selbstständige sowie strukturierte Arbeitsweise</li>
+<li>Ihre Fähigkeit, Kundenprobleme zu erkennen und zu einer Lösung zu führen</li>
+<li>Ihr Interesse sich weiterzuentwickeln</li>
+<li>sehr gute Deutschkenntnisse und gute Englischkenntnisse</li>
+</ul>
+<h3><strong><br /></strong>Lust uns zu verstärken?<strong><br /></strong></h3>
+<p>Dann klicken Sie <a href="mailto:karriere@inwerken.de">hier</a>, um sich zu bewerben oder rufen Sie direkt bei uns an, auch gern bei Fragen.</p>
+<h3>Wir freuen uns auf Sie:<strong><br /></strong></h3>
+<p>Die Inwerken AG ist ein mittelständisches, stetig wachsendes IT-Dienstleistungsunternehmen, das für einen Rundum-Service im SAP- und Webanwendungsbereich steht. Dabei bieten wir unseren Kunden eine professionelle, unternehmensnahe IT-Beratung und Entwicklung, die die tägliche Arbeit erleichtert. Unsere rund 70 Beschäftigte an den Standorten Isernhagen bei Hannover, Berlin, Braunschweig, Hamburg, Rudolstadt und Stuttgart zeichnen sich durch ein breites Fachwissen aus. Sie sind der Antrieb unserer Unternehmung. Als Teil unseres Teams haben Sie die Chance sich einzubringen, etwas zu bewegen und aktiv mitzugestalten.</p>
+<div> </div>
+<p><em>Ihre Ansprechperson<br /></em>Miriam Taufall<br />HR-Managerin<br />Tel: +49 511 936 206 78<br /><a href="mailto:karriere@inwerken.de">karriere@inwerken.de</a></p>
+<div> </div>
+<div> </div>
+
+
+<div class="wp-block-buttons is-content-justification-center is-layout-flex wp-container-core-buttons-is-layout-8 wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-width wp-block-button__width-75"><a class="wp-block-button__link wp-element-button" href="mailto:karriere@inwerken.de">Bewerben Sie sich jetzt</a></div>
+</div>
+<p>Der Beitrag <a href="/blog/sap-entwickler-m-w-d/">SAP-Entwickler (m/w/d)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Massenkopie von Klassen</title>
+		<link>/blog/massenkopie-von-klassen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 13 Jun 2023 14:32:33 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">/?p=1042615</guid>
+
+					<description><![CDATA[<p>Im Standard gibt es keine Möglichkeit, eine Klasse massenhaft, also mit vielen verschiedenen Namen zu kopieren. Gerade für Schulungen kann es jedoch sinnvoll sein, eine Klasse für viele Benutzer zu kopieren. Besonders sinnvoll ist es zum Beispiel für das UnitTest Koan von Damir Majer. Bei diesem Koan geht es darum, die verschiedenen Techniken der Unit-Tests zu erlernen. Mit dem folgenden Programm ist es möglich, eine Klasse auf verschiedene Klassen zu kopieren. Es werden alle Benutzer...</p>
+<p>Der Beitrag <a href="/blog/massenkopie-von-klassen/">Massenkopie von Klassen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Im Standard gibt es keine Möglichkeit, eine Klasse massenhaft, also mit vielen verschiedenen Namen zu kopieren. Gerade für Schulungen kann es jedoch sinnvoll sein, eine Klasse für viele Benutzer zu kopieren. Besonders sinnvoll ist es zum Beispiel für das <a href="https://blogs.sap.com/2018/02/08/have-fun-with-abap-koans/">UnitTest Koan</a> von <a href="https://people.sap.com/majcon">Damir Majer</a>. Bei diesem Koan geht es darum, die verschiedenen Techniken der Unit-Tests zu erlernen. </p>
+
+
+
+<p>Mit dem folgenden Programm ist es möglich, eine Klasse auf verschiedene Klassen zu kopieren. Es werden alle Benutzer einer bestimmten Benutzergruppe ermittelt. Für jeden Benutzer wird eine Klasse mit dem Benutzernamen aus der zu kopierenden Klasse erstellt.</p>
+
+
+
+<p>Zusätzlich kannst du entscheiden, ob für jeden Benutzer eine eigene Entwicklungsklasse angelegt wird.</p>
+
+
+
+<p>Mit der Testoption kannst du dir die Klassen, die angelegt werden würden, ausgeben lassen.</p>
+
+
+      <div class="
+                    pg85d4c9af15f4                    pg-image">
+        
+          
+            <img decoding="async"  src="/wp-content/uploads/2023/06/SNAG-0833.png"   srcset=" /wp-content/uploads/2023/06/SNAG-0833-300x145.png 300w, /wp-content/uploads/2023/06/SNAG-0833.png 608w"  alt="" title="SNAG-0833" />
+          
+              </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+<h2 class="wp-block-heading">Kopierte Klassen löschen</h2>
+
+
+
+<p>Möchtest du die kopierten Klassen später wieder löschen, um die nächste Schulung vorzubereiten, dann kannst du den Funktionsbaustein <strong>OO_CLASS_DELETE</strong> mit den Parametern COMMIT = X und FORCE = X verwenden. Der Baustein SEO_CLASS_DELETE löscht anscheinend nicht vollständig. Nach dem Löschen mit diesem Baustein und dem erneuten Versuch eine Klasse auf die gelöscht Klasse zu kopieren, gibt es den Kurzdump TMDIR_CLASS_ALREADY_EXISTS.</p>
+
+
+
+<h2 class="wp-block-heading">Aktivierung</h2>
+
+
+
+<p>Zur Aktivierung der kopierten Klasse verwende ich den Funktionsbaustein SEO_CLASS_ACTIVATE. Dieser funktioniert jedoch eventuell (abhängig vom SAP-Release?) nicht korrekt und hinterlässt die Bestandteile der kopierten Klasse als <em>nicht aktiviert</em> zurück. Versuche stattdessen den Funktionsbaustein CLAS_OBJECT_ACTIVATE.</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT zt9r_copy_class.
+
+PARAMETERS p_test  AS CHECKBOX       DEFAULT 'X'.
+PARAMETERS p_crdev AS CHECKBOX       DEFAULT 'X'.
+PARAMETERS p_class TYPE seoclskey    DEFAULT 'ZCL_KOANS_ABOUT_ABAPUNIT'.
+PARAMETERS p_newcl TYPE seoclskey    DEFAULT 'ZCL_KOANS_&lt;USER>'.
+PARAMETERS p_usrcls TYPE usr02-class DEFAULT 'DEV'.
+SELECT-OPTIONS so_user FOR sy-uname.
+
+START-OF-SELECTION.
+
+  PERFORM copy.
+
+FORM copy.
+  DATA ls_newcls     TYPE seoclskey.
+  DATA lt_class_keys TYPE seoc_class_keys.
+  DATA lv_save       TYPE sap_bool.
+  DATA lv_devclass   TYPE devclass.
+
+  SELECT bname
+    FROM usr02
+    INTO TABLE @DATA(lt_users)
+   WHERE bname IN @so_user
+     AND class = @p_usrcls. "do not change DDIC, SAP*, etc
+
+  LOOP AT lt_users INTO DATA(ls_user)
+    WHERE bname &lt;> 'DDIC'
+      AND bname &lt;> 'SAP*'.
+
+    IF p_crdev = abap_true.
+      PERFORM create_devclass USING ls_user-bname.
+    ENDIF.
+
+    lv_devclass = |${ ls_user-bname }|.
+
+    ls_newcls-clsname = p_newcl.
+    REPLACE '&lt;USER>' WITH ls_user-bname INTO ls_newcls-clsname.
+    WRITE: / ls_newcls-clsname.
+
+    CHECK p_test = space.
+
+    CALL FUNCTION 'SEO_CLASS_COPY'
+      EXPORTING
+        clskey       = p_class
+        new_clskey   = ls_newcls
+        save         = abap_true
+      CHANGING
+        devclass     = lv_devclass
+      EXCEPTIONS
+        not_existing = 1
+        deleted      = 2
+        is_interface = 3
+        not_copied   = 4
+        db_error     = 5
+        no_access    = 6
+        OTHERS       = 7.
+    IF sy-subrc = 0.
+      WRITE: 'copied'.
+      lt_class_keys = VALUE #( ( ls_newcls ) ).
+      CALL FUNCTION 'SEO_CLASS_ACTIVATE'
+        EXPORTING
+          clskeys       = lt_class_keys
+        EXCEPTIONS
+          not_specified = 1
+          not_existing  = 2
+          inconsistent  = 3
+          OTHERS        = 4.
+      .  IF sy-subrc = 0.
+        WRITE: 'und aktiviert'.
+      ENDIF.
+    ELSE.
+      WRITE: / ls_newcls-clsname, 'NOT copied'.
+    ENDIF.
+
+
+  ENDLOOP.
+ENDFORM.
+
+FORM create_devclass USING name.
+
+  DATA lv_devclass TYPE devclass.
+  DATA ls_devclass TYPE trdevclass.
+  DATA lv_changed  TYPE c LENGTH 1.
+  DATA lv_text     TYPE c LENGTH 80.
+
+  ls_devclass-devclass  = |${ name }|.
+  CALL FUNCTION 'TRINT_DEVCLASS_GET'
+    EXPORTING
+      iv_devclass        = ls_devclass-devclass
+    EXCEPTIONS
+      devclass_not_found = 1           " Package Does Not Exist
+      OTHERS             = 2.
+  IF sy-subrc = 0.
+    RETURN.
+  ENDIF.
+
+  ls_devclass-ctext     = |local package for { name }|.
+  ls_devclass-as4user   = name.
+  ls_devclass-pdevclass = space.
+  ls_devclass-dlvunit   = 'LOCAL'.
+  ls_devclass-component = space.
+  ls_devclass-comp_appr = space.
+  ls_devclass-comp_text = space.
+  ls_devclass-korrflag  = 'X'.
+  ls_devclass-namespace = space.
+  ls_devclass-tpclass    = space.
+  ls_devclass-type       = 'N'.
+  ls_devclass-target     = space.
+  ls_devclass-packtype   = space.
+  ls_devclass-restricted = space.
+  ls_devclass-mainpack   = space.
+  ls_devclass-created_by = 'COPYREPORT'.
+  ls_devclass-created_on = sy-datum.
+
+  CALL FUNCTION 'TRINT_MODIFY_DEVCLASS'
+    EXPORTING
+      iv_action             = 'CREA'
+      iv_dialog             = space
+      is_devclass           = ls_devclass
+      iv_request            = space
+    IMPORTING
+      es_devclass           = ls_devclass
+      ev_something_changed  = lv_changed
+    EXCEPTIONS
+      no_authorization      = 1
+      invalid_devclass      = 2
+      invalid_action        = 3
+      enqueue_failed        = 4
+      db_access_error       = 5
+      system_not_configured = 6
+      OTHERS                = 7.
+  IF sy-subrc > 0.
+    MESSAGE i000(oo) WITH 'error creating package' lv_devclass.
+    STOP.
+  ELSE.
+    WRITE: / 'Package created:', name, lv_text.
+  ENDIF.
+ENDFORM.                    "create_devclass</pre>
+<p>Der Beitrag <a href="/blog/massenkopie-von-klassen/">Massenkopie von Klassen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

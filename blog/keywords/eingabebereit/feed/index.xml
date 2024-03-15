@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>eingabebereit Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/eingabebereit/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 25 May 2018 11:55:10 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>eingabebereit Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ALV Editierbar machen</title>
+		<link>/blog/alv-editierbar-machen/</link>
+					<comments>/blog/alv-editierbar-machen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 10 Oct 2006 10:20:50 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[eingabebereit]]></category>
+		<category><![CDATA[editierbar]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=385</guid>
+
+					<description><![CDATA[<p>Dieses kurze Programm zeigt, was n&#246;tig ist, um eine Tabelle in einem ALV-Grid editieren zu k&#246;nnen. Der Name der Datenbanktabelle wird einmal festgelegt und das Programm erzeugt die entsprechenden Datentabelle und liest die Daten von der Datenbank.</p>
+<p>Der Beitrag <a href="/blog/alv-editierbar-machen/">ALV Editierbar machen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Dieses kurze Programm zeigt, was nötig ist, um eine Tabelle in einem ALV-Grid editieren zu können. Der Name der Datenbanktabelle wird einmal festgelegt und das Programm erzeugt die entsprechenden Datentabelle und liest die Daten von der Datenbank. Das Eingabe bereite Grid wird angezeigt und kann editiert werden.</p>
+<p>Das unten stehende Programm erzeugt selbstständig die Datenstrukturen für die Tabelle T005, liest die ersten zehn Datensätze von der Datenbank und zeigt sie in einem editierbaren ALV-Grid an.</p>
+<p>Beim Verlassen der Anwendung werden die Daten als Liste ausgegeben.</p>
+<p><strong><u>HINWEIS:<br />
+</u></strong>Die Methode <span style="color: #fb2412;">Handle_Data_Changed</span> wird erst aufgerufen, nachdem die ENTER-Taste gedrückt wurde!!!<br />
+Sollen die Änderungen auch nach dem Druck einer Funktionstaste übernommen werden, so muss vorher die Methode <span style="color: #fb2412;"><strong>CHECK_DATA_CHANGED</strong></span> aufgerufen werden! Es sei denn, Sie registrieren nicht den MC_EVT_ENTER sondern nehmen stattdessen den MC_EVT_MODIFIED&#8230; <span style="color: #fb2412;">Dann erfolgt die Datenänderung sofort, nachdem das Feld verlassen wird.</span></p>
+<p><strong>Es erfolgt natürlich keine Änderung auf der Datenbank!</strong></p>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td style="width: 361px;" valign="top"><img decoding="async" class="alignnone" src="/wp-content/uploads/tt_images/ALV/alvedit.GIF" /><br />
+Die Tabelle T005 wird in einem ALV Grid geändert</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true ">*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZZ_ALV_EDIT
+*&amp;---------------------------------------------------------------------*
+
+REPORT  zz_alv_edit LINE-SIZE 1000.
+
+*** Variablen
+DATA:
+*** Pointer für CREATE DATA
+  gref           TYPE REF TO data,
+*** Name der Datenbanktabelle
+  gv_sname       LIKE dd02l-tabname VALUE 'T005',
+*** Feldkatalog
+  gt_fcat        TYPE lvc_t_fcat.
+
+*** Feld-Symbole
+FIELD-SYMBOLS:
+*** Feldkatalog
+  &lt;fcat&gt;      TYPE lvc_s_fcat,
+*** Feld der Struktur
+  &lt;feld&gt;      TYPE ANY,
+*** Arbeitsbereich der internen Tabelle
+  &lt;wa&gt;        TYPE ANY,
+*** Die interne Tabelle mit Struktur aus GV_SNAME
+  &lt;itab&gt;      TYPE table.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_events DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_events DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS:
+      handle_data_changed
+            FOR EVENT data_changed  OF  cl_gui_alv_grid
+            IMPORTING er_data_changed sender.
+
+ENDCLASS.                    "lcl_events DEFINITION
+
+*---------------------------------------------------------------------*
+*       CLASS lcl_rohr_eventhandler IMPLEMENTATION
+*---------------------------------------------------------------------*
+CLASS lcl_events IMPLEMENTATION.
+
+  METHOD handle_data_changed.
+******************************************
+*** HandleDataChanged                  ***
+******************************************
+    DATA: ls_good                TYPE lvc_s_modi.
+
+*** alle Inhalte der geänderten Zellen in die interne Tabelle schreiben
+    LOOP AT er_data_changed-&gt;mt_good_cells INTO ls_good.
+*** Dazu auf die richtige Zeile in der ITAB positionieren:
+      READ TABLE &lt;itab&gt; ASSIGNING &lt;wa&gt; INDEX ls_good-row_id.
+      IF sy-subrc = 0.
+*** Und das geänderte Feld dem Feldsymbol zuweisen
+        ASSIGN COMPONENT ls_good-fieldname OF STRUCTURE &lt;wa&gt; TO &lt;feld&gt;.
+        IF sy-subrc = 0.
+*** Feldwert zuweisen
+          &lt;feld&gt; = ls_good-value.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.                    "handle_data_changed
+
+ENDCLASS.                    "lcl_events IMPLEMENTATION
+
+*** Variablen ALV
+DATA:
+  ref_alv        TYPE REF TO cl_gui_alv_grid,
+  ref_container  TYPE REF TO cl_gui_custom_container,
+  ref_alv_events TYPE REF TO lcl_events.
+
+
+*** Programmstart
+START-OF-SELECTION.
+
+*** Aufruf des Dynpros
+  CALL SCREEN 4000.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  init
+*&amp;---------------------------------------------------------------------*
+FORM init.
+
+*** Container erzeugen
+  CHECK ref_alv IS INITIAL.
+  CREATE OBJECT ref_container
+         EXPORTING container_name = 'ALV'.
+
+  TRY.
+*** Erzeugung der Datenstrukturen zur Laufzeit
+      CREATE DATA gref TYPE STANDARD TABLE OF (gv_sname).
+      ASSIGN gref-&gt;* TO &lt;itab&gt;.
+
+*** Einlesen der Daten
+      SELECT * FROM (gv_sname)
+        INTO TABLE &lt;itab&gt;
+       UP TO 10 ROWS.
+
+*** Fehler abfangen
+    CATCH cx_sy_create_data_error.
+      WRITE 'Wrong Database!'.
+  ENDTRY.
+
+*** Feldkatalog einlesen
+  CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_structure_name = gv_sname
+    CHANGING
+      ct_fieldcat      = gt_fcat
+    EXCEPTIONS
+      OTHERS           = 3.
+
+*** Alle Felder editierbar machen
+  LOOP AT gt_fcat ASSIGNING &lt;fcat&gt;.
+    &lt;fcat&gt;-edit = 'X'.
+  ENDLOOP.
+
+*** ALV erzeugen
+  PERFORM create_alv.
+
+ENDFORM.                    "init
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  STATUS_4000  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE status_4000 OUTPUT.
+
+*** Status
+  SET TITLEBAR '4000'.
+  SET PF-STATUS 'STLI' OF PROGRAM 'SAPMSSY0'.
+
+*** Clear
+  CLEAR sy-ucomm.
+
+*** Init ALV
+  PERFORM init.
+
+ENDMODULE.                 " STATUS_4000  OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  USER_COMMAND_4000  INPUT
+*&amp;---------------------------------------------------------------------*
+MODULE user_command_4000 INPUT.
+
+  CASE sy-ucomm.
+    WHEN 'BACK' OR '%EX' OR 'RW'.
+*** Liste
+      LEAVE TO LIST-PROCESSING.
+      SET PF-STATUS space.
+*** Tabelleninhalt ausgeben
+      LOOP AT &lt;itab&gt; ASSIGNING &lt;wa&gt;.
+        NEW-LINE.
+        DO.
+          ASSIGN COMPONENT sy-index OF STRUCTURE &lt;wa&gt; TO &lt;feld&gt;.
+          IF sy-subrc = 0.
+*** Ausgabe des Feldes
+            WRITE: &lt;feld&gt;.
+          ELSE.
+            EXIT. "from DO-LOOP
+          ENDIF.
+        ENDDO.
+      ENDLOOP.
+*** Exit
+      SET SCREEN 0. LEAVE SCREEN.
+  ENDCASE.
+
+ENDMODULE.                 " USER_COMMAND_4000  INPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  create_alv
+*&amp;---------------------------------------------------------------------*
+FORM create_alv .
+
+*** ALV anbinden
+  CREATE OBJECT ref_alv
+        EXPORTING
+          i_parent          = ref_container
+          i_appl_events     = 'X'
+        EXCEPTIONS
+          OTHERS            = 5.
+
+*** Edit-Event extra registrieren
+  ref_alv-&gt;register_edit_event( i_event_id = cl_gui_alv_grid=&gt;mc_evt_enter ).
+
+*** Edit-Mode aktiv setzen
+  ref_alv-&gt;set_ready_for_input( i_ready_for_input = 1 ).
+
+*** ...und EventHandler zuweisen
+  CREATE OBJECT ref_alv_events.
+  SET HANDLER ref_alv_events-&gt;handle_data_changed FOR ref_alv.
+
+*** First Display
+  CALL METHOD ref_alv-&gt;set_table_for_first_display
+    CHANGING
+      it_fieldcatalog = gt_fcat
+      it_outtab       = &lt;itab&gt;
+    EXCEPTIONS
+      OTHERS          = 4.
+
+*** Fokus auf das Grid setzen
+  cl_gui_alv_grid=&gt;set_focus( ref_alv ).
+
+*** Flush
+  CALL METHOD cl_gui_cfw=&gt;flush.
+
+ENDFORM.                    " create_alv</pre>
+<h3 class="head1">Dynpro-Ablauflogik</h3>
+<p class="sap1">PROCESS BEFORE OUTPUT.<br />
+MODULE STATUS_4000.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE USER_COMMAND_4000.</p>
+<p><strong><u>HINWEIS:</u></strong><br />
+Auf dem Dynpro muss ein &#8220;Custom Container&#8221; mit Namen &#8220;ALV&#8221; angelegt werden.</p>
+<p><strong><u>TIPP für Version ECC 5.0:<br />
+</u></strong>Wenn Sie in den Eigenschaften des Dynpros das Häkchen &#8220;Ohne Applikationsbar&#8221; setzen, dann wird die Zeile, in der normalerweise die Druckknöpfe stehen, ausgeblendet und es steht Ihnen mehr Platz für das ALV-Grid zur Verfügung!</p>
+<p>Der Beitrag <a href="/blog/alv-editierbar-machen/">ALV Editierbar machen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/alv-editierbar-machen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Docking-Container Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/docking-container/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 30 Mar 2020 12:39:19 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Docking-Container Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Application-Event stört gewaltig&#8230;</title>
+		<link>/blog/application-event-stoert-gewaltig/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 17 Feb 2017 17:53:43 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<category><![CDATA[Folgebildsteuerung]]></category>
+		<category><![CDATA[Planauftrag]]></category>
+		<category><![CDATA[CO41]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017905</guid>
+
+					<description><![CDATA[<p>Aufgabe: Transaktion CO41 - Umsetzung Planaufträge um ein paar Funktionen zu erweitern. Ich entschied mich dafür, an geeigneter Stelle einen Docking-Container mit einem Dynamischen Dokument anzubinden. Durch Drucktasten und Eingabefelder wollte ich die geforderte Funktionalität abbilden. Doch leider machte mir eine Fehlermeldung schwer zu schaffen...</p>
+<p>Der Beitrag <a href="/blog/application-event-stoert-gewaltig/">Application-Event stört gewaltig&#8230;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich bekam die Aufgabe, die Transaktion CO41 &#8211; Umsetzung Planaufträge um ein paar Funktionen zu erweitern. Nach einigem Hin- und Herüberlegen entschied ich mich dafür, an geeigneter Stelle (Include LCOUPF1N &#8211; Routine INIT_FBILD) mittels impliziter Erweiterung einen Docking-Container mit einem <a href="https://tricktresor.com/blog/dynamische-dokumente/">Dynamischen Dokument</a> anzubinden. Der Docking Container war schnell erstellt und auch die ersten Zeichen inklusive Drucktaste waren zügig gezaubert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-33-33.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017906 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-33-33.jpg" alt="" width="493" height="280" srcset="/wp-content/uploads/2017/02/2017-02-17_18-33-33.jpg 493w, /wp-content/uploads/2017/02/2017-02-17_18-33-33-300x170.jpg 300w, /wp-content/uploads/2017/02/2017-02-17_18-33-33-148x85.jpg 148w, /wp-content/uploads/2017/02/2017-02-17_18-33-33-71x40.jpg 71w" sizes="(max-width: 493px) 100vw, 493px" /></a></p>
+<p>Leider funktioniert dieser erste Wurf nicht, denn nach Drücken des Druckknopfes wurde nicht meine registrierte Methode angesprungen, sondern es kam die Meldung &#8220;Die angeforderte Funktion %_GC 1 ist hier nicht vorgesehen&#8221;.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-36-01.jpg"><img decoding="async" class="size-full wp-image-1017907 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-17_18-36-01.jpg" alt="" width="473" height="139" srcset="/wp-content/uploads/2017/02/2017-02-17_18-36-01.jpg 473w, /wp-content/uploads/2017/02/2017-02-17_18-36-01-300x88.jpg 300w" sizes="(max-width: 473px) 100vw, 473px" /></a></p>
+<p>Ich brauchte lange, um herauszufinden, dass die in einigen von der SAP verwendete <a href="https://tricktresor.com/blog/folgebildsteuerung/">FBS &#8211; Folgebildsteuerung</a> der Grund für die Meldung war (Funktionsbaustein SCREEN_SEQUENCE_CONTROL). Beziehungsweise war das nicht in erster Linie der Grund, sondern der Umstand, dass bei den Dynamischen Dokumenten die zugehörigen Events alle standardmäßig als &#8220;application events&#8221; registriert werden. Das hat zur Folge, dass die Ereignissteuerung nicht nur innerhalb der Klasse durchgeführt wird, sondern einen &#8220;Umweg&#8221; über das Dynpro macht. Es wird in dem Fall ein Funktionscode ausgelöst, bei dem das <em>PAI &#8211; Process After Input</em> durchlaufen wird.</p>
+<p>Meistens ist das egal, denn es werden vom Programm in der Regel nur die Funktionscodes abgeprüft, die auch definiert wurden. Man kann also in einer Transaktion &#8220;JIFDIJIFG&#8221; eingeben und es passiert nichts. In der CO41 kann man das jedoch nicht, da für jeden Funktionscode in einer Tabelle nachgeprüft wird, wie bei diesem Funktionscode verfahren werden soll. Findet der Funktionsbaustein SCREEN_SEQUENCE_CONTROL keinen Eintrag, dann kommt die oben genannte Meldung.</p>
+<h2>Lösung</h2>
+<p>Ich machte mich schon darauf gefasst, die Klasse CL_DD_DOCUMENT abzuleiten, um die Methode DISPLAY, in der die Ereignisregistrierung stattfindet, zu redefinieren. Glücklicherweise ist das HTML-Objekt, in dem das Dynamische Dokument angezeigt wird und für das die Ereignisse registriert werden, öffentlich. Dadurch konnte ich das Ereignis SAPEVENT erneut, aber diesmal <strong>ohne</strong> APPL_EVENT, registrieren:</p>
+<pre class="">document-&gt;merge_document( ).
+document-&gt;display_document( parent = docker ).
+DATA(html) = document-&gt;html_control.
+
+DATA: myevent_tab TYPE cntl_simple_events,
+myevent TYPE cntl_simple_event.
+myevent-eventid = html-&gt;m_id_sapevent.
+myevent-appl_event = ' '.
+APPEND myevent TO myevent_tab.
+html-&gt;set_registered_events( events = myevent_tab ).</pre>
+<p>Nun konnte ich endlich meine Tasten drücken, ohne dass mir die Folgebildsteuerung in die Quere kam.</p>
+<p>Der Beitrag <a href="/blog/application-event-stoert-gewaltig/">Application-Event stört gewaltig&#8230;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Container-Rahmen</title>
+		<link>/blog/container-rahmen/</link>
+					<comments>/blog/container-rahmen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 19 Aug 2011 17:17:36 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[Rahmen]]></category>
+		<category><![CDATA[shellstyle]]></category>
+		<category><![CDATA[docker]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=616</guid>
+
+					<description><![CDATA[<p>Ein Docking-Container hat normalerweise einen breiten Rahmen, damit dessen Gr&#246;&#223;e leicht ge&#228;ndert werden kann. Das ist aber nicht immer erw&#252;nscht... </p>
+<p>Der Beitrag <a href="/blog/container-rahmen/">Container-Rahmen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein Docking-Container hat normalerweise einen breiten Rahmen, damit dessen Größe leicht geändert werden kann. Das ist aber nicht immer erwünscht&#8230;</p>
+<p class="head1">Durch Dick und Dünn</p>
+<p>Bei CREATE OBJECT des Containers kann in der Regel der Parameter STYLE übergeben werden. Dieser wird intern auf Standarwerte gesetzt, wenn er nicht vom Aufrufer übergeben wird.</p>
+<p>Mit diesem Aufruf können Sie einen Docking-Container mit einer dünnen Linie anstatt des dicken 3d-Rahmens erzeugen.</p>
+<p class="head1">So sieht&#8217;s aus</p>
+<p>So sieht der Rahmen normalerweise aus:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/abap/Bild565.jpg" /></p>
+<p>So sieht er mit dünnem Rahmen aus:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/abap/Bild566.jpg" /></p>
+<p>Dieser kann allerdings nicht mehr vom Anwender verschoben werden!!</p>
+<p class="head1">Coding DÜNN</p>
+<p class="sap1">DATA shellstyle TYPE i.</p>
+<p>*** define Shellstyle<br />
+shellstyle = cl_gui_container=&gt;ws_visible<br />
++ cl_gui_container=&gt;ws_child.</p>
+<p>*** Create Docking Container<br />
+CREATE OBJECT gr_dock<br />
+EXPORTING<br />
+side      = cl_gui_docking_container=&gt;dock_at_top<br />
+extension = 10<br />
+style     = shellstyle.</p>
+<p class="head1">Oder anders herum&#8230;</p>
+<p>Den Tric kann man allerdings auch genau anders herum verwenden! So sieht ein ALV-Grid im Container normalerweise aus:</p>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/ALV/Alv_rahmen_duenn.jpg" /><br />
+ALV-Grid mit normalem Rahmen</td>
+</tr>
+</tbody>
+</table>
+<p>Mit dem richtigen Style kann man dem Container einen dicken Rahmen verpassen:</p>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/ALV/alv_rahmen_dick.jpg" /><br />
+ALV mit dickem Rahmen</td>
+</tr>
+</tbody>
+</table>
+<p class="head1">Coding DICK</p>
+<p>Hier ist das Coding dazu:</p>
+<p class="sap1"><span style="color: #fb2412;">*** Style</span><br />
+DATA lv_style TYPE i.</p>
+<p>lv_style = cl_gui_container=&gt;ws_thickframe<br />
++ cl_gui_container=&gt;ws_visible<br />
++ cl_gui_container=&gt;ws_child.</p>
+<p><span style="color: #fb2412;">*** Create Custom Container</span><br />
+CREATE OBJECT gr_cc<br />
+EXPORTING<br />
+style          = lv_style<br />
+container_name = &#8216;CUSTOM_CONTAINER&#8217;<br />
+EXCEPTIONS<br />
+OTHERS         = 6.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/container-rahmen/">Container-Rahmen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/container-rahmen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Inhaltsverzeichnis für Liste</title>
+		<link>/blog/inhaltsverzeichnis-fuer-liste/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 01 Aug 2008 13:34:04 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=505</guid>
+
+					<description><![CDATA[<p>In der neuen Version der ST22, der Dumpanalyse, sieht man links ein Inhaltsverzeichnis des Dumps. Mit Doppelklick kann man den entsprechenden Abschnitt in der Liste springen. Mit diesem Programm zeigen wir Ihnen, wie es geht.</p>
+<p>Der Beitrag <a href="/blog/inhaltsverzeichnis-fuer-liste/">Inhaltsverzeichnis für Liste</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In der neuen Version der ST22, der Dumpanalyse, sieht man links ein Inhaltsverzeichnis des Dumps. Mit Doppelklick kann man den entsprechenden Abschnitt in der Liste springen. Mit diesem Programm zeigen wir Ihnen, wie es geht.<br /><P class="head1">Screenshot </P><P><IMG src="/wp-content/uploads/tt_images/abap/eck_028.jpg"></P><P class="head1">Coding</P><P class="sap1">REPORT.</P><P class="sap1">CLASS lcl_application DEFINITION DEFERRED.</P><P class="sap1"><BR>DATA o_dock&nbsp;&nbsp;&nbsp; TYPE REF TO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cl_gui_docking_container.<BR>DATA o_tree&nbsp;&nbsp;&nbsp; TYPE REF TO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cl_gui_simple_tree.<BR>DATA o_appl&nbsp;&nbsp;&nbsp; TYPE REF TO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lcl_application.<BR>DATA gt_nodes&nbsp; TYPE STANDARD TABLE OF mtreesnode.<BR>DATA gs_node&nbsp;&nbsp; TYPE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mtreesnode.</P><P class="sap1"><BR>PARAMETERS p_pagnum TYPE sypagno DEFAULT 10.</P><P class="sap1"><BR><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS LCL_APPLICATION DEFINITION<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</FONT><BR>CLASS lcl_application DEFINITION.</P><P class="sap1">&nbsp; PUBLIC SECTION.<BR>&nbsp;&nbsp;&nbsp; METHODS:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; handle_node_double_click<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FOR EVENT node_double_click<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OF cl_gui_simple_tree<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING node_key.</P><P class="sap1">ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;LCL_APPLICATION DEFINITION</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS LCL_APPLICATION IMPLEMENTATION<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</FONT><BR>CLASS lcl_application IMPLEMENTATION.</P><P class="sap1">&nbsp; METHOD&nbsp; handle_node_double_click.</P><P class="sap1">&nbsp;&nbsp;&nbsp; DATA lv_page TYPE i.<BR>&nbsp;&nbsp;&nbsp; lv_page = node_key.<BR>&nbsp;&nbsp;&nbsp; SCROLL LIST TO PAGE lv_page.</P><P class="sap1">&nbsp; ENDMETHOD.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;HANDLE_NODE_DOUBLE_CLICK</P><P class="sap1">ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;LCL_APPLICATION IMPLEMENTATION</P><P class="sap1"><BR>START-OF-SELECTION.</P><P class="sap1">&nbsp; PERFORM init_dock.<BR>&nbsp; PERFORM list.</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; init_dock<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM init_dock.</P><P class="sap1">&nbsp; DATA lt_events TYPE cntl_simple_events.<BR>&nbsp; DATA ls_event&nbsp; TYPE cntl_simple_event.</P><P class="sap1"><BR><FONT color="#fb2412">*&#8211; Create docking control</FONT><BR>&nbsp; CREATE OBJECT o_dock<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; side&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = o_dock-&gt;dock_at_left<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ratio&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 30<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_autodef_progid_dynnr = &#8216;X&#8217;.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Create TreeControl</FONT><BR>&nbsp; CREATE OBJECT o_tree<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = o_dock<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; node_selection_mode = cl_gui_simple_tree=&gt;node_sel_mode_single.</P><P class="sap1"><FONT color="#fb2412">*&#8211; build tree</FONT><BR>&nbsp; CLEAR gs_node.<BR>&nbsp; gs_node-node_key = &#8216;Root&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;#EC NOTEXT<BR>&nbsp; gs_node-isfolder = &#8216;X&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; a folder.<BR>&nbsp; gs_node-text&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;Seiten&#8217;.<BR>&nbsp; APPEND gs_node TO gt_nodes.</P><P class="sap1">&nbsp; DO p_pagnum TIMES.<BR><FONT color="#fb2412">*&#8211; build one tree nodes for each page</FONT><BR>&nbsp;&nbsp;&nbsp; CLEAR gs_node.<BR>&nbsp;&nbsp;&nbsp; gs_node-node_key&nbsp; = sy-index.<BR>&nbsp;&nbsp;&nbsp; gs_node-relatkey&nbsp; = &#8216;Root&#8217;.<BR>&nbsp;&nbsp;&nbsp; gs_node-relatship = cl_gui_simple_tree=&gt;relat_last_child.<BR>&nbsp;&nbsp;&nbsp; gs_node-text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = sy-index.<BR>&nbsp;&nbsp;&nbsp; shift gs_node-text LEFT DELETING LEADING space.<BR>&nbsp;&nbsp;&nbsp; APPEND gs_node TO gt_nodes.<BR>&nbsp; ENDDO.</P><P class="sap1"><FONT color="#fb2412">*&#8211; set nodes</FONT><BR>&nbsp; CALL METHOD o_tree-&gt;add_nodes<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; table_structure_name = &#8216;MTREESNODE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; node_table&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gt_nodes.</P><P class="sap1"><FONT color="#fb2412">*&#8211; expand root</FONT><BR>&nbsp; CALL METHOD o_tree-&gt;expand_root_nodes.</P><P class="sap1"><FONT color="#fb2412">*&#8211; set events<BR></FONT>&nbsp; ls_event-eventid = cl_gui_simple_tree=&gt;eventid_node_double_click.<BR>&nbsp; ls_event-appl_event = &#8216;X&#8217;. &#8221; process PAI if event occurs<BR>&nbsp; APPEND ls_event TO lt_events.</P><P class="sap1"><FONT color="#fb2412">*&#8211; register</FONT><BR>&nbsp; CALL METHOD o_tree-&gt;set_registered_events<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; events = lt_events.</P><P class="sap1"><FONT color="#fb2412">*&#8211; create application</FONT><BR>&nbsp; CREATE OBJECT o_appl.</P><P class="sap1"><FONT color="#fb2412">*&#8211; assign event handlers&nbsp;</FONT><BR>&nbsp; SET HANDLER o_appl-&gt;handle_node_double_click FOR o_tree.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;init_dock</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; list<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM list.</P><P class="sap1">&nbsp; DO p_pagnum TIMES.</P><P class="sap1">&nbsp;&nbsp;&nbsp; DO 20 TIMES.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Seite&#8217;, sy-pagno, &#8216;=&gt; Zeile&#8217;, sy-index.<BR>&nbsp;&nbsp;&nbsp; ENDDO.<BR>&nbsp;&nbsp;&nbsp; NEW-PAGE.<BR>&nbsp; ENDDO.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;list</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/inhaltsverzeichnis-fuer-liste/">Inhaltsverzeichnis für Liste</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Neue Schaltflächen</title>
+		<link>/blog/neue-schaltflaechen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 28 Aug 2007 21:52:07 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=430</guid>
+
+					<description><![CDATA[<p>Mithilfe eines Docking-Containers und einer Toolbar "zaubern" wir eine neue Schaltfl&#228;chenleiste. Der Clou hierbei ist, dass der aktuelle GUI-Status ausgelesen wird und nur bestimmte Funktionen als Drucktaste aufgenommen werden.</p>
+<p>Der Beitrag <a href="/blog/neue-schaltflaechen/">Neue Schaltflächen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mithilfe eines Docking-Containers und einer Toolbar &#8220;zaubern&#8221; wir eine neue Schaltflächenleiste. Der Clou hierbei ist, dass der aktuelle GUI-Status ausgelesen wird und nur bestimmte Funktionen als Drucktaste aufgenommen werden.</p>
+<p>Die Aufteilung der Funktionstasten kann bei großen Transaktionen sinnvoll sein. Hier könnten Funktionen, die für die gesamte Transaktion gelten in der Standard-Drucktastenleiste stehen und Funktionen, die für das aktuelle Dynpro notwendig sind, stehen in der Sidebar. Oder umgekehrt&#8230;</p>
+<p>Unser Beispielprogramm zeigt ein Dynpro mit der &#8220;Sidebar&#8221;. Die Funktione, die in der Sidebar angezeigt werden, werden aus dem aktuellen GUI-Status gelesen. Dabei werden nur Funktionen angezeigt, die mit einem Dollarzeichen beginnen. So können wir im GUI-Status einfach definieren, welche Funktionen in die Sidebar aufgenommen werden.</p>
+<h2>Darstellung</h2>
+<p class="head1">Und so sieht unsere kleine Spielerei aus:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/abap/sidebar.jpg" /></p>
+<h3><span style="font-size: inherit;">Abwandlung</span></h3>
+<p class="text1">Anstelle des Docking-Containers könnte man auch einen Dialogbox-Container nehmen (CL_GUI_DIALOGBOX_CONTAINER). Dann wären die Drucktasten in einem eigenen kleinen Fenster vorhanden, das der Anwender verschieben kann.</p>
+<h2 class="head1">Info</h2>
+<p class="text1">Die Funktionen müssen natürlich nicht aus dem GUI-Status gelesen werden, sie können auch &#8220;per Hand&#8221; übertragen werden. Man muss dann im Programm steuern, welche Funktionen sichtbar sein sollen.</p>
+<h2 class="head1">Ohne Applikationsbar&#8230;</h2>
+<p class="text1">Wenn man mal in der Höhe so viel Platz wie möglich haben möchte, dann kann man die Sidebar auch als Ersatz für die Drucktastenleiste nehmen. Dafür müssen natürlich auch die Systemfunktionen angezeigt werden und es muss evtl. auf &#8220;Trenner&#8221; im Status reagiert werden.</p>
+<p class="text1">Wenn man dann in den Dynpro-Eigenschaften den Haken bei &#8220;Ohne Applikationsbar&#8221; setzt, dann steht der Platz, der für die Drucktastenleiste reserviert ist, dem Dynpro zu Verfügung&#8230;</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/abap/sidebar2.jpg" /></p>
+<h2><span style="font-size: inherit;">Coding</span></h2>
+<pre class="sap1">REPORT ZZ_SIDEBAR.
+CLASS lcl_my_event_handler DEFINITION DEFERRED.
+DATA evt_receiver TYPE REF TO lcl_my_event_handler.
+DATA gr_box       TYPE REF TO cl_gui_dialogbox_container.
+DATA gr_dock      TYPE REF TO cl_gui_docking_container.
+DATA gr_toolbar   TYPE REF TO cl_gui_toolbar.
+DATA gv_pfkey     TYPE sypfkey VALUE 'BOX'.
+DATA gv_mode      TYPE i.
+DATA gv_text      TYPE text80.
+DATA gt_fkeys     TYPE STANDARD TABLE OF rsmpe_keys.
+DATA gs_fkey      TYPE                   rsmpe_keys.
+
+TYPE-POOLS icon.
+
+<span style="color: #fb2412;">*----------------------------------------------------------------------*
+*       CLASS lcl_my_event_handler DEFINITION
+*----------------------------------------------------------------------*
+</span>CLASS lcl_my_event_handler DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS: on_function_selected
+               FOR EVENT function_selected OF cl_gui_toolbar
+                 IMPORTING fcode.
+
+ENDCLASS.                    "lcl_my_event_handler DEFINITION
+
+<span style="color: #fb2412;">*----------------------------------------------------------------------*
+*       CLASS lcl_my_event_handler IMPLEMENTATION
+*----------------------------------------------------------------------*</span>
+CLASS lcl_my_event_handler IMPLEMENTATION.
+
+  METHOD on_function_selected.
+
+    CASE fcode.
+
+<span style="color: #fb2412;">*** Docking-Container lösen
+</span>      WHEN 'KILLME'.
+        FREE gr_toolbar.
+        FREE gr_box.
+        CALL METHOD gr_dock-&gt;free.
+        CALL METHOD cl_gui_cfw=&gt;flush.
+
+      WHEN OTHERS.
+<span style="color: #fb2412;">*** Funktionscode ausführen
+</span>        CALL FUNCTION 'SAPGUI_SET_FUNCTIONCODE'
+          EXPORTING
+            functioncode = fcode.
+    ENDCASE.
+
+  ENDMETHOD.                    "lcl_my_event_handler
+
+ENDCLASS.                    "lcl_my_event_handler IMPLEMENTATION
+
+START-OF-SELECTION.
+  CALL SCREEN 100.
+
+<span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  init
+*&amp;---------------------------------------------------------------------*
+</span>FORM init.
+
+  DATA myevent_tab TYPE cntl_simple_events.
+  DATA myevent TYPE cntl_simple_event.
+
+  CHECK gr_dock IS INITIAL.
+
+<span style="color: #fb2412;">*** Docking Container erzeugen</span>
+  CREATE OBJECT gr_dock
+    EXPORTING
+       repid     = sy-cprog
+       dynnr     = sy-dynnr
+       side      = cl_gui_docking_container=&gt;dock_at_left
+       extension = 180
+    EXCEPTIONS
+      OTHERS     = 6.
+  IF sy-subrc = 0.
+
+<span style="color: #fb2412;">*** Toolbar erzeugen</span>
+    CREATE OBJECT gr_toolbar
+      EXPORTING
+        parent       = gr_dock
+        display_mode = cl_gui_toolbar=&gt;m_mode_vertical.
+  ENDIF.
+
+<span style="color: #fb2412;">*** Ereignisbehandlungroutinen
+</span>  myevent-eventid    = cl_gui_toolbar=&gt;m_id_function_selected.
+  myevent-appl_event = 'X'.
+  APPEND myevent TO myevent_tab.
+  CREATE OBJECT evt_receiver.
+
+  CALL METHOD gr_toolbar-&gt;set_registered_events
+    EXPORTING
+      events = myevent_tab.
+
+  SET HANDLER evt_receiver-&gt;on_function_selected
+              FOR gr_toolbar.
+
+ENDFORM.                    "init
+
+<span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Module  STATUS_0100  OUTPUT
+*&amp;---------------------------------------------------------------------*
+</span>MODULE status_0100 OUTPUT.
+  SET PF-STATUS gv_pfkey.
+  SET TITLEBAR 'BOX'.
+  PERFORM init.
+  PERFORM transfer_box.
+ENDMODULE.                 " STATUS_0100  OUTPUT
+
+<span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Module  USER_COMMAND_0100  INPUT
+*&amp;---------------------------------------------------------------------*
+</span>MODULE user_command_0100 INPUT.
+
+  CASE sy-ucomm.
+    WHEN 'BACK' OR 'HOME' OR 'END'.
+<span style="color: #fb2412;">*** Exit</span> 
+      SET SCREEN 0. LEAVE SCREEN.
+    WHEN OTHERS.
+      CASE sy-ucomm.
+        WHEN 'CHANGE'.
+<span style="color: #fb2412;">*** Wechseln-Knopf wurde gedrückt</span>
+          IF gv_pfkey = 'BOX1'.
+<span style="color: #fb2412;">*** Status 2 einschalten</span>
+            gv_pfkey = 'BOX2'.
+          ELSE.
+<span style="color: #fb2412;">*** Status 1 einschalten</span>
+            gv_pfkey = 'BOX1'.
+          ENDIF.
+        WHEN OTHERS.
+<span style="color: #fb2412;">*** "Normale" Funktionen</span>
+          IF sy-ucomm(1) = '$'.
+<span style="color: #fb2412;">*** Bei den Funktionen aus der Sidebar gesondert reagieren:</span>
+            READ TABLE gt_fkeys INTO gs_fkey WITH KEY code = sy-ucomm.
+            IF sy-subrc = 0.
+              gv_text = gs_fkey-quickinfo.
+            ENDIF.
+          ENDIF.
+      ENDCASE.
+  ENDCASE.
+
+ENDMODULE.                 " USER_COMMAND_0100  INPUT
+
+<span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  transfer_box
+*&amp;---------------------------------------------------------------------*
+</span>FORM transfer_box.
+
+  STATICS lv_pfkey TYPE sypfkey.
+
+  CHECK gr_toolbar IS BOUND.
+
+  CHECK sy-pfkey &lt;&gt; lv_pfkey.
+  lv_pfkey = sy-pfkey.
+
+  DATA lv_func  TYPE ui_func.
+  DATA lv_info  TYPE iconquick.
+  DATA lv_text  TYPE text40.
+
+<span style="color: #fb2412;">*** GUI-Status lesen
+</span>  CALL FUNCTION 'RS_CUA_GET_STATUS'
+    EXPORTING
+      language     = sy-langu
+      program      = sy-cprog
+      status       = sy-pfkey
+    TABLES
+      functionkeys = gt_fkeys
+    EXCEPTIONS
+      OTHERS       = 6.
+
+<span style="color: #fb2412;">*** Alle vorhandenen Knöpfe löschen</span>
+  CALL METHOD gr_toolbar-&gt;delete_all_buttons
+    EXCEPTIONS
+      OTHERS = 1.
+
+<span style="color: #fb2412;">*** Schliessen-Knopf einfügen</span>
+  CALL METHOD gr_toolbar-&gt;add_button
+    EXPORTING
+      fcode            = 'KILLME'
+      icon             = icon_close
+      butn_type        = '0'
+      text             = 'Fenster schließen'
+      quickinfo        = space
+      is_checked       = ' '
+      is_disabled      = ' '
+    EXCEPTIONS
+      cntb_error_fcode = 1.
+
+<span style="color: #fb2412;">*** Den Wechseln-Knopf an zweiter Stelle positionieren
+</span>  READ TABLE gt_fkeys INTO gs_fkey WITH KEY code = 'CHANGE'.
+  IF sy-subrc = 0.
+    lv_func = gs_fkey-code.
+    lv_info = gs_fkey-quickinfo.
+
+    CALL METHOD gr_toolbar-&gt;add_button
+      EXPORTING
+        fcode            = lv_func
+        icon             = gs_fkey-icon_id
+        butn_type        = '0'
+        text             = gs_fkey-text
+        quickinfo        = lv_info
+      EXCEPTIONS
+        cntb_error_fcode = 1.
+  ENDIF.
+
+<span style="color: #fb2412;">*** Dann einen "Trenner"
+</span>  CALL METHOD gr_toolbar-&gt;add_button
+    EXPORTING
+      fcode            = '$$$'
+      icon             = space
+      butn_type        = '3'
+    EXCEPTIONS
+      cntb_error_fcode = 1.
+
+<span style="color: #fb2412;">*** Und nun die aktiven Funktionen, die mit "$" beginnen
+</span>  LOOP AT gt_fkeys INTO gs_fkey WHERE active = 'X'
+                                  AND code(1) = '$'
+                                  AND sys_icon = space.
+
+    lv_func = gs_fkey-code.
+    lv_info = gs_fkey-quickinfo.
+    CALL METHOD gr_toolbar-&gt;add_button
+      EXPORTING
+        fcode            = lv_func
+        icon             = gs_fkey-icon_id
+        butn_type        = '0'
+        text             = gs_fkey-text
+        quickinfo        = lv_info
+      EXCEPTIONS
+        cntb_error_fcode = 1.
+  ENDLOOP.
+
+  CALL METHOD cl_gui_cfw=&gt;dispatch.
+
+ENDFORM.                    "transfer_box</pre>
+<p>Der Beitrag <a href="/blog/neue-schaltflaechen/">Neue Schaltflächen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ABAP-Liste und Control</title>
+		<link>/blog/abap-liste-und-control/</link>
+					<comments>/blog/abap-liste-und-control/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 15 Jul 2004 01:47:45 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=272</guid>
+
+					<description><![CDATA[<p>Hier zeigen wird Ihnen einen ABAP-Report, der eine Liste ausgibt. Links von der Liste ist mittels DockingContainer ein TextEditControl eingebunden. Per Doppelklick auf eine Listzeile wird diese in den Editor geschrieben.</p>
+<p>Der Beitrag <a href="/blog/abap-liste-und-control/">ABAP-Liste und Control</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier zeigen wird Ihnen einen ABAP-Report, der eine Liste ausgibt. Links von der Liste ist mittels DockingContainer ein TextEditControl eingebunden. Per Doppelklick auf eine Listzeile wird diese in den Editor geschrieben.<br /><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/abap_texteditcontrol.gif"><BR>Ein TextEditControl angebunden an eine ABAP-Liste</P></TD></TR></TBODY></TABLE></P><HR noShade><HR noShade><P class="text1" align="center"><STRONG>Vielen Dank an dieser Stelle an BlackAdept!</STRONG></P><P class="head1">Das Programm</P><P class="sap1">REPORT zz_docking_liste.</P><P class="sap1">CLASS cl_gui_cfw DEFINITION LOAD.</P><P class="sap1">types: tabzeile(132).<BR>DATA:&nbsp; o_docker&nbsp;&nbsp;&nbsp; TYPE REF TO cl_gui_docking_container,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o_text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO cl_gui_textedit,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF tabzeile,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; line&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE i.</P><P class="sap1">AT LINE-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Aktuelle Cursorposition ermitteln<BR></FONT>&nbsp; CALL METHOD o_text-&gt;get_selection_pos<BR>&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from_line&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = line.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Texttabelle l&ouml;schen<BR></FONT>&nbsp; CLEAR tab.<BR>*&#8211; Aktuellen Inhalt des TextEditControls lesen<BR>&nbsp; CALL METHOD o_text-&gt;get_text_as_r3table<BR>&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; table&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = tab.</P><P class="sap1">&nbsp; IF tab IS INITIAL.<BR><FONT color="#fb2412">*&#8211; Ausgew&auml;hlte Zeile anf&uuml;gen</FONT><BR>&nbsp;&nbsp;&nbsp; APPEND sy-lisel TO tab.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*&#8211; Ausgew&auml;hlte Zeile nach Cursorposition anf&uuml;gen</FONT><BR>&nbsp;&nbsp;&nbsp; ADD 1 TO line.<BR>&nbsp;&nbsp;&nbsp; INSERT sy-lisel INTO tab INDEX line.<BR>&nbsp; ENDIF.<BR><FONT color="#fb2412">*&#8211; Texttabelle wieder zum TextEditControl senden</FONT><BR>&nbsp; CALL METHOD o_text-&gt;set_text_as_r3table<BR>&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; table&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = tab.</P><P class="sap1">END-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Docking-Instanz erzeugen<BR></FONT>&nbsp; CREATE OBJECT o_docker<BR>&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; side&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = o_docker-&gt;dock_at_left<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ratio&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 30<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_autodef_progid_dynnr = &#8216;X&#8217;.</P><P class="sap1"><FONT color="#fb2412">*&#8211; TextEditControl erzeugen<BR></FONT>&nbsp; CREATE OBJECT o_text<BR>&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = o_docker<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; wordwrap_position&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 40<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; wordwrap_mode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = o_text-&gt;wordwrap_at_fixed_position.</P><P class="sap1"><BR><FONT color="#fb2412">*&#8211; Liste ausgeben</FONT><BR>&nbsp; DO 80 TIMES.</P><P class="sap1">&nbsp;&nbsp;&nbsp; FORMAT COLOR = sy-index.<BR>&nbsp;&nbsp;&nbsp; WRITE:/ &#8216;Listzeile&#8217;, sy-index.</P><P class="sap1">&nbsp; ENDDO.</P></p>
+<p>Der Beitrag <a href="/blog/abap-liste-und-control/">ABAP-Liste und Control</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/abap-liste-und-control/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>DockingContainer</title>
+		<link>/blog/dockingcontainer/</link>
+					<comments>/blog/dockingcontainer/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 09 Mar 2004 17:17:04 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<category><![CDATA[cl_gui_textedit]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=209</guid>
+
+					<description><![CDATA[<p>Ein kurzes Demoprogramm das zeigt, wie ein TextEditControl in einem Dynpro angedockt werden kann. An der linken Seite des Dynpros wird der Quelltext des Programms angezeigt.</p>
+<p>Der Beitrag <a href="/blog/dockingcontainer/">DockingContainer</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein kurzes Demoprogramm das zeigt, wie ein TextEditControl in einem Dynpro angedockt werden kann. An der unteren Seite des Selektionsbildes wird der Quelltext des Programms angezeigt.</p>
+<p>Dieses Demoprogramm erzeugt <strong>TextEditControl</strong> in einem <strong>Docker</strong> auf der linken Seite des Dynpros. Durch den Docker kann das TextEdit-Control beliebig in der Größe verändert werden.</p>
+<p>Es ist natürlich auch möglich andere Controls &#8220;anzudocken&#8221;: TreeControl, CalendarControl, BarChartControl, HTMLViewerControl und andere.</p>
+<p><img decoding="async" class="alignnone size-full wp-image-1019343" src="https://tricktresor.com/wp-content/uploads/2004/03/editcontrol-docker.png" alt="" width="568" height="438" srcset="/wp-content/uploads/2004/03/editcontrol-docker.png 568w, /wp-content/uploads/2004/03/editcontrol-docker-300x231.png 300w, /wp-content/uploads/2004/03/editcontrol-docker-117x91.png 117w" sizes="(max-width: 568px) 100vw, 568px" /></p>
+<h2 class="head1">Der Report</h2>
+<pre>REPORT ztrcktrsr_blog_textedit01.
+
+DATA t_sourcecode  TYPE TABLE OF text1000.
+data edit TYPE REF TO cl_gui_textedit.
+data docker TYPE REF TO cl_gui_docking_container.
+
+PARAMETERS p_repid TYPE syrepid DEFAULT sy-repid.
+
+INITIALIZATION.
+
+*-- DockingContainer erzeugen
+  CREATE OBJECT docker
+    EXPORTING
+      ratio = 60.
+
+*-- edit an DockingContainer andocken
+  CREATE OBJECT edit
+    EXPORTING
+      parent = docker.
+
+*-- Kommentare definieren
+  edit-&gt;set_comments_string( comments_string = '*' ).
+
+*-- Kommentare hervorheben
+  edit-&gt;set_highlight_comments_mode( highlight_comments_mode = 1 ).
+
+*-- readonly
+  edit-&gt;set_readonly_mode( 1 ).
+
+*-- Umbruch
+  edit-&gt;set_wordwrap_behavior(
+         wordwrap_mode              = 2 "off
+         wordwrap_position          = 72
+         wordwrap_to_linebreak_mode = 0 ).
+
+**-- DockingContainer Links andocken
+  docker-&gt;dock_at( EXPORTING side = cl_gui_docking_container=&gt;dock_at_right ).
+
+AT SELECTION-SCREEN.
+
+*-- Report lesen
+  CLEAR t_sourcecode.
+  READ REPORT p_repid INTO t_sourcecode.
+
+
+*-- Report als Text anzeigen
+  edit-&gt;set_text_as_r3table( table = t_sourcecode ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/dockingcontainer/">DockingContainer</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dockingcontainer/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

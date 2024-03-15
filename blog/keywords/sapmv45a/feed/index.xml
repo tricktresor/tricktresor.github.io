@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>SAPMV45A Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/sapmv45a/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 25 May 2018 11:53:31 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>SAPMV45A Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Preisfindung im Kundenauftrag von außen anstossen</title>
+		<link>/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Mar 2017 20:25:15 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Vertriebsbeleg]]></category>
+		<category><![CDATA[Preisfindung]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_SALESORDER_CHANGE]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017958</guid>
+
+					<description><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus: Userexit in SAPMV45A anpassen Parameter setzen BAPI aufrufen Parameter zurücknehmen Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:...</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus:</p>
+<ol>
+<li>Userexit in SAPMV45A anpassen</li>
+<li>Parameter setzen</li>
+<li>BAPI aufrufen</li>
+<li>Parameter zurücknehmen</li>
+</ol>
+<p>Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:</p>
+<ol>
+<li>EXPORT TO MEMORY und IMPORT FROM MEMORY</li>
+<li>Öffentliches Attribut der eigenen globalen Klasse</li>
+</ol>
+<h2>Anlage der globalen Klasse</h2>
+<p>Als erstes musst du eine Klasse anlegen mit der die neue Preisfindung durchgeführt werden soll. In meinem Beispiel heißt sie ZCL_SD_NP (New Pricing).</p>
+<p>Lege das öffentliche Klassenattribut KNPRS vom Typ KNPRS an (static). Das ist die Preisfindungsart, mit der die Art der neuen Preisfindung gesteuert werden kann.</p>
+<h2>Quelltext (relevanter Teil ) in MV45AFZB:</h2>
+<pre class="">FORM userexit_new_pricing_vbap CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL.  
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBAP</pre>
+<pre class="">FORM userexit_new_pricing_vbkd CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL. 
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBKD</pre>
+<h2>Quelltext Klasse</h2>
+<p>Nun brauchen wir noch die Methode TRIGGER_NEW_PRICING</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017959 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png" alt="" width="776" height="177" srcset="/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png 776w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-300x68.png 300w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-768x175.png 768w" sizes="(max-width: 776px) 100vw, 776px" /></a></p>
+<pre class="">DATA: 
+  ls_bapisdh1x  TYPE bapisdh1x,
+  lt_pos        TYPE STANDARD TABLE OF bapisditm WITH NON-UNIQUE DEFAULT KEY,
+  lt_posx       TYPE STANDARD TABLE OF bapisditmx WITH NON-UNIQUE DEFAULT KEY,
+  lt_return     TYPE bapiret2_t.
+FIELD-SYMBOLS: 
+  &lt;ls_pos&gt;      LIKE LINE OF lt_pos,
+  &lt;ls_posx&gt;     LIKE LINE OF lt_posx.
+
+
+CLEAR ct_bapiret2.
+knprs = iv_knprs.
+*--------------------------------------------------------------------*
+* Get all positions to be redermined
+*--------------------------------------------------------------------*
+SELECT posnr AS itm_number werks AS plant
+INTO CORRESPONDING FIELDS OF TABLE lt_pos
+FROM vbap
+WHERE vbeln = iv_vbeln_va.
+
+LOOP AT lt_pos ASSIGNING &lt;ls_pos&gt;.
+APPEND INITIAL LINE TO lt_posx ASSIGNING &lt;ls_posx&gt;.
+&lt;ls_posx&gt;-itm_number = &lt;ls_pos&gt;-itm_number.
+&lt;ls_posx&gt;-updateflag = 'U'.
+ENDLOOP.
+
+ls_bapisdh1x-updateflag = 'U'.
+CALL FUNCTION 'BAPI_SALESORDER_CHANGE'
+  EXPORTING
+    salesdocument    = iv_vbeln_va
+    order_header_inx = ls_bapisdh1x
+  TABLES
+    return           = ct_bapiret2
+    order_item_in    = lt_pos
+    order_item_inx   = lt_posx
+  EXCEPTIONS
+    ERROR_MESSAGE = 1.
+
+CLEAR knprs.  " Only once
+
+TRY.
+    DATA(ls_return) = ct_bapiret2[ type = 'E' ].
+    CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
+    RAISE EXCEPTION TYPE zcx_my_exception.
+  CATCH CX_SY_ITAB_LINE_NOT_FOUND.
+    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+ENDTRY.
+</pre>
+<p>Durch Aufruf der Methode ZCL_SD_NP=&gt;TRIGGER_NEW_PRICING( &#8230; ) kannst du nun einen Beleg dazu bewegen, eine neue Preisfindung durchzuführen.</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Kleinigkeiten SAPMV45A Auftragsbearbeitung</title>
+		<link>/blog/kleinigkeiten-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 12:35:55 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=584</guid>
+
+					<description><![CDATA[<p>Hier stehen ein paar Kleinigkeiten zur Auftragsbearbeitung. Funktionsbausteine, Felder, Tipps und so weiter.</p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-2/">Kleinigkeiten SAPMV45A Auftragsbearbeitung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier stehen ein paar Kleinigkeiten zur Auftragsbearbeitung. Funktionsbausteine, Felder, Tipps und so weiter.</p>
+<h2 class="head1">Eingabebereitschaft prüfen</h2>
+<p>Um in einem User-Exit SAPMV45A zu prüfen, ob ein Feld eingabebereit ist, kann der folgende Funktionsbaustein verwendet werden:</p>
+<pre class="lang:abap decode:true ">  CALL FUNCTION 'SD_FIELD_INPUT_CHECK'
+    EXPORTING
+      TABNAME        = 'KUAGV'
+      FIELDNAME      = 'KUNNR'
+    IMPORTING
+      DISPLAY_STATUS = DA_SUBRC.</pre>
+<h2>Views zu Partnern</h2>
+<p>Standardmäßig sind die Daten zu den gängigen Partnern in den folgenden Views zu finden. Es muss nicht jedes Mal die Partnertabelle XVBPA gelesen werden:</p>
+<ul>
+<li>KUAGV Auftraggeber</li>
+<li>KUWEV Warenempfänger</li>
+<li>KUPAV Partner aus KNVP</li>
+<li>KURGV Regulierer</li>
+</ul>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-2/">Kleinigkeiten SAPMV45A Auftragsbearbeitung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Partnertabelle</title>
+		<link>/blog/partnertabelle/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 18 Nov 2005 11:26:24 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=357</guid>
+
+					<description><![CDATA[<p>H&#228;ufig wird in SAPMV45A-Userexits ein bestimmter Partner ben&#246;tigt. Entweder, um die Partnernummer zu verwenden oder auch um Adressdaten herauszubekommen. Wir zeigen Ihnen, wie Sie am einfachsten an die Daten kommen</p>
+<p>Der Beitrag <a href="/blog/partnertabelle/">Partnertabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>H&auml;ufig wird in SAPMV45A-Userexits ein bestimmter Partner ben&ouml;tigt. Entweder, um die Partnernummer zu verwenden oder auch um Adressdaten herauszubekommen. Wir zeigen Ihnen, wie Sie am einfachsten an die Daten kommen<br /><P class="head1">Tabelle XVBPA</P><P>Die Partner stehen in der internen Tabelle XVBPA. Die Partnerverwendung (Feld PARVW) gibt dabei Auskunft &uuml;ber die Rolle des Partners. </P><P>Wenn es sich um einen Partner auf Kopfebene handelt, ist das Feld POSNR initial.</P><P class="head1">Views verwenden</P><P>H&auml;ufig sieht man in Programmen folgendes:</P><P class="sap1">READ TABLE XVBPA WITH KEY PARVW = &#8216;WE&#8217; POSNR = 0.<BR>IF sy-subrc = 0.<BR><FONT color="#fb2412">*** Pr&uuml;fungen mit Warenempf&auml;nger<BR></FONT>&nbsp; &#8230;&nbsp; <BR>ENDIF.</P><P>Dies k&ouml;nnen Sie sich sparen, zumindest f&uuml;r den&nbsp;Warenempf&auml;nger, den Auftraggeber und den Regulierer, denn f&uuml;r diese gibt es Views, die st&auml;ndig aktuell gehalten werden:</P><UL><LI>Auftraggeber:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; KUAGV</LI><LI>Regulierer:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; KURGV</LI><LI>Warenempf&auml;nger: KUWEV</LI></UL><P class="head1">Adresse ge&auml;ndert?</P><P>Ob die Adresse manuell im Beleg ge&auml;ndert wurde, erkennen Sie an dem Feld ADRNR. Wenn diese mit der Partnerrolle beginnt, dann wurde der Partner ge&auml;ndert.</P><P>Die aktuellen Adressdaten stehen in der internen Tabelle XVBADR.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/partnertabelle/">Partnertabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Texte löschen</title>
+		<link>/blog/texte-loeschen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 19 Aug 2005 21:55:24 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=353</guid>
+
+					<description><![CDATA[<p>Mit diesem Coding k&#246;nnen Sie bereits erfasste Texte in der Auftragsbearbeitung wieder l&#246;schen. Das ist dann hilfreich, wenn aufgrund einer sepziellen Situation festgestellt wird, dass die Position gel&#246;scht werden soll. Es finde sich aber wahrscheinlich auch andere Einsatzm&#246;glichkeiten.</p>
+<p>Der Beitrag <a href="/blog/texte-loeschen/">Texte löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Coding k&ouml;nnen Sie bereits erfasste Texte in der Auftragsbearbeitung wieder l&ouml;schen. Das ist dann hilfreich, wenn aufgrund einer sepziellen Situation festgestellt wird, dass die Position gel&ouml;scht werden soll. Es finde sich aber wahrscheinlich auch andere Einsatzm&ouml;glichkeiten.<br /><P class="text1">Die Texte werden bis zur Speicherung des Auftrags im SAP-Memory gehalten. Welche Texte vorhanden sind, wird in dem <STRONG>Textkatalog</STRONG> festgehalten.</P><P class="text1">Im folgenden Coding wird der Positionstext f&uuml;r die Position 10 mit der ID &#8220;0001&#8221; gel&ouml;scht.</P><P class="sap1"><FONT color="#fb2412">*** Datendeklaration<BR></FONT>&nbsp;&nbsp;DATA<BR>&nbsp;&nbsp;&nbsp; BEGIN OF lt_catalog OCCURS 0,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tdobject&nbsp;&nbsp;&nbsp; LIKE thead-tdobject,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tdname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE thead-tdname,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tdid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE thead-tdid,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tdspras&nbsp;&nbsp;&nbsp;&nbsp; LIKE thead-tdspras,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; function(1),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rename(1)&nbsp;&nbsp; TYPE c,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; filler,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id(6)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE n,<BR>&nbsp;&nbsp;&nbsp; END&nbsp;&nbsp; OF lt_catalog,</P><P class="sap1">&nbsp;&nbsp;&nbsp; lv_memoname(16).</P><P class="sap1"><FONT color="#fb2412">*** Katalog der ge&auml;nderten Texte einlesen<BR></FONT>&nbsp; IMPORT catalog TO lt_catalog FROM MEMORY ID &#8216;SAPLSTXD&#8217;.</P><P class="sap1">&nbsp; LOOP AT lt_catalog WHERE&nbsp;tdobject = &#8216;VBBP&#8217;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND tdid&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;0010&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** richtige Positionsnummer??<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;IF lt_catalog-tdname+10(6) = &#8216;000010&#8217;.<BR><FONT color="#fb2412">*** Ge&auml;nderten Text&nbsp;&#8220;0010&#8221; suchen<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_memoname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;SAPLSTXD&#8217;.<BR>&nbsp; &nbsp;&nbsp;&nbsp; lv_memoname+8(6) = lt_catalog-id.<BR><FONT color="#fb2412">*** &#8230; und l&ouml;schen<BR></FONT>&nbsp;&nbsp;&nbsp; &nbsp; FREE MEMORY ID lv_memoname.<BR><FONT color="#fb2412">*** Eintrag aus Katalog l&ouml;schen<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE lt_catalog.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">&nbsp; ENDLOOP.</P><P class="sap1"><FONT color="#fb2412">*** Katalog &#8220;Ge&auml;nderte Texte&#8221; wieder zur&uuml;sckschreiben<BR></FONT>&nbsp; EXPORT catalog FROM lt_catalog TO MEMORY ID &#8216;SAPLSTXD&#8217;.</P></p>
+<p>Der Beitrag <a href="/blog/texte-loeschen/">Texte löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Abfrage verschiedener Aktivitäten</title>
+		<link>/blog/abfrage-verschiedener-aktivitaeten/</link>
+					<comments>/blog/abfrage-verschiedener-aktivitaeten/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 28 Dec 2004 11:20:15 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[Userexits]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=300</guid>
+
+					<description><![CDATA[<p>Bei der Programmierung von User-Exits muss man darauf achten, dass die Routinen auch aufgerufen werden, wenn der Auftrag nicht mit der VA02 bearbeitet wird, sonndern evtl. durch einen BAPI aufgerufen wird, oder zugeh&#246;rige Montageauftrag ge&#228;ndert wird. Welche Aktivit&#228;ten m&#246;glich sind und wie sie abzufragen sind, verraten wir Ihnen hier.</p>
+<p>Der Beitrag <a href="/blog/abfrage-verschiedener-aktivitaeten/">Abfrage verschiedener Aktivitäten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei der Programmierung von User-Exits muss man darauf achten, dass die Routinen auch aufgerufen werden, wenn der Auftrag nicht mit der VA02 bearbeitet wird, sonndern evtl. durch einen BAPI aufgerufen wird, oder zugeh&ouml;rige Montageauftrag ge&auml;ndert wird. Welche Aktivit&auml;ten m&ouml;glich sind und wie sie abzufragen sind, verraten wir Ihnen hier.<br /><P>Bei einer &Auml;nderung von &#8220;Aussen&#8221; wird nicht die Transaktion VA02 aufgerufen, sondern es werden Funktionsbausteine verwendet.</P><P>Wird die Auftragsbearbeitung von einem anderen Programm aufgerufen, so wird die Variable <STRONG>CALL_ACTIVITY </STRONG>gesetzt. </P><P>Die folgenden Werte sind vorgesehen (Include RVDIREKT):</P><P class="sap1"><FONT color="#fb2412">* Aktivit&auml;ten bei CALL_FUNCTION<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_atp_simulate(4)&nbsp;&nbsp;&nbsp; VALUE &#8216;SIMU&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_atp_area(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;V03R&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_purchase(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;ME21&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_invoice_receipt(4) VALUE &#8216;MR01&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_invoice_request(4) VALUE &#8216;VA90&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_service_request(4) VALUE &#8216;IW51&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_good_movement(4)&nbsp;&nbsp; VALUE &#8216;MB11&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Montage, Fertigungsauftr&auml;ge, Planauftr&auml;ge, Netzpl&auml;ne:</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_assembly(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;CO01&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_assembly_co40(4)&nbsp;&nbsp; VALUE &#8216;CO40&#8217;,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;n_667847<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_assembly_co08(4)&nbsp;&nbsp; VALUE &#8216;CO08&#8217;,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;n_667847<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_service_order(4)&nbsp;&nbsp; VALUE &#8216;IW31&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Kreditaktivit&auml;ten beginnen alle mit CR</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit(2)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;CR&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Kreditaktivit&auml;ten im einzelnen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_recheck(4)&nbsp; VALUE &#8216;CRCH&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_authori(4)&nbsp; VALUE &#8216;CRAU&#8217;, &#8220;komplette Pr&uuml;fung<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_authpre(4)&nbsp; VALUE &#8216;CRAP&#8217;, &#8220;interne Pr&uuml;fung<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_release(4)&nbsp; VALUE &#8216;CRRL&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_reject(4)&nbsp;&nbsp; VALUE &#8216;CRRJ&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_forward(4)&nbsp; VALUE &#8216;CRFW&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Kreditneuaufbau RFDKLI20 ohne &Auml;nderungsbelege</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_credit_recreate(4) VALUE &#8216;CRRE&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Unterkontrakte im PUSH-Modus aus Gruppenkontrakt aktualisieren</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_gruko_pushdata(4) VALUE &#8216;GKPU&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Reparaturabwicklung</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_rueck_inspection(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;RINS&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_rueck_notification(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;RNOT&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_rueck_service_order(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;RSOR&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_rueck_start_of_repair(4)&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;RSST&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_dialog_pull_inspection(4)&nbsp;&nbsp;&nbsp; VALUE &#8216;DPIL&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_dialog_pull_service_order(4) VALUE &#8216;DPSO&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_dialog(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;DIAL&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; act_nodialog(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;NDIA&#8217;,<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp; Abrechnung der Bonusabsprachen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity_rebate_set(4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALUE &#8216;VBO1&#8217;.</P><P class="text1">Bei Auftrags&auml;nderungen mit der VA02 ist die Variable initial.</P></p>
+<p>Der Beitrag <a href="/blog/abfrage-verschiedener-aktivitaeten/">Abfrage verschiedener Aktivitäten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/abfrage-verschiedener-aktivitaeten/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Zugriff auf den Prozeßauftrag</title>
+		<link>/blog/zugriff-auf-den-prozessauftrag/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 23 Mar 2004 16:44:52 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[Schnittstelle SD-PP]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=225</guid>
+
+					<description><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie aus dem Kundenauftrag heraus auf die Daten des Proze&#223;auftrags herankommen. </p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-den-prozessauftrag/">Zugriff auf den Prozeßauftrag</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie aus dem Kundenauftrag heraus auf die Daten des Proze&szlig;auftrags herankommen. <br /><P>Falls das Programm bereits auf den Fertigungsauftrag zugegriffen hat, steht der Auftrag noch im Speicher. In diesem Fall k&ouml;nnen die aktuellen Daten mit dem Funktionsbaustein <STRONG><FONT color="#fb2412">CO_BT_CAUFV_READ_WITH_KEY</FONT></STRONG> gelesen werden.</P><P>Sollten die Daten nicht vorhanden sein, l&ouml;st der Baustein eine Exception aus und die Daten m&uuml;ssen mit <STRONG><FONT color="#fb2412">VB_CP_HEADER_DATA</FONT></STRONG> von der Datenbank nachgelesen werden.</P><P>Beide Bausteine Liefern die Kopfdaten und Positionsdaten eines Auftrags zur&uuml;ck.</P><P class="head1">Coding</P><P class="sap1"><FONT color="#fb2412">*&#8211; Datendefinitionen</FONT><BR>DATA: zx_aufvd LIKE caufvd, <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; zx_afpod LIKE afpod.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Init</FONT><BR>CLEAR: zx_aufvd, zx_afpod.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Lesen aus internem Speicher</FONT><BR>CALL FUNCTION &#8216;CO_BT_CAUFV_READ_WITH_KEY&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;aufnr_act&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = l_aufnr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;no_dialog_info = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;caufvd_exp&nbsp;&nbsp;&nbsp;&nbsp; = zx_aufvd<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;afpod_exp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = zx_afpod<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>IF sy-subrc &gt; 0.<BR><FONT color="#fb2412">*&#8211; Auf den Proze&szlig;auftrag wurde noch nicht zugegriffen: Von DB lesen<BR></FONT>&nbsp;&nbsp;CALL FUNCTION &#8216;VB_CP_HEADER_DATA&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_aufnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = l_aufnr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e_caufvd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = zx_aufvd<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e_afpod&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = zx_afpod<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;order_not_found = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>ENDIF.<BR></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-den-prozessauftrag/">Zugriff auf den Prozeßauftrag</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

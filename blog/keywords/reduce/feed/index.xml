@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>REDUCE Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/reduce/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 21 Jun 2018 10:25:04 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>REDUCE Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>REDUCE + SWITCH + COND [ABAP740]</title>
+		<link>/blog/reduce-switch-cond-abap740/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 03 May 2017 13:07:57 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[abap740]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[switch]]></category>
+		<category><![CDATA[CONV]]></category>
+		<category><![CDATA[COND]]></category>
+		<category><![CDATA[string]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018016</guid>
+
+					<description><![CDATA[<p>Heute im Code-Dojo hatte ich die Aufgabe gestellt, eine Funktion zu schreiben, die einen String mit variabel zu bestimmender Länge und zufälligen Zeichenfolgen aus Zahlen und Buchstaben zurück liefert. Zum Beispiel &#8220;I71B7HJ4BG&#8221; oder &#8220;6EE17ICBF54IE486EHD8&#8221;. Idee Mit VALUE und FOR sollte ein String Zeichen für Zeichen zusammengesetzt werden. Mit einer Zufallsfunktion sollte ermittelt werden, ob ein Buchstabe oder eine Zahl eingesetzt werden soll. Per SWITCH sollte ebenfalls eine Zufallsfunktion aufgerufen werden, die eine Zahl bzw. einen Buchstaben...</p>
+<p>Der Beitrag <a href="/blog/reduce-switch-cond-abap740/">REDUCE + SWITCH + COND [ABAP740]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute im Code-Dojo hatte ich die Aufgabe gestellt, eine Funktion zu schreiben, die einen String mit variabel zu bestimmender Länge und zufälligen Zeichenfolgen aus Zahlen und Buchstaben zurück liefert. Zum Beispiel &#8220;I71B7HJ4BG&#8221; oder &#8220;6EE17ICBF54IE486EHD8&#8221;.</p>
+<h2>Idee</h2>
+<p>Mit VALUE und FOR sollte ein String Zeichen für Zeichen zusammengesetzt werden. Mit einer Zufallsfunktion sollte ermittelt werden, ob ein Buchstabe oder eine Zahl eingesetzt werden soll. Per SWITCH sollte ebenfalls eine Zufallsfunktion aufgerufen werden, die eine Zahl bzw. einen Buchstaben zurück liefert.. Per String-Konkatenation sollten die zufälligen Zeichen zusammengesetzt werden.</p>
+<h2>Abweichung</h2>
+<p>die Aufgabe lässt sich mit VALUE nicht lösen. Stattdessen muss REDUCE genommen werden.</p>
+<h2>Code</h2>
+<p>Für jede Stelle des zu generierenden Strings (FOR &#8211; UNTIL &#8211; NEXT) wird eine Funktion RND_TYPE aufgerufen. Diese gibt zufällig den Wert TRUE oder FALSE zurück. Per SWITCH-Anweisung wird entschieden, ob eine Zahl (FALSE) oder ein Buchstabe (TRUE) generiert werden soll. Das generierte Zeichen wird per String-Konkatenation Zeichen für Zeichen zusammengebaut.</p>
+<p>&nbsp;</p>
+<pre class="lang:abap decode:true">REPORT.
+
+CLASS main DEFINITION.
+   PUBLIC SECTION.
+     DATA rnd_num TYPE REF TO cl_abap_random_int.
+     DATA rnd_chr TYPE REF TO cl_abap_random_int.
+     METHODS constructor.
+     METHODS rnd_type
+       RETURNING VALUE(type) TYPE boolean.
+     METHODS create_random_string
+       IMPORTING max           TYPE i
+       RETURNING VALUE(string) TYPE string.
+     METHODS get_random_char
+       RETURNING VALUE(char) TYPE char01.
+     METHODS get_random_number
+       RETURNING VALUE(number) TYPE numc01.
+ ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+   METHOD constructor.
+     rnd_chr = cl_abap_random_int=&gt;create( seed = CONV #( sy-uzeit ) min = 0 max = 25 ).
+     rnd_num = cl_abap_random_int=&gt;create( seed = CONV #( sy-uzeit ) min = 0 max = 9 ).
+   ENDMETHOD.
+   METHOD rnd_type.
+
+    type = COND #( LET random = get_random_number( ) IN
+                    WHEN random &lt;= 5 THEN abap_true
+                    ELSE abap_false ).
+   ENDMETHOD.
+
+  METHOD get_random_char.
+     DATA(offset) = rnd_num-&gt;get_next( ).
+     char = sy-abcde+offset(1).
+   ENDMETHOD.
+
+  METHOD get_random_number.
+     number = rnd_num-&gt;get_next( ).
+   ENDMETHOD.
+
+  METHOD create_random_string.
+
+    string = REDUCE #( INIT text = ``
+                        FOR i = 1
+                        UNTIL i &gt; max
+                        NEXT text = text &amp;&amp; SWITCH #( rnd_type( )
+                                              WHEN abap_true  THEN get_random_char( )
+                                              WHEN abap_false THEN get_random_number( ) ) ).
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+PARAMETERS p_len type i DEFAULT 10.
+PARAMETERS p_str TYPE char20 MODIF ID a.
+
+AT SELECTION-SCREEN OUTPUT.
+   LOOP AT SCREEN.
+     CASE screen-group1.
+       WHEN 'A'.
+         screen-input = '0'.
+         MODIFY SCREEN.
+     ENDCASE.
+   ENDLOOP.
+
+AT SELECTION-SCREEN.
+   p_str = NEW main( )-&gt;create_random_string( p_len ).</pre>
+<h2>Lessons Learned</h2>
+<p>Mit REDUCE können Operationen auf einen Datentyp &#8220;reduziert&#8221; werden. Mit VALUE funktioniert das nicht.</p>
+<pre class="lang:abap decode:true">string = REDUCE #( INIT text = ``
+                   FOR i = 1
+                   UNTIL i &gt; max
+                   NEXT text = text &amp;&amp; SWITCH #( rnd_type( )
+                                         WHEN abap_true  THEN get_random_char( )
+                                         WHEN abap_false THEN get_random_number( ) ) ).</pre>
+<p>Mit SWITCH können nur Exakte Werte abgefragt werden (wie bei CASE auch mit OR verknüpft). Es sind jedoch keine &#8220;Größer-/ Kleiner-Vergleiche&#8221; möglich.</p>
+<pre class="lang:abap decode:true ">[...] SWITCH #( rnd_type( )
+        WHEN abap_true  THEN get_random_char( )
+        WHEN abap_false THEN get_random_number( ) ) ).</pre>
+<p>Mit COND können beliebige Bedingungen geprüft werden. Allerdings muss hier jede Bedingung separat angegeben werden. Wenn der abzufragende Wert das Ergebnis einer Funktion ist, so sollte mit LET gearbeitet werden, um nicht für jede Bedingung die Funktion aufrufen zu müssen.</p>
+<pre class="lang:abap decode:true">var = COND #( LET random = get_random_number( ) IN
+              WHEN random &lt;= 5 THEN abap_true
+              ELSE abap_false ).</pre>
+<p>Die implizite Typ-Definition mit INIT (bei der REDUCE-Anweisung) ist mit Vorsicht zu genießen! Ich hatte aus Gewohnheit einen leeren &#8220;String&#8221; mit Hochkomma-Space-Hochkomma definiert. In Wirklichkeit hatte ich damit aber einen CHAR(1)-Feld definiert und die Funktion hat immer nur ein Zeichen zurück geliefert. Die String-Konkatenation hat diesen fest definierten Typ also nicht automatisch erweitert, so wie es beim String der Fall ist. Erst die Verwendung eines <em>echten</em> Strings durch die Backticks &#8220; liefert das gewünschte Ergebnis.</p>
+<p>Es kann auch der Typ direkt angegeben werden (INIT text TYPE string) aber dann ist keine Vorbelegung mehr möglich. Eine implizite Definition durch Vorbelegung ist dann jedoch wieder durch die Verwendung von CONV möglich: INIT text = CONV string( &#8216;hallo&#8217; )</p>
+<p>Bei der FOR-Funktion (FOR i = 1) muss das Hochzählen der Variable (THEN i + 1) nicht zwingend definiert werden! Wird THEN nicht angegeben, so wird implizit die Inkrementierung um Eins vorgenommen:</p>
+<pre class="lang:abap decode:true ">[...] FOR i = 1 UNTIL i &gt; 10 [...]</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/reduce-switch-cond-abap740/">REDUCE + SWITCH + COND [ABAP740]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ABAP 740-Features unter der Lupe</title>
+		<link>/blog/abap-740-features-unter-der-lupe/</link>
+					<comments>/blog/abap-740-features-unter-der-lupe/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 Apr 2017 15:12:16 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[standard table]]></category>
+		<category><![CDATA[sorted table]]></category>
+		<category><![CDATA[GROUP BY]]></category>
+		<category><![CDATA[WHERE]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017998</guid>
+
+					<description><![CDATA[<p>Aus einer einfachen Anfängerfrage im abapforum.com hat sich eine recht spannende Antwortserie entwickelt, die auf die neuen Sprachfeatures von ABAP740 eingeht. Ich habe diese einmal zusammen gefasst und auch Laufzeitmessungen durchgeführt. Die Frage Die Frage von debianfan lautete: Wie ermittele ich die Anzahl von Datensätzen bestimmter Ausprägung in einer internen Tabelle? Die interne Tabelle NAMES besteht nur aus den Feldern NAME (string) TF (boolean) Die folgenden Lösungen sind teilweise vereinfacht und ohne DATA-Definitionen. Die einzelnen...</p>
+<p>Der Beitrag <a href="/blog/abap-740-features-unter-der-lupe/">ABAP 740-Features unter der Lupe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Aus einer einfachen Anfängerfrage im <a href="http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21900&amp;p=82019">abapforum.com</a> hat sich eine recht spannende Antwortserie entwickelt, die auf die neuen Sprachfeatures von ABAP740 eingeht. Ich habe diese einmal zusammen gefasst und auch Laufzeitmessungen durchgeführt.</p>
+<h2>Die Frage</h2>
+<p>Die Frage von debianfan lautete: Wie ermittele ich die Anzahl von Datensätzen bestimmter Ausprägung in einer internen Tabelle?</p>
+<p>Die interne Tabelle NAMES besteht nur aus den Feldern</p>
+<ul>
+<li>NAME (string)</li>
+<li>TF (boolean)</li>
+</ul>
+<p>Die folgenden Lösungen sind teilweise vereinfacht und ohne DATA-Definitionen. Die einzelnen lauffähigen Lösungen sind unten im Beispielprogramm ersichtlich.</p>
+<h2>Lösung 1 &#8211; 2xLOOP+WHERE(DATA)</h2>
+<p>Die einfachste und auf der Hand liegende Antwort von Tron war:</p>
+<pre class="">LOOP AT names INTO name WHERE tf = abap_true.
+  ADD 1 TO zaehler_true.
+ENDLOOP.
+
+LOOP AT names INTO name WHERE tf = abap_false.
+  ADD 1 TO zaehler_false.
+ENDLOOP.
+</pre>
+<p>Die Lösung ist einfach und verständlich.</p>
+<p>Der Einwand von Ralf war, dass bei WHERE die gesamte Tabelle durchlaufen werden muss, wenn kein Index verwendet wird. Das kann sich bei großen Tabellen negativ auf die Laufzeit auswirken.</p>
+<p>Mein Gedanke war, dass ich zwei LOOPs nicht schön finde und außerdem ein LOOP mit einer Case-Anweisung noch einen Tacken einfacher und deutlich sein müsste. Dazu später mehr.</p>
+<h2>Lösung 2 &#8211; FILTER</h2>
+<p>Haubi hat dann den Vorschlag gemacht, die einzelnen Einträge mittels FILTER zu zählen:</p>
+<pre class=""> DATA(lv_true)  = lines( FILTER #( names WHERE tf = abap_true ) ).
+ DATA(lv_false) = lines( FILTER #( names WHERE tf = abap_false ) ).</pre>
+<p>Diese Lösung finde ich sehr schlank und gut lesbar. Was mich hier stört, ist, dass durch FILTER alle verarbeiteten Tabelleneinträge kopiert werden. Es werden alle Datensätze die der WHERE-Anweisung entsprechen in eine neue Tabelle kopiert. Die Tabelle ist zwar temporär und wird nur für die Zeit der Verarbeitung des FILTER-Befehls verwendet, aber bei großen Tabellen kann sich die zusätzliche Speicherlast negativ auswirken.</p>
+<h2>Lösung 3 &#8211; REDUCE</h2>
+<p>Ich wollte dann unbedingt noch eins drauf setzen und eine Lösung haben, die auch bei vielen Ausprägungen von TF funktioniert und die Werte von TF nicht bekannt sind. Zudem wollte ich komplett die neuen Sprachfeatures verwenden.</p>
+<p>Bei beiden vorhergehenden Lösungen fand ich es nicht gut, dass gezielt im Programm auf ABAP_TRUE und ABAP_FALSE abgefragt wurde. In diesem Beispiel ist es in Ordnung, weil das die Vorgabe war. Der häufigere Fall ist jedoch, dass eine Gruppe viele und gegebenenfalls nicht bekannte Ausprägungen hat (Verkaufsorganisation, Datum, Materialnummer, etc.).</p>
+<p>Meine Lösung bestand dann aus einer Kombination aus VALUE und REDUCE:</p>
+<pre class=""> DATA(sum) = VALUE ttf( FOR GROUPS grp OF &lt;name&gt; IN names
+                        WHERE ( name IS NOT INITIAL )
+                        GROUP BY ( tf = &lt;name&gt;-tf )
+                          ( tf    = grp
+                            count = REDUCE #( INIT i = 0
+                                       FOR name IN names
+                                       WHERE ( tf = grp )
+                                       NEXT i = i + 1 ) ) ).</pre>
+<p>Diese Lösung baut eine Tabelle auf aus TF und COUNT, so dass alle Gruppenwerte mit der entsprechenden Anzahl Einträge in der Tabelle SUM landen.</p>
+<p>Eigentlich müsste diese Lösung die langsamste sein, denn es werden zuerst die Gruppen gebildet. Dafür muss die gesamte Tabelle durchlaufen werden. Dann werden zu jedem Gruppeneintrag erneut die zugehörigen Einträge gelesen und gezählt. Deswegen wollte ich zuerst gar keine Laufzeitmessung machen. Die Herausforderung für mich war in erster Linie, die Problemstellung mit den neuen Sprachfeatures abzubilden, da ich mich mit der Syntax eher schwer tue.</p>
+<h2>Lösung 4 &#8211; 1xLOOP+WHERE(DATA)</h2>
+<p>Ich habe mit den vorhandenen drei Lösungen ein Testprogramm geschrieben um die Laufzeit mit der Transaktion SAT analysieren zu können.</p>
+<p>Allerdings habe ich gemerkt, dass ich die Lösung von Tron falsch übernommen hatte, nämlich folgendermaßen:</p>
+<pre class="">LOOP AT names INTO name.
+  CASE name-tf.
+    WHEN abap_true.
+      ADD 1 TO zaehler_true.
+    WHEN abap_false.
+      ADD 1 TO zaehler_false.
+  ENDCASE.
+ENDLOOP.</pre>
+<p>Anstatt zweier LOOPs hatte ich nur einen LOOP und eine CASE-Abfrage.</p>
+<p>Da ich die schon dabei war zu testen, wollte ich Trons Code genau so übernehmen, da ich davon ausging, dass meine Variante mit CASE schneller sein würde. Allerdings war dem nicht so&#8230;</p>
+<h2>Update</h2>
+<p>Zusätzlich zu den LOOP-Lösungen, die mit dem Zusatz INTO workarea arbeiten, habe ich noch die Varianten mit ASSIGNING (Feldsymbol) und TRANSPORTING NO FIELDS aufgenommen.</p>
+<h2>Lösung 5 &#8211; 1xLOOP+CASE(Fieldsymbol)</h2>
+<p>Die Lösung mit einem LOOP und CASE-Anweisung jedoch mit LOOP-ASSIGNING.</p>
+<h2>Lösung 6 &#8211; 2xLOOP+WHERE(Fieldsymbol)</h2>
+<p>Die Lösung mit zwei LOOPs und entsprechender WHERE-Bedingung jedoch mit LOOP-ASSIGNING.</p>
+<h2>Lösung 7 &#8211; 2xLOOP+WHERE(ohne Feldtransport)</h2>
+<p>Die Lösung mit zwei LOOPs und entsprechender WHERE-Bedingung jedoch mit dem Zusatz TRANSPORTING NO FIELDS.</p>
+<h2>Laufzeitanalyse</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018001" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg" alt="" width="748" height="269" srcset="/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg 748w, /wp-content/uploads/2017/04/2017-04-26_17-13-33-300x108.jpg 300w" sizes="(max-width: 748px) 100vw, 748px" /></a></p>
+<p>&nbsp;</p>
+<p>Der Vollständigkeit halber habe ich die Messung auch noch einmal mit der Variante &#8220;SORTED TABLE&#8221; durchgeführt. Und wieder war ich überrascht: Die Variante mit Sorted Table ist deutlich langsamer als die Variante mit Standard Table&#8230;</p>
+<p>Hier das Ergebnis der Laufzeitmessungen mit 100.000 Datensätzen und STANDARD TABLE:</p>
+<pre class="">Variante          Laufzeit
+P01_REDUCE         76.602
+P02_FILTER         36.755
+P03_LOOP_CASE      33.891
+P04_LOOP_WHERE     27.282
+P05_LOOP_CASE_FS   25.097
+P06_LOOP_WHERE_FS  18.805
+P07_LOOP_WHERE_NO  17.774
+</pre>
+<h2>abapgit</h2>
+<p>Eine aktuelle Version der Lösungen (inzwischen erweitert auf den Vergleich mit SORTED TABLE) findest du im github <a href="https://github.com/tricktresor/">Tricktresor-Repository</a>:</p>
+<p><a href="https://github.com/tricktresor/loop_performance_comparison">https://github.com/tricktresor/loop_performance_comparison</a></p>
+<h2>Code</h2>
+<p>Methode rnd_name baut aus zufälligen Buchstaben Fantasienamen auf.</p>
+<p>Methode rnd_bool liefert per Zufall den Wert TRUE oder FALSE zurück.</p>
+<p>Die Methoden p01 &#8211; p07 enthalten die jeweils erwähnten Lösungsvarianten.</p>
+<pre class="">REPORT.
+" http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21900&amp;p=82017#p82017
+
+PARAMETERS p TYPE i DEFAULT 100000.
+
+CLASS help DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS rnd_name RETURNING VALUE(name) TYPE string.
+ CLASS-METHODS rnd_bool RETURNING VALUE(tf) TYPE boolean.
+ CLASS-METHODS class_constructor.
+ CLASS-METHODS p01_reduce.
+ CLASS-METHODS p02_filter.
+ CLASS-METHODS p03_loop_case.
+ CLASS-METHODS p04_loop_where.
+ CLASS-METHODS p05_loop_case_fs.
+ CLASS-METHODS p06_loop_where_fs.
+ CLASS-METHODS p07_loop_where_no.
+ PROTECTED SECTION.
+ CLASS-DATA rnd TYPE REF TO cl_abap_random.
+ TYPES:
+ BEGIN OF lst_names,
+ name TYPE string,
+ tf TYPE abap_bool,
+ END OF lst_names,
+ ltt_names TYPE STANDARD TABLE OF lst_names
+ WITH NON-UNIQUE KEY name
+ WITH NON-UNIQUE SORTED KEY key_tf COMPONENTS tf.
+
+* ltt_names TYPE SORTED TABLE OF lst_names
+* WITH NON-UNIQUE KEY name
+* WITH NON-UNIQUE SORTED KEY key_tf COMPONENTS tf.
+ CLASS-DATA names TYPE ltt_names.
+ENDCLASS.
+
+CLASS help IMPLEMENTATION.
+ METHOD class_constructor.
+ rnd = cl_abap_random=&gt;create( ).
+ names = VALUE ltt_names( FOR i = 1 THEN i + 1 WHILE i &lt;= p
+ ( name = help=&gt;rnd_name( ) tf = help=&gt;rnd_bool( ) ) ).
+
+ ENDMETHOD.
+
+ METHOD rnd_name.
+ DATA(len) = rnd-&gt;intinrange( low = 5 high = 40 ).
+ DO len TIMES.
+ DATA(pos) = rnd-&gt;intinrange( low = 0 high = 25 ).
+ name = name &amp;&amp; sy-abcde+pos(1).
+ ENDDO.
+ ENDMETHOD.
+
+ METHOD rnd_bool.
+ CASE rnd-&gt;intinrange( low = 0 high = 1 ).
+ WHEN 0.
+ tf = abap_false.
+ WHEN 1.
+ tf = abap_true.
+ ENDCASE.
+ ENDMETHOD.
+
+ METHOD p01_reduce.
+ TYPES:
+ BEGIN OF stf,
+ tf TYPE abap_bool,
+ count TYPE i,
+ END OF stf,
+ ttf TYPE SORTED TABLE OF stf WITH UNIQUE KEY tf.
+
+ DATA(sum) = VALUE ttf( FOR GROUPS grp OF &lt;name&gt; IN names
+ WHERE ( name IS NOT INITIAL )
+ GROUP BY ( tf = &lt;name&gt;-tf )
+ ( tf = grp
+ count = REDUCE #( INIT i = 0
+ FOR name IN names
+ WHERE ( tf = grp )
+ NEXT i = i + 1 ) ) ).
+* cl_demo_output=&gt;display_data( sum ).
+ ENDMETHOD.
+
+ METHOD p02_filter.
+ DATA(lv_true) = lines( FILTER #( names USING KEY key_tf WHERE tf = abap_true ) ).
+ DATA(lv_false) = lines( FILTER #( names USING KEY key_tf WHERE tf = abap_false ) ).
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p03_loop_case.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names INTO DATA(name).
+ CASE name-tf.
+ WHEN abap_true. ADD 1 TO lv_true.
+ WHEN abap_false. ADD 1 TO lv_false.
+ ENDCASE.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p04_loop_where.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names INTO DATA(name) WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names INTO name WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p05_loop_case_fs.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names ASSIGNING FIELD-SYMBOL(&lt;name&gt;).
+ CASE &lt;name&gt;-tf.
+ WHEN abap_true. ADD 1 TO lv_true.
+ WHEN abap_false. ADD 1 TO lv_false.
+ ENDCASE.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p06_loop_where_fs.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names ASSIGNING FIELD-SYMBOL(&lt;name&gt;) WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names ASSIGNING &lt;name&gt; WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p07_loop_where_no.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names TRANSPORTING NO FIELDS WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names TRANSPORTING NO FIELDS WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+
+ENDCLASS.
+
+START-OF-SELECTION.
+
+
+ help=&gt;p01_reduce( ).
+ help=&gt;p02_filter( ).
+ help=&gt;p03_loop_case( ).
+ help=&gt;p04_loop_where( ).
+ help=&gt;p05_loop_case_fs( ).
+ help=&gt;p06_loop_where_fs( ).
+ help=&gt;p07_loop_where_no( ).</pre>
+<p>Der Beitrag <a href="/blog/abap-740-features-unter-der-lupe/">ABAP 740-Features unter der Lupe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/abap-740-features-unter-der-lupe/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>REDUCE ABAP750 FOR x = u IN n = 1 THEN brainf*ck</title>
+		<link>/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/</link>
+					<comments>/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 28 Feb 2017 16:18:53 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[abap740]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[new features]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017909</guid>
+
+					<description><![CDATA[<p>Hoijoijoi. Ich gebe zu, ich tue mich echt schwer mit den neuen Befehlen im ABAP-Sprachschatz. Besonders die ganz neuen Features im ABAP Release 7.50 (oder 7.40 &#8211; ich blick da nicht mehr durch) fordern mich ziemlich (REDUCE, COND, FILTER etc). Angeregt durch den Artikel von Jerry Wang im neuen SCN über REDUCE habe ich mich mit dem Befehl-REDUCE näher beschäftigt. Über die ABAP-Doku bin ich dann auf die Demoprogramme DEMO_REDUCE* gestolpert und beim DEMO_REDUCE_SIMPLE hängen geblieben....</p>
+<p>Der Beitrag <a href="/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/">REDUCE ABAP750 FOR x = u IN n = 1 THEN brainf*ck</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hoijoijoi. Ich gebe zu, ich tue mich echt schwer mit den neuen Befehlen im ABAP-Sprachschatz. Besonders die ganz neuen Features im ABAP Release 7.50 (oder 7.40 &#8211; ich blick da nicht mehr durch) fordern mich ziemlich (REDUCE, COND, FILTER etc).</p>
+<p>Angeregt durch den Artikel von <a href="https://blogs.sap.com/2017/02/27/functional-programming-try-reduce-in-javascript-and-in-abap/comment-page-1/#comment-365125">Jerry Wang im neuen SCN über REDUCE</a> habe ich mich mit dem Befehl-REDUCE näher beschäftigt. Über die ABAP-Doku bin ich dann auf die Demoprogramme DEMO_REDUCE* gestolpert und beim DEMO_REDUCE_SIMPLE hängen geblieben.</p>
+<p>Das Programm ermittelt mit Hilfe des REDUCE-Befehls die Summe von Werten in einer Tabelle. Das Programm DEMO_REDUCE_COND_ITERATION erzeugt mit Hilfe einer FOR-Schleife zusammengesetzte Texte (1 2 3 4 usw).</p>
+<p>Ich wollte dann ein bisserl mit den Features herumspielen und hatte die Idee, einen HTML-Text zusammen zusetzen.</p>
+<p>Aus der Tabelle</p>
+<p>&lt;HTML&gt;<br />
+&lt;BODY&gt;<br />
+&lt;P&gt;</p>
+<p>wollte ich die einzelnen Elemente plus einem separaten Text zu einem String zusammenfügen. Das funktionierte auch noch sehr einfach:</p>
+<pre>DATA(text) = REDUCE string(
+               INIT html = ``
+                FOR command IN html_commands 
+                NEXT html = |{ html }{ command }| ) 
+            &amp;&amp; 'Hallo Welt'.</span></pre>
+<p>Eigentlich nur zum Spaß habe ich versucht, ob ich mit einem erneuten &amp;&amp; auch ein erneutes REDUCE benutzen kann. Obwohl ich einigermaßen überrascht war, dass es anstandslos funktionierte, wäre ich auch maßlos enttäuscht gewesen, wenn es nicht geklappt hätte&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Der nächste Schritt war dann etwas komplizierter: Ich wollte die einzelnen Tags auch wieder schließen. Natürlich in umgekehrter Reihenfolge. Und mit dem SLASH, der ein Ende-Tag anzeigt. Hier brauchte es dann etliche Versuche und verwirrte Blicke in die Doku um zu dem folgenden Ergebnis zu gelangen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-28_16-53-39.jpg"><img decoding="async" class="size-full wp-image-1017910 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-28_16-53-39.jpg" alt="" width="450" height="185" srcset="/wp-content/uploads/2017/02/2017-02-28_16-53-39.jpg 450w, /wp-content/uploads/2017/02/2017-02-28_16-53-39-300x123.jpg 300w" sizes="(max-width: 450px) 100vw, 450px" /></a></p>
+<p>Und hier der Quelltext dazu:</p>
+<pre class="">REPORT zdemo_reduce_simple.
+
+CLASS demo DEFINITION.
+  PUBLIC SECTION.
+  CLASS-METHODS main.
+ENDCLASS.
+
+CLASS demo IMPLEMENTATION.
+  METHOD main.
+
+  DATA(html_commands) = VALUE string_table(
+                              ( `&lt;html&gt;` )
+                              ( `&lt;body&gt;` )
+                              ( `&lt;p&gt;` ) ).
+  cl_demo_output=&gt;write( html_commands ).
+
+
+  DATA(text) = REDUCE string(
+                INIT html = ``
+                 FOR command IN html_commands NEXT html = |{ html }{ command }| )
+             &amp;&amp; 'Hallo Welt'
+             &amp;&amp; REDUCE string( INIT html = ``
+                FOR n = lines( html_commands )
+                THEN n - 1
+                WHILE n &gt; 0
+                 NEXT html = html &amp;&amp; COND #( LET command = html_commands[ n ]
+                                              IN WHEN command IS NOT INITIAL
+                                                 THEN command(1) &amp;&amp; '/' &amp;&amp; command+1 ) ).
+
+   cl_demo_output=&gt;write( text ).
+   cl_demo_output=&gt;display( ).
+ ENDMETHOD.
+
+ENDCLASS.
+
+START-OF-SELECTION.
+ demo=&gt;main( ).</pre>
+<p>Ich lasse es einfach so unkommentiert stehen. Wenn man weiß, was der Ausdruck macht, ist es einigermaßen klar.</p>
+<p>Hier der Beitrag von Horst Keller zum Thema ABAP-740 Features: <a href="https://blogs.sap.com/2014/09/30/abap-news-for-740-sp08-iteration-expressions/">https://blogs.sap.com/2014/09/30/abap-news-for-740-sp08-iteration-expressions/</a></p>
+<h2>Table Expressions</h2>
+<p>Sehr gewöhnungsbedürftig für mich ist der Zusatz um die einzelne Tabellenzeile (die Tabelle hat ja keine Struktur) anzusprechen:</p>
+<pre class="">COND #( LET command = html_commands[ n ]
+         IN WHEN command IS NOT INITIAL
+            THEN command(1) &amp;&amp; '/' &amp;&amp; command+1 )</pre>
+<p>Mein erster Ansatz war Folgendes (was aber nicht funktionierte):</p>
+<pre class="">html_commands[ n ]-TABLE_LINE</pre>
+<p>Also bin ich zum COND-Ausdruck gekommen. Hier finde ich verwirrend, dass anscheinend zwingend eine WHEN-Klausel angegeben werden muss. Vielleicht gibt es auch eine einfachere Alternative?! Bestimmt. Lasst es mich gerne wissen.</p>
+<p>Link zur Horst Kellers Blog: <a href="https://blogs.sap.com/2013/05/29/abap-news-for-release-740-table-expressions/">https://blogs.sap.com/2013/05/29/abap-news-for-release-740-table-expressions/</a></p>
+<p>&nbsp;</p>
+<p>Ein komisches Gefühl, auf ein mal wieder Anfänger zu sein&#8230;</p>
+<p>Der guten alten Zeiten Willen noch mal das Coding mit ABAPvor740. Viel Länger ist es auch nicht. Und ob die Programmierung mit ABAP740 eleganter oder besser ist, wage ich zu bezweifeln.</p>
+<pre class="">DATA text TYPE string.
+LOOP AT html_commands INTO DATA(command).
+  text = text &amp;&amp; command.
+ENDLOOP.
+text = text &amp;&amp; 'Hallo Welt'.
+
+DATA line TYPE i.
+line = lines( html_commands ).
+DO lines( html_commands ) TIMES.
+  DATA(cmd) = html_commands[ line ].
+  text = text &amp;&amp; cmd(1) &amp;&amp; '/' &amp;&amp; cmd+1.
+  SUBTRACT 1 FROM line.
+ENDDO.</pre>
+<p>Der Beitrag <a href="/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/">REDUCE ABAP750 FOR x = u IN n = 1 THEN brainf*ck</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/feed/</wfw:commentRss>
+			<slash:comments>5</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

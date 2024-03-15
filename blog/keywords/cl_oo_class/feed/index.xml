@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_oo_class Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_oo_class/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 14 Oct 2021 12:54:03 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_oo_class Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Welche Redefinitionen gibt es?</title>
+		<link>/blog/welche-redefinitionen-gibt-es/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 26 Jun 2018 15:50:15 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Redefinition]]></category>
+		<category><![CDATA[cl_oo_class]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<category><![CDATA[klasse]]></category>
+		<category><![CDATA[Methode]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018881</guid>
+
+					<description><![CDATA[<p>In einem Projekt habe ich viel mit einer Superklasse und vielen Vererbungen gearbeitet. Die Superklasse besitzt sozusagen die Standardimplementierung für die einzelnen Funktionen und die Unterklassen können das Verhalten durch Redefinition ändern, wenn es erforderlich ist. mit der Zeit sind viele Unterklassen zusammen gekommen. Das Konzept hat sich gut bewährt. Allerdings stellt sich nun das Problem, dass ich bei einer neuen Klasse nicht mehr wusste, bei welcher anderen Unterklasse es eine Abweichung zum Standard gibt....</p>
+<p>Der Beitrag <a href="/blog/welche-redefinitionen-gibt-es/">Welche Redefinitionen gibt es?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Projekt habe ich viel mit einer Superklasse und vielen Vererbungen gearbeitet. Die Superklasse besitzt sozusagen die Standardimplementierung für die einzelnen Funktionen und die Unterklassen können das Verhalten durch Redefinition ändern, wenn es erforderlich ist.</p>
+<p>mit der Zeit sind viele Unterklassen zusammen gekommen. Das Konzept hat sich gut bewährt. Allerdings stellt sich nun das Problem, dass ich bei einer neuen Klasse nicht mehr wusste, bei welcher anderen Unterklasse es eine Abweichung zum Standard gibt. Um das herauszubekommen musste ich jede einzelne Klasse anklicken, die Methodenliste herunter scrollen, die entsprechende Methode finden und schauen ob und wie die Redefinition aussah.</p>
+<p>Für einen Programmierer natürlich ein nicht zu tolerierendes Vorgehen! 8)</p>
+<h2>Finde Redefinitionen!</h2>
+<p>Der unten stehende Report nutzt die Klasse CL_OO_CLASS um die Subklassen zu ermitteln. In den Redefinition der Subklasse wird nach der vorgegebenen Methode gesucht. Ist diese vorhanden, also redefiniert, dann wird sie in der Liste ausgegeben.</p>
+<p>Mit einem Doppelklick auf eine Methode wird der Quelltext im Docker angezeigt. Zur Anzeige des Quelltextes wird die Klasse CL_GUI_ABAPEDIT verwendet.</p>
+<p><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/06/redef1.png"><img fetchpriority="high" decoding="async" class="alignnone size-large wp-image-1018882" src="https://tricktresor.com/wp-content/uploads/2018/06/redef1-1024x648.png" alt="" width="640" height="405" srcset="/wp-content/uploads/2018/06/redef1-1024x648.png 1024w, /wp-content/uploads/2018/06/redef1-300x190.png 300w, /wp-content/uploads/2018/06/redef1-768x486.png 768w, /wp-content/uploads/2018/06/redef1-174x111.png 174w, /wp-content/uploads/2018/06/redef1.png 1179w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Coding</h2>
+<pre class="lang:abap decode:true ">REPORT ztrcktrsr_find_redefinitions.
+
+<!--StartFragment --><span class="L0S52">DATA </span>gv_clsname         <span class="L0S52">TYPE </span>seoclsname<span class="L0S55">.</span>
+<span class="L0S52">DATA </span>gv_cpdname         <span class="L0S52">TYPE </span>seocpdname<span class="L0S55">.</span>
+<span class="L0S52">DATA </span>gt_dynp            <span class="L0S52">TYPE </span><span class="L0S52">TABLE </span><span class="L0S52">OF </span>dynpread <span class="L0S52">WITH </span><span class="L0S52">DEFAULT </span><span class="L0S52">KEY</span><span class="L0S55">.</span> 
+
+PARAMETERS p_clas TYPE seoclsname DEFAULT 'CL_GUI_CONTROL'.
+PARAMETERS p_meth TYPE seocpdname DEFAULT 'FREE'.
+
+<!--StartFragment --><span class="L0S52">AT </span><span class="L0S52">SELECTION-SCREEN </span><span class="L0S52">ON </span><span class="L0S52">VALUE-REQUEST </span><span class="L0S52">FOR </span>p_clas<span class="L0S55">.</span>
+
+  <span class="L0S52">CALL </span><span class="L0S52">FUNCTION </span><span class="L0S33">'SEOM_OO_PATTERN_SELECTION'</span>
+    <span class="L0S52">IMPORTING</span>
+      clsname             <span class="L0S55">= </span>gv_clsname
+      cpdname             <span class="L0S55">= </span>gv_cpdname
+    <span class="L0S52">EXCEPTIONS</span>
+      selection_cancelled <span class="L0S55">= </span><span class="L0S32">1</span>
+      <span class="L0S52">OTHERS              </span><span class="L0S55">= </span><span class="L0S32">2</span><span class="L0S55">.</span>
+  <span class="L0S52">IF </span>sy<span class="L0S70">-</span>subrc <span class="L0S55">= </span><span class="L0S32">0</span><span class="L0S55">.</span>
+    p_clas <span class="L0S55">= </span>gv_clsname<span class="L0S55">.</span>
+    gt_dynp <span class="L0S55">= </span><span class="L0S52">VALUE </span>#<span class="L0S55">( </span><span class="L0S55">( </span>fieldname <span class="L0S55">= </span><span class="L0S33">'P_METH' </span>fieldvalue <span class="L0S55">= </span>gv_cpdname <span class="L0S55">) </span><span class="L0S55">)</span><span class="L0S55">.</span>
+    <span class="L0S52">CALL </span><span class="L0S52">FUNCTION </span><span class="L0S33">'DYNP_VALUES_UPDATE'</span>
+      <span class="L0S52">EXPORTING</span>
+        dyname     <span class="L0S55">= </span>sy<span class="L0S70">-</span>cprog
+        dynumb     <span class="L0S55">= </span>sy<span class="L0S70">-</span>dynnr
+      <span class="L0S52">TABLES</span>
+        dynpfields <span class="L0S55">= </span>gt_dynp
+      <span class="L0S52">EXCEPTIONS</span>
+        <span class="L0S52">OTHERS     </span><span class="L0S55">= </span><span class="L0S32">8</span><span class="L0S55">.</span>
+    <span class="L0S52">IF </span>sy<span class="L0S70">-</span>subrc &lt;&gt; <span class="L0S32">0</span><span class="L0S55">.</span>
+      p_meth <span class="L0S55">= </span>gv_cpdname<span class="L0S55">.</span>
+    <span class="L0S52">ENDIF</span><span class="L0S55">.</span>
+  <span class="L0S52">ENDIF</span><span class="L0S55">.</span> 
+CLASS lcl_main DEFINITION.
+  PUBLIC SECTION.
+    METHODS on_double_click
+                  FOR EVENT double_click OF cl_salv_events_table
+      IMPORTING row column.
+    METHODS docker.
+    METHODS display.
+    METHODS do
+      IMPORTING
+        i_class  TYPE clike
+        i_method TYPE clike
+        i_start  TYPE boolean_flg.
+  PROTECTED SECTION.
+    DATA mt_redef     TYPE STANDARD TABLE OF seoredef.
+    DATA mo_docker    TYPE REF TO cl_gui_docking_container.
+    DATA mo_editor    TYPE REF TO cl_gui_abapedit.
+    METHODS display_source IMPORTING is_source TYPE seoredef.
+
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+  METHOD on_double_click.
+    docker( ).
+    DATA(redef) = mt_redef[ row ].
+
+    display_source( redef ).
+
+  ENDMETHOD.
+
+  METHOD display_source.
+    DATA lt_source TYPE STANDARD TABLE OF string.
+
+    DATA(include) = cl_oo_classname_service=&gt;get_method_include(
+                      EXPORTING mtdkey = VALUE #( clsname = is_source-clsname
+                                                  cpdname = is_source-mtdname ) ).
+    READ REPORT include INTO lt_source.
+    mo_editor-&gt;set_text( lt_source ).
+
+  ENDMETHOD.
+
+  METHOD docker.
+
+    CHECK mo_docker IS INITIAL.
+    mo_docker = NEW #( side = cl_gui_docking_container=&gt;dock_at_right ratio = 50 ).
+    mo_editor = NEW #( parent = mo_docker ).
+    mo_editor-&gt;set_readonly_mode( 1 ).
+
+  ENDMETHOD.
+
+  METHOD display.
+
+    TRY.
+        " create SALV
+        CALL METHOD cl_salv_table=&gt;factory
+          IMPORTING
+            r_salv_table = DATA(lr_table)
+          CHANGING
+            t_table      = mt_redef.
+
+        lr_table-&gt;get_functions( )-&gt;set_all( ).
+
+        " register event DOUBLE_CLICK
+        SET HANDLER on_double_click FOR lr_table-&gt;get_event( ).
+
+        " hide columns which are not relevant
+        DATA(lr_columns) = lr_table-&gt;get_columns( ).
+        lr_columns-&gt;get_column( 'VERSION' )-&gt;set_technical( ).
+        lr_columns-&gt;get_column( 'MTDABSTRCT' )-&gt;set_technical( ).
+        lr_columns-&gt;get_column( 'MTDFINAL' )-&gt;set_technical( ).
+        lr_columns-&gt;get_column( 'ATTVALUE' )-&gt;set_technical( ).
+        lr_columns-&gt;get_column( 'EXPOSURE' )-&gt;set_technical( ).
+        lr_table-&gt;display( ).
+      CATCH cx_salv_error.
+    ENDTRY.
+
+
+  ENDMETHOD.
+
+
+  METHOD do.
+
+    DATA lr_class TYPE REF TO cl_oo_class.
+    DATA lt_subclasses TYPE seo_relkeys.
+    DATA ls_subclass   LIKE LINE OF lt_subclasses.
+
+    TRY .
+        lr_class ?= cl_oo_class=&gt;get_instance( i_class ).
+
+        LOOP AT lr_class-&gt;redefinitions INTO DATA(ls_redef) WHERE mtdname = i_method.
+          APPEND ls_redef TO mt_redef.
+        ENDLOOP.
+        lt_subclasses = lr_class-&gt;get_subclasses( ).
+
+        IF i_start = abap_true.
+          " search
+          LOOP AT lt_subclasses INTO ls_subclass.
+            do( i_class  = ls_subclass-clsname
+                i_method = i_method
+                i_start  = space ).
+          ENDLOOP.
+        ENDIF.
+
+      CATCH cx_class_not_existent.
+
+    ENDTRY.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+START-OF-SELECTION.
+
+  DATA(main) = NEW lcl_main( ).
+  main-&gt;do( i_class  = p_clas
+            i_method = p_meth
+            i_start  = abap_true ).
+  main-&gt;display( ).</pre>
+<h2>abapGit</h2>
+<p>Der inzwischen obligatorische Link zu Github: <a class="keychainify-checked" href="https://github.com/tricktresor/find_redefinitions">https://github.com/tricktresor/find_redefinitions</a></p>
+<p>Der Beitrag <a href="/blog/welche-redefinitionen-gibt-es/">Welche Redefinitionen gibt es?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,434 @@
+*&---------------------------------------------------------------------*
+*& Report  ZZ_GRID_VARIANT
+*&---------------------------------------------------------------------*
+
+
+***_________________________________***
+***                                 ***
+***    http://www.tricktresor.de    ***
+***_________________________________***
+***                                 ***
+
+
+* BESCHREIBUNG
+* ============
+* Das Programm enthält eine Klasse, mit deren Hilfe vier durch einen
+* Splitter getrennte ALV-Grids angezeigt werden
+* Es können Varianten abgespeichert werden, die dann als Schnellzugriff
+* mit einem Button in der Toolbar aktiviert werden können
+* Mit Doppelklick auf das Feld "Vertriebsbelegnummer" wird der Beleg
+* angezeigt.
+
+* DYNPRO 100
+* ==========
+* Dynpro 100 muss angelegt werden.
+* Es muss einen CustomContainer mit Namen CONTAINER enthalten
+* Der Status "100" muss angelegt werden. Die Funktionstaste F3 muss
+* mit dem Funktionscode BACK belegt werden.
+
+* DYNPRO-ABLAUFLOGIK
+* ==================
+* PROCESS BEFORE OUTPUT.
+*   MODULE pbo.
+*
+* PROCESS AFTER INPUT.
+*   MODULE pai.
+
+REPORT zz_grid_variant.
+
+*** Class for event receiver
+CLASS lcl_event_receiver DEFINITION DEFERRED.
+
+*** global data
+DATA gr_grid1    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid2    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid3    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid4    TYPE REF TO            lcl_event_receiver.
+
+DATA gt_vbak     TYPE STANDARD TABLE OF vbak.
+DATA gt_vbap     TYPE STANDARD TABLE OF vbap.
+DATA gt_vbkd     TYPE STANDARD TABLE OF vbkd.
+DATA gt_vbpa     TYPE STANDARD TABLE OF vbpa.
+
+DATA gr_cc       TYPE REF TO            cl_gui_custom_container.
+DATA gr_splitter TYPE REF TO            cl_gui_splitter_container.
+
+DATA gr_cont1    TYPE REF TO            cl_gui_container.
+DATA gr_cont2    TYPE REF TO            cl_gui_container.
+DATA gr_cont3    TYPE REF TO            cl_gui_container.
+DATA gr_cont4    TYPE REF TO            cl_gui_container.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+
+  PUBLIC SECTION.
+
+    DATA gr_grid    TYPE REF TO            cl_gui_alv_grid.
+    DATA gr_cont    TYPE REF TO            cl_gui_container.
+    DATA gs_variant TYPE                   disvariant.
+    DATA gs_layout  TYPE                   lvc_s_layo.
+    DATA gv_table   TYPE                   text80.
+
+    METHODS:
+
+*** constructor
+    constructor
+           IMPORTING i_handle    TYPE c
+                     i_container TYPE REF TO cl_gui_container
+                     i_title     TYPE lvc_title
+                     i_table     TYPE c,
+
+*** event for double click
+    handle_double_click
+       FOR EVENT double_click OF cl_gui_alv_grid
+           IMPORTING e_row e_column es_row_no sender,
+
+*** event for adding buttons to toolbar
+    handle_toolbar
+       FOR EVENT toolbar OF cl_gui_alv_grid
+           IMPORTING e_object e_interactive sender,
+
+*** event for pressed buttons
+    handle_user_command
+       FOR EVENT user_command OF cl_gui_alv_grid
+           IMPORTING e_ucomm sender.
+
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+
+  METHOD constructor.
+
+    FIELD-SYMBOLS <outtab> TYPE STANDARD TABLE.
+
+    gv_table = i_table.
+    ASSIGN (gv_table) TO <outtab>.
+    CHECK sy-subrc = 0.
+
+*** Create ALV Grid
+    CREATE OBJECT gr_grid
+      EXPORTING
+        i_parent = i_container.
+
+*** Set variant
+    CLEAR gs_variant.
+    gs_variant-report    = sy-repid.
+    gs_variant-handle    = i_handle.
+    gs_variant-username  = sy-uname.
+
+*** Layout
+    gs_layout-grid_title = i_title.
+
+*** Set display
+    CALL METHOD gr_grid->set_table_for_first_display
+      EXPORTING
+        i_structure_name = i_handle
+        is_variant       = gs_variant
+        i_save           = 'A'
+        i_default        = 'X'
+        is_layout        = gs_layout
+      CHANGING
+        it_outtab        = <outtab>
+      EXCEPTIONS
+        OTHERS           = 4.
+
+**** Create event handler for grid
+*    CREATE OBJECT gr_evth.
+    SET HANDLER handle_user_command
+                handle_toolbar
+                handle_double_click
+            FOR gr_grid.
+
+*** set toolbar interactive
+    CALL METHOD gr_grid->set_toolbar_interactive.
+
+
+  ENDMETHOD.                    "constructor
+
+  METHOD handle_double_click.
+
+    FIELD-SYMBOLS <outtab> TYPE STANDARD TABLE.
+    FIELD-SYMBOLS <outwa>  TYPE ANY.
+    FIELD-SYMBOLS <value>  TYPE ANY.
+
+    ASSIGN (gv_table) TO <outtab>.
+    CHECK sy-subrc = 0.
+
+
+    CASE e_column.
+      WHEN 'VBELN'.
+        READ TABLE <outtab> ASSIGNING <outwa> INDEX es_row_no-row_id.
+        IF sy-subrc = 0.
+          ASSIGN COMPONENT e_column OF STRUCTURE <outwa> TO <value>.
+          IF sy-subrc = 0.
+            SET PARAMETER ID 'AUN' FIELD <value>.
+            CALL TRANSACTION 'VA03' AND SKIP FIRST SCREEN.
+          ENDIF.
+        ENDIF.
+    ENDCASE.
+
+  ENDMETHOD.                    "handle_double_click
+
+  METHOD handle_toolbar.
+
+    DATA ls_toolbar       TYPE stb_button.
+    DATA ls_variant       TYPE disvariant.
+
+*** Variants
+    DATA lt_ltdx          TYPE STANDARD TABLE OF ltdx.
+    FIELD-SYMBOLS <ltdx>  TYPE ltdx.
+*** Variant texts
+    DATA lt_ltdxt         TYPE STANDARD TABLE OF ltdxt.
+    FIELD-SYMBOLS <ltdxt> TYPE ltdxt.
+
+*** Set buttons for variants
+    SELECT * FROM ltdx INTO TABLE lt_ltdx UP TO 10 ROWS
+     WHERE relid  = 'LT'
+       AND report = gs_variant-report
+       AND handle = gs_variant-handle
+       AND srtf2  = 0
+       AND ( username = space
+         OR  username = sy-uname )
+      ORDER BY username variant.
+
+    IF sy-subrc = 0.
+
+*** add Seperator to toolbar
+      ls_toolbar-function  = 'DUMMY'.
+      ls_toolbar-butn_type = '3'.
+      APPEND ls_toolbar TO e_object->mt_toolbar.
+
+*** Get variant texts
+      SELECT * FROM ltdxt INTO TABLE lt_ltdxt
+         FOR ALL ENTRIES IN lt_ltdx
+       WHERE relid  = 'LT'
+         AND report = gs_variant-report
+         AND handle = gs_variant-handle
+         AND variant = lt_ltdx-variant
+         AND langu = sy-langu.
+
+*** Get actual variant
+      CALL METHOD sender->get_variant
+        IMPORTING
+          es_variant = ls_variant.
+
+      LOOP AT lt_ltdx ASSIGNING <ltdx>.
+*... get variant text
+        READ TABLE lt_ltdxt ASSIGNING <ltdxt> WITH KEY variant = <ltdx>-variant.
+
+*... Button to create customer order with template
+        CLEAR ls_toolbar.
+        ls_toolbar-function  = '$'.
+        ls_toolbar-function+1 = <ltdx>-variant.
+        IF <ltdx>-variant(1) = '/'.
+*** global variant
+          ls_toolbar-icon      = icon_alv_variant_choose.
+        ELSE.
+*** user specific variant
+          ls_toolbar-icon      = icon_usergroup.
+        ENDIF.
+        ls_toolbar-butn_type = '0'.
+        ls_toolbar-disabled  = space.
+        IF <ltdxt> IS ASSIGNED.
+          ls_toolbar-text      = <ltdxt>-text.
+        ELSE.
+          ls_toolbar-text      = <ltdx>-variant.
+        ENDIF.
+        ls_toolbar-quickinfo = space.
+        IF ls_variant-variant = <ltdx>-variant.
+          ls_toolbar-checked   = 'X'.
+        ELSE.
+          ls_toolbar-checked   = space.
+        ENDIF.
+        APPEND ls_toolbar TO e_object->mt_toolbar.
+
+      ENDLOOP.
+    ENDIF. "Variants exist?
+
+  ENDMETHOD.                    "handle_toolbar
+
+  METHOD handle_user_command.
+
+*** data
+    DATA lv_user_specific TYPE c.
+    DATA ls_variant       TYPE disvariant.
+    DATA ls_stable        TYPE lvc_s_stbl.
+    DATA lt_fieldcat      TYPE  lvc_t_fcat.
+    DATA lt_sort          TYPE  lvc_t_sort.
+    DATA lt_filter        TYPE  lvc_t_filt.
+    DATA ls_layout        TYPE  lvc_s_layo.
+
+*** Variant
+    CLEAR ls_variant.
+    ls_variant-variant = e_ucomm.
+    SHIFT ls_variant-variant LEFT BY 1 PLACES.
+    ls_variant-report    = gs_variant-report.
+    ls_variant-handle    = gs_variant-handle.
+    IF ls_variant-variant(1) <> '/'.
+      ls_variant-username  = sy-uname.
+      lv_user_specific     = 'X'.
+    ENDIF.
+    CALL METHOD sender->get_frontend_fieldcatalog
+      IMPORTING
+        et_fieldcatalog = lt_fieldcat.
+
+    CALL FUNCTION 'LVC_VARIANT_SELECT'
+      EXPORTING
+        i_dialog            = space
+        i_user_specific     = lv_user_specific
+        it_default_fieldcat = lt_fieldcat
+      IMPORTING
+        et_fieldcat         = lt_fieldcat
+        et_sort             = lt_sort
+        et_filter           = lt_filter
+      CHANGING
+        cs_variant          = ls_variant
+      EXCEPTIONS
+        wrong_input         = 1
+        fc_not_complete     = 2
+        not_found           = 3
+        program_error       = 4
+        data_missing        = 5
+        OTHERS              = 6.
+    IF sy-subrc = 0.
+      CALL METHOD sender->set_variant( ls_variant ).
+      CALL METHOD sender->set_frontend_fieldcatalog( lt_fieldcat ).
+      CALL METHOD sender->set_filter_criteria( lt_filter ).
+      CALL METHOD sender->set_sort_criteria( lt_sort ).
+      ls_stable = 'XX'.
+      CALL METHOD sender->refresh_table_display
+        EXPORTING
+          is_stable      = ls_stable
+          i_soft_refresh = space.
+    ENDIF.
+
+  ENDMETHOD.                           "handle_user_command
+
+ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+
+*** _______________________________________________________ ***
+***                                                         ***
+***                 START OF PROGRAM
+*** _______________________________________________________ ***
+***                                                         ***
+
+START-OF-SELECTION.
+
+  SELECT * FROM vbak INTO TABLE gt_vbak UP TO 30 ROWS.
+  SELECT * FROM vbap INTO TABLE gt_vbap UP TO 30 ROWS.
+  SELECT * FROM vbpa INTO TABLE gt_vbpa UP TO 30 ROWS.
+  SELECT * FROM vbkd INTO TABLE gt_vbkd UP TO 30 ROWS.
+
+
+  CALL SCREEN 100.
+
+*&---------------------------------------------------------------------*
+*&      Module  PBO  OUTPUT
+*&---------------------------------------------------------------------*
+MODULE pbo OUTPUT.
+
+  SET PF-STATUS '100'.
+  SET TITLEBAR '100'.
+  CLEAR sy-ucomm.
+
+  IF gr_cc IS INITIAL.
+    CREATE OBJECT gr_cc
+      EXPORTING
+        container_name = 'CONTAINER'.
+  ENDIF.
+
+  IF gr_splitter IS INITIAL.
+    CREATE OBJECT gr_splitter
+      EXPORTING
+        parent  = gr_cc
+        rows    = 2
+        columns = 2.
+
+    CALL METHOD gr_splitter->get_container
+      EXPORTING
+        row       = 1
+        column    = 1
+      RECEIVING
+        container = gr_cont1.
+
+    CALL METHOD gr_splitter->get_container
+      EXPORTING
+        row       = 1
+        column    = 2
+      RECEIVING
+        container = gr_cont2.
+
+    CALL METHOD gr_splitter->get_container
+      EXPORTING
+        row       = 2
+        column    = 1
+      RECEIVING
+        container = gr_cont3.
+
+    CALL METHOD gr_splitter->get_container
+      EXPORTING
+        row       = 2
+        column    = 2
+      RECEIVING
+        container = gr_cont4.
+  ENDIF.
+
+
+
+
+  IF gr_grid1 IS INITIAL.
+    CREATE OBJECT gr_grid1
+      EXPORTING
+        i_handle    = 'VBAK'
+        i_container = gr_cont1
+        i_title     = 'Tabelle VBAK'
+        i_table     = 'GT_VBAK'.
+  ENDIF.
+
+  IF gr_grid2 IS INITIAL.
+    CREATE OBJECT gr_grid2
+      EXPORTING
+        i_handle    = 'VBAP'
+        i_container = gr_cont2
+        i_title     = 'Tabelle VBAP'
+        i_table     = 'GT_VBAP'.
+  ENDIF.
+
+  IF gr_grid3 IS INITIAL.
+    CREATE OBJECT gr_grid3
+      EXPORTING
+        i_handle    = 'VBKD'
+        i_container = gr_cont3
+        i_title     = 'Tabelle VBKD'
+        i_table     = 'GT_VBKD'.
+  ENDIF.
+
+  IF gr_grid4 IS INITIAL.
+    CREATE OBJECT gr_grid4
+      EXPORTING
+        i_handle    = 'VBPA'
+        i_container = gr_cont4
+        i_title     = 'Tabelle VBPA'
+        i_table     = 'GT_VBPA'.
+  ENDIF.
+
+
+
+ENDMODULE.                 " PBO  OUTPUT
+
+*&---------------------------------------------------------------------*
+*&      Module  PAI  INPUT
+*&---------------------------------------------------------------------*
+MODULE pai INPUT.
+
+  CASE sy-ucomm.
+    WHEN 'BACK'.
+      SET SCREEN 0. LEAVE SCREEN.
+  ENDCASE.
+
+ENDMODULE.                 " PAI  INPUT

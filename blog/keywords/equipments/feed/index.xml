@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Equipments Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/equipments/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 11 May 2017 09:24:10 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Equipments Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Grundsätzliches</title>
+		<link>/blog/grundsaetzliches-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Aug 2010 15:31:03 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Instandhaltung]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[EQUI]]></category>
+		<category><![CDATA[IH]]></category>
+		<category><![CDATA[Equipments]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=556</guid>
+
+					<description><![CDATA[<p>Grunds&#228;tzliches zu Equipments: Funktionsbausteine, Tabellen, Suchhilfen etc.</p>
+<p>Der Beitrag <a href="/blog/grundsaetzliches-2/">Grundsätzliches</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Grundsätzliches zu Equipments: Funktionsbausteine, Tabellen, Suchhilfen etc.</p>
+<h2 class="head1">Funktionsbausteine</h2>
+<h3 class="head2">EQUIPMENT_READ_VIEW</h3>
+<p class="text1">Lesen eines Equipments. Das Equi kann beim Lesen bereits gesperrt werden.</p>
+<h3 class="head2">EQUIPMENT_MODIFY</h3>
+<p class="text1">Ändern eines Equipments. Am besten vorher mit EQUIPMENT_READ_VIEW lesen.</p>
+<h3 class="head2">EQUIPMENT_LOCK / EQUIPMENT_UNLOCK</h3>
+<p class="text1">Sperren und Entsperren eines Equipments</p>
+<h3 class="head2">EQUIPMENT_TRANSMIT_DATA</h3>
+<p>Datenweitergabe an untergeordnete Equipments</p>
+<h2 class="head1">BAPIS</h2>
+<h3 class="head2">BAPI_EQUI_CHANGE</h3>
+<p class="text1">Equipment ändern.</p>
+<h3 class="head2">BAPI_EQUI_CREATE</h3>
+<p class="text1">Equipment anlegen.</p>
+<h3 class="head2">BAPI_EQUI_INSTALL</h3>
+<p class="text1">Equipment einem anderen Equipment unterordnen/ einbauen.</p>
+<h3 class="head2">BAPI_EQUI_DISMANTLE</h3>
+<p class="text1">Equipment ausbauen</p>
+<h3 class="head2">BAPI_OBJCL_GETCLASSES</h3>
+<p>Prüfen, ob ein Equipment klassifiziert ist</p>
+<pre class="lang:abap decode:true ">*** check if equipment is classified
+    CALL FUNCTION 'BAPI_OBJCL_GETCLASSES'
+      EXPORTING
+        objectkey_imp   = lv_objkey
+        objecttable_imp = 'EQUI'
+        classtype_imp   = '002'
+      TABLES
+        alloclist       = lt_alloc
+        return          = lt_return.</pre>
+<h3>EQUIPMENT_CLASS_ALLOCATE</h3>
+<p>Equipment klassifizieren</p>
+<pre class="lang:abap decode:true ">*** classify equipment
+      CALL FUNCTION 'EQUIPMENT_CLASS_ALLOCATE'
+        EXPORTING
+          read_sequi         = ' '
+          eq_class           = 'OBJECTINFO'
+          eq_class_type      = '002'
+          update_new         = 'X'
+          commit_new         = 'S'
+        CHANGING
+          s_equi             = v_equi
+        EXCEPTIONS
+          err_class_allocate = 1
+          OTHERS             = 2.</pre>
+<h2>Tabellen und Views</h2>
+<h3 class="head2">EQUI</h3>
+<p>Haupttabelle für die Equipments</p>
+<h3 class="head2">EQKT</h3>
+<p>Texttabelle</p>
+<h3 class="head2">EQUZ</h3>
+<p>Zeitabhängige Zusatzdaten</p>
+<h3 class="head2">ILOA</h3>
+<p>Standortdaten. Verknüpfung über EQUZ-ILOAN</p>
+<h3 class="head2">EQUI_ADDR</h3>
+<p>Adreßview für Sammelsuchhilfe EQUI über ADRC &#8211; ILOA &#8211; EQUZ &#8211; EQKT</p>
+<h3 class="head2">V_EQUI</h3>
+<p>Technische Objekte PM; View über EQUI &#8211; EQUZ &#8211; EQKT &#8211; ILOA</p>
+<h3 class="head2">EQST</h3>
+<p>Verbindungstabelle Equipment &#8211; Stückliste</p>
+<h3 class="head2">EQBS</h3>
+<p class="text1">Bestandssegment</p>
+<p>Der Beitrag <a href="/blog/grundsaetzliches-2/">Grundsätzliches</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

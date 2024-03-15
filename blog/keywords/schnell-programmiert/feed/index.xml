@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Schnell programmiert Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/schnell-programmiert/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 28 May 2019 08:40:19 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Schnell programmiert Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Formelberechnung</title>
+		<link>/blog/formelberechnung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Jul 2014 17:51:11 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Formeln]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4942</guid>
+
+					<description><![CDATA[<p>Mit Computern kann man rechnen. Das ist toll und gut so. Wenn man allerdings Berechnungen Außerhalb eines Programms definieren möchte, dann kommt man schnell an die Grenzen. Einfache Operationen sind schnell programmiert und ausgewertet, bei komplexen Operationen kommt man jedoch schnell ins Schwitzen. Gottseidank besitzt SAP einen Formeleditor, den man sehr einfach für eigene Berechnungen verwenden kann. Mit entsprechenden Funktionsbausteinen oder einer Klasse kann eine Formel geprüft und ausgewertet werden.</p>
+<p>Der Beitrag <a href="/blog/formelberechnung/">Formelberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit Computern kann man rechnen. Das ist toll und gut so. Wenn man allerdings Berechnungen Außerhalb eines Programms definieren möchte, dann kommt man schnell an die Grenzen. Einfache Operationen sind schnell programmiert und ausgewertet, bei komplexen Operationen kommt man jedoch schnell ins Schwitzen. Gottseidank besitzt SAP einen Formeleditor, den man sehr einfach für eigene Berechnungen verwenden kann. Mit entsprechenden Funktionsbausteinen oder einer Klasse kann eine Formel geprüft und ausgewertet werden.</p>
+<h2>Funktionsbausteine</h2>
+<p>Es gibt zwei Funktionsbausteine: Einen für die Prüfung einer Formel und einer für die Berechnung:</p>
+<p>Prüfung: CHECK_FORMULA</p>
+<p>Berechnung: EVAL_FORMULA</p>
+<p>Beide Funktionsbausteine haben die folgenden Parameter:</p>
+<p>FORMULA: Enthält die Formel<br />
+PROGRAM: Programmname zur Wertzuweisung<br />
+ROUTINE: Name des Unterprogramms zur Wertzuweisung</p>
+<h3>Einfache Berechnung einer Formel</h3>
+<p>Der einfachste Aufruf zur Berechnung einer (fast) beliebigen Formel erfolgt mit dem Funktionsbaustein EVAL_FORMULA. Es reicht, wenn du diesem Baustein die Berechnung mitgibst, z.B. 10*3:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_170727.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-4943" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_16_170727.jpg" alt="Formel1" width="474" height="287" srcset="/wp-content/uploads/2014/07/Bild_2014_07_16_170727.jpg 474w, /wp-content/uploads/2014/07/Bild_2014_07_16_170727-300x181.jpg 300w" sizes="(max-width: 474px) 100vw, 474px" /></a></p>
+<h3>Berechnung mit Variablen</h3>
+<p>Nun möchte man natürlich nicht nur Werte berechnen, sondern auch mit Variablen arbeiten, wie zum Beispiel &#8220;A + B&#8221;. Das funktioniert mit den Funktionsbausteinen ebenfalls. Die Formel lautet: A+B. Allerdings müssen die Werte natürlich zugewiesen werden. Hierfür muss man den Programmnamen und den Namen des Unterprogramms angeben, in dem die Werte zugewiesen werden. Ein kleines Beispielprogramm lautet: RSCALC01. Die folgenden Berechnungen werden durchgeführt; die Wertezuweisung erfolgt im Programm.</p>
+<pre>FUESSE + AEDERCHEN + OEHRCHEN                        6,0000000000000000E+00
+(-B+SQRT(B**2-(4*A*C)))/(2*A)                        4,0000000000000000E+00
+0**0                                                 1,0000000000000000E+00
+-16**0.5                                            -4,0000000000000000E+00</pre>
+<h3>Formelspeicher</h3>
+<p>Formeln können zentral in der Tabelle TFKT abgelegt werden. Du kannst also eine Formel VOLUMEN hinterlegen: BREITE * HOEHE * LAENGE.</p>
+<p>In deinem Programm musst dann eine entsprechende Zuweisung zu diesen Variablen BREITE, HOEHE, LAENGE machen. Nun ändert sich so eine Volumenberechnung natürlich nicht. Es sei denn, man hinterlegt einen Sicherheitswert, um das Volumen etwas zu vergrößern, also z.B.: BREITE * HOEHE * LAENGE * 1,005</p>
+<p>In diesem Fall kann die Volumenberechnung in mehreren Applikationen verwendet werden und sobald der Sicherheitswert geändert wird, wird dies in allen Berechnungen berücksichtigt.</p>
+<p>Eine andere Variante wäre, dass jeder Dimension ein eigener Sicherheitswert zugewiesen wird:</p>
+<table>
+<tbody>
+<tr>
+<td>KEY</td>
+<td>Formeltext</td>
+</tr>
+<tr>
+<td>VOLUMEN</td>
+<td>TFKT:BREITE * TFKT:HOEHE * TFKT:LAENGE</td>
+</tr>
+<tr>
+<td>BREITE</td>
+<td>BREITE + 1</td>
+</tr>
+<tr>
+<td>HOEHE</td>
+<td>HOEHE + 1</td>
+</tr>
+<tr>
+<td>LAENGE</td>
+<td>LAENGE + 2</td>
+</tr>
+</tbody>
+</table>
+<p>Die Tabelleneinträge lassen sich mit Transaktion SE16N bearbeiten; es gibt keinen Tabellenpflegedialog dafür&#8230; Sollte die Benutzung mit SE16n nicht möglich sein, so kann jedoch schnell ein Tabellenpflegedialog für die Tabelle generiert werden.</p>
+<p>[notice type=&#8217;info&#8217;]<strong>Aus der Doku zum Funktionsbaustein CHECK_FORMULA</strong></p>
+<p>Wenn eine Benutzergruppe eine andere Tabelle als TFKT benötigt (um z.B. den Schlüsselteil zu strukturieren oder eigene Felder aufzunehmen), sollte die Referenztabelle TFKT zunächst kopiert werden. Eigene Funktionen können bei Bedarf ab Position 79 angefügt werden.</p>
+<p>Eine Tabelle, die zur Formelablage verwendet wird, muß eine Schlüssellänge von 13 und einen Funktionsteil der Länge 65 besitzen.[/notice]</p>
+<h3>Parameter</h3>
+<p>Formeln können auch Parameter enthalten, so dass du zum Beispiel die Formel VOLUMEN mit entsprechenden Werten aufrufen kannst:</p>
+<pre>VOLUMEN(10,20,30)</pre>
+<p>Die Parameter werden durch Komma getrennt. Die formalen Parameter in der Formel beginnen mit # und werden durchnummeriert. Die Berechnung für das Volumen sieht dann so aus:</p>
+<pre>VOLUMEN: #1*#2*#3</pre>
+<p>[notice type=&#8217;info&#8217;]SAP-Hinweis: 560672 &#8211; Selbstdefinierte Formeln in Tabelle TFKT[/notice]</p>
+<h3>Demoprogramm</h3>
+<pre>REPORT  zz_demo_formula.
+*== selection screen</pre>
+<pre>PARAMETERS p_formel TYPE char50       DEFAULT 'TFKT:VOLUMEN'.
+PARAMETERS p_breite TYPE p DECIMALS 2 DEFAULT 10.
+PARAMETERS p_hoehe  TYPE p DECIMALS 2 DEFAULT 10.
+PARAMETERS p_laenge TYPE p DECIMALS 2 DEFAULT 10.
+PARAMETERS p_result TYPE p DECIMALS 2 MODIF ID x.
+ 
+*== DATA
+DATA gv_retcode     TYPE i.
+DATA gv_repid       TYPE repid VALUE sy-repid.
+*== set result field to Display only
+AT SELECTION-SCREEN OUTPUT.
+  LOOP AT SCREEN.
+    IF screen-group1 = 'X'.
+      screen-input = '0'.
+      MODIFY SCREEN.
+    ENDIF.
+  ENDLOOP.
+ 
+AT SELECTION-SCREEN.
+*== check formula (Syntax check)
+   CALL FUNCTION 'CHECK_FORMULA'
+     EXPORTING
+       formula = p_formel
+       program = gv_repid
+       routine = 'CHECK_VALUES'
+     IMPORTING
+       subrc   = gv_retcode.
+*== compute formula
+   IF gv_retcode IS INITIAL.
+     CALL FUNCTION 'EVAL_FORMULA'
+       EXPORTING
+         formula = p_formel
+         program = gv_repid
+         routine = 'GET_VALUES'
+       IMPORTING
+         value   = p_result
+       EXCEPTIONS
+         OTHERS  = 1.
+   ENDIF.
+ 
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_VALUES
+*&amp;---------------------------------------------------------------------*
+FORM get_values USING parm CHANGING wert subrc.
+   CASE parm.
+     WHEN 'BREITE'.
+       wert = p_breite.
+       subrc = 0.
+     WHEN 'HOEHE'.
+       wert = p_hoehe.
+       subrc = 0.
+     WHEN 'LAENGE'.
+       wert = p_laenge.
+       subrc = 0.
+   ENDCASE.
+ENDFORM.                    "GET_VALUES
+ 
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CHECK_VALUES
+*&amp;---------------------------------------------------------------------*
+FORM check_values USING parm CHANGING subrc.
+   CASE parm.
+     WHEN 'BREITE'
+       OR 'HOEHE'
+       OR 'LAENGE'.
+       subrc = 0.
+   ENDCASE.
+ENDFORM.                    "CHECK_VALUES</pre>
+<h3>Bugs/ Probleme</h3>
+<p>Ich habe es nicht geschafft, den Parameter UNIT_OF_MEASURE sinnvoll einzusetzen. In obigem Beispiel mit der Volumenberechnung wäre es natürlich schön, wenn ich eine Berechnung in Metern durchführen möchte, jedoch immer genau 1 CM Sicherheitsabstand addiert werden soll. Es scheint jedoch so, als würde der Parameter komplett ignoriert werden. Eventuell habe ich aber die Verwendung nicht richtig verstanden&#8230;</p>
+<p>[notice type=&#8217;alert&#8217;]912586 &#8211; Formelinterpreter: geschachtelte Aufrufe mit Parametern<br />
+1324714 &#8211; Formelinterpreter: Fehlerhafte Berechnungen bei TFKT [/notice]</p>
+<p>Demoprogramm RSCALC10 funktioniert nicht.</p>
+<p>Der Beitrag <a href="/blog/formelberechnung/">Formelberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Datenbankablage für ArchiveLink einrichten</title>
+		<link>/blog/datenbankablage-fuer-archivelink-einrichten/</link>
+					<comments>/blog/datenbankablage-fuer-archivelink-einrichten/#comments</comments>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Thu, 30 May 2013 07:02:31 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=674</guid>
+
+					<description><![CDATA[<p>Mit dem miniSAP wird eine komplette Basiskomponente, BC resp. SAP_BASIS, bereitgestellt. Wer im Umfeld dieser Komponente t&#228;tig ist, z.B. im Bereich des Records Management BC-SRV-RM und das miniSAP diesbez&#252;glich f&#252;r Testzwecke einsetzt, wird schnell auf die Notwendigkeit einer ArchiveLink-f&#228;higen Ablage sto&#223;en. Der folgende Beitrag beschreibt die Einrichtung einer solchen. Dar&#252;ber hinaus wird ein Programm vorgestellt, mit dem beliebige lokale Dateien archiviert werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/datenbankablage-fuer-archivelink-einrichten/">Datenbankablage für ArchiveLink einrichten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit dem miniSAP wird eine komplette Basiskomponente, BC resp. SAP_BASIS, bereitgestellt. Wer im Umfeld dieser Komponente t&auml;tig ist, z.B. im Bereich des Records Management BC-SRV-RM und das miniSAP diesbez&uuml;glich f&uuml;r Testzwecke einsetzt, wird schnell auf die Notwendigkeit einer ArchiveLink-f&auml;higen Ablage sto&szlig;en. Der folgende Beitrag beschreibt die Einrichtung einer solchen. Dar&uuml;ber hinaus wird ein Programm vorgestellt, mit dem beliebige lokale Dateien archiviert werden k&ouml;nnen.<br /><P>Zu Beginn m&ouml;chte ich kurz den Hinweis 595563 &#8211; Datenbankablage f&uuml;r ArchiveLink &#8211; erw&auml;hnen. Dieser beschreibt selbige Vorgehensweise mit &auml;hnlichen Schritten.</P><P class="head1"><EM>1. Tabelle kopieren</EM></P><P class="text1">Im ersten Schritt richten wir den Zielbereich ein, in dem die Dokumente abgelegt werden. Wie der Titel des Beitrages schon vermuten l&auml;sst, handelt es sich hierbei um eine Datenbanktabelle. Mit der Transaktion SE80 ins Paket SDOK wechseln, die Tabelle SDOKCONT1 suchen und via Kontextmen&uuml; als lokales Objekt kopieren z.B. mit dem Namen ZDOKCONT1. Danach ins eigene Paket wechseln, die Tabelle in Bearbeitung nehmen, dann die Erweiterungskategorie der Tabelle definieren, die Tabelle speichern und aktivieren. Damit haben wir die Voraussetzung geschaffen, dass Dokumente hier abgelegt werden k&ouml;nnen.</P><P><EM><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_001.jpg"></EM></P><P class="head1"><EM>2. Content Repository einrichten</EM></P><P>Im folgenden Schritt richten wir ein Content Repository ein. Damit definieren wir im miniSAP-System den Bereich &uuml;ber den mit dem Archivsystem, welches ja in unserem Fall die Tabelle aus Schritt eins ist, kommuniziert wird. Wird z.B. ein Dokument archiviert, so muss das Content Repository (CR) und ein eindeutiger Identifikator, auch Archiv-Dokument-ID (ArcDocID) genannt, definiert werden. So kann jedes Dokument eindeutig identifiziert werden. Mit der Transaktion OAC0 richten wir z.B. das Content Repository ZA ein.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_002.jpg"><BR>Content Repository: Detail</P></TD></TR></TBODY></TABLE></P><P class="head1"><EM>3. Dokumentart einrichten</EM></P><P>Eine Dokumentart definiert eine eindeutige technische Bezeichnung f&uuml;r eine bestimmte Dokumentensorte, z.B. HRICONTRAC (Human Resource Incoming Work Contract) f&uuml;r einen Arbeitsvertrag. Wir richten uns eine eigene Dokumentart mit der Transaktion OAC2 ein, z.B. ZTEXT f&uuml;r eine Textdatei beliebigen Inhalts.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_003.jpg"><BR>Dokumentart einrichten</P></TD></TR></TBODY></TABLE></P><P class="head1"><EM>4. Dokumentverkn&uuml;pfung einrichten</EM></P><P>Die definierte Dokumentart muss nun noch mit einem Business-Objekt (BO) verkn&uuml;pft werden. Ein BO beschreibt die zum ihm geh&ouml;rigen Methoden, Attribute und Schl&uuml;sselfelder im BO-Repository. Wir w&auml;hlen hier das BO SOFM (Office Document). Mit der Transaktion OAC3 wird diese Dokumentverkn&uuml;pfung eingerichtet. Hier muss dann auch das unter Schritt zwei definierte CR sowie eine Verkn&uuml;pfungstabelle angegeben werden. In dieser Verkn&uuml;pfungstabelle werden die eindeutigen Identifikatoren des archivierten Dokumentes unter dem anwendungsspezifischen Schl&uuml;ssel abgelegt. Wir w&auml;hlen hier den Standard TOA01.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_004.jpg"><BR>Neue Eintr&auml;ge</P></TD></TR></TBODY></TABLE></P><P class="head1"><EM>5. Report implementieren</EM></P><P>Mit dem nun folgenden Programm k&ouml;nnen beliebige Dokumente archiviert und deren Verkn&uuml;pfungseintr&auml;ge geschrieben werden.</P><P class="sap1">&#8220;-Begin&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>&nbsp; Report&nbsp; Z_ARCHIVEFILE.<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-Variables&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data tabFileName Type filetable.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data rc Type sy-subrc.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data UserAction Type i.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data ArcDocID Type toa01-arc_doc_id.<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-GUI&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter FileName Type sapb-sappfad Lower Case.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter ContRep Type toaar-archiv_id.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter DocTyp Type toadd-doc_type.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Selection-Screen Skip 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter BusObj Type toaom-sap_object.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter ArObj Type toaom-ar_object.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter ObjID Type sapb-sapobjid Lower Case.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Selection-Screen Skip 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Selection-Screen PushButton /1(79) ArcDoc User-Command ArcDoc.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Selection-Screen Skip 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter DocID Type toa01-arc_doc_id.<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-Initialization&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Initialization.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ArcDoc = &#8216;Put document into archive'(001).<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-Event press button to select file&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; At Selection-Screen On Value-Request For FileName.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Clear FileName.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Clear tabFileName.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Call Method cl_gui_frontend_services=&gt;file_open_dialog<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; window_title = &#8216;Datei zum Upload in das Archiv&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; multiselection = abap_false<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file_filter = &#8216;*.*&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changing<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file_table = tabFileName<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rc = rc<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_action = UserAction.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If UserAction = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read Table tabFileName Into FileName Index 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-Main&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; At Selection-Screen.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case sy-ucomm.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When &#8216;ARCDOC&#8217;.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Call Function &#8216;ARCHIVOBJECT_CREATE_FILE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_ID = ContRep<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOCUMENT_TYPE = DocTyp<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PATH = FileName<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Importing<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_DOC_ID = ArcDocID<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exceptions<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_ARCHIV = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_COMMUNICATIONTABLE = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_UPLOAD = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_KERNEL = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS = 5.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DocID = ArcDocID.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Call Function &#8216;ARCHIV_CONNECTION_INSERT&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_ID = ContRep<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARC_DOC_ID = ArcDocID<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AR_OBJECT = ArObj<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OBJECT_ID = ObjID<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SAP_OBJECT = BusObj<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOC_TYPE = DocTyp<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exceptions<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_CONNECTIONTABLE = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS = 2.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Message &#8216;Success&#8217; Type &#8216;S&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Call Function &#8216;ARCHIVOBJECT_DELETE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_ID = ContRep<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_DOC_ID = ArcDocID<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exceptions<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_ARCHIV = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_COMMUNICATIONTABLE = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_KERNEL = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS = 4.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Message &#8216;Connection insert not successful&#8217; Type &#8216;E&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Message &#8216;Archiving not successful&#8217; Type &#8216;E&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndCase.<BR><BR>&#8220;-End&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</P><P class="head1"><EM>6. Report testen</EM></P><P>Zugegeben ist die von mir gew&auml;hlte Object-ID nicht gerade sinnvoll, da sie eigentlich mit den Schl&uuml;sselfeldern des BO korrespondieren sollte, aber f&uuml;r einen Test reicht es aus. Nach dem Aufruf muss in der Tabelle TOA01 ein Eintrag vorliegen und in der Tabelle ZDOKCONT1 m&uuml;ssen ebenfalls Eintr&auml;ge vorhanden sein.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_006.jpg"><BR>Test des Reports</P></TD></TR></TBODY></TABLE></P><P class="head1"><EM>7. Erfolg testen</EM></P><P>Mit der Transaktion SE37 kann das FM ARCHIVOBJECT_DISPLAY aufgerufen werden. Hier ist die ArcDocID und das Content Repository zu &uuml;bergeben. Mit Ausf&uuml;hrung des FM wird der Document Viewer gestartet und das archivierte Dokument angezeigt. Sofern alles korrekt eingerichtet ist, sollte nun das Dokument sichtbar sein.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_007.jpg"><BR>Testumgebung ARCHIVEOBJECT_DISPLAY</P></TD></TR></TBODY></TABLE></P><P>Mit relativ wenig Aufwand kann man sich auf diesem Wege eine ArchiveLink-f&auml;hige Ablage in einem miniSAP zur Verf&uuml;gung stellen und diese auch in anderen Applikationen nutzen, z.B. dem Folders Management.</P></p>
+<p>Der Beitrag <a href="/blog/datenbankablage-fuer-archivelink-einrichten/">Datenbankablage für ArchiveLink einrichten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/datenbankablage-fuer-archivelink-einrichten/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Mein Anteil, Dein Anteil</title>
+		<link>/blog/mein-anteil-dein-anteil/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Mon, 13 May 2013 06:05:38 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=672</guid>
+
+					<description><![CDATA[<p>Im Umfeld der Systemadministration wird h&#228;ufig die Forderung erhoben, Inhalte von SAP-Tabellen einem kontinuierlichen automatischen Monitoring zu unterziehen. Die Tabelleninhalte sind dabei Bestandteil verschiedenster &#220;berwachungsperspektiven, z.B. zur Ermittlung von Fehleranteilen bzw. einfach nur zur Feststellung von bestimmten Verh&#228;ltnissen oder die Gesamtanzahl von Datens&#228;tzen in einer Tabelle. Aus den Ergebnissen leiten sich dann Aktivit&#228;ten ab, z.B. ein Alarm der zu manuellen Aktionen f&#252;hrt oder einfach nur zum Versandt einer E-Mail.</p>
+<p>Der Beitrag <a href="/blog/mein-anteil-dein-anteil/">Mein Anteil, Dein Anteil</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im Umfeld der Systemadministration wird h&auml;ufig die Forderung erhoben, Inhalte von SAP-Tabellen einem kontinuierlichen automatischen Monitoring zu unterziehen. Die Tabelleninhalte sind dabei Bestandteil verschiedenster &Uuml;berwachungsperspektiven, z.B. zur Ermittlung von Fehleranteilen bzw. einfach nur zur Feststellung von bestimmten Verh&auml;ltnissen oder die Gesamtanzahl von Datens&auml;tzen in einer Tabelle. Aus den Ergebnissen leiten sich dann Aktivit&auml;ten ab, z.B. ein Alarm der zu manuellen Aktionen f&uuml;hrt oder einfach nur zum Versandt einer E-Mail.<br /><P>Im Umfeld der Systemadministration wird h&auml;ufig die Forderung erhoben, Inhalte von SAP-Tabellen einem kontinuierlichen automatischen Monitoring zu unterziehen. Die Tabelleninhalte sind dabei Bestandteil verschiedenster &Uuml;berwachungsperspektiven, z.B. zur Ermittlung von Fehleranteilen bzw. einfach nur zur Feststellung von bestimmten Verh&auml;ltnissen oder die Gesamtanzahl von Datens&auml;tzen in einer Tabelle. Aus den Ergebnissen leiten sich dann Aktivit&auml;ten ab, z.B. ein Alarm der zu manuellen Aktionen f&uuml;hrt oder einfach nur zum Versandt einer E-Mail.</P><P>Der folgende Code ist ein remote-f&auml;higer Funktionsbaustein (FM), dem als Argument ein Tabellenname und zwei optionale SQL-Bedingungen &uuml;bergeben werden m&uuml;ssen. Die erste SQL-Bedingung kann zur Einschr&auml;nkung der Basismenge genutzt werden. Wird hier keine SQL-Bedingung &uuml;bergeben, so wird die gesamte Anzahl aller Datens&auml;tze des &uuml;bergebenen Tabellennamens verwendet. Mit der zweiten SQL-Bedingung wird dann die Menge an Datens&auml;tzen ermittelt, deren Verh&auml;ltnis ermittelt werden soll. Wird gar keine SQL-Bedingung &uuml;bergeben, so wird einfach nur die Gesamtanzahl der Datens&auml;tze in der Tabelle ermittelt.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/Attribute1.JPG"><BR>Wichtig: In den Eigenschaften Remote f&auml;higer Baustein aktivieren</P></TD></TR></TBODY></TABLE></P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/Attribute2.JPG"><BR>Importparameter</P></TD></TR></TBODY></TABLE></P><P>Die R&uuml;ckgabewerte sind dann die entsprechende Gesamtanzahl, sowie die Anzahl der Datens&auml;tze die der zweiten SQL-Bedingung entsprechen und deren Verh&auml;ltnis zueinander in Prozent.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/Attribute3.JPG"><BR>R&uuml;ckgabewerte</P></TD></TR></TBODY></TABLE></P><P>Mit diesem RFC-f&auml;higen FM wird ein einfacher Ansatz geboten, ein externes Monitoring flexibel&nbsp;und simpel zu realisieren. So k&ouml;nnen nun z.B. via Java Connector (JCo) SAP-Tabellen periodisch abgefragt und aus den Ergebnissen Aktivit&auml;ten im Rechenzentrum abgeleitet werden.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/Result.JPG"><BR>Das Ergebnis einer Beispielverarbeitung</P></TD></TR></TBODY></TABLE></P><P class="sap1">&#8220;-Begin&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>Function zCountTableEntries.<BR>*&#8221;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR>*&#8221;*&#8221;Local Interface:<BR>*&#8221;&nbsp; IMPORTING<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(TABLENAME) TYPE&nbsp; STRING<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(SQL_CONDITION_ALL) TYPE&nbsp; STRING OPTIONAL<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(SQL_CONDITION_SEL) TYPE&nbsp; STRING OPTIONAL<BR>*&#8221;&nbsp; EXPORTING<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(COUNT_ALL) TYPE&nbsp; I<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(COUNT_SEL) TYPE&nbsp; I<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(SEL_TO_ALL_PERCENT) TYPE&nbsp; F<BR>*&#8221;&nbsp; EXCEPTIONS<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TABLE_NOT_EXISTS<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NO_TABLE_ENTRIES<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_IN_SQL_CONDITION<BR>*&#8221;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-&nbsp; &#8220;-Important hint&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR>&#8220;-<BR>&#8220;- Don&#8217;t forget to set the Remote-Enabled Module attribute<BR>&#8220;-<BR>&#8220;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</P><P class="sap1">&nbsp;&nbsp;&nbsp; &#8220;-Interface&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp; &#8220;- Importing<BR>&nbsp;&nbsp;&nbsp; &#8220;- TABLENAME = Name of the table<BR>&nbsp;&nbsp;&nbsp; &#8220;- SQL_CONDITION_ALL = SQL condition for the table<BR>&nbsp;&nbsp;&nbsp; &#8220;- SQL_CONDITION_SEL = SQL condition for the selection<BR>&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp; &#8220;- Exporting<BR>&nbsp;&nbsp;&nbsp; &#8220;- COUNT_ALL = Count of all table entries<BR>&nbsp;&nbsp;&nbsp; &#8220;- COUNT_SEL = Count of selected entries<BR>&nbsp;&nbsp;&nbsp; &#8220;- SEL_TO_ALL_PERCENT = Proportion of selected to all entries<BR>&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp; &#8220;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</P><P class="sap1">&nbsp;&nbsp;&nbsp; &#8220;-Variables&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data Count_Tab Type i Value 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data oRef Type Ref To cx_root.</P><P class="sap1">&nbsp;&nbsp;&nbsp; &#8220;-Main&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;-Hint&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;- Don&#8217;t forget to implement Authority-Check Object<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Count( Distinct TABNAME ) Into Count_Tab From DD02L<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Where TABNAME = TABLENAME And TABCLASS = &#8216;TRANSP&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0 And Count_Tab = 1.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If SQL_CONDITION_ALL Is Initial.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Count(*) Into COUNT_ALL From (TABLENAME).<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Count(*) Into COUNT_ALL From (TABLENAME)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Where (SQL_CONDITION_ALL).<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If SQL_CONDITION_SEL Is Not Initial.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0 And COUNT_ALL &gt; 0.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Try.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Count(*) Into COUNT_SEL From (TABLENAME)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Where (SQL_CONDITION_SEL).<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SEL_TO_ALL_PERCENT = ( COUNT_SEL / COUNT_ALL ) * 100.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Catch cx_root Into oRef.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Raise ERROR_IN_SQL_CONDITION.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndTry.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Raise NO_TABLE_ENTRIES.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Raise TABLE_NOT_EXISTS.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.</P><P class="sap1">&nbsp; EndFunction.</P><P class="sap1">&#8220;-End&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR></P></p>
+<p>Der Beitrag <a href="/blog/mein-anteil-dein-anteil/">Mein Anteil, Dein Anteil</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Scripting Tracker</title>
+		<link>/blog/scripting-tracker-lite/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Mon, 04 Feb 2013 11:00:12 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=666</guid>
+
+					<description><![CDATA[<p>Scripting Tracker Lite ist ein kleines Tool auf Basis der SAP GUI Scripting Engine zur Analyse der verwendeten Scripting Objekte im UI. Es ist eine Erg&#228;nzung oder ein Ersatz f&#252;r die SAP GUI Scripting Development Tools, insbesondere dem Wizard. Seit Microsoft mit Windows 7 die Auslieferung der Agenten eingestellt hat, gab es mit den SAP GUI eigenen Scripting Development Tools immer wieder Probleme.</p>
+<p>Der Beitrag <a href="/blog/scripting-tracker-lite/">Scripting Tracker</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Scripting Tracker ist ein Tool auf Basis der SAP GUI Scripting Engine zur Analyse der verwendeten Scripting Objekte im UI und zum Aufzeichnen von Benutzeraktivitäten als Skript. Es ist eine Ergänzung oder ein Ersatz für die SAP GUI Scripting Development Tools bzw. des SAP GUI Scripting Rekorders. Seit Microsoft mit Windows 7 die Auslieferung der Agenten eingestellt hat, gab es mit den SAP GUI eigenen Scripting Development Tools immer wieder Probleme. Zuletzt endete dies mit der Deaktivierung der Tools, siehe auch SAP-Hinweis 1633639. Auch der SAP GUI Scripting Rekorder kann durch den Scripting Tracker ersetzt werden, wobei der Scripting Tracker nicht nur VBScript-Code erzeugt, sondern auch PowerShell- und AutoIt-Code.</p>
+<figure id="attachment_930008" aria-describedby="caption-attachment-930008" style="width: 262px" class="wp-caption alignnone"><img decoding="async" src="https://tricktresor.com/wp-content/uploads/2013/02/stefanschnell_tracker001-262x300.jpg" alt="Scripting Tracker - Objektübersicht" width="262" height="300" class="size-medium wp-image-930008" srcset="/wp-content/uploads/2013/02/stefanschnell_tracker001-262x300.jpg 262w, /wp-content/uploads/2013/02/stefanschnell_tracker001.jpg 696w" sizes="(max-width: 262px) 100vw, 262px" /><figcaption id="caption-attachment-930008" class="wp-caption-text">Scripting Tracker &#8211; Objektübersicht</figcaption></figure>
+<p>Scripting Tracker zeigt alle Scripting-Objekte aller SAP-Sessions übersichtlich als Knoten in einer Baumstruktur an. Für jedes dieser Objekte werden, nachdem es mit einem einfachen Mausklick ausgewählt wurde, eine Reihe technischer Details angezeigt, wie z.B. die ID, Position usw. Auch können mit Scripting Tracker Screens unterschiedlicher Systeme verglichen und die Unterschiede einfach transparent gemacht werden.</p>
+<figure id="attachment_930009" aria-describedby="caption-attachment-930009" style="width: 262px" class="wp-caption alignnone"><img decoding="async" src="https://tricktresor.com/wp-content/uploads/2013/02/stefanschnell_tracker002-262x300.jpg" alt="Scripting Tracker - Screen-Vergleich" width="262" height="300" class="size-medium wp-image-930009" srcset="/wp-content/uploads/2013/02/stefanschnell_tracker002-262x300.jpg 262w, /wp-content/uploads/2013/02/stefanschnell_tracker002.jpg 696w" sizes="(max-width: 262px) 100vw, 262px" /><figcaption id="caption-attachment-930009" class="wp-caption-text">Scripting Tracker &#8211; Screen-Vergleich</figcaption></figure>
+<p>Mit dem Rekorder können Benutzeraktivitäten in unterschiedlichen Skriptsprachen aufgezeichnet und abgespielt werden. Der Scripting Tracker unterstützt den NetWeaver Business Client (NWBC) und ABAP in Eclipse (AiE). Auch die Schnittstelle zum SAP GUI Scripting API wird in einer Baumstruktur dargestellt, jede Methode und jede Eigenschaft kann mit ihren Parametern betrachtet werden.</p>
+<figure id="attachment_930011" aria-describedby="caption-attachment-930011" style="width: 262px" class="wp-caption alignnone"><img loading="lazy" decoding="async" src="https://tricktresor.com/wp-content/uploads/2013/02/stefanschnell_tracker004-262x300.jpg" alt="Scripting Tracker - SAP GUI Scripting API" width="262" height="300" class="size-medium wp-image-930011" srcset="/wp-content/uploads/2013/02/stefanschnell_tracker004-262x300.jpg 262w, /wp-content/uploads/2013/02/stefanschnell_tracker004.jpg 696w" sizes="(max-width: 262px) 100vw, 262px" /><figcaption id="caption-attachment-930011" class="wp-caption-text">Scripting Tracker &#8211; SAP GUI Scripting API</figcaption></figure>
+<p>Scripting Tracker bietet die Möglichkeit jedes Scripting Objekt mit einem roten Rahmen zu identifizieren. Einerseits ist es möglich ein Objekt aus der Baumstruktur auszuwählen, dann den rechten Mouse-Button zu betätigen und das markierte Objekt auf dem SAP GUI mit zu sehen. Andererseits kann aber auch eine beliebige Session aus der Baumstruktur ausgewählt werden. Dann ist der Identifizierungs-Button zu betätigen. Nun muss nur noch mit dem Mauszeiger über die gewählte Session gefahren werden und jedes unter dem Mauszeiger befindliche Scripting Objekt wird mit einem roten Rahmen kenntlich gemacht. Diese Funktionalität entspricht genau dem des SAP GUI Scripting Wizard. Nach der Identifizierung des Objektes kann mit dem Kopier-Button der technische Name, auch ID genannt, in die Zwischenablage kopiert werden und weiter verwendet werden.</p>
+<p>Der Rekorder von Scripting Tracker bietet viele zusätzliche Möglichkeiten, alleine schon die visuelle Kontrolle des Codes der durch das Aufzeichnen entsteht. Die Aufzeichnung kann beliebig gestoppt und fortgesetzt werden. Zusätzlich können technische Informationen des Screens hinzugefügt werden, dies unterstützt die Analyse.</p>
+<figure id="attachment_930010" aria-describedby="caption-attachment-930010" style="width: 262px" class="wp-caption alignnone"><img loading="lazy" decoding="async" src="https://tricktresor.com/wp-content/uploads/2013/02/stefanschnell_tracker003-262x300.jpg" alt="Scripting Tracker - Rekorder" width="262" height="300" class="size-medium wp-image-930010" srcset="/wp-content/uploads/2013/02/stefanschnell_tracker003-262x300.jpg 262w, /wp-content/uploads/2013/02/stefanschnell_tracker003.jpg 696w" sizes="(max-width: 262px) 100vw, 262px" /><figcaption id="caption-attachment-930010" class="wp-caption-text">Scripting Tracker &#8211; Rekorder</figcaption></figure>
+<p>Scripting Tracker ist ein vollwertiger Ersatz des SAP GUI Scripting Rekorders und der Development Tools. Scripting Tracker bietet darüber hinaus einen deutlich erweiterten Funktionsumfang.</p>
+<p><strong><u>Wichtiger Hinweis:</u></strong><br />
+Scripting Tracker verwendet die SAP GUI Scripting Engine. Deshalb ist es notwendig das SAP GUI Scripting auf dem Präsentations- und Applikationsserver zu aktivieren. Dies kann auf dem Präsentationsserver im Optionsmenü des SAP-Logon geschehen und auf dem Applikationsserver mit dem Transaktions-Code RZ11 und dem Parameter sapgui/user_scripting durchgeführt werden. Wenn das SAP GUI Scripting auf dem Applikations-Server nicht aktiviert ist, werden diese Sessions auch nicht in Scripting Tacker angezeigt.</p>
+<p>Link zur Homepage: <a href="http://tracker.stschnell.de/" target="_blank">http://tracker.stschnell.de/</a></p>
+<p>Der Beitrag <a href="/blog/scripting-tracker-lite/">Scripting Tracker</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Verwendung von SAP GUI Scripting in der Windows PowerShell</title>
+		<link>/blog/verwendung-von-sap-gui-scripting-in-der-windows-powershell/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Fri, 21 Dec 2012 01:42:48 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=664</guid>
+
+					<description><![CDATA[<p>Mit dem Einsatz von  Microsoft Windows 7 im Business Umfeld bietet sich auch die M&#246;glichkeit die PowerShell zu nutzen. Bei der PowerShell handelt es sich um eine Kommandozeilen-Shell und Skript-Sprache, als Ersatz von CMD und WSH. Im folgenden Beispiel wird eine m&#246;gliche Nutzung von SAP GUI Scripting im Kontext der PowerShell demonstriert.</p>
+<p>Der Beitrag <a href="/blog/verwendung-von-sap-gui-scripting-in-der-windows-powershell/">Verwendung von SAP GUI Scripting in der Windows PowerShell</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit dem Einsatz von  Microsoft Windows 7 im Business Umfeld bietet sich auch die M&ouml;glichkeit die PowerShell zu nutzen. Bei der PowerShell handelt es sich um eine Kommandozeilen-Shell und Skript-Sprache, als Ersatz von CMD und WSH. Im folgenden Beispiel wird eine m&ouml;gliche Nutzung von SAP GUI Scripting im Kontext der PowerShell demonstriert.<br /><P class="text1">Mit Einzug von Windows 7 im Business Umfeld bietet sich nun die M&ouml;glichkeit der Nutzung der PowerShell f&uuml;r die Automatisierung,&nbsp;als Ersatz f&uuml;r die&nbsp;CMD-Kommandozeile&nbsp;und des WSH (Windows Scripting Host). Weitere Informationen zur PowerShell k&ouml;nnen hier eingesehen werden: <A href="http://technet.microsoft.com/en-us/library/bb978526.aspx" target="_blank" Target="_blank">http://technet.microsoft.com/en-us/library/bb978526.aspx</A>.<BR>Im folgenden Code-Beispiel, welches die Transaktion SE16 aufruft und die Tabelle USR01 zur Anzeige bringt,&nbsp;soll kurz demonstriert werden, wie SAP GUI Scripting in die&nbsp;PowerShell integriert&nbsp;werden kann.</P><P class="text1">Der SAP GUI Scripting Code wurde direkt aus dem SAP GUI Scripting Rekorder &uuml;bernommen. Aus &Uuml;bersichtsgr&uuml;nden wurden lediglich die Abfragen der Objektexistenzen&nbsp;entfernt und die Erzeugung des Event-Handlings.&nbsp;Weiterhin&nbsp;sind noch&nbsp;einige Modifikationen am Code notwendig. Das Anf&uuml;hrungszeichen &#8221; muss durch `&#8221; ersetzt werden und das Zeilenende mit `n. Das Apostroph kann mit Alt+096 erzeugt werden. So kann der Code in der PowerShell mit der Taste F5 zur Ausf&uuml;hrung gebracht werden.</P><P class="sap1">#-Begin&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;</P><P class="sap1">&nbsp; $VB = New-Object -COMObject MSScriptControl.ScriptControl<BR>&nbsp; <BR>$Cmd = @&#8221;<BR>Set SapGuiAuto = GetObject(`&#8221;SAPGUI`&#8221;)`n<BR>Set application = SapGuiAuto.GetScriptingEngine`n<BR>Set connection = application.Children(0)`n<BR>Set session = connection.Children(0)`n<BR>session.findById(`&#8221;wnd[0]/tbar[0]/okcd`&#8221;).text = `&#8221;/nse16`&#8221;`n<BR>session.findById(`&#8221;wnd[0]/tbar[0]/btn[0]`&#8221;).press`n<BR>session.findById(`&#8221;wnd[0]/usr/ctxtDATABROWSE-TABLENAME`&#8221;).text = `&#8221;USR01`&#8221;`n<BR>session.findById(`&#8221;wnd[0]/tbar[1]/btn[7]`&#8221;).press`n<BR>session.findById(`&#8221;wnd[0]/tbar[1]/btn[8]`&#8221;).press`n<BR>&#8220;@<BR>&nbsp; <BR>&nbsp; $VB.Language = &#8220;VBScript&#8221;<BR>&nbsp; $VB.AllowUI = $TRUE<BR>&nbsp; $VB.ExecuteStatement($Cmd)</P><P class="sap1">#-End&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</P><P class="text1"><FONT color="#000000" face="Courier New"></FONT>Der automatisch erzeugte Code des SAP GUI Scripting Rekorders f&uuml;gt sich nahtlos in das PowerShell-Scripting ein. Mit den M&ouml;glichkeiten der PowerShell, z.B. durch Zugriffe auf dynamische&nbsp;Bibliotheken und den Klassen des&nbsp;dotNET Framework, er&ouml;ffnen sich so ganz neue Perspektiven der SAP GUI Scripting Integration in lokale Automatisierungsprozesse.<BR></P></p>
+<p>Der Beitrag <a href="/blog/verwendung-von-sap-gui-scripting-in-der-windows-powershell/">Verwendung von SAP GUI Scripting in der Windows PowerShell</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>BinFile2ABAP</title>
+		<link>/blog/binfile2abap/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Tue, 20 Nov 2012 20:12:02 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=660</guid>
+
+					<description><![CDATA[<p>Dateien jeglichen Formats als ABAP-Funktionsbaustein bereitstellen: Viele Informationen sind in unterschiedlichen Dateien gespeichert und liegen h&#228;ufig in unterschiedlichsten Formaten vor. Dabei k&#246;nnen jedoch diese Informationen f&#252;r den Endanwender oftmals von gro&#223;er Bedeutung sein und dann entsteht die Frage, wie k&#246;nnen diese Informationen zum Endanwender gelangen. BinFile2ABAP bietet die M&#246;glichkeit dieses Problem zu l&#246;sen. </p>
+<p>Der Beitrag <a href="/blog/binfile2abap/">BinFile2ABAP</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><strong>Dateien jeglichen Formats als ABAP-Source bereitstellen</strong></p>
+<p>Viele Informationen sind in unterschiedlichen Dateien gespeichert und liegen häufig in unterschiedlichsten Formaten vor. Dabei können jedoch diese Informationen für den Endanwender oftmals von großer Bedeutung sein und dann entsteht die Frage, wie können diese Informationen zum Endanwender gelangen. BinFile2ABAP bietet eine Möglichkeit dieses Problem zu lösen, neben dem MIME Repository.</p>
+<figure id="attachment_931639" aria-describedby="caption-attachment-931639" style="width: 300px" class="wp-caption alignnone"><img loading="lazy" decoding="async" class="size-medium wp-image-931639" src="https://tricktresor.com/wp-content/uploads/2012/11/stefanschnell_binfile2abap001-300x277.jpg" alt="BinFile2ABAP" width="300" height="277" srcset="/wp-content/uploads/2012/11/stefanschnell_binfile2abap001-300x277.jpg 300w, /wp-content/uploads/2012/11/stefanschnell_binfile2abap001-768x708.jpg 768w, /wp-content/uploads/2012/11/stefanschnell_binfile2abap001.jpg 902w" sizes="(max-width: 300px) 100vw, 300px" /><figcaption id="caption-attachment-931639" class="wp-caption-text">BinFile2ABAP</figcaption></figure>
+<p>Mit BinFile2ABAP kann jede Datei in ein ABAP-Funktionsbaustein eingebettet werden. Die Datei wird dazu in ein ABAP-Quellcode umgewandelt und als Funktionsbaustein, Report oder Form-Routine bereit gestellt. Mit Aufruf dieses Funktionsbausteines, Report oder Form-Routine wird die eingebettete Datei auf dem Präsentationsserver gespeichert und, je nach Operationsart, kopiert, ausgeführt oder bei einer COM-DLL auch registriert. Wenn die Operationsart mit synchronen Modus und Löschung gewählt wurde, wird die gespeicherte Datei nach der Ausführung auch wieder gelöscht.</p>
+<p>Weitere Optionen sind die Nutzung eines alternativen Pfades, wenn das SAP-Arbeitsverzeichnis nicht gepflegt ist, und die Nutzung eines alternativen Programmnamens, hier saplogon.exe, im Falle scharfer Umgebungsrestriktionen auf dem Präsentationsserver. Selbst in äußerst geschlossenen Umgebungen kann dieses Vorgehen verwendet. Diverse Tests in Citrix-Umgebungen mit produktiven Systemen haben dies bewiesen.</p>
+<p>Darüber hinaus kann BinFile2ABAP die Dateien auch als JSON-Datei bereitstellen. Auf diesem Wege kann eine Backend-Anbindung via OData für UI5 simuliert werden.</p>
+<p>Mit dieser Möglichkeit kann der Entwickler auf einfachste Weise die Informationen integrieren und ausliefern. Dem Endanwender kann so die Information punktgenau zur Verfügung gestellt werden. Jeder Dateityp kann in ein ABAP-Programm integriert werden, z.B. Adobe Portable Document Format (PDF) oder Flash, Compiled HTML Help (CHM), alle Bild-, Sound- und Video-Formate usw. usw.</p>
+<p>So kann beispielsweise eine Trainingsdokumentation zu einem Programm ein- und angebunden werden. Der Aufruf der Dokumentation wird mit einem Button verknüpft und wenn der Endanwender diesen Button betätigt, wird die Trainingsdokumentation im PDF-Format geöffnet und vom lokalen Adobe Reader angezeigt.</p>
+<p>BinFile2ABAP ist Freeware und kann von <a href="http://www.stschnell.de/">www.stschnell.de</a> heruntergeladen werden, oder alternativ <a title="hier" href="http://www.stschnell.de/binfile2abap.zip" target="_blank">hier</a> der direkte Link.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/binfile2abap/">BinFile2ABAP</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAP-Daten per HTML anzeigen</title>
+		<link>/blog/sap-daten-per-html-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Fri, 17 Aug 2012 11:08:06 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=654</guid>
+
+					<description><![CDATA[<p>Oftmals besteht die Notwendigkeit einfach nur bestimmte Daten eines SAP-Systems anzuzeigen. Die Installation des SAPGUI f&#252;r Windows, mit mehreren hundert Megabytes, scheint daf&#252;r etwas &#252;berdimensioniert zu sein. So bieten sich die SAP Konnektoren NCo (dotNET) und JCo (Java) als schlanke Alternativen. Daneben existiert aber auch noch die M&#246;glichkeit mit den SAP ActiveX Steuerelementen auf ein SAP-System zuzugreifen und solche Informationen aus Tabellen in Erfahrung zu bringen. In diesem Beitrag soll eine derartige Implementierung gezeigt werden.</p>
+<p>Der Beitrag <a href="/blog/sap-daten-per-html-anzeigen/">SAP-Daten per HTML anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Oftmals besteht die Notwendigkeit einfach nur bestimmte Daten eines SAP-Systems anzuzeigen. Die Installation des SAPGUI für Windows, mit mehreren hundert Megabytes, scheint dafür etwas überdimensioniert zu sein. So bieten sich die SAP Konnektoren NCo (dotNET) und JCo (Java) als schlanke Alternativen. Daneben existiert aber auch noch die Möglichkeit mit den SAP ActiveX Steuerelementen auf ein SAP-System zuzugreifen und solche Informationen aus Tabellen in Erfahrung zu bringen. In diesem Beitrag soll eine derartige Implementierung gezeigt werden.</p>
+<p><a href="/wp-content/downloads/StSchnell_ReadTableViewHTML.pdf" target="_blank">Hier ist das PDF-Dokument zum Download</a></p>
+<p><strong><u>TIPP:<br />
+</u></strong>Speichern Sie die HTML-Datei mit der Endung .hta ab. Dadurch umgehen Sie die eventuell eingestellten Sicherheitseinstellungen des Internet Explorers wo vielleicht keine ActiveX-Komponenten ausgeführt werden dürfen.</p>
+<p><strong>Wichtiger Hinweis:</strong> Der hier vorgestellt Tipp hat aktuell historischen Charakter, da der IE mit der Edge-Engine kein VBScript mehr unterstützt und da die klassische RFC-Bibliothek, die die SAP ActiveX-Bibliotheken nutzen, ab dem 31.03.2016 keinem Support mehr unterliegen.</p>
+<p class="head1">Coding Download</p>
+<p class="text1"><a href="/wp-content/downloads/StSchnell_ReadTableViewHTM.zip" target="_blank">Hier ist die aktuelle HTML-Datei als ZIP-Download.</a></p>
+<p class="head1">Coding HTML</p>
+<p>&lt;!&#8211; Begin&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;</p>
+<p>This HTML and VBScript source shows how to connect a SAP system via<br />
+SAP ActiveX control libraries, to read data from a SAP table and to<br />
+view this data in a HTML table, with header line.</p>
+<p>Author:  Stefan Schnell<br />
+Version: 0.80</p>
+<p>&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211; &#8211;&gt;</p>
+<p>&lt;html&gt;</p>
+<p>&lt;head&gt;</p>
+<p>&lt;title&gt;<br />
+Connect a SAP system and view table content<br />
+&lt;/title&gt;</p>
+<p>&lt;hta:application applicationname=&#8221;ReadSAPTable&#8221; id=&#8221;ReadSAPTable&#8221;<br />
+version=&#8221;1.0&#8243;/&gt;</p>
+<p>&lt;!&#8211; To encode your source, use the Script Encoder screnc.exe &#8211;&gt;<br />
+&lt;script language=&#8221;VBScript.Encode&#8221;&gt;</p>
+<p>&#8216;-Directives&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<br />
+Option Explicit</p>
+<p>&#8216;-Function Connect&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<br />
+&#8216;-<br />
+&#8216;- Connects a SAP system<br />
+&#8216;-<br />
+&#8216;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+Function Connect(ByVal SAPFunc, ByRef Connection)</p>
+<p>&#8216;-Get SAP.LogonControl connection&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+Set Connection = SAPFunc.Connection()<br />
+If Not IsObject(Connection) Then<br />
+MsgBox &#8220;No SAP.Connection instance&#8221;, vbOKOnly, &#8220;Error&#8221;<br />
+Connect = vbFalse<br />
+Exit Function<br />
+End If</p>
+<p>&#8216;-Set connection parameters&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+Connection.Client = CStr(Document.eingabe.Client.Value)<br />
+Connection.User = CStr(Document.eingabe.User.Value)<br />
+Connection.Password = CStr(Document.eingabe.Password.Value)<br />
+Connection.Language = &#8220;DE&#8221;<br />
+Connection.System = CStr(Document.eingabe.System.Value)<br />
+Connection.HostName = CStr(Document.eingabe.HostName.Value)<br />
+Connection.SystemNumber = _<br />
+CStr(Document.eingabe.SystemNumber.Value)</p>
+<p>&#8216;-Connect SAP system&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<br />
+Connect = Connection.Logon(0, vbTrue)</p>
+<p>End Function</p>
+<p>&#8216;-Sub GetData&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+&#8216;-<br />
+&#8216;- Gets the content of a SAP table<br />
+&#8216;-<br />
+&#8216;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+Sub GetData()</p>
+<p>&#8216;-Variables&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<br />
+Dim SAPFunc, Connection, ReadTableFunc, Param, Table, Fields<br />
+Dim RowCount, i, j, DataLine, Node, HTMLTable, SAPTableName<br />
+Dim tr, td, arrDataLine</p>
+<p>&#8216;-Get the name of the table&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+SAPTableName = CStr(Document.eingabe.SAPTableName.Value)<br />
+If Trim(SAPTableName) = &#8220;&#8221; Then<br />
+MsgBox &#8220;No SAP table name specify&#8221;, vbOKOnly, &#8220;Error&#8221;<br />
+Exit Sub<br />
+End If</p>
+<p>&#8216;-Get SAP.Functions&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<br />
+&#8216;-<br />
+&#8216;- If it is not possible to create SAP.Functions instance,<br />
+&#8216;- Microsoft(c) Internet Explorer(c) creates an error<br />
+&#8216;-<br />
+&#8216;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<br />
+Set SAPFunc = CreateObject(&#8220;SAP.Functions&#8221;)<br />
+If Not IsObject(SAPFunc) Then<br />
+Exit Sub<br />
+End If</p>
+<p>If Connect(SAPFunc, Connection) = vbTrue Then</p>
+<p>&#8216;-Get function module RFC_READ_TABLE&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<br />
+Set ReadTableFunc = SAPFunc.Add(&#8220;RFC_READ_TABLE&#8221;)</p>
+<p>If IsObject(ReadTableFunc) Then</p>
+<p>&#8216;-Clear HTML table&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<br />
+Set HTMLTable = Document.getElementById(&#8220;Tabelle&#8221;)<br />
+j = HTMLTable.childNodes.length<br />
+If j &gt; 0 Then<br />
+For i = 1 To j<br />
+Set Node = HTMLTable.lastChild<br />
+HTMLTable.removeChild(Node)<br />
+Next<br />
+Set Node = Nothing<br />
+End If</p>
+<p>&#8216;-Define export parameter DELIMITER to ~&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<br />
+Set Param = ReadTableFunc.Exports(&#8220;DELIMITER&#8221;)<br />
+Param.Value = &#8220;~&#8221;</p>
+<p>&#8216;-Get SAP table data&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+&#8216;-Define export parameter QUERY_TABLE&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<br />
+Set Param = ReadTableFunc.Exports(&#8220;QUERY_TABLE&#8221;)<br />
+Param.Value = SAPTableName<br />
+&#8216;-Delete entries&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<br />
+ReadTableFunc.Tables(&#8220;OPTIONS&#8221;).Rows.RemoveAll<br />
+ReadTableFunc.Tables(&#8220;FIELDS&#8221;).Rows.RemoveAll<br />
+&#8216;-Read table&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+If ReadTableFunc.Call() = vbTrue Then<br />
+Set Table = ReadTableFunc.Tables(&#8220;DATA&#8221;)<br />
+Set Fields = ReadTableFunc.Tables(&#8220;FIELDS&#8221;)<br />
+If IsObject(Table) And IsObject(Fields) Then<br />
+RowCount = Fields.RowCount()<br />
+&#8216;-Print head line&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<br />
+Set tr = HTMLTable.insertRow(0)<br />
+For i = 1 To RowCount<br />
+Set td = tr.insertCell()<br />
+td.innerText = Fields.Value(i, &#8220;FIELDNAME&#8221;)<br />
+Next<br />
+RowCount = Table.RowCount()<br />
+&#8216;-Print SAP table content to HTML table&#8212;&#8212;&#8212;&#8211;<br />
+If RowCount &gt; 0 Then<br />
+For i = 1 To RowCount<br />
+Set DataLine = _<br />
+Document.createTextNode(Table.Value(i, &#8220;WA&#8221;))<br />
+arrDataLine = Split(DataLine.data, &#8220;~&#8221;)<br />
+Set tr = HTMLTable.insertRow(i)<br />
+For j = 0 To UBound(arrDataLine)<br />
+Set td = tr.insertCell()<br />
+If Trim(arrDataLine(j)) = &#8220;&#8221; Then<br />
+td.innerHTML = &#8220;&amp;nbsp;&#8221;<br />
+Else<br />
+td.innerText = arrDataLine(j)<br />
+End If<br />
+Next<br />
+Next<br />
+Set td = Nothing<br />
+Set tr = Nothing<br />
+Else<br />
+MsgBox &#8220;No data&#8221;, vbOKOnly, &#8220;Information&#8221;<br />
+End If<br />
+Set Table = Nothing<br />
+Else<br />
+MsgBox &#8220;No SAP table instance&#8221;, vbOKOnly, &#8220;Error&#8221;<br />
+End If<br />
+Else<br />
+MsgBox &#8220;RFC_READ_TABLE &#8221; &amp; SAPTableName &amp; _<br />
+&#8221; not successful&#8221;, vbOKOnly, &#8220;Error&#8221;<br />
+End If</p>
+<p>Set HTMLTable = Nothing<br />
+Set ReadTableFunc = Nothing</p>
+<p>Else<br />
+MsgBox &#8220;No RFC_READ_TABLE instance&#8221;, vbOKOnly, &#8220;Fehler&#8221;<br />
+End If</p>
+<p>&#8216;-Logoff&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<br />
+Connection.Logoff()</p>
+<p>Else<br />
+MsgBox &#8220;No connection to SAP system&#8221;, vbOKOnly, &#8220;Error&#8221;<br />
+End If</p>
+<p>End Sub</p>
+<p>&lt;/script&gt;</p>
+<p>&lt;/head&gt;</p>
+<p>&lt;!&#8211; GUI&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;- &#8211;&gt;</p>
+<p>&lt;body&gt;</p>
+<p>&lt;h2 style=&#8221;font-family:Arial;&#8221;&gt;<br />
+Connect a SAP system and view table content<br />
+&lt;/h2&gt;</p>
+<p>&lt;form name=&#8221;eingabe&#8221; style=&#8221;font-family:Arial;&#8221;&gt;<br />
+&lt;!&#8211; Client (Mandant) &#8211;&gt;<br />
+Client:&amp;nbsp;&lt;input type=&#8221;text&#8221; name=&#8221;Client&#8221; size=&#8221;3&#8243; value=&#8221;000&#8243;&gt;<br />
+&amp;nbsp;&amp;nbsp;<br />
+&lt;!&#8211; User (Benutzer) &#8211;&gt;<br />
+User:&amp;nbsp;&lt;input type=&#8221;text&#8221; name=&#8221;User&#8221; size=&#8221;15&#8243; value=&#8221;BCUSER&#8221;&gt;<br />
+&amp;nbsp;&amp;nbsp;<br />
+&lt;!&#8211; Password &#8211;&gt;<br />
+Password:&amp;nbsp;&lt;input type=&#8221;password&#8221; name=&#8221;Password&#8221; size=&#8221;25&#8243;<br />
+value=&#8221;minisap&#8221;&gt;<br />
+&lt;br /&gt;<br />
+&lt;!&#8211; System (SID) &#8211;&gt;<br />
+System:&amp;nbsp;&lt;input type=&#8221;text&#8221; name=&#8221;System&#8221; size=&#8221;3&#8243; value=&#8221;NSP&#8221;&gt;<br />
+&amp;nbsp;&amp;nbsp;<br />
+&lt;!&#8211; Hostname &#8211;&gt;<br />
+Hostname:&amp;nbsp;&lt;input type=&#8221;text&#8221; name=&#8221;HostName&#8221; size=&#8221;25&#8243;<br />
+value=&#8221;192.168.28.139&#8243;&gt;<br />
+&amp;nbsp;&amp;nbsp;<br />
+&lt;!&#8211; Systemnumber &#8211;&gt;<br />
+Systemnumber:&amp;nbsp;&lt;input type=&#8221;text&#8221; name=&#8221;SystemNumber&#8221; size=&#8221;2&#8243;<br />
+value=&#8221;00&#8243;&gt;<br />
+&lt;br /&gt;&lt;br /&gt;<br />
+&lt;!&#8211; SAPTablename &#8211;&gt;<br />
+Table name:&amp;nbsp;&lt;input type=&#8221;text&#8221; name=&#8221;SAPTableName&#8221; size=&#8221;30&#8243;&gt;<br />
+&amp;nbsp;<br />
+&lt;!&#8211; Button to view the table &#8211;&gt;<br />
+&lt;input type=&#8221;button&#8221; value=&#8221;GetData&#8221; onClick=&#8217;GetData()&#8217;&gt;<br />
+&lt;/form&gt;</p>
+<p>&lt;table id=&#8221;Tabelle&#8221; border=&#8221;1&#8243;&gt;<br />
+&lt;/table&gt;</p>
+<p>&lt;/body&gt;</p>
+<p>&lt;/html&gt;</p>
+<p>&lt;!&#8211; End&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212; &#8211;&gt;</p>
+<p>Der Beitrag <a href="/blog/sap-daten-per-html-anzeigen/">SAP-Daten per HTML anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Performance ActiveX</title>
+		<link>/blog/performance-activex/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Mon, 13 Aug 2012 10:36:19 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=652</guid>
+
+					<description><![CDATA[<p>Die vorliegende Pr&#228;sentation betrachtet Performance-Gesichtspunkte zum ActiveX-Einsatz mit dem SAP GUI f&#252;r Windows. Sie beschreibt diesbez&#252;glich eine Pr&#252;fung, deren Ergebnis sowie Handlungsempfehlungen zum Einsatz von OLE in ABAP-Programmen.</p>
+<p>Der Beitrag <a href="/blog/performance-activex/">Performance ActiveX</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die vorliegende Pr&auml;sentation betrachtet Performance-Gesichtspunkte zum ActiveX-Einsatz mit dem SAP GUI f&uuml;r Windows. Sie beschreibt diesbez&uuml;glich eine Pr&uuml;fung, deren Ergebnis sowie Handlungsempfehlungen zum Einsatz von OLE in ABAP-Programmen.<br /><P>&nbsp;</P><P><A href="/wp-content/downloads/StSchnell_SAPGUIActiveX_Performance.pdf" target="_blank" Target="_blank">Hier ist die Pr&auml;sentation im PDF-Format.</A></P></p>
+<p>Der Beitrag <a href="/blog/performance-activex/">Performance ActiveX</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Tabelle lesen mit SAPGUI Scripting</title>
+		<link>/blog/tabelle-lesen-mit-sapgui-scripting/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Fri, 20 Apr 2012 11:04:07 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=639</guid>
+
+					<description><![CDATA[<p>SAPGUI Scripting bietet sehr viele M&#246;glichkeiten und Ans&#228;tze. Neben der Simulation von Benutzereingaben k&#246;nnen mit SAP GUI Scripting noch ganz andere Ans&#228;tze realisiert und Perspektiven er&#246;ffnet werden. Allerdings ist es dazu notwendig die M&#246;glichkeiten von Microsoft Visual Basic Script mit denen von SAPGUI Scripting geschickt zu kombinieren. Im Folgenden wird beschrieben wie mit SAPGUIScripting der Transaktionskode SE16 ausgef&#252;hrt und eine beliebige Tabelle geladen wird. Die Anzeige wird in den ALV-Grid-Modus (ABAP List Viewer) geschaltet und es wird Zeile f&#252;r Zeile ausgelesen. Die gelesenen Zeilen werden dann von Microsoft Visual Basic Script in eine Datei geschrieben. Die Felder werden mit einem Semikolon voneinander getrennt, so dass die so entstandene CSV-Datei am Ende z.B. von Microsoft Excel eingelesen und weiterverarbeitet werden kann.</p>
+<p>Der Beitrag <a href="/blog/tabelle-lesen-mit-sapgui-scripting/">Tabelle lesen mit SAPGUI Scripting</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>SAPGUI Scripting bietet sehr viele Möglichkeiten und Ansätze. Neben der Simulation von Benutzereingaben können mit SAP GUI Scripting noch ganz andere Ansätze realisiert und Perspektiven eröffnet werden. Allerdings ist es dazu notwendig die Möglichkeiten von Microsoft Visual Basic Script mit denen von SAPGUI Scripting geschickt zu kombinieren. Im Folgenden wird beschrieben wie mit SAPGUIScripting der Transaktionskode SE16 ausgeführt und eine beliebige Tabelle geladen wird. Die Anzeige wird in den ALV-Grid-Modus (ABAP List Viewer) geschaltet und es wird Zeile für Zeile ausgelesen. Die gelesenen Zeilen werden dann von Microsoft Visual Basic Script in eine Datei geschrieben. Die Felder werden mit einem Semikolon voneinander getrennt, so dass die so entstandene CSV-Datei am Ende z.B. von Microsoft Excel eingelesen und weiterverarbeitet werden kann.<br />
+<a href="/wp-content/downloads/StSchnell_ReadTableWithSAPGUIScripting.pdf" target="_blank" rel="noopener noreferrer">Hier ist die Dokumentation im PDF-Format.</a></p>
+<p>Der Beitrag <a href="/blog/tabelle-lesen-mit-sapgui-scripting/">Tabelle lesen mit SAPGUI Scripting</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Library Calling</title>
+		<link>/blog/library-calling/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Tue, 03 Jan 2012 16:32:39 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Scripting]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=633</guid>
+
+					<description><![CDATA[<p>Oftmals besteht der Wunsch oder sogar die Notwendigkeit mit einem ABAP-Programm von einem SAP-Applikationsserver auf dem Pr&#228;sentationsserver mit dem Betriebssystem Microsoft Windows Operationen auszuf&#252;hren. Im Folgenden wird beschrieben wie mit der Programmiersprache FreeBASIC eine DLL erstellt und diese mittels DynamicWrapperX mit einem ABAP-Programm verwendet werden kann.</p>
+<p>Der Beitrag <a href="/blog/library-calling/">Library Calling</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Oftmals besteht der Wunsch oder sogar die Notwendigkeit mit einem ABAP-Programm von einem SAP-Applikationsserver auf dem Pr&auml;sentationsserver mit dem Betriebssystem Microsoft Windows Operationen auszuf&uuml;hren. Im Folgenden wird beschrieben wie mit der Programmiersprache FreeBASIC eine DLL erstellt und diese mittels DynamicWrapperX mit einem ABAP-Programm verwendet werden kann.<br /><P class="head1">Hello, Library Calling</P><P>von Stefan Schnell</P><P>Oftmals besteht der Wunsch oder sogar die Notwendigkeit mit einem ABAP-Programm von einem SAP-Applikationsserver auf dem Pr&auml;sentationsserver mit dem Betriebssystem Microsoft&nbsp;Windows Operationen auszuf&uuml;hren. Zu diesem Zweck bieten ABAP und der SAPGUI f&uuml;r Windows&nbsp;einige M&ouml;glichkeiten an, die jedoch nicht alle Wege bereitstellen. So ist beispielsweise ein direkter Zugriff auf<BR>dynamische Bibliotheken, auch als DLLs bekannt, und eine Kommunikation mit dem GUI, sobald das ABAP-Programm im Hintergrund ausgef&uuml;hrt wird, nicht vorgesehen. Im Folgenden wird beschrieben wie mit der Programmiersprache FreeBASIC eine DLL erstellt und diese mittels DynamicWrapperX mit einem<BR>ABAP-Programm verwendet werden kann. Weiterhin wird aufgezeigt wie dieses Szenario mit BackgroundLight auch in Hintergrundprozessen verwendet werden kann.</P><P><A href="/wp-content/downloads/StSchnell_LibraryCalling.pdf" target="_blank" Target="_blank">Hier das PDF-Dokument</A></P></p>
+<p>Der Beitrag <a href="/blog/library-calling/">Library Calling</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

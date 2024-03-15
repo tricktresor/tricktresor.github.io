@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Gruppe Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/gruppe/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 23 Sep 2020 11:28:00 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Gruppe Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Loop At ITAB Group By</title>
+		<link>/blog/loop-at-itab-group-by/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 09 Sep 2020 18:28:58 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Gruppe]]></category>
+		<category><![CDATA[GROUP BY]]></category>
+		<category><![CDATA[WHERE]]></category>
+		<category><![CDATA[LOOP]]></category>
+		<guid isPermaLink="false">/?p=1024249</guid>
+
+					<description><![CDATA[<p>Mühsam ernährt sich das Eichhörnchen. Die heutige Nuss galt dem Befehlszusatz GROUP BY für den LOOP über eine interne Tabelle. Es gibt dankenswerter Weise in der SAP-Doku inzwischen viele Beispiele. Diese sind jedoch sehr abstrakt. Sie zeigen die Syntax, verdeutlichen aber nicht unbedingt, was damit möglich ist. Ich präsentiere euch heute ein paar Möglichkeiten der Gruppierung, die hoffentlich die Funktionsweise deutlich machen. Beispieldaten im Folgenden verwende ich diese Struktur für meine Beispiele: Die Tabelle soll...</p>
+<p>Der Beitrag <a href="/blog/loop-at-itab-group-by/">Loop At ITAB Group By</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Mühsam ernährt sich das Eichhörnchen. Die heutige Nuss galt dem Befehlszusatz GROUP BY für den LOOP über eine interne Tabelle. Es gibt dankenswerter Weise in der SAP-Doku inzwischen viele Beispiele. Diese sind jedoch sehr abstrakt. Sie zeigen die Syntax, verdeutlichen aber nicht unbedingt, was damit möglich ist. </p>
+
+
+
+<p>Ich präsentiere euch heute ein paar Möglichkeiten der Gruppierung, die hoffentlich die Funktionsweise deutlich machen. </p>
+
+
+
+<h2 class="wp-block-heading">Beispieldaten</h2>
+
+
+
+<p>im Folgenden verwende ich diese Struktur für meine Beispiele:</p>
+
+
+
+<pre class="wp-block-code"><code>TYPES: BEGIN OF _doc,
+         docnr TYPE n length 10,
+         itmno TYPE n length 6,
+         category type c length 2,
+         del_flag type abap_bool,
+       END OF _doc,
+       _docs TYPE SORTED TABLE OF _doc WITH UNIQUE KEY docnr itmno.
+
+DATA(documents) = VALUE _docs(
+  ( docnr = 12001 itmno = 10 category = 'A1' del_flag = 'X' )
+  ( docnr = 12001 itmno = 20 category = 'A1' del_flag = ' ' )
+  ( docnr = 12002 itmno = 10 category = 'A2' del_flag = 'X' )
+  ( docnr = 12003 itmno = 10 category = 'B3' del_flag = ' ' )
+  ( docnr = 12003 itmno = 20 category = 'B1' del_flag = ' ' )  ).</code></pre>
+
+
+
+<p>Die Tabelle soll generelle Belege mit Positionsnummer, einem Positionstypen und einem Löschkennzeichen simulieren.</p>
+
+
+
+<h2 class="wp-block-heading">Generelle Funktionsweise</h2>
+
+
+
+<p>Der Befehlszusatz GROUP BY zum LOOP bietet die Möglichkeit der Gruppierung, ähnlich wie die Sprachelemente AT NEW oder AT CHANGE OF innerhalb eines LOOP. Allerdings bietet der GROUP BY Befehl noch einige weitere Möglichkeiten.</p>
+
+
+
+<p>In der einfachen Variante kannst du ein Feld der internen Tabelle angeben, nach dem gruppiert werden soll. </p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents INTO DATA(document)
+  GROUP BY document-docnr INTO DATA(docgrp).
+  WRITE: / docgrp.
+ENDLOOP.</code></pre>
+
+
+
+<p>Das Ergebnis ist eine Liste aller eindeutigen Belegnummern:</p>
+
+
+
+<pre class="wp-block-code"><code>0000012001
+0000012002
+0000012003</code></pre>
+
+
+
+<h2 class="wp-block-heading">Gruppenelemente</h2>
+
+
+
+<p>Es ist nun eine Gruppe DOCGRP vorhanden. Auf die Zeilen dieser Gruppe kann mit Hilfe des Befehls LOOP AT GROUP zugegriffen werden:</p>
+
+
+
+<pre class="wp-block-code"><code>  LOOP AT GROUP docgrp INTO DATA(docline).
+    WRITE: / doc1line-docnr, docline-itmno.
+  ENDLOOP.
+</code></pre>
+
+
+
+<h2 class="wp-block-heading">So weit so gut&#8230;</h2>
+
+
+
+<p>Es gibt zwei Interessante Zusätze in einer Gruppe:</p>
+
+
+
+<ul><li>GROUP INDEX</li><li>GROUP SIZE</li></ul>
+
+
+
+<p>Diese können zusätzlich definiert werden. Im LOOP kann darauf zugegriffen werden.</p>
+
+
+
+<h3 class="wp-block-heading">GROUP INDEX</h3>
+
+
+
+<p>Der Zusatz GRIOUP INDEX liefert den aktuellen Index der (unsortierten) Gruppe. </p>
+
+
+
+<h3 class="wp-block-heading">GROUP SIZE</h3>
+
+
+
+<p>Der Zusatz GROUP SIZE liefert Informationen über die Anzahl der enthaltenen Gruppenelemente.</p>
+
+
+
+<h3 class="wp-block-heading">Beispiel</h3>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents INTO DATA(document)
+  GROUP BY
+  ( doc   = document-docnr
+    size  = GROUP SIZE
+    index = GROUP INDEX )
+  INTO DATA(docgrp).
+  WRITE: / |elements in group { 
+    docgrp-index align = left } "{ 
+    docgrp-doc }": { 
+    docgrp-size ALIGN = left } entries|.
+
+  LOOP AT GROUP docgrp INTO DATA(doc).
+    WRITE: / doc-docnr, doc-itmno.
+  ENDLOOP.
+ENDLOOP.
+</code></pre>
+
+
+
+<p>Ergebnis:</p>
+
+
+
+<pre class="wp-block-code"><code>number of elements in group 1: 2 entries
+0000012001 000010
+elements in group 1 "0000012001": 2 entries
+0000012001 000010
+0000012001 000020
+elements in group 2 "0000012002": 1 entries
+0000012002 000010
+elements in group 3 "0000012003": 2 entries
+0000012003 000010
+0000012003 000020</code></pre>
+
+
+
+<p>In diesem Fall müssen die Gruppenfelder, die nun in Klammern eingefasst werden müssen, selbst definiert werden. </p>
+
+
+
+<h2 class="wp-block-heading">Dynamische Gruppen</h2>
+
+
+
+<p>Jetzt kommt der spannende Teil, der einen großen Vorteil gegenüber der alten AT NEW Gruppenstufenverarbeitung hat. Die Gruppen können dynamisch anhand der Feldwerte definiert werden. Im Folgenden Beispiel fasse ich alle Einträge mit einem Löschkennzeichen in der Gruppe &#8220;deleted&#8221; zusammen. Alle anderen Einträge kommen in die Gruppe &#8220;valid&#8221;.</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents
+INTO DATA(doc)
+GROUP BY (
+    del_group = COND string( WHEN doc-del_flag = space THEN 'valid' ELSE 'deleted' )
+    size  = GROUP SIZE
+    index = GROUP INDEX  )
+  INTO DATA(docgrp).
+  WRITE: / 'number of', docgrp-del_group, 'entries:', docgrp-size.
+ENDLOOP.</code></pre>
+
+
+
+<p>Ergebnis:</p>
+
+
+
+<pre class="wp-block-code"><code>number of deleted entries:          2
+number of valid entries:          3</code></pre>
+
+
+
+<p>Ich füge also je nachdem, ob das Löschhkennzeichen gesetzt ist oder nicht, eine andere Gruppenbezeichnung ein. Das ist besonders dann interessant, wenn man mehrere unterschiedliche Elemente gruppieren möchte. Beispielsweise alle Positionstypen, die mit A oder B beginnen:</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents
+INTO DATA(doc)
+GROUP BY (
+    cat   = doc-category(1)
+    size  = GROUP SIZE
+    index = GROUP INDEX  )
+  INTO DATA(docgrp).
+
+  WRITE: / 'number of items in category', 
+    docgrp-cat LEFT-JUSTIFIED NO-GAP, 
+    docgrp-size.
+
+ENDLOOP.</code></pre>
+
+
+
+<p>Ergebnis:</p>
+
+
+
+<pre class="wp-block-code"><code>number of items in category A         3
+number of items in category B         2</code></pre>
+
+
+
+<p>Ebenso könnte man nach Bestellungen gruppieren, die einen &#8220;geringen&#8221; oder einen &#8220;höheren&#8221; Bestellwert haben. Oder ich kann Aufträge direkt nach Aufträgen mit A-, B- oder C-Kunden gruppieren, indem ich für die Ermittlung der Kundenklassifizierung eine Methode in der GROUP BY Klausel verwende.</p>
+
+
+
+<h2 class="wp-block-heading">Gruppen gruppieren</h2>
+
+
+
+<p>Die definierten Gruppen können ebenfalls weiter gruppiert werden. Im folgenden Beispiel gruppiere ich erst nach der <em>Positionstypengruppe</em> (A oder B) aus dem obigen Beispiel. In dieser Gruppe gruppiere ich dann noch einmal nach dem eigentlichem Positionstyp (A1, A2, &#8230;). zudem berücksichtige ich in der WHERE-Bedingung nur die Positionen ohne Löschkennzeichen. Für dieses Beispiel habe ich die Datenbasis etwas erweitert&#8230;</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents
+INTO DATA(doc2)
+GROUP BY (
+    cat   = doc2-category(1)
+    size  = GROUP SIZE
+    index = GROUP INDEX  )
+  INTO DATA(docgrp2).
+
+  WRITE: /1 'number of items in category',
+    docgrp2-cat LEFT-JUSTIFIED NO-GAP,
+    docgrp2-size.
+
+  LOOP AT GROUP docgrp2 INTO DATA(docline2)
+  WHERE del_flag = space GROUP BY ( category = docline2-category ) INTO DATA(grpcat).
+    write: /5 'category', grpcat-category.
+    LOOP AT GROUP grpcat INTO DATA(cat).
+      WRITE: /9 cat-docnr, cat-itmno, cat-category.
+    ENDLOOP.
+  ENDLOOP.
+
+ENDLOOP.</code></pre>
+
+
+
+<p>Ergebnis:</p>
+
+
+
+<pre class="wp-block-code"><code>number of items in category A         5
+    category A1
+        0000012001 000020 A1
+        0000012003 000030 A1
+    category A2
+        0000012004 000010 A2
+number of items in category B         5
+    category B3
+        0000012003 000010 B3
+        0000012003 000020 B3
+        0000012005 000010 B3
+        0000012005 000020 B3
+    category B1
+        0000012006 000010 B1</code></pre>
+
+
+
+<h2 class="wp-block-heading">Einschränkungen</h2>
+
+
+
+<p>Bei meinem heutigen Ausflug in die Gruppenstufen bin ich über folgende Einschränkungen gestolpert:</p>
+
+
+
+<ol><li>Sortierung nur nach Gruppenstufenfeldern möglich, aber nicht nach GROUP SIZE</li><li>Kein WHERE über Gruppenstufen möglich</li></ol>
+
+
+
+<h3 class="wp-block-heading">Sortierung</h3>
+
+
+
+<p>Ich wollte gerne die Gruppen nach der Anzahl der Elemente sortieren. Das ist leider nicht möglich.</p>
+
+
+
+<h3 class="wp-block-heading">WHERE über Gruppenstufen</h3>
+
+
+
+<p>Es ist anscheinend nicht möglich, die erzeugten Gruppen direkt über eine WHERE-Bedingung einzuschränken. In den meisten Fällen kann man es sicherlich über eine geschickte WHERE-Bedingung über die Tabelle abbilden (zum Beispiel WHERE category(1) = &#8216;A&#8217;). Allerdings wäre eine Einschränkung über die Gruppen selbst eventuell auch hilfreich. Zum Beispiel könnte die Bedingung für die Gruppe DEL_GROUP, die ich mit <em>valid </em>und <em>deleted </em>definiert hatte, etwas komplizierter und aufgrund einen Methodenaufrufes nicht ersichtlich sein. Ich würde dann trotzdem nur über die Einträge mit <em>valid </em>verarbeiten wollen. Das geht natürlich mit CHECK innerhalb des LOOP, eine WHERE-Bedingung wäre jedoch eleganter.</p>
+<p>Der Beitrag <a href="/blog/loop-at-itab-group-by/">Loop At ITAB Group By</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Gruppensummenstufenberechnung</title>
+		<link>/blog/gruppensummenstufenberechnung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 15 Dec 2015 22:06:40 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Gruppe]]></category>
+		<category><![CDATA[Gruppenstufe]]></category>
+		<category><![CDATA[refresh]]></category>
+		<category><![CDATA[soft-refresh]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=389721</guid>
+
+					<description><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten...</p>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten&#8230;</p>
+<p>Vielen Dank an Stefan, der sich die Mühe gemacht hat, ein Minimaldemo zu erstellen.</p>
+<h2>Gruppenstufen</h2>
+<p>Nach dem Start des Demoprogramms erscheint ein &#8220;normaler&#8221; ALV mit Daten aus der Flugdatenbank:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" rel="attachment wp-att-389724"><img fetchpriority="high" decoding="async" class="alignnone wp-image-389724 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" alt="2015-12-15_22-48-55" width="741" height="327" srcset="/wp-content/uploads/2015/12/2015-12-15_22-48-55.png 741w, /wp-content/uploads/2015/12/2015-12-15_22-48-55-300x132.png 300w" sizes="(max-width: 741px) 100vw, 741px" /></a></p>
+<p>Bei normaler Summierung und Bildung von Gruppenstufen, gibt es keine Bezeichnung der gebildeten Gruppen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" rel="attachment wp-att-389725"><img decoding="async" class="alignnone size-full wp-image-389725" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" alt="2015-12-15_22-50-50" width="740" height="285" srcset="/wp-content/uploads/2015/12/2015-12-15_22-50-50.png 740w, /wp-content/uploads/2015/12/2015-12-15_22-50-50-300x116.png 300w" sizes="(max-width: 740px) 100vw, 740px" /></a></p>
+<p>Die Bildung der Gruppenbezeichnung kann sehr komplex werden. Das Beispiel demonstriert die Bezeichnung der Gruppenstufen im Feld &#8220;PLANETYPE&#8221;:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" rel="attachment wp-att-389723"><img decoding="async" class="alignnone wp-image-389723 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" alt="2015-12-15_22-41-44" width="752" height="322" srcset="/wp-content/uploads/2015/12/2015-12-15_22-41-44.png 752w, /wp-content/uploads/2015/12/2015-12-15_22-41-44-300x128.png 300w" sizes="(max-width: 752px) 100vw, 752px" /></a></p>
+<p>&nbsp;</p>
+<h2>Code</h2>
+<pre>REPORT zdemo_alv_summenzeilen.
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_helper DEFINITION FINAL.
+ PUBLIC SECTION.
+
+ CLASS-METHODS: read_data,
+ display,
+ handle_after_user_command FOR EVENT after_user_command OF cl_gui_alv_grid,
+ summenzeilen_anpassen.
+
+ CLASS-DATA: mo_grid TYPE REF TO cl_gui_alv_grid,
+ mt_data TYPE STANDARD TABLE OF saplane WITH NON-UNIQUE DEFAULT KEY.
+ENDCLASS. "lcl_helper DEFINITION
+
+
+START-OF-SELECTION.
+ lcl_helper=&gt;read_data( ).
+
+END-OF-SELECTION.
+ lcl_helper=&gt;display( ).
+
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_helper IMPLEMENTATION.
+
+ METHOD read_data.
+
+ SELECT *
+ INTO TABLE mt_data
+ FROM saplane.
+
+ ENDMETHOD. "read_data
+
+ METHOD display.
+
+ DATA: ls_variant TYPE disvariant.
+ WRITE:/ 'Wenn man das hier liest, ist ein interner Fehler aufgetreten'. "#EC NOTEXT
+
+*--------------------------------------------------------------------*
+* ALV erzeugen
+*--------------------------------------------------------------------*
+ CREATE OBJECT mo_grid
+ EXPORTING
+ i_parent = cl_gui_container=&gt;screen0
+ EXCEPTIONS
+ OTHERS = 1.
+
+*--------------------------------------------------------------------*
+* Event AFTER_USER_COMMAND nutzbar machen
+* Da sehr viele Usercommands ( auch SAP-Usercommands ) implizit einen
+* full-refresh des Grid durchführen, müssen wir uns stets dahinter klemmen
+* um unsere eigene Zwischensummenzeilengenerierung zu erhalten
+*--------------------------------------------------------------------*
+ SET HANDLER handle_after_user_command FOR mo_grid.
+
+*--------------------------------------------------------------------*
+* Defaultlayouts ermöglichen, um Zwischensummen ohne Userinteraktion zu demonstrieren
+*--------------------------------------------------------------------*
+ ls_variant-handle = '0001'.
+ ls_variant-report = sy-repid.
+
+*--------------------------------------------------------------------*
+* Anzeigen des grid
+*--------------------------------------------------------------------*
+ mo_grid-&gt;set_table_for_first_display( EXPORTING
+ i_structure_name = 'SAPLANE'
+ is_variant = ls_variant
+ i_save = 'A'
+ i_default = 'X'
+ CHANGING
+ it_outtab = mt_data
+ EXCEPTIONS
+ OTHERS = 1 ).
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "display
+
+ METHOD handle_after_user_command.
+*--------------------------------------------------------------------*
+* SAP hat evtl. noch keinen Refresh gemacht.
+* Daher würden Änderungen, die in der Methode summenzeilen_anpassen
+* gemacht und dann mit soft-refresh an den Grid gereicht würden im
+* Nachgang durch den ausstehenden full-refresh zunichte gemacht, da
+* der Grid beim full refresh auch die Summen- und Zwischensummenzeilen
+* neu generiert
+* Daher wird der full-refresh jetzt explizit vor unserer Anpassung
+* ausgeführt und der nachfolgende soft_refresh lässt unsere
+* Summenzeilen stehen.
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = ' ' ).
+
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "handle_AFTER_USER_COMMAND
+
+ METHOD summenzeilen_anpassen.
+
+ DATA: lr_data_summe TYPE REF TO data,
+ lr_data_zwischensumme TYPE REF TO data,
+ lt_grouplevels TYPE lvc_t_grpl, "#EC NEEDED Normalerweise braucht man das um gezielt die Zwischensummen zu manipulieren
+ lv_tabix TYPE numc2.
+
+ FIELD-SYMBOLS: &lt;lt_data&gt; LIKE mt_data,
+ &lt;ls_data&gt; LIKE LINE OF &lt;lt_data&gt;.
+*--------------------------------------------------------------------*
+* Zwischensummenzeilen holen -
+*--------------------------------------------------------------------*
+ mo_grid-&gt;get_subtotals( IMPORTING
+ ep_collect00 = lr_data_summe " Summenzeile
+ ep_collect01 = lr_data_zwischensumme " Zwischensummenzeile - Stufe 1
+* EP_COLLECT02 - EP_COLLECT09 Zwischensummenzeilen - Stufe 2-9
+ et_grouplevels = lt_grouplevels ). " Informationen welche Zwischensummenzeile(n) zu welchen Gridzeilen gehören
+
+*--------------------------------------------------------------------*
+* Hier kann das jetzt hinreichend komplex werden
+* Zur Demo werde ich in alle Summen und Zwischensummen im Feld
+* "PLANETYPE" etwas einfüllen
+*--------------------------------------------------------------------*
+ IF lr_data_summe IS BOUND.
+ ASSIGN lr_data_summe-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe1-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+ IF lr_data_zwischensumme IS BOUND.
+ ASSIGN lr_data_zwischensumme-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe2-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+
+*--------------------------------------------------------------------*
+* ALV-Anzeige neu aufbauen lassen, ohne Zwischensummen vom ALV generieren zu lassen
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = 'X' ).
+
+ ENDMETHOD. "summenzeilen_anpassen
+ENDCLASS. "lcl_helper IMPLEMENTATION</pre>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

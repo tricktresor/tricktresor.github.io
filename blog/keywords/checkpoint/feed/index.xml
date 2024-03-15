@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>checkpoint Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/checkpoint/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 26 Sep 2022 14:39:08 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>checkpoint Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Checkpoint-Gruppe &#8211; Die Fahrkarten bitte!</title>
+		<link>/blog/checkpoint-gruppe-die-fahrkarten-bitte/</link>
+					<comments>/blog/checkpoint-gruppe-die-fahrkarten-bitte/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 05 Feb 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[checkpoint]]></category>
+		<category><![CDATA[log-point]]></category>
+		<category><![CDATA[break-point]]></category>
+		<category><![CDATA[logging]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[RFC]]></category>
+		<category><![CDATA[saab]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5247</guid>
+
+					<description><![CDATA[<p>Checkpoint-Gruppen sind eine nützliche Sache. Leider funktionieren Sie nur auf einem Weg: Ist ein Kontrollpunkt aktiv, verhält sich der jeweilige Befehl (LOG-POINT, BREAK-POINT, ASSERT) entsprechend. Leider kann man nicht prüfen, ob eine Protokollierung eingeschaltet ist, da die Befehle keinen SY-SUBRC liefern. Hier stelle ich eine Routine vor, die prüft, ob die Protokollierung für eine Checkpoint-Gruppe eingeschaltet ist.</p>
+<p>Der Beitrag <a href="/blog/checkpoint-gruppe-die-fahrkarten-bitte/">Checkpoint-Gruppe &#8211; Die Fahrkarten bitte!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Heute stand ich vor der Frage, wie man im Programm eine Abfrage einbaut, die man in jedem System ohne extra Parametertabelle oder ähnlichem an- oder ausschalten kann. Normalerweise gibt es dafür Parameter-Tabellen oder man könnte auch Benutzerparameter verwenden. Ersteres war jedoch zu aufwändig und die zweite Variante passte nicht, da für beliebige Benutzer (auch RFC-User) gesteuert werden sollte, ob eine Protokollierung statt findet oder nicht.</p>
+
+
+
+<p>Da ich für die Protokollierung einiger Aktionen bereits die Checkpoint-Gruppen verwendet habe, kam ich auf die Idee, diese abzufragen. Eigentlich funktioniert der Befehl LOG-POINT anders: Die Anweisung wird eingebaut und wenn in der Transaktion SAAB die Protokollierung zum aktuellen Zeitpunkt aktiviert wurde, dann wird das Protokoll geschrieben:</p>
+
+
+
+<pre class="wp-block-preformatted">LOG ID ztricktresor&nbsp;SUBKEY&nbsp;'CHECK1'&nbsp;FIELDS&nbsp;subrc.</pre>
+
+
+
+<h2 class="wp-block-heading">Transaktion SAAB</h2>
+
+
+
+<p>In der Transaktion Checkpoint-Gruppe ändern SAAB kannst du einstellen, wie sich die einzelnen Befehle LOG-POINT, ASSERT, BREAK-POINT verhalten sollen.</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2015/02/2015-02-04_18-25-01.png"><img fetchpriority="high" decoding="async" width="300" height="171" src="https://tricktresor.com/wp-content/uploads/2015/02/2015-02-04_18-25-01-300x171.png" alt="2015-02-04_18-25-01" class="wp-image-5250" srcset="/wp-content/uploads/2015/02/2015-02-04_18-25-01-300x171.png 300w, /wp-content/uploads/2015/02/2015-02-04_18-25-01-624x356.png 624w, /wp-content/uploads/2015/02/2015-02-04_18-25-01.png 770w" sizes="(max-width: 300px) 100vw, 300px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">Andersherum wird ein Schuh draus</h2>
+
+
+
+<p>Die Aktivierungsdaten werden in die Tabelle AAB_ID_ACT geschrieben. Zusätzlich wird gespeichert, wann die Aktivierung abläuft und welche Kontrollpunkte aktiv sind (Breakpoints, Logpoints, Assertions). Diese Tabelle lese ich aus, um zu prüfen, ob das Logging zu einer Checkpoint-Gruppe aktiv ist.</p>
+
+
+
+<p>Welche Kontrollpunkte aktiv sind, wird im Feld ACTMODE bitweise gespeichert. Die Bits haben dabei folgende Bedeutung:</p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td>Bit 1</td><td>Bit 2</td><td>Bit 3</td><td>Bit 4</td><td>Bit 5</td><td>Bit 6</td><td>Bit 7</td><td>Bit 8</td></tr><tr><td>ohne Funktion</td><td>Logging</td><td>Assertions<br>Hintergrund<br>abbrechen</td><td>Assertions<br>Hintergrund<br>protokollieren</td><td>Assertions<br>abbrechen</td><td>Assertions<br>protokollieren</td><td>Assertions<br>anhalten</td><td>Breakpoints</td></tr></tbody></table></figure>
+
+
+
+<p>Mithilfe des Befehls GET BIT 2 OF ACTMODE bekomme ich heraus, ob das Logging eingeschaltet ist.</p>
+
+
+
+<p>Der Wert ist dann 64, Du kannst die Konstante CL_ABAP_AAB_UTILITIES=>BITMASK_LOGPOINT verwenden.</p>
+
+
+
+<h2 class="wp-block-heading">Globale Checkpoint-Aktivierungen</h2>
+
+
+
+<p>In der Transaktion SAAB legt man in der Regel die Einstellungen für sich selbst an. Du kannst jedoch über <em>Alle Aktivierungen</em> [_Benutzer_] auch globale Einstellungen vornehmen. Diese sind dann für alle Benutzer gültig. Das Feld AAB_ID_ACT-USERNAME ist in dem Fall initial.</p>
+
+
+
+<p>Ebenso kann eine Einschränkung auf Server vorgenommen werden. Ist das der Fall, dann steht im Feld AAB_ID_ACT-SERVER der Name des Applicationservers.</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT zz_checkpoint.
+
+CLASS lcl_saab DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS check_active IMPORTING name          TYPE clike
+                                         user          TYPE clike OPTIONAL
+                               RETURNING VALUE(active) TYPE boolean.
+ENDCLASS.
+
+CLASS lcl_saab IMPLEMENTATION.
+  METHOD check_active.
+*== local data
+    DATA ls_aabact  TYPE aab_id_act.
+    DATA lv_tstamp  TYPE timestamp.
+    DATA lv_actmode TYPE x.
+
+    active = abap_false.
+
+*== check checkpoint
+    SELECT SINGLE * FROM aab_id_act INTO ls_aabact
+     WHERE name     = name 
+       AND username = user.
+    IF sy-subrc = 0.
+*== Checkpoint active
+      GET TIME STAMP FIELD lv_tstamp.
+
+      IF lv_tstamp &lt;= ls_aabact-exp_tstamp. 
+*== checkpoint is valid at the moment     
+        lv_actmode = ls_aabact-actmode. 
+*== check if logging is active         
+        GET BIT 2 OF lv_actmode INTO DATA(lv_logging).         
+        IF lv_logging = 1. 
+*== yes, active           
+          active = abap_true.         
+        ENDIF.      
+      ENDIF. 
+    ENDIF.   
+  ENDMETHOD. 
+ENDCLASS. 
+
+PARAMETERS p_name TYPE progname DEFAULT 'ZTRICKTRESOR'. 
+
+START-OF-SELECTION.   
+  IF lcl_saab=&gt;check_active( p_name ) = abap_true.
+    MESSAGE i000(oo) WITH 'Checkpoint-Gruppe' p_name ' Logging ist aktiv'.
+  ELSE.
+    MESSAGE i000(oo) WITH 'Checkpoint-Gruppe' p_name 'Logging ist NICHT aktiv'.
+  ENDIF.</pre>
+
+
+
+<h2 class="wp-block-heading">Update</h2>
+
+
+
+<p>In der Zwischenzeit habe ich die Klasse CL_ABAP_AAB_UTILITIES gefunden mit der du die Aktivierung einfach prüfen kannst:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(logpoint_active) = cl_abap_aab_utilities=>is_active(
+  EXPORTING
+    id            = 'ZTRICKTRESOR'
+    mode_logpoint = abap_true ).</code></pre>
+<p>Der Beitrag <a href="/blog/checkpoint-gruppe-die-fahrkarten-bitte/">Checkpoint-Gruppe &#8211; Die Fahrkarten bitte!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/checkpoint-gruppe-die-fahrkarten-bitte/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

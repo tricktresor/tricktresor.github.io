@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Syslog Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/syslog/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 03 Dec 2020 15:32:04 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Syslog Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Syslog-Eintrag schreiben</title>
+		<link>/blog/syslog-eintrag-schreiben/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Oct 2009 16:40:16 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Syslog]]></category>
+		<category><![CDATA[System-Log]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=531</guid>
+
+					<description><![CDATA[<p>Die einfachste Art, einen Syslog-Eintrag zu schreiben, ist der Aufruf eines Funktionsbausteins. Hier beschreiben wir kurz, wie das funktioniert.</p>
+<p>Der Beitrag <a href="/blog/syslog-eintrag-schreiben/">Syslog-Eintrag schreiben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Die einfachste Art, einen Syslog-Eintrag zu schreiben, ist der Aufruf eines Funktionsbausteins. Hier beschreiben wir kurz, wie das funktioniert.</p>
+
+
+
+<p>Verwenden tun wir den Funktionsbaustein RSLG_WRITE_SYSLOG_ENTRY. Folgend der Aufruf für einen einfachen Syslog-Eintrag:</p>
+
+
+
+<pre class="wp-block-code"><code>    CALL FUNCTION 'RSLG_WRITE_SYSLOG_ENTRY'
+       EXPORTING
+         data_word1       = 'ZTEST'
+         data_word2       = 'User'
+         data_word3       = sy-uname
+         data_word4       = 'hat die Variante umgestellt:'
+         data_word5       = lv_variant
+         sl_message_area  = 'C4'
+         sl_message_subid = '1'  "Anwendung &amp;A warnt: &amp;B &amp;C &amp;D &amp;E"
+       EXCEPTIONS
+         OTHERS           = 5.</code></pre>
+
+
+
+<p>Die Meldung taucht dann im Syslog auf:</p>
+
+
+
+<pre class="wp-block-preformatted">Applikation ZTEST warnt: User EWULFF hat die Variante umgestellt: /DEFAULT</pre>
+
+
+
+<p>Eine Liste der möglichen Meldungsnummern stehen in der Tabelle TSL1T.  Eine Auflistung der Meldungen ist mit Programm RSLG0011 möglich.</p>
+<p>Der Beitrag <a href="/blog/syslog-eintrag-schreiben/">Syslog-Eintrag schreiben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Syslog Meldungen</title>
+		<link>/blog/syslog-meldungen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Oct 2009 16:21:28 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Syslog]]></category>
+		<category><![CDATA[System-Log]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=530</guid>
+
+					<description><![CDATA[<p>Die Meldungen im Syslog sind so &#228;hnlich wie die Nachrichten, die mit MESSAGE erzeugt werden. Allerdings hat man im Syslog mehr M&#246;glichkeiten. Hier wollen wir kurz erkl&#228;ren, was zu einer Syslog-Meldung geh&#246;rt.</p>
+<p>Der Beitrag <a href="/blog/syslog-meldungen/">Syslog Meldungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Meldungen im Syslog sind so &auml;hnlich wie die Nachrichten, die mit MESSAGE erzeugt werden. Allerdings hat man im Syslog mehr M&ouml;glichkeiten. Hier wollen wir kurz erkl&auml;ren, was zu einer Syslog-Meldung geh&ouml;rt.<br /><P>Die Meldungen werden mit Transaktion SE92 gepflegt. Diese ist schon ziemlich veraltet, was man ihr an verschiedenen Stellen anmerkt. So wird z.B. noch nicht einmal die Meldung gesperrt, wenn man sie bearbeitet&#8230; </P><P class="head1">Meldungsgebiete</P><P>Es gibt verschiedene Meldungsgebiete:</P><UL><LI>A:&nbsp; ABAP-Nachrichten <LI>B:&nbsp; Datenbankschnittstelle und SQL <LI>DD:&nbsp; Data Dictionary <LI>E:&nbsp; Hintergrundverarbeitung <LI>und andere&#8230;</LI></UL><P>Eigene Meldungen sollten nat&uuml;rlich mit &#8220;Z&#8221; beginnen&#8230;</P><P class="head1">Problemklasse</P><P>Die meisten Sachen sind dokumentiert, wenn auch nur versteckt. So muss man z.B. um g&uuml;ltige Werte f&uuml;r &#8220;Problemklasse alt&#8221; zu bekommen, erst von der F1-Hilfe zum&nbsp;Datenelement, &uuml;ber die Dom&auml;ne hin zur Pr&uuml;ftabelle TSL2D h&uuml;pfen:</P><UL><LI>K &#8211; Problem in der SAP-Basis <LI>S &#8211; Betriebsverfolgung <LI>T &#8211; Problem in einer Transaktion <LI>W &#8211; Warnung <LI>X &#8211; Sonstiges</LI></UL><P class="head1">Kategorie</P><P>Desweiteren muss eine Kategorie angegeben werden, die den Schaverhalt am besten trifft.</P><P>Auch der &#8220;Schweregrad&#8221; ist wichtig. Der Grad ist &auml;hnlich aufgebaut, wie bei den Ampeln, allerdings in etwas abgewandelter Form:</P><UL><LI>Wei&szlig;: Information <LI>Gr&uuml;n: Warnung <LI>Gelb: Hohe Priorit&auml;t <LI>rot: Sehr hohe Priorit&auml;t</LI></UL><P class="head1">Meldungstext</P><P>Der Meldungstext ist &auml;hnlich aufgebaut, wie eine &#8220;Nachricht&#8221;. Es k&ouml;nnen Platzhalter vergeben werden, die dann sp&auml;ter aufgef&uuml;llt werden.</P><P>Hier funktionieren die Platzhalter allerdings etwas anders&#8230; So werden die Platzhalter &amp;1 oder &amp;2 nicht durch den &#8220;Parameter-1&#8221; und &#8220;Parameter-2&#8221; ersetzt, sondern jeweils in der angegebenen L&auml;nge des entsprechenden Parameters. In diesem Fall also: 1. Parameter mit der L&auml;nge &#8220;1&#8221; und 2. Parameter mit der L&auml;nge &#8220;2&#8221;&#8230;</P><P>Die &#8220;richtigen&#8221; Parameter sind dann: &amp;A, &amp;B usw. Die Verwendung wird aber gut erkl&auml;rt.</P><P><STRONG><U>Achtung:</U></STRONG><BR>Das Meldungsgebiet &#8220;AU&#8221; hat anscheinend eine besondere Bedeutung f&uuml;r das &#8220;Security Audit-Log&#8221;. Hier sind andere Kategorieren sichtbar.</P><P>Doku &#8220;Security-Audit-Log:<BR><A href="http://help.sap.com/saphelp_erp2005/helpdata/DE/2c/c59d37d373243de10000009b38f8cf/frameset.htm" target="_blank" Target="_blank">http://help.sap.com/saphelp_erp2005/helpdata/DE/<BR>2c/c59d37d373243de10000009b38f8cf/frameset.htm</A></P></p>
+<p>Der Beitrag <a href="/blog/syslog-meldungen/">Syslog Meldungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>EXEC SQL</title>
+		<link>/blog/exec-sql/</link>
+					<comments>/blog/exec-sql/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 02 Oct 2004 13:29:03 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Syslog]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=283</guid>
+
+					<description><![CDATA[<p>Hier wird ein SELECT-Befehl in einer EXEC SQL-Klammer ausgef&#252;hrt. Der SELECT bietet dann mehr M&#246;glichkeiten. In diesem Beispiel wird ein gelesenes Feld in GRO&#223;-Buchstaben umgwandelt.</p>
+<p>Der Beitrag <a href="/blog/exec-sql/">EXEC SQL</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2>Open SQL vs. Native SQL</h2>
+<p>ABAP verwendet für die Datenbankzugriffe Open SQL. Das ist ein Format, das Datenbank unabhängig ist. Dadurch ist es möglich, eine durchgängige ABAP-Syntax zu haben, unabhängig davon, welche Datenbank verwendet wird.</p>
+<p>Unterschiede werden hier ganz gut erklärt:</p>
+<p><a href="https://blogs.sap.com/2006/06/26/open-sql-vs-native-sql/">https://blogs.sap.com/2006/06/26/open-sql-vs-native-sql/</a></p>
+<h3>Open SQL</h3>
+<p>Durch den Zugriff mittels Open SQL sind die Zugriffe auf die Datenbank genormt und beschnitten. Nicht jede Funktionalität, die eine Datenbank bietet, wird von Open SQL unterstützt.</p>
+<h3>Native SQL</h3>
+<p>Es können im ABAP-Umfeld Native SQL Anweisungen ausgeführt werden. Diese müssen mittels <a href="https://help.sap.com/doc/abapdocu_750_index_htm/7.50/en-US/abapexec_cursor.htm">EXEC-SQL</a> definiert werden.</p>
+<h2>Anwendungsbeispiel &#8220;upper&#8221;</h2>
+<p>Im Folgenden wird ein SELECT-Befehl in einer EXEC SQL-Klammer ausgeführt. Der SELECT bietet dann mehr Möglichkeiten. In diesem Beispiel wird ein gelesenes Feld mit dem Native SQL-Befehl &#8220;upper&#8221; in GROß-Buchstaben umgewandelt.</p>
+<p>In dem folgenden Coding wird in der Länderbezeichnung der Ländertabelle T005T, die als &#8220;lower-case&#8221; gespeichert ist, nach einem Wert gesucht.</p>
+<h2>Code</h2>
+<pre>REPORT Z.
+
+DATA:
+  itab like t005t OCCURS 0 WITH HEADER LINE,
+    BEGIN OF i_exec OCCURS 0,
+      spras LIKE t005t-spras,
+      landx LIKE t005t-landx,
+    END OF i_exec.
+
+*** Zu suchender Text in der Länderbezeichnung
+PARAMETERS: p1 LIKE t005t-landx DEFAULT '*SCH*'.
+
+START-OF-SELECTION.
+
+*** Umsetzung der Wildcards für SELECT
+TRANSLATE p1 USING '*%+_'.
+TRANSLATE p1 TO UPPER CASE.
+
+*** EXEC SQL
+EXEC SQL PERFORMING WRITE_INTO_TABLE.
+  SELECT SPRAS, LANDX, NATIO
+    INTO :ITAB-SPRAS,
+         :ITAB-LANDX,
+         :ITAB-NATIO
+    FROM T005T
+   WHERE MANDT        =    :SY-MANDT
+     AND UPPER(LANDX) LIKE :P1
+ENDEXEC.
+
+*** Ausgabe der selektierten Länder
+LOOP AT i_exec.
+  WRITE:/ i_exec.
+ENDLOOP.
+
+**************************************************
+* FORM write_into_table
+**************************************************
+FORM write_into_table.
+
+  MOVE-CORRESPONDING itab TO i_exec.
+  APPEND i_exec.
+
+ENDFORM.</pre>
+<h2>Groß-Kleinschreibung Code</h2>
+<p>Eventuell muss darauf geachtet werden, dass die Feldnamen case-sensitiv sind (MS-SQL; Hinweis 459676).</p>
+<h2>Groß-Kleinschreibung Text</h2>
+<p>Sonderzeichen und Umlaute sind problematisch. Der String &#8220;Bäcker&#8221; wird mit der Metode evtl. nicht gefunden, da der Native-SQL-Zugriff die Sonderzeichen nicht korrekt umwandelt.</p>
+<h2>SQL-Fehler</h2>
+<p>SQL-Fehler 207 oder 208 bei EXEC SQL oder ADBC-Zugriff auf Tabelle</p>
+<p>207 Invalid column name &#8216;&lt;name&gt;&#8217;.<br />
+208 Invalid object name &#8216;&lt;name&gt;&#8217;.</p>
+<p>Falls ein verkehrter Feldname angegeben wird &#8211; z.B. MANDT anstelle von CLIENT &#8211; dann wird ein Kurzdump erzeugt. Dort taucht aber nur der Fehler 207 auf. Im Syslog SM21 stehen dann genauere Informationen:</p>
+<p>Laufzeitfehler &#8220;DBIF_DSQL2_SQL_ERROR&#8221; aufgetreten.<br />
+&gt; Kurzdump &#8220;080311 131016 xserver02 _XPO_00 &#8221; erstellt.<br />
+Datenbankfehler 207 beim OPC aufgetreten<br />
+&gt; Invalid column name &#8216;MANDT&#8217;.Invalid column name<br />
+&gt; &#8216;addrnumber&#8217;.Invalid column name &#8216;name1&#8217;.</p>
+<p>Der Beitrag <a href="/blog/exec-sql/">EXEC SQL</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/exec-sql/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

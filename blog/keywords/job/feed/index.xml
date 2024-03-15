@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>job Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/job/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 08 Mar 2021 13:20:00 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>job Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Periodischer Job mit unabhängigen Steps</title>
+		<link>/blog/periodischer-job-mit-unabhaengigen-steps/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 08 Mar 2021 13:19:59 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[steps]]></category>
+		<category><![CDATA[periodisch]]></category>
+		<category><![CDATA[job]]></category>
+		<guid isPermaLink="false">/?p=1026410</guid>
+
+					<description><![CDATA[<p>Jobeinplanungen sind im täglichen Betrieb eines SAP-Systems nicht wegzudenken und gehören zum "Daily Business". Trotzdem gibt es hin und wieder eine Anforderung, die trotz jahrelanger ausgeklügelter Techniken nicht ausreicht. In diesem Fall ein periodischer Job mit voneinander unabhängigen Verarbeitungsschritten.</p>
+<p>Der Beitrag <a href="/blog/periodischer-job-mit-unabhaengigen-steps/">Periodischer Job mit unabhängigen Steps</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Jobverarbeitung is in vielen Bereichen und für viele Funktionalitäten wichtig. Jobeinplanungen sind eine gängige Technik, die jahrzehntelang erprobt ist. Kürzlich bin ich in einem Projekt auf eine Anforderung gestoßen, die nicht so ohne Weiteres mit den Standardmitteln der Jobeinplanung möglich war.</p>
+
+
+
+<h2 class="wp-block-heading">Anforderung</h2>
+
+
+
+<p>Es soll ein periodischer Job mit mehreren Steps eingeplant werden, deren Verarbeitungsschritte (Steps) unabhängig voneinander sind. Unabhängig heißt in diesem Fall, dass ein Verarbeitungsschritt, der durch einen Kurzdump abbricht, die Ausführung der anderen Schritte nicht beeinträchtigen soll. </p>
+
+
+
+<h3 class="wp-block-heading">Möglichkeit 1</h3>
+
+
+
+<p>Die erste auf der Hand liegende Möglichkeit ist, einen Job periodisch einzuplanen, der einzelne Verarbeitungsschritte enthält. Leider bricht der gesamte Job ab, wenn einer der Verarbeitungsschritte durch einen Shortdump abbricht. Diese Möglichkeit kommt also nicht in Betracht.</p>
+
+
+
+<h3 class="wp-block-heading">Möglichkeit 2</h3>
+
+
+
+<p>Die zweite Möglichkeit wäre, die einzelnen Verarbeitungsschritte als einzelne Jobs zu definieren und jeweils den einen Job als Vorgänger des jeweils nächsten Jobs zu definieren. Aber auch hier gibt es eine Einschränkung: Diese Jobs können nicht periodisch geplant werden. </p>
+
+
+
+<h2 class="wp-block-heading">Lösung</h2>
+
+
+
+<p>Die Lösung für mich war in diesem Fall natürlich ein ABAP Programm. Das folgende Programm kann man periodisch als Job einplanen und hier bis zu fünf Programme unabhängig voneinander, jeweils mit Vorgänger &#8211; Nachfolger-Beziehung, definieren. Wenn das Programm ausgeführt wird, startet es das erste Programm sofort als Job. Das zweite Programm wird gestartet, wenn der Job für das erste Programm beendet wurde und so weiter. Dabei ist es unerheblich, ob der Vorgängerjob regulär beendet wurde oder abgebrochen ist. </p>
+
+
+
+<p>Das Programm ist fest auf fünf Verarbeitungsschritte ausgelegt. Es kann einfach auf weitere Steps erweitert werden. Sofern noch sehr viele Verarbeitungsschritte verwaltet werden sollten, sollte man die Verarbeitung dynamisch programmieren. Dafür müsste man jedoch auch die Eingabe für die Definition der Verarbeitungsschritte so anpassen, dass die einzelnen Programme in einer Liste (Grid) eingegeben werden können. </p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="549" height="579" src="/wp-content/uploads/2021/03/SNAG-01324.png" alt="" class="wp-image-1026411" srcset="/wp-content/uploads/2021/03/SNAG-01324.png 549w, /wp-content/uploads/2021/03/SNAG-01324-284x300.png 284w" sizes="(max-width: 549px) 100vw, 549px" /><figcaption>Report mit beispielhaften Reporteinplanungen</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT z_schedule_05_jobs_periodic.
+
+PARAMETERS nam1 TYPE btcjob     OBLIGATORY.
+PARAMETERS rep1 TYPE syrepid    OBLIGATORY.
+PARAMETERS var1 TYPE raldb_vari OBLIGATORY.
+SELECTION-SCREEN SKIP 1.
+
+PARAMETERS nam2 TYPE btcjob.
+PARAMETERS rep2 TYPE syrepid.
+PARAMETERS var2 TYPE raldb_vari.
+SELECTION-SCREEN SKIP 1.
+
+PARAMETERS nam3 TYPE btcjob.
+PARAMETERS rep3 TYPE syrepid.
+PARAMETERS var3 TYPE raldb_vari.
+SELECTION-SCREEN SKIP 1.
+
+PARAMETERS nam4 TYPE btcjob.
+PARAMETERS rep4 TYPE syrepid.
+PARAMETERS var4 TYPE raldb_vari.
+SELECTION-SCREEN SKIP 1.
+
+PARAMETERS nam5 TYPE btcjob.
+PARAMETERS rep5 TYPE syrepid.
+PARAMETERS var5 TYPE raldb_vari.
+
+
+CLASS lcx_job DEFINITION INHERITING FROM cx_static_check.
+ENDCLASS.
+
+CLASS lcl_define_job DEFINITION.
+  PUBLIC SECTION.
+    METHODS constructor
+      IMPORTING
+        iv_name    TYPE btcjob
+        iv_report  TYPE syrepid
+        iv_variant TYPE raldb_vari
+      RAISING
+        lcx_job.
+
+    METHODS start
+      IMPORTING
+        iv_pred_jobcount TYPE btcjobcnt OPTIONAL
+        iv_pred_jobname  TYPE btcjob OPTIONAL
+      RAISING
+        lcx_job.
+
+    DATA mv_jobcount     TYPE btcjobcnt.
+    DATA mv_jobname      TYPE btcjob.
+    DATA mv_released     TYPE abap_bool.
+
+ENDCLASS.
+
+CLASS lcl_define_job IMPLEMENTATION.
+  METHOD constructor.
+
+    mv_jobname = iv_name.
+
+    CALL FUNCTION 'JOB_OPEN'
+      EXPORTING
+        jobname          = iv_name
+      IMPORTING
+        jobcount         = mv_jobcount
+      EXCEPTIONS
+        cant_create_job  = 1
+        invalid_job_data = 2
+        jobname_missing  = 3
+        OTHERS           = 4.
+    IF sy-subrc = 0.
+      CALL FUNCTION 'JOB_SUBMIT'
+        EXPORTING
+          authcknam               = sy-uname
+          jobcount                = mv_jobcount
+          jobname                 = iv_name
+          report                  = iv_report
+          variant                 = iv_variant
+        EXCEPTIONS
+          bad_priparams           = 1
+          bad_xpgflags            = 2
+          invalid_jobdata         = 3
+          jobname_missing         = 4
+          job_notex               = 5
+          job_submit_failed       = 6
+          lock_failed             = 7
+          program_missing         = 8
+          prog_abap_and_extpg_set = 9
+          OTHERS                  = 10.
+      IF sy-subrc &lt;> 0.
+        RAISE EXCEPTION TYPE lcx_job.
+      ENDIF.
+    ENDIF.
+  ENDMETHOD.
+  METHOD start.
+
+    CALL FUNCTION 'JOB_CLOSE'
+      EXPORTING
+        jobcount             = mv_jobcount
+        jobname              = mv_jobname
+        pred_jobcount        = iv_pred_jobcount
+        pred_jobname         = iv_pred_jobname
+        strtimmed            = SWITCH #( iv_pred_jobcount WHEN space THEN 'X' ELSE space )
+      IMPORTING
+        job_was_released     = mv_released
+      EXCEPTIONS
+        cant_start_immediate = 1
+        invalid_startdate    = 2
+        jobname_missing      = 3
+        job_close_failed     = 4
+        job_nosteps          = 5
+        job_notex            = 6
+        lock_failed          = 7
+        invalid_target       = 8
+        OTHERS               = 9.
+    IF sy-subrc &lt;> 0.
+      RAISE EXCEPTION TYPE lcx_job.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.
+
+
+START-OF-SELECTION.
+
+  TRY.
+
+      DATA(job1) = NEW lcl_define_job(
+        iv_name    = nam1
+        iv_report  = rep1
+        iv_variant = var1 ).
+      job1->start( ).
+
+      IF rep2 IS NOT INITIAL.
+        DATA(job2) = NEW lcl_define_job(
+          iv_name    = nam2
+          iv_report  = rep2
+          iv_variant = var2 ).
+        job2->start(
+          iv_pred_jobname  = job1->mv_jobname
+          iv_pred_jobcount = job1->mv_jobcount ).
+      ENDIF.
+
+      IF rep3 IS NOT INITIAL.
+        DATA(job3) = NEW lcl_define_job(
+          iv_name    = nam3
+          iv_report  = rep3
+          iv_variant = var3 ).
+        job3->start(
+          iv_pred_jobname  = job2->mv_jobname
+          iv_pred_jobcount = job2->mv_jobcount ).
+      ENDIF.
+
+      IF rep4 IS NOT INITIAL.
+        DATA(job4) = NEW lcl_define_job(
+          iv_name    = nam4
+          iv_report  = rep4
+          iv_variant = var4 ).
+        job4->start(
+          iv_pred_jobname  = job3->mv_jobname
+          iv_pred_jobcount = job3->mv_jobcount ).
+      ENDIF.
+
+      IF rep5 IS NOT INITIAL.
+        DATA(job5) = NEW lcl_define_job(
+          iv_name    = nam5
+          iv_report  = rep5
+          iv_variant = var5 ).
+        job5->start(
+          iv_pred_jobname  = job4->mv_jobname
+          iv_pred_jobcount = job4->mv_jobcount ).
+      ENDIF.
+    CATCH lcx_job.
+      MESSAGE 'Error job creation!' TYPE 'I'.
+  ENDTRY.</pre>
+<p>Der Beitrag <a href="/blog/periodischer-job-mit-unabhaengigen-steps/">Periodischer Job mit unabhängigen Steps</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>IF cl_qualification=&gt;i_speak( &#8216;ABAP&#8217; ) = abap_true. me-&gt;apply( ). ENDIF.</title>
+		<link>/blog/inwerken_jobs/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 20 Jun 2017 11:36:03 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[job]]></category>
+		<category><![CDATA[inwerken]]></category>
+		<category><![CDATA[firma]]></category>
+		<category><![CDATA[stellenangebot]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018048</guid>
+
+					<description><![CDATA[<p>Ich suche neue Kolleginnen und Kollegen! Du möchtest in einem starken Team arbeiten, neue Technologien kennen lernen und suchst eine neue Herausforderung? Dann bewirb dich bei uns!</p>
+<p>Der Beitrag <a href="/blog/inwerken_jobs/">IF cl_qualification=&gt;i_speak( &#8216;ABAP&#8217; ) = abap_true. me-&gt;apply( ). ENDIF.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2>Kurz und knapp</h2>
+<p>Ich suche neue Kolleginnen und Kollegen!</p>
+<p>Du kannst ABAP oder suchst als SAP-Berater eine neue Herausforderung?</p>
+<p>Dann bewirb dich bei uns: <a href="mailto:bewerbung@inwerken.de">bewerbung@inwerken.de</a>.</p>
+<h2>Die etwas längere Version</h2>
+<p>Der ein oder andere kennt mich als &#8220;Mr. Tricktresor&#8221; oder als <a href="http://www.abapforum.com/forum/search.php?author_id=202&amp;sr=posts">ewx im ABAPforum.com</a>. Allerdings wissen, glaube ich, nur wenige, dass ich bei der Firma INWERKEN AG angestellt bin. Dort programmiere und berate ich in Kundenprojekten als auch bei internen Projekten. Ich habe bei Inwerken angefangen, weil ich begeistert von den Kollegen war und ich meine eigenen Ziele verfolgen konnte. Heute, ziemlich genau neun Jahre später, bin ich immer noch überzeugt von dem technischen Knowhow  meiner Kollegen und dem Zusammenhalt in der Firma. Das <a href="http://amzn.to/2tjl20B">ABAP-Kochbuch </a>wäre ohne meine Kollegen nie zustande gekommen.</p>
+<p>Wer mich kennt, der weiß, dass ich ein ehrlicher Mensch bin. Deswegen muss ich auch klar sagen: Es ist nicht alles perfekt. Natürlich gibt es bei Inwerken Probleme und Dinge, die nicht optimal funktionieren. Aber wir können immer über alles sprechen und meistens finden wir eine zufriedenstellende Lösung. Ich möchte nun nicht die ganzen Buzzwords von wegen flache Strukturen, Teamgeist und so weiter aufzählen, das kann nur in die Hose gehen. Am besten machst du dir selbst ein Bild.</p>
+<h2>Das Team Inwerken</h2>
+<p>Da wir ein SAP-Beratungshaus sind, ist der Großteil natürlich in der SAP-Beratung und ABAP-Programmierung tätig. Wir beschäftigen uns dabei mit der ganzen breiten Palette von SAP-Produkten. Wir machen komplette SAP-Einführungen als auch Add-On-Programmierungen und Anpassungen an bestehenden Systemen. Wir optimieren Prozesse und Programme. In der Regel verstehen wir das große Ganze und verlieren trotzdem die Details nicht aus dem Blick.</p>
+<p>Wir haben ein hervorragendes Backoffice bestehend aus fünf Kolleginnen, die sich um alles kümmern, was nicht mit SAP zu tun hat.</p>
+<p>Die interne vierköpfige IT und Basisadministration betreut unsere Software und Notebooks sowie unsere Inwerken-eigenen SAP-Systeme. Ganz neu im Fuhrpark sind gerade vier HANA und S/4HANA Systeme!</p>
+<p>Im Beratungsbereich haben wir für fast jedes Modul fähige Mitarbeiter und Mitarbeiterinnen. Egal ob Preisfindung im SD, Chargenfindung in der Lieferung, Arbeitsplanerstellung bei Fertigungsaufträgen oder Infocubes im Business Warehouse: Fast immer gibt es jemanden, der sich auskennt.</p>
+<p>ABAP-Programmierung besteht nicht nur aus IF-ELSE-ENDIF oder SELECT, sondern aus einer Vielzahl von Komponenten und modulspezifischen Funktionen Und auch hier sind zu vielen Spezialthemen Leute unterwegs, die genau wissen, was sie tun. Dabei ist es egal ob es sich um BAPIs, Programmierkonzepte oder die Analyse von schwer nachzustellenden Fehlern geht, bei Inwerken ist meistens jemand, der sich schon einmal mit dem Thema auseinandergesetzt hat oder schlichtweg hilft, wenn ein Programm nicht so funktioniert, wie es soll. Auf jeden Fall kann man sich immer zusammensetzen und Lösungen diskutieren oder Ideen sammeln.</p>
+<h2>Die Firma</h2>
+<p>Die Inwerken AG ist aus der 1999 gegründeten COMbridge AG hervorgegangen. Bereits zu COMbridge-Zeiten hatte die Firma den Ruf, Probleme anzupacken und lösen. Mit Inwerken ist daraus eine Firma entwachsen, die ich durchaus einen sehr attraktiven Arbeitgeber nennen würde. Inwerken besteht aktuell aus 57 Mitarbeitern, davon acht Auszubildende.</p>
+<p>Wir organisieren regelmäßig <a href="https://www.inwerken.de/karriere/inside-inwerken-newsblog-intern/">Team-Events und Feste</a>, bei denen der Spaß und Teamgeist nicht zu kurz kommen. Neben dem Spaßfaktor bietet Inwerken jedoch auch flexible Arbeitszeitmodelle, Homeoffice, ergonomische Arbeitsplätze, vielfältige soziale Leistungen, Kaffee und Mineralwasser, Firmenwagenregelung und interne Weiterbildungsmöglichkeiten (Englishkurs, Code-Dojo, Workshops).</p>
+<p><a href="https://www.inwerken.de/"><img decoding="async" class="alignnone size-full wp-image-1018049" src="https://tricktresor.com/wp-content/uploads/2017/06/IMG_0117.jpg" alt="" width="640" height="480" srcset="/wp-content/uploads/2017/06/IMG_0117.jpg 640w, /wp-content/uploads/2017/06/IMG_0117-300x225.jpg 300w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Community</h2>
+<p>Wir engagieren uns stark in der SAP-Community. Regelmäßig richten wir die SAP CodeJam zu verschiedenen Themen aus. Die CodeJam ist ein beliebtes Event bei dem man unkompliziert mit neuen Techniken (SAPUI5, HANA, Gateway etc.) in Kontakt treten kann. Ein erfahrener SAP-Mitarbeiter führt durch den Tag und steht Fragen Rede und Antwort.</p>
+<p>Im Februar 2017 haben wir unseren ersten SAP Inside Track veranstaltet, der ein großer Erfolg war. Bei einem SAP Inside Track halten SAP-Profis aus der SAP-Community Vorträge über verschiedenste Themen. Die Themen sind meistens technisch und in der Regel mit irgend einem SAP-Bezug. Es wurden jedoch auch schon ein Vortrag über Rum mit anschließender Verköstigung gehalten. Die Inside Tracks sind eine gute Gelegenheit um viele verschiedene Eindrücke zu meistens sehr aktuellen Themen zu bekommen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/06/sithvr.png"><img decoding="async" class="alignnone size-large wp-image-1018051" src="https://tricktresor.com/wp-content/uploads/2017/06/sithvr-1024x679.png" alt="" width="640" height="424" srcset="/wp-content/uploads/2017/06/sithvr-1024x679.png 1024w, /wp-content/uploads/2017/06/sithvr-300x199.png 300w, /wp-content/uploads/2017/06/sithvr-768x509.png 768w, /wp-content/uploads/2017/06/sithvr-95x62.png 95w, /wp-content/uploads/2017/06/sithvr.png 1299w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Bewerbung &#8211; Wir suchen dich!</h2>
+<p>Inwerken ist klar auf Wachstumskurs. Aus diesem Grund suchen wir neue Mitarbeiter: Berater und Entwickler aus (fast) allen SAP-Teilbereichen. Wenn du gerne in einem modernen Arbeitsumfeld in einem leistungsstarken Team an anspruchsvollen Projekten mitarbeiten möchtest, dann bewirb dich und schicke uns eine Mail: <a href="mailto:bewerbung@inwerken.de">bewerbung@inwerken.de</a>.</p>
+<p>Schaue dich gerne bei unseren <a href="https://www.inwerken.de/karriere/offene-stellen/">offenen Stellen</a> um. Es ist nichts für dich dabei? Wenn du das Gefühl hast, dass Inwerken die richtige Firma ist, dann sprich uns trotzdem an! Gute Leute können wir immer gebrauchen.</p>
+<p>Ich bin gespannt auf deine Bewerbung!!</p>
+<p>Der Beitrag <a href="/blog/inwerken_jobs/">IF cl_qualification=&gt;i_speak( &#8216;ABAP&#8217; ) = abap_true. me-&gt;apply( ). ENDIF.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Events</title>
+		<link>/blog/events/</link>
+					<comments>/blog/events/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 22 Jul 2003 20:12:57 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<category><![CDATA[Workflow]]></category>
+		<category><![CDATA[event]]></category>
+		<category><![CDATA[job]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=99</guid>
+
+					<description><![CDATA[<p>Events oder auch Ereignisse k&#246;nnen verwendet werden, um Hintergrundjobs zu starten. Da ein Event auch vom Betriebssystem ausgel&#246;st werden kann, eignet es sich hervorragend zur Realisierung von Schnittstellen.</p>
+<p>Der Beitrag <a href="/blog/events/">Events</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Events oder auch Ereignisse können verwendet werden, um Hintergrundjobs zu starten. Da ein Event auch vom Betriebssystem ausgelöst werden kann, eignet es sich hervorragend zur Realisierung von Schnittstellen.</p>
+<p>[notice type=&#8217;alert&#8217;]Verwechseln Sie die Events nicht mit den Ereignissen aus dem Bereich &#8220;Workflow&#8221;!!! Diese heißen zwar genau so, werden aber anders behandelt.[/notice]</p>
+<h2 class="head1">Anlegen eines Events</h2>
+<p>Um ein Event im R/3 <span style="color: #f49047;">anzulegen</span>, verwenden Sie die Transaktion SM62. Klicken Sie auf &#8220;Benutzerereignisbezeichnungen Pflegen&#8221; und drücken Sie &lt;Enter&gt;. Sie können nun mit dem Anlegen-Symbol ein Ereignis anlegen. Geben Sie hierzu nur den Namen und die Bezeichnung ein.</p>
+<h2>Auslösen eines Events</h2>
+<h3>&#8230;aus SAP</h3>
+<p>Sie können ein Event aus R/3 heraus mit der Transaktion SM64 auslösen.</p>
+<p>Mit der Methode cl_batch_event=&gt;raise( ) erreichen Sie das gleiche aus einem Programm heraus. Der Funktionsbaustein BP_EVENT_RAISE sollte nicht mehr verwendet werden, da er als veraltet gekennzeichnet wurde.</p>
+<p>Wenn man <em>cl_batch_event=&gt;raise </em>auslöst, kann man außer der eventid auch einen <strong>Eventparameter</strong> mitgeben. Wenn ein Job allgemein auf die Eventid reagiert, kann während der Laufzeit dieser Eventparameter mit Hilfe des Funktionsbausteins GET_JOB_RUNTIME_INFO ausgelesen werden.  Da der Parameter ein recht langes Textfeld ist kann man damit z.B. Informationen mitgeben welches Material, Kunde etc. in diesem speziellen Fall bearbeitet werden soll.</p>
+<h3>&#8230;vom Betriebssystem</h3>
+<p>Auf Betriebssystemebene rufen Sie das Programm <span style="color: #fb2412;">sapevt</span> (für UNIX) bzw. <span style="color: #fb2412;">sapevt.exe </span>(für Windows) auf das im R/3-Arbeitsverzeichnis steht:</p>
+<pre class="sap1">sapevt z_event -p DATEI_IST_DA pf=mbs_d00.pfl</pre>
+<p>Alternativ können Sie auch den Namen des R/3-Systems angeben (name) und die Instanznr (nr). Es erscheint dann die Meldung &#8220;No profile used&#8221; die aber ignoriert werden kann (Diesmal ohne Parameter):</p>
+<pre class="sap1">sapevt z_event name=TT1 nr=01</pre>
+<p>Sie können so eine einfach Schnittstelle realisieren, in dem Sie eine Datei auf den Applikationsserver kopieren und danach das Programm ausführen. Mit der Transaktion SM36 legen Sie einen Job an, der auf dieses Ereignis reagiert und die Datei einliest.</p>
+<h2>Parameter auslesen</h2>
+<p>Mit dem Funktionsbaustein GET_JOB_RUNTIME_INFO können die übergebenen Parameter innerhalb des Programms wieder ausgelesen werden.</p>
+<p>Der Beitrag <a href="/blog/events/">Events</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/events/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

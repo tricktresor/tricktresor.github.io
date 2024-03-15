@@ -1,0 +1,818 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_gui_docking_container Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_gui_docking_container/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 07 Sep 2022 16:08:09 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_gui_docking_container Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>BASE64-kodiertes Pony anzeigen</title>
+		<link>/blog/base64-kodiertes-pony-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Sep 2022 16:08:08 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<category><![CDATA[cl_gui_picture]]></category>
+		<guid isPermaLink="false">/?p=1038114</guid>
+
+					<description><![CDATA[<p>Ein kleines Demo-Programm um ein BASE64 kodiertes Rennpony-GIF in einem Container anzuzeigen.</p>
+<p>Der Beitrag <a href="/blog/base64-kodiertes-pony-anzeigen/">BASE64-kodiertes Pony anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In diesem Beispielprogramm zeige ich dir, wie du ein niedliches Pony anzeigen kannst. Grüße gehen raus an <a class="keychainify-checked" href="https://galoppsim.racing/" target="_blank" rel="noreferrer noopener">Marco Matjes</a>. Das Coding ist nicht schön, aber es zeigt, wie man ein BASE64-Codiertes Bild (in diesem Fall ein GIF) in einem Container anzeigen kann. Kleine Bilder oder Icons können so relativ einfach im Quelltext eingebunden werden.</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="607" height="304" src="/wp-content/uploads/2022/09/image.png" alt="" class="wp-image-1038123" srcset="/wp-content/uploads/2022/09/image.png 607w, /wp-content/uploads/2022/09/image-300x150.png 300w, /wp-content/uploads/2022/09/image-272x137.png 272w" sizes="(max-width: 607px) 100vw, 607px" /><figcaption class="wp-element-caption">So sieht das Pony aus</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="wp-block-code"><code>REPORT.
+
+DATA picture       TYPE REF TO cl_gui_picture.
+DATA pic_container TYPE REF TO cl_gui_docking_container.
+DATA graphic_url(255).
+
+TYPES: BEGIN OF graphic_str,
+         line(255) TYPE x,
+       END OF graphic_str,
+       graphic_tab TYPE STANDARD TABLE OF graphic_str.
+DATA graphic_table TYPE graphic_tab.
+DATA graphic_size TYPE i.
+
+PARAMETERS p_dummy.
+
+INITIALIZATION.
+  PERFORM show.
+
+START-OF-SELECTION.
+
+  DEFINE a.
+    concatenate l_graphic_str &amp;1 into l_graphic_str.
+  END-OF-DEFINITION.
+
+FORM show.
+
+  DATA: l_graphic_xstr TYPE xstring,
+        l_graphic_x    TYPE x,
+        l_graphic_conv TYPE i,
+        l_graphic_str  TYPE string,
+        l_graphic_offs TYPE i.
+
+
+  pic_container = NEW #( extension = 300 no_autodef_progid_dynnr = 'X' ).
+  picture = NEW #( parent = pic_container ).
+
+  CLEAR graphic_table.
+
+  "GIF rennpony 16 colors
+  a 'R0lGODlhFQATADMAACH5BAAAAAAALAAAAAAVABMAg////19qcHaPjo6ij5XL/p3Mx6rR3qTS+LPUksPessjcysvl+ufbrvrclPfv1Or'.
+  a '0+wSMEMg5F1mY6g0eztzmNA3TKEu4LYaptI2jShbBMIahlDNwXCwDYcdQeQ6HwEDxOyiKmyNhKhj8pobYBjkl6K5TokZRKBe+3enhRn'.
+  a 'Eg3u/EbwH2aiWJfB6hfjzAa3d6ewYHDzRpWQ0SCoMJBoc0gCYOMo15hho1aiaLAAqgkRR/aYE9iKVQPZtppwCsXREAOw=='.
+
+  CALL FUNCTION 'SSFC_BASE64_DECODE'
+    EXPORTING
+      b64data = l_graphic_str
+    IMPORTING
+      bindata = l_graphic_xstr
+    EXCEPTIONS
+      OTHERS  = 8.
+
+
+  graphic_size = xstrlen( l_graphic_xstr ).
+  CHECK graphic_size > 0.
+
+  l_graphic_conv = graphic_size.
+  l_graphic_offs = 0.
+
+  WHILE l_graphic_conv > 255.
+    APPEND VALUE #( line = l_graphic_xstr+l_graphic_offs(255) ) TO graphic_table.
+    l_graphic_offs = l_graphic_offs + 255.
+    l_graphic_conv = l_graphic_conv - 255.
+  ENDWHILE.
+
+  APPEND VALUE #( line = l_graphic_xstr+l_graphic_offs(l_graphic_conv) ) TO graphic_table.
+
+
+  CALL FUNCTION 'DP_CREATE_URL'
+    EXPORTING
+      type      = 'image'                                    "#EC NOTEXT
+      subtype   = 'gif'
+      cacheable = space
+      size      = graphic_size
+      lifetime  = cndp_lifetime_transaction
+    TABLES
+      data      = graphic_table
+    CHANGING
+      url       = graphic_url.
+
+  picture->clear_picture( ).
+  picture->load_picture_from_url( url = graphic_url ).
+  picture->set_display_mode( cl_gui_picture=>display_mode_fit ).
+
+ENDFORM.</code></pre>
+<p>Der Beitrag <a href="/blog/base64-kodiertes-pony-anzeigen/">BASE64-kodiertes Pony anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>GUI-Designer &#8220;guidrasil&#8221;</title>
+		<link>/blog/gui-designer-guidrasil/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 17 Oct 2018 17:19:56 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_picture]]></category>
+		<category><![CDATA[guidrasil]]></category>
+		<category><![CDATA[GUI-Designer]]></category>
+		<category><![CDATA[rtti]]></category>
+		<category><![CDATA[cl_gui_textedit]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019340</guid>
+
+					<description><![CDATA[<p>Vor langer Zeit habe ich mich mit der automatischen und generischen Erzeugung und Verwaltung von SAPGUI-Controls beschäftigt. Aus dieser Beschäftigung heraus ist der GUI-Designer entstanden, den ich guidrasil getauft habe. Folge mir in die Welt der Controls und Container...</p>
+<p>Der Beitrag <a href="/blog/gui-designer-guidrasil/">GUI-Designer &#8220;guidrasil&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Vor langer Zeit habe ich mich mit der automatischen und generischen Erzeugung und Verwaltung von <em>SAPGUI-Controls</em> beschäftigt.</p>
+<h2>Was sind Controls?</h2>
+<p>Controls sind ActiveX-Komponenten (auch OCX-Komponenten genannt), die im SAPGUI verwendet werden können und mit diesem ausgeliefert werden. Diese Windows-Komponenten werden über entsprechende Klassen im SAP angesprochen und erzeugt. Die Erzeugung erfolgt in der Regel ähnlich:</p>
+<ol>
+<li>CREATE OBJECT &lt;object reference&gt;</li>
+<li>&lt;object reference&gt;-SET_&#8230;.</li>
+<li>Manche Controls benötigen noch ein explizites DISPLAY.</li>
+</ol>
+<p>Die typischen GUI-Controls sind:</p>
+<ul>
+<li>CL_GUI_ALV_GRID</li>
+<li>CL_GUI_TEXTEDIT</li>
+<li>CL_GUI_PICTURE</li>
+<li>CL_GUI_CALENDAR</li>
+<li>CL_GUI_HTML_VIEWER</li>
+<li>CL_GUI_SIMPLE_TREE</li>
+<li>CL_GUI_COLUMN_TREE</li>
+<li>CL_GUI_LIST_TREE</li>
+</ul>
+<p>Controls benötigen einen Container, in dem sie platziert werden können. Lustiger Weise erben die Container-Klassen von der gleichen Klasse wie die Controls selber: CL_GUI_CONTROL. Die Container erben dann alle von CL_GUI_CONTAINER:</p>
+<ul>
+<li>CL_GUI_DOCKING_CONTAINER</li>
+<li>CL_GUI_CUSTOM_CONTAINER</li>
+<li>CL_GUI_DIALOGBOX_CONTAINER</li>
+</ul>
+<p>Eine Sonderstellung nehmen die Splitter-Controls ein, denn sie stellen ebenfalls wieder Container zur Verfügung:</p>
+<ul>
+<li>CL_GUI_SPLITTER_CONTAINER</li>
+<li>CL_GUI_EASY_SPLITTER_CONTAINER</li>
+</ul>
+<h3>Programmierung von Controls</h3>
+<p>Eine typische Programmierung sieht wie folgt aus:</p>
+<ul>
+<li>Erzeuge einen Container</li>
+<li>Erzeuge das Control in diesem Container</li>
+<li>Setze Eigenschaften des Controls</li>
+</ul>
+<p>In diesem <a href="https://tricktresor.com/blog/dockingcontainer/">Demoprogramm</a> zeige ich kurz, wie ein Textedit-Control in einem Docking-Container aufgebaut wird.</p>
+<h3>Setzen von Eigenschaften</h3>
+<p>Die Ansteuerung der Controls ist natürlich immer unterschiedlich, da sich die Control unterscheiden. Ein Picture-Control ist nun mal immer read-only, Ein Textedit-Control nicht. Das ist auch genau das Problem: Wenn ich ein Control häufig verwende, dann kenne ich die Eigenschaften und notwendigen Attribute. Wenn nicht, dann muss ich suchen. Zudem ist die Aktivierung von Attributen manchmal per BOOLEAN notwendig (X und space) und manchmal verlangt das Control &#8220;1&#8221; und &#8220;0&#8221;.</p>
+<h2>Idee eines GUI-Designers</h2>
+<p>Da die Controls alle von der Klasse CL_GUI_CONTROL abstammen, ist es möglich jedes Control über eine generelle Methodenschnittstelle zu erzeugen. Ich kann also einer Methode irgend einen Container übergeben (egal, ob Docking-Container, Custom-Container oder Dialogbox) und das Control wieder zurück bekommen. Oder ich kann ein Control erzeugen und es in einer Tabelle speichern.</p>
+<p>Das folgende Beispielprogramm macht genau das: Durch die Einstellungen auf dem Selektionsbildschirm wird definiert, welche Art von Control auf welcher Seite angedockt werden soll. Mit &lt;ENTER&gt; werden der Container sowie das Control erzeugt und in einer internen Tabelle abgelegt:</p>
+<p><img decoding="async" class="alignnone size-large wp-image-1019345" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil-demo01-1024x773.png" alt="" width="640" height="483" srcset="/wp-content/uploads/2018/10/guidrasil-demo01-1024x773.png 1024w, /wp-content/uploads/2018/10/guidrasil-demo01-300x226.png 300w, /wp-content/uploads/2018/10/guidrasil-demo01-768x580.png 768w, /wp-content/uploads/2018/10/guidrasil-demo01.png 1378w" sizes="(max-width: 640px) 100vw, 640px" /></p>
+<h3>Demoprogramm</h3>
+<pre>REPORT zguidrsail_demo_generic_ctrl.
+
+SELECTION-SCREEN BEGIN OF BLOCK ctrl WITH FRAME TITLE TEXT-ctl.
+PARAMETERS p_text RADIOBUTTON GROUP ctrl DEFAULT 'X'.
+PARAMETERS p_icon RADIOBUTTON GROUP ctrl.
+SELECTION-SCREEN END OF BLOCK ctrl.
+
+SELECTION-SCREEN BEGIN OF BLOCK side WITH FRAME TITLE TEXT-sid.
+PARAMETERS p_left RADIOBUTTON GROUP side DEFAULT 'X'.
+PARAMETERS p_rigt RADIOBUTTON GROUP side.
+PARAMETERS p_botm RADIOBUTTON GROUP side.
+SELECTION-SCREEN END OF BLOCK side.
+
+CLASS ctrl_demo DEFINITION.
+  PUBLIC SECTION.
+    METHODS add_text
+      IMPORTING
+        side TYPE i.
+    METHODS add_icon
+      IMPORTING
+        side TYPE i.
+  PROTECTED SECTION.
+    TYPES: BEGIN OF ts_object,
+             container TYPE REF TO cl_gui_container,
+             control   TYPE REF TO cl_gui_control,
+           END OF ts_object.
+
+    DATA objects TYPE STANDARD TABLE OF ts_object.
+    METHODS append_control
+      IMPORTING
+        container TYPE REF TO cl_gui_container
+        control   TYPE REF TO cl_gui_control.
+
+ENDCLASS.
+
+CLASS ctrl_demo IMPLEMENTATION.
+  METHOD add_text.
+    DATA(parent) = NEW cl_gui_docking_container( side = side ratio = 20 ).
+    DATA(textedit) = NEW cl_gui_textedit( parent = parent ).
+    textedit-&gt;set_text_as_stream( VALUE texttab( ( tdline = `This is a demonstration` ) ) ).
+    append_control( container = parent control = textedit ).
+  ENDMETHOD.
+  METHOD add_icon.
+    DATA(parent) = NEW cl_gui_docking_container( side = side ratio = 20 ).
+    DATA(icon) = NEW cl_gui_picture( parent = parent ).
+    icon-&gt;load_picture_from_sap_icons( icon_message_question ).
+    icon-&gt;set_display_mode( cl_gui_picture=&gt;display_mode_fit_center ).
+    append_control( container = parent control = icon ).
+  ENDMETHOD.
+  METHOD append_control.
+    APPEND VALUE #( container = container control = control ) TO objects.
+  ENDMETHOD.
+ENDCLASS.
+
+INITIALIZATION.
+  DATA(demo) = NEW ctrl_demo( ).
+
+AT SELECTION-SCREEN.
+
+  CASE 'X'.
+    WHEN p_left.
+      DATA(side) = cl_gui_docking_container=&gt;dock_at_left.
+    WHEN p_rigt.
+      side = cl_gui_docking_container=&gt;dock_at_right.
+    WHEN p_botm.
+      side = cl_gui_docking_container=&gt;dock_at_bottom.
+  ENDCASE.
+
+  CASE 'X'.
+    WHEN p_text.
+      demo-&gt;add_text( side = side ).
+    WHEN p_icon.
+      demo-&gt;add_icon( side = side ).
+  ENDCASE.</pre>
+<h3>Dynamische Verwaltung</h3>
+<p>Da ich nun alle erzeugten Container und Controls in einer Tabelle habe, kann ich auch auf die Objekte und deren Eigenschaften zugreifen. Ich könnte zum Beispiel die Tabelle durchgehen und fragen: Ist im Feld CONTAINER ein Objekt der Klasse CL_GUI_DOCKING_CONTAINER? Wenn ja, frage ich das Control nach seinen wichtigen Eigenschaften: RATIO und SIDE:</p>
+<pre>IF itab-container IS INSTANCE OF cl_gui_docking_container.
+  DATA dock TYPE REF TO cl_gui_docking_container.
+  dock ?= itab-container.
+  DATA(side) = dock-&gt;get_docking_side( ).
+  dock-&gt;get_ratio( ratio = DATA(ratio) ).
+ENDIF.</pre>
+<p>Auf diese Weise könnte ich mir alle wichtigen Eigenschaften eines Controls beschaffen und speichern.</p>
+<h3>Dynamische Erzeugung</h3>
+<p>Mit Hilfe von RTTI (Run Time Type Information) in Form der Klasse CL_ABAP_TYPEDESCR kann ich sogar den Klassennamen des Objektes ermitteln:</p>
+<p>DATA(clsnam) = cl_abap_typedescr=&gt;describe_by_object_ref( itab-container )-&gt;get_relative_name( ).<br />
+Wenn ich diesen habe, dann ich das Objekt auch dynamisch erzeugen:</p>
+<pre>DATA: container TYPE REF TO cl_gui_container, 
+      exc_ref TYPE REF TO cx_root.
+
+DATA: ptab TYPE abap_parmbind_tab.
+
+ptab = VALUE #( 
+                ( name  = 'SIDE' 
+                  kind  = cl_abap_objectdescr=&gt;exporting 
+                  value = REF #( side ) ) 
+                ( name  = 'RATIO' 
+                  kind  = cl_abap_objectdescr=&gt;exporting 
+                  value = REF #( ratio ) ) ).
+
+TRY. 
+    CREATE OBJECT container TYPE (clsnam) 
+      PARAMETER-TABLE ptab. 
+  CATCH cx_sy_create_object_error INTO exc_ref. 
+    MESSAGE exc_ref-&gt;get_text( ) TYPE 'I'. 
+ENDTRY.</pre>
+<p>Eine dynamische Erzeugung ist jedoch gar nicht notwendig, denn ich kenne ja den Klassennamen und kann die Erzeugung wiederum an eine Erbauer-Klasse auslagern.</p>
+<h2>guidrasil</h2>
+<p>Nach dem oben beschriebenen Prinzip funktioniert der GUI-Designer ungefähr. Eine wichtige Eigenschaft ist jedoch, dass man erst auswählen muss, auf welcher Seite man einen Docking-Container erstellen möchte. In diesem Docking-Container wird dann ein Splitter erzeugt, der oben eine Toolbar integriert und unten erneut einen leeren Container anzeigt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_02.png"><img decoding="async" class="alignnone size-full wp-image-1019347" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_02.png" alt="" width="663" height="392" srcset="/wp-content/uploads/2018/10/guidrasil_02.png 663w, /wp-content/uploads/2018/10/guidrasil_02-300x177.png 300w" sizes="(max-width: 663px) 100vw, 663px" /></a></p>
+<p>&nbsp;</p>
+<p>In der Toolbar kann man dann die gewünschten Controls oder Splitter-Container auswählen. Der GUI-Designer merkt sich, welche Objekte an welcher Stelle erzeugt werden. Das Erzeugen der einzelnen Controls sowie das Speichern der unterstützten Eigenschaften übernimmt die Erbauer-Klasse, die es für jedes Control gibt.</p>
+<p>Zusätzlich stellt die Erbauer-Klasse auch noch einen Dialog zur Verfügung, in dem die Eigenschaften des Control eingestellt werden können.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019346" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png" alt="" width="340" height="200" srcset="/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png 340w, /wp-content/uploads/2018/10/guidrasil_ctrl_function_icon-300x176.png 300w" sizes="(max-width: 340px) 100vw, 340px" /></a></p>
+<h2>I&#8217;d rather write code that writes code than write code</h2>
+<p>Eine weitere Eigenschaft der Erbauer-Klasse ist, dass jede Erbauer-Klasse ja genau weiß, wie das eigene Control erzeugt werden muss. Das heißt, es kann auch Code zur Verfügung stellen, der für die Erzeugung des Controls notwendig ist.</p>
+<p>Der GUI-Designer weiß genau, welche Controls in welcher Reihenfolge erzeugt werden müssen. Der Designer muss also nur noch jedes Control nach dem Erzeugungscode fragen&#8230;</p>
+<h2>abapGit</h2>
+<p>Der GUI-Designer guidrasil ist verfügbar per <a href="https://github.com/larshp/abapGit">abapGit</a> auf <a href="https://github.com/tricktresor">Github</a>:</p>
+<p><a href="https://github.com/tricktresor/guidrasil">https://github.com/tricktresor/guidrasil</a></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/gui-designer-guidrasil/">GUI-Designer &#8220;guidrasil&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bilder aus MIME-Repository anzeigen</title>
+		<link>/blog/bilder-aus-mime-repository-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 17 Aug 2018 08:54:41 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Bild]]></category>
+		<category><![CDATA[MIME]]></category>
+		<category><![CDATA[cl_gui_picture]]></category>
+		<category><![CDATA[SMW0]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019068</guid>
+
+					<description><![CDATA[<p>Ich präsentiere: Das hässlichste Logo aller Zeiten: Allerdings hat es auch einen Vorteil: Taucht dieses Bild irgendwo auf, weiß man sofort: Es handelt sich um ein Demo-Programm. SAP-Web-Repository Das Bild ist im SAP-Web Repository gespeichert. Dieses Repository wird mit Transaktion SMW0 aufgerufen. Zur Auswahl stehen &#8220;HTML-Schablonen&#8221; und &#8220;Binäre Daten&#8221;. Wähle &#8220;Binäre Daten&#8221; aus: Wenn du weißt, wie der Name des Bildes lautet, kannst du diesen vorbelegen: Die entsprechenden Dateien im Web-Repository werden angezeigt: Einlesen eines...</p>
+<p>Der Beitrag <a href="/blog/bilder-aus-mime-repository-anzeigen/">Bilder aus MIME-Repository anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Ich präsentiere: Das hässlichste Logo aller Zeiten:</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/08/enjoysap_logo_original.png"><img loading="lazy" decoding="async" width="556" height="148" src="https://tricktresor.com/wp-content/uploads/2018/08/enjoysap_logo_original.png" alt="" class="wp-image-1019070" srcset="/wp-content/uploads/2018/08/enjoysap_logo_original.png 556w, /wp-content/uploads/2018/08/enjoysap_logo_original-300x80.png 300w" sizes="(max-width: 556px) 100vw, 556px" /></a></figure>
+
+
+
+<p>Allerdings hat es auch einen Vorteil: Taucht dieses Bild irgendwo auf, weiß man sofort: Es handelt sich um ein Demo-Programm.</p>
+
+
+
+<h2 class="wp-block-heading">SAP-Web-Repository</h2>
+
+
+
+<p>Das Bild ist im SAP-Web Repository gespeichert. Dieses Repository wird mit Transaktion SMW0 aufgerufen. Zur Auswahl stehen &#8220;HTML-Schablonen&#8221; und &#8220;Binäre Daten&#8221;. Wähle &#8220;Binäre Daten&#8221; aus:</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/08/smw0_1.png"><img loading="lazy" decoding="async" width="410" height="229" src="https://tricktresor.com/wp-content/uploads/2018/08/smw0_1.png" alt="" class="wp-image-1019074" srcset="/wp-content/uploads/2018/08/smw0_1.png 410w, /wp-content/uploads/2018/08/smw0_1-300x168.png 300w, /wp-content/uploads/2018/08/smw0_1-71x40.png 71w" sizes="(max-width: 410px) 100vw, 410px" /></a></figure>
+
+
+
+<p>Wenn du weißt, wie der Name des Bildes lautet, kannst du diesen vorbelegen:</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/08/smw0_2.png"><img loading="lazy" decoding="async" width="677" height="245" src="https://tricktresor.com/wp-content/uploads/2018/08/smw0_2.png" alt="" class="wp-image-1019073" srcset="/wp-content/uploads/2018/08/smw0_2.png 677w, /wp-content/uploads/2018/08/smw0_2-300x109.png 300w" sizes="(max-width: 677px) 100vw, 677px" /></a></figure>
+
+
+
+<p>Die entsprechenden Dateien im Web-Repository werden angezeigt:</p>
+
+
+
+<figure class="wp-block-image"><img loading="lazy" decoding="async" width="674" height="272" src="https://tricktresor.com/wp-content/uploads/2018/08/smw0_3.png" alt="" class="wp-image-1019072" srcset="/wp-content/uploads/2018/08/smw0_3.png 674w, /wp-content/uploads/2018/08/smw0_3-300x121.png 300w" sizes="(max-width: 674px) 100vw, 674px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Einlesen eines Web-Repository-Objektes</h2>
+
+
+
+<p>Das Einlesen und des Bildes erfolgt mit Hilfe der Funktionsbausteine WWW_GET_MIME_OBJECT und DP_CREATE_URL. Das Beispielprogramm zeigt das Bild in einem Docking-Container auf dem Selektionsbild an:</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/08/enjoysap_logo.png"><img loading="lazy" decoding="async" width="615" height="359" src="https://tricktresor.com/wp-content/uploads/2018/08/enjoysap_logo.png" alt="" class="wp-image-1019069" srcset="/wp-content/uploads/2018/08/enjoysap_logo.png 615w, /wp-content/uploads/2018/08/enjoysap_logo-300x175.png 300w, /wp-content/uploads/2018/08/enjoysap_logo-148x85.png 148w, /wp-content/uploads/2018/08/enjoysap_logo-193x112.png 193w, /wp-content/uploads/2018/08/enjoysap_logo-71x40.png 71w" sizes="(max-width: 615px) 100vw, 615px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT.
+
+PARAMETERS dummy.
+
+CLASS mime_picture DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS get IMPORTING name TYPE clike RETURNING VALUE(url) TYPE w3url.
+ENDCLASS.
+
+CLASS mime_picture IMPLEMENTATION.
+  METHOD get.
+
+    DATA query_table TYPE STANDARD TABLE OF w3query.
+    DATA query_line TYPE w3query.
+    DATA html_table TYPE STANDARD TABLE OF w3html .
+    DATA html_line TYPE w3html .
+    DATA return_code TYPE w3param-ret_code.
+    DATA content_type TYPE  w3param-cont_type.
+    DATA content_length TYPE  w3param-cont_len.
+    DATA pic_data TYPE STANDARD TABLE OF w3mime .
+
+    query_line-name = '_OBJECT_ID'.
+    query_line-value = name.
+    APPEND query_line TO query_table.
+
+    CALL FUNCTION 'WWW_GET_MIME_OBJECT'
+      TABLES
+        query_string        = query_table
+        html                = html_table
+        mime                = pic_data
+      CHANGING
+        return_code         = return_code
+        content_type        = content_type
+        content_length      = content_length
+      EXCEPTIONS
+        object_not_found    = 1
+        parameter_not_found = 2
+        OTHERS              = 3.
+
+    CALL FUNCTION 'DP_CREATE_URL'
+      EXPORTING
+        type     = 'image'
+        subtype  = cndp_sap_tab_unknown
+        size     = content_length
+        lifetime = cndp_lifetime_transaction
+      TABLES
+        data     = pic_data
+      CHANGING
+        url      = url
+      EXCEPTIONS
+        OTHERS   = 1.
+
+  ENDMETHOD.
+ENDCLASS.
+
+INITIALIZATION.
+
+  DATA(go_pic) = NEW cl_gui_picture(
+                  parent = NEW cl_gui_docking_container(
+                                 side  = cl_gui_docking_container=&gt;dock_at_bottom
+                                 ratio = 80 ) ).
+  go_pic-&gt;load_picture_from_url( mime_picture=&gt;get( 'ENJOYSAP_LOGO' ) ). 
+  go_pic-&gt;set_display_mode( cl_gui_picture=&gt;display_mode_fit ).</pre>
+
+
+
+<h2 class="wp-block-heading">Obsoleter Baustein WWW_GET_MIME_OBJECT</h2>
+
+
+
+<p>Anstelle der beiden Funktionsbausteine WWW_GET_MIME_OBJECT (als obsolet gekennzeichnet) und DP_CREATE_URL kann auch der Funktionsbaustein DP_PUBLISH_WWW_URL verwendet werden. Das Coding wird hierdurch deutlich schlanker:</p>
+
+
+
+<pre class="wp-block-code"><code>METHOD get.
+    
+    CALL FUNCTION 'DP_PUBLISH_WWW_URL'
+      EXPORTING
+        objid                 = conv W3OBJID( name )
+        lifetime              = cndp_lifetime_transaction
+      IMPORTING
+        url                   = url
+      EXCEPTIONS
+        OTHERS                = 1.
+
+  ENDMETHOD.</code></pre>
+<p>Der Beitrag <a href="/blog/bilder-aus-mime-repository-anzeigen/">Bilder aus MIME-Repository anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Drag&#8217;n&#8217;Drop mit Datei</title>
+		<link>/blog/dragndrop-mit-datei/</link>
+					<comments>/blog/dragndrop-mit-datei/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 25 Nov 2011 17:01:49 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[docker]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[cl_gui_html_viewer]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[TextEditControl]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=631</guid>
+
+					<description><![CDATA[<p>In diesem Beispiel zeigen wir, wie Sie eine Datei aus dem Windows-Explorer auf ein SAP-Control ziehen k&#246;nnen und den Dateipfad sowie Dateinamen angezeigt bekommen. So l&#228;sst sich z.B. eine Anwendung programmieren, die Dateien per Drag'n'Drop entgegen nimmt und auf den Application server hoch l&#228;dt.</p>
+<p>Der Beitrag <a href="/blog/dragndrop-mit-datei/">Drag&#8217;n&#8217;Drop mit Datei</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><a href="https://tricktresor.com/wp-content/uploads/2011/11/02_21_15_35_20.jpg"><img loading="lazy" decoding="async" class="alignright size-medium wp-image-4505" alt="Drag and drop html" src="https://tricktresor.com/wp-content/uploads/2011/11/02_21_15_35_20-300x158.jpg" width="300" height="158" srcset="/wp-content/uploads/2011/11/02_21_15_35_20-300x158.jpg 300w, /wp-content/uploads/2011/11/02_21_15_35_20-624x330.jpg 624w, /wp-content/uploads/2011/11/02_21_15_35_20.jpg 625w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>In diesem Beispiel zeigen wir, wie Sie eine Datei aus dem Windows-Explorer auf ein SAP-Control ziehen können und den Dateipfad sowie Dateinamen angezeigt bekommen. So lässt sich z.B. eine Anwendung programmieren, die Dateien per Drag&#8217;n&#8217;Drop entgegen nimmt und auf den Application server hoch lädt.<br />
+SAP-Controls und Drag&#8217;n&#8217;Drop</p>
+<p>SAP-Controls können normalerweise nur DragDropObjekte aufnehmen, die auch von einem SAP-Control erzeugt wurden.</p>
+<p>Ausnahmen sind der ABAP-Editor und das TextEditControl: Sie können eine Textdatei auf das Control ziehen und der Inhalt wird im Control dargestellt.</p>
+<p>Leider feuert kein Control ein Event &#8220;DropComplete&#8221;, auf das man reagieren könnte, geschweige denn, dass man schon bei &#8220;onDrop&#8221; entscheiden könnte, ob man dieses Objekt haben möchte oder nicht.</p>
+<p>Eine Ausnahme bildet das HTML-Control, das ja den Internet Explorer verwendet um HTML- oder PDF-Dateien anzuzeigen.</p>
+<p>Das Control CL_GUI_HTML_VIEWER erzeugt das Ereignis &#8220;NAVIGATE_COMPLETE&#8221;, sobald die &#8220;Navigation&#8221; abgeschlossen wurde. Eine Datei, die per Drag and Drop auf dieses Control gezogen wird, löst ebenfalls dieses Ereignis aus.</p>
+<h2>Beschreibung</h2>
+<p>Dieses Programm dockt das HTML-Control an das Selektionsbild an und zeigt die URL einer ge-drop-ten Datei an.</p>
+<h2>Code</h2>
+<pre>REPORT z_dock_drop.
+*** Selection screen
+PARAMETERS: p_url     TYPE string.
+INITIALIZATION.
+  PERFORM create_objects.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS:
+      handle_navigate_complete
+          FOR EVENT navigate_complete
+          OF cl_gui_html_viewer
+            IMPORTING url sender.
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+
+  METHOD handle_navigate_complete.
+    p_url = url.
+*    sender-&gt;go_back( ). "If object should not be displayed
+  ENDMETHOD.                    "handle_sapevent
+ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CREATE_OBJECTS
+*&amp;---------------------------------------------------------------------*
+FORM create_objects.
+*** Data
+  DATA cl_docker         TYPE REF TO cl_gui_docking_container.
+  DATA t_events        TYPE cntl_simple_events.
+  DATA wa_event        LIKE LINE OF t_events.
+  DATA event_receiver  TYPE REF TO lcl_event_receiver.
+  DATA t_html          TYPE STANDARD TABLE OF text8192
+                       WITH NON-UNIQUE DEFAULT KEY.
+  DATA html            LIKE LINE OF t_html.
+  DATA url             TYPE text1000.
+  DATA cl_html         TYPE REF TO cl_gui_html_viewer.
+
+*** create docker
+  CREATE OBJECT cl_docker
+    EXPORTING
+      extension               = 300
+      side                    = cl_gui_docking_container=&gt;dock_at_bottom
+      no_autodef_progid_dynnr = 'X'.
+
+*** create HTML
+  CREATE OBJECT cl_html
+    EXPORTING
+      parent = cl_docker.
+
+*** Register NAVIGATE_COMPLETE
+  CALL METHOD cl_html-&gt;get_registered_events
+    IMPORTING
+      events = t_events.
+      wa_event-eventid    = cl_gui_html_viewer=&gt;m_id_navigate_complete.
+      wa_event-appl_event = 'X'.
+  READ TABLE t_events TRANSPORTING NO FIELDS
+        WITH KEY eventid = wa_event-eventid.
+  IF sy-subrc &lt;&gt; 0.
+    APPEND wa_event TO t_events.
+  ENDIF.
+  CALL METHOD cl_html-&gt;set_registered_events
+    EXPORTING
+      events = t_events.
+SET HANDLER lcl_event_receiver=&gt;handle_navigate_complete FOR cl_html.
+
+*** Build HTML-Code
+  CONCATENATE  '&lt;html&gt;'
+               '&lt;head&gt;&lt;title&gt;Dropzone&lt;/title&gt;'
+               '&lt;/head&gt;'
+               '&lt;body bgcolor="#22FF22"&gt;'
+               '&lt;p&gt;&lt;font size= 30&gt;hierher mit den Bildern!!&lt;/font&gt;&lt;/p&gt;'
+               '&lt;/body&gt;'
+               '&lt;/html&gt;'
+          INTO html.
+  APPEND html TO t_html.
+
+*** load HTML
+  CALL METHOD cl_html-&gt;load_data
+    IMPORTING
+      assigned_url = url
+    CHANGING
+      data_table   = t_html.
+
+*** Show HTML page
+  CALL METHOD cl_html-&gt;show_url
+    EXPORTING
+      url = url.
+ENDFORM.                    " CREATE_OBJECTS</pre>
+<p>Der Beitrag <a href="/blog/dragndrop-mit-datei/">Drag&#8217;n&#8217;Drop mit Datei</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dragndrop-mit-datei/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Container-Rahmen</title>
+		<link>/blog/container-rahmen/</link>
+					<comments>/blog/container-rahmen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 19 Aug 2011 17:17:36 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[docker]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[Rahmen]]></category>
+		<category><![CDATA[shellstyle]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=616</guid>
+
+					<description><![CDATA[<p>Ein Docking-Container hat normalerweise einen breiten Rahmen, damit dessen Gr&#246;&#223;e leicht ge&#228;ndert werden kann. Das ist aber nicht immer erw&#252;nscht... </p>
+<p>Der Beitrag <a href="/blog/container-rahmen/">Container-Rahmen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein Docking-Container hat normalerweise einen breiten Rahmen, damit dessen Größe leicht geändert werden kann. Das ist aber nicht immer erwünscht&#8230;</p>
+<p class="head1">Durch Dick und Dünn</p>
+<p>Bei CREATE OBJECT des Containers kann in der Regel der Parameter STYLE übergeben werden. Dieser wird intern auf Standarwerte gesetzt, wenn er nicht vom Aufrufer übergeben wird.</p>
+<p>Mit diesem Aufruf können Sie einen Docking-Container mit einer dünnen Linie anstatt des dicken 3d-Rahmens erzeugen.</p>
+<p class="head1">So sieht&#8217;s aus</p>
+<p>So sieht der Rahmen normalerweise aus:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/abap/Bild565.jpg" /></p>
+<p>So sieht er mit dünnem Rahmen aus:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/abap/Bild566.jpg" /></p>
+<p>Dieser kann allerdings nicht mehr vom Anwender verschoben werden!!</p>
+<p class="head1">Coding DÜNN</p>
+<p class="sap1">DATA shellstyle TYPE i.</p>
+<p>*** define Shellstyle<br />
+shellstyle = cl_gui_container=&gt;ws_visible<br />
++ cl_gui_container=&gt;ws_child.</p>
+<p>*** Create Docking Container<br />
+CREATE OBJECT gr_dock<br />
+EXPORTING<br />
+side      = cl_gui_docking_container=&gt;dock_at_top<br />
+extension = 10<br />
+style     = shellstyle.</p>
+<p class="head1">Oder anders herum&#8230;</p>
+<p>Den Tric kann man allerdings auch genau anders herum verwenden! So sieht ein ALV-Grid im Container normalerweise aus:</p>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/ALV/Alv_rahmen_duenn.jpg" /><br />
+ALV-Grid mit normalem Rahmen</td>
+</tr>
+</tbody>
+</table>
+<p>Mit dem richtigen Style kann man dem Container einen dicken Rahmen verpassen:</p>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/ALV/alv_rahmen_dick.jpg" /><br />
+ALV mit dickem Rahmen</td>
+</tr>
+</tbody>
+</table>
+<p class="head1">Coding DICK</p>
+<p>Hier ist das Coding dazu:</p>
+<p class="sap1"><span style="color: #fb2412;">*** Style</span><br />
+DATA lv_style TYPE i.</p>
+<p>lv_style = cl_gui_container=&gt;ws_thickframe<br />
++ cl_gui_container=&gt;ws_visible<br />
++ cl_gui_container=&gt;ws_child.</p>
+<p><span style="color: #fb2412;">*** Create Custom Container</span><br />
+CREATE OBJECT gr_cc<br />
+EXPORTING<br />
+style          = lv_style<br />
+container_name = &#8216;CUSTOM_CONTAINER&#8217;<br />
+EXCEPTIONS<br />
+OTHERS         = 6.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/container-rahmen/">Container-Rahmen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/container-rahmen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>DockingContainer</title>
+		<link>/blog/dockingcontainer/</link>
+					<comments>/blog/dockingcontainer/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 09 Mar 2004 17:17:04 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Docking-Container]]></category>
+		<category><![CDATA[cl_gui_textedit]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=209</guid>
+
+					<description><![CDATA[<p>Ein kurzes Demoprogramm das zeigt, wie ein TextEditControl in einem Dynpro angedockt werden kann. An der linken Seite des Dynpros wird der Quelltext des Programms angezeigt.</p>
+<p>Der Beitrag <a href="/blog/dockingcontainer/">DockingContainer</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein kurzes Demoprogramm das zeigt, wie ein TextEditControl in einem Dynpro angedockt werden kann. An der unteren Seite des Selektionsbildes wird der Quelltext des Programms angezeigt.</p>
+<p>Dieses Demoprogramm erzeugt <strong>TextEditControl</strong> in einem <strong>Docker</strong> auf der linken Seite des Dynpros. Durch den Docker kann das TextEdit-Control beliebig in der Größe verändert werden.</p>
+<p>Es ist natürlich auch möglich andere Controls &#8220;anzudocken&#8221;: TreeControl, CalendarControl, BarChartControl, HTMLViewerControl und andere.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019343" src="https://tricktresor.com/wp-content/uploads/2004/03/editcontrol-docker.png" alt="" width="568" height="438" srcset="/wp-content/uploads/2004/03/editcontrol-docker.png 568w, /wp-content/uploads/2004/03/editcontrol-docker-300x231.png 300w, /wp-content/uploads/2004/03/editcontrol-docker-117x91.png 117w" sizes="(max-width: 568px) 100vw, 568px" /></p>
+<h2 class="head1">Der Report</h2>
+<pre>REPORT ztrcktrsr_blog_textedit01.
+
+DATA t_sourcecode  TYPE TABLE OF text1000.
+data edit TYPE REF TO cl_gui_textedit.
+data docker TYPE REF TO cl_gui_docking_container.
+
+PARAMETERS p_repid TYPE syrepid DEFAULT sy-repid.
+
+INITIALIZATION.
+
+*-- DockingContainer erzeugen
+  CREATE OBJECT docker
+    EXPORTING
+      ratio = 60.
+
+*-- edit an DockingContainer andocken
+  CREATE OBJECT edit
+    EXPORTING
+      parent = docker.
+
+*-- Kommentare definieren
+  edit-&gt;set_comments_string( comments_string = '*' ).
+
+*-- Kommentare hervorheben
+  edit-&gt;set_highlight_comments_mode( highlight_comments_mode = 1 ).
+
+*-- readonly
+  edit-&gt;set_readonly_mode( 1 ).
+
+*-- Umbruch
+  edit-&gt;set_wordwrap_behavior(
+         wordwrap_mode              = 2 "off
+         wordwrap_position          = 72
+         wordwrap_to_linebreak_mode = 0 ).
+
+**-- DockingContainer Links andocken
+  docker-&gt;dock_at( EXPORTING side = cl_gui_docking_container=&gt;dock_at_right ).
+
+AT SELECTION-SCREEN.
+
+*-- Report lesen
+  CLEAR t_sourcecode.
+  READ REPORT p_repid INTO t_sourcecode.
+
+
+*-- Report als Text anzeigen
+  edit-&gt;set_text_as_r3table( table = t_sourcecode ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/dockingcontainer/">DockingContainer</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dockingcontainer/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

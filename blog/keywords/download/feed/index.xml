@@ -1,0 +1,1076 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Download Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/download/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 17 Aug 2023 17:01:14 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Download Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Bankleitzahlen einlesen</title>
+		<link>/blog/bankleitzahlen-einlesen/</link>
+					<comments>/blog/bankleitzahlen-einlesen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 23 Jan 2015 10:40:43 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[bank]]></category>
+		<category><![CDATA[blz]]></category>
+		<category><![CDATA[bundesbank]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5224</guid>
+
+					<description><![CDATA[<p>Das Einlesen der Bankleitzahlen ist dabei gar nicht die größte Herausforderung, sondern das Finden der aktuellen Bankleitzahlendatei. Markus Völker hat hierfür eine kleine Klasse geschrieben, mit der 1.die URL der Bankleitzahlendatei ermittelt wird 2.Die Bankleitzahlen ins SAP-System eingelesen werden.</p>
+<p>Der Beitrag <a href="/blog/bankleitzahlen-einlesen/">Bankleitzahlen einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mal wieder ein Thema aus dem FI-Bereich. Diesmal geht es um die Aktualisierung der Bankleitzahlen. Die Bundesbank bietet die aktuellen Bankleitzahlen zum Download an. Weitere Infos gibt es <a title="Bankleitzahlen" href="http://www.bundesbank.de/Navigation/DE/Aufgaben/Unbarer_Zahlungsverkehr/Bankleitzahlen/bankleitzahlen.html">hier</a>.</p>
+<p>Das Einlesen der Bankleitzahlen ist dabei gar nicht die größte Herausforderung, sondern das Finden der aktuellen Bankleitzahlendatei. Markus Völker hat hierfür eine kleine Klasse geschrieben, mit der</p>
+<ol>
+<li>die URL der Bankleitzahlendatei ermittelt wird</li>
+<li>Die Bankleitzahlen ins SAP-System eingelesen werden</li>
+</ol>
+<h2>Verbesserungspotential</h2>
+<p>Die Klasse ermittelt und liest die Bankleitzahlen ein. Eventuelle wäre es jedoch wünschenswert zu sehen, welche und wie viele Debitoren von den Änderungen betroffen sind. Es müsste dafür eine Prüfung gegen die Tabelle KNBK gemacht werden.</p>
+<h2>Proxy</h2>
+<p>Falls du dich mit User und Kennwort am Proxy anmelden musst, dann muss du nach der Methode cl_http_client=&gt;create_by_url den folgenden Aufruf einbauen:</p>
+<pre>lo_client-&gt;propertytype_logon_popup = http_client-&gt;co_disabled.
+call method lo_client-&gt;authenticate
+     exporting
+        username  = 'myProxyUser'
+        password  = 'myProxyPassword'.</pre>
+<p>Dementsprechend muss der CONSTRUCTOR um die beiden Parameter username und password erweitert werden.</p>
+<h2>Coding</h2>
+<pre>REPORT  zrep_bbank_vs_bnka.
+**&amp;---------------------------------------------------------------------*
+**&amp; Report  ZREP_BBANK_VS_BNKA
+**&amp;
+**&amp;---------------------------------------------------------------------*
+**&amp; Dieser Report demonstriert die Benutzung der Klasse lcl_cmp_bnka_to_bbank
+**&amp; Author: Markus Völker
+**&amp;---------------------------------------------------------------------*
+
+
+PARAMETERS p_proxy TYPE string LOWER CASE DEFAULT '123.100.100.88'.
+PARAMETERS p_pport TYPE string            DEFAULT `80`.
+
+
+CLASS lcl_cmp_bnka_to_bbank DEFINITION.
+  PUBLIC SECTION.
+
+    TYPES:
+      BEGIN OF mts_bnka_result,
+             status TYPE char01,
+             bankl  TYPE bankl,
+      END OF mts_bnka_result .
+    TYPES:
+      mtt_bnka_result TYPE STANDARD TABLE OF mts_bnka_result WITH DEFAULT KEY .
+
+**Vergleiche:
+**http://www.bundesbank.de/Redaktion/DE/Downloads/Aufgaben/Unbarer_Zahlungsverkehr/Bankleitzahlen/merkblatt_bankleitzahlendatei.pdf?__blob=publicationFile
+    TYPES:
+      BEGIN OF mts_bundesbank,
+        blz(8), "Bankleitzahl
+        merkmal(1), "Merkmal, ob bankleitzahlführender Zahlungsdienstleister ("1") oder nicht ("2")
+        bezeichnung(58), "Bezeichnung des Zahlungsdienstleisters
+        plz(5), "Postleitzahl
+        ort(35), "Ort
+        kurzbezeichnung(27), "Kurzbezeichnung des Zahlungsdienstleisters mit Ort
+        pan(5), "Institutsnummer für PAN
+        bic(11), "Business Identifier Code (BIC)
+        pz(2), "Kennzeichen für Prüfzifferberechnungsmethode
+        datensatz(6), "Nummer des Datensatzes
+        aenderungs(1), "Änderungskennzeichen
+        blz_loesch(1), "Hinweis auf eine beabsichtigte Bankleitzahllöschung
+        nach_blz(8), "Hinweis auf Nachfolge-Bankleitzahl
+        knz_iban(6), "Kennzeichen für die IBAN-Regel
+      END OF mts_bundesbank .
+    TYPES:
+      mtt_bundesbank TYPE STANDARD TABLE OF mts_bundesbank WITH DEFAULT KEY .
+
+    CONSTANTS  mc_bank_changes  TYPE char01 VALUE 'C'.     "#EC NOTEXT "Die Bank ist zur Änderung vorgesehen
+    CONSTANTS  mc_bank_correct  TYPE char01 VALUE 'O'.     "#EC NOTEXT "Die Bank ist in Ordnung
+    CONSTANTS  mc_bank_missing  TYPE char01 VALUE 'M'.     "#EC NOTEXT "Die Bank existiert nicht mehr
+    CLASS-DATA mv_proxy_host    TYPE string .              "Proxy IP
+    CLASS-DATA mv_proxy_service TYPE string .              "Proxy Port
+    DATA       mt_bbank_datei   TYPE mtt_bundesbank .      "Datei der Bundesbank
+
+    METHODS constructor
+      IMPORTING
+        iv_proxy_host    TYPE string OPTIONAL
+        iv_proxy_service TYPE string OPTIONAL .
+    METHODS set_bbank_file
+      IMPORTING
+        iv_path        TYPE csequence OPTIONAL
+      EXPORTING
+        ev_subrc       TYPE sy-subrc
+        ev_err_message TYPE string.
+    TYPE-POOLS abap .
+    METHODS compare_bbank_with_bnka
+      IMPORTING
+        iv_with_missing      TYPE flag DEFAULT abap_true
+        iv_with_changes      TYPE flag DEFAULT abap_true
+        iv_with_correct      TYPE flag DEFAULT abap_true
+      RETURNING
+        VALUE(rt_result_tab) TYPE mtt_bnka_result .
+  PROTECTED SECTION.
+    METHODS get_bbank_file_from_web
+      EXPORTING
+        ev_subrc       TYPE sy-subrc
+        ev_err_message TYPE string
+        et_filetab     TYPE table .
+
+ENDCLASS.
+
+CLASS lcl_cmp_bnka_to_bbank IMPLEMENTATION.
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method COMPARE_BBANK_WITH_BNKA
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IV_WITH_MISSING                TYPE        FLAG (default =ABAP_TRUE)
+* | [---&gt;] IV_WITH_CHANGES                TYPE        FLAG (default =ABAP_TRUE)
+* | [---&gt;] IV_WITH_CORRECT                TYPE        FLAG (default =ABAP_TRUE)
+* | [&lt;-()] RT_RESULT_TAB                  TYPE        MTT_BNKA_RESULT
+* +--------------------------------------------------------------------------------------
+  METHOD compare_bbank_with_bnka.
+
+    DATA: lt_bnka  TYPE TABLE OF bnka,
+          lv_subrc TYPE sy-subrc.
+
+    FIELD-SYMBOLS: &lt;bnka&gt;   TYPE bnka,
+                   &lt;bbank&gt;  TYPE mts_bundesbank,
+                   &lt;result&gt; TYPE mts_bnka_result.
+
+    DEFINE append_result.
+      append initial line to rt_result_tab assigning &lt;result&gt;.
+      &lt;result&gt;-status = &amp;1.
+      &lt;result&gt;-bankl  = &amp;2.
+    END-OF-DEFINITION.
+
+* Wenn wir noch keine Daten haben, holen wir halt welche
+    IF mt_bbank_datei IS INITIAL.
+      set_bbank_file( IMPORTING ev_subrc = lv_subrc ).
+      IF lv_subrc &lt;&gt; 0.
+        RETURN.
+      ENDIF.
+    ENDIF.
+
+* Alle Banken holen
+    SELECT * FROM bnka INTO TABLE lt_bnka WHERE banks = 'DE'.
+
+* Vergleich der Daten
+*/--------------------------------------------------------------------------------\
+    LOOP AT lt_bnka ASSIGNING &lt;bnka&gt;.
+*   Lese die Vergleichsdaten
+      READ TABLE mt_bbank_datei ASSIGNING  WITH KEY blz = &lt;bnka&gt;-bnklz.  "#EC WARNOK.
+      IF sy-subrc &lt;&gt; 0.
+*     Die Bank existiert nicht mehr
+        append_result mc_bank_missing &lt;bnka&gt;-bankl.
+      ELSEIF -blz_loesch = '1'.
+*     Die Bank ist zum Löschen vorgemerkt
+        append_result mc_bank_changes &lt;bnka&gt;-bankl.
+      ELSE.
+*     Keine Veränderungen festzustellen
+        append_result mc_bank_correct &lt;bnka&gt;-bankl.
+      ENDIF.
+    ENDLOOP.
+*\--------------------------------------------------------------------------------/
+
+* Lösche ungewünschtes
+*/--------------------------------------------------------------------------------\
+    IF iv_with_missing = abap_false.
+      DELETE rt_result_tab WHERE status = mc_bank_missing.
+    ENDIF.
+    IF iv_with_changes = abap_false.
+      DELETE rt_result_tab WHERE status = mc_bank_changes.
+    ENDIF.
+    IF iv_with_correct = abap_false.
+      DELETE rt_result_tab WHERE status = mc_bank_correct.
+    ENDIF.
+*\--------------------------------------------------------------------------------/
+
+  ENDMETHOD.                                               "compare_bbank_with_bnka
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZZ_CMP_BNKA_TO_BBANK-&gt;CONSTRUCTOR
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IV_PROXY_HOST                  TYPE        STRING(optional)
+* | [---&gt;] IV_PROXY_SERVICE               TYPE        STRING(optional)
+* +--------------------------------------------------------------------------------------
+  METHOD constructor.
+* Das hier ist nur die Erinnerung, eventuell einen Proxy setzen zu müssen
+    mv_proxy_host    = iv_proxy_host .
+    mv_proxy_service = iv_proxy_service.
+  ENDMETHOD.                                               "constructor
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Protected Method GET_BBANK_FILE_FROM_WEB
+* +-------------------------------------------------------------------------------------------------+
+* | [&lt;---] EV_SUBRC                       TYPE        SY-SUBRC
+* | [&lt;---] EV_ERR_MESSAGE                 TYPE        STRING
+* | [&lt;---] ET_FILETAB                     TYPE        TABLE
+* +--------------------------------------------------------------------------------------
+  METHOD get_bbank_file_from_web.
+* Hole die Datei der Bundesbank per HTTP
+    DATA: lv_url     TYPE string,
+          lv_datvon  TYPE d,
+          lv_datbis  TYPE d,
+          lo_http    TYPE REF TO if_http_client,
+          lv_recdata TYPE xstring,
+          lt_tmpbin  TYPE TABLE OF raw256,
+          lv_tmplen  TYPE i.
+
+*******************
+* DATUMSBERECHNUNG
+*******************
+
+*     Monat/Jahr von:
+*/--------------------------------------------------------------------------------\
+    lv_datvon = sy-datum.
+    DO.
+      lv_datvon = cl_hrpad_date_computations=&gt;subtract_months_from_date( start_date = lv_datvon               " Datum von dem Monate subtrahiert werden
+                                                                         months     = 1  ).                   " Anzahl Monate
+      IF lv_datvon+4(2) MOD 3 = 0.
+        EXIT.
+      ENDIF.
+    ENDDO.
+*     Tag von ...
+    lv_datvon+6(2) = '01'.
+    DO.
+*      Finde den ersten Samstag im Monat ...
+      IF cl_hrpad_date_computations=&gt;get_weekday_number( lv_datvon ) = 6.            "Samstag
+        EXIT.
+      ENDIF.
+      lv_datvon = lv_datvon + 1.
+    ENDDO.
+    lv_datvon = lv_datvon + 2.                             "Wir brauchen aber den Montag
+*\--------------------------------------------------------------------------------/
+*     Monat/Jahr bis:
+*/--------------------------------------------------------------------------------\
+    lv_datbis = sy-datum.
+    DO.
+      IF lv_datbis+4(2) MOD 3 = 0.
+        EXIT.
+      ENDIF.
+      lv_datbis = cl_hrpad_date_computations=&gt;add_months_to_date( start_date = lv_datbis               " Datum von dem Monate subtrahiert werden
+                                                                  months     = 1  ).                   " Anzahl Monate
+    ENDDO.
+*     Tag von ...
+    lv_datbis+6(2) = '01'.
+    DO.
+*      Finde den ersten Samstag im Monat ...
+      IF cl_hrpad_date_computations=&gt;get_weekday_number( lv_datbis ) = 6.            "Samstag
+        EXIT.
+      ENDIF.
+      lv_datbis = lv_datbis + 1.
+    ENDDO.
+    lv_datbis = lv_datbis + 1.                             "geht bis Sonntag
+*\--------------------------------------------------------------------------------/
+
+* URL Zusammenbauen
+*/--------------------------------------------------------------------------------\
+    lv_url =    'http://www.bundesbank.de/Redaktion/DE/Downloads/Aufgaben/Unbarer_Zahlungsverkehr/Bankleitzahlen/' ##no_text
+             &amp;&amp; |{ lv_datbis(4) }_{ lv_datbis+4(2) }_{ lv_datbis+6(2) }/blz_{ lv_datvon(4) }_{ lv_datvon+4(2) }_{ lv_datvon+6(2) }_txt.txt?__blob=publicationFile|.
+*\--------------------------------------------------------------------------------/
+
+*******************
+* HTTP - Verbindung
+*******************
+* Erstellen des Verbindungsobjekts
+    cl_http_client=&gt;create_by_url( EXPORTING url           = lv_url
+                                             proxy_host    = mv_proxy_host               " logische Destination (Wird bei Funktionsaufruf angegeben)
+                                             proxy_service = mv_proxy_service            " Portnummer
+                                   IMPORTING
+                                             client        = lo_http ).             " HTTP Client Abstraction
+
+* Request senden
+    lo_http-&gt;send( EXCEPTIONS OTHERS = 1 ).
+    IF sy-subrc &lt;&gt; 0.
+      lo_http-&gt;get_last_error( IMPORTING code    = ev_subrc
+                                         message = ev_err_message ).
+      RETURN.
+    ENDIF.
+
+* Daten annehmen
+    lo_http-&gt;receive( EXCEPTIONS OTHERS = 1 ).
+    IF sy-subrc &lt;&gt; 0.
+      lo_http-&gt;get_last_error( IMPORTING code    = ev_subrc
+                                         message = ev_err_message ).
+      RETURN.
+    ENDIF.
+
+* Datei reinladen...
+    lv_recdata = lo_http-&gt;response-&gt;get_data( ).
+    IF lv_recdata IS INITIAL.
+      ev_subrc = 1024.
+      RETURN.
+    ENDIF.
+
+* Daten in eine "Datei" - Tabelle konvertieren
+*/--------------------------------------------------------------------------------\
+    CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
+      EXPORTING
+        buffer        = lv_recdata
+      IMPORTING
+        output_length = lv_tmplen
+      TABLES
+        binary_tab    = lt_tmpbin.
+
+    CALL FUNCTION 'SCMS_BINARY_TO_TEXT'
+      EXPORTING
+        input_length = lv_tmplen
+      TABLES
+        binary_tab   = lt_tmpbin
+        text_tab     = et_filetab.
+*\--------------------------------------------------------------------------------/
+
+  ENDMETHOD.                                               "GET_BBANK_FILE_FROM_HTML
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZZ_CMP_BNKA_TO_BBANK-&gt;SET_BBANK_FILE
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IV_PATH                        TYPE        CSEQUENCE(optional)
+* | [&lt;---] EV_SUBRC                       TYPE        SY-SUBRC
+* | [&lt;---] EV_ERR_MESSAGE                 TYPE        STRING
+* | [EXC!] FAILED_VIA_UPLOAD
+* +--------------------------------------------------------------------------------------
+  METHOD set_bbank_file.
+
+    DATA: lt_filetab TYPE TABLE OF char512.
+    FIELD-SYMBOLS:  &lt;file&gt;  TYPE char512,
+                    &lt;bbank&gt; TYPE mts_bundesbank.
+
+    IF iv_path IS NOT INITIAL AND cl_gui_frontend_services=&gt;file_exist( iv_path ) = abap_true.
+*   Datei einfach vom Frontend hochladen
+      cl_gui_frontend_services=&gt;gui_upload( EXPORTING
+                                              filename = iv_path               " Name der Datei
+                                            CHANGING
+                                              data_tab = lt_filetab            " Übergabetabelle für Datei-Inhalt
+                                            EXCEPTIONS
+                                              OTHERS   = 1 ).
+      ev_subrc = sy-subrc.
+    ELSE.
+*   Datei per HTTP holen
+      me-&gt;get_bbank_file_from_web( IMPORTING ev_subrc       = ev_subrc
+                                             ev_err_message = ev_err_message
+                                             et_filetab     = lt_filetab ).
+    ENDIF.
+
+* Wenn die Datei leer ist machen wir hier nichts
+    IF lt_filetab IS INITIAL.
+      RETURN.
+    ENDIF.
+
+* In die richtige Struktur kippen:
+    LOOP AT lt_filetab ASSIGNING &lt;file&gt;.
+      APPEND INITIAL LINE TO mt_bbank_datei ASSIGNING &lt;bbank&gt;.
+      &lt;bbank&gt; = &lt;file&gt;.
+    ENDLOOP.
+  ENDMETHOD.                                               "set_bbank_file
+ENDCLASS.
+
+DATA gr_bbank  TYPE REF TO lcl_cmp_bnka_to_bbank.
+DATA gv_subrc  TYPE sy-subrc.
+DATA gv_err    TYPE string.
+DATA gt_result TYPE lcl_cmp_bnka_to_bbank=&gt;mtt_bnka_result.
+FIELD-SYMBOLS  TYPE lcl_cmp_bnka_to_bbank=&gt;mts_bnka_result.
+
+
+START-OF-SELECTION.
+
+* Objekt instanziieren
+  CREATE OBJECT gr_bbank
+    EXPORTING
+      iv_proxy_host    = p_proxy                           " logische Destination
+      iv_proxy_service = p_pport.                          " Portnummer
+
+* Datei innerhalb der Klasse organisieren
+  gr_bbank-&gt;set_bbank_file( IMPORTING
+                             ev_subrc       = gv_subrc     " Rückgabewert von ABAP-Anweisungen
+                             ev_err_message = gv_err       " Error - Message
+                           ).
+  IF gv_subrc &lt;&gt; 0.
+    WRITE: / gv_err.
+    RETURN.
+  ENDIF.
+
+* Vergleich der Daten aus der Bundesbank und SAP holen
+  gt_result = gr_bbank-&gt;compare_bbank_with_bnka( ).
+
+* primitive Ausgabe... :)
+  LOOP AT gt_result ASSIGNING .
+    CASE -status.
+      WHEN lcl_cmp_bnka_to_bbank=&gt;mc_bank_missing.
+        WRITE: / 'MISSING'.
+      WHEN lcl_cmp_bnka_to_bbank=&gt;mc_bank_changes.
+        WRITE: / 'CHANGING'.
+      WHEN lcl_cmp_bnka_to_bbank=&gt;mc_bank_correct.
+        WRITE: /  'OK'.
+    ENDCASE.
+    WRITE: 12 '|', -bankl.
+  ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/bankleitzahlen-einlesen/">Bankleitzahlen einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bankleitzahlen-einlesen/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Gibt&#8217;s da auch &#8216;ne App für?</title>
+		<link>/blog/gibts-da-auch-ne-app-fuer/</link>
+					<comments>/blog/gibts-da-auch-ne-app-fuer/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 16 May 2014 15:20:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[android]]></category>
+		<category><![CDATA[farbe]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[app]]></category>
+		<category><![CDATA[itunes]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4746</guid>
+
+					<description><![CDATA[<p>Ich wurde des öfteren schon gefragt, ob es nicht vielleicht eine Tricktresor-App gibt, damit die ganzen Tricks &#038; Tricks auch mobil verfügbar sind. Nun ist es endlich soweit! Mithilfe von Blappsta ist die Tricktresor-App wahr geworden.</p>
+<p>Der Beitrag <a href="/blog/gibts-da-auch-ne-app-fuer/">Gibt&#8217;s da auch &#8216;ne App für?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Jawoll!!! Ich bin glücklich, sprachlos, geflasht, beeindruckt und finde es einfach cool, unglaublich, sensationell und unfassbar: Der Tricktresor als App! Im Apple AppStore und im Android Play store.</p>
+<h2>Apple iTunes-Store</h2>
+<p><a title="Tricktresor-App | iTunes AppStore" href="https://itunes.apple.com/de/app/tricktresor/id876887227?mt=8" target="_blank"><img fetchpriority="high" decoding="async" class="alignnone wp-image-4747 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/05/2014-05-16-11.08.18-169x300.png" alt="Tricktresor-App AppStore" width="169" height="300" srcset="/wp-content/uploads/2014/05/2014-05-16-11.08.18-169x300.png 169w, /wp-content/uploads/2014/05/2014-05-16-11.08.18-576x1024.png 576w, /wp-content/uploads/2014/05/2014-05-16-11.08.18-624x1107.png 624w, /wp-content/uploads/2014/05/2014-05-16-11.08.18.png 640w" sizes="(max-width: 169px) 100vw, 169px" /></a></p>
+<p>&nbsp;</p>
+<h2>Google Play Store</h2>
+<p><a title="Tricktresor-App | Google Play Store" href="https://play.google.com/store/apps/details?id=com.blappsta.tricktresor" target="_blank"><img decoding="async" class="alignnone size-medium wp-image-4748" src="https://tricktresor.com/wp-content/uploads/2014/05/05_16_17_01_54-300x197.jpg" alt="Tricktresor-App Play store" width="300" height="197" srcset="/wp-content/uploads/2014/05/05_16_17_01_54-300x197.jpg 300w, /wp-content/uploads/2014/05/05_16_17_01_54-624x411.jpg 624w, /wp-content/uploads/2014/05/05_16_17_01_54.jpg 660w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p><strong>Update:</strong></p>
+<p>Leider gab es anscheinend mit dem Google-Playstore und der Blappsta-App Probleme, die nicht geklärt werden konnten.</p>
+<p>Deswegen gibt es die App nun direkt als Paket hier:</p>
+<p><a href="https://play.google.com/store/apps/details?id=com.blappsta.tricktresor">https://play.google.com/store/apps/details?id=com.blappsta.tricktresor</a></p>
+<h2>Nebelhorn Medien GmbH</h2>
+<p>Möglich geworden ist das durch die Firma <a title="Nebelhorn Medien AG | Blappsta" href="http://www.blappsta.com/?blaffid=app_62">Nebelhorn Medien GmbH</a>, die mit ihrem <a title="Wordpress Plugin &quot;Blappsta&quot;" href="http://wordpress.org/plugins/yournewsapp/">WordPress-Plugin Blappsta</a> eine Verbindung zu einer eigenen App herstellt.</p>
+<h2>Blappsta-Wordpress-Plugin</h2>
+<p>Die Einrichtung des Plugins ist kinderleicht und bietet viele Einstellmöglichkeiten (Farbe, Kategoriebilder etc.). Nachdem das Plugin installiert wurde, kann das Aussehen und Verhalten auf der Blappsta-Seite getestet werden. Es kann dann ein Antrag auf eine eigene App gestellt werden. Dies hat bei mir innerhalb einer Woche geklappt.</p>
+<h2>Kosten</h2>
+<p>Die von mir verwendete Version von Blappsta ist kostenfrei (Private Version). Den &#8220;Preis&#8221; müsst ihr zahlen indem ihr die am unteren Ende der App eingeblendete Werbung hinnehmt. Natürlich gibt es auch <a title="Blappsta Business" href="http://www.blappsta.com/?blaffid=app_62">Blappsta Business</a> mit mehr Features, ohne Werbung, dafür aber auch für eine monatliche Pauschale.</p>
+<p>Der Beitrag <a href="/blog/gibts-da-auch-ne-app-fuer/">Gibt&#8217;s da auch &#8216;ne App für?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/gibts-da-auch-ne-app-fuer/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Hovitaga Advanced Pattern Enhancement</title>
+		<link>/blog/hovitaga-advanced-pattern-enhancement/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Mar 2014 15:44:49 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Muster]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4550</guid>
+
+					<description><![CDATA[<p>Wer in ABAP programmiert hat mit Sicherheit schon den Befehl "Muster einfügen" im Editor verwendet. Hierüber lassen sich in erster Linie die Aufrufe für Funktionsbausteine und Methoden in den Quelltext einfügen. Gerade bei Funktionsbausteinen ist dies ein unerlässliches Hilfsmittel, denn die Syntaxprüfung prüft bei Funktionsbausteinen nicht, ob ein falscher Parameter verwendet wird. Die ungarische SAP-Entwicklerfirma Hovitaga hat für das Einfügen von Mustern ein kleines kostenloses AddOn entwickelt.</p>
+<p>Der Beitrag <a href="/blog/hovitaga-advanced-pattern-enhancement/">Hovitaga Advanced Pattern Enhancement</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wer in ABAP programmiert hat mit Sicherheit schon den Befehl &#8220;Muster einfügen&#8221; im Editor verwendet. Hierüber lassen sich in erster Linie die Aufrufe für Funktionsbausteine und Methoden in den Quelltext einfügen. Gerade bei Funktionsbausteinen ist dies ein unerlässliches Hilfsmittel, denn die Syntaxprüfung prüft bei Funktionsbausteinen nicht, ob ein falscher Parameter verwendet wird.</p>
+<p>Die ungarische SAP-Entwicklerfirma <a title="Homepage | Hovitaga" href="http://www.hovitaga.com/">Hovitaga </a>hat für das Einfügen von Mustern ein kleines kostenloses AddOn entwickelt. Doch der Reihe nach.</p>
+<h2>Einfügen von Mustern</h2>
+<p>Über das Menü <em>Hilfsmittel &#8211; Einstellungen</em> im Editor können einige Einstellungen für das Einfügen von Mustern vorgenommen werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_07_16_22_14.jpg"><img decoding="async" class="alignnone size-medium wp-image-4552" alt="Muster Einstellungen" src="https://tricktresor.com/wp-content/uploads/2014/03/03_07_16_22_14-282x300.jpg" width="282" height="300" srcset="/wp-content/uploads/2014/03/03_07_16_22_14-282x300.jpg 282w, /wp-content/uploads/2014/03/03_07_16_22_14.jpg 565w" sizes="(max-width: 282px) 100vw, 282px" /></a></p>
+<p>&nbsp;</p>
+<h2>Muster einfügen SAP Standard</h2>
+<p>Das Einfügen von Mustern erfolgt über den Druckknopf <em>Muster</em> im Editor. Es erscheint ein Popup in dem man auswählen muss, für welchen Befehl man ein Muster einfügen möchte. Wir entscheiden uns für die Option <em>ABAP Objects Muster</em> und gelangen auf ein weiteres Popup:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_07_16_11_34.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4553" alt="ABAP Objects Muster" src="https://tricktresor.com/wp-content/uploads/2014/03/03_07_16_11_34-289x300.jpg" width="289" height="300" srcset="/wp-content/uploads/2014/03/03_07_16_11_34-289x300.jpg 289w, /wp-content/uploads/2014/03/03_07_16_11_34.jpg 376w" sizes="(max-width: 289px) 100vw, 289px" /></a></p>
+<p>&nbsp;</p>
+<p>Nachdem ich mich an dieser Stelle häufig ärgere, dass in der Suchhilfe zur Methode alle Methoden der Klasse angezeigt werden und keine Unterscheidung zwischen PRIVATE, PROTECTED oder PUBLIC gemacht wird, endet hier auch die Funktionalität im SAP Standard. Je nach Release wird vor dem Aufruf der Methode noch die Datendeklaration eingefügt.</p>
+<h2>Muster einfügen Hovitaga style</h2>
+<p>Dort, wo SAP aufhört, fängt die Funktionalität von Hovitaga an. An der Stelle, wo normalerweise der Code in den Quelltext eingefügt wird, erscheint erneut ein Popup:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_07_15_50_29.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4554" alt="Hovitaga Dialog" src="https://tricktresor.com/wp-content/uploads/2014/03/03_07_15_50_29-300x191.jpg" width="300" height="191" srcset="/wp-content/uploads/2014/03/03_07_15_50_29-300x191.jpg 300w, /wp-content/uploads/2014/03/03_07_15_50_29-1024x655.jpg 1024w, /wp-content/uploads/2014/03/03_07_15_50_29-624x399.jpg 624w, /wp-content/uploads/2014/03/03_07_15_50_29.jpg 1363w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Hier kann durch verschiedene Funktionen der Aufruf im Quelltext gesteuert werden. Anstatt im Coding nicht benötigte Parameter zu löschen, kann im Dialog bereits entschieden werden, welche Parameter benötigt werden. Auf Wunsch wird auch die Datendeklaration für den jeweiligen Parameter eingefügt. Für Tabellenparameter kann auch ein entsprechender Arbeitsbereich deklariert werden. Hovitaga folgt hierbei den üblichen Namenskonventionen:</p>
+<ul>
+<li>S = Struktur</li>
+<li>T = Tabelle</li>
+<li>V = Variable</li>
+<li>R = Referenz auf ein Objekt</li>
+</ul>
+<p>Durch einen Schalter kann zwischen globaler und lokaler Datendeklaration gewählt werden, was sich in der Namenskonvention durch die Verwendung von G oder L auswirkt.</p>
+<p>In einer Vorschau wird der einzufügende Aufruf angezeigt. Man sieht sofort, wie sich die Änderungen von z.B. &#8220;Remove Unsed Lines&#8221; auswirken.</p>
+<h2>Fazit</h2>
+<p>Ich möchte nicht soweit gehen, dass es ein unentbehrliches Tool für den ABAP-Programmierer ist. Allerdings finden sich sinnvolle Funktionen in dieser Erweiterung, die das Leben durchaus leichter machen können. Es gibt also eine klare Tricktresor-Empfehlung!</p>
+<h2>Download</h2>
+<p><a title="Advanced Pattern Enhancement | Hovitaga" href="http://www.hovitaga.com/Advanced-pattern-enhancement-overview">Hovitaga Advanced Pattern Enhancement &#8211; Product page and Download</a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/hovitaga-advanced-pattern-enhancement/">Hovitaga Advanced Pattern Enhancement</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Pfadauswahl mit DIRECTORY_BROWSE</title>
+		<link>/blog/pfadauswahl-mit-directory-browse/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 06 Feb 2014 13:46:59 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[directory]]></category>
+		<category><![CDATA[Verzeichnis]]></category>
+		<category><![CDATA[suchhilfe]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<category><![CDATA[Selektionsbilder]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[f4]]></category>
+		<category><![CDATA[value-request]]></category>
+		<category><![CDATA[browse]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4372</guid>
+
+					<description><![CDATA[<p>Hier demonstriere ich die Verwendung der Methode CL_GUI_FRONTEND_SERVICES=>DIRECTORY_BROWSE. Eigentlich einfach zu verwenden, aber für die F4-Hilfe ist ein kleiner Trick notwendig. Zudem zeige ich, wie die Methode in einem Suchhilfe-Exit verwendet werden kann.</p>
+<p>Der Beitrag <a href="/blog/pfadauswahl-mit-directory-browse/">Pfadauswahl mit DIRECTORY_BROWSE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um einen Dateipfad auf dem Frontend auszuwählen, gibt es die Methode DIRECTORY_BROWSE der Klasse CL_GUI_FRONTEND_SERVICES. Um sie jedoch in der F4-Hilfe eines Reports sinnvoll verwenden zu können, muss man sich noch eines Tricks bedienen. Das Problem: Bei Aufruf der F4-Hilfe steht der Wert des Parameters für den die F4-Hilfe aufgerufen wurde, nicht zur Verfügung.</p>
+<p>Aus diesem Grund muss der Feldinhalt explizit mit Hilfe des Funktionsbausteins DYNP_VALUES_READ gelesen werden.</p>
+<p><img loading="lazy" decoding="async" width="675" height="422" class="alignnone size-full wp-image-4374" src="https://tricktresor.com/wp-content/uploads/2014/02/img_52f391e706cfb.png" alt="" srcset="/wp-content/uploads/2014/02/img_52f391e706cfb.png 675w, /wp-content/uploads/2014/02/img_52f391e706cfb-300x187.png 300w, /wp-content/uploads/2014/02/img_52f391e706cfb-624x390.png 624w" sizes="(max-width: 675px) 100vw, 675px" /></p>
+<h2>Coding</h2>
+<pre>REPORT z_test_browse_directory.
+
+*== SELECTION SCREEN
+PARAMETERS p_path  TYPE text200 OBLIGATORY LOWER CASE.
+
+*== Help Value path
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_path.
+  PERFORM f4_path.
+
+*== init
+INITIALIZATION.
+  PERFORM get_download_path.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_download_path
+*&amp;---------------------------------------------------------------------*
+FORM get_download_path.
+
+*== local data
+  DATA lv_upload_path    TYPE string.
+  DATA lv_download_path  TYPE string.
+
+*== get current download path
+  CALL METHOD cl_gui_frontend_services=&gt;get_upload_download_path
+    CHANGING
+      upload_path   = lv_upload_path
+      download_path = lv_download_path.
+
+*== set parameter
+  p_path = lv_download_path.
+
+ENDFORM.                    "get_download_path
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  f4_path
+*&amp;---------------------------------------------------------------------*
+FORM f4_path.
+
+*== local data
+  DATA lv_out    TYPE string.
+  DATA lv_in     TYPE string.
+  DATA lt_fields TYPE TABLE OF dynpread.
+  DATA ls_field  TYPE dynpread.
+
+*== get current value for path
+  ls_field = 'P_PATH'.
+  APPEND ls_field TO lt_fields.
+
+  CALL FUNCTION 'DYNP_VALUES_READ'
+    EXPORTING
+      dyname     = sy-cprog
+      dynumb     = sy-dynnr
+    TABLES
+      dynpfields = lt_fields
+    EXCEPTIONS
+      OTHERS     = 1.
+
+  IF sy-subrc = 0.
+    READ TABLE lt_fields INTO ls_field INDEX 1.
+    lv_in = ls_field-fieldvalue.
+  ENDIF.
+
+*== call popup for directory selection
+  CALL METHOD cl_gui_frontend_services=&gt;directory_browse
+    EXPORTING
+      initial_folder  = lv_in
+    CHANGING
+      selected_folder = lv_out
+    EXCEPTIONS
+      OTHERS          = 4.
+
+  IF sy-subrc = 0 AND lv_out IS NOT INITIAL.
+*== set selected path
+    p_path = lv_out.
+  ELSE.
+*== set origin path
+    p_path = lv_in.
+  ENDIF.
+
+ENDFORM.</pre>
+<h1>Verwendung in einer Suchhilfe</h1>
+<p>Einfacher und sinnvoller jedoch ist die Verwendung in einer Suchhilfe! Warum? Erstens kann die Suchhilfe an ein entsprechendes Feld einer Dictionarystruktur angebunden werden und zweitens lässt sich auch in einem Report eine Suchhilfe einfacher verwenden.</p>
+<p>Das Programm reduziert sich so auf die folgende Angabe bei dem Parameter P_PATH:</p>
+<pre>PARAMETERS p_path  TYPE string OBLIGATORY LOWER CASE <span style="color: #ff0000;">MATCHCODE OBJECT ZSH_DIRECTORY</span>.</pre>
+<p>du ahnst es schon: Die Suchhilfe heißt in diesem Fall ZSH_DIRECTORY. Um diese zu erstellen musst du folgendes tun:</p>
+<ol>
+<li>Anlage der Suchhilfe in der SE11</li>
+<li>Anlage eines Funktionsbausteins, der als Suchhilfe-Exit verwendet wird.</li>
+</ol>
+<p>Wir fangen bei 2. an:</p>
+<h2>2. Anlage Suchhilfe-Exit</h2>
+<p>Du benötigst eine Funktionsgruppe. Einfach in der SE80 eine anlegen. In diese Funktionsgruppe kopierst du den Baustein F4IF_SHLP_EXIT_EXAMPLE auf den Baustein Z_F4IF_SHLP_EXIT_DIRECTORY. Das Kopieren ist wichtig, da die Suchhilfe-Exit-Bausteine eine definierte Schnittstelle haben.</p>
+<p>Im STEP SELECT fügst du das Coding ein, dessen Kern wir bereits aus dem vorherigen Coding kennen:</p>
+<pre>  IF callcontrol-step = 'SELECT'.
+*== data (please set data definitions to top of function module!)
+    DATA lv_in TYPE string.
+    DATA lv_out TYPE string.
+    FIELD-SYMBOLS &lt;itf&gt; LIKE LINE OF shlp-interface.
+    FIELD-SYMBOLS &lt;rec&gt; LIKE LINE OF record_tab.
+*== get field value
+    READ TABLE shlp-interface WITH KEY shlpfield = 'PATH' ASSIGNING &lt;itf&gt;.
+    IF sy-subrc = 0.
+*== use field value as start directory
+      lv_in = &lt;itf&gt;-value.
+*== call popup for directory selection
+      CALL METHOD cl_gui_frontend_services=&gt;directory_browse
+        EXPORTING
+          initial_folder  = lv_in
+        CHANGING
+          selected_folder = lv_out
+        EXCEPTIONS
+          OTHERS          = 4.
+      IF sy-subrc = 0 AND lv_out IS NOT INITIAL.
+        APPEND INITIAL LINE TO record_tab ASSIGNING &lt;rec&gt;.
+        &lt;rec&gt;-string = lv_out.
+        callcontrol-step = 'RETURN'.
+      ENDIF.
+    ENDIF.
+  ENDIF.</pre>
+<p>Grob passiert folgendes:</p>
+<ol>
+<li>Wir lesen aus der Schnittstellenbeschreibung den Parameter PATH, den wir in der Suchhilfe definiert haben, aus und verwenden ihn als Startverzeichnis</li>
+<li>Aufruf der Methode DIRECTORY_BROWSE</li>
+<li>Füllen der Rückgabetabelle RECORD_TAB</li>
+<li>Setzen des Folgeschrittes RETURN um die Anzeige des gefundenen Verzeichnisses im Popup zu verhindern</li>
+</ol>
+<p>[notice type=&#8217;info&#8217;]Eventuell kann es sein, dass in dem Beispiel das Startverzeichnis nicht in die Suchhilfe übernommen wird. In dem Fall muss gegebenenfalls ebenfalls der Funktionsbaustein DYNP_VALUES_READ eingesetzt werden. Das verwendete Parametername steht in der INTERFACE-Struktur im Feld VALFIELD.[/notice]</p>
+<h2>1. Anlage der Suchhilfe</h2>
+<p>Transaktion SE11: Suchhilfe Anlegen:</p>
+<p><img loading="lazy" decoding="async" width="414" height="359" class="alignnone size-full wp-image-4377" src="https://tricktresor.com/wp-content/uploads/2014/02/img_52f395b7a234f.png" alt="" srcset="/wp-content/uploads/2014/02/img_52f395b7a234f.png 414w, /wp-content/uploads/2014/02/img_52f395b7a234f-300x260.png 300w" sizes="(max-width: 414px) 100vw, 414px" /></p>
+<p>In der Suchhilfe muss der erstellte Funktionsbaustein als Suchhilfe-Exit eingetragen werden:</p>
+<p><img loading="lazy" decoding="async" width="737" height="429" class="alignnone size-full wp-image-4378" src="https://tricktresor.com/wp-content/uploads/2014/02/img_52f3960b0c6f8.png" alt="" srcset="/wp-content/uploads/2014/02/img_52f3960b0c6f8.png 737w, /wp-content/uploads/2014/02/img_52f3960b0c6f8-300x174.png 300w, /wp-content/uploads/2014/02/img_52f3960b0c6f8-624x363.png 624w" sizes="(max-width: 737px) 100vw, 737px" /></p>
+<p>Der Beitrag <a href="/blog/pfadauswahl-mit-directory-browse/">Pfadauswahl mit DIRECTORY_BROWSE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Simulation einer E-Mail-Anhang-Konvertierung</title>
+		<link>/blog/simulation-einer-e-mail-anhang-konvertierung/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Thu, 26 Dec 2013 08:42:45 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[anhang]]></category>
+		<category><![CDATA[konvertierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[e-mail]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=4104</guid>
+
+					<description><![CDATA[<p>Oft haben Entwickler das Problem, dass nicht alle Applikationen, die sie für Ihre Entwicklung benötigen, zur richtigen Zeit verfügbar sind. So kann es notwendig sein die eine oder andere Applikation zu simulieren. Hier ist ein Lösungsansatz wie eine Konvertierung von Bildern als E-Mail-Anhang simuliert werden kann, z.B. für ein ERMS (E-Mail Response Management System). Ein Beispiel: Ein Sachbearbeiter erhält eine E-Mail von einem Kunden über einen Schadensfall mit einem Foto von seiner Kamera. Das Foto...</p>
+<p>Der Beitrag <a href="/blog/simulation-einer-e-mail-anhang-konvertierung/">Simulation einer E-Mail-Anhang-Konvertierung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Oft haben Entwickler das Problem, dass nicht alle Applikationen, die sie für Ihre Entwicklung benötigen, zur richtigen Zeit verfügbar sind. So kann es notwendig sein die eine oder andere Applikation zu simulieren. Hier ist ein Lösungsansatz wie eine Konvertierung von Bildern als E-Mail-Anhang simuliert werden kann, z.B. für ein ERMS (E-Mail Response Management System).</p>
+<p>Ein Beispiel: Ein Sachbearbeiter erhält eine E-Mail von einem Kunden über einen Schadensfall mit einem Foto von seiner Kamera. Das Foto liegt aber nicht in einem gängigen Format wie jpeg oder tif vor. Für eine schnelle Schadensfallbearbeitung ist es jedoch notwendig das Foto in ein pdf zu konvertieren und zu archivieren. Für diesen Fall bietet das ERMS eine automatische Konvertierung &#8211; aber zum Entwicklungszeitpunkt ist die Konvertierung noch nicht verfügbar.</p>
+<p>Um das Format eines Bildes umzuwandeln kann nconvert verwendet werden, welches Bestandteil des frei verfügbaren <a title="XNview" href="http://www.xnview.com/de" target="_blank">XNview</a> ist. Dazu ist es notwendig nconvert mit <a title="BinFile2ABAP" href="http://www.stschnell.de/binfile2abap.htm" target="_blank">BinFile2ABAP</a> in ein ABAP Funktionsbaustein umzuwandeln. Mit diesem Funktionsbaustein und nconvertX, einer ActiveX-Bibliothek für den Präsentationsserver welche die Möglichkeit eröffnet nconvert in ABAP zu nutzen, kann eine Konvertierung simuliert werden.</p>
+<p>Laden Sie sich das folgende Datei herunter, dort finden Sie die entsprechenden ABAP-Funktionsbausteine.<br />
+<a href="http://www.stschnell.de/temp/nconvertx.zip">nconvertx.zip</a></p>
+<p>nconvert unterstützt 493 unterschiedliche Formate. Es ist ebenso möglich z.B. die Größe des Bildes zu ändern oder eine ganze Menge anderer Sachen.</p>
+<p><span style="line-height: 1.5em">Mit nconvert und nconvertX ist es sehr einfach eine E-Mail-Anhang Bildkonvertierung zu simulieren.</span></p>
+<p>Ergänzung vom 06.03.2014:<br />
+Die Datei nconvert.jpg ist nach dem Download in nconvert.zip umzubenennen und kann dann entpackt werden.<br />
+nconvertX ist nun vollständig in 32 und 64 bit Environments nutzbar &#8211; siehe auch Diskussion <a href="http://scn.sap.com/thread/3505080">hier</a>.<br />
+Eine vollständige Hilfe mit Beispielen liegt nconvertX bei.</p>
+<p>Der Beitrag <a href="/blog/simulation-einer-e-mail-anhang-konvertierung/">Simulation einer E-Mail-Anhang-Konvertierung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Up- und Download von Transporten</title>
+		<link>/blog/up-und-download-von-transporten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 07 Jul 2008 09:24:39 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Transport]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[KTW]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=494</guid>
+
+					<description><![CDATA[<p>Worum geht es? Will man ein SAP-System mit seinen Entwicklungen  best&#252;cken, so mu&#223; man die Transport-Dateien umst&#228;ndlich hochladen. Je  nach Ausstattung fehlen grundlegende Transaktionen. Hierf&#252;r gibt es nun das folgende Programm, das sowohl einen Up- als auch einen Download auf einfache Weise erm&#246;glicht. </p>
+<p>Der Beitrag <a href="/blog/up-und-download-von-transporten/">Up- und Download von Transporten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Worum geht es? Will man ein SAP-System mit seinen Entwicklungen bestücken, so muß man die Transport-Dateien umständlich hochladen. Je nach Ausstattung fehlen grundlegende Transaktionen. Hierfür gibt es nun das folgende Programm, das sowohl einen Up- als auch einen Download auf einfache Weise ermöglicht.</p>
+<p>Download des Quellcodes <a href="https://tricktresor.com/wp-content/downloads/zSTW_UPL_DOWNL_AUFTRAG.txt" target="_blank">hier</a>.</p>
+<p>Vielen Dank an Stefan Wagenblast!</p>
+<h2 class="head1">Neue Version von Stefan Schnell</h2>
+<p class="text1">Stefan hat das Programm noch mal erweitert.</p>
+<p class="text1">Das angepaste Programm ist <a href="/wp-content/downloads/zSTW_UPL_DOWNL_AUFTRAG.txt" target="_blank">hier</a>, die ausführliche Dokumentation im PDF-Format kann <a href="/wp-content/downloads/zSTW_UPL_DOWNL_AUFTRAG_Anleitung.pdf" target="_blank">hier</a> herunter geladen werden.</p>
+<p class="head1">
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/up-und-download-von-transporten/">Up- und Download von Transporten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bubble-la-Bap</title>
+		<link>/blog/bubble-la-bap/</link>
+					<comments>/blog/bubble-la-bap/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 17 Dec 2007 11:02:22 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[Spiele]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Download]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=447</guid>
+
+					<description><![CDATA[<p>Das Spiel "Jawbreaker" mit neuer Grafik-Engine und kompletter Undo-Funktion. Bubble-La-Bap ist ein Wortspiel mit "Bubbles", dem Originalnamen auf Windows(R)-Mobile-Ger&#228;ten, "ABAP" und "Papperlapapp". Viel Spa&#223;! ACHTUNG: SUCHTGEFAHR!!!</p>
+<p>Der Beitrag <a href="/blog/bubble-la-bap/">Bubble-la-Bap</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Spiel &#8220;Jawbreaker&#8221; mit neuer Grafik-Engine und kompletter Undo-Funktion. Bubble-La-Bap ist ein Wortspiel mit &#8220;Bubbles&#8221;, dem Originalnamen auf Windows(R)-Mobile-Geräten, &#8220;ABAP&#8221; und &#8220;Papperlapapp&#8221;. Viel Spaß! ACHTUNG: SUCHTGEFAHR!!!</p>
+<h2 class="head1">Beschreibung</h2>
+<p class="text1">Bei &#8220;Bubble-La-Bap&#8221; müssen die &#8220;Bälle&#8221; zum platzen gebracht werden. Sobald mindestens zwei gleichfarbige Bälle neben- oder übereinander stehen, können diese angeklickt und &#8220;aufgelöst&#8221; werden. Die darüber liegenden Bälle rutschen nach unten und nach rechts nach. Beim Spielmodus &#8220;fortlaufend&#8221; werden leere Spalten von links wieder aufgefüllt.</p>
+<p class="text1">Je mehr Bälle zusammen aufgelöst werden, umso mehr Punkte gibt es. Für zwei Bälle gibt es nur vier Punkte, für neun Bälle schon 72&#8230;</p>
+<p class="text1">Das Spiel wurde unter Release ERP 5.0 geschrieben, sollte aber ab Version 4.6C lauffähig sein.</p>
+<h2 class="head1">Screenshot</h2>
+<p><img decoding="async" src="https://tricktresor.com/wp-content/uploads/tt_images/spiele/bubblelabap1.jpg" alt="" />  <img decoding="async" src="https://tricktresor.com/wp-content/uploads/tt_images/spiele/bubblelabap2.jpg" alt="" /></p>
+<h2 class="head1">Vorbereitungen</h2>
+<h3 class="head2">GUI-Status 0100</h3>
+<p class="text1">Der GUI-Status &#8216;0100&#8217; muss angelegt werden. Funktionstasten:</p>
+<ul>
+<li>
+<div class="text1"><strong>NEW</strong> &#8211; Neues Spiel &#8211; F8</div>
+</li>
+<li>
+<div class="text1"><strong>UNDO</strong> &#8211; Zug rückgängig &#8211; F5</div>
+</li>
+</ul>
+<h3 class="head2">Dynpro</h3>
+<p>Dynpro 100 muss angelegt werden mit dem CustomContainer &#8220;CC_FIELDS&#8221; der Größe 60 x 20.</p>
+<h3 class="head2">Ablauflogik</h3>
+<p class="sap1">PROCESS BEFORE OUTPUT.<br />
+MODULE STATUS_0100.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE USER_COMMAND_0100.</p>
+<h2 class="head1">Coding</h2>
+<p class="text1"><a title="Bubble-la-Bap | Games" href="https://tricktresor.com/wp-content/downloads/bubblelabap.txt" target="_blank">Der Quelltext zum Download hier</a></p>
+<p class="head1">Anpassungen an andere Releases</p>
+<p class="head2">Release 4.7</p>
+<p class="text1">Type-Pool WRFAC ist nicht vorhanden. Deswegen muss die dort verwendete Konstante WRFAC_STYLE_COLOR_NEGATIVE lokal definiert werden:</p>
+<p class="sap1">DATA wrfac_style_color_negative(4) TYPE x VALUE &#8216;00000007&#8217;.</p>
+<p class="text1">
+<p>Der Beitrag <a href="/blog/bubble-la-bap/">Bubble-la-Bap</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bubble-la-bap/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Download von Programmen</title>
+		<link>/blog/download-von-programmen/</link>
+					<comments>/blog/download-von-programmen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Jan 2005 13:36:44 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[READ REPORT]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=310</guid>
+
+					<description><![CDATA[<p>Mit diesem Programm k&#246;nnen Sie ABAP-Programme auf ihren PC speichern. Es werden dabei die Texte als auch die Dokumentation ber&#252;cksichtigt. Jeder Report wird in einer Datei mit der Endung "ABAP" gespeichert. Zudem wird eine &#220;bersichtsdatei erstellt, in der alle heruntergeladenen Programme mit Bezeichnung aufgef&#252;hrt sind. Die Auswahl der Programme erfolgt nach Programmname, Autor oder Entwicklungsklasse.</p>
+<p>Der Beitrag <a href="/blog/download-von-programmen/">Download von Programmen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Programm kannst du ABAP-Programme auf deinen PC speichern. Es werden dabei die Texte als auch die Dokumentation berücksichtigt. Jeder Report wird in einer Datei mit der Endung &#8220;ABAP&#8221; gespeichert. Zudem wird eine Übersichtsdatei erstellt, in der alle heruntergeladenen Programme mit Bezeichnung aufgeführt sind. Die Auswahl der Programme erfolgt nach Programmname, Autor oder Entwicklungsklasse.</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p><u><strong>Tipp:</strong></u><br />
+Du kannst einen Report per Drag and Drop direkt aus dem Explorer in das TextEditControl des ABAP-Editors ziehen![/notice]</p>
+<pre class="lang:abap decode:true ">*---------------------------------------------------------------------*
+* Author: Harald Werft                                                *
+* Datum.: 15.11.1995                                                  *
+*---------------------------------------------------------------------*
+* Download von Objekten (Reports/Includes/Modulpool                   *
+*---------------------------------------------------------------------*
+* Angepasst von Enno Wulff                                            *
+* https://tricktresor.com/
+*---------------------------------------------------------------------*
+REPORT  zsysrep1.
+
+TABLES: dokil,                         "Index Doku-Tabelle
+        tadir.                         "Tabelle mit Entwicklungsklasse
+
+DATA:
+* Ausgewählte Elemente
+  prog      LIKE tadir    OCCURS 0 WITH HEADER LINE,
+
+* Inhalt
+  BEGIN OF inhalt OCCURS 0,
+    report TYPE syrepid,
+    bezei(200),
+  END OF inhalt,
+
+* Report
+  BEGIN OF t OCCURS 0,
+    line(72),
+  END OF t,
+
+* Texelemente für Report
+  te        LIKE textpool OCCURS 0 WITH HEADER LINE,
+
+* Variablen Textverarbeitung
+  texthead  LIKE thead,
+  textlines LIKE tline    OCCURS 0 WITH HEADER LINE,
+
+* Download
+  BEGIN OF tab OCCURS 0,
+    line(400),
+  END OF tab,
+
+  BEGIN OF name,
+    pfad(500),
+    datei(500),
+    erweit(5),
+  END OF name,
+  filename  LIKE rlgrap-filename.
+
+*** Selektionsbild
+PARAMETER: i_pfad(200) DEFAULT 'C:/DATENREPORT'.
+SELECT-OPTIONS i_objnam FOR tadir-obj_name.
+SELECT-OPTIONS i_devcla FOR tadir-devclass.
+SELECT-OPTIONS i_author FOR tadir-author.
+PARAMETER: i_doku AS CHECKBOX DEFAULT 'X'.
+
+************************************************************************
+START-OF-SELECTION.
+************************************************************************
+
+*** Alle Programme laut Selektionskriterium ermitteln
+  SELECT * FROM  tadir INTO TABLE prog
+   WHERE pgmid       = 'R3TR'
+     AND object      = 'PROG'
+     AND obj_name   IN i_objnam
+     AND devclass   IN i_devcla
+     AND author     IN i_author.
+
+  REFRESH inhalt.
+
+  LOOP AT prog.
+    REFRESH t.
+*** Einlesen der Reportssource
+    READ REPORT prog-obj_name INTO t.
+    IF sy-subrc = 0.
+*** Einlesen des Textpools
+      REFRESH te.
+      READ TEXTPOOL prog-obj_name INTO te LANGUAGE sy-langu.
+*** Inhaltsdatei aufbauen
+      inhalt-report = prog-obj_name.
+      inhalt-bezei  = space.
+*** Lesen der Reportbezeichnung
+      READ TABLE te WITH KEY id = 'R'.
+      IF sy-subrc = 0.
+        inhalt-bezei = te-entry.
+      ENDIF.
+      APPEND inhalt.
+*** Übergabe der Texte an die Downloadtabelle
+      LOOP AT te.
+        APPEND te(254) TO tab.
+      ENDLOOP.
+      REFRESH textlines.
+      CLEAR: textlines, texthead.
+      IF NOT i_doku IS INITIAL.
+*** Lesen Index DOKU-Tabelle
+        SELECT SINGLE * FROM  dokil
+           WHERE  id      = 'RE'
+           AND    object  = prog-obj_name
+           AND    langu   = 'D'
+           AND    typ     = 'E'.
+        IF sy-subrc = 0.
+*** Lesen der Doku falls gewünscht
+          CALL FUNCTION 'DOCU_GET'
+               EXPORTING
+                    id     = dokil-id
+                    langu  = dokil-langu
+                    object = dokil-object
+                    typ    = dokil-typ
+               IMPORTING
+                    head   = texthead
+               TABLES
+                    line   = textlines
+               EXCEPTIONS
+                    OTHERS = 1.
+          REFRESH te.
+          CLEAR te.
+*** Übertragen der Dokumentation in die Downloadtabelle
+          APPEND LINES OF textlines TO tab.
+        ENDIF.
+      ENDIF.
+      APPEND sy-uline(70) TO tab.
+      APPEND LINES OF t   TO tab.
+*** Download des Reports
+      name-pfad   = i_pfad.
+      name-datei  = prog-obj_name.
+      name-erweit = '.ABAP'.
+      CONDENSE name NO-GAPS.
+      filename    = name.
+      CALL FUNCTION 'WS_DOWNLOAD'
+           EXPORTING
+                filename            = filename
+                filetype            = 'ASC'
+                mode                = ' '
+           TABLES
+                data_tab            = tab
+           EXCEPTIONS
+                file_open_error     = 01
+                file_write_error    = 02
+                invalid_filesize    = 03
+                invalid_table_width = 04
+                invalid_type        = 05
+                no_batch            = 06
+                unknown_error       = 07.
+      PERFORM fehler_download.
+    ENDIF.
+
+  ENDLOOP.
+
+*** Ausgabe des Inhaltsverzeichnis in Datei
+  name-pfad   = i_pfad.
+  name-datei  = 'Inhalt'.
+  name-erweit = '.TXT'.
+  CONDENSE name NO-GAPS.
+  filename    = name.
+  CALL FUNCTION 'WS_DOWNLOAD'
+       EXPORTING
+            filename            = filename
+            filetype            = 'ASC'
+            mode                = ' '
+       TABLES
+            data_tab            = inhalt
+       EXCEPTIONS
+            file_open_error     = 01
+            file_write_error    = 02
+            invalid_filesize    = 03
+            invalid_table_width = 04
+            invalid_type        = 05
+            no_batch            = 06
+            unknown_error       = 07.
+  PERFORM fehler_download.
+
+END-OF-SELECTION.
+
+*---------------------------------------------------------------------*
+*       FORM FEHLER_DOWNLOAD                                          *
+*---------------------------------------------------------------------*
+* Fehlermelung und Abbruch, wenn beim Download Fehler auftraten.      *
+*---------------------------------------------------------------------*
+FORM fehler_download.
+
+  IF sy-subrc NE 0.
+    WRITE: / 'Fehler beim Download:'.
+    CASE sy-subrc.
+      WHEN 1.
+        WRITE: / 'File Open Error'.
+      WHEN 2.
+        WRITE: / 'File Write Error'.
+      WHEN 3.
+        WRITE: / 'Invalid Filesize'.
+      WHEN 4.
+        WRITE: / 'Invalid Table Width'.
+      WHEN 5.
+        WRITE: / 'Invalid Type'.
+      WHEN 6.
+        WRITE: / 'No Batch'.
+      WHEN 7.
+        WRITE: / 'Unknown'.
+    ENDCASE.
+    STOP.
+  ENDIF.
+
+ENDFORM.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/download-von-programmen/">Download von Programmen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/download-von-programmen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

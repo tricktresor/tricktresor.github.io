@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ascii Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/ascii/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:58 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ascii Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SALV-Table mit &#8220;Grafik&#8221;</title>
+		<link>/blog/salv-table-mit-grafik/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Jun 2014 19:04:27 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Sonderzeichen]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[ascii]]></category>
+		<category><![CDATA[zeichensatz]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4891</guid>
+
+					<description><![CDATA[<p>Heute kam mir die Idee, Daten in einem ALV-Grid einmal grafisch darzustellen. Ich hatte eigentlich vor, die grafischen Zeichen aus dem DOS-Zeichensatz zu verwenden, aber diese stehen leider nicht zur Verfügung. Hier also eine Variante mit verfügbaren Sonderzeichen.</p>
+<p>Der Beitrag <a href="/blog/salv-table-mit-grafik/">SALV-Table mit &#8220;Grafik&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute kam mir die Idee, Daten in einem ALV-Grid einmal grafisch darzustellen. Ich hatte eigentlich vor, die grafischen Zeichen aus dem DOS-Zeichensatz zu verwenden:</p>
+<p><a href="http://www.torsten-horn.de/techdocs/ascii.htm"><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-4893" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_210631-300x179.jpg" alt="Bild_2014_06_26_210631" width="300" height="179" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_210631-300x179.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_26_210631-624x372.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_26_210631.jpg 626w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Leider war das nicht möglich. Ich habe mich dann für ein anderes Sonderzeichen entschieden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg"><img decoding="async" class="alignnone wp-image-4892 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg" alt="Bild_2014_06_26_200626 (2)" width="588" height="330" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg 588w, /wp-content/uploads/2014/06/Bild_2014_06_26_200626-2-300x168.jpg 300w" sizes="(max-width: 588px) 100vw, 588px" /></a></p>
+<p>Die Länge des &#8220;Balkens&#8221; wird anhand der verwenden Feldgröße von 20 Zeichen berechnet.</p>
+<p>Das Pipe-Symbol | sieht auch gut aus. Nimmt nicht so viel Platz weg&#8230;</p>
+<p><img decoding="async" class="alignnone wp-image-4894 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_210606.jpg" alt="Bild_2014_06_26_210606" width="484" height="193" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_210606.jpg 484w, /wp-content/uploads/2014/06/Bild_2014_06_26_210606-300x119.jpg 300w" sizes="(max-width: 484px) 100vw, 484px" /></p>
+<h2>Coding</h2>
+<pre>REPORT z.
+
+*== global data
+DATA:
+  BEGIN OF gs_data,
+    matnr   TYPE char10,
+    descr   TYPE text20,
+    amount  TYPE i,
+    camount TYPE char20,
+  END OF gs_data,
+  gt_data LIKE TABLE OF gs_data,
+  hex TYPE x VALUE 7.
+
+FIELD-SYMBOLS  TYPE c.
+
+*== start of program
+START-OF-SELECTION.
+  PERFORM main.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  main
+*&amp;---------------------------------------------------------------------*
+FORM main.
+
+*== local data
+  DATA lo_grid      TYPE REF TO cl_salv_table.
+  FIELD-SYMBOLS  LIKE LINE OF gt_data.
+
+*== assign special Character
+  ASSIGN hex TO  CASTING.
+
+*== Fill testdata
+  gs_data-matnr = '1000'. gs_data-descr = 'Screw'.      gs_data-amount = 120. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1300'. gs_data-descr = 'Nut 1"'.     gs_data-amount = 030. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1506'. gs_data-descr = 'Driver'.     gs_data-amount = 222. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1660'. gs_data-descr = 'Tool '.      gs_data-amount = 180. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2040'. gs_data-descr = 'Screw 0.4"'. gs_data-amount = 178. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2220'. gs_data-descr = 'Screw 0.6"'. gs_data-amount = 660. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2456'. gs_data-descr = 'Gripper'.    gs_data-amount = 066. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2660'. gs_data-descr = 'Nipper'.     gs_data-amount = 510. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2807'. gs_data-descr = 'Pincer'.     gs_data-amount = 790. APPEND gs_data TO gt_data.
+
+*== calc amount
+  LOOP AT gt_data ASSIGNING .
+    PERFORM calc CHANGING .
+  ENDLOOP.
+
+*== call SALV
+  TRY.
+      CALL METHOD cl_salv_table=&gt;factory
+        IMPORTING
+          r_salv_table = lo_grid
+        CHANGING
+          t_table      = gt_data.
+      lo_grid-&gt;display( ).
+
+    CATCH cx_salv_msg.
+      WRITE: / 'Error: ALV exception CX_SALV_MSG'.
+  ENDTRY.
+
+ENDFORM.                    "main
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  calc
+*&amp;---------------------------------------------------------------------*
+FORM calc CHANGING cs_data LIKE gs_data.
+
+*== local data
+  DATA number TYPE i.
+  DATA max TYPE i VALUE 1000.
+
+*== calculate bar
+  number = cs_data-amount * 100 / 1000 / 5.
+
+*== Fill bar
+  DO number TIMES.
+     CONCATENATE cs_data-camount  INTO cs_data-camount.
+  ENDDO.
+
+ENDFORM.                    "calc</pre>
+<p>Der Beitrag <a href="/blog/salv-table-mit-grafik/">SALV-Table mit &#8220;Grafik&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ASCII-Tabelle</title>
+		<link>/blog/ascii-tabelle/</link>
+					<comments>/blog/ascii-tabelle/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 04 Jan 2011 15:17:09 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ascii]]></category>
+		<category><![CDATA[dec]]></category>
+		<category><![CDATA[hex]]></category>
+		<category><![CDATA[binär]]></category>
+		<category><![CDATA[zeichensatz]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=571</guid>
+
+					<description><![CDATA[<p>Von Urs Rohner stammt das Programm zur Generierung einer ASCII-Tabelle.</p>
+<p>Der Beitrag <a href="/blog/ascii-tabelle/">ASCII-Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Von Urs Rohner stammt das Programm zur Generierung einer ASCII-Tabelle.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2011/01/Bild_2014_06_26_170608.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4888 size-full" src="https://tricktresor.com/wp-content/uploads/2011/01/Bild_2014_06_26_170608.jpg" alt="ascii" width="411" height="360" srcset="/wp-content/uploads/2011/01/Bild_2014_06_26_170608.jpg 411w, /wp-content/uploads/2011/01/Bild_2014_06_26_170608-300x262.jpg 300w, /wp-content/uploads/2011/01/Bild_2014_06_26_170608-400x350.jpg 400w" sizes="(max-width: 411px) 100vw, 411px" /></a></p>
+<p class="sap1">REPORT zexp_ascii NO STANDARD PAGE HEADING.<br />
+<span style="color: #fb2412;">**********************************************************<br />
+* Show ASCII Codes<br />
+*<br />
+*   This is freeware. Please read the terms of use.<br />
+*   Written by Urs Rohner, Rohner IT Consulting &amp; Engineering<br />
+*<br />
+*   Contact Author: Urs Rohner<br />
+*<br />
+* comments<br />
+*  This is a classic report: show a list containing the ordinals<br />
+*  of all characters (actually the current SAP codepage will be shown).<br />
+*<br />
+**********************************************************</span></p>
+<p class="sap1">PARAMETERS:<br />
+_base      TYPE i DEFAULT 2,<br />
+_text(128) TYPE c LOWER CASE.</p>
+<p class="sap1">FIELD-SYMBOLS:<br />
+&lt;c&gt;, &lt;x&gt;.</p>
+<p class="sap1">DATA:<br />
+_b(8) TYPE c, &#8221; bit pattern<br />
+_i    TYPE i, &#8221; ordinal value<br />
+_c    TYPE c, &#8221; character representation<br />
+_x    TYPE x. &#8221; hexadecimal</p>
+<p class="sap1"><span style="color: #fb2412;">* Main ( )<br />
+</span>START-OF-SELECTION.<br />
+ASSIGN _c TO &lt;c&gt; TYPE &#8216;X&#8217;.<br />
+ASSIGN _x TO &lt;x&gt; TYPE &#8216;X&#8217;.<br />
+DO 256 TIMES.<br />
+&lt;c&gt; = &lt;x&gt; = _i = sy-index &#8211; 1.<br />
+PERFORM m_dec2base USING _i _base _b.<br />
+IF _text IS INITIAL OR _text CA _c.<br />
+WRITE: /  _i, 20 _b, 40 &#8216;%&#8217; NO-GAP, _x, 50 _c.<br />
+ENDIF.<br />
+ENDDO.</p>
+<p class="sap1"><span style="color: #fb2412;">* Method: m_dec2base&gt;<br />
+* Convert an interger to a string number with base _b<br />
+</span>FORM m_dec2base USING<br />
+value(_n) TYPE i<br />
+value(_b) TYPE i<br />
+_s.</p>
+<p class="sap1">  FIELD-SYMBOLS:<br />
+&lt;d&gt;.       &#8221; digit in _s<br />
+DATA:<br />
+d_ TYPE i,<br />
+p_ TYPE i,<br />
+q_ TYPE i,<br />
+r_ TYPE i, &#8221; required length of _s<br />
+s_ TYPE c, &#8221; sign of _n<br />
+t_ TYPE c, &#8221; type of _s<br />
+l_ TYPE i. &#8221; length of _s</p>
+<p class="sap1">  &#8221; prepare sign<br />
+IF _n GE 0.<br />
+CLEAR s_.<br />
+ELSE.<br />
+_n = ABS( _n ).<br />
+s_ = &#8216;-&#8216;.<br />
+ENDIF.</p>
+<p class="sap1">  &#8221; check for requested base<br />
+IF _b GT 1.<br />
+&#8221; check whether target string is okay<br />
+DESCRIBE FIELD _s TYPE t_ LENGTH l_ IN BYTE MODE.<br />
+IF t_ EQ &#8216;C&#8217;.<br />
+&#8221; calculate number of required digits r_<br />
+IF _n NE 0.<br />
+r_ = CEIL( LOG( _n + 1 ) / LOG( _b ) ).<br />
+ELSE.<br />
+r_ = 1.<br />
+ENDIF.<br />
+IF l_ GE r_.<br />
+DO r_ TIMES.<br />
+p_ = sy-index &#8211; 1.<br />
+q_ = _b ** ( r_ &#8211; sy-index ).<br />
+ASSIGN _s+p_(1) TO &lt;d&gt;.<br />
+d_ = _n DIV q_.<br />
+_n = _n &#8211; ( d_ * q_ ).<br />
+PERFORM m_dec2dig USING d_ &lt;d&gt;.<br />
+ENDDO.<br />
+ELSE.<br />
+CLEAR _s. &#8221; length of _s is too short<br />
+ENDIF.<br />
+ELSE.<br />
+CLEAR _s. &#8221; _s must be of character type<br />
+ENDIF.<br />
+ELSE.<br />
+CLEAR _s. &#8221; _b must be at least 2<br />
+ENDIF.<br />
+ENDFORM.                                                    &#8220;m_dec2base</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  m_dec2dig<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+</span>FORM m_dec2dig USING<br />
+value(_d) TYPE i<br />
+_i        TYPE c.</p>
+<p class="sap1">  CASE _d.<br />
+WHEN 0.  _i = &#8216;0&#8217;.<br />
+WHEN 1.  _i = &#8216;1&#8217;.<br />
+WHEN 2.  _i = &#8216;2&#8217;.<br />
+WHEN 3.  _i = &#8216;3&#8217;.<br />
+WHEN 4.  _i = &#8216;4&#8217;.<br />
+WHEN 5.  _i = &#8216;5&#8217;.<br />
+WHEN 6.  _i = &#8216;6&#8217;.<br />
+WHEN 7.  _i = &#8216;7&#8217;.<br />
+WHEN 8.  _i = &#8216;8&#8217;.<br />
+WHEN 9.  _i = &#8216;9&#8217;.<br />
+WHEN 10. _i = &#8216;A&#8217;.<br />
+WHEN 11. _i = &#8216;B&#8217;.<br />
+WHEN 12. _i = &#8216;C&#8217;.<br />
+WHEN 13. _i = &#8216;D&#8217;.<br />
+WHEN 14. _i = &#8216;E&#8217;.<br />
+WHEN 15. _i = &#8216;F&#8217;.<br />
+ENDCASE.<br />
+ENDFORM.                                                    &#8220;m_dec2dig</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/ascii-tabelle/">ASCII-Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ascii-tabelle/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

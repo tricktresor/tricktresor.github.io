@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Featured Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/tricktresor/featured/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 24 Mar 2021 10:40:08 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Featured Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Automatische Aufgabengenerierung [abapGit]</title>
+		<link>/blog/automatische-aufgabengenerierung-abapgit/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 20 Oct 2020 17:00:59 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abapGit]]></category>
+		<category><![CDATA[github]]></category>
+		<category><![CDATA[issue]]></category>
+		<guid isPermaLink="false">/?p=1024465</guid>
+
+					<description><![CDATA[<p>Dank des devtoberfestes habe ich diese Woche einiges über github gelernt. Ein cooles Feature möchte ich gerne mit euch teilen: Github actions Github actions können verwendet werden, um auf github Ereignisse reagieren zu können. Ein wichtiges Ereignis ist der Commit einer Datei (push). TODO to Issue Action Mit einer YAML-Definition kann man mit einer Action auf die Ereignisse reagieren. Ich habe im github Marketplace die Action TODO to issue action gefunden und einmal ausprobiert. Mit...</p>
+<p>Der Beitrag <a href="/blog/automatische-aufgabengenerierung-abapgit/">Automatische Aufgabengenerierung [abapGit]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Dank des <a href="https://github.com/SAP-samples/sap-devtoberfest-2020/blob/master/topics/github/readme.md">devtoberfestes</a> habe ich diese Woche einiges über github gelernt. Ein cooles Feature möchte ich gerne mit euch teilen:</p>
+
+
+
+<h2 class="wp-block-heading">Github actions</h2>
+
+
+
+<p><a class="keychainify-checked" href="https://github.com/features/actions">Github actions</a> können verwendet werden, um auf github Ereignisse reagieren zu können. Ein wichtiges Ereignis ist der Commit einer Datei (push). </p>
+
+
+
+<h2 class="wp-block-heading">TODO to Issue Action</h2>
+
+
+
+<p>Mit einer YAML-Definition kann man mit einer <em>Action</em> auf die Ereignisse reagieren. Ich habe im github Marketplace die Action<a href="https://github.com/marketplace/actions/todo-to-issue"> TODO to issue action </a>gefunden und einmal ausprobiert.</p>
+
+
+
+<p>Mit dieser Action ist es möglich auf einen bestimmten <em>Marker</em> zu reagieren, der im Quelltext vorkommt. Sinnvoll ist im ABAP-Umfeld das Doppelte Anführungszeichen, dass einen Kommentar einleitet, gefolgt von dem Wort &#8220;TODO&#8221;. Findet der Workflow beim Einchecken (push) eines Sourcecodes diesen Marker, dann erstellt die Action automatisch ein Issue im github Repository.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="500" height="616" src="/wp-content/uploads/2020/10/issue05.jpg" alt="" class="wp-image-1024467" srcset="/wp-content/uploads/2020/10/issue05.jpg 500w, /wp-content/uploads/2020/10/issue05-244x300.jpg 244w" sizes="(max-width: 500px) 100vw, 500px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Test Repository</h2>
+
+
+
+<p>Um das Ganze auszuprobieren, habe ich ein Testrepository im github angelegt: <a class="keychainify-checked" href="https://github.com/tricktresor/todo_action_test">TODO to Issue</a>.</p>
+
+
+
+<h2 class="wp-block-heading">Vorbereitungen</h2>
+
+
+
+<p>Um TODO to Action Issues in deinem Repository zu aktivieren, musst du zwei Dinge tun:</p>
+
+
+
+<ul><li>Erstellen der Workflowdatei</li><li>Anlegen des TODO Labeles</li></ul>
+
+
+
+<h3 class="wp-block-heading">YAML-Workflowdatei</h3>
+
+
+
+<p>Um den Workflow einzurichten, brauchst du nur eine YML-Datei in dem Ordner .github/workflows erstellen. Wahrscheinlich existiert der Ordner noch nicht. Dann lege ihn einfach an.</p>
+
+
+
+<p>Die Datei kann zum Beispiel wie folgt aussehen:</p>
+
+
+
+<pre class="wp-block-preformatted">name: todo2issue
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: TODO to Issue
+        uses: alstr/todo-to-issue-action@v2.0
+        with:
+          REPO: ${{ github.repository }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL: "\"TODO"
+          COMMENT_MARKER: "\""
+          CLOSE_ISSUES: true
+        id: "todo"</pre>
+
+
+
+<p>Die wichtige Anpassung für ABAP-Programme ist die Definition des COMMENT_MARKERs mit &#8220;. Da das doppelte Anführungszeichen ein Sonderzeichen ist, muss es mit dem Escape-Zeichen &#8216;\&#8217; erstellt werden.</p>
+
+
+
+<p>Die Definition des * als Kommentarmarker hat bei mir zu einem Syntaxfehler im YAML-File geführt. Das doppelte Anführungszeichen finde ich aber eh sinnvoller.</p>
+
+
+
+<h3 class="wp-block-heading">Label TODO</h3>
+
+
+
+<p>Wechsele in deinem Repository zu der Registerkarte <em>Issues</em> und lege ein Issue an. Auf der rechten Seite kannst du aus den verfügbaren Labels auswählen. TODO existiert noch nicht und du musst es anlegen.</p>
+
+
+
+<h2 class="wp-block-heading">Anwendung</h2>
+
+
+
+<p>Um die Anlage eines Issues zu prüfen, habe ich ein einfaches Programm erstellt und einen TODO-Kommentar eingefügt:</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT langs INTO DATA(lang). "TODO use ALV grid for display<br>  WRITE: / lang-sptxt.<br>ENDLOOP.</code></pre>
+
+
+
+<p>Beim Einchecken mit abapGit wird auf das Ereignis <em>push</em> reagiert und der Workflow startet:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="339" src="/wp-content/uploads/2020/10/SNAG-00796-1024x339.png" alt="" class="wp-image-1024470" srcset="/wp-content/uploads/2020/10/SNAG-00796-1024x339.png 1024w, /wp-content/uploads/2020/10/SNAG-00796-300x99.png 300w, /wp-content/uploads/2020/10/SNAG-00796-768x254.png 768w, /wp-content/uploads/2020/10/SNAG-00796-1536x509.png 1536w, /wp-content/uploads/2020/10/SNAG-00796.png 1543w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Registerkarte &#8220;Actions&#8221; direkt nach dem push</figcaption></figure>
+
+
+
+<p>Die Verarbeitung dauert etwa eine Minute. Danach ist das Issue in der Registerkarte <em>Issues </em>vorhanden:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="199" src="/wp-content/uploads/2020/10/SNAG-00799-1024x199.png" alt="" class="wp-image-1024469" srcset="/wp-content/uploads/2020/10/SNAG-00799-1024x199.png 1024w, /wp-content/uploads/2020/10/SNAG-00799-300x58.png 300w, /wp-content/uploads/2020/10/SNAG-00799-768x149.png 768w, /wp-content/uploads/2020/10/SNAG-00799.png 1216w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Die automatisch generierten Aufgaben in der Registerkarte &#8220;Issues&#8221;</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Features</h2>
+
+
+
+<p>In der Action <em>TODO to Issue Action </em>gibt es noch ein paar zusätzliche Features, die sehr interessant sind:</p>
+
+
+
+<h3 class="wp-block-heading">Closing issues</h3>
+
+
+
+<p>Wenn das Label CLOSE_ISSUES auf TRUE gesetzt wird, dann erkennt die Action, wenn ein TODO aus dem Quelltext entfernt wurde. Was will man mehr? </p>
+
+
+
+<h3 class="wp-block-heading">Multiline Todos</h3>
+
+
+
+<p>Mit mehrzeiligen Kommentaren kann ein Issue mit einer Beschreibung angelegt werden:</p>
+
+
+
+<pre class="wp-block-preformatted">"TODO Come up with a more imaginative greeting
+"Everyone uses hello world and it's boring.</pre>
+
+
+
+<h3 class="wp-block-heading">Dynamic Labels</h3>
+
+
+
+<p>Fügt man dem TODO-Kommentar das Schlüsselwort <em>labels:</em> voran, dann kann man zusätzliche Tags (Labels) mitgeben:</p>
+
+
+
+<pre class="wp-block-preformatted">labels: enhancement, help wanted</pre>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Ich finde, dass das Feature <em>TODO to Action Issue</em> extrem hilfreich ist. Die Verwaltung funktioniert nach ersten Tests sehr gut. Im Issue selbst ist gut erkenntlich, in welchem Zusammenhang das todo steht. Ein direkter Link zum Sourcecode ist ebenfalls vorhanden. Auch das Löschen von Todos funktioniert gut. Änderungen im Quelltext erzeugen keine doppelten Issues. Wenn ein Issue geschlossen wurde, wird es erneut angelegt, sobald ein Issue mit dem gleichen Text wieder auftaucht.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="500" height="649" src="/wp-content/uploads/2020/10/issues3.jpg" alt="" class="wp-image-1024468" srcset="/wp-content/uploads/2020/10/issues3.jpg 500w, /wp-content/uploads/2020/10/issues3-231x300.jpg 231w" sizes="(max-width: 500px) 100vw, 500px" /></figure>
+
+
+
+<p>Viel Spaß beim Verwaltungen deiner Projekte mit Issues!</p>
+<p>Der Beitrag <a href="/blog/automatische-aufgabengenerierung-abapgit/">Automatische Aufgabengenerierung [abapGit]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>GROSSER MATJES-PREIS 2020</title>
+		<link>/blog/grosser-matjes-preis-2020/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 26 Jun 2020 11:17:07 +0000</pubDate>
+				<category><![CDATA[Lustiges]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Excel]]></category>
+		<category><![CDATA[GaloppSim]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<guid isPermaLink="false">/?p=1023787</guid>
+
+					<description><![CDATA[<p>Zum dritten Mal findet das Rennen um den großen Matjes-Preis statt. Durch die Erfahrungen aus dem Corona-Cup Ende März, in dem die armen Pixelponys mit Mund-Nasenschutz rennen mussten, kann der große Matjes-Preis durch gelockerte Maßnahmen nun weitestgehend uneingeschränkt durchgeführt werden. Alle wichtigen Informationen rund um das Rennen erfährst du auf der Website https://galoppsim.racing/grosser-matjes-preis/ Renninformation Startmodus Taktik und Training vieles mehr Galoppsimulation Das Rennen wird komplett virtuell in the cloud ausgeführt (cloud = someone elses computer)...</p>
+<p>Der Beitrag <a href="/blog/grosser-matjes-preis-2020/">GROSSER MATJES-PREIS 2020</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Zum dritten Mal findet das Rennen um den<a aria-label="undefined (opens in a new tab)" href="https://galoppsim.racing/grosser-matjes-preis/" target="_blank" rel="noreferrer noopener"> großen Matjes-Preis</a> statt. Durch die Erfahrungen aus dem <a aria-label="undefined (opens in a new tab)" href="https://galoppsim.racing/corona-cup-2020/" target="_blank" rel="noreferrer noopener">Corona-Cup</a> Ende März, in dem die armen Pixelponys mit Mund-Nasenschutz rennen mussten,  kann der große Matjes-Preis durch gelockerte Maßnahmen nun weitestgehend uneingeschränkt durchgeführt werden.  </p>
+
+
+
+<p>Alle wichtigen Informationen rund um das Rennen erfährst du auf der Website <a href="https://galoppsim.racing/grosser-matjes-preis/">https://galoppsim.racing/grosser-matjes-preis/</a></p>
+
+
+
+<ul><li>Renninformation</li><li>Startmodus</li><li>Taktik und Training</li><li>vieles mehr</li></ul>
+
+
+
+<h2 class="wp-block-heading">Galoppsimulation</h2>
+
+
+
+<p>Das Rennen wird komplett virtuell <em>in the cloud </em>ausgeführt (cloud = someone elses computer) ausgeführt. Die Grundlagen für das Rennen hat der Gründer des <a aria-label="undefined (opens in a new tab)" href="http://matjes-institut.de/" target="_blank" rel="noreferrer noopener">Matjes-Institutes</a> in Hamburg, Marco Matjes, gelegt, als er sich das Programmieren mit Excel (VBA) beibringen wollte. </p>
+
+
+
+<p>Mit dem <a href="https://galoppsim.racing/download/1743/">Galoppsim Trainingsversion</a> kannst du deine eigenen Rennen planen und ausführen:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="641" src="/wp-content/uploads/2020/06/gmp2020_trainingsedition-1024x641.png" alt="" class="wp-image-1023791" srcset="/wp-content/uploads/2020/06/gmp2020_trainingsedition-1024x641.png 1024w, /wp-content/uploads/2020/06/gmp2020_trainingsedition-300x188.png 300w, /wp-content/uploads/2020/06/gmp2020_trainingsedition-768x480.png 768w, /wp-content/uploads/2020/06/gmp2020_trainingsedition-487x304.png 487w, /wp-content/uploads/2020/06/gmp2020_trainingsedition-563x353.png 563w, /wp-content/uploads/2020/06/gmp2020_trainingsedition.png 1154w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Galoppsim Trainingsversion</figcaption></figure>
+
+
+
+<p>Jedes Rennen wird auf <a href="https://www.twitch.tv/galoppsim" target="_blank" aria-label="undefined (opens in a new tab)" rel="noreferrer noopener">Twitch </a>live übertragen und begeistert kommentiert.</p>
+
+
+
+<h2 class="wp-block-heading">Aba isch &#8216;abe doch ga kein Pfärrd&#8230;!</h2>
+
+
+
+<p>Das kannst du ändern. Und zwar ganz einfach mit dem <a href="https://galoppsim.racing/download/1639/">Pixelpferdeditor</a> vom <a aria-label="undefined (opens in a new tab)" href="http://matjes-institut.de/" target="_blank" rel="noreferrer noopener">Matjes-Institut für Galoppsimulation</a>.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="773" height="366" src="/wp-content/uploads/2020/06/SNAG-00504.png" alt="" class="wp-image-1023790" srcset="/wp-content/uploads/2020/06/SNAG-00504.png 773w, /wp-content/uploads/2020/06/SNAG-00504-300x142.png 300w, /wp-content/uploads/2020/06/SNAG-00504-768x364.png 768w" sizes="(max-width: 773px) 100vw, 773px" /><figcaption>Pferdeeditor</figcaption></figure>
+
+
+
+<p>Die Daten werden per Mail dem Rennveranstalter übermittelt. Danach fehlt eigentlich nur noch die Zahlung des</p>
+
+
+
+<div class="wp-block-image"><figure class="alignright size-large is-resized"><img loading="lazy" decoding="async" src="/wp-content/uploads/2020/06/image.png" alt="" class="wp-image-1023789" width="186" height="94"/><figcaption>Startgeld</figcaption></figure></div>
+
+
+
+<h2 class="wp-block-heading">Startgeld</h2>
+
+
+
+<p>Mit einem lächerlich günstigen, an Übervorteilung grenzenden Betrag von EUR 5,- kannst du deinen Pixelpanther an den Start schicken. Alle Einnahmen werden zu gleichen Teilen an folgende soziale Einrichtungen oder Projekte für Kinder gespendet:</p>
+
+
+
+<ul><li><a rel="noreferrer noopener" href="https://www.grosse-hilfe.de/" target="_blank">Große Hilfe für kleine Helden</a>&nbsp;(Heilbronn)</li><li><a rel="noreferrer noopener" href="https://sternenbruecke.de/home" target="_blank">Kinder-Hospiz Sternenbrücke</a>&nbsp;(Hamburg)</li></ul>
+
+
+
+<h2 class="wp-block-heading">Anmeldung</h2>
+
+
+
+<p>Hier geht es zur <a aria-label="undefined (opens in a new tab)" href="https://galoppsim.racing/grosser-matjes-preis/#anker20anmeldung" target="_blank" rel="noreferrer noopener">Anmeldung zum Großen Matjes-Preis 2020</a> sowie allen wichtigen Informationen rund um Rennsimulation, Rennen, Taktiken, Spenden, Editoren, Ergebnisse und vieles mehr.</p>
+
+
+
+<p>Die ersten Qualifikationsläufe haben bereits statt gefunden:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="846" height="302" src="/wp-content/uploads/2020/06/image-1.png" alt="" class="wp-image-1023792" srcset="/wp-content/uploads/2020/06/image-1.png 846w, /wp-content/uploads/2020/06/image-1-300x107.png 300w, /wp-content/uploads/2020/06/image-1-768x274.png 768w" sizes="(max-width: 846px) 100vw, 846px" /><figcaption>Qualifikationslauf Großer Matjes-Preis 2020</figcaption></figure>
+<p>Der Beitrag <a href="/blog/grosser-matjes-preis-2020/">GROSSER MATJES-PREIS 2020</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SimDia² als Alternative zur Programmierung?</title>
+		<link>/blog/simdia%c2%b2-als-alternative-zur-programmierung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 15 Jan 2018 16:44:36 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Module]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[migration]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[LSMW]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018330</guid>
+
+					<description><![CDATA[<p>Für Datenimporte muss man programmieren oder sich mit der LSMW auskennen. Beides Tools, die dem Anwender in der Regel nicht zur Verfügung stehen. Hier ist SimDia² das ideale Tool. Allerdings nicht nur für Fachanwender und Key-User...</p>
+<p>Der Beitrag <a href="/blog/simdia%c2%b2-als-alternative-zur-programmierung/">SimDia² als Alternative zur Programmierung?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Über mein Lieblings-AddOn <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> habe ich ja bereits mehrmals geschrieben (<a href="https://tricktresor.com/blog/simdia2-sap-datenimport-einfach/">SAP Datenimport einfach?</a>, <a href="https://tricktresor.com/blog/simdia2-neue-version-des-besten-sap-import-tools/">Neue Version SimDia²</a> und <a href="https://tricktresor.com/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten</a>). Grund dafür waren die große Funktionalität und die extrem einfache Handhabung. Beides ermöglicht es auch Endanwendern und Nicht-Informatikern, sehr schnell &#8211; also in wenigen Minuten &#8211; einen Datenaustausch zwischen Excel und SAP zu definieren und automatisch ausführen zu lassen.</p>
+<p>Mein Problem als leidenschaftlicher Programmierer und „Datenmalträtierer“ war aber bisher immer, dass mir ein bisschen die „Anwender-Brille“ fehlte und damit entsprechende Anwendungsfälle. In meinem Arbeitsalltag habe ich nämlich mit Datenimport-Anfragen nicht wirklich zu tun (worüber ich aber ehrlicherweise gar nicht traurig bin). Und wenn doch, dann habe ich ja dieses Tool zum <em>Extreme Customizing</em>: ABAP. Daher ging ich bis vor kurzem davon aus, dass SimDia² vor allem ein Tool für Fachabteilungen und Endanwender zur Lösung kleinerer und einfacher Datenimport-Aufgaben ist.</p>
+<p>Das Problem eines Entwicklers in meiner Xing-Gruppe <a href="https://www.xing.com/communities/groups/tricktresor-f8f4-1000599">Tricktresor</a>  zum Thema <a href="https://www.xing.com/communities/posts/aufzeichnung-in-lsmw-sekundaerressourcen-pflegen-1014264586">Aufzeichnung in LSMW (Sekundärressourcen pflegen)</a> brachte mich jedoch zu der Frage, ob und wie sich der dort geschilderte und recht komplexe Vorgang statt mit LSMW auch mit SimDia² lösen ließe. Kurz und gut: mit ein wenig Auffrischung im Umgang mit SimDia² (was mir bis dahin aus oben erwähnten Gründen etwas gefehlt hatte) ließ sich die gesamte Aufgabe schlussendlich in nur 2-3 Minuten lösen.</p>
+<h2>Aufzeichnung mit SimDia²</h2>
+<p>Im Grunde reicht es, wenn man die betreffende SAP-Transaktion gut kennt (in diesem Fall die mir bis dahin unbekannte C202) und ein wenig weiß, wie SAP tickt. Da die gesamte SimDia²-Aufzeichnung im normalen SAP GUI-Dialog stattfindet, verschwinden auch keine Registerkarten (wie teilweise beim Batchinput) und nach dem Text <em>Planungs-Vorgang</em> lässt sich sehr einfach in der Tabelle suchen. Der einzige Trick besteht dann noch darin, den gefundenen Vorgang zu markieren. Aber auch das verrät SAP einem nach beherztem Druck auf die rechte Maustaste:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/sd01.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018332" src="https://tricktresor.com/wp-content/uploads/2018/01/sd01.png" alt="" width="313" height="61" srcset="/wp-content/uploads/2018/01/sd01.png 313w, /wp-content/uploads/2018/01/sd01-300x58.png 300w" sizes="(max-width: 313px) 100vw, 313px" /></a></p>
+<p>Anschließend lassen sich die Sekundärressourcen ganz einfach ebenfalls über das Kontext-Menü  aufrufen und versorgen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/sd02.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018331" src="https://tricktresor.com/wp-content/uploads/2018/01/sd02.png" alt="" width="314" height="64" srcset="/wp-content/uploads/2018/01/sd02.png 314w, /wp-content/uploads/2018/01/sd02-300x61.png 300w" sizes="(max-width: 314px) 100vw, 314px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/sd03.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018333" src="https://tricktresor.com/wp-content/uploads/2018/01/sd03-1024x590.png" alt="" width="640" height="369" srcset="/wp-content/uploads/2018/01/sd03-1024x590.png 1024w, /wp-content/uploads/2018/01/sd03-300x173.png 300w, /wp-content/uploads/2018/01/sd03-768x442.png 768w, /wp-content/uploads/2018/01/sd03-265x153.png 265w, /wp-content/uploads/2018/01/sd03-148x85.png 148w, /wp-content/uploads/2018/01/sd03-193x112.png 193w, /wp-content/uploads/2018/01/sd03-71x40.png 71w, /wp-content/uploads/2018/01/sd03.png 1502w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Nur für Fachabteilungen?</h2>
+<p>Ist SimDia² also „nur“ ein Tool für Fachabteilungen und Endanwender zur Lösung kleinerer Datenimport-Aufgaben? Mitnichten.</p>
+<p>Nachdem bei mir der Knoten geplatzt war &#8211; spätestens, als ich gesehen hatte, wie einfach auch die <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial6">Verarbeitung von Kopf- und Detaildaten</a> damit ist &#8211; wurde mir klar, dass mit SimDia² eben auch komplexe Fälle abgebildet werden können. Auch solche, für die in der LSMW geballtes Entwickler-Gehirnschmalz und manchmal sogar ABAP nötig sind.</p>
+<p>Denn auf diese Weise können &#8211; und da müssen wir Entwickler jetzt ganz stark sein<img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /> &#8211; auch ganz „normale“ SAP-Anwender komplexe Datenimporte durchführen. Wenn man mal kurz darüber nachdenkt, ist das doch aber gar nicht so verkehrt. Warum? Weil dadurch die Aufgaben von denjenigen erledigt werden können, die sich mit den Daten ohnehin am besten auskennen. Und wir Entwickler können uns auf das konzentrieren, wofür wir eigentlich ausgebildet wurden und bezahlt werden: komplexe Software-Lösungen entwickeln und unsere Unternehmen fit zu machen für die Zukunft. Außerdem sagt ja keiner, dass wir SimDia² nicht auch für unsere Zwecke einsetzen können, falls z. B. die Datenimporte weiterhin von der IT durchgeführt werden sollen. Wenn wir Aufgaben in ein paar Minuten erledigen können, für die vorher einige Stunden nötig waren, dann beschwert sich darüber sicher auch niemand.</p>
+<h2>SimDia²</h2>
+<p>Mehr Informationen zu SimDia² findest du auf der Homepage: <a href="https://ersasoft.de/de/simdia/?s=tt">https://ersasoft.de/</a></p>
+<h2>Erfahrungsberichte</h2>
+<p>Da ich selbst SimDia² in der Praxis noch nicht eingesetzt habe (ich darf zum Glück tun, wofür ich ausgebildet wurde und bezahlt werde<img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" />), interessieren mich natürlich einschlägige Erfahrungen. Falls ihr also weitere Beispiele für mich habt, in denen ihr komplexe Datentransfers mit SimDia² erledigt habt, für die vorher eine aufwendige LSMW-Programmierung notwendig war, dann gerne immer her damit!</p>
+<p><br />
+[accordian]</p>
+<h2>Tricktresor- Bonus</h2>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p><em>Da SimDia² eine professionelle Software für SAP-Nutzer ist, benutze bitte deine Firmen-Mailadresse. SAP-Berater können einen entsprechenden Hinweis in die Nachricht schreiben.</em></p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>[contact-form-7]</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p></p>
+<p>Der Beitrag <a href="/blog/simdia%c2%b2-als-alternative-zur-programmierung/">SimDia² als Alternative zur Programmierung?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>abapGit</title>
+		<link>/blog/abapgit/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 10 Jan 2018 23:52:18 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Community]]></category>
+		<category><![CDATA[abapGit]]></category>
+		<category><![CDATA[github]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018300</guid>
+
+					<description><![CDATA[<p>abapGit revolutioniert gerade die Art, wie die SAP-Community zusammen arbeiten kann. Das Addon, das Lars Hvam im Alleingang entwickelt hat, hat SAPLink inzwischen fast vollständig abgelöst und begeistert jeden, der damit einmal zu tun hatte. In diesem Artikel erfährst du, was abapGit ist, wie es funktioniert und welche Vorteile es gibt.</p>
+<p>Der Beitrag <a href="/blog/abapgit/">abapGit</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>abapGit revolutioniert gerade die Art, wie die SAP-Community zusammen arbeiten kann. Das Addon, das Lars Hvam im Alleingang entwickelt hat, hat SAPLink inzwischen fast vollständig abgelöst und begeistert jeden, der damit einmal zu tun hatte. In diesem Artikel erfährst du, was abapGit ist, wie es funktioniert und welche Vorteile es gibt.</p>
+<h2>Github</h2>
+<p>Die Grundlage von abapGit ist die Open Source Plattform <a href="https://github.com/">Github</a>. Auf dieser Plattform kann Quellcode verwaltet werden. Andere Anwender können sich die Quelltexte auf ihren Computer laden, verwenden, verbessern und die verbesserte Version wieder publizieren. Zusammenarbeit wird durch diese Plattform enorm erleichtert. Es gibt auch andere Plattformen, die nach einem ähnlichen Prinzip arbeiten: Gitlab, BitBucket und so weiter. Hier gibt es eine Liste der Alternativen: <a href="https://trusted.de/github-alternativen">https://trusted.de/github-alternativen</a>.</p>
+<p>Github zum Beispiel erlaubt in der kostenlosen Variante nur öffentliche Projekte. Die Plattform <a href="https://about.gitlab.com/products/feature-comparison/">GitLab</a> ermöglicht auch private Projekte, die nicht öffentlich sichtbar sind.</p>
+<h2>Der Nutzen im SAP-Umfeld</h2>
+<p>Im Gegensatz zu den meisten anderen Programmiersprachen, benötigt man einen kompletten <em>SAP-Server</em>, um ABAP-Programme ausführen zu können. Dieser Server steht jedoch zentral in einem Unternehmen. Damit hat man auch ein zentrales Repository und benötigt Github nicht. In diesem Fall haben alle, die SAP programmieren auch Zugriff auf den unternehmenseigenen Server. Was also bringt die Installation und die Verwendung von abapGit?</p>
+<p>Wenn jemand im Unternehmen das Tool abapGit auf dem SAP-Entwicklungssystem installiert und den Zugang zum öffentlichen github-Repository freischalten lässt, dann können Mitarbeiter an öffentlichen ABAP-Open-Source-Projekten teilhaben. Ein Klick und die entsprechende Anwendung kann aus dem Github-Repository auf dem SAP-Server installiert werden. Es gibt mehrere Gründe, warum das jemand tun könnte:</p>
+<ul>
+<li>Viele der Github-Projekte sind Demoprogramme oder Lernprojekte zu einem Thema. So kann man sich also schnell und einfach zu vielen Themen weiterbilden ohne dass man Tabellen, Programme, Klasse, Datenelemente etc. manuell im SAP-System anlegen muss.
+<ul>
+<li><a href="https://github.com/pixelbaker/ABAP-RayTracer">ABAP-RayTracer</a></li>
+<li><a href="https://github.com/christianguenter2/ABAP_conways_game_of_life">Conways Game Of Life</a></li>
+</ul>
+</li>
+<li>Es werden immer mehr wertvolle Tools von SAP-begeisterten Programmierern entwickelt. Diese Tools darf ein Unternehmen kostenlos nutzen. Durch abapGit können diese einfach und gefahrlos installiert werden
+<ul>
+<li><a href="https://github.com/ivanfemia/abap2xlsx">ABAP2XLSX</a></li>
+<li><a href="https://github.com/larshp/abapOpenChecks">abapOpenChecks</a></li>
+</ul>
+</li>
+</ul>
+<p>Wenn ein Unternehmen kostenlose, von vielen erfahrenen Menschen programmierte Software nutzt, dann ist es nur recht und billig, dass ein Unternehmen durch die Beteiligung der eigenen Mitarbeiter auch etwas an die Gemeinschaft zurück gibt. abapGit macht es einfach möglich.</p>
+<p>Lars Hvam hat berichtet in seinen Blogs auf <a href="https://blogs.sap.com/author/lars.hvam/">blogs.sap.com</a> über abapGit als auch über seine Open-Source-Projekte und andere Programmierthemen. Zusätzlich hat er eine Seite erstellt, auf denen ABAP-Projekte gelistet werden: <a href="http://dotabap.org/">http://dotabap.org/</a></p>
+<h2>Weitere Berichte über abapGit</h2>
+<p>https://blogs.sap.com/2017/06/21/abapgit-so-easy/</p>
+<p>https://blogs.sap.com/2017/11/19/getting-started-open-sourcing-abap-code/</p>
+<h2>Zukunft</h2>
+<p>Die Problemlose Zusammenarbeit im ABAP-Umfeld ist immer noch Neuland. Dementsprechend sind auch die genannten Plattformen zur Speicherung von Quelltext und zur Zusammenarbeit für die meisten ABAP-Programmierer ungewohnt. Das genial andere Programm ZABAPGIT von Lars Hvam ermöglicht jedoch viele neue Möglichkeiten. Im Gegensatz zu SAPLink, das irgendwann in der Entwicklung stoppte und oftmals fehlerhaft und umständlich zu bedienen war, arbeitet abapGit sensationell einfach und sicher.</p>
+<p>Jeder, der eine kleine Programmierung, ein Mini-Addon oder ein Lernprojekt auf dem SAP-Server erstellt hat, kann es einfach mit anderen teilen und von der Gemeinschaft verbessern lassen.</p>
+<h2>Tricktresor auf Github</h2>
+<p>Angefangen hat es gestern mit einem kleinen Blogeintrag &#8220;<a href="https://blogs.sap.com/2018/01/09/variations-of-selecting-multiple-options-from-a-list/">Varianten einer Mehrfachselektion</a>&#8220;, den ich auf blogs.sap.com veröffentlicht habe, habe ich angefangen, den Quellcode, der im Tricktresor ja eh bereits öffentlich ist, auch auf Github zu publizieren. Alle Github-Projekte könnt ihr unter der folgenden Adresse sehen:</p>
+<p><a href="https://github.com/tricktresor?tab=repositories">https://github.com/tricktresor?tab=repositories</a></p>
+<p>Hier werde ich neue und auch alte Programmierungen veröffentlichen. Einerseits tue ich das, um euch den Quellcode einfacher zur Verfügung zu stellen. Andererseits sammle ich damit ebenfalls Erfahrungen um damit meine eigene Arbeit besser machen zu können als auch meine Kunden beraten zu können.</p>
+<p>Zudem hoffe ich auch, dass vielleicht das eine oder andere kleine Programm Stück für Stück verbessert wird, auf ein neues ABAP-Release gehoben wird oder auch eine Toolsammlung entsteht, die uns allen das Leben leichter macht.</p>
+<h2>Eigene Projekte</h2>
+<p>Wenn du ein eigenes Projekt auf Github veröffentlichen möchtest, dann ist es ziemlich leicht.</p>
+<h3>abapGit installieren</h3>
+<p>Als erstes musst du abapGit auf dem SAP-Server installieren, sofern dies noch niemand vor dir getan hat. Dafür musst du abapGit herunterladen und installieren: <a href="http://abapgit.org/">abapgit.org</a> Wie genau, das steht dort beschrieben.</p>
+<p>Solltest du keine Verbindung zu github.com bekommen, so muss die HTTP-Verbindung freigeschaltet werden (SAP-Server, Router, Antivirenprogramme prüfen).</p>
+<h3>Github-Account</h3>
+<p>Sofern du noch keinen Github-Account hast, musst du einen auf <a href="https://github.com/">https://github.com/</a> anlegen.</p>
+<p>Danach kannst du direkt auf der Startseite oder über das Menü PLUS ein neues Projekt anlegen .</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/github1-1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018308" src="https://tricktresor.com/wp-content/uploads/2018/01/github1-1.png" alt="" width="1045" height="304" srcset="/wp-content/uploads/2018/01/github1-1.png 1045w, /wp-content/uploads/2018/01/github1-1-300x87.png 300w, /wp-content/uploads/2018/01/github1-1-768x223.png 768w, /wp-content/uploads/2018/01/github1-1-1024x298.png 1024w" sizes="(max-width: 1045px) 100vw, 1045px" /></a></p>
+<p>Hier gibst du einen Namen sowie die Beschreibung ein. In der kostenlosen Variante kannst du nur öffentliche Projekte erstellen.</p>
+<p>Wichtig ist, dass du den Haken &#8220;Initialize this repository with a README&#8221; setzt. Eine Lizenz solltest du auch direkt auswählen. Am meisten verwendet wird die MIT-License.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/github2-1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018309" src="https://tricktresor.com/wp-content/uploads/2018/01/github2-1.png" alt="" width="768" height="609" srcset="/wp-content/uploads/2018/01/github2-1.png 768w, /wp-content/uploads/2018/01/github2-1-300x238.png 300w" sizes="(max-width: 768px) 100vw, 768px" /></a></p>
+<p>Ein Klick auf <em>Create repository</em> erzeugt das Projekt. Herzlichen Glückwunsch!</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit5.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018320 size-full" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit5.png" alt="" width="996" height="680" srcset="/wp-content/uploads/2018/01/abapgit5.png 996w, /wp-content/uploads/2018/01/abapgit5-300x205.png 300w, /wp-content/uploads/2018/01/abapgit5-768x524.png 768w" sizes="(max-width: 996px) 100vw, 996px" /></a></p>
+<h3>abapGit</h3>
+<p>Theoretisch kannst du nun eine neue Datei anlegen und ABAP-Quellcode in diese Datei kopieren. Praktisch funktioniert das jedoch nicht, da abapGit noch Meta-Daten zu dem jeweiligen Objekt speichert. Diese werden nur geschrieben und später wieder erkannt, wenn du die SAP-Objekte über das Programm ZABAPGIT hinzufügst. Starte dafür die Transaktion SE38 und führe das Programm ZABAPGIT aus.</p>
+<p>Die Startseite ist dann wahrscheinlich leer, aber in etwa wird dich folgendes Bild begrüßen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit2.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018312 size-large" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit2-1024x434.png" alt="" width="640" height="271" srcset="/wp-content/uploads/2018/01/abapgit2-1024x434.png 1024w, /wp-content/uploads/2018/01/abapgit2-300x127.png 300w, /wp-content/uploads/2018/01/abapgit2-768x325.png 768w, /wp-content/uploads/2018/01/abapgit2.png 1086w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h3>Repository füllen</h3>
+<p>Wie bekommst du nun Programme und andere Objekte nach Github? Zuerst klonst du das gewünschte Projekt über den Link &#8220;Clone&#8221; im abapGit-Menu. Es erscheint dann folgendes Popup:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit3.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018311" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit3.png" alt="" width="904" height="164" srcset="/wp-content/uploads/2018/01/abapgit3.png 904w, /wp-content/uploads/2018/01/abapgit3-300x54.png 300w, /wp-content/uploads/2018/01/abapgit3-768x139.png 768w" sizes="(max-width: 904px) 100vw, 904px" /></a></p>
+<p>Hier trägst du dir github-URL ein sowie ein Paket. Du kannst ein lokales Paket definieren, das nicht transportiert wird (du benötigst also keinen Transportauftrag) oder du nimmst ein Z- oder Y-Paket, das einen Transport in die nachfolgenden SAP-Systeme erlaubt.</p>
+<p>Wenn das Paket noch nicht existiert, kannst du es über die Schaltfläche &#8220;Create Package&#8221; anlegen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit4.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018310" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit4.png" alt="" width="760" height="252" srcset="/wp-content/uploads/2018/01/abapgit4.png 760w, /wp-content/uploads/2018/01/abapgit4-300x99.png 300w" sizes="(max-width: 760px) 100vw, 760px" /></a></p>
+<p>du kannst für die Github-Projekte auch ein Hauptpaket definieren und dann für jedes Projekt ein eigenes Unterpaket erstellen.</p>
+<p>Als Ergebnis erhältst du wiederum eine sehr übersichtliche Seite:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit6.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018321 size-full" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit6.png" alt="" width="1073" height="311" srcset="/wp-content/uploads/2018/01/abapgit6.png 1073w, /wp-content/uploads/2018/01/abapgit6-300x87.png 300w, /wp-content/uploads/2018/01/abapgit6-768x223.png 768w, /wp-content/uploads/2018/01/abapgit6-1024x297.png 1024w" sizes="(max-width: 1073px) 100vw, 1073px" /></a></p>
+<p>Wenn du nun ein Programm in diesem Paket anlegst, dann kannst du über <em>Refresh</em> prüfen, ob du das Programm auch wirklich in dem Paket angelegt hast. Es erscheint dann in der Liste.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit7.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018322 size-full" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit7.png" alt="" width="1035" height="122" srcset="/wp-content/uploads/2018/01/abapgit7.png 1035w, /wp-content/uploads/2018/01/abapgit7-300x35.png 300w, /wp-content/uploads/2018/01/abapgit7-768x91.png 768w, /wp-content/uploads/2018/01/abapgit7-1024x121.png 1024w" sizes="(max-width: 1035px) 100vw, 1035px" /></a></p>
+<p>Über den Link <em>Stage</em> kannst du die Daten ins Github hochladen. In der Übersicht siehst du die Objekte, die übertragen werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit8.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018323 size-full" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit8.png" alt="" width="1068" height="189" srcset="/wp-content/uploads/2018/01/abapgit8.png 1068w, /wp-content/uploads/2018/01/abapgit8-300x53.png 300w, /wp-content/uploads/2018/01/abapgit8-768x136.png 768w, /wp-content/uploads/2018/01/abapgit8-1024x181.png 1024w" sizes="(max-width: 1068px) 100vw, 1068px" /></a></p>
+<p>Mit <em>Add all and commit</em> gelangst du zum nächsten Schritt. Hier musst du deine Anmeldedaten von Github eintragen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit9-1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018325" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit9-1.png" alt="" width="582" height="461" srcset="/wp-content/uploads/2018/01/abapgit9-1.png 582w, /wp-content/uploads/2018/01/abapgit9-1-300x238.png 300w" sizes="(max-width: 582px) 100vw, 582px" /></a></p>
+<p>Danach noch dein Kennwort eingeben und es wird die Übertragung zu Github gestartet.</p>
+<p>Ob es geklappt hat, kannst du direkt auf Github prüfen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit10.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018326" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit10.png" alt="" width="990" height="488" srcset="/wp-content/uploads/2018/01/abapgit10.png 990w, /wp-content/uploads/2018/01/abapgit10-300x148.png 300w, /wp-content/uploads/2018/01/abapgit10-768x379.png 768w" sizes="(max-width: 990px) 100vw, 990px" /></a></p>
+<p>&nbsp;</p>
+<h3>Weg frei zur Zusammenarbeit</h3>
+<p>Damit ist der Weg frei zur Zusammenarbeit mit anderen SAP-Entwicklern. Wenn dein Projekt spannend ist oder gerade diese Funktion von anderen Programmierern benötigt wird, wird sich jemand finden, der hier mitarbeitet. Du kannst deine Programme natürlich auch einfach so auf Github speichern und hauptsächlich für dich dein persönliches Lernprogramm oder Code-Fundgrube verwalten.</p>
+<p>Happy Coding!</p>
+<p>Der Beitrag <a href="/blog/abapgit/">abapGit</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>IF cl_qualification=&gt;i_speak( &#8216;ABAP&#8217; ) = abap_true. me-&gt;apply( ). ENDIF.</title>
+		<link>/blog/inwerken_jobs/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 20 Jun 2017 11:36:03 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[job]]></category>
+		<category><![CDATA[inwerken]]></category>
+		<category><![CDATA[firma]]></category>
+		<category><![CDATA[stellenangebot]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018048</guid>
+
+					<description><![CDATA[<p>Ich suche neue Kolleginnen und Kollegen! Du möchtest in einem starken Team arbeiten, neue Technologien kennen lernen und suchst eine neue Herausforderung? Dann bewirb dich bei uns!</p>
+<p>Der Beitrag <a href="/blog/inwerken_jobs/">IF cl_qualification=&gt;i_speak( &#8216;ABAP&#8217; ) = abap_true. me-&gt;apply( ). ENDIF.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2>Kurz und knapp</h2>
+<p>Ich suche neue Kolleginnen und Kollegen!</p>
+<p>Du kannst ABAP oder suchst als SAP-Berater eine neue Herausforderung?</p>
+<p>Dann bewirb dich bei uns: <a href="mailto:bewerbung@inwerken.de">bewerbung@inwerken.de</a>.</p>
+<h2>Die etwas längere Version</h2>
+<p>Der ein oder andere kennt mich als &#8220;Mr. Tricktresor&#8221; oder als <a href="http://www.abapforum.com/forum/search.php?author_id=202&amp;sr=posts">ewx im ABAPforum.com</a>. Allerdings wissen, glaube ich, nur wenige, dass ich bei der Firma INWERKEN AG angestellt bin. Dort programmiere und berate ich in Kundenprojekten als auch bei internen Projekten. Ich habe bei Inwerken angefangen, weil ich begeistert von den Kollegen war und ich meine eigenen Ziele verfolgen konnte. Heute, ziemlich genau neun Jahre später, bin ich immer noch überzeugt von dem technischen Knowhow  meiner Kollegen und dem Zusammenhalt in der Firma. Das <a href="http://amzn.to/2tjl20B">ABAP-Kochbuch </a>wäre ohne meine Kollegen nie zustande gekommen.</p>
+<p>Wer mich kennt, der weiß, dass ich ein ehrlicher Mensch bin. Deswegen muss ich auch klar sagen: Es ist nicht alles perfekt. Natürlich gibt es bei Inwerken Probleme und Dinge, die nicht optimal funktionieren. Aber wir können immer über alles sprechen und meistens finden wir eine zufriedenstellende Lösung. Ich möchte nun nicht die ganzen Buzzwords von wegen flache Strukturen, Teamgeist und so weiter aufzählen, das kann nur in die Hose gehen. Am besten machst du dir selbst ein Bild.</p>
+<h2>Das Team Inwerken</h2>
+<p>Da wir ein SAP-Beratungshaus sind, ist der Großteil natürlich in der SAP-Beratung und ABAP-Programmierung tätig. Wir beschäftigen uns dabei mit der ganzen breiten Palette von SAP-Produkten. Wir machen komplette SAP-Einführungen als auch Add-On-Programmierungen und Anpassungen an bestehenden Systemen. Wir optimieren Prozesse und Programme. In der Regel verstehen wir das große Ganze und verlieren trotzdem die Details nicht aus dem Blick.</p>
+<p>Wir haben ein hervorragendes Backoffice bestehend aus fünf Kolleginnen, die sich um alles kümmern, was nicht mit SAP zu tun hat.</p>
+<p>Die interne vierköpfige IT und Basisadministration betreut unsere Software und Notebooks sowie unsere Inwerken-eigenen SAP-Systeme. Ganz neu im Fuhrpark sind gerade vier HANA und S/4HANA Systeme!</p>
+<p>Im Beratungsbereich haben wir für fast jedes Modul fähige Mitarbeiter und Mitarbeiterinnen. Egal ob Preisfindung im SD, Chargenfindung in der Lieferung, Arbeitsplanerstellung bei Fertigungsaufträgen oder Infocubes im Business Warehouse: Fast immer gibt es jemanden, der sich auskennt.</p>
+<p>ABAP-Programmierung besteht nicht nur aus IF-ELSE-ENDIF oder SELECT, sondern aus einer Vielzahl von Komponenten und modulspezifischen Funktionen Und auch hier sind zu vielen Spezialthemen Leute unterwegs, die genau wissen, was sie tun. Dabei ist es egal ob es sich um BAPIs, Programmierkonzepte oder die Analyse von schwer nachzustellenden Fehlern geht, bei Inwerken ist meistens jemand, der sich schon einmal mit dem Thema auseinandergesetzt hat oder schlichtweg hilft, wenn ein Programm nicht so funktioniert, wie es soll. Auf jeden Fall kann man sich immer zusammensetzen und Lösungen diskutieren oder Ideen sammeln.</p>
+<h2>Die Firma</h2>
+<p>Die Inwerken AG ist aus der 1999 gegründeten COMbridge AG hervorgegangen. Bereits zu COMbridge-Zeiten hatte die Firma den Ruf, Probleme anzupacken und lösen. Mit Inwerken ist daraus eine Firma entwachsen, die ich durchaus einen sehr attraktiven Arbeitgeber nennen würde. Inwerken besteht aktuell aus 57 Mitarbeitern, davon acht Auszubildende.</p>
+<p>Wir organisieren regelmäßig <a href="https://www.inwerken.de/karriere/inside-inwerken-newsblog-intern/">Team-Events und Feste</a>, bei denen der Spaß und Teamgeist nicht zu kurz kommen. Neben dem Spaßfaktor bietet Inwerken jedoch auch flexible Arbeitszeitmodelle, Homeoffice, ergonomische Arbeitsplätze, vielfältige soziale Leistungen, Kaffee und Mineralwasser, Firmenwagenregelung und interne Weiterbildungsmöglichkeiten (Englishkurs, Code-Dojo, Workshops).</p>
+<p><a href="https://www.inwerken.de/"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018049" src="https://tricktresor.com/wp-content/uploads/2017/06/IMG_0117.jpg" alt="" width="640" height="480" srcset="/wp-content/uploads/2017/06/IMG_0117.jpg 640w, /wp-content/uploads/2017/06/IMG_0117-300x225.jpg 300w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Community</h2>
+<p>Wir engagieren uns stark in der SAP-Community. Regelmäßig richten wir die SAP CodeJam zu verschiedenen Themen aus. Die CodeJam ist ein beliebtes Event bei dem man unkompliziert mit neuen Techniken (SAPUI5, HANA, Gateway etc.) in Kontakt treten kann. Ein erfahrener SAP-Mitarbeiter führt durch den Tag und steht Fragen Rede und Antwort.</p>
+<p>Im Februar 2017 haben wir unseren ersten SAP Inside Track veranstaltet, der ein großer Erfolg war. Bei einem SAP Inside Track halten SAP-Profis aus der SAP-Community Vorträge über verschiedenste Themen. Die Themen sind meistens technisch und in der Regel mit irgend einem SAP-Bezug. Es wurden jedoch auch schon ein Vortrag über Rum mit anschließender Verköstigung gehalten. Die Inside Tracks sind eine gute Gelegenheit um viele verschiedene Eindrücke zu meistens sehr aktuellen Themen zu bekommen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/06/sithvr.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018051" src="https://tricktresor.com/wp-content/uploads/2017/06/sithvr-1024x679.png" alt="" width="640" height="424" srcset="/wp-content/uploads/2017/06/sithvr-1024x679.png 1024w, /wp-content/uploads/2017/06/sithvr-300x199.png 300w, /wp-content/uploads/2017/06/sithvr-768x509.png 768w, /wp-content/uploads/2017/06/sithvr-95x62.png 95w, /wp-content/uploads/2017/06/sithvr.png 1299w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Bewerbung &#8211; Wir suchen dich!</h2>
+<p>Inwerken ist klar auf Wachstumskurs. Aus diesem Grund suchen wir neue Mitarbeiter: Berater und Entwickler aus (fast) allen SAP-Teilbereichen. Wenn du gerne in einem modernen Arbeitsumfeld in einem leistungsstarken Team an anspruchsvollen Projekten mitarbeiten möchtest, dann bewirb dich und schicke uns eine Mail: <a href="mailto:bewerbung@inwerken.de">bewerbung@inwerken.de</a>.</p>
+<p>Schaue dich gerne bei unseren <a href="https://www.inwerken.de/karriere/offene-stellen/">offenen Stellen</a> um. Es ist nichts für dich dabei? Wenn du das Gefühl hast, dass Inwerken die richtige Firma ist, dann sprich uns trotzdem an! Gute Leute können wir immer gebrauchen.</p>
+<p>Ich bin gespannt auf deine Bewerbung!!</p>
+<p>Der Beitrag <a href="/blog/inwerken_jobs/">IF cl_qualification=&gt;i_speak( &#8216;ABAP&#8217; ) = abap_true. me-&gt;apply( ). ENDIF.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Espresso-Tutorials</title>
+		<link>/blog/espresso-tutorials/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 04 Sep 2015 10:58:04 +0000</pubDate>
+				<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Tutorials]]></category>
+		<category><![CDATA[Flatrate]]></category>
+		<category><![CDATA[Wissen]]></category>
+		<category><![CDATA[ebook]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=201619</guid>
+
+					<description><![CDATA[<p>SAP-Wissen zum Mitnehmen: Espresso-Tutorials. Klein. Stark. SAP. Umfassende und doch auf das Wesentliche beschränkte Lektüre zu SAP-Themen.</p>
+<p>Der Beitrag <a href="/blog/espresso-tutorials/">Espresso-Tutorials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>SAP-Wissen zum Mitnehmen: Espresso-Tutorials. Klein. Stark. SAP. Umfassende und doch auf das Wesentliche beschränkte Lektüre zu verschiedenen SAP-Themen.</p>
+<p><a class="keychainify-checked" href="https://www.espresso-tutorials.de/shop/?ref=4"><img loading="lazy" decoding="async" class="aligncenter wp-image-230059 size-full" src="https://tricktresor.com/wp-content/uploads/2015/09/2015-09-04_11-01-06.jpg" alt="Espresso-Tutorials" width="475" height="162" srcset="/wp-content/uploads/2015/09/2015-09-04_11-01-06.jpg 475w, /wp-content/uploads/2015/09/2015-09-04_11-01-06-300x102.jpg 300w" sizes="(max-width: 475px) 100vw, 475px" /></a></p>
+<p>Espresso-Tutorials konzentrieren sich auf ein Thema. Kurz und knackig. Die Bücher liegen in der Regel in einem digitalen Format vor, so dass sie bequem am Tablet oder PC gelesen werden können.</p>
+<h2>Flatrate-Wissen</h2>
+<p>Die große Besonderheit bei Espresso-Tutorials: <a class="keychainify-checked" href="https://www.espresso-tutorials.de/sap-e-book-flatrate/?ref=4">Die eBook-Flatrate</a> für EUR 149,00 pro Jahr.</p>
+<p>In dieser Flatrate sind alle Bücher aus der Espresso-Bibliothek enthalten. Zudem auch alle, die noch erscheinen. Für Firmen gibt es spezielle Angebote, um den Mitarbeitern das gesamte Wissen der Espresso-Fachbücher online zur Verfügung stellen zu können.<br />
+<iframe loading="lazy" src="https://www.youtube.com/embed/CQYeorl6pYk" width="560" height="315" frameborder="0" allowfullscreen="allowfullscreen"></iframe></p>
+<h2>Eingebettete Videos</h2>
+<p>Zu vielen Büchern gibt es erklärende Videos, die direkt aus dem eBook heraus angesehen werden können. Eine wertvolle Hilfe zum Verständnis!</p>
+<h2>Stöbern</h2>
+<p><a class="keychainify-checked" href="https://www.espresso-tutorials.de/shop/?ref=4&amp;_kategorie=programmierung">Die Espresso-Bibliothek</a></p>
+<h2>Vorteil</h2>
+<p>Mit dem Gutscheincode &#8220;<strong>915-885-313</strong>&#8221; sparst du 10 Euro Gebühr im ersten Jahr!</p>
+<p>Der Beitrag <a href="/blog/espresso-tutorials/">Espresso-Tutorials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SimDia² &#8211; Neue Version des besten SAP-Import-Tools</title>
+		<link>/blog/simdia2-neue-version-des-besten-sap-import-tools/</link>
+					<comments>/blog/simdia2-neue-version-des-besten-sap-import-tools/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 22 Jul 2015 04:00:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[datenerfassung]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Datenimport]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Import]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[TableControl]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=163546</guid>
+
+					<description><![CDATA[<p>Über ein Jahr sind seit der Veröffentlichung meines Test-Berichts zu SimDia² vergangen. Dort habe ich die Version 2.5 getestet. Seitdem wurden vom Hersteller ERSAsoft bereits zwei neue Versionen veröffentlicht. Höchste Zeit also für ein Update. Die aktuelle Version ist 2.7.</p>
+<p>Der Beitrag <a href="/blog/simdia2-neue-version-des-besten-sap-import-tools/">SimDia² &#8211; Neue Version des besten SAP-Import-Tools</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Über ein Jahr sind seit der Veröffentlichung meines <a href="https://ersasoft.de/de/simdia/?s=tt">Test-Berichts zu SimDia²</a> vergangen. Dort habe ich die Version 2.5 getestet. Seitdem wurden vom Hersteller <a href="https://ersasoft.de/de/?s=tt">ERSAsoft</a> bereits zwei neue Versionen veröffentlicht. Höchste Zeit also für ein Update. Die aktuelle <a href="https://ersasoft.de/de/simdia/?s=tt">Version ist 2.7</a>.</p>
+<h2><strong>Update</strong></h2>
+<p>Neben vielen Kleinigkeiten wurden zwei recht große Funktionen implementiert. Zunächst zu den &#8220;Kleinigkeiten&#8221;, die jedoch das Leben noch einfacher machen:</p>
+<ul>
+<li>Pause-Button: Die aktuelle Aufzeichnung kann unterbrochen werden, um zum Beispiel nachschauen zu können, ob bereits bestimmte Daten vorhanden sind.</li>
+<li>Gesteigerte Performance, insbesondere bei großen Datenmengen</li>
+<li>Benutzung der F4-Hilfe während der Aufzeichnung</li>
+<li>Mehrsprachigkeit</li>
+<li>Verbesserte Unterstützung von eingabebereiten ALV-Grid</li>
+</ul>
+<p>Die zwei großen Änderungen sind:</p>
+<ul>
+<li>Dynamische Maßnahmen</li>
+<li>Berechtigungsverwaltung</li>
+</ul>
+<p>Mit den<em> dynamischen Maßnahmen</em> ist es nun möglich, SAP-Aktionen dynamisch (sprich: für jeden Datensatz der Excel-Datei unterschiedlich) in Abhängigkeit der Datenkonstellation in SAP und/oder Excel auszuführen &#8211; oder dies eben nicht zu tun.</p>
+<p>Zusammen mit der verbesserten Auswahlmöglichkeit bzw. Positionierbarkeit auf einem TableControl (s.u.) lassen sich z.B. Materialstämme sehr einfach anpassen.</p>
+<p>Bereits mit der vorigen Version wurde SimDia² ein recht weit reichendes Verwaltungstool spendiert, um die Berechtigungen für das Programm sehr differenziert festzulegen. Dies dürfte vor allem in größeren Organisationen nicht ganz unwichtig sein.</p>
+<p>Die Berechtigungsverwaltung erlaubt es einem Administrator, festzulegen, welcher Windows-Benutzer Skripte erstellen oder lediglich ausführen darf.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/07/2015-07-21_22-47-39.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-166925" src="https://tricktresor.com/wp-content/uploads/2015/07/2015-07-21_22-47-39-300x255.jpg" alt="Simdia² - Admin" width="300" height="255" srcset="/wp-content/uploads/2015/07/2015-07-21_22-47-39-300x255.jpg 300w, /wp-content/uploads/2015/07/2015-07-21_22-47-39.jpg 760w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Eine Übersicht über alle Verbesserungen findest du im <a href="https://ersasoft.de/de/ressourcen/newsletter-archiv/?s=tt">Newsletter-Archiv von SimDia²</a>.</p>
+<h2><strong>Technik</strong></h2>
+<p>SimDia² ist zwar nach wie vor ein reines Windows-Programm. Das Programm-Fenster legt sich mittlerweile aber nicht mehr nur einfach <span style="text-decoration: underline;">über</span> den SAP GUI sondern wird fest ans SAP GUI „angetackert“. Für mich ein kleiner, für die einfache Bedienung aber nicht unwichtiger Punkt.</p>
+<h2><strong>Anwendung &#8211; Funktionalität </strong></h2>
+<p>In TableControls ist die Suche nach dem Identifikations-Merkmal jetzt nicht mehr auf die erste Spalte eingeschränkt. Vielmehr kann jetzt in einer beliebigen Spalte nach einer zu ändernden Tabellenzeile gesucht werden. Darüber hinaus kann jetzt auch z.B. in SUB-Fenstern, wie z.B. der Sichtenauswahl der Transaktion MM01/MM02&#8230;) gezielt nach der auszuwählenden Sicht gesucht werden, auch wenn sich diese je nach Material an unterschiedlichsten Positionen befindet.</p>
+<h2><strong>Pro und Contra</strong></h2>
+<p>Zwar können mit SimDia² immer noch keine Abfragen oder Verzweigungen programmiert werden (was ja eigentlich auch der Programm-Philosophie „Daten importieren ohne programmieren“ widersprechen würde). Aber immerhin lassen sich jetzt auch auf einfache Weise Buttons (und auch Tabs) abhängig von den Excel-Daten betätigen. Und damit sind wir dann doch schon (fast) bei der Möglichkeit, Abfragen oder Verzweigungen zu erstellen (das Wort „Programmieren“ vermeide ich bewusst, denn da gehört doch noch ein wenig mehr dazu.).</p>
+<p>Anhand eines <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial7">Videos</a> auf der SimDia²-Homepage wird z.B. gezeigt, wie aufgrund der Excel-Daten ein Button betätigt werden kann, um fallweise in einem dadurch ausgelösten Popup zusätzliche Daten zu erfassen.</p>
+<h2>Fazit</h2>
+<p>Nach wie vor ist <a href="https://ersasoft.de/de/simdia/?s=tt">Simdia²</a> ein einfach gehaltenes Tool, das jedoch sehr mächtig ist. Als Programmierer möchte ich natürlich für jede wiederkehrende Aufgabe ein ABAP-Programm schreiben. Solange es jedoch lediglich darum geht, aus einer Excel-Tabelle einfache Daten in ein SAP-System zu bekommen, ist Simdia² fast jeder Programmierung überlegen.</p>
+<p>Schon wenn nur ein paar wenige (einfache) Datenübernahmeprogramme geschrieben werden müssen, komme ich wahrscheinlich bereits in Erklärungsnot, warum ich denn dafür nicht eine Simdia-Lizenz gekauft hätte.</p>
+<p>Alleine dadurch, dass der Fachbereich selbst schnell und einfach definieren kann, welche Daten wo abgelegt werden sollen, können zwei Fliege mit einer (Simdia²-) Klappe geschlagen werden:</p>
+<ol>
+<li>Die IT wird entlastet. Es muss keine Anforderung definiert werden, die dann geprüft und umgesetzt werden muss.</li>
+<li>Der Fachbereich kann sich selbst helfen und ist nicht auf freie Kapazitäten der IT angewiesen</li>
+</ol>
+<p>Häufig werden Anforderungen gar nicht an die IT herangetragen, weil von vornherein feststeht, dass für solche kleinen Aufgaben kaum Zeit übrig ist.</p>
+<p>Ich habe von Fachabteilungen gehört, die sich mit einer geeigneten Batchinput-Datei und der Word-Serienbrief-Funktion geholfen haben, um Daten in ihr SAP-System zu bekommen. Im Gegensatz dazu ist Simdia² wirklich ein Kinderspiel!</p>
+<p></p>
+<h2>Tricktresor- Bonus</h2>
+<p>Nach wie vor bietet ERSAsoft allen Tricktresor-Lesern einen Nachlass von 5% an. Fülle einfach das unten stehende Formular aus und du bekommst den erwähnten Nachlass gewährt.</p>
+<p><strong>Du wirst dich wundern, was mit Simdia in deinem Unternehmen möglich ist!</strong></p>
+<p><span style="line-height: 1.5em;">[accordian]</span></p>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>[contact-form-7]</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p></p>
+<p>Der Beitrag <a href="/blog/simdia2-neue-version-des-besten-sap-import-tools/">SimDia² &#8211; Neue Version des besten SAP-Import-Tools</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/simdia2-neue-version-des-besten-sap-import-tools/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Schwarz. Kompakt. Hilfreich. Espresso-Tutorials</title>
+		<link>/blog/schwarz-kompakt-hilfreich-espresso-tutorials/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 29 Jan 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[tutorial]]></category>
+		<category><![CDATA[buch]]></category>
+		<category><![CDATA[epub]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[ebook]]></category>
+		<category><![CDATA[BW]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5235</guid>
+
+					<description><![CDATA[<p>Espresso-Tutorials hat sich auf Themen aus dem Finanzbereich spezialisiert. Aber auch Themen zu Produktionsplanung, BW, CRM und einige mehr stellt der Verlag bereit. Das Angebot soll zudem stark in Richtung Programmierung ausgebaut werden. Auch viele Video-Tutorials erleichtern bei vielen Themen den Einstieg in die Materie.</p>
+<p>Der Beitrag <a href="/blog/schwarz-kompakt-hilfreich-espresso-tutorials/">Schwarz. Kompakt. Hilfreich. Espresso-Tutorials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Unser Medienpartner, der Espresso Tutorials Verlag, hat sein SAP E-Book und SAP Videoangebot weiter ausgebaut.</p>
+<p>Für eine Flatrate von 99 Euro (inkl. MwSt.) erhältst du für ein Jahr Zugang zu allen SAP Inhalten des Verlags.</p>
+<p>Espresso-Tutorials hat sich auf Themen aus dem Finanzbereich spezialisiert. Aber auch Themen zu Produktionsplanung, BW, CRM und einige mehr stellt der Verlag bereit. Das Angebot soll zudem stark in Richtung Programmierung ausgebaut werden. Die Video-Tutorials erleichtern bei vielen Themen den Einstieg in die Materie.</p>
+<p>Auf jeden Fall eine spannende Sache.</p>
+<p>Die Nachschlagewerke können mittels PC, iOS und Android abgerufen werden.</p>
+<p>Gerade die Nutzung mit mobilen Endgeräten dürfte für SAP-Berater, SAP-Experten und Freelancern interessant sein, um von überall darauf zuzugreifen. Für das Jahr 2015 sind bereits mehr als zwanzig zusätzliche Titel zur Veröffentlichung angekündigt. Auch die Neuerscheinungen sollen allen Abonnenten sofort nach Veröffentlichung zugänglich gemacht werden.</p>
+<p>Mit dem Gutscheincode &#8220;<strong><span style="color: #0000ff;">915-885-313</span></strong>&#8221; sparst du 10 Euro Gebühr im ersten Jahr!</p>
+<p>Die enthaltenen Buch- und Videotitel, Konditionen, ein Informationsvideo und eine Bestellmöglichkeit findest du hier:</p>
+<p><a href="http://onleihe.espresso-tutorials.com/"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5241" src="https://tricktresor.com/wp-content/uploads/2015/01/ET_Webbanner_300x125_2-300x125.jpg" alt="ET_Webbanner_300x125_2" width="300" height="125" /></a></p>
+<p><a href="http://onleihe.espresso-tutorials.com/">http://onleihe.espresso-tutorials.com/</a></p>
+<p>Der Beitrag <a href="/blog/schwarz-kompakt-hilfreich-espresso-tutorials/">Schwarz. Kompakt. Hilfreich. Espresso-Tutorials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>CodeJam zum Thema ABAP on HANA</title>
+		<link>/blog/codejam-zum-thema-abap-on-hana/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 01 Sep 2014 14:59:01 +0000</pubDate>
+				<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[HANA]]></category>
+		<category><![CDATA[Codejam]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5023</guid>
+
+					<description><![CDATA[<p>Die SAP veranstaltet seit einiger Zeit sogenannte CodeJams. Bei diesen kostenlosen Veranstaltungen bekommen Entwickler die Möglichkeit, die neuesten Technologien eigenhändig unter Anleitung auszuprobieren.<br />
+Es ist uns nun gelungen, diese Veranstaltungsreihe nach Hannover zu holen. Am 16. Oktober 2014 wird die CodeJam mit dem Thema „ABAP on HANA“ bei Inwerken zu Gast sein. In der Zeit von 10:00 bis 16:00 Uhr werden die Teilnehmer die Möglichkeit haben, ihre ABAP Kenntnisse auf das HANA-Level zu heben. </p>
+<p>Der Beitrag <a href="/blog/codejam-zum-thema-abap-on-hana/">CodeJam zum Thema ABAP on HANA</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2>SAP CodeJam</h2>
+<p>Die SAP veranstaltet seit einiger Zeit sogenannte CodeJams. Bei diesen kostenlosen Veranstaltungen bekommen Entwickler die Möglichkeit, die neuesten Technologien eigenhändig unter Anleitung auszuprobieren.<br />
+Es ist Inwerken nun gelungen, diese Veranstaltungsreihe nach Hannover zu holen. Am 16. Oktober 2014 wird die CodeJam mit dem Thema „ABAP on HANA“ bei Inwerken zu Gast sein. In der Zeit von 10:00 bis 16:00 Uhr werden die Teilnehmer die Möglichkeit haben, ihre ABAP Kenntnisse auf das HANA-Level zu heben.</p>
+<p>Mehr unter <a title="ABAP on HANA" href="http://www.inwerken.de/codejam-zum-thema-abap-hana-16-oktober-2014-bei-der-inwerken-ag-hannover/">http://www.inwerken.de/codejam-zum-thema-abap-hana-16-oktober-2014-bei-der-inwerken-ag-hannover/</a></p>
+<p>Der Beitrag <a href="/blog/codejam-zum-thema-abap-on-hana/">CodeJam zum Thema ABAP on HANA</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Gibt&#8217;s da auch &#8216;ne App für?</title>
+		<link>/blog/gibts-da-auch-ne-app-fuer/</link>
+					<comments>/blog/gibts-da-auch-ne-app-fuer/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 16 May 2014 15:20:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[farbe]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[app]]></category>
+		<category><![CDATA[itunes]]></category>
+		<category><![CDATA[android]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4746</guid>
+
+					<description><![CDATA[<p>Ich wurde des öfteren schon gefragt, ob es nicht vielleicht eine Tricktresor-App gibt, damit die ganzen Tricks &#038; Tricks auch mobil verfügbar sind. Nun ist es endlich soweit! Mithilfe von Blappsta ist die Tricktresor-App wahr geworden.</p>
+<p>Der Beitrag <a href="/blog/gibts-da-auch-ne-app-fuer/">Gibt&#8217;s da auch &#8216;ne App für?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Jawoll!!! Ich bin glücklich, sprachlos, geflasht, beeindruckt und finde es einfach cool, unglaublich, sensationell und unfassbar: Der Tricktresor als App! Im Apple AppStore und im Android Play store.</p>
+<h2>Apple iTunes-Store</h2>
+<p><a title="Tricktresor-App | iTunes AppStore" href="https://itunes.apple.com/de/app/tricktresor/id876887227?mt=8" target="_blank"><img loading="lazy" decoding="async" class="alignnone wp-image-4747 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/05/2014-05-16-11.08.18-169x300.png" alt="Tricktresor-App AppStore" width="169" height="300" srcset="/wp-content/uploads/2014/05/2014-05-16-11.08.18-169x300.png 169w, /wp-content/uploads/2014/05/2014-05-16-11.08.18-576x1024.png 576w, /wp-content/uploads/2014/05/2014-05-16-11.08.18-624x1107.png 624w, /wp-content/uploads/2014/05/2014-05-16-11.08.18.png 640w" sizes="(max-width: 169px) 100vw, 169px" /></a></p>
+<p>&nbsp;</p>
+<h2>Google Play Store</h2>
+<p><a title="Tricktresor-App | Google Play Store" href="https://play.google.com/store/apps/details?id=com.blappsta.tricktresor" target="_blank"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4748" src="https://tricktresor.com/wp-content/uploads/2014/05/05_16_17_01_54-300x197.jpg" alt="Tricktresor-App Play store" width="300" height="197" srcset="/wp-content/uploads/2014/05/05_16_17_01_54-300x197.jpg 300w, /wp-content/uploads/2014/05/05_16_17_01_54-624x411.jpg 624w, /wp-content/uploads/2014/05/05_16_17_01_54.jpg 660w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p><strong>Update:</strong></p>
+<p>Leider gab es anscheinend mit dem Google-Playstore und der Blappsta-App Probleme, die nicht geklärt werden konnten.</p>
+<p>Deswegen gibt es die App nun direkt als Paket hier:</p>
+<p><a href="https://play.google.com/store/apps/details?id=com.blappsta.tricktresor">https://play.google.com/store/apps/details?id=com.blappsta.tricktresor</a></p>
+<h2>Nebelhorn Medien GmbH</h2>
+<p>Möglich geworden ist das durch die Firma <a title="Nebelhorn Medien AG | Blappsta" href="http://www.blappsta.com/?blaffid=app_62">Nebelhorn Medien GmbH</a>, die mit ihrem <a title="Wordpress Plugin &quot;Blappsta&quot;" href="http://wordpress.org/plugins/yournewsapp/">WordPress-Plugin Blappsta</a> eine Verbindung zu einer eigenen App herstellt.</p>
+<h2>Blappsta-Wordpress-Plugin</h2>
+<p>Die Einrichtung des Plugins ist kinderleicht und bietet viele Einstellmöglichkeiten (Farbe, Kategoriebilder etc.). Nachdem das Plugin installiert wurde, kann das Aussehen und Verhalten auf der Blappsta-Seite getestet werden. Es kann dann ein Antrag auf eine eigene App gestellt werden. Dies hat bei mir innerhalb einer Woche geklappt.</p>
+<h2>Kosten</h2>
+<p>Die von mir verwendete Version von Blappsta ist kostenfrei (Private Version). Den &#8220;Preis&#8221; müsst ihr zahlen indem ihr die am unteren Ende der App eingeblendete Werbung hinnehmt. Natürlich gibt es auch <a title="Blappsta Business" href="http://www.blappsta.com/?blaffid=app_62">Blappsta Business</a> mit mehr Features, ohne Werbung, dafür aber auch für eine monatliche Pauschale.</p>
+<p>Der Beitrag <a href="/blog/gibts-da-auch-ne-app-fuer/">Gibt&#8217;s da auch &#8216;ne App für?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/gibts-da-auch-ne-app-fuer/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

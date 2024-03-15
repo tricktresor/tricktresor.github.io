@@ -1,0 +1,1106 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>VALUE Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/value/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 18 Feb 2021 16:36:15 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>VALUE Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Aggregation mit VALUE, GROUPS und FOR</title>
+		<link>/blog/aggregation-mit-value-groups-und-for/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 17 Dec 2020 16:06:24 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[field-symbols]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[GROUP BY]]></category>
+		<category><![CDATA[groups]]></category>
+		<category><![CDATA[for]]></category>
+		<guid isPermaLink="false">/?p=1024772</guid>
+
+					<description><![CDATA[<p>Als SAP-Programmierer hat man häufig mit Datenstrukturen zu tun, die aus einer Belegnummer und einer Positionsnummer bestehen. Hieraus ergibt sich dann häufig die Aufgabenstellung, alle Belegnummern in einer separaten Tabelle zu sammeln, also auf Belegnummer zu aggregieren. Der folgende Code-Schnipsel erledigt das für eine Tabelle mit Hilfe der VALUE-Anweisung in Verbindung mit FOR und GROUPS. Zuerst die Datenstruktur der Tabelle, die aus Belegnummer (Document = D) und Position ( Item = IT) besteht. Zum Testen...</p>
+<p>Der Beitrag <a href="/blog/aggregation-mit-value-groups-und-for/">Aggregation mit VALUE, GROUPS und FOR</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Als SAP-Programmierer hat man häufig mit Datenstrukturen zu tun, die aus einer Belegnummer und einer Positionsnummer bestehen. Hieraus ergibt sich dann häufig die Aufgabenstellung, alle Belegnummern in einer separaten Tabelle zu sammeln, also auf Belegnummer zu aggregieren.</p>
+
+
+
+<p>Der folgende Code-Schnipsel erledigt das für eine Tabelle mit Hilfe der VALUE-Anweisung in Verbindung mit FOR und GROUPS.</p>
+
+
+
+<p>Zuerst die Datenstruktur der Tabelle, die aus Belegnummer (Document = D) und Position ( Item = IT) besteht. </p>
+
+
+
+<pre class="wp-block-code"><code>TYPES: BEGIN OF _dit,
+         doc TYPE n LENGTH 10,
+         itm TYPE posnr,
+       END OF _dit,
+       _dits TYPE SORTED TABLE OF _dit WITH UNIQUE KEY doc itm.</code></pre>
+
+
+
+<p>Zum Testen fülle ich die Tabelle mit ein paar Testdaten:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(dits) = VALUE _dits(
+ ( doc = 100 itm = 1 )
+ ( doc = 100 itm = 2 )
+ ( doc = 102 itm = 2 )
+ ( doc = 103 itm = 4 )
+ ( doc = 103 itm = 5 ) ).</code></pre>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow"><p>Die VALUE-Anweisung macht übrigens einen INSERT INTO TABLE, was bedeutet, dass die einzufügenden Werte nicht sortiert vorliegen müssen!</p><p>Die folgende Anweisung verursacht also keinen Shortdump:</p><p>DATA(dits) = VALUE _dits( ( doc = 200 ) ( doc = 100 ) ).</p><cite>Info zur Anwendung VALUE</cite></blockquote>
+
+
+
+<p>Die Zielstruktur, sieht wie folgt aus:</p>
+
+
+
+<pre class="wp-block-code"><code>TYPES: BEGIN OF _doc,
+         no TYPE n LENGTH 10,
+       END OF _doc,
+       _docs TYPE SORTED TABLE OF _doc WITH UNIQUE KEY no.
+</code></pre>
+
+
+
+<p>Das Coding für die Aggregation lautet folgendermaßen:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(docs) = VALUE _docs(
+    FOR GROUPS d OF line IN dits
+      GROUP BY line-doc ( no = d ) ).</code></pre>
+
+
+
+<p>Es ist so kompakt, dass man es auch noch vertretbar in einer Zeile stehen lassen kann.</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(docs) = VALUE _docs( FOR GROUPS d OF line IN dits GROUP BY line-doc ( no = d ) ).</code></pre>
+
+
+
+<h2 class="wp-block-heading">DATA vs. FIELD-SYMBOLS</h2>
+
+
+
+<p>Die Syntax lässt zwei Schreibweisen zu: einmal mit einer Workarea (DATA) und einmal mit Feldsymbolen. In meinem Beispiel unterscheidet sich die Schreibweise also nur für ein Element:</p>
+
+
+
+<ul><li> LINE (DATA) </li><li>&lt;LINE&gt; (Field-Symbols)</li></ul>
+
+
+
+<p>Die Verwendung von Field-Symbols ist generell schneller. Die Performance hängt stark davon ab, wie breit die Tabelle ist. Bei meinem Bespiel, das nur die beiden Felder DOC und ITM enthält, ist der Vorsprung von Field-Symbols nur minimal. Ändere ich die Breite der Struktur jedoch, indem ich z.B. die Tabelle VBAP einbinde (ca. 3700 Zeichen breit), dann verlängert sich die Laufzeit bei Field-Symbols um ca. 1/3. Bei DATA ist die Laufzeit mehr als drei Mal so hoch!</p>
+
+
+
+<p>Empfehlung also: Verwende immer die Variante mit Field-Symbols! Einen praktischen Nutzen habe ich bisher noch nicht finden können. Normalerweise kann man bei der Verwendung von Feldsymbolen mit ihrer Hilfe die zugrunde liegenden Daten direkt verändern. Bei dieser Variante mit GROUPS ist das meines Wissens jedoch nicht möglich.   </p>
+
+
+
+<h2 class="wp-block-heading">Gruppierung mit SELECT</h2>
+
+
+
+<p>Seit Release 7.52 ist es möglich, einen SELECT auf eine interne Tabelle abzusetzen. Und auch so kann man natürlich gruppieren:</p>
+
+
+
+<pre class="wp-block-code"><code>SELECT DISTINCT doc AS no
+  FROM @dits AS itab
+  INTO TABLE @DATA(docs).</code></pre>
+
+
+
+<h2 class="wp-block-heading">Gruppierung mit LOOP</h2>
+
+
+
+<p>In diesem Artikel habe ich beschrieben, wie die Gruppierung bei einer LOOP-Schleife funktioniert.</p>
+
+
+
+<figure class="wp-block-embed is-type-wp-embed is-provider-tricktresor wp-block-embed-tricktresor"><div class="wp-block-embed__wrapper">
+<blockquote hcb-fetch-image-from="/blog/loop-at-itab-group-by/" class="wp-embedded-content" data-secret="gU2ZtmeY9U"><a href="/blog/loop-at-itab-group-by/">Loop At ITAB Group By</a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" title="&#8222;Loop At ITAB Group By&#8220; &#8212; Tricktresor" src="/blog/loop-at-itab-group-by/embed/#?secret=gU2ZtmeY9U" data-secret="gU2ZtmeY9U" width="600" height="338" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+</div></figure>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/aggregation-mit-value-groups-und-for/">Aggregation mit VALUE, GROUPS und FOR</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Modernes ABAP  &#8211; Ein Beispiel</title>
+		<link>/blog/modernes-abap-ein-beispiel/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 29 Nov 2019 16:28:04 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[switch]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[COND]]></category>
+		<category><![CDATA[corresponding]]></category>
+		<guid isPermaLink="false">/?p=1022972</guid>
+
+					<description><![CDATA[<p>Die Neuerungen im ABAP-Umfeld sind inzwischen bereits einige Jahre alt. Über den VALUE Operator, der mit Release 7.40 eingeführt wurde, hat Horst Keller bereits 2013 gebloggt. Trotzdem werden einige der neuen Befehle nur sparsam eingesetzt. Das liegt einerseits daran, dass man sich wirklich an die Verwendung gewöhnen muss, andererseits ist man vielleicht unsicher, welche Gefahren (Performance) sie bergen. Ich persönlich finde zudem, dass ein übermäßiger Einsatz der Befehle, die sehr vielfältig untereinander geschachtelt werden können,...</p>
+<p>Der Beitrag <a href="/blog/modernes-abap-ein-beispiel/">Modernes ABAP  &#8211; Ein Beispiel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Die Neuerungen im ABAP-Umfeld sind inzwischen bereits einige Jahre alt. Über den VALUE Operator, der mit Release 7.40 eingeführt wurde, hat Horst Keller bereits <a href="https://blogs.sap.com/2013/05/27/abap-news-for-release-740-constructor-operator-value/">2013 gebloggt</a>. Trotzdem werden einige der neuen Befehle nur sparsam eingesetzt. Das liegt einerseits daran, dass man sich wirklich an die Verwendung gewöhnen muss, andererseits ist man vielleicht unsicher, welche Gefahren (Performance) sie bergen. Ich persönlich finde zudem, dass ein übermäßiger Einsatz der Befehle, die sehr vielfältig untereinander geschachtelt werden können, auch schnell nicht mehr <em>schön</em> aussehen und zudem schwer zu überblicken sind.</p>
+
+
+
+<p>Aber um mal wieder einen Beitrag zu schreiben und weil es vielleicht doch <em>elegant</em> ist, eine komplexe Aufgabe in nur <em>einer Zeile</em> zu lösen, stelle ich dir heute folgende Lösung vor.</p>
+
+
+
+<h2 class="wp-block-heading">Interne Tabelle kopieren</h2>
+
+
+
+<p>Nehmen wir an, wir hätten eine Tabelle mit einer <em>Materialnummer</em>, einer <em>gewünschten Menge</em> (QTY) und der <em>verfügbaren Menge</em> (AVQ). Für die Anzeige im SALV-Grid soll die Tabelle noch um den Materialkurztext erweitert werden und Einträge, bei denen die gewünschte Menge von der verfügbaren Menge abweicht, sollen farblich gekennzeichnet werden.</p>
+
+
+
+<h3 class="wp-block-heading">Datenstrukturen</h3>
+
+
+
+<p>Die Strukturen der Quelltabelle (SRC) und der Zieltabelle (TGT) sehen wie folgt aus:</p>
+
+
+
+<pre class="wp-block-code"><code>  TYPES: BEGIN OF _src,
+           mat TYPE c LENGTH 1, "material number
+           qty TYPE i, "requested qty
+           avq TYPE i, "available qty
+         END OF _src,
+         _src_t TYPE STANDARD TABLE OF _src WITH EMPTY KEY,
+
+         BEGIN OF _tgt,
+           mat TYPE c LENGTH 1,
+           qty TYPE i,
+           avq TYPE c LENGTH 2,
+           txt TYPE maktx,
+           col TYPE lvc_t_scol,
+         END OF _tgt,
+         _tgt_t TYPE STANDARD TABLE OF _tgt WITH EMPTY KEY.</code></pre>
+
+
+
+<h2 class="wp-block-heading">Testdaten</h2>
+
+
+
+<p>Die Tabelle, die ich in die Ausgabetabelle für das SALV-Grid kopieren möchte, wird mit ein paar Testdaten gefüllt:</p>
+
+
+
+<pre class="wp-block-code"><code>  DATA(src) = VALUE _src_t(
+      ( mat = 'A' qty = 10 avq = 10 )
+      ( mat = 'B' qty = 20 avq = 15 )
+      ( mat = 'C' qty = 30 avq = 30 ) ).</code></pre>
+
+
+
+<h2 class="wp-block-heading">Hilfsklasse</h2>
+
+
+
+<p>Mit der folgenden Hilfsklasse wird der Text zu einem Material ermittelt:</p>
+
+
+
+<pre class="wp-block-code"><code>CLASS mat DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS text
+      IMPORTING mat          TYPE char1
+      RETURNING VALUE(descr) TYPE string.
+ENDCLASS.
+
+CLASS mat IMPLEMENTATION.
+  METHOD text.
+    descr = SWITCH #( mat
+      WHEN 'A' THEN `Antenna`
+      WHEN 'B' THEN `Brain`
+      WHEN 'C' THEN `Case`
+      ELSE `unknown` ).
+  ENDMETHOD.
+ENDCLASS.</code></pre>
+
+
+
+<h3 class="wp-block-heading">Herkömmliche Vorgehensweise</h3>
+
+
+
+<p>Das althergebrachte Coding ohne neue ABAP-Features könnte wie folgt aussehen: </p>
+
+
+
+<pre class="wp-block-code"><code>  DATA tgt1     TYPE _tgt_t.
+  DATA tgt_line TYPE _tgt.
+  DATA col_line TYPE lvc_s_scol.
+
+  LOOP AT src INTO DATA(src_line).
+    CLEAR tgt_line.
+    MOVE-CORRESPONDING src_line TO tgt_line.
+    tgt_line-txt = mat=&gt;text( tgt_line-mat ).
+    IF tgt_line-qty &lt;&gt; tgt_line-avq.
+      CLEAR col_line.
+      col_line-fname = space.
+      col_line-color-col = 6.
+      APPEND col_line TO tgt_line-col.
+    ENDIF.
+    append tgt_line to tgt1.
+  ENDLOOP.</code></pre>
+
+
+
+<h3 class="wp-block-heading">Neue Vorgehensweise</h3>
+
+
+
+<p>Mit Hilfe der neuen ABAP-Features VALUE, COND, FOR und CORRESPONDING habe ich die folgende Lösung erarbeitet:</p>
+
+
+
+<pre class="wp-block-code"><code>  DATA(tgt) = VALUE _tgt_t( FOR line IN src (
+      VALUE #( BASE CORRESPONDING #( line )
+      txt = mat=&gt;text( line-mat )
+      col = COND #( LET color = VALUE lvc_t_scol( ) IN
+                WHEN line-qty &lt;&gt; line-avq 
+                  THEN VALUE #( ( fname = '' color-col = 6 ) ) )
+      ) ) ).</code></pre>
+
+
+
+<p>Auffällig sind folgende Dinge:</p>
+
+
+
+<ul><li>Das Coding ist deutlich kürzer</li><li>Es sind keine Variablendeklarationen notwendig</li><li>Es sieht einigermaßen <em>konfus </em>aus</li></ul>
+
+
+
+<p>Schön ist auf jeden Fall, dass mit Hilfe <em>eines</em> Befehls, bzw. einer Befehlskette, Daten von einer Tabelle in eine andere kopiert werden können und sozusagen nebenbei weitere Feldmanipulationen vorgenommen werden können.</p>
+
+
+
+<h3 class="wp-block-heading">VALUE</h3>
+
+
+
+<p>Den Value-Befehl habe ich lieben gelernt, denn er macht es in vielfältigen Situationen einfach, Daten in eine Struktur oder Tabelle einzufügen. Und zwar ohne dass eine Datendeklaration notwendig wäre.</p>
+
+
+
+<p>Der Value-Befehl wird direkt gefolgt von der Typendefinition, die verwendet werden soll. Wenn die Typendefinition implizit ermittelbar ist, zum Beispiel, weil die Daten an eine bereits definierte Variable übergeben werden, dann reicht die Angabe des &#8220;#&#8221;. In meinem Beispiel möchte ich aber gerade die Datendefinition durch den VALUE-Befehl definieren, also gebe ich den zu verwendenden Tabellentyp an:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) VALUE _tgt_t( ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">FOR</h3>
+
+
+
+<p>In der VALUE-Angabe führe ich einen LOOP über die Quelltabelle aus und kopiere die Felder der Quelltabelle in die Zieltabelle mittels CORRESPONDING:</p>
+
+
+
+<pre class="wp-block-code"><code>  DATA(tgt) = VALUE _tgt_t( 
+    FOR line IN src (
+      CORRESPONDING #( line ) ) ).</code></pre>
+
+
+
+<p>Der Befehl FOR line IN src entspricht also in etwa dem Befehl:</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT src INTO DATA(line).</code></pre>
+
+
+
+<h3 class="wp-block-heading">CORRESPONDING</h3>
+
+
+
+<p>Eine Herausforderung war es, zusätzlich zu CORRESPONDING noch weitere Felder anderweitig belegen zu können. Das folgende Coding funktioniert nämlich nicht:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) = VALUE _tgt_t( 
+  FOR line IN src (
+    CORRESPONDING #( line )
+    txt = mat=&gt;text( line-mat ) ) ).</code></pre>
+
+
+
+<p>Hier muss mit einer erneuten VALUE-Operation gearbeitet werden:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) = VALUE _tgt_t(
+  FOR line IN src (
+    VALUE #( BASE CORRESPONDING #( line )
+    txt = mat=&gt;text( line-mat ) ) ) ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">COND</h3>
+
+
+
+<p>Nun haben wir bereits die Tabelle kopiert und zusätzlich den Materialtext dazu gelesen. Zusätzlich möchte ich noch die COLOR-Tabelle füllen, wenn sich die angeforderte Menge von der verfügbaren Menge unterscheidet. Diese Anforderung habe ich mit COND realisiert:</p>
+
+
+
+<pre class="wp-block-code"><code>col = COND #( LET color = VALUE lvc_t_scol( ) IN
+        WHEN line-qty &lt;&gt; line-avq
+          THEN VALUE #( ( fname = '' color-col = 6 ) ) )</code></pre>
+
+
+
+<p>Alleine diesen Befehl finde ich deutlich komplexer als eine zuvor ausgeführten IF-Anweisung. COND ist allerdings notwendig, wenn der Code Inline ausgeführt werden soll. Zudem ist er sehr mächtig, denn es können verschiedene Bedingungen abgefragt werden. Er entspricht also in etwa einer verschachtelten IF &#8211; ELSEIF &#8211; ELSE Struktur.</p>
+
+
+
+<h3 class="wp-block-heading">SWITCH</h3>
+
+
+
+<p>Den Switch-Befehl, der in etwa einer CASE-Anweisung entspricht, habe ich nicht mehr in der Kopier-Anweisung unter bekommen&#8230; Die Arbeitsweise lässt sich jedoch gut in der Hilfsmethode MAT=&gt;TEXT( ) ersehen.</p>
+
+
+
+<h2 class="wp-block-heading">Ausgabe </h2>
+
+
+
+<p>Die Ausgabe der aufbereiteten Tabelle erfolgt mit Hilfe des SALV-Grid:</p>
+
+
+
+<pre class="wp-block-code"><code>  TRY.
+      cl_salv_table=&gt;factory(
+        IMPORTING
+          r_salv_table   = DATA(salv)
+        CHANGING
+          t_table        = tgt ).
+      DATA(cols) = salv-&gt;get_columns( ).
+      cols-&gt;set_color_column( 'COL' ).
+      salv-&gt;display( ).
+    CATCH cx_salv_msg.
+      MESSAGE 'error salv' TYPE 'I'.
+  ENDTRY.</code></pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="465" height="72" src="/wp-content/uploads/2019/11/salv1.png" alt="" class="wp-image-1022973" srcset="/wp-content/uploads/2019/11/salv1.png 465w, /wp-content/uploads/2019/11/salv1-300x46.png 300w" sizes="(max-width: 465px) 100vw, 465px" /><figcaption>Ausgabe der kopierten Tabelle</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Zu der vorgestellten Lösung und allgemein möchte ich folgendes anmerken:</p>
+
+
+
+<h3 class="wp-block-heading">Formatierung</h3>
+
+
+
+<p>Formatierung ist alles!</p>
+
+
+
+<p>Die neuen ABAP-Features sind so komplex und können im Grunde <em>endlos</em> verschachtelt werden. Deswegen ist es notwendig, den Quelltext so zu formatieren, dass deutlich wird, welche Befehle und Sequenzen zusammengehören. Erschwerend kommt hinzu, dass für die neuen Befehle kein Pretty-Print möglich ist. Man muss also selber entscheiden, was noch in eine Zeile passt und was wie weit eingerückt werden sollte.</p>
+
+
+
+<p>Wenn das obige Coding sinnlos formatiert wird, dann sieht es wirklich sehr unübersichtlich aus:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) = VALUE _tgt_t( FOR line IN src (  VALUE #( BASE 
+      CORRESPONDING #( line )  txt = mat=&gt;text( line-mat )
+          col = COND #( LET color =  VALUE lvc_t_scol( ) 
+        IN WHEN line-qty &lt;&gt; line-avq 
+             THEN VALUE #( ( fname = '' color-col = 6 ) ) ) ) ) ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">Anzahl der Verwendungen</h3>
+
+
+
+<p>Wenn die Zuweisungen oder Ermittlungen, die durch die neuen ABAP-Features gemacht werden sozusagen <em>einmalig</em> sind, dann sind sie eine elegante Möglichkeit, die Programmierung kürzer zu machen. Sobald die Ergebnisse jedoch vielschichtiger werden oder die Abfragen komplexer, dann ist es sinnvoll, die entsprechenden Anweisungen entweder vorab berechnet oder in Funktionen ausgelagert werden. </p>
+
+
+
+<h3 class="wp-block-heading">Debugging</h3>
+
+
+
+<p>Was man immer im Hinterkopf behalten sollte ist, dass das Debuggen komplexer Anweisungsketten deutlich erschwert wird. Man kann zwar im Debugger die Schrittweite setzen, die ein Debuggen der Einzelteile ermöglicht, allerdings ist dies sehr mühsam. Es kann kein Break-Point innerhalb einer Anweisungskette gesetzt werden.</p>
+
+
+
+<h3 class="wp-block-heading">Anwendung</h3>
+
+
+
+<p>Auf jeden Fall sollte man sich mit den neuen Befehlen beschäftigen und diese in die tägliche Arbeit einfließen lassen. Es übt und erleichtert in vielen Fällen die Arbeit. Nur so lernt man, fremden Code zu verstehen und wann und wie man die neuen Befehle selber am sinnvollsten einsetzt. </p>
+
+
+
+<p>Eine gute Möglichkeit, um auf dem Laufenden zu bleiben und auch um die Anwendung der ABAP-Features zu verstehen, ist, <a href="https://people.sap.com/horst.keller">Horst Keller</a> auf <a href="https://people.sap.com/horst.keller#content:blogposts">blogs.sap.com</a> zu folgen.</p>
+<p>Der Beitrag <a href="/blog/modernes-abap-ein-beispiel/">Modernes ABAP  &#8211; Ein Beispiel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ABAP 740-Features unter der Lupe</title>
+		<link>/blog/abap-740-features-unter-der-lupe/</link>
+					<comments>/blog/abap-740-features-unter-der-lupe/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 Apr 2017 15:12:16 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[standard table]]></category>
+		<category><![CDATA[sorted table]]></category>
+		<category><![CDATA[GROUP BY]]></category>
+		<category><![CDATA[WHERE]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017998</guid>
+
+					<description><![CDATA[<p>Aus einer einfachen Anfängerfrage im abapforum.com hat sich eine recht spannende Antwortserie entwickelt, die auf die neuen Sprachfeatures von ABAP740 eingeht. Ich habe diese einmal zusammen gefasst und auch Laufzeitmessungen durchgeführt. Die Frage Die Frage von debianfan lautete: Wie ermittele ich die Anzahl von Datensätzen bestimmter Ausprägung in einer internen Tabelle? Die interne Tabelle NAMES besteht nur aus den Feldern NAME (string) TF (boolean) Die folgenden Lösungen sind teilweise vereinfacht und ohne DATA-Definitionen. Die einzelnen...</p>
+<p>Der Beitrag <a href="/blog/abap-740-features-unter-der-lupe/">ABAP 740-Features unter der Lupe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Aus einer einfachen Anfängerfrage im <a href="http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21900&amp;p=82019">abapforum.com</a> hat sich eine recht spannende Antwortserie entwickelt, die auf die neuen Sprachfeatures von ABAP740 eingeht. Ich habe diese einmal zusammen gefasst und auch Laufzeitmessungen durchgeführt.</p>
+<h2>Die Frage</h2>
+<p>Die Frage von debianfan lautete: Wie ermittele ich die Anzahl von Datensätzen bestimmter Ausprägung in einer internen Tabelle?</p>
+<p>Die interne Tabelle NAMES besteht nur aus den Feldern</p>
+<ul>
+<li>NAME (string)</li>
+<li>TF (boolean)</li>
+</ul>
+<p>Die folgenden Lösungen sind teilweise vereinfacht und ohne DATA-Definitionen. Die einzelnen lauffähigen Lösungen sind unten im Beispielprogramm ersichtlich.</p>
+<h2>Lösung 1 &#8211; 2xLOOP+WHERE(DATA)</h2>
+<p>Die einfachste und auf der Hand liegende Antwort von Tron war:</p>
+<pre class="">LOOP AT names INTO name WHERE tf = abap_true.
+  ADD 1 TO zaehler_true.
+ENDLOOP.
+
+LOOP AT names INTO name WHERE tf = abap_false.
+  ADD 1 TO zaehler_false.
+ENDLOOP.
+</pre>
+<p>Die Lösung ist einfach und verständlich.</p>
+<p>Der Einwand von Ralf war, dass bei WHERE die gesamte Tabelle durchlaufen werden muss, wenn kein Index verwendet wird. Das kann sich bei großen Tabellen negativ auf die Laufzeit auswirken.</p>
+<p>Mein Gedanke war, dass ich zwei LOOPs nicht schön finde und außerdem ein LOOP mit einer Case-Anweisung noch einen Tacken einfacher und deutlich sein müsste. Dazu später mehr.</p>
+<h2>Lösung 2 &#8211; FILTER</h2>
+<p>Haubi hat dann den Vorschlag gemacht, die einzelnen Einträge mittels FILTER zu zählen:</p>
+<pre class=""> DATA(lv_true)  = lines( FILTER #( names WHERE tf = abap_true ) ).
+ DATA(lv_false) = lines( FILTER #( names WHERE tf = abap_false ) ).</pre>
+<p>Diese Lösung finde ich sehr schlank und gut lesbar. Was mich hier stört, ist, dass durch FILTER alle verarbeiteten Tabelleneinträge kopiert werden. Es werden alle Datensätze die der WHERE-Anweisung entsprechen in eine neue Tabelle kopiert. Die Tabelle ist zwar temporär und wird nur für die Zeit der Verarbeitung des FILTER-Befehls verwendet, aber bei großen Tabellen kann sich die zusätzliche Speicherlast negativ auswirken.</p>
+<h2>Lösung 3 &#8211; REDUCE</h2>
+<p>Ich wollte dann unbedingt noch eins drauf setzen und eine Lösung haben, die auch bei vielen Ausprägungen von TF funktioniert und die Werte von TF nicht bekannt sind. Zudem wollte ich komplett die neuen Sprachfeatures verwenden.</p>
+<p>Bei beiden vorhergehenden Lösungen fand ich es nicht gut, dass gezielt im Programm auf ABAP_TRUE und ABAP_FALSE abgefragt wurde. In diesem Beispiel ist es in Ordnung, weil das die Vorgabe war. Der häufigere Fall ist jedoch, dass eine Gruppe viele und gegebenenfalls nicht bekannte Ausprägungen hat (Verkaufsorganisation, Datum, Materialnummer, etc.).</p>
+<p>Meine Lösung bestand dann aus einer Kombination aus VALUE und REDUCE:</p>
+<pre class=""> DATA(sum) = VALUE ttf( FOR GROUPS grp OF &lt;name&gt; IN names
+                        WHERE ( name IS NOT INITIAL )
+                        GROUP BY ( tf = &lt;name&gt;-tf )
+                          ( tf    = grp
+                            count = REDUCE #( INIT i = 0
+                                       FOR name IN names
+                                       WHERE ( tf = grp )
+                                       NEXT i = i + 1 ) ) ).</pre>
+<p>Diese Lösung baut eine Tabelle auf aus TF und COUNT, so dass alle Gruppenwerte mit der entsprechenden Anzahl Einträge in der Tabelle SUM landen.</p>
+<p>Eigentlich müsste diese Lösung die langsamste sein, denn es werden zuerst die Gruppen gebildet. Dafür muss die gesamte Tabelle durchlaufen werden. Dann werden zu jedem Gruppeneintrag erneut die zugehörigen Einträge gelesen und gezählt. Deswegen wollte ich zuerst gar keine Laufzeitmessung machen. Die Herausforderung für mich war in erster Linie, die Problemstellung mit den neuen Sprachfeatures abzubilden, da ich mich mit der Syntax eher schwer tue.</p>
+<h2>Lösung 4 &#8211; 1xLOOP+WHERE(DATA)</h2>
+<p>Ich habe mit den vorhandenen drei Lösungen ein Testprogramm geschrieben um die Laufzeit mit der Transaktion SAT analysieren zu können.</p>
+<p>Allerdings habe ich gemerkt, dass ich die Lösung von Tron falsch übernommen hatte, nämlich folgendermaßen:</p>
+<pre class="">LOOP AT names INTO name.
+  CASE name-tf.
+    WHEN abap_true.
+      ADD 1 TO zaehler_true.
+    WHEN abap_false.
+      ADD 1 TO zaehler_false.
+  ENDCASE.
+ENDLOOP.</pre>
+<p>Anstatt zweier LOOPs hatte ich nur einen LOOP und eine CASE-Abfrage.</p>
+<p>Da ich die schon dabei war zu testen, wollte ich Trons Code genau so übernehmen, da ich davon ausging, dass meine Variante mit CASE schneller sein würde. Allerdings war dem nicht so&#8230;</p>
+<h2>Update</h2>
+<p>Zusätzlich zu den LOOP-Lösungen, die mit dem Zusatz INTO workarea arbeiten, habe ich noch die Varianten mit ASSIGNING (Feldsymbol) und TRANSPORTING NO FIELDS aufgenommen.</p>
+<h2>Lösung 5 &#8211; 1xLOOP+CASE(Fieldsymbol)</h2>
+<p>Die Lösung mit einem LOOP und CASE-Anweisung jedoch mit LOOP-ASSIGNING.</p>
+<h2>Lösung 6 &#8211; 2xLOOP+WHERE(Fieldsymbol)</h2>
+<p>Die Lösung mit zwei LOOPs und entsprechender WHERE-Bedingung jedoch mit LOOP-ASSIGNING.</p>
+<h2>Lösung 7 &#8211; 2xLOOP+WHERE(ohne Feldtransport)</h2>
+<p>Die Lösung mit zwei LOOPs und entsprechender WHERE-Bedingung jedoch mit dem Zusatz TRANSPORTING NO FIELDS.</p>
+<h2>Laufzeitanalyse</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018001" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg" alt="" width="748" height="269" srcset="/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg 748w, /wp-content/uploads/2017/04/2017-04-26_17-13-33-300x108.jpg 300w" sizes="(max-width: 748px) 100vw, 748px" /></a></p>
+<p>&nbsp;</p>
+<p>Der Vollständigkeit halber habe ich die Messung auch noch einmal mit der Variante &#8220;SORTED TABLE&#8221; durchgeführt. Und wieder war ich überrascht: Die Variante mit Sorted Table ist deutlich langsamer als die Variante mit Standard Table&#8230;</p>
+<p>Hier das Ergebnis der Laufzeitmessungen mit 100.000 Datensätzen und STANDARD TABLE:</p>
+<pre class="">Variante          Laufzeit
+P01_REDUCE         76.602
+P02_FILTER         36.755
+P03_LOOP_CASE      33.891
+P04_LOOP_WHERE     27.282
+P05_LOOP_CASE_FS   25.097
+P06_LOOP_WHERE_FS  18.805
+P07_LOOP_WHERE_NO  17.774
+</pre>
+<h2>abapgit</h2>
+<p>Eine aktuelle Version der Lösungen (inzwischen erweitert auf den Vergleich mit SORTED TABLE) findest du im github <a href="https://github.com/tricktresor/">Tricktresor-Repository</a>:</p>
+<p><a href="https://github.com/tricktresor/loop_performance_comparison">https://github.com/tricktresor/loop_performance_comparison</a></p>
+<h2>Code</h2>
+<p>Methode rnd_name baut aus zufälligen Buchstaben Fantasienamen auf.</p>
+<p>Methode rnd_bool liefert per Zufall den Wert TRUE oder FALSE zurück.</p>
+<p>Die Methoden p01 &#8211; p07 enthalten die jeweils erwähnten Lösungsvarianten.</p>
+<pre class="">REPORT.
+" http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21900&amp;p=82017#p82017
+
+PARAMETERS p TYPE i DEFAULT 100000.
+
+CLASS help DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS rnd_name RETURNING VALUE(name) TYPE string.
+ CLASS-METHODS rnd_bool RETURNING VALUE(tf) TYPE boolean.
+ CLASS-METHODS class_constructor.
+ CLASS-METHODS p01_reduce.
+ CLASS-METHODS p02_filter.
+ CLASS-METHODS p03_loop_case.
+ CLASS-METHODS p04_loop_where.
+ CLASS-METHODS p05_loop_case_fs.
+ CLASS-METHODS p06_loop_where_fs.
+ CLASS-METHODS p07_loop_where_no.
+ PROTECTED SECTION.
+ CLASS-DATA rnd TYPE REF TO cl_abap_random.
+ TYPES:
+ BEGIN OF lst_names,
+ name TYPE string,
+ tf TYPE abap_bool,
+ END OF lst_names,
+ ltt_names TYPE STANDARD TABLE OF lst_names
+ WITH NON-UNIQUE KEY name
+ WITH NON-UNIQUE SORTED KEY key_tf COMPONENTS tf.
+
+* ltt_names TYPE SORTED TABLE OF lst_names
+* WITH NON-UNIQUE KEY name
+* WITH NON-UNIQUE SORTED KEY key_tf COMPONENTS tf.
+ CLASS-DATA names TYPE ltt_names.
+ENDCLASS.
+
+CLASS help IMPLEMENTATION.
+ METHOD class_constructor.
+ rnd = cl_abap_random=&gt;create( ).
+ names = VALUE ltt_names( FOR i = 1 THEN i + 1 WHILE i &lt;= p
+ ( name = help=&gt;rnd_name( ) tf = help=&gt;rnd_bool( ) ) ).
+
+ ENDMETHOD.
+
+ METHOD rnd_name.
+ DATA(len) = rnd-&gt;intinrange( low = 5 high = 40 ).
+ DO len TIMES.
+ DATA(pos) = rnd-&gt;intinrange( low = 0 high = 25 ).
+ name = name &amp;&amp; sy-abcde+pos(1).
+ ENDDO.
+ ENDMETHOD.
+
+ METHOD rnd_bool.
+ CASE rnd-&gt;intinrange( low = 0 high = 1 ).
+ WHEN 0.
+ tf = abap_false.
+ WHEN 1.
+ tf = abap_true.
+ ENDCASE.
+ ENDMETHOD.
+
+ METHOD p01_reduce.
+ TYPES:
+ BEGIN OF stf,
+ tf TYPE abap_bool,
+ count TYPE i,
+ END OF stf,
+ ttf TYPE SORTED TABLE OF stf WITH UNIQUE KEY tf.
+
+ DATA(sum) = VALUE ttf( FOR GROUPS grp OF &lt;name&gt; IN names
+ WHERE ( name IS NOT INITIAL )
+ GROUP BY ( tf = &lt;name&gt;-tf )
+ ( tf = grp
+ count = REDUCE #( INIT i = 0
+ FOR name IN names
+ WHERE ( tf = grp )
+ NEXT i = i + 1 ) ) ).
+* cl_demo_output=&gt;display_data( sum ).
+ ENDMETHOD.
+
+ METHOD p02_filter.
+ DATA(lv_true) = lines( FILTER #( names USING KEY key_tf WHERE tf = abap_true ) ).
+ DATA(lv_false) = lines( FILTER #( names USING KEY key_tf WHERE tf = abap_false ) ).
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p03_loop_case.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names INTO DATA(name).
+ CASE name-tf.
+ WHEN abap_true. ADD 1 TO lv_true.
+ WHEN abap_false. ADD 1 TO lv_false.
+ ENDCASE.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p04_loop_where.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names INTO DATA(name) WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names INTO name WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p05_loop_case_fs.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names ASSIGNING FIELD-SYMBOL(&lt;name&gt;).
+ CASE &lt;name&gt;-tf.
+ WHEN abap_true. ADD 1 TO lv_true.
+ WHEN abap_false. ADD 1 TO lv_false.
+ ENDCASE.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p06_loop_where_fs.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names ASSIGNING FIELD-SYMBOL(&lt;name&gt;) WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names ASSIGNING &lt;name&gt; WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p07_loop_where_no.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names TRANSPORTING NO FIELDS WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names TRANSPORTING NO FIELDS WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+
+ENDCLASS.
+
+START-OF-SELECTION.
+
+
+ help=&gt;p01_reduce( ).
+ help=&gt;p02_filter( ).
+ help=&gt;p03_loop_case( ).
+ help=&gt;p04_loop_where( ).
+ help=&gt;p05_loop_case_fs( ).
+ help=&gt;p06_loop_where_fs( ).
+ help=&gt;p07_loop_where_no( ).</pre>
+<p>Der Beitrag <a href="/blog/abap-740-features-unter-der-lupe/">ABAP 740-Features unter der Lupe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/abap-740-features-unter-der-lupe/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Moderne UI mit altem SAPGUI und ALV-Grid</title>
+		<link>/blog/moderne-ui-mit-altem-sapgui-und-alv-grid/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 25 Apr 2017 18:10:35 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[hotspot]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[switch]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[parameter]]></category>
+		<category><![CDATA[checkbox]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017986</guid>
+
+					<description><![CDATA[<p>Ich habe eine kleine Spielerei gebaut, weil ich eine Möglichkeit brauchte um Parameter ein- und auszuschalten. Die normale Methode mit &#8220;X&#8221; und &#8220;Space&#8221; oder Checkbox fand ich langweilig und mir kam die Idee, dass es möglich sein müsste, eine etwas modernere Art der Darstellung möglich sein müsste. Sowas in dieser Art: Bild: http://pixabay.com/ Neue UI Natürlich sind die grafischen Möglichkeiten etwas beschränkt, aber die Funktionalität, wie man sie von jedem aktuellen Smartphone kennt, müsste machbar...</p>
+<p>Der Beitrag <a href="/blog/moderne-ui-mit-altem-sapgui-und-alv-grid/">Moderne UI mit altem SAPGUI und ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich habe eine kleine Spielerei gebaut, weil ich eine Möglichkeit brauchte um Parameter ein- und auszuschalten. Die normale Methode mit &#8220;X&#8221; und &#8220;Space&#8221; oder Checkbox fand ich langweilig und mir kam die Idee, dass es möglich sein müsste, eine etwas modernere Art der Darstellung möglich sein müsste.</p>
+<p>Sowas in dieser Art:</p>
+<p><a href="https://pixabay.com/de/schalter-kontakt-schaltfl%C3%A4che-auf-1531504/"><img decoding="async" class="alignnone wp-image-1017987 size-medium" src="https://tricktresor.com/wp-content/uploads/2017/04/switch-1531504_640-300x300.png" alt="" width="300" height="300" srcset="/wp-content/uploads/2017/04/switch-1531504_640-300x300.png 300w, /wp-content/uploads/2017/04/switch-1531504_640-150x150.png 150w, /wp-content/uploads/2017/04/switch-1531504_640-83x83.png 83w, /wp-content/uploads/2017/04/switch-1531504_640.png 640w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Bild: <a href="http://pixabay.com/">http://pixabay.com/</a></p>
+<h2>Neue UI</h2>
+<p>Natürlich sind die grafischen Möglichkeiten etwas beschränkt, aber die Funktionalität, wie man sie von jedem aktuellen Smartphone kennt, müsste machbar sein. In Frage kam nur der ALV-Grid (CL_GUI_ALV_GRID). Ich habe mit dem CL_SALV_TABLE angefangen, aber hier lassen sich die Rahmenlinien nicht ausblenden; das geht leider nur im ALV-Grid.</p>
+<p>Und tatsächlich:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-48-36.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1017988" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-48-36.jpg" alt="" width="505" height="76" srcset="/wp-content/uploads/2017/04/2017-04-25_19-48-36.jpg 505w, /wp-content/uploads/2017/04/2017-04-25_19-48-36-300x45.jpg 300w" sizes="(max-width: 505px) 100vw, 505px" /></a></p>
+<p>Ich habe noch mit ein paar anderen Varianten herumgespielt, aber das Prinzip ist immer das gleiche:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-52-05.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1017989" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-52-05.jpg" alt="" width="505" height="76" srcset="/wp-content/uploads/2017/04/2017-04-25_19-52-05.jpg 505w, /wp-content/uploads/2017/04/2017-04-25_19-52-05-300x45.jpg 300w" sizes="(max-width: 505px) 100vw, 505px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-51-25.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1017990" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-51-25.jpg" alt="" width="505" height="76" srcset="/wp-content/uploads/2017/04/2017-04-25_19-51-25.jpg 505w, /wp-content/uploads/2017/04/2017-04-25_19-51-25-300x45.jpg 300w" sizes="(max-width: 505px) 100vw, 505px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-50-29.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1017991" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-50-29.jpg" alt="" width="505" height="76" srcset="/wp-content/uploads/2017/04/2017-04-25_19-50-29.jpg 505w, /wp-content/uploads/2017/04/2017-04-25_19-50-29-300x45.jpg 300w" sizes="(max-width: 505px) 100vw, 505px" /></a></p>
+<h2>Beschreibung</h2>
+<p>Das Programm baut aus der Parametertabelle eine neue Parametertabelle, die jeweils für ON und OFF ein eigenes Feld für ein Icon hat. Für die Felder wurde die Hotspot-Funktionalität gesetzt, damit man per Klick den Zustand des Schalters ändern kann.</p>
+<p>Um die Funktion &#8220;wasserdicht&#8221; zu machen, müsste noch verhindert werden, dass die Spaltenbreite verändert werden kann (passiert schnell beim Klicken auf die ausgeblendete Rahmenlinie in der Mitte):</p>
+<p><a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">Geschützte Methoden nutzen</a> für die Methode  SET_RESIZE_COLS.</p>
+<h2>Code</h2>
+<pre class="">REPORT zz_swwwwwwitch.
+
+"Dummy parameter do display docker
+PARAMETERS p.
+
+CLASS main DEFINITION.
+ PUBLIC SECTION.
+   INCLUDE &lt;cl_alv_control&gt;.
+   TYPES: BEGIN OF ty_param,
+            name TYPE string,
+            text TYPE string,
+            status TYPE boolean,
+          END OF ty_param,
+          ty_params TYPE STANDARD TABLE OF ty_param WITH NON-UNIQUE DEFAULT KEY.
+
+   METHODS init_grid IMPORTING parent TYPE REF TO cl_gui_container.
+   METHODS add_parameter
+     IMPORTING name TYPE clike
+       text TYPE clike OPTIONAL
+       status TYPE boolean OPTIONAL.
+   METHODS get_params
+     RETURNING VALUE(parameters) TYPE ty_params.
+
+   "Settings color
+   CONSTANTS color_on TYPE i VALUE col_positive.
+   CONSTANTS color_off TYPE i VALUE col_negative.
+
+   "Settings icons
+* CONSTANTS status_icon_on TYPE icon_text VALUE icon_businav_szenario.
+* CONSTANTS status_icon_off TYPE icon_text VALUE icon_businav_szenario.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE icon_led_green.
+* CONSTANTS status_icon_off TYPE icon_text VALUE icon_led_red.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE ICON_oo_class.
+* CONSTANTS status_icon_off TYPE icon_text VALUE ICON_oo_class.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE ICON_oo_object.
+* CONSTANTS status_icon_off TYPE icon_text VALUE ICON_oo_class.
+
+ CONSTANTS status_icon_on TYPE icon_text VALUE icon_ps_network_activity.
+ CONSTANTS status_icon_off TYPE icon_text VALUE icon_ps_network_activity.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE ICON_add_row.
+* CONSTANTS status_icon_off TYPE icon_text VALUE ICON_remove_row.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE icon_org_unit.
+* CONSTANTS status_icon_off TYPE icon_text VALUE icon_org_unit.
+
+   TYPES: BEGIN OF ty_ui_param,
+     name TYPE string,
+     text TYPE string,
+     status_on TYPE icon_text,
+     status_off TYPE icon_text,
+     t_color TYPE lvc_t_scol,
+     t_style TYPE lvc_t_styl,
+   END OF ty_ui_param,
+   ty_ui_params TYPE STANDARD TABLE OF ty_ui_param.
+
+ PROTECTED SECTION.
+   DATA grid TYPE REF TO cl_gui_alv_grid.
+   DATA params TYPE ty_params.
+   DATA ui_params TYPE ty_ui_params.
+
+   METHODS set_ui.
+   METHODS set_color
+     IMPORTING status TYPE boolean
+     RETURNING VALUE(color) TYPE lvc_t_scol.
+   METHODS handle_click FOR EVENT hotspot_click OF cl_gui_alv_grid
+     IMPORTING e_row_id.
+
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+
+ METHOD init_grid.
+
+ "Local data
+ DATA fieldcat TYPE lvc_t_fcat.
+ DATA field TYPE lvc_s_fcat.
+ DATA layout TYPE lvc_s_layo.
+
+ "Transform parameter data to display UI
+ set_ui( ).
+
+ "Create grid in given container
+ CREATE OBJECT grid
+   EXPORTING
+     i_parent = parent.
+
+ "Set fields
+ CLEAR field.
+ field-fieldname = 'NAME'.
+ field-outputlen = 20.
+ field-colddictxt = 'Parameter'.
+ field-style = alv_style_font_bold.
+ APPEND field TO fieldcat.
+
+ CLEAR field.
+ field-fieldname = 'TEXT'.
+ field-outputlen = 40.
+ field-colddictxt = 'Description'.
+ APPEND field TO fieldcat.
+
+ CLEAR field.
+ field-fieldname = 'STATUS_ON'.
+ field-outputlen = 4.
+ field-colddictxt = 'On'.
+ field-hotspot = abap_true.
+ field-icon = abap_true.
+ field-fix_column = abap_true.
+ APPEND field TO fieldcat.
+
+ CLEAR field.
+ field-fieldname = 'STATUS_OFF'.
+ field-outputlen = 4.
+ field-colddictxt = 'Off'.
+ field-hotspot = abap_true.
+ field-icon = abap_true.
+ field-fix_column = abap_true.
+ APPEND field TO fieldcat.
+
+ "Layout
+ layout-stylefname = 'T_STYLE'.
+ layout-ctab_fname = 'T_COLOR'.
+ layout-no_toolbar = abap_true.
+ layout-no_headers = abap_true.
+
+ "Display Grid
+ grid-&gt;set_table_for_first_display(
+   EXPORTING
+     is_layout = layout
+   CHANGING
+     it_outtab = ui_params
+     it_fieldcatalog = fieldcat
+   EXCEPTIONS
+     OTHERS = 4 ).
+
+   "Set handler
+   SET HANDLER handle_click FOR grid.
+
+ ENDMETHOD.
+
+ METHOD get_params.
+   "return current settings
+   parameters = params.
+ ENDMETHOD.
+
+ METHOD add_parameter.
+   "add parameter to parameter table
+   APPEND VALUE #( name   = name
+                   text   = text
+                   status = status ) TO params.
+ ENDMETHOD.
+
+ METHOD set_color.
+
+   CASE status.
+     WHEN abap_true.
+       "set color for switched on
+       color = VALUE #( ( fname = 'STATUS_OFF' color-col = color_on )
+                        ( fname = 'STATUS_ON' color-col = color_on ) ).
+     WHEN abap_false.
+       "set color for switched off
+       color = VALUE #( ( fname = 'STATUS_OFF' color-col = color_off )
+                        ( fname = 'STATUS_ON' color-col = color_off ) ).
+   ENDCASE.
+
+ ENDMETHOD.
+
+
+ METHOD set_ui.
+
+ "for each parameter
+ LOOP AT params INTO DATA(param).
+
+   "check if ui entry exists
+   READ TABLE ui_params ASSIGNING FIELD-SYMBOL(&lt;ui_param&gt;) WITH KEY name = param-name.
+   IF sy-subrc &gt; 0.
+
+   CASE param-status.
+     WHEN abap_true.
+       "set parameter switched on
+       APPEND VALUE #( name = param-name
+                       text = param-text
+                       status_on = status_icon_on
+                       status_off = 'ON'
+                       t_color = set_color( abap_true )
+                       t_style = VALUE #( ( fieldname = 'STATUS_ON' style2 = alv_style2_no_border_right )
+                                          ( fieldname = 'STATUS_OFF' style2 = alv_style2_no_border_left ) )
+                     ) TO ui_params ASSIGNING &lt;ui_param&gt;.
+
+     WHEN abap_false.
+     "set parameter switched off
+       APPEND VALUE #( name = param-name
+                       text = param-text
+                       status_on = 'OFF'
+                       status_off = status_icon_off
+                       t_color = set_color( abap_false )
+                       t_style = VALUE #( ( fieldname = 'STATUS_ON' style2 = alv_style2_no_border_right )
+                                          ( fieldname = 'STATUS_OFF' style2 = alv_style2_no_border_left ) )
+                     ) TO ui_params ASSIGNING &lt;ui_param&gt;.
+
+   WHEN abap_undefined.
+     "Set parameter not yet defined
+     APPEND VALUE #( name = param-name
+                     text = param-text
+                     status_on = space
+                     status_off = space
+                     t_style = VALUE #( ( fieldname = 'STATUS_ON' style2 = alv_style2_no_border_right )
+                                        ( fieldname = 'STATUS_OFF' style2 = alv_style2_no_border_left ) )
+                   ) TO ui_params ASSIGNING &lt;ui_param&gt;.
+
+       ENDCASE.
+     ENDIF.
+   ENDLOOP.
+ ENDMETHOD.
+
+ METHOD handle_click.
+ "read parameter entries
+ READ TABLE ui_params ASSIGNING FIELD-SYMBOL(&lt;ui_param&gt;) INDEX e_row_id-index.
+ READ TABLE params ASSIGNING FIELD-SYMBOL(&lt;param&gt;) WITH KEY name = &lt;ui_param&gt;-name.
+
+ IF &lt;ui_param&gt;-status_on = status_icon_on OR
+   &lt;ui_param&gt;-status_on = status_icon_off.
+   "set switch to OFF
+   &lt;ui_param&gt;-status_on = 'OFF'.
+   &lt;ui_param&gt;-status_off = status_icon_off.
+   &lt;ui_param&gt;-t_color = set_color( abap_false ).
+   &lt;param&gt;-status = abap_false.
+ ELSE.
+   "Set switch to ON
+   &lt;ui_param&gt;-status_on = status_icon_on.
+   &lt;ui_param&gt;-status_off = 'ON'.
+   &lt;ui_param&gt;-t_color = set_color( abap_true ).
+   &lt;param&gt;-status = abap_true.
+ ENDIF.
+ "Make changes visible
+ grid-&gt;refresh_table_display( i_soft_refresh = abap_true ).
+ ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+
+ DATA(main) = NEW main( ).
+
+ main-&gt;add_parameter( name = 'DISPLAY_TECH_DESCR' text = 'Display technical description' status = abap_true ).
+ main-&gt;add_parameter( name = 'DISPLAY_VALUES' text = 'Display values' status = abap_false ).
+ main-&gt;add_parameter( name = 'AUTOSAVE' text = 'Autosave' status = abap_true ).
+ main-&gt;add_parameter( name = 'INST_CALC' text = 'Instant calculation' status = abap_undefined ).
+
+ main-&gt;init_grid( NEW cl_gui_docking_container( ratio = 60 side = cl_gui_docking_container=&gt;dock_at_bottom ) ).
+
+AT SELECTION-SCREEN.
+ "Enter on selection screen displays current parameters
+ DATA(params) = main-&gt;get_params( ).
+ cl_demo_output=&gt;display_data( params ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/moderne-ui-mit-altem-sapgui-und-alv-grid/">Moderne UI mit altem SAPGUI und ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

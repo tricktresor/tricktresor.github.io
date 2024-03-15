@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>V7 - SD Transporte Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/v7-sd-transporte/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 29 Nov 2013 17:00:28 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>V7 - SD Transporte Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Lieferungen löschen</title>
+		<link>/blog/lieferungen-loeschen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 23 Nov 2004 15:22:00 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[V7 - SD Transporte]]></category>
+		<category><![CDATA[Transport]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=293</guid>
+
+					<description><![CDATA[<p>In einem Transport k&#246;nnen Sie &#252;ber eine Customer-Function abfragen, ob Funktionscodes ausgef&#252;hrt werden d&#252;rfen. Leider wird beim L&#246;schen einer Lieferung die Lieferungsnummer selbst nicht &#252;bergeben. Ein fieser Trick hilft hier.</p>
+<p>Der Beitrag <a href="/blog/lieferungen-loeschen/">Lieferungen löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Transport k&ouml;nnen Sie &uuml;ber eine Customer-Function abfragen, ob Funktionscodes ausgef&uuml;hrt werden d&uuml;rfen. Leider wird beim L&ouml;schen einer Lieferung die Lieferungsnummer selbst nicht &uuml;bergeben. Ein fieser Trick hilft hier.<br /><P>Folgender Trick bezieht sich auf die <STRONG>Transaktion VT02n </STRONG>ab SAP R/3 Release 4.6</P><P>Das folgende Coding verbietet das L&ouml;schen einer Lieferung, wenn diese schon Warenausgang gebucht wurde.</P><P>Als Erstes m&uuml;ssen Sie die Erweiterung </P><P><STRONG>V56AFCCH</STRONG> &#8211; Transportbearbeitung: Pr&uuml;fen Funktionscode erlaubt</P><P>in ein Erweiterungsprojekt aufnehmen (Transaktion CMOD).</P><P>Im Funktionsexit EXIT_SAPMV56A_001 m&uuml;ssen Sie das vorgegebene Include anlegen und das folgende Coding hinterlegen:</P><P class="sap1">CASE i_fcode.<BR><FONT color="#fb2412">*** Pr&uuml;fen, ob Lieferung gel&ouml;scht werden darf:</FONT><BR>&nbsp; WHEN &#8216;MM_TPDL&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Datendeklaration</FONT><BR>&nbsp;&nbsp;&nbsp; DATA: l_tree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO cl_gui_alv_tree,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_wbstk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE wbstk,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_selected_node&nbsp;&nbsp;&nbsp; TYPE lvc_nkey,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_fieldname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE lvc_fname,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_vbeln&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE vbeln_vl,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_node_text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE lvc_value.</P><P class="sap1"><FONT color="#fb2412">*** Feldsymbol</FONT><BR>&nbsp;&nbsp;&nbsp; FIELD-SYMBOLS &lt;fs_treemodel&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Dirty Assign f&uuml;r das TreeModel in&nbsp;Transaktion VT02n</FONT><BR>&nbsp;&nbsp;&nbsp; ASSIGN (&#8216;(SAPLV56I_PLAN_SCREEN)G_VIEW_ADM-ASSG-REF_ALV_TREE&#8217;)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TO &lt;fs_treemodel&gt;.<BR>&nbsp;&nbsp;&nbsp; CHECK sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp; l_tree = &lt;fs_treemodel&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Den ausgew&auml;hlten Knoten ermitteln<BR></FONT>&nbsp;&nbsp;&nbsp; CALL METHOD l_tree-&gt;get_selected_item<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING&nbsp; e_selected_node = l_selected_node<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e_fieldname&nbsp;&nbsp;&nbsp;&nbsp; = l_fieldname<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.</P><P class="sap1">&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">***&nbsp;Nur weiter,&nbsp;wenn die Lieferung selbst markiert wurde:<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK l_fieldname = &#8216;&amp;Hierarchy&#8217;.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*** Der Knotentext enth&auml;lt die&nbsp;angeklickte Lieferung</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD l_tree-&gt;get_outtab_line<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING&nbsp; i_node_key&nbsp;&nbsp;&nbsp;&nbsp; = l_selected_node<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING&nbsp; e_node_text&nbsp;&nbsp;&nbsp; = l_node_text<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS node_not_found = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">***&nbsp;Pr&uuml;fung durchf&uuml;hren, ob Lieferung gel&ouml;scht werden darf<BR>*** In diesem Fall darf die Lieferung nicht gel&ouml;scht werden,<BR>*** wenn sie schon Warenausgang gebucht wurde</FONT><BR>&nbsp;&nbsp;&nbsp; SELECT SINGLE vbeln wbstk FROM vbuk <BR>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;INTO (l_vbeln, l_wbstk)<BR>&nbsp;&nbsp;&nbsp;&nbsp; WHERE vbeln = l_node_text.<BR>&nbsp;&nbsp;&nbsp;&nbsp;CHECK sy-subrc = 0.</P><P class="sap1">&nbsp;&nbsp;&nbsp; IF l_wbstk = &#8216;C&#8217;.<BR><FONT color="#fb2412">*** Ausnahme ausl&ouml;sen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE e001(zv7) with l_vbeln<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RAISING fcode_not_permitted.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">ENDCASE.</P><P class="sap1">&nbsp;</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/lieferungen-loeschen/">Lieferungen löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>AutoIt Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/autoit/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:52 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>AutoIt Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Auf Abwegen [AutoIt]</title>
+		<link>/blog/auf-abwegen-autoit/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sun, 31 Jan 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[AutoIt]]></category>
+		<category><![CDATA[PDF]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=462076</guid>
+
+					<description><![CDATA[<p>Meine ersten Erfahrungen mit AutoIT - einer freien BASIC-Programmiersprache. Die enorme Funktionsvielfalt und einfache Verwendung als auch die sehr gute und mit Beispielen gespickte Dokumentation haben mich sehr beeindruckt. Aber lest selbst...</p>
+<p>Der Beitrag <a href="/blog/auf-abwegen-autoit/">Auf Abwegen [AutoIt]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Zur Abwechslung dieses Mal nichts aus der Rubrik ABAP. Das Thema ist <a href="https://www.autoitscript.com/site/autoit/">AutoIT</a>. AutoIt ist ein Freeware BASIC-Dialekt, von dem <a href="http://stschnell.de/">Stefan </a>mir bereits einige Male erzählt hat. Er hat sogar SAP und AutoIt verbunden: <a href="http://scn.sap.com/docs/DOC-36116">SCN-Artikel</a>.</p>
+<p>Der Grund, weswegen ich AutoIt brauchte, ist der folgende: Von einer internen Internetseite wollte ich Daten (Artikel + Dokumente) automatisiert übernehmen. ABAP kommt da erst mal nicht in Frage&#8230; Also erinnerte ich mich an AutoIt. BASIC-Programmierung ist nicht schwer (dachte ich) und die Funktionen sind sehr gut und mit Beispielen dokumentiert (wusste ich von Stefan).</p>
+<p>Also ran ans Werk.</p>
+<h2>Voraussetzungen</h2>
+<p>Die von uns verwendete Community von der ich die Daten sammeln wollte, bietet eine einfache Möglichkeit, einen Artikel als PDF abzuspeichern: An die URL muss lediglich die Endung &#8220;.pdf&#8221; gehängt werde und der Artikel wird in eine PDF-Datei umgewandelt und direkt angezeigt.</p>
+<p>Leider werden als URLs nur Nummern verwendet, wie z.B. &#8220;DOC-1234&#8221;. Ich wollte die Datei natürlich nicht nur als DOC-1234.pdf speichern, sondern den Titel des Dokumentes als Dateiname verwenden.</p>
+<p>Automatisieren wollte ich die Ermittlung aller vorhandenen Dokumente und das Speichern der Datei unter einem sprechenden Namen.</p>
+<h2>Quelle: RSS</h2>
+<p>Durch Zufall bin ich darauf gestoßen, dass die Seite einen RSS-Feed mit den relevanten Informationen zur Verfügung stellt: URL + Titel.</p>
+<p>Die Idee war also, den RSS-Stream von allen Dokumenten zu speichern und dann in diesem mit Hilfe von AutoIt nach den entsprechenden Tags zu durchsuchen.</p>
+<h2>Erste Berührung mit AutoIt</h2>
+<p>Ich war darauf gefasst, dass ich bestimmte Aktionen mittels Rekorder aufzeichnen müsste um diese dann wieder abzuspeichern:</p>
+<ul>
+<li>Aufruf URL</li>
+<li>Markieren des Titels</li>
+<li>STRG-C um den Titel in den Zwischenspeicher zu kopieren</li>
+<li>Bewegen der Maus an den Bildschirmrand, damit das Speichern-Symbol erscheint</li>
+<li>Klick auf &#8220;Speichern&#8221;</li>
+<li>STRG-V um den Titel als Dateiname wieder einzufügen</li>
+</ul>
+<p>Nach ein paar Stunden Recherche und Ausprobieren war alles viel einfacher und es entstand ein kurzes AutoIt-Skript.</p>
+<p>Kurz zur Funktionsweise:</p>
+<p>Mit der Funktion <a href="https://www.autoitscript.com/autoit3/docs/functions/FileOpen.htm">FileOpen</a> wird der abgespeicherte RSS-Feed eingelesen.</p>
+<p>Mittels <a href="https://www.autoitscript.com/autoit3/docs/libfunctions/_StringBetween.htm">_StringBetween</a> konnte ich die URLs in ein einfaches Array laden. Für den Titel benutzte ich ein zweites Array.</p>
+<p>Die vorhandene Funktion <a href="https://www.autoitscript.com/autoit3/docs/functions/InetGet.htm">inetget </a>war wie für mich gemacht: Sie speichert eine übergebene URL als Datei.</p>
+<p>Ein Loop drum herum (FOR-NEXT, wir sind ja in BASIC!) und fertig war das Klau-äähhh-Migrations-Skript.</p>
+<h3>Direkter ist perfekter</h3>
+<p>Den Umweg über die Datei hätte ich mir sparen können, denn der folgende Code liest den RSS-Stream direkt in eine Variable:</p>
+<pre>Local $dRSS = inetread("http://www.website.de/feed/")
+Local $sRSS = BinaryToString($dRSS)</pre>
+<h3>Arrays</h3>
+<p>Die Arbeit mit Arrays ist anders, als mit &#8220;internen Tabellen&#8221;. AutoIt bietet eine Menge Funktionen an, um Arrays zu füllen und zu bearbeiten.</p>
+<p>Eine Datei kann zum Beispiel sehr einfach in ein Array geladen werden:</p>
+<p>#include &lt;File.au3&gt;<br />
+Dim $arCSV<br />
+$csvFile = &#8220;muster.csv&#8221;<br />
+_FileReadToArray($csvFile, $arCSV)</p>
+<p>Das eingelesene Array kann zu Kontrollzwecken mit <a href="https://www.autoitscript.com/autoit3/docs/libfunctions/_ArrayDisplay.htm">_ArrayDisplay </a>einfach angezeigt werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/01/2016-01-31_00-05-21.jpg" rel="attachment wp-att-462147"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-462147" src="https://tricktresor.com/wp-content/uploads/2016/01/2016-01-31_00-05-21.jpg" alt="2016-01-31_00-05-21" width="615" height="399" srcset="/wp-content/uploads/2016/01/2016-01-31_00-05-21.jpg 615w, /wp-content/uploads/2016/01/2016-01-31_00-05-21-300x195.jpg 300w" sizes="(max-width: 615px) 100vw, 615px" /></a></p>
+<h2>Erfahrungen</h2>
+<p>Natürlich bin ich erst über ein paar Umwege und mit tatkräftiger Unterstützung von Stefan dahin gekommen, aber ich muss sagen, dass mir AutoIt ausnehmend gut gefallen hat! Einfaches Dateihandling, viele Stringfunktionen, eine sehr gute Dokumentation mit Beispielen machten es mir wirklich einfach, mein Problem zu lösen.</p>
+<p>Nachdem ich mich daran gewöhnt habe, dass es bei BASIC IF-THEN heißt, und nicht nur einfach IF, ging die Arbeit mit AutoIt leicht von der Hand.</p>
+<p>Ich habe mich nur auf die Aufgabe konzentriert und wenig links und rechts geguckt. Was ich allerdings beim Recherchieren und Ausprobieren der Beispielprogramme gesehen habe: Es scheint schier unendliche Möglichkeiten zu geben, das Windows-System zu steuern. Einzelne Fenster von laufenden Applikationen können gesucht und &#8220;übernommen&#8221; werden. Auf viele Funktionen kann direkt zugegriffen werden.</p>
+<p>Probleme gab es mit der <a href="https://www.autoitscript.com/autoit3/docs/libfunctions/IE%20Management.htm">_IE-Bibliothek </a>zur Steuerung des Internet Explorers auf meinem Rechner. Ich musste erst den &#8220;sicheren Modus&#8221; abschalten, damit die Bibliothek ihren Dienst tun konnte. Letztendlich habe ich sie nicht benötigt, denn inetget ist die Perfekte Lösung, aber mit den _IE-Funktionen hätte ich dem Internet Explorer &#8220;Beine machen können&#8221;.</p>
+<h3>Editor</h3>
+<p>Der Editor ist einfach zu bedienen und bietet Syntax Highlighting, Autovervollständigung, eine Tidy-Code-Funktion und vieles Mehr.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/01/2016-01-30_23-47-14.jpg" rel="attachment wp-att-462078"><img decoding="async" class="alignnone size-full wp-image-462078" src="https://tricktresor.com/wp-content/uploads/2016/01/2016-01-30_23-47-14.jpg" alt="2016-01-30_23-47-14" width="483" height="399" srcset="/wp-content/uploads/2016/01/2016-01-30_23-47-14.jpg 483w, /wp-content/uploads/2016/01/2016-01-30_23-47-14-300x248.jpg 300w" sizes="(max-width: 483px) 100vw, 483px" /></a></p>
+<p>Insgesamt hat mit AutoIt sehr beeindruckt und ich werde es in Zukunft sicherlich öfter als Problemlösungswaffe in Betracht ziehen.</p>
+<h2>AutoIt-Skript</h2>
+<p>Folgend das erarbeitete Skript, das aus einem gespeicherten RSS-Feed die URLs aufruft und als Datei speichert.</p>
+<pre>#include &lt;FileConstants.au3&gt;
+#include &lt;MsgBoxConstants.au3&gt;
+#include &lt;WinAPIFiles.au3&gt;
+#include &lt;String.au3&gt;
+#include &lt;Array.au3&gt;
+#include &lt;InetConstants.au3&gt;</pre>
+<pre>Example()</pre>
+<pre>Func Example()
+ Local Const $sFilepath = "D:\temp\feed.xml"</pre>
+<pre> Local $hFileOpen = FileOpen($sFilepath, $FO_READ)
+ If $hFileOpen = -1 Then
+ MsgBox($MB_SYSTEMMODAL, "", "An error occurred when reading the file.")
+ Return False
+ EndIf</pre>
+<pre>; Read the contents of the file using the handle returned by FileOpen.
+ Local $sFileRead = FileRead($hFileOpen)</pre>
+<pre>; Close the handle returned by FileOpen.
+ FileClose($hFileOpen)</pre>
+<pre> Local $aArray = _StringBetween($sFileRead, "&lt;link&gt;", "&lt;/link&gt;", $STR_ENDISSTART)
+ Local $aArray_descr = _StringBetween($sFileRead, "&lt;title&gt;", "&lt;/title&gt;", $STR_ENDISSTART)</pre>
+<pre> For $index = 0 To _ArrayMaxIndex($aArray)
+  $url = $aArray[$index]</pre>
+<pre>  If StringLeft($url, 5) = "https" Then
+   inetget($url &amp; ".pdf", "D:\temp\jive\" &amp; $aArray_descr[$index] &amp; ".pdf")
+   Sleep(1000)
+  EndIf
+ Next</pre>
+<pre>EndFunc ;==&gt;Example</pre>
+<p>Der Beitrag <a href="/blog/auf-abwegen-autoit/">Auf Abwegen [AutoIt]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

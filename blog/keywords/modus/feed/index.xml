@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Modus Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/modus/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 10 Jun 2021 11:02:20 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Modus Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Aufmerksamkeit erlangen &#8211; SAPGUI Modus in den Vordergrund</title>
+		<link>/blog/aufmerksamkeit-erlangen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 10 Jun 2021 11:01:27 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Modus]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<guid isPermaLink="false">/?p=1029150</guid>
+
+					<description><![CDATA[<p>Obwohl der SAPGUI bereits als &#8220;tot&#8221; eingestuft wird, finden sich immer wieder neue Erkenntnisse&#8230; In diesem Beitrag zeige ich dir, wie du einen SAPGUI-Modus in den Vordergrund bringen kannst, um die Aufmerksamkeit des Anwenders zurückzuerlangen. Solange der Anwender nur SAPGUI-Modi anzeigt, wird der gewünschte SAPGUI-Modus in den Vordergrund kommen und die anderen Fenster überlagern. Sollte noch ein anderes Programm (Browser, Outlook, Excel etc.), dann wird der Wunsch nach Aufmerksamkeit durch ein Blinken des SAPGUI-Icons in...</p>
+<p>Der Beitrag <a href="/blog/aufmerksamkeit-erlangen/">Aufmerksamkeit erlangen &#8211; SAPGUI Modus in den Vordergrund</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Obwohl der SAPGUI bereits als &#8220;tot&#8221; eingestuft wird, finden sich immer wieder neue Erkenntnisse&#8230; In diesem Beitrag zeige ich dir, wie du einen SAPGUI-Modus in den Vordergrund bringen kannst, um die Aufmerksamkeit des Anwenders zurückzuerlangen. </p>
+
+
+
+<p>Solange der Anwender nur SAPGUI-Modi anzeigt, wird der gewünschte SAPGUI-Modus in den Vordergrund kommen und die anderen Fenster überlagern. Sollte noch ein anderes Programm (Browser, Outlook, Excel etc.), dann wird der Wunsch nach Aufmerksamkeit durch ein Blinken des SAPGUI-Icons in der Taskleiste angezeigt.</p>
+
+
+
+<p>Das folgende Programm kannst du in zwei verschiedenen Modi starten um den Effekt zu sehen. Die beiden Modi sollten möglichst übereinander (nicht nebeneinander) liegen, um den Effekt erkennen zu können.</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<pre class="wp-block-code"><code>REPORT zz_activate_gui_mode.
+
+*--------------------------------------------------------------------*
+* Programm in 2 verschiedenen Modi aufrufen und etwa 1 Sekunde versetzt starten!
+*--------------------------------------------------------------------*
+
+DO 10 TIMES.
+  CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+    EXPORTING
+      text = |Modus: { sy-modno }  Index: { sy-index }|.
+
+  CALL FUNCTION 'SAPGUI_SET_PROPERTY'
+    DESTINATION 'SAPGUI'
+    EXPORTING
+      property = 'ACTIVATE'
+      value    = 'X'
+    EXCEPTIONS
+      OTHERS   = 0.
+
+  WAIT UP TO 3 SECONDS.
+ENDDO.</code></pre>
+<p>Der Beitrag <a href="/blog/aufmerksamkeit-erlangen/">Aufmerksamkeit erlangen &#8211; SAPGUI Modus in den Vordergrund</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>OLE2 Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/ole2/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 30 Oct 2017 10:18:28 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>OLE2 Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Windowsdrucker mit VBScript ermitteln</title>
+		<link>/blog/windowsdrucker-mit-vbscript-ermitteln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 30 Oct 2017 10:18:28 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[WMI]]></category>
+		<category><![CDATA[Windows]]></category>
+		<category><![CDATA[OLE2]]></category>
+		<category><![CDATA[VBScript]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018186</guid>
+
+					<description><![CDATA[<p>VBScript ist ein starkes Instrument, um dem Windows-System Informationen zu entlocken. Stefan Schnell hat bereits einige Beispiele für die Verwendung von VBScript in ABAP geliefert (Siehe unten). Nachdem ich mit Stefans Hilfe kurz gezeigt habe, wie man die Bildschirmauflösung mittels VBScript ermitteln kann (Bildschirmauflösung ermitteln mit VBScript), hier noch ein Bespiel, das demonstriert, wie man das Ergebnis einer VBScript-Funktion zurück ins ABAP bekommt und wie man das Ergebnis als &#8220;Tabelle&#8221; übergeben kann. Code Das folgende...</p>
+<p>Der Beitrag <a href="/blog/windowsdrucker-mit-vbscript-ermitteln/">Windowsdrucker mit VBScript ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>VBScript ist ein starkes Instrument, um dem Windows-System Informationen zu entlocken. Stefan Schnell hat bereits einige Beispiele für die Verwendung von VBScript in ABAP geliefert (Siehe unten). Nachdem ich mit Stefans Hilfe kurz gezeigt habe, wie man die Bildschirmauflösung mittels VBScript ermitteln kann (Bildschirmauflösung ermitteln mit VBScript), hier noch ein Bespiel, das demonstriert, wie man das Ergebnis einer VBScript-Funktion zurück ins ABAP bekommt und wie man das Ergebnis als &#8220;Tabelle&#8221; übergeben kann.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/wmi_printer.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018187" src="https://tricktresor.com/wp-content/uploads/2017/10/wmi_printer.png" alt="" width="633" height="366" srcset="/wp-content/uploads/2017/10/wmi_printer.png 633w, /wp-content/uploads/2017/10/wmi_printer-300x173.png 300w, /wp-content/uploads/2017/10/wmi_printer-265x153.png 265w, /wp-content/uploads/2017/10/wmi_printer-148x85.png 148w, /wp-content/uploads/2017/10/wmi_printer-193x112.png 193w, /wp-content/uploads/2017/10/wmi_printer-71x40.png 71w" sizes="(max-width: 633px) 100vw, 633px" /></a></p>
+<h2>Code</h2>
+<p>Das folgende Beispielprogramm liefert alle im Windows installierten Drucker als Tabelle zurück.</p>
+<pre class="lang:abap decode:true">REPORT.
+
+
+CLASS lcl_wmi DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS get_printers RETURNING VALUE(result) TYPE string_table.
+ENDCLASS.
+
+CLASS lcl_wmi IMPLEMENTATION.
+
+  METHOD get_printers.
+
+    "-Macros--------------------------------------------------------------
+    DEFINE _.
+      vbscode = vbscode &amp;&amp; &amp;1 &amp;&amp; cl_abap_char_utilities=&gt;cr_lf.
+    END-OF-DEFINITION.
+
+    "-Variables-----------------------------------------------------------
+    DATA scriptctrl TYPE obj_record.
+    DATA vbscode TYPE string.
+    DATA result_string TYPE string.
+
+
+    "-Main----------------------------------------------------------------
+    _ 'Function GetPrinters()'.
+    _ '  Set oObj = GetObject("winmgmts:\\.\root\cimv2", "")'.
+    _ '  If IsObject(oObj) Then'.
+    _ '    Set colItems = oObj.ExecQuery("Select * from Win32_PrinterConfiguration",,48)'.
+    _ '    For Each oItem in colItems'.
+    _ '      Res = Res &amp; vbCrLf &amp; oItem.Description'.
+    _ '    Next'.
+    _ '    GetPrinters = Res'.
+    _ '  End If'.
+    _ 'End Function'.
+    CREATE OBJECT scriptctrl 'MSScriptControl.ScriptControl'.
+    CHECK sy-subrc = 0 AND scriptctrl-handle &lt;&gt; 0 AND scriptctrl-type = 'OLE2'.
+
+    DATA result_table TYPE STANDARD TABLE OF string.
+    "Set Property Of ScriptCtrl 'AllowUI' = 1.
+    SET PROPERTY OF scriptctrl 'Language' = 'VBScript'.
+    CALL METHOD OF scriptctrl 'AddCode' EXPORTING #1 = vbscode.
+    CALL FUNCTION 'AC_SYSTEM_FLUSH' EXCEPTIONS OTHERS = 1.
+    CALL METHOD OF scriptctrl 'Eval' = result_string EXPORTING #1 = 'GetPrinters()'.
+    CALL FUNCTION 'AC_SYSTEM_FLUSH' EXCEPTIONS OTHERS = 1.
+    FREE OBJECT scriptctrl.
+
+    SPLIT result_string AT cl_abap_char_utilities=&gt;cr_lf INTO TABLE result.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+START-OF-SELECTION.
+  DATA(result) = lcl_wmi=&gt;get_printers( ).
+  Write: / 'Installierte Drucker:'.
+  LOOP AT result INTO DATA(line).
+    WRITE: / line.
+  ENDLOOP.</pre>
+<p>&nbsp;</p>
+<h2>Neue Welten</h2>
+<p>Welche anderen Informationen noch auf Entdeckung im ABAP warten, kannst du auf dieser Microsoft-Seite herausfinden:</p>
+<p>https://msdn.microsoft.com/en-us/library/aa389273(v=vs.85).aspx</p>
+<p>Es ist eventuell eine ganz neue <em>Benutzererfahrung</em> möglich, wenn ein Programm mit langer Laufzeit, dass häufig auf mobilen Notebooks ausgeführt wird (zum Beispiel von Außendienstlern oder von Lagerarbeitern), vor Benutzung den <a href="https://msdn.microsoft.com/en-us/library/aa394074(v=vs.85).aspx">Batteriestatus</a> prüft. Wenn der Status &#8220;kritisch&#8221; ist, erfolgt die Meldung, dass das Notebook vor Ausführung evtl. lieber an Strom angeschlossen werden sollte&#8230;</p>
+<h2>Weiterführende Links</h2>
+<p><a href="https://blogs.sap.com/2014/05/14/how-to-use-vbscript-inside-abap-and-store-vbscript-source-as-include/">https://blogs.sap.com/2014/05/14/how-to-use-vbscript-inside-abap-and-store-vbscript-source-as-include/</a></p>
+<p><a href="https://wiki.scn.sap.com/wiki/display/Snippets/How+to+use+VBScript+in+ABAP">https://wiki.scn.sap.com/wiki/display/Snippets/How+to+use+VBScript+in+ABAP</a></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/windowsdrucker-mit-vbscript-ermitteln/">Windowsdrucker mit VBScript ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

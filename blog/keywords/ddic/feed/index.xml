@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>DDIC Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/ddic/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 05 Nov 2019 11:16:39 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>DDIC Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Änderung von Daten mit Hilfe desTabellenpflegedialogs</title>
+		<link>/blog/aenderung-von-daten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 21 Mar 2013 09:44:48 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[view]]></category>
+		<category><![CDATA[update]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=669</guid>
+
+					<description><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzuf&#252;gen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten m&#252;ssen zuvor gepr&#252;ft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugef&#252;gt wurden, durchlaufen.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um Daten, die in einem Tabellenpflegedialog verarbeitet werden, automatisiert hinzuzufügen, muss ein Funktionsbaustein aufgerufen werden, der dies tut. Die Daten müssen zuvor geprüft sein. Der Funktionsbaustein tut dies leider nicht.Es werden dann aber alle Erweiterungen, die durch Zeitpunkte hinzugefügt wurden, durchlaufen.</p>
+<p>Folgendes &#8211; zugegebener Maßen durch Copy and Paste zusammengeschusterte Programm &#8211; demonstriert das Hinzufügen bzw. die Änderung eines Datensatzes in der Tabelle ZTEST1:</p>
+<p class="head1">Felder der Tabelle:</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>FELD1</li>
+<li>FELD2</li>
+</ul>
+<p class="head1">Anmerkungen</p>
+<p>Die Tabellendefinition mit OCCURS ist nicht mehr aktuell.</p>
+<p>Das Coding ist Halb-generisch&#8230; Wo es ohne viel Aufwand möglich war, habe ich versucht, die Tabelle ZTEST1 generisch zu verwenden</p>
+<ul>
+<li>Zuweisung der Werte in TOTAL</li>
+<li>SELECT</li>
+</ul>
+<p>Allerdings habe ich dies nicht stringent verfolgt:</p>
+<ul>
+<li>WHERE_Bedingung ist nicht generisch</li>
+<li>Struktur-Definition ist nicht dynamisch</li>
+</ul>
+<p>Dieses Programm soll auch in erster Linie die Verwendung des Bausteins VIEW_MAINTENANCE_LOW_LEVEL demonstrieren. Ich wollte jedoch darauf achten, dass die Verwendung auch einigermaßen variabel möglich ist.</p>
+<p class="head1">Coding</p>
+<p class="sap1">REPORT.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Selection Screen</span><br />
+PARAMETERS matnr TYPE ztest1-matnr DEFAULT &#8216;1234&#8217;.<br />
+PARAMETERS feld1 TYPE ztest1-feld1 DEFAULT &#8216;TESTFELD1&#8217;.<br />
+PARAMETERS feld2 TYPE ztest1-feld2 DEFAULT &#8216;Hier ist ein Test&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Macro für die Definition der notwendigen Tabellenstruktur</span><br />
+DEFINE _define_vim_tables.<br />
+data: begin of extract_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end   of extract_data.</p>
+<p class="sap1">  data: begin of total_data occurs 01.<br />
+include structure &amp;1.<br />
+include structure vimflagtab.<br />
+data: end of total_data.<br />
+END-OF-DEFINITION.</p>
+<p class="sap1">DATA:   sellist     LIKE vimsellist OCCURS 10 WITH HEADER LINE,<br />
+fu_to_excl  LIKE vimexclfun OCCURS 10 WITH HEADER LINE,<br />
+x_header    LIKE vimdesc    OCCURS 1,<br />
+x_namtab    LIKE vimnamtab  OCCURS 1,<br />
+hlp_sellist LIKE vimsellist OCCURS 0 WITH HEADER LINE,<br />
+corr_keytab LIKE e071k      OCCURS 0.</p>
+<p class="sap1">CONSTANTS viewname TYPE tabname VALUE &#8216;ZTEST1&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Definition der notwendigen Tabellen mit MARK- und ACTION-Flag</span><br />
+_define_vim_tables ztest1.</p>
+<p class="sap1">FIELD-SYMBOLS &lt;f&gt; TYPE ANY.</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufbau Selektionskriterien<br />
+</span>  CLEAR: sellist.<br />
+sellist-viewfield = &#8216;MATNR&#8217;.<br />
+sellist-operator  = &#8216;EQ&#8217;.<br />
+sellist-value     = matnr.<br />
+sellist-and_or    = space.<br />
+APPEND sellist.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Struktur der Tabelle ermitteln<br />
+</span>  CALL FUNCTION &#8216;VIEW_GET_DDIC_INFO&#8217;<br />
+EXPORTING<br />
+viewname        = viewname<br />
+TABLES<br />
+x_header        = x_header<br />
+x_namtab        = x_namtab<br />
+sellist         = hlp_sellist<br />
+EXCEPTIONS<br />
+no_tvdir_entry  = 3<br />
+table_not_found = 5.</p>
+<p class="sap1">  ASSIGN COMPONENT &#8216;MATNR&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = matnr.<br />
+ASSIGN COMPONENT &#8216;FELD1&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld1.<br />
+ASSIGN COMPONENT &#8216;FELD2&#8217; OF STRUCTURE total_data TO &lt;f&gt;. &lt;f&gt; = feld2.<br />
+ASSIGN COMPONENT &#8216;ACTION&#8217; OF STRUCTURE total_data TO &lt;f&gt;.<br />
+SELECT COUNT(*) FROM (viewname) WHERE matnr = matnr.<br />
+IF sy-subrc = 0.<br />
+<span style="color: #fb2412;">*== Satz ist vorhanden: Änderung</span><br />
+&lt;f&gt; = &#8216;U&#8217;.<br />
+ELSE.<br />
+<span style="color: #fb2412;">*== Satz ist neu<br />
+</span>    &lt;f&gt; = &#8216;N&#8217;.<br />
+ENDIF.<br />
+APPEND total_data.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Aufruf des Bausteins</span><br />
+CALL FUNCTION &#8216;VIEW_MAINTENANCE_LOW_LEVEL&#8217;<br />
+EXPORTING<br />
+corr_number               = &#8216; &#8216;<br />
+fcode                     = &#8216;SAVE&#8217;<br />
+view_action               = &#8216;U&#8217;<br />
+view_name                 = viewname<br />
+TABLES<br />
+corr_keytab               = corr_keytab<br />
+dba_sellist               = hlp_sellist<br />
+dpl_sellist               = hlp_sellist<br />
+excl_cua_funct            = fu_to_excl<br />
+extract                   = extract_data<br />
+total                     = total_data<br />
+x_header                  = x_header<br />
+x_namtab                  = x_namtab<br />
+EXCEPTIONS<br />
+function_not_found        = 1<br />
+missing_corr_number       = 2<br />
+no_value_for_subset_ident = 3<br />
+saving_correction_failed  = 4<br />
+OTHERS                    = 5.<br />
+IF sy-subrc = 0.<br />
+COMMIT WORK.<br />
+ENDIF.</p>
+<p>Der Beitrag <a href="/blog/aenderung-von-daten/">Änderung von Daten mit Hilfe desTabellenpflegedialogs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Interne Tabelle DDIC</title>
+		<link>/blog/interne-tabelle-ddic/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2012 13:57:36 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[assign component]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[cl_abap_typedescr]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[create data]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[cl_abap_tabledescr]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=655</guid>
+
+					<description><![CDATA[<p>Eine interne Tabelle anhand einer gegebenen DDIC-Struktur erzeugen und Ausgabe als einfache Liste</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-ddic/">Interne Tabelle DDIC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine interne Tabelle anhand einer gegebenen DDIC-Struktur erzeugen und Ausgabe als einfache Liste</p>
+<p class="head1">Verwendung</p>
+<p>Die in diesem Beispiel verwendete Möglichkeit interne Tabellen und Arbeitsbereiche dynamisch zu erzeugen kann verwendet werden, wenn der Inhalt einer Datenbanktabelle ausgelesen werden soll.</p>
+<p>So könnte man zum Beispiel ein Programm schreiben, das alle Tabellen ausliest, in denen das Datenelement &#8220;MATNR&#8221; vor kommt. Für jede Tabelle wird dann dynamisch eine interne Tabelle generiert und mittels ASSIGN COMPONENT &#8216;MATNR&#8217; könnten dynamisch Prüfungen auf die Materialnummer erfolgen.</p>
+<p class="head1">Coding</p>
+<p class="sap1"><span style="color: #fb2412;">*== data</span><br />
+DATA gr_struct     TYPE REF TO cl_abap_structdescr.<br />
+DATA gr_table      TYPE REF TO cl_abap_tabledescr.<br />
+DATA gd_table      TYPE REF TO data.<br />
+DATA gd_line       TYPE REF TO data.</p>
+<p class="sap1"><span style="color: #fb2412;">*== field symbols</span><br />
+FIELD-SYMBOLS &lt;workarea&gt; TYPE ANY.<br />
+FIELD-SYMBOLS &lt;table&gt;    TYPE ANY TABLE.<br />
+FIELD-SYMBOLS &lt;value&gt;    TYPE ANY.</p>
+<p class="sap1">PARAMETERS p_table TYPE tabname DEFAULT &#8216;T000&#8217;.</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*== get structure description</span><br />
+gr_struct  ?= cl_abap_typedescr=&gt;describe_by_name( p_table ).<br />
+*== create table description using structure description<br />
+gr_table   ?= cl_abap_tabledescr=&gt;create( gr_struct ).</p>
+<p class="sap1"><span style="color: #fb2412;">*== create work area</span><br />
+CREATE DATA gd_line TYPE HANDLE gr_struct.<br />
+ASSIGN gd_line-&gt;* TO &lt;workarea&gt;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== create internal table</span><br />
+CREATE DATA gd_table TYPE HANDLE gr_table.<br />
+ASSIGN gd_table-&gt;* TO &lt;table&gt;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== select data from database into dynamically generated internal table</span><br />
+SELECT * FROM (p_table)<br />
+INTO CORRESPONDING FIELDS OF TABLE &lt;table&gt; UP TO 20 ROWS.</p>
+<p class="sap1"><span style="color: #fb2412;">*== loop at all table lines for output</span><br />
+LOOP AT &lt;table&gt; ASSIGNING &lt;workarea&gt;.<br />
+NEW-LINE.<br />
+DO.<br />
+<span style="color: #fb2412;">*== loop at all components of the structure</span><br />
+ASSIGN COMPONENT sy-index OF STRUCTURE &lt;workarea&gt; TO &lt;value&gt;.<br />
+IF sy-subrc &gt; 0.<br />
+EXIT.<br />
+ELSE.<br />
+<span style="color: #fb2412;">*== and write into list</span><br />
+WRITE &lt;value&gt; COLOR COL_NORMAL.<br />
+ENDIF.<br />
+ENDDO.<br />
+ENDLOOP.</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-ddic/">Interne Tabelle DDIC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Laufzeitinformation über interne Tabelle</title>
+		<link>/blog/laufzeitinformation-ueber-interne-tabelle/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2011 15:10:28 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=628</guid>
+
+					<description><![CDATA[<p>Zur Laufzeit Informationen &#252;ber im Report deklarierte Objekte (Strukturen, Tabellen, etc.) zu bekommen ist mithilfe der RTTI-Klassen (RTTI = Run Time Type Information) recht einfach. Man muss nur wissen, dass es sie gibt...</p>
+<p>Der Beitrag <a href="/blog/laufzeitinformation-ueber-interne-tabelle/">Laufzeitinformation über interne Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Zur Laufzeit Informationen über im Report deklarierte Objekte (Strukturen, Tabellen, etc.) zu bekommen ist mithilfe der RTTI-Klassen (RTTI = Run Time Type Information) recht einfach. Man muss nur wissen, dass es sie gibt&#8230;</p>
+<p>Mit dem folgenden Programm werden die Langtexte der im Datenelement hinterlegten Felddefinitionen einer internen Struktur ermittelt.</p>
+<h2>Ausgabe</h2>
+<p>Das Programm erzeugt eine Liste mit allen in der Struktur &#8220;WA_TAB&#8221; vorhandenen Felder mit der Information, ob das Feld einen Bezug zum Data Dictionary hat und falls ja: den Langtext zum Datenelement.</p>
+<pre>Info | Feld | Beschreibung des Feldes</pre>
+<h2>Coding</h2>
+<pre>REPORT.
+*== Types
+TYPES: BEGIN OF ty_test,
+         langu TYPE sylangu,
+         abcde TYPE syabcde,
+       END OF ty_test.
+
+*== data
+DATA: BEGIN OF wa_tab,
+        kunnr  LIKE knvv-kunnr,
+        matnr  LIKE mara-matnr,
+        maktx  LIKE makt-maktx,
+        kbetr  LIKE konp-kbetr,
+        flag   TYPE c LENGTH 10, " Ohne DDIC
+        werks  TYPE werks_d,     " Datenelement
+        test   TYPE ty_test,     " Struktur!!
+      END OF wa_tab.
+
+START-OF-SELECTION.
+*== explore structure:
+  PERFORM show_struc_info.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  struc
+*&amp;---------------------------------------------------------------------*
+FORM struc USING value(istruc).
+  DATA  cl_type               TYPE REF TO cl_abap_typedescr.
+  DATA  cl_struc              TYPE REF TO cl_abap_structdescr.
+  DATA  cl_elem               TYPE REF TO cl_abap_elemdescr.
+  FIELD-SYMBOLS &lt;fs_comps&gt;    TYPE abap_compdescr.
+  DATA  l_type_kind           TYPE abap_typekind.
+  DATA  l_name                TYPE string.
+  FIELD-SYMBOLS &lt;fs_any&gt;      TYPE ANY.
+  DATA wa_dfies               TYPE dfies.
+
+  cl_struc ?= cl_abap_datadescr=&gt;describe_by_data( p_data = istruc  ). 
+*== check each element of given structure 
+  LOOP AT cl_struc-&gt;components ASSIGNING &lt;fs_comps&gt;. 
+    ASSIGN COMPONENT &lt;fs_comps&gt;-name OF STRUCTURE istruc TO &lt;fs_any&gt;. 
+    IF sy-subrc EQ 0. 
+*== Describe field 
+      DESCRIBE FIELD &lt;fs_any&gt; TYPE l_type_kind. 
+      IF l_type_kind CA 'uv'. 
+*== again a structure... 
+        PERFORM struc USING &lt;fs_any&gt;. 
+      ELSE.
+*== Element: get definition 
+        cl_elem ?= cl_abap_datadescr=&gt;describe_by_data( p_data = &lt;fs_any&gt;  ). 
+*== Name of field 
+        l_name = cl_elem-&gt;get_relative_name( ). 
+*== if referenced to dictionary 
+        IF cl_elem-&gt;is_ddic_type( ) = 'X'. 
+          TRY. 
+*== get information from dictionary 
+            wa_dfies = cl_elem-&gt;get_ddic_field( ). 
+            WRITE : / 'DDIC:', 12 &lt;fs_comps&gt;-name, wa_dfies-scrtext_l. 
+          CATCH cx_root. 
+            CLEAR wa_dfies. 
+            WRITE : / 'Error DDIC:', 12 &lt;fs_comps&gt;-name, l_name. 
+          ENDTRY. 
+        ELSE. 
+*== If no dictionary reference: use elements name 
+          WRITE : / 'No DDIC:', 12 &lt;fs_comps&gt;-name, l_name. 
+        ENDIF. 
+      ENDIF. 
+    ENDIF. 
+  ENDLOOP.
+
+ENDFORM.                    "struc 
+*&amp;---------------------------------------------------------------------* 
+*&amp;      Form  show_struc_info 
+*&amp;---------------------------------------------------------------------* 
+FORM show_struc_info.
+  DATA  l_type_kind           TYPE abap_typekind. 
+*== Which kind of data? 
+  l_type_kind = cl_abap_datadescr=&gt;get_data_type_kind( p_data = wa_tab ). 
+*== extract structures 
+  IF l_type_kind CA 'uv'. 
+    PERFORM struc USING wa_tab. 
+  ENDIF. 
+
+ENDFORM.                    " test_struct</pre>
+<p>Der Beitrag <a href="/blog/laufzeitinformation-ueber-interne-tabelle/">Laufzeitinformation über interne Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Datenbank-View inkludieren</title>
+		<link>/blog/datenbank-view-inkludieren/</link>
+					<comments>/blog/datenbank-view-inkludieren/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 08 Apr 2011 09:32:33 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=593</guid>
+
+					<description><![CDATA[<p>Wenn mehrere Tabellen in einem Datenbank-View zusammengefasst werden sollen, dann ist es nicht unbedingt ratsam, alle Felder der Tabelle einzeln aufzunehmen. Das geht zwar &#252;ber den Button "Tabellenfelder" sehr einfach, aber neue Felder in einer der Tabellen taucht dann nicht im View auf. Hier die Patentl&#246;sung...</p>
+<p>Der Beitrag <a href="/blog/datenbank-view-inkludieren/">Datenbank-View inkludieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wenn mehrere Tabellen in einem Datenbank-View zusammengefasst werden sollen, dann ist es nicht unbedingt ratsam, alle Felder der Tabelle einzeln aufzunehmen. Das geht zwar &uuml;ber den Button &#8220;Tabellenfelder&#8221; sehr einfach, aber neue Felder in einer der Tabellen taucht dann nicht im View auf. Hier die Patentl&ouml;sung&#8230;<br /><P class="head1">Datenbanktabelle inkludieren</P><P>SAP bietet in der Pflege zu Datenbank-Views die M&ouml;glichkeit, alle Felder einer Tabelle in den View einzubinden. Hierzu m&uuml;ssen im &#8220;Viewfeld&#8221; sowie im &#8220;Feldnamen&#8221; ein Sternchen eingetragen werden:</P><P><IMG src="/wp-content/uploads/tt_images/DBView.jpg"></P><P class="head1">Vorteile</P><P>Das hat die folgenden Vorteile:</P><UL><LI>Der View sieht &uuml;bersichtlicher aus. <LI>&Auml;nderungen in den Tabellen werden auch in den View &uuml;bernommen.</LI></UL><P class="head1">Vorhandene Feldnamen</P><P>Es kann allerdings sein, dass bei dieser Methode Feldnamen im View doppelt vorhanden sind. Verkn&uuml;pft man z.B. die Tabelle MARA und MARC in einem View, dann sind die Felder MANDT und MATNR doppelt vorhanden.</P><P>Es gibt nun zwei M&ouml;glichkeiten, dieses Problem zu l&ouml;sen:</P><OL><LI>Wenn Felder nicht ben&ouml;tigt werden, k&ouml;nnen sie mit einem Minus-Zeichen (&#8220;-&#8220;) ausgeblendet werden (Siehe Screenshot)</LI><LI>Doppelt vorhandene Felder k&ouml;nnen auch mit einem anderen Namen in den View aufgenommen werden, m&uuml;ssen dann aber nat&uuml;rlich ebenfalls explizit benannt werden.</LI></OL><P class="head1">Nachteile</P><P>Meiner Meinung nach gibt es bei dieser Variante des Inkludierens zwei Nachteile:</P><OL><LI>Es ist nicht auf den ersten Blick erkennbar, welche Felder in dem View vorhanden sind. Daf&uuml;r muss man in den Data Browser (SE16n) wechseln oder in der SE11 das Laufzeitobjekt ansehen.</LI><LI>In dem Datenbank-View ist hinterher nicht mehr erkennbar, welches Feld aus welche Tabelle kommt. Das ist aber ein generelles Problem von Views und hat eigentlich nichts direkt mit dem inkludieren zu tun. Sch&ouml;n w&auml;re ein Funktion, mit der man &#8220;named includes&#8221;&nbsp;verwenden k&ouml;nnte, also z.B. MARA_* um &nbsp;vor allen Feldnamen aus der Tabelle MARA den Prefix &#8220;MARA_&#8221; zu haben.</LI></OL><P><STRONG><U>SAP-Doku: <BR></U></STRONG><A href="http://help.sap.com/saphelp_erp60_sp/helpdata/DE/cf/21ec5d446011d189700000e8322d00/frameset.htm" Target="_blank">http://help.sap.com/saphelp_erp60_sp/helpdata/DE<BR>/cf/21ec5d446011d189700000e8322d00/frameset.htm</A></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/datenbank-view-inkludieren/">Datenbank-View inkludieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/datenbank-view-inkludieren/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Feld generisch umsetzen</title>
+		<link>/blog/feld-generisch-umsetzen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 21 Aug 2008 11:30:37 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=508</guid>
+
+					<description><![CDATA[<p>Aus verschiedenen Gr&#252;nden k&#246;nnte es sein, dass Sie Werte eines bestimmten Feldes auf der Datenbank &#228;ndern m&#246;chten. Normalerweise schreiben Sie dazu ein Programm, dass die Daten f&#252;r jede Tabelle einliest, das Feld &#228;ndert und die Daten wieder zur&#252;ck schreibt. Wir pr&#228;sentieren Ihnen hier eine generelle L&#246;sung...</p>
+<p>Der Beitrag <a href="/blog/feld-generisch-umsetzen/">Feld generisch umsetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Aus verschiedenen Gr&uuml;nden k&ouml;nnte es sein, dass Sie Werte eines bestimmten Feldes auf der Datenbank &auml;ndern m&ouml;chten. Normalerweise schreiben Sie dazu ein Programm, dass die Daten f&uuml;r jede Tabelle einliest, das Feld &auml;ndert und die Daten wieder zur&uuml;ck schreibt. Wir pr&auml;sentieren Ihnen hier eine generelle L&ouml;sung&#8230;<br /><P>Das folgende Programm enth&auml;lt eine Routine, mit der Sie generell ein Feld in einer beliebigen Tabelle &auml;ndern k&ouml;nnen.</P><P>Die Umsetzung m&uuml;ssen Sie f&uuml;r Ihren Fall nat&uuml;rlich anpassen. </P><P class="head2">Problemstellung</P><P>In einem CHAR(6)-Feld steht eine Nummer mit f&uuml;hrenden Nullen, z.B.&nbsp;000034. Das zugrundeliegende Datenelement soll ab auf ein zweistelliges Characterfeld umgesetzt werden. Bei einer &Auml;nderung und anschliessenden Umsetzung der Datenbank w&uuml;rden einfach die ersten beiden Stellen (00) genommen werden. Die eigentliche Information geht also verloren. Handelt es sich um ein Schl&uuml;sselfeld, so gehen gehen sogar Datens&auml;tze verloren!</P><P class="head2">L&ouml;sungsansatz</P><P>In diesem speziellen Fall wird&nbsp;die sechsstellige Nummer, die in einem Characterfeld gespeichert ist, auf eine zweistellige Nummer umgesetzt.</P><P>Da es sich um ein Schl&uuml;sselfeld handelt, werden die vorhandenen Datens&auml;tze gelesen, gel&ouml;scht, umgesetzt und anschlie&szlig;end wieder eingef&uuml;gt.</P><P class="head1">Coding</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* Report&nbsp; ZZUMS1<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>REPORT&nbsp; zzums1.</P><P class="sap1">PARAMETERS p_u1 AS CHECKBOX DEFAULT space.<BR>PARAMETERS p_u2 AS CHECKBOX DEFAULT space.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1">&nbsp; IF p_u1 &lt;&gt; space. <BR>&nbsp;&nbsp;&nbsp; PERFORM change USING &#8216;ZZTAB1&#8217;.&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; IF p_u2 &lt;&gt; space. <BR>&nbsp;&nbsp;&nbsp; PERFORM change USING &#8216;ZZTAB2&#8217;.&nbsp;&nbsp;&nbsp; <BR>&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; change<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM change USING fi_tabname.</P><P class="sap1"><FONT color="#fb2412">*** data</FONT><BR>&nbsp; DATA dref&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO data.<BR>&nbsp; FIELD-SYMBOLS &lt;table&gt; TYPE ANY TABLE.<BR>&nbsp; FIELD-SYMBOLS &lt;wa&gt;&nbsp;&nbsp;&nbsp; TYPE ANY.<BR>&nbsp; FIELD-SYMBOLS &lt;value&gt; TYPE ANY.</P><P class="sap1"><FONT color="#fb2412">*** create table dynamically</FONT><BR>&nbsp; CREATE DATA dref TYPE STANDARD TABLE OF (fi_tabname).</P><P class="sap1"><FONT color="#fb2412">*** assign referenced table to table-field-symbol</FONT><BR>&nbsp; ASSIGN dref-&gt;* TO &lt;table&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Print protocol</FONT><BR>&nbsp; WRITE: / fi_tabname.</P><P class="sap1"><FONT color="#fb2412">*** Select data into internal table</FONT><BR>&nbsp; SELECT * FROM (fi_tabname) INTO TABLE &lt;table&gt;.</P><P class="sap1">&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** in this case the field to be changed is a key field&#8230;<BR>*** delete existing entries</FONT><BR>&nbsp;&nbsp;&nbsp; DELETE (fi_tabname) FROM TABLE &lt;table&gt;.</P><P class="sap1"><FONT color="#fb2412">*** set new value for each entry</FONT><BR>&nbsp;&nbsp;&nbsp; LOOP AT &lt;table&gt; ASSIGNING &lt;wa&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN COMPONENT &#8216;FIELDNAME&#8217; OF STRUCTURE &lt;wa&gt; TO &lt;value&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SHIFT &lt;value&gt; LEFT BY 4 PLACES.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.</P><P class="sap1"><FONT color="#fb2412">*** and insert changed entries</FONT><BR>&nbsp;&nbsp;&nbsp; INSERT (fi_tabname) FROM TABLE &lt;table&gt;.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** everything ok: commit changes</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: &#8216;Modify ok, Entries:&#8217;, sy-dbcnt.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; COMMIT WORK.<BR>&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*** something went wrong: rollback</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: &#8216;Modify failure!&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ROLLBACK WORK.<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** protocol</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: &#8216;Nothing selected&#8230;&#8217;.<BR>&nbsp; ENDIF.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </P></p>
+<p>Der Beitrag <a href="/blog/feld-generisch-umsetzen/">Feld generisch umsetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Suchfunktion</title>
+		<link>/blog/suchfunktion/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Jul 2008 11:51:08 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=499</guid>
+
+					<description><![CDATA[<p>Ein Tabellenpflegedialog besitzt leider zwei elementare Funktionen nicht: Sortieren und Suchen. Wie eine Suchfunktion eingebaut werden kann, zeigen wir Ihnen in diesem Beitrag!</p>
+<p>Der Beitrag <a href="/blog/suchfunktion/">Suchfunktion</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein Tabellenpflegedialog besitzt leider zwei elementare Funktionen nicht: Sortieren und Suchen. Wie eine Suchfunktion eingebaut werden kann, zeige  ich dir in diesem Beitrag!</p>
+<p>Um die Suchfunktion einzubauen, muss das generierte Pflegedynpro angepasst werden. <strong>Die Änderung ist also weg, sobald der Pflegedialog neu generiert wird!!</strong></p>
+<h2 class="head1">Vorbereitung</h2>
+<p>Zuerst muss ein Druckknopf zum Suchen eingebaut werden. Dies kann zum Einen über den Zeitpunkt &#8220;<strong>ST &#8211; Name des Trägerprogramms für das GUI-Menü</strong>&#8221; erreicht werden. Die einfachere Möglichkeit ist jedoch, einfach einen Druckknopf mit dem Fernglas auf das Dynpro zu bauen. Weisen Sie den Funktionscode <strong>&#8220;ZZFIND&#8221;</strong> zu.</p>
+<p>Dann muss in der Ablauflogik ein neues Modul angelegt werden:</p>
+<pre class="lang:abap decode:true ">      MODULE liste_update_liste.
+    ENDCHAIN.
+  ENDLOOP.
+  MODULE zz_usercommand.
+  MODULE liste_after_loop.</pre>
+<p>Wichtig ist, dass das Modul <strong>vor </strong>dem Modul LISTE_AFTER_LOOP steht!</p>
+<p>Ein Doppelklick auf zz_usercommand legt dieses an. Hier solltest du einen Unterroutinenaufruf gleichen Namens machen:</p>
+<pre class="lang:abap decode:true ">PERFORM zz_usercommand.</pre>
+<p>Nachdem du dies Routine angelegt hast, füge den folgenden Code ein:</p>
+<pre class="lang:abap decode:true ">FORM zz_usercommand .
+
+  DATA lv_searchtext TYPE text30.
+  DATA lv_action     TYPE c.
+  DATA ls_myview     LIKE zmyview_extract.
+
+  CASE sy-ucomm.
+    WHEN 'ZZFIND'.
+*** Ask for search string
+      CALL FUNCTION 'POPUP_TO_SEARCH_VALUE'
+        EXPORTING
+          textline1   = 'Suchtext'
+          titel       = 'Einträge suchen'
+          valuelength = 30
+        IMPORTING
+          action      = lv_action
+          value       = lv_searchtext
+        EXCEPTIONS
+          OTHERS      = 2.
+      IF lv_action = 'J'.
+*** search...
+        CLEAR mark_extract.
+*** each line
+        LOOP AT total INTO ls_myview.
+          IF ls_org CS lv_searchtext.
+*** and mark if found
+            ls_myview-mark = 'M'.
+            ADD 1 TO mark_extract.
+          ELSE.
+            ls_myview-mark = space.
+          ENDIF.
+          MODIFY total FROM ls_myview.
+        ENDLOOP.
+*** Display all marked entries
+        function = 'ALMK'.
+      ENDIF.
+  ENDCASE.
+
+ENDFORM.                    " zz_usercommand</pre>
+<p>Ersetze &#8220;MYVIEW&#8221; durch den Namen deines Views oder Tabelle.</p>
+<h2 class="head1">Ergebnis</h2>
+<p>Du hast nun einen Druckknopf zum Suchen auf Ihrem Pflegedynpro. Nach Drücken erscheint ein Popup, das nach einem Suchstring fragt.</p>
+<p>Alle gefundenen Einträge werden angezeigt.</p>
+<p>Der Beitrag <a href="/blog/suchfunktion/">Suchfunktion</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Struktur per Programm anlegen</title>
+		<link>/blog/struktur-per-programm-anlegen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Feb 2007 19:05:44 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=400</guid>
+
+					<description><![CDATA[<p>Im Customizing zu den Nachrichtenarten werden die Tabellen zu den Zugriffsfolgen generiert. Mit dem folgenden Programm k&#246;nnen Sie so eine automatische Generierung nachvollziehen.</p>
+<p>Der Beitrag <a href="/blog/struktur-per-programm-anlegen/">Struktur per Programm anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im Customizing zu den Nachrichtenarten werden die Tabellen zu den Zugriffsfolgen generiert. Mit dem folgenden Programm können Sie so eine automatische Generierung nachvollziehen.</p>
+<pre>*---------------------------------------------------------------------*
+* Report  Z_GEN_LAENDER
+*---------------------------------------------------------------------*
+* Erzeugen einer Dictionary-Struktur
+* o Für jedes Land in der Ländertabelle, dessen Länderkürzel mit "D"
+*   beginnt, wird ein Feldname angelegt beginnend mit LAND_
+* o Die Struktur wird der Entwicklungsklasse aus dem Selektionsbild
+*   zugeordnet
+* o Die Struktur wird in einen Transportauftrag aufgenommen
+*---------------------------------------------------------------------*
+
+REPORT  z_GEN_LAENDER.
+
+DATA lt_t005      TYPE STANDARD TABLE OF t005.
+DATA ls_t005      TYPE                   t005.
+
+PARAMETERS: p_tab TYPE tabname  DEFAULT 'Z_LAENDER',
+            p_dcl type devclass default 'Z_VERKAUF'.
+
+START-OF-SELECTION.
+
+  PERFORM selection.
+  PERFORM structure.
+  PERFORM tadirentry.
+  PERFORM transport.
+  MESSAGE s000(vz) WITH 'Struktur wurde angelegt'.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  selection
+*&amp;---------------------------------------------------------------------*
+FORM selection.
+
+*** Alle Länder, deren Kürzel mit D beginnt einlesen
+  SELECT * FROM t005 INTO TABLE lt_t005
+   WHERE land1 LIKE 'D%'.
+
+*** Sort
+  SORT lt_t005.
+
+ENDFORM.                    "selection
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  structure
+*&amp;---------------------------------------------------------------------*
+FORM structure.
+
+  DATA ls_dd02v     TYPE dd02v.
+  DATA ls_dd09l     TYPE dd09l.
+  DATA lt_dd03p     TYPE STANDARD TABLE OF dd03p.
+  DATA ls_dd03p     TYPE dd03p.
+
+*** Struktur
+  CLEAR ls_dd02v.
+  ls_dd02v-tabname      = p_tab.
+  ls_dd02v-ddlanguage   = 'D'.
+  ls_dd02v-tabclass     = 'INTTAB'.
+  ls_dd02v-ddtext       = 'Automatically generated structure'.
+  ls_dd02v-applclass    = 'VIEW'.
+  ls_dd02v-as4user      = sy-uname.
+  ls_dd02v-as4date      = sy-datum.
+  ls_dd02v-as4time      = sy-uzeit.
+  ls_dd02v-exclass      = '3'.
+
+*** Technische Einstellungen werden für eine Struktur nicht benötigt
+  CLEAR ls_dd09l.
+
+*** Felder
+  CLEAR lt_dd03p.
+  LOOP AT lt_t005 INTO ls_t005.
+    CLEAR ls_dd03p.
+    ls_dd03p-tabname    = p_tab.
+    CONCATENATE 'LAND_' ls_t005-land1 INTO ls_dd03p-fieldname.
+    ls_dd03p-position   = sy-tabix.
+    ls_dd03p-rollname   = 'LAND1'.
+    ls_dd03p-domname    = 'LAND1'.
+    APPEND ls_dd03p TO lt_dd03p.
+  ENDLOOP.
+
+*** Struktur erzeugen
+  CALL FUNCTION 'DD_TABL_PUT'
+    EXPORTING
+      dd02v_wa            = ls_dd02v
+      dd09l_wa            = ls_dd09l
+      put_state           = 'A'
+      tabl_name           = p_tab
+    TABLES
+      dd03p_tab           = lt_dd03p
+    EXCEPTIONS
+      db_access_failure   = 1
+      object_inconsistent = 2
+      OTHERS              = 3.
+  IF sy-subrc &lt;&gt; 0.
+    WRITE: / 'Fehler bei DD_TABL_PUT', sy-subrc.
+    STOP.
+  ENDIF.
+
+ENDFORM.                    "structure
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  tadirentry
+*&amp;---------------------------------------------------------------------*
+FORM tadirentry.
+
+  DATA lv_srcsystem TYPE srcsystem.
+  DATA lv_obj_name  TYPE sobj_name.
+
+*** Originalsystem
+  lv_srcsystem = sy-sysid.
+*** Name der Struktur:
+  lv_obj_name = p_tab.
+
+*** TADIR-Eintrag erzeugen
+  CALL FUNCTION 'TR_TADIR_INTERFACE'
+    EXPORTING
+      wi_test_modus      = ' '
+      wi_tadir_pgmid     = 'R3TR'
+      wi_tadir_object    = 'TABL'
+      wi_tadir_obj_name  = lv_obj_name
+      wi_tadir_srcsystem = lv_srcsystem
+      wi_tadir_author    = sy-uname
+      wi_tadir_devclass  = p_dcl
+      wi_set_genflag     = 'X'
+    EXCEPTIONS
+      OTHERS             = 25.
+  IF sy-subrc &lt;&gt; 0.
+    WRITE: / 'Fehler bei TR_TADIR_INTERFACE'.
+    STOP.
+  ENDIF.
+
+ENDFORM.                    "tadirentry
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  transport
+*&amp;---------------------------------------------------------------------*
+FORM transport.
+
+*** Data
+  DATA: iko200 TYPE ko200,
+        iorder TYPE trkorr,
+        itask  TYPE trkorr.
+
+*** Object
+  iko200-pgmid    = 'R3TR'.
+  iko200-object   = 'TABL'.
+  iko200-objfunc  = space.
+  iko200-obj_name = p_tab.
+
+*** Auftrag abfragen
+  CALL FUNCTION 'TR_ORDER_CHOICE_CORRECTION'
+    EXPORTING
+      iv_category = 'SYST'
+    IMPORTING
+      ev_order    = iorder
+      ev_task     = itask
+    EXCEPTIONS
+      OTHERS      = 3.
+  IF sy-subrc &lt;&gt; 0.
+    WRITE: / 'Fehler TR_ORDER_CHOICE_CORRECTION'.
+    STOP.
+  ENDIF.
+
+*** Prüfen der Objekte
+  CALL FUNCTION 'TR_OBJECT_CHECK'
+    EXPORTING
+      wi_ko200                = iko200
+    EXCEPTIONS
+      cancel_edit_other_error = 1
+      show_only_other_error   = 2
+      OTHERS                  = 3.
+  IF sy-subrc &lt;&gt; 0.
+    WRITE: / 'Fehler TR_OBJECT_CHECK'.
+    STOP.
+  ELSE.
+
+*** Einfügen des Objektes in den Auftrag
+    CALL FUNCTION 'TR_OBJECT_INSERT'
+      EXPORTING
+        wi_order                = itask
+        wi_ko200                = iko200
+      EXCEPTIONS
+        cancel_edit_other_error = 1
+        show_only_other_error   = 2
+        OTHERS                  = 3.
+    IF sy-subrc &gt; 0.
+      WRITE: / 'Fehler TR_OBJECT_INSERT'.
+    ELSE.
+      COMMIT WORK.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.                    "transport
+
+
+</pre>
+<p>Der Beitrag <a href="/blog/struktur-per-programm-anlegen/">Struktur per Programm anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Transportanschluss</title>
+		<link>/blog/transportanschluss/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Transport]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=366</guid>
+
+					<description><![CDATA[<p>Pflegetabellen k&#246;nnen entweder mit dem Standardtransportanschluss versehen werden, dann werden die &#196;nderungen immer in einen Transportauftrag aufgenommen. &#196;nderungen in anderen Systemen sind dann nicht m&#246;glich. Oder es wird kein Transportanschluss verwendet, dann k&#246;nnen die Eintr&#228;ge aber auch manuell nicht transportiert werden. Diese L&#246;sung zeigt Ihnen, wie Eintr&#228;ge transportiert und in anderen System trotzdem ge&#228;ndert werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/transportanschluss/">Transportanschluss</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Pflegetabellen k&ouml;nnen entweder mit dem Standardtransportanschluss versehen werden, dann werden die &Auml;nderungen immer in einen Transportauftrag aufgenommen. &Auml;nderungen in anderen Systemen sind dann nicht m&ouml;glich. Oder es wird kein Transportanschluss verwendet, dann k&ouml;nnen die Eintr&auml;ge aber auch manuell nicht transportiert werden. Diese L&ouml;sung zeigt Ihnen, wie Eintr&auml;ge transportiert und in anderen System trotzdem ge&auml;ndert werden k&ouml;nnen.<br /><P>Pflegetabellen k&ouml;nnen entweder mit dem Standardtransportanschluss versehen werden, dann werden die &Auml;nderungen immer in einen Transportauftrag aufgenommen. &Auml;nderungen in anderen Systemen sind dann nicht m&ouml;glich. </P><P>Die andere M&ouml;glichkeit:&nbsp;Es wird kein Transportanschluss verwendet, dann k&ouml;nnen die Eintr&auml;ge aber auch manuell nicht transportiert werden. </P><P>Mit der folgenden L&ouml;sung k&ouml;nnen Sie Eintr&auml;ge im Entwicklungssystem wie gewohnt transportieren und in anderen Systemen trotzdem &auml;ndern.</P><P class="head1">Tabellenpflegedialog</P><P>In der Generierungsumgebung des Tabellenpflegedialogs m&uuml;ssen Sie bei &#8220;<STRONG>Angaben&nbsp;zum Datentransports&nbsp;des Dialogs</STRONG>&#8221; den Radiobutton &#8220;Standard Aufzeichnungsroutine&#8221; aktivieren.</P><P class="head1">Zeitpunkte</P><P>Wechseln Sie dann unter &#8220;<EM>Umfeld &#8211; Modifikation &#8211; Zeitpunkte</EM>&#8221; zu der Pflege der Zeitpunkte zum Pflegedialog.</P><P>Die Warnung, dass die Daten SAP geh&ouml;ren, k&ouml;nnen Sie getrost ignorieren.</P><P>Legen Sie dann einen neuen Eintrag mit dem Zeitpunkt&nbsp;&#8220;<STRONG>01</STRONG>&#8221; an. Nennen Sie die Routine ZZ_TRANSPORT.</P><P>Mit einem Klick auf das Editor-Icon gelangen Sie in den Editor. Legen Sie hier&nbsp;das folgende Coding an:</P><P class="sap1">FORM zz_transport.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp; IF sy-sysid &lt;&gt; &#8216;DEV&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR><FONT color="#fb2412">*** Im&nbsp;Entwicklungssystem wird ein Transportauftrag verlangt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>*** In alle anderen Systemen kein Transportanschlu&szlig;!<BR></FONT>&nbsp;&nbsp;&nbsp; LOOP AT x_header WHERE flag = space.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x_header-flag = vim_transport_denied.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY x_header.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp; ENDIF.<BR><FONT color="#fb2412">***&nbsp; Sichern erlaubt und erw&uuml;nscht!</FONT><BR>&nbsp; CLEAR sy-subrc.<BR><BR>ENDFORM.</P><P>Ersetzen Sie die System-ID &#8220;DEV&#8221; durch die Kennung Ihres Entwicklungssystems.</P></p>
+<p>Der Beitrag <a href="/blog/transportanschluss/">Transportanschluss</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Transportieren?</title>
+		<link>/blog/transportieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Transport]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=351</guid>
+
+					<description><![CDATA[<p>Eine Tabelle k&#246;nnen Sie entweder als "Anwendungstabelle" oder als "Customizingtabelle" klassifizieren. Dies hat Auswirkungen auf den Pflegedialog: Eine Anwendungstabelle kann in jedem System ge&#228;ndert werden, eine Customizingtabelle kann nur ge&#228;ndert werden, wenn das System auf "&#228;nderbar" gesetzt ist. Anwendungsdaten k&#246;nnen nicht transportiert werden... Oder doch?</p>
+<p>Der Beitrag <a href="/blog/transportieren/">Transportieren?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine Tabelle k&ouml;nnen Sie entweder als &#8220;Anwendungstabelle&#8221; oder als &#8220;Customizingtabelle&#8221; klassifizieren. Dies hat Auswirkungen auf den Pflegedialog: Eine Anwendungstabelle kann in jedem System ge&auml;ndert werden, eine Customizingtabelle kann nur ge&auml;ndert werden, wenn das System auf &#8220;&auml;nderbar&#8221; gesetzt ist. Anwendungsdaten k&ouml;nnen nicht transportiert werden&#8230; Oder doch?<br /><P>Im folgenden Fall m&ouml;chte ich Ihnen eine L&ouml;sung vorstellen, bei der Sie eine Tabelle in <STRONG>jedem System </STRONG>pflegen k&ouml;nnen und trotzdem Eintr&auml;ge aus dem Entwicklungsystem <STRONG>transportiert werden</STRONG>.</P><P>In diesem Fall werden automatisch <STRONG>neue Eintr&auml;ge</STRONG> in einen Transportauftrag &uuml;bernommen. Bereits vorhandene Eintr&auml;ge werden nicht transportiert. F&uuml;r neue Eintr&auml;ge hingegen wird ein Transportauftrag verlangt.</P><P>Um&nbsp;das zu realisieren, m&uuml;ssen Sie folgendes tun:</P><P class="head1">1. Tabelle anlegen</P><P>Legen Sie eine Customizingtabelle <STRONG>ZMYTAB</STRONG> an (Auslieferungsklasse &#8220;<STRONG>C</STRONG>&#8220;).</P><P class="head1">2. Pflegedialog generieren</P><P>Generieren Sie den Pflegedialog dazu. </P><P>Aktivieren Sie bitte das H&auml;kchen &#8220;Keine oder individuelle Aufzeichnungsroutine&#8221;</P><P class="head1">3. Zeitpunkte und Coding erfassen</P><P>Nach dem&nbsp;Generieren des Pflegedialogs springen Sie bitte im Men&uuml; in die Zeitpunkte: <EM>Umfeld &#8211; Modifikationen &#8211; Zeitpunkte</EM>.</P><P>Dort m&uuml;ssen Sie die folgenden Zeitpunkte anlegen:</P><UL><LI>Zeitpunkt &#8220;<STRONG>01</STRONG>&#8221;&nbsp;ZZ_SICHERN_VORHER <LI>Zeitpunkt &#8220;<STRONG>10</STRONG>&#8221;&nbsp;ZZ_TRANSPORT_KOPF <LI>Zeitpunkt &#8220;<STRONG>12</STRONG>&#8221;&nbsp;ZZ_TRANSPORTTABELLE_AENDERN</LI></UL><P>Mit dem Druckknopf neben dem Routinennamen gelangen Sie in das Coding. Das System fragt nach einem Include, in dem die Unterroutinen angelegt werden sollen. Definieren Sie gegebenenfalls ein neues Include.</P><P class="head2">Coding f&uuml;r Zeitpunkt 01</P><P class="text1">Hier wird vor dem Sichern das Kennzeichen ge&auml;ndert, dass normalerweise bei &#8220;Keine Aufzeichnungsroutine&#8221; aktiv ist und den Transport verhindert.</P><P class="sap1">FORM zz_sichern_vorher.</P><P class="sap1">&nbsp; PERFORM zz_check_transport.</P><P class="sap1">ENDFORM.</P><P class="head2">Coding f&uuml;r Zeitpunkt 10</P><P class="sap1">FORM zz_transport_kopf.</P><P class="sap1">&nbsp; PERFORM zz_check_transport.</P><P class="sap1">ENDFORM.</P><P class="head2">Coding f&uuml;r Zeitpunkt 12</P><P>Beim &Auml;ndern der Transporttabelle werden alle Eintr&auml;ge wieder rausgeworfen, die nur ge&auml;ndert oder gel&ouml;scht worden sind, so&nbsp;dass nur die neu angelegten Eintr&auml;ge im Transportauftrag stehen.</P><P class="sap1">FORM zz_transporttabelle_aendern.</P><P class="sap1">&nbsp; FIELD-SYMBOLS &lt;key&gt;.</P><P class="sap1">&nbsp; LOOP AT corr_keytab WHERE pgmid&nbsp;&nbsp; = &#8216;R3TR&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND object&nbsp; = &#8216;TABU&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND objname = x_header-roottab.<BR><FONT color="#fb2412">*** Keyfeld<BR></FONT>&nbsp;&nbsp;&nbsp; ASSIGN corr_keytab-tabkey(x_header-keylen) TO &lt;key&gt;.<BR><FONT color="#fb2412">*** Alle Eintr&auml;ge zur Tabelle pr&uuml;fen:<BR></FONT>&nbsp;&nbsp;&nbsp; READ TABLE total INTO zmytab_total<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WITH KEY &lt;key&gt;.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc = 0 AND zmytab_total-action &lt;&gt; neuer_eintrag.<BR><FONT color="#fb2412">*** Wenn der Satz nur ge&auml;ndert oder gel&ouml;scht wurde, dann aus der<BR>*** Transporttabelle l&ouml;schen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE corr_keytab.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">&nbsp; ENDLOOP.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ZZ_TRANSPORTTABELLE_AENDERN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </P><P class="head2">Coding zum Pr&uuml;fen ob Transportauftrag ben&ouml;tigt wird</P><P class="text1"><STRONG><U>Achtung!</U></STRONG> Bitte setzen Sie bei SY-SYSID Ihr Entwicklungssystem ein!&nbsp;</P><P class="sap1">FORM zz_check_transport.</P><P class="sap1">&nbsp; DATA new.<BR>&nbsp; CLEAR new.</P><P class="sap1">&nbsp; IF sy-sysid = &#8216;TTE&#8217;. &#8220;Entwicklungssystem<BR><FONT color="#fb2412">*** Im&nbsp;Entwicklungssystem wird ein Transportauftrag verlangt, <BR>*** wenn neue Eintr&auml;ge zugef&uuml;gt wurden<BR></FONT>&nbsp;&nbsp;&nbsp; LOOP AT total INTO zmytab_total.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF zmytab_total-action = neuer_eintrag.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp; LOOP AT x_header.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF new = space.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x_header-flag = vim_transport_denied.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ELSE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x_header-flag = space.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY x_header.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** In alle anderen Systemen kein Transportanschlu&szlig;!<BR></FONT>&nbsp;&nbsp; LOOP AT x_header.<BR>&nbsp;&nbsp;&nbsp;&nbsp; x_header-flag = vim_transport_denied.<BR>&nbsp;&nbsp;&nbsp;&nbsp; MODIFY x_header.<BR>&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;ENDIF.</P><P class="sap1">ENDFORM.</P><P class="head1">Globale Datendefinition (Release 4.6C)</P><P>Bitte legen Sie noch die folgende Struktur zu Beginn des Includes an:</P><P class="sap1">DATA: BEGIN OF zmytab_total.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INCLUDE STRUCTURE zmytab.<BR>DATA:&nbsp;&nbsp; action(1),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mark(1),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; END OF zmytab_total.</P><P>Das Coding ist in einem 4.5B-System nicht n&ouml;tig.</P></p>
+<p>Der Beitrag <a href="/blog/transportieren/">Transportieren?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Generierungsprotokoll löschen</title>
+		<link>/blog/generierungsprotokoll-loeschen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 04 Oct 2004 15:45:18 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Viewcluster]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=288</guid>
+
+					<description><![CDATA[<p>Die SE54 zeigt bei einem Aktivierungsfehler leider immer alle vorhergegangenen Fehler mit an. Dieses Protokoll k&#246;nnen Sie jedoch l&#246;schen!</p>
+<p>Der Beitrag <a href="/blog/generierungsprotokoll-loeschen/">Generierungsprotokoll löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die SE54 zeigt bei einem Aktivierungsfehler leider immer alle vorhergegangenen Fehler mit an. Dieses Protokoll k&ouml;nnen Sie jedoch l&ouml;schen!<br /><P>Verwenden Sie die Transaktion <STRONG>SLG2</STRONG>, um die Protokolleintr&auml;ge zu l&ouml;schen.</P><P class="sap1">Objekt:&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<FONT>SM34</FONT><BR>Unterobjekt: <FONT>CLUSTER</FONT></P></p>
+<p>Der Beitrag <a href="/blog/generierungsprotokoll-loeschen/">Generierungsprotokoll löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

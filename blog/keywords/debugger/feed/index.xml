@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Debugger Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/debugger/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 28 Mar 2019 14:18:12 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Debugger Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Debugger-Scripting (1)</title>
+		<link>/blog/debugger-scripting-1/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 03 Dec 2015 17:14:08 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[break-point]]></category>
+		<category><![CDATA[abap740]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=367679</guid>
+
+					<description><![CDATA[<p>Es passiert des Öfteren, dass einem Authority-Checks in den Weg geworfen werden. Einem einzelnen kann man schnell Herr werden, in dem man sich einen Break-Point auf die Anweisung "AUTHORITY-CHECK" setzt, F5 (Einzelschritt) drückt, den SY-SUBRC auf "0" ändert und dann weiter macht. Aber bei vielen...?!</p>
+<p>Der Beitrag <a href="/blog/debugger-scripting-1/">Debugger-Scripting (1)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Lange habe ich mich vor den umfangreichen Funktionen es Debugger-Scripting gedrückt. Durch das sensationelle Buch von <a href="http://amzn.to/1lttbu9" target="_blank">Paul Harding &#8220;ABAP To The Future&#8221;</a> habe ich mich nun endlich getraut.</p>
+<h2>Mein erstes Debugger-Skript</h2>
+<p>Es passiert des Öfteren, dass einem Authority-Checks in den Weg geworfen werden. Einem einzelnen kann man schnell Herr werden, in dem man sich einen Break-Point auf die Anweisung &#8220;AUTHORITY-CHECK&#8221; setzt, F5 (Einzelschritt) drückt, den SY-SUBRC auf &#8220;0&#8221; ändert und dann weiter macht.</p>
+<p>Wenn es mehrere Checks sind, kann es schnell nerven.</p>
+<p>Mein erstes Debugger-Skript habe ich genau hierfür geschrieben. Es macht genau das, was ich eben beschrieben habe.</p>
+<pre>METHOD script.
+
+  debugger_controller-&gt;debug_step( 
+       p_command = cl_tpda_script_debugger_ctrl=&gt;debug_step_over ).
+
+  cl_tpda_script_data_descr=&gt;change_value(
+         p_new_value = '4'
+         p_varname = 'SY-SUBRC' ).
+
+ENDMETHOD. "script</pre>
+<p>Damit das Skript funktioniert, musst du an geeigneter Stelle den Debugger anschalten (/h, geht auch vor dem Aufruf einer Transaktion!!) und zum Tab &#8220;Script&#8221; wechseln.</p>
+<p>Dort setzt du einen Break-Point bei der Anweisung AUTHORITY-CHECK:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-03_17-55-27.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-370544" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-03_17-55-27-300x238.jpg" alt="2015-12-03_17-55-27" width="300" height="238" srcset="/wp-content/uploads/2015/12/2015-12-03_17-55-27-300x238.jpg 300w, /wp-content/uploads/2015/12/2015-12-03_17-55-27.jpg 820w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Dann musst du nur noch das oben vorgestellte Coding in der Methode SCRIPT einfügen.</p>
+<p>&#8220;Skript starten&#8221; und auf einmal werden alle Berechtigungsprüfungen wahr&#8230;</p>
+<h2>Leider&#8230;</h2>
+<p>funktioniert der Trace bei dieser Methode nicht. Normalerweise kann man das aktuelle Ereignis tracen:</p>
+<pre>trace-&gt;add_src_info( ).</pre>
+<p>Entweder ist ein AUTHORITY-CHECK kein Ereignis, oder es funktioniert aus anderen Gründen nicht.</p>
+<p>Wahrscheinlich letzteres, denn auch ein eigener Eintrag in den Trace bleibt erfolglos:</p>
+<pre> DATA trace_entry TYPE tpda_trace_custom.
+ trace_entry-value = 'hier steht was...'.
+ trace-&gt;add_custom_info( p_trace_entry = trace_entry ).</pre>
+<p>Wer hier noch Tipps hat: Immer her damit in die Kommentare!</p>
+<h2>Wizard</h2>
+<p>Wer das Debugger-Skripting weiter erforschen möchte, kann das sehr komfortabel über den Wizard machen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-03_18-01-43.jpg"><img decoding="async" class="alignnone size-medium wp-image-370545" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-03_18-01-43-247x300.jpg" alt="2015-12-03_18-01-43" width="247" height="300" srcset="/wp-content/uploads/2015/12/2015-12-03_18-01-43-247x300.jpg 247w, /wp-content/uploads/2015/12/2015-12-03_18-01-43.jpg 461w" sizes="(max-width: 247px) 100vw, 247px" /></a></p>
+<p>Alle möglichen Befehle werden hier als Muster eingefügt. Alle möglichen Konstanten, die in diesem Zusammenhang möglich sind, werden als Kommentar eingebunden:</p>
+<pre>*************************************************
+* debugger commands (p_command):
+* Step into(F5) -&gt; CL_TPDA_SCRIPT_DEBUGGER_CTRL=&gt;DEBUG_STEP_INTO
+* Execute(F6) -&gt; CL_TPDA_SCRIPT_DEBUGGER_CTRL=&gt;DEBUG_STEP_OVER
+* Return(F7) -&gt; CL_TPDA_SCRIPT_DEBUGGER_CTRL=&gt;DEBUG_STEP_OUT
+* Continue(F8) -&gt; CL_TPDA_SCRIPT_DEBUGGER_CTRL=&gt;DEBUG_CONTINUE
+*************************************************
+****************************************************************
+*Interface (CLASS = CL_TPDA_SCRIPT_DEBUGGER_CTRL / METHOD = DEBUG_STEP )
+*Importing
+* REFERENCE( P_COMMAND ) TYPE I
+****************************************************************
+
+*TRY.
+DEBUGGER_CONTROLLER-&gt;DEBUG_STEP( P_COMMAND = P_COMMAND ).
+* CATCH cx_tpda_scr_rtctrl_status .
+* CATCH cx_tpda_scr_rtctrl .
+*ENDTRY.</pre>
+<h2>Speichern &amp; Laden</h2>
+<p>Die Skripts können &#8211; inklusive erstellter Breakpoints!! &#8211; gespeichert werden. Entweder direkt im System im ABAP-Repository oder lokal auf dem Rechner.</p>
+<p>Da es sich bei den Skripten um &#8220;normale&#8221; Programme handelt (Programmtyp &#8220;Subroutinenpool&#8221;), ist es sinnvoll, sich an Namenskonventionen zu halten. Alle SAP-eigenen vorgefertigten Skripte beginnen mit &#8220;RSTPDA_SCRIPT&#8221;.</p>
+<p>Der Beitrag <a href="/blog/debugger-scripting-1/">Debugger-Scripting (1)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Beliebige XML-Datei in interne Tabelle einlesen</title>
+		<link>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/</link>
+					<comments>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Sep 2014 17:05:16 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[parser]]></category>
+		<category><![CDATA[itab]]></category>
+		<category><![CDATA[field-symbols]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[cl_xml_document]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5081</guid>
+
+					<description><![CDATA[<p>Viele Daten werden im XML-Format ausgetauscht. Um die Daten in SAP verarbeiten zu können, muss man parsen oder eine entsprechende Transformation "programmieren". Mit XML tue ich mich manchmal etwas schwer und bin daher froh über jede Vereinfachung.</p>
+<p>Mithilfe eines kleinen generischen Programms ist es einfach möglich, die folgende XML-Datei in eine interne Tabelle zu laden.</p>
+<p>Der Beitrag <a href="/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/">Beliebige XML-Datei in interne Tabelle einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Viele Daten werden im XML-Format ausgetauscht. Um die Daten in SAP verarbeiten zu können, muss man parsen oder eine entsprechende Transformation &#8220;programmieren&#8221;. Mit XML tue ich mich manchmal etwas schwer und bin daher froh über jede Vereinfachung.</p>
+<p>Mithilfe eines kleinen generischen Programms ist es einfach möglich, die folgende XML-Datei in eine interne Tabelle zu laden:</p>
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;hierarchie1&gt;
+&lt;hierarchie2&gt;Beispiel XML&lt;/hierarchie2&gt;
+&lt;hierarchie2&gt;Tricktresor&lt;/hierarchie2&gt;
+&lt;hierarchie2&gt;Enno Wulff&lt;/hierarchie2&gt;
+&lt;/hierarchie1&gt;
+</pre>
+<figure id="attachment_5082" aria-describedby="caption-attachment-5082" style="width: 487px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/09/xml_itab.png"><img decoding="async" class="wp-image-5082 size-full" src="https://tricktresor.com/wp-content/uploads/2014/09/xml_itab.png" alt="Interne Tabelle mit XML-Daten" width="487" height="110" srcset="/wp-content/uploads/2014/09/xml_itab.png 487w, /wp-content/uploads/2014/09/xml_itab-300x67.png 300w" sizes="(max-width: 487px) 100vw, 487px" /></a><figcaption id="caption-attachment-5082" class="wp-caption-text">Screenshot aus dem Debugger</figcaption></figure>
+<p>Man sieht deutlich, dass die einzelnen Tags der XML-Datei sequentiell in die Tabelle übernommen wurden. Für viele Anwendungsfälle dürfte das für die weitere Verarbeitung ausreichen.</p>
+<p>[notice type=&#8217;info&#8217;]Dieses Programm erzeugt lediglich die Transformation von der XML-Struktur in eine interne Tabelle. Es erfolgt keine Ausgabe![/notice]</p>
+<h2>Coding</h2>
+<pre>REPORT.
+TYPES tyt_tab_xml TYPE TABLE OF smum_xmltb.
+
+DATA: gv_xml_xstring  TYPE          xstring,
+      gt_xml_tab      TYPE TABLE OF smum_xmltb,
+      gv_filename     TYPE          localfile,
+      go_xml_document TYPE REF TO   cl_xml_document,
+      gv_subrc        TYPE          sy-subrc,
+      gv_size         TYPE          sy-tabix.
+
+
+START-OF-SELECTION.
+
+  PERFORM display_popup CHANGING gv_filename.
+
+  PERFORM upload_xml USING gv_filename
+                     CHANGING go_xml_document
+                              gv_subrc.
+  IF gv_subrc = 0.
+
+    PERFORM parse_to_xstring USING go_xml_document
+                             CHANGING gv_xml_xstring
+                                      gv_size
+                                      gv_subrc.
+    IF gv_subrc = 0.
+      PERFORM parse_xml_to_itab USING gv_xml_xstring
+                                CHANGING gt_xml_tab.
+
+    ELSE.
+      EXIT.
+    ENDIF.
+  ELSE.
+    EXIT.
+  ENDIF.
+
+END-OF-SELECTION.
+
+FORM display_popup CHANGING cv_filename TYPE localfile.
+
+  DATA: lt_filetable TYPE filetable,
+        lv_anz_dat   TYPE i.
+
+  cl_gui_frontend_services=&gt;file_open_dialog(
+    EXPORTING
+      window_title            =     'Wählen Sie eine XML.Datei aus'    " Titel des Datei-Öffnen Dialogs
+      default_filename        =     'C:\test.xml'
+      initial_directory       =     'C:\' " Ausgangsverzeichnis
+  CHANGING
+      file_table              = lt_filetable   " Tabelle, die selektierte Dateien enthält
+      rc                      = lv_anz_dat     " Rückgabewert: Anzahl Dateien oder -1 falls Fehler auftritt
+  EXCEPTIONS
+    OTHERS                  = 5
+    ).
+
+  READ TABLE lt_filetable INTO cv_filename INDEX 1.
+
+ENDFORM.
+
+FORM upload_xml USING iv_filename        TYPE localfile
+                CHANGING co_xml_document TYPE REF TO cl_xml_document
+                         cv_subrc        TYPE sy-subrc.
+*== create the object
+  CREATE OBJECT co_xml_document.
+
+*== Upload xml file
+  co_xml_document-&gt;import_from_file(
+  EXPORTING
+    filename = iv_filename
+    RECEIVING
+    retcode = cv_subrc  ).
+
+ENDFORM.
+
+FORM parse_to_xstring USING io_xml_document  TYPE REF TO cl_xml_document
+                      CHANGING cv_xml_string TYPE xstring
+                               cv_size       TYPE sy-tabix
+                               cv_subrc      TYPE sy-subrc.
+*== Convert to xstring
+  CALL METHOD io_xml_document-&gt;render_2_xstring
+    IMPORTING
+      retcode = cv_subrc      " Returncode
+      stream  = cv_xml_string " XString (STREAM)
+      size    = cv_size.      " Anzahl Zeichen
+ENDFORM.
+
+FORM parse_xml_to_itab USING iv_xml_string TYPE xstring
+                       CHANGING ct_xml_tab TYPE tyt_tab_xml.
+
+  DATA: lt_return TYPE TABLE OF bapiret2.
+
+*== Convert XML to itab
+  CALL FUNCTION 'SMUM_XML_PARSE'
+    EXPORTING
+      xml_input = iv_xml_string
+    TABLES
+      xml_table = ct_xml_tab
+      return    = lt_return.
+  BREAK-POINT.
+
+ENDFORM.</pre>
+<h2>Übertragen der generischen in eine interne Tabelle</h2>
+<p>In unserem Beispiel muss die interne Tabelle das Feld &#8220;HIERARCHIE2&#8221; besitzen. Die Zuweisung aller XML-Werte der &#8220;Hierarchiestufe 2&#8221; werden dann dem Feld &#8220;ITAB-HIERARCHIE2&#8221; zugewiesen.</p>
+<p>[notice type=&#8217;info&#8217;]Der Aufruf der Routine muss noch hinzugefügt werden. Die zu übergebene interne Tabelle kann jeden beliebigen Typ haben. In diesem Beispiel wird der Typ TYT_ITAB verwendet.[/notice]</p>
+<pre>FORM build_itab USING it_xml_tab     TYPE tyt_tab_xml
+             CHANGING itab TYPE tyt_itab.
+
+  FIELD-SYMBOLS: &lt;ls_data_tab&gt; LIKE LINE OF itab,
+                 &lt;ls_xml_tab&gt;  LIKE LINE OF it_xml_tab,
+                 &lt;lv_value&gt;    TYPE         data.
+
+  LOOP AT it_xml_tab ASSIGNING &lt;ls_xml_tab&gt; WHERE hier EQ 2.
+    TRANSLATE &lt;ls_xml_tab&gt;-cname TO UPPER CASE.
+    IF &lt;ls_xml_tab&gt;-cname = 'HIERARCHIE2'.
+      APPEND INITIAL LINE TO itab ASSIGNING &lt;ls_data_tab&gt;.
+    ENDIF.
+    ASSIGN COMPONENT &lt;ls_xml_tab&gt;-cname OF STRUCTURE &lt;ls_data_tab&gt; TO &lt;lv_value&gt;.
+    &lt;lv_value&gt; = &lt;ls_xml_tab&gt;-cvalue.
+  ENDLOOP.
+ENDFORM..</pre>
+<p>Der Beitrag <a href="/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/">Beliebige XML-Datei in interne Tabelle einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Tipps und Tricks</title>
+		<link>/blog/tipps-und-tricks/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 10 Nov 2010 13:55:32 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[Debugging]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=567</guid>
+
+					<description><![CDATA[<p>Kleine Infos und Tricks zum neuen Debugger</p>
+<p>Der Beitrag <a href="/blog/tipps-und-tricks/">Tipps und Tricks</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Kleine Infos und Tricks zum neuen Debugger<br /><P class="head1">Links</P><P>New ABAP Debugger – Tips and Tricks by Olga Dolinskaja (SAP):<BR><A href="http://www.sdn.sap.com/irj/scn/weblogs?blog=/pub/wlg/21986" Target="_blank">http://www.sdn.sap.com/irj/scn/weblogs?blog=/pub/wlg/21986</A></P></p>
+<p>Der Beitrag <a href="/blog/tipps-und-tricks/">Tipps und Tricks</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Systeminformationen</title>
+		<link>/blog/systeminformationen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sun, 20 Jul 2003 22:29:13 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[Debugging]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=92</guid>
+
+					<description><![CDATA[<p>Viele n&#252;tzliche Informationen lassen sich im Debugger anzeigen. So k&#246;nnen geladene Programme, verwendete Tabellen, Memory-ID's und deren Werte und andere Datensegmente. Die Darstellung ist sehr technisch und nicht alle Informationen sind n&#252;tzlich. Viele Informationen ersparen aber eine aufwendige Suche.</p>
+<p>Der Beitrag <a href="/blog/systeminformationen/">Systeminformationen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Viele n&uuml;tzliche Informationen lassen sich im Debugger anzeigen. So k&ouml;nnen geladene Programme, verwendete Tabellen, Memory-ID&#8217;s und deren Werte und andere Datensegmente. Die Darstellung ist sehr technisch und nicht alle Informationen sind n&uuml;tzlich. Viele Informationen ersparen aber eine aufwendige Suche.<br /><P class="head1">Interne Daten</P><P>Wenn Sie sich im Debugging befinden erhalten Sie eine Menge Informationen &uuml;ber den Men&uuml;punkt <EM>Springen &#8211; System &#8211; Systembereiche</EM>.</P><P>Hier gibt es eine Menge an Objekten, die Sie per Doppelklick ausw&auml;hlen k&ouml;nnen.</P><P>Interessant ist zum Beispiel das Objekt &#8220;<STRONG>MEMORIES</STRONG>&#8220;, in dem Sie alle im SAP-Memory hinterlegten ID&#8217;s und deren Inhalte sehen k&ouml;nnen.</P><P>Das Objekt &#8220;<STRONG>SMEM</STRONG>&#8221; gibt Aufschluss &uuml;ber alle Parameter-ID&#8217;s und deren Werte, die f&uuml;r den Benutzer gespeichert sind.</P><P>Zugegeben, die meisten Informationen sind sehr kryptisch, aber manchmal lohnt es sich, einen Blick hierhin zu werfen.</P><P>Beim neuen Debugger (ECC6.0) ist das Systemtool etwas versteckt. Wechseln Sie am besten zu einem anderen Desktop und w&auml;hlen Sie die Funktion &#8220;Ersetze Werkzeug&#8221;. In dem Popup klicken Sie dann die Kategorie &#8220;Spezialwerkzeug&#8221; auf und w&auml;hlen &#8220;Systembereiche.</P><P><IMG src="/wp-content/uploads/tt_images/abap/popup_debugger.jpg"></P><P><IMG src="/wp-content/uploads/tt_images/abap/Eck_029.jpg"></P><P class="head1">SCREEN-Tabelle</P><P>In Reports k&ouml;nnen Sie alle Felder, die bei LOOP AT SCREEN durchlaufen werden, in einer Tabelle sehen: <STRONG>%_SSCR</STRONG></P><P>Dies funktioniert jedoch nur bei Reports, nicht bei echten Dynpros!</P><P><IMG src="/wp-content/uploads/tt_images/abap/Eck_028.jpg"></P><P>Ab ECC6.0 haben Sie die M&ouml;glichkeit &uuml;ber oben genannten Trick den Bereich SCREEN anzuzeigen. Hier stehen alle Felder &#8211; auch die von Dynpros!!</P></p>
+<p>Der Beitrag <a href="/blog/systeminformationen/">Systeminformationen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Tabelleninhalte</title>
+		<link>/blog/tabelleninhalte/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sun, 20 Jul 2003 22:06:35 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[Debugging]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=91</guid>
+
+					<description><![CDATA[<p>Tabelleneintr&#228;ge und Strukturen anzeigen und &#228;ndern.</p>
+<p>Der Beitrag <a href="/blog/tabelleninhalte/">Tabelleninhalte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Tabelleneintr&auml;ge und Strukturen anzeigen und &auml;ndern.<br /><P>Variablen k&ouml;nnen mit Doppelklick auf die Variable im Quelltext in die Anzeige &uuml;bernommen werden. Mit einem Doppelklick auf die Variable im Bereich &#8220;Feldnamen &#8211; Feldinhalte&#8221; sehen Sie die Details zu der Variablen. </P><P>Handelt es sich um eine &#8220;normale&#8221; Variable, so werden die L&auml;nge und der Typ angezeigt. </P><P>Handelt es sich um eine Struktur, so werden die Felder der Struktur angezeigt.</P><P>Bei einer Tabelle werden die Tabellenzeilen zur Anzeige gebracht. Einzelne Eintr&auml;ge k&ouml;nnen Sie sich anzeigen lassen, indem Sie den Index der Zeile direkt angeben (&#8230;im unteren Beispiel die dritte Zeile&#8230;)&nbsp;und einen Doppelklick darauf machen:</P><P class="sap1">t_tabname[3]</P><P>Alle Felder dieser Tabellenzeile werden dann untereinander mit Wert ausgegeben.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/tabelleninhalte/">Tabelleninhalte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Popup&#8217;s debuggen</title>
+		<link>/blog/popups-debuggen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 May 2003 20:37:50 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Debugging]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=46</guid>
+
+					<description><![CDATA[<p>Was tun, wenn irgendwann im Programm ein Popup erscheint, das man debuggen m&#246;chte? Die OK-Code-Zeile steht ja nicht zur Verf&#252;gung...</p>
+<p>Der Beitrag <a href="/blog/popups-debuggen/">Popup&#8217;s debuggen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Was tun, wenn irgendwann im Programm ein Popup erscheint, das man debuggen m&ouml;chte? Die OK-Code-Zeile steht ja nicht zur Verf&uuml;gung&#8230;<br /><P>Um ein Popup zu debuggen haben Sie folgende M&ouml;glichkeiten: </P><P>1. Lassen Sie es gar nicht erst so weit kommen: Setzen Sie in der Anwendung einen BREAK-POINT bei der Anweisung &#8220;CALL SCREEN&#8221;. Von hier aus k&ouml;nnen Sie dann bequem weiter debuggen.</P><P>2. Legen Sie einen Shortcut auf dem Desktop an. Diesen Shortcut k&ouml;nnen Sie dann auf ein SAP-Popup ziehen. </P><P>Legen Sie die Verkn&uuml;pfung durch rechten Mausklick auf den Desktop an:</P><P><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/debug1.gif"><BR></P></TD></TR></TBODY></TABLE></P><P>Pflegen Sie die folgenden Parameter. Wichtig sind die Felder &#8220;Type&#8221; und &#8220;Command&#8221;.</P><P><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/debug2.gif"><BR>Die SAPGUI-Parameter</P></TD></TR></TBODY></TABLE></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/popups-debuggen/">Popup&#8217;s debuggen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SE16 austricksen</title>
+		<link>/blog/se16-austricksen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 05 May 2003 22:49:52 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Debugging]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[se16]]></category>
+		<category><![CDATA[se16n]]></category>
+		<category><![CDATA[tabelle editieren]]></category>
+		<category><![CDATA[&sap_edit]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=34</guid>
+
+					<description><![CDATA[<p>In der SE16 k&#246;nnen eigentlich keine Eintr&#228;ge ge&#228;ndert werden, wenn ein Pflegedialog f&#252;r die Tabelle existiert oder die Tabellenklasse ein &#228;ndern nicht zul&#228;sst. Mit Debugging-BErechtigung geht das aber doch!</p>
+<p>Der Beitrag <a href="/blog/se16-austricksen/">SE16 austricksen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In der SE16 können eigentlich keine Einträge geändert werden, wenn ein Pflegedialog für die Tabelle existiert oder die Tabellenklasse ein ändern nicht zulässt. Mit Debugging-BErechtigung geht das aber doch!</p>
+<p>Wenn Sie die Berechtigung zum Debuggen und Feldinhalte ändern haben, dann können Sie relativ einfach Tabelleneinträge ändern.</p>
+<p>Starten Sie die Tabellenanzeige mit <strong>SE16</strong>, geben Ihre Selektionskriterien ein und führen die Suche aus. In der Übersicht markieren Sie die Einträge, die Sie ändern möchten.</p>
+<p>Geben Sie nun in der OK-Code-Zeile &#8220;<span style="color: #fb2412;">/h</span>&#8221; ein, drücken Sie &lt;Enter&gt;  und machen dann einen Doppelklick auf einen markierten Eintrag.</p>
+<p>Sie gelangen in den Debug-Modus. Drücken Sie hier einmal F7 für die Funktion &#8220;Return&#8221;, geben dann in der Feldzeile die Variable &#8220;CODE&#8221; ein. Der Inhalt ist bisher &#8220;SHOW&#8221;. Ändern Sie ihn in &#8220;<span style="color: #fb2412;">EDIT</span>&#8221; und führen das Programm mit F8 weiter aus.</p>
+<p>Sie können nun die markierten Einträge nach belieben ändern.</p>
+<p>Einziger Wermutstropfen: <span style="color: #f49047;">Die Fremdschlüsselprüfung ist aktiv.</span> Sie können also nur Einträge in die Felder schreiben, die durch eine eventuell aktivierte Fremdschlüsselprüfung aktivert sind.</p>
+<h2 class="head2">Nachtrag</h2>
+<p>In neueren Releases muss folgendermaßen vorgegangen werden:</p>
+<p>Um den Edit Mode der SE16 herbei zu führen muss im Unterprogramm  SET_STATUS_VAL ein Breakpoint gesetzt werden: in Zeile 34 &#8211; if code = &#8216;SHOW&#8217;</p>
+<p>Hier kann dann wie gehabt der CODE auf EDIT oder INSR gesetzt werden.</p>
+<h2 class="head1">Einträge editieren mit SE16n</h2>
+<p><a class="hoverZoomLink" href="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130602.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4879 hoverZoomLink" src="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130602-300x125.jpg" alt="Bild_2014_06_25_130602" width="300" height="125" srcset="/wp-content/uploads/2003/05/Bild_2014_06_25_130602-300x125.jpg 300w, /wp-content/uploads/2003/05/Bild_2014_06_25_130602.jpg 343w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Das Ändern von Einträgen mit der <strong>SE16N</strong> ist ebenfalls sehr einfach: Geben Sie einfach, nachdem Sie die zu ändernde Tabelle eingetragen haben, den Funktionscode</p>
+<p class="sap1">&amp;SAP_EDIT</p>
+<p>in die OK-Code-Zeile ein. Es wird dann die Meldung &#8220;SAP-Editierfunktion wurde aktiviert&#8221; ausgegeben und Sie können die Einträge berabeiten.</p>
+<p><span style="color: #fb2412;">Auch in der SE16N ist die Fremdschlüsselprüfung aktiv.</span> Diese kann aber ausgeschaltet werden: Im Selektionsbild der SE16N geben Sie den Funktionscode</p>
+<p class="sap1">&amp;SAP_NO_CHECK</p>
+<p>ein. Dann ist die Fremdschlüsselprüfung deaktiviert. <strong>Diese Funktion ist natürlich mit Vorsicht zu genießen, denn in der Regel haben Fremdschlüsselprüfungen ihren Sinn!!</strong></p>
+<h2 class="head1">Protokoll</h2>
+<p>Die Änderungen, die mit der Transaktion SE16N gemacht werden, werden protokolliert. Diese Änderungen können mit dem <strong>Programm RKSE16N_CD</strong><br />
+ausgewertet werden.</p>
+<h2>Hinweis 1420281</h2>
+<p>In diesem Hinweis ist beschrieben, wie die Editierfunktionalität &amp;sap_edit wieder abgeschaltet werden kann. Ab Release 6.00 wird diese Änderung mit Support Packages 17 &amp; 18 ausgeliefert. Eine Nutzung der funktion &amp;sap_edit ist dann nicht mehr möglich.</p>
+<p>Um trotzdem eine Tabellen ändern zu können, kann man sich &#8211; Feldänderungen im Debugging erlaubt vorausgesetzt &#8211; wie folgt behelfen:</p>
+<ol>
+<li>Aufruf der Transaktion SE16N</li>
+<li>Eingabe des Tabellennamens</li>
+<li>Einschränkung der Werte im Selektionsbild</li>
+<li>/h in OK-Codezeile eingeben (Debugging aktiveren) und Enter drücken</li>
+<li>Selektion ausführen (Funktionstaste F8)</li>
+<li>Im Debugger die Felder gd-edit und gd-sapedit auf X ändern (Siehe Screenshot)</li>
+<li>F8 drücken um fortzufahren</li>
+</ol>
+<p><a href="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130639.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4878 size-full" src="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130639.jpg" alt="Bild_2014_06_25_130639" width="483" height="128" srcset="/wp-content/uploads/2003/05/Bild_2014_06_25_130639.jpg 483w, /wp-content/uploads/2003/05/Bild_2014_06_25_130639-300x79.jpg 300w" sizes="(max-width: 483px) 100vw, 483px" /></a></p>
+<h2>Funktionsbaustein SE16N_INTERFACE</h2>
+<p>Noch einfacher lässt sich die Transaktion SE16n &#8220;austricksen&#8221;, indem du gleich den zu Grunde liegenden Funktionsbaustein SE16N_INTERFACE in der SE37 im Testmodus aufrufst.</p>
+<p>Hier kannst du die beiden Parameter I_EDIT und I_SAPEDIT direkt mit einem X vorbelegen.</p>
+<p>Nachteil bei dieser Variante: Es wird sofort die Ergebnisliste ausgegeben, du kannst also keine Vorselektion machen. Das heißt, <em>machen</em> kannst du sie schon, jedoch nur einigermaßen umständlich über den Parameter IT_AND_SELFIELDS.</p>
+<p>Der Beitrag <a href="/blog/se16-austricksen/">SE16 austricksen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

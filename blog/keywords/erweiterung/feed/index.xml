@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Erweiterung Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/erweiterung/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 26 Oct 2017 18:28:09 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Erweiterung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ALV-Grid um Sortierfunktion erweitern (Vererbung)</title>
+		<link>/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Oct 2017 18:28:09 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[Sortierung]]></category>
+		<category><![CDATA[Erweiterung]]></category>
+		<category><![CDATA[Geschützte Methoden]]></category>
+		<category><![CDATA[Redefinition]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018153</guid>
+
+					<description><![CDATA[<p>Objektorientierte Programmierung ist häufig immer noch ein rotes Tuch für viele. Man weiß zwar, wie Methoden aufgerufen werden und dass ein Objekt mit CREATE OBJECT oder NEW erzeugt werden muss aber die Designprinzipien sind irgendwie unklar. Und SAP-Klassen sind eh unantastbar. In diesem Artikel möchte ich dir eine Möglichkeit vorstellen, wie du den SAP-Standard mit Standardmitteln, nämlich mit Hilfe der Vererbung, erweitern kannst. Ich erweitere Beispielhaft die Funktionalität des ALV-Grid.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/">ALV-Grid um Sortierfunktion erweitern (Vererbung)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Objektorientierte Programmierung ist häufig immer noch ein rotes Tuch für viele. Man weiß zwar, wie Methoden aufgerufen werden und dass ein Objekt mit CREATE OBJECT oder NEW erzeugt werden muss aber die Designprinzipien sind irgendwie unklar. Und SAP-Klassen sind eh <em>unantastbar</em>.</p>
+<p>In diesem Artikel möchte ich dir eine Möglichkeit vorstellen, wie du den SAP-Standard mit Standardmitteln, nämlich mit Hilfe der Vererbung, erweitern kannst.</p>
+<h2>Enjoy und Bedienung</h2>
+<p>Trotz der GUI-Elemente, die unter dem Schlagwort <a href="https://www.computerwoche.de/a/ein-freundlicheres-gesicht-fuer-r-3-sap-enjoy,506853"><em>ENJOY</em> </a>eingeführt wurden, sind viele Elemente immer noch nicht wirklich benutzerfreundlich. Einiges kann man ändern, anderes nicht. Eine Möglichkeit um mit Hilfe der SAP-Standardcontrols ein neues Look &amp; Feel zu erzeugen, habe ich in diesem Beitrag gezeigt: Moderne UI mit altem SAPGUI und ALV-Grid</p>
+<p>Hier habe ich das Standard-ALV-Grid verwendet, um eine neue Funktionalität zu erzeugen. Dies ist allerdings ein eigenständiges Objekt und erweitert nicht die Standardfunktionalität des ALV-Grids.</p>
+<p>Wie das Überschreiben von geschützten Methoden generell funktioniert, habe ich hier beschrieben: <a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">Geschützte Methoden nutzen</a></p>
+<p>Dieser Artikel soll zeigen, dass es sich eventuell lohnt, auch über andere Erweiterungen von SAP-Standardfunktionalitäten nachzudenken. Es gibt Funktionalitäten, die eventuell in <strong>jedem</strong> ALV-Grid hilfreich wären. Zum Beispiel das einfache Umsortieren von Einträgen.</p>
+<h3>Umsortierung mittels Drag &amp; Drop</h3>
+<p>Eine Möglichkeit ist die Sortierung mittels Drag&amp;Drop im ALV-Feldkatalog:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/alv-grid-sort.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018154" src="https://tricktresor.com/wp-content/uploads/2017/10/alv-grid-sort.png" alt="" width="595" height="450" srcset="/wp-content/uploads/2017/10/alv-grid-sort.png 595w, /wp-content/uploads/2017/10/alv-grid-sort-300x227.png 300w" sizes="(max-width: 595px) 100vw, 595px" /></a></p>
+<p>Die Bedienung ist hier zwar auch gewöhnungsbedürftig, denn ein Eintrag, der umsortiert werden soll, muss erst mit einem Klick markiert und kann dann erst mittels Drag &amp; Drop an eine andere Stelle verschoben werden, aber immerhin.</p>
+<h3>Umsortierung mit Funktionstasten</h3>
+<p>Eine andere Möglichkeit wäre das Verschieben von Einträgen mit Funktionstasten. Folgender Screenshot ist aus dem unten stehenden Demo-Programm. Das ALV-Grid wurde um die Funktionstasten &#8220;Sort Up&#8221; und &#8220;Sort Down&#8221; erweitert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/alv2.png"><img decoding="async" class="alignnone size-full wp-image-1018155" src="https://tricktresor.com/wp-content/uploads/2017/10/alv2.png" alt="" width="801" height="296" srcset="/wp-content/uploads/2017/10/alv2.png 801w, /wp-content/uploads/2017/10/alv2-300x111.png 300w, /wp-content/uploads/2017/10/alv2-768x284.png 768w, /wp-content/uploads/2017/10/alv2-800x296.png 800w" sizes="(max-width: 801px) 100vw, 801px" /></a></p>
+<p>Wie das im Einzelnen geht, erkläre ich gleich.</p>
+<h2>Redefinition</h2>
+<p>eine wirklich starke Waffe des objektorientierten Sprachumfangs ist die Vererbung. Sofern die anzupassende Klasse nicht als &#8220;Final&#8221; definiert wurde, können <em>geschützte</em> und <em>öffentliche</em> Methoden redefiniert werden. Leider wird bei Anlage einer Klasse das Kennzeichen &#8220;Final&#8221; vorbelegt, so dass der Programmierer dieses aktiv entfernen muss. Ist dieses Kennzeichen gesetzt, funktioniert die Ableitung bzw. Vererbung nicht.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/klasse_final.png"><img decoding="async" class="alignnone size-full wp-image-1018156" src="https://tricktresor.com/wp-content/uploads/2017/10/klasse_final.png" alt="" width="504" height="340" srcset="/wp-content/uploads/2017/10/klasse_final.png 504w, /wp-content/uploads/2017/10/klasse_final-300x202.png 300w" sizes="(max-width: 504px) 100vw, 504px" /></a></p>
+<p>Die Klasse CL_GUI_ALV_GRID allerdings darf vererbt werden, denn sie ist nicht als final gekennzeichnet. Nichts desto Trotz muss bei Klassen sehr genau definiert werden, welche Methoden vererbt werden dürfen und welche nicht.</p>
+<h2>Funktion &#8220;Umsortieren&#8221;</h2>
+<p>Die neue Funktion nenne ich &#8220;Umsortieren&#8221;, denn es ist keine Sortieren-Funktion, die man aus dem Standard kennt. Um Einträge umsortieren zu können, wird in der Regel im SAP mit einem Sortierfeld gearbeitet, das der Anwender manuell pflegen muss. Dazu wird häufig in Zehnerschritten gearbeitet, um später Einträge einfügen zu können. Einträge in dieser Form in eine andere Reihenfolge zu bringen ist in der Regel sehr mühselig.</p>
+<p>Die Idee ist, dass der Anwender einen Eintrag markieren kann und diesem mit den Funktionstasten &#8220;Sort Up&#8221; und Sort Down&#8221; in der Liste hoch und runter verschieben kann. Ein Feld, in der die aktuelle Reihenfolge festgehalten wird, brauchen wir natürlich trotzdem.</p>
+<h2>Vererbung</h2>
+<p>Ich möchte die Klasse CL_GUI_ALV_GRID also für meine Zwecke missbrauchen und muss sie deswegen ableiten bzw. vererben. Dazu lege ich in der Transaktion SE80 oder SE24 eine neue Klasse an: ZCL_GUI_ALV_GRID_SORT und gebe als Oberklasse zu zu beerbende Klasse CL_GUI_ALV_GRID an:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018157" src="https://tricktresor.com/wp-content/uploads/2017/10/class1.png" alt="" width="661" height="229" srcset="/wp-content/uploads/2017/10/class1.png 661w, /wp-content/uploads/2017/10/class1-300x104.png 300w, /wp-content/uploads/2017/10/class1-660x229.png 660w" sizes="(max-width: 661px) 100vw, 661px" /></a></p>
+<h2>Sortierfeld</h2>
+<p>Der Programmierer muss angeben können, welches Feld für die Sortierung der Einträge verwendet werden soll. In diesem Feld wird dann die automatische Nummerierung anhand der Reihenfolge gesetzt. Ich lege dafür die Methode SET_SORT_FIELD an mit dem Übergabeparameter FIELDNAME.</p>
+<p>Diese Methode muss vor SET_TABLE_FOR_FIRST_DISPLAY aufgerufen werden, damit die Umsortierfunktionalität von Anfang an zur Verfügung steht.</p>
+<p>Das Sortierfeld merke ich mir im Attribut MV_SORT_FIELD.</p>
+<h2>Ereignis TOOLBAR</h2>
+<p>Da ich das Ereignis TOOLBAR nutzen möchte, um die neuen Funktionstasten einzubauen, muss ich es für meine abgeleitete Klasse registrieren:</p>
+<pre class="lang:abap decode:true">SET HANDLER on_toolbar FOR me.</pre>
+<p>Zusätzlich benötige ich eine Methode, die beim Auslösen des Ereignisses angesprungen wird: ON_TOOLBAR. Diese Methode muss als Ereignisbehandler für das Ereignis TOOLBAR definiert werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class2.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018158" src="https://tricktresor.com/wp-content/uploads/2017/10/class2.png" alt="" width="420" height="383" srcset="/wp-content/uploads/2017/10/class2.png 420w, /wp-content/uploads/2017/10/class2-300x274.png 300w" sizes="(max-width: 420px) 100vw, 420px" /></a></p>
+<p>Der Methode stehen nun theoretisch alle Parameter des Ereignisses zur Verfügung. Allerdings müssen diese manuell übernommen werden. Die Drucktaste &#8220;Ereignisparameter&#8221; in der Sicht &#8220;Parameter&#8221; erledigt das für mich:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class3.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018159" src="https://tricktresor.com/wp-content/uploads/2017/10/class3.png" alt="" width="830" height="256" srcset="/wp-content/uploads/2017/10/class3.png 830w, /wp-content/uploads/2017/10/class3-300x93.png 300w, /wp-content/uploads/2017/10/class3-768x237.png 768w" sizes="(max-width: 830px) 100vw, 830px" /></a></p>
+<p>In der Methode füge ich die Drucktasten SORT_UP und SORT_DOWN der Toolbar hinzu.</p>
+<pre class="lang:abap decode:true">  METHOD on_toolbar.
+
+    check mv_sort_field is NOT INITIAL.
+
+    APPEND VALUE #(   function  = 'Sort_down'
+                      icon      = icon_next_page
+                      quickinfo = space
+                      butn_type = if_sat_ui_button_types=&gt;normal
+                      disabled  = space
+                      text      = 'Sort down'
+                      checked   = space ) TO e_object-&gt;mt_toolbar.
+    APPEND VALUE #(   function  = 'Sort_up'
+                      icon      = icon_previous_page
+                      quickinfo = space
+                      butn_type = if_sat_ui_button_types=&gt;normal
+                      disabled  = space
+                      text      = 'Sort up'
+                      checked   = space ) TO e_object-&gt;mt_toolbar.
+
+  ENDMETHOD.</pre>
+<h2>Redefinition DISPATCH</h2>
+<p>Um intern auf die Drucktasten reagieren zu können, muss ich die Methode DISPATCH redefinieren und meine Drucktasten SORT_UP und SORT_DOWN für das Ereignis TOOLBAR_BUTTON_CLICK abfangen.</p>
+<p>In allen anderen Fällen muss die Methode DISPATCH der abgeleiteten Klasse aufgerufen werden (SUPER-&gt;DISPATCH).</p>
+<p>Im Falle des Ereignisses TOOLBAR_BUTTON_CLICK muss ich mir noch die Ereignisparameter besorgen in denen der Funktionscode der Drucktaste steht (Methode GET_EVENT_PARAMETER).</p>
+<p>Nun gilt es noch, folgendes zu tun:</p>
+<ul>
+<li>Abfrage auf die Funktionscodes SORT_UP und SORT_DOWN</li>
+<li>Zugriff auf die Datentabelle erhalten</li>
+<li>Ermitteln der aktuellen Cursorposition</li>
+<li>Umsortieren des Eintrags</li>
+<li>Neunummerierung</li>
+<li>Cursor auf die umsortierte Zeile setzen</li>
+<li>Anzeige aktualisieren</li>
+</ul>
+<pre class="lang:abap decode:true">  METHOD dispatch.
+
+    DATA action TYPE string.
+    CASE eventid.
+      WHEN evt_toolbar_button_click.
+        CALL METHOD get_event_parameter
+          EXPORTING
+            parameter_id = 0
+            queue_only   = space
+          IMPORTING
+            parameter    = action.
+        CALL METHOD cl_gui_cfw=&gt;flush.
+        CASE action.
+          WHEN 'Sort_up'.
+            CALL METHOD get_current_cell
+              IMPORTING
+                es_row_id = DATA(ls_row)
+                es_row_no = DATA(ls_row_no).
+            FIELD-SYMBOLS &lt;outtab&gt; TYPE table.
+            ASSIGN mt_outtab-&gt;* TO &lt;outtab&gt;.
+            IF ls_row-index &gt; 1.
+              READ TABLE &lt;outtab&gt; ASSIGNING FIELD-SYMBOL(&lt;outline&gt;) INDEX ls_row-index.
+              DATA(indx) = ls_row-index - 1.
+              ASSIGN COMPONENT 2 OF STRUCTURE &lt;outline&gt; TO FIELD-SYMBOL(&lt;value&gt;).
+              IF sy-subrc = 0.
+                INSERT &lt;outline&gt; INTO &lt;outtab&gt; INDEX indx.
+                indx = indx + 2.
+                DELETE &lt;outtab&gt; INDEX indx.
+                indx = indx - 2.
+
+                LOOP AT &lt;outtab&gt; ASSIGNING &lt;outline&gt;.
+                  ASSIGN COMPONENT mv_sort_field OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+                  &lt;value&gt; = sy-tabix.
+                ENDLOOP.
+                refresh_table_display( is_stable = VALUE #( col = abap_true row = abap_true ) i_soft_refresh = abap_true ).
+                set_selected_rows( it_row_no = VALUE #( ( row_id = indx ) ) ).
+              ENDIF.
+            ENDIF.
+            EXIT.
+          WHEN 'Sort_down'.
+            CALL METHOD get_current_cell
+              IMPORTING
+                es_row_id = ls_row
+                es_row_no = ls_row_no.
+            ASSIGN mt_outtab-&gt;* TO &lt;outtab&gt;.
+            IF ls_row-index &lt; lines( &lt;outtab&gt; ).
+              READ TABLE &lt;outtab&gt; ASSIGNING &lt;outline&gt; INDEX ls_row-index.
+              indx = ls_row-index + 2.
+              ASSIGN COMPONENT 2 OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+              IF sy-subrc = 0.
+                INSERT &lt;outline&gt; INTO &lt;outtab&gt; INDEX indx.
+                indx = indx - 2.
+                DELETE &lt;outtab&gt; INDEX indx.
+                indx = indx + 1.
+                LOOP AT &lt;outtab&gt; ASSIGNING &lt;outline&gt;.
+                  ASSIGN COMPONENT mv_sort_field OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+                  &lt;value&gt; = sy-tabix.
+                ENDLOOP.
+
+                refresh_table_display( is_stable = VALUE #( col = abap_true row = abap_true ) i_soft_refresh = abap_true ).
+                set_selected_rows( it_row_no = VALUE #( ( row_id = indx ) ) ).
+              ENDIF.
+            ENDIF.
+            EXIT.
+        ENDCASE.
+    ENDCASE.
+
+
+    super-&gt;dispatch(
+      EXPORTING
+        cargo             = cargo
+        eventid           = eventid
+        is_shellevent     = is_shellevent
+        is_systemdispatch = is_systemdispatch
+      EXCEPTIONS
+        cntl_error        = 1
+        OTHERS            = 2 ).
+
+  ENDMETHOD.</pre>
+<h2>Testprogramm</h2>
+<p>In folgendem Testprogramm kannst du die Verwendung des neuen Standards sehen. Du siehst, dass trotz meines Eingriffs in die Toolbar weiterhin Drucktasten hinzugefügt werden können:</p>
+<pre class="lang:abap decode:true">REPORT zz_alv_grid_sort.
+
+DATA gs_data TYPE vbak.
+
+SELECT-OPTIONS s_vbeln FOR gs_data-vbeln.
+
+
+CLASS main DEFINITION.
+  PUBLIC SECTION.
+    TYPES ty_data       TYPE vbak.
+
+    TYPES ty_data_t     TYPE STANDARD TABLE OF ty_data
+                             WITH DEFAULT KEY.
+
+    DATA ms_data        TYPE ty_data.
+    DATA mt_data        TYPE ty_data_t.
+
+    DATA mr_grid        TYPE REF TO zcl_gui_alv_grid_sort.
+    METHODS start.
+  PROTECTED SECTION.
+    METHODS selection.
+    METHODS display.
+    METHODS handle_toolbar      FOR EVENT toolbar
+                  OF cl_gui_alv_grid
+      IMPORTING e_object.
+    METHODS handle_user_command FOR EVENT user_command
+                  OF cl_gui_alv_grid
+      IMPORTING e_ucomm sender.
+
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+
+  METHOD handle_user_command.
+
+    DATA lt_rows TYPE lvc_t_row.
+    DATA ls_row   TYPE lvc_s_row.
+    DATA ls_data  TYPE ty_data.
+
+    CASE e_ucomm.
+      WHEN 'USER01'.
+        sender-&gt;get_selected_rows( IMPORTING et_index_rows = lt_rows ).
+        LOOP AT lt_rows INTO ls_row.
+          READ TABLE mt_data INTO ls_data INDEX ls_row-index.
+          IF sy-subrc = 0.
+            MESSAGE i000(oo) WITH 'Usercommand 01: Beleg' ls_data-vbeln.
+          ENDIF.
+        ENDLOOP.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD handle_toolbar.
+
+    DATA: ls_toolbar  TYPE stb_button.
+
+*** Trenner
+    CLEAR ls_toolbar.
+    MOVE 3 TO ls_toolbar-butn_type.
+    APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+*** Icon “Test”
+    CLEAR ls_toolbar.
+    MOVE icon_generate              TO ls_toolbar-icon.
+    MOVE 'USER01'                   TO ls_toolbar-function.
+    MOVE 'User 01'                  TO ls_toolbar-quickinfo.
+    MOVE 'Userbutton 01'            TO ls_toolbar-text.
+    APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+  ENDMETHOD.
+
+
+  METHOD start.
+    selection( ).
+    display( ).
+  ENDMETHOD.
+
+  METHOD selection.
+    SELECT * FROM vbak INTO TABLE mt_data UP TO 10 ROWS.
+  ENDMETHOD.
+
+  METHOD display.
+
+    WRITE 'DUMMY'.
+
+    CREATE OBJECT mr_grid
+      EXPORTING
+        i_parent      = cl_gui_container=&gt;screen0
+        i_appl_events = space.
+
+    mr_grid-&gt;set_sort_field( 'ERNAM' ).
+
+    SET HANDLER handle_toolbar      FOR mr_grid.
+    SET HANDLER handle_user_command FOR mr_grid.
+
+
+    DATA lv_structure_name    TYPE dd02l-tabname VALUE 'VBAK'.
+    DATA ls_variant           TYPE disvariant.
+    DATA lv_save              TYPE char01 VALUE 'U'.
+    DATA lv_default           TYPE char01 VALUE abap_true.
+    DATA ls_layout            TYPE lvc_s_layo.
+
+    ls_layout-sel_mode       = 'A'.
+    ls_layout-grid_title     = 'Titel'.
+
+    mr_grid-&gt;set_table_for_first_display(
+      EXPORTING
+        i_structure_name              = lv_structure_name
+        is_variant                    = ls_variant
+        i_save                        = lv_save
+        i_default                     = lv_default
+        is_layout                     = ls_layout
+      CHANGING
+        it_outtab                     = mt_data ).
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+START-OF-SELECTION.
+  NEW main( )-&gt;start( ).</pre>
+<p>&nbsp;</p>
+<h2>Ergebnis</h2>
+<p>Du kannst nun den Cursor auf einen Eintrag stellen und durch Klicken auf &#8220;Sort Up&#8221; oder &#8220;Sort Down&#8221; den Eintrag umsortieren. Die Sortierung wird in dem Feld &#8220;ERNAM &#8211; Angelegt von&#8221; vorgehalten.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class4.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018161" src="https://tricktresor.com/wp-content/uploads/2017/10/class4.png" alt="" width="753" height="335" srcset="/wp-content/uploads/2017/10/class4.png 753w, /wp-content/uploads/2017/10/class4-300x133.png 300w" sizes="(max-width: 753px) 100vw, 753px" /></a></p>
+<h2>Fazit</h2>
+<p>Die Änderung von SAP-Standardfunktionen ist möglich. Allerdings ist das erstens nicht immer so einfach, wie in diesem Artikel beschrieben. In der Regel muss man genau und langwierig debuggen und prüfen, wo welche Methoden verwendet werden können. Zudem müssen die Funktionen natürlich ausgiebig getestet werden. Immerhin sollen sie genau wie die Standardfunktionalität zuverlässig funktionieren.</p>
+<p>Des Weiteren sollten Funktionen, die wirklich in einer Vielzahl von eigenen Programmierungen eingesetzt werden sauber ausprogrammiert werden. In dem hier vorgestellten Beispiel sollte zum Beispiel sichergestellt werden, dass das Feld mit der Sortierung auch wirklich im Feldkatalog vorhanden ist. Die Benutzereigene Sortierung muss irgendwie berücksichtigt werden.</p>
+<p>Zudem sollte es natürlich möglich sein, auch mehrere Zeilen zu markieren und diese en bloc zu verschieben. Das hängt aber wiederum von der Programmierung ab, ob wirklich mehrere Zeilen markiert werden dürfen oder nicht.</p>
+<p>Ebenso wäre die Eingangs erwähnte Sortierung mittels Drag &amp; Drop sinnvoll. Diese könnte dann allerdings einer anderen vom Programmierer erstellten Drag &amp; Drop Funktionalität in die Quere kommen.</p>
+<p>Allerdings lohnt es sich, hier Aufwand zu investieren, denn die erweiterte Funktionalität kann eventuell viele separate Programmierungen überflüssig machen oder vorhandene Programmierungen auf einfache Weise benutzerfreundlicher machen.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/">ALV-Grid um Sortierfunktion erweitern (Vererbung)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>BAPI_SALESORDER_CREATEFROMDAT2 Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/bapi_salesorder_createfromdat2/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 15 May 2023 12:15:20 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>BAPI_SALESORDER_CREATEFROMDAT2 Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Kundenfelder in BAPI-Struktur füllen</title>
+		<link>/blog/kundenfelder-in-bapi-struktur-fuellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 18 May 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_SALESORDER_CREATEFROMDAT2]]></category>
+		<category><![CDATA[EXTENSION]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=631934</guid>
+
+					<description><![CDATA[<p>Ein kleiner Überblick über das Befüllen von kundeneigenen Feldern im BAPI_SALESORDER_CREATEFROMDAT2. Hier gehe ich speziell auf die Zuweisung der Feldstruktur zu dem EXTENSION-Container ein. </p>
+<p>Der Beitrag <a href="/blog/kundenfelder-in-bapi-struktur-fuellen/">Kundenfelder in BAPI-Struktur füllen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Das Befüllen von Kundeneigenen Feldern in einem BAPI stellt einen häufig vor Probleme. Ich stelle dir hier eine kurze Doku mit Beispielcoding vor, um Kundenfelder korrekt und beschwerdefrei übergeben zu können.<br>Als Beispiel verwenden ich den BAPI_SALESORDER_CREATEFROMDAT2 zum Anlegen von Kundenaufträgen.</p>
+
+
+
+<h2 class="wp-block-heading">Vorbedingung BAPE_VBAK</h2>
+
+
+
+<p>Alle kundeneigenen Felder, die mittels APPEND an die Kopfstruktur VBAK angehängt wurden, müssen ebenfalls in einem APPEND an die Struktur BAPE_VBAK appendiert werden. Hierbei ist es wichtig, dass die Felder zeichenartig sein müssen! Es dürfen also keine Felder vom Typ FLOAT, DEC oder INT verwendet werden! Entweder müssen diese Felder außen vor gelassen werden (sie können dann nicht mittels BAPI geändert werden), oder es muss ein eigenes zeichenartiges Datenelement speziell für den BAPI angelegt werden.</p>
+
+
+
+<h2 class="wp-block-heading">Beispiel</h2>
+
+
+
+<p>Die Umwandlung einer Struktur in einen &#8220;Container&#8221; braucht man immer, wenn man Kundenfelder in BAPIs verwenden möchte. In vielen BAPIs gibt es einen EXTENSION-Parameter, dem alle Kundenfelder übergeben werden. In diesem speziellen Fall ist es die Übergabetabelle EXTENSIONIN.</p>
+
+
+
+<p>Die Anweisung zum Füllen der EXTENSIONIN sieht klassischerweise in etwa so aus:</p>
+
+
+
+<pre class="wp-block-preformatted">DATA ls_bape_vbak &nbsp;TYPE bape_vbak.<br>DATA ls_extension &nbsp;TYPE bapiparex.<br>DATA lt_extensions TYPE STANDARD TABLE OF bapiparex.<br><br>ls_bape_vbak-zzfeld1 &nbsp; &nbsp;= '1'.<br>ls_bape_vbak-zzfeld2 &nbsp; &nbsp;= 'ABCD'.<br><br>ls_extension-structure &nbsp;= 'BAPE_VBAK'.<br>ls_extension+30(960) &nbsp; &nbsp;= ls_bape_vbak. "(bapiparex-valuepart1 - 4)<br>APPEND ls_extension TO lt_extensions.</pre>
+
+
+
+<p>Abgesehen davon, dass die Unterteilung der Kundenfelder in VALUEPART1 bis VALUEPART4 absoluter Schwachsinn ist, ist es unter Unicode nicht mehr einfach möglich, die Strukturen zuzuweisen. Im ABAP-Editor erhältst du dann die Meldung:</p>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow">
+<p>&#8220;LS_EXTENSION+30(960)&#8221; und &#8220;LS_BAPE_VBAK&#8221; sind in einem<br>Unicode-Programm nicht ineinander konvertierbar.</p>
+</blockquote>
+
+
+
+<h2 class="wp-block-heading">Casting notwendig</h2>
+
+
+
+<p>Entweder bedient man sich des Tricks mit dem <a href="https://tricktresor.com/blog/casting-zwischen-strukturen/">X-Casting</a> oder man verwendet die entsprechende Klasse von SAP:&nbsp;<a href="https://help.sap.com/saphelp_nw73/helpdata/de/79/c554d3b3dc11d5993800508b6b8b11/content.htm?original_fqdn=help.sap.de">CL_ABAP_CONTAINER_UTILITIES</a>.<br>Mit dieser Klasse &#8211; und speziell der Methode FILL_CONTAINER_C &#8211; ist es möglich, die typgerechte Umwandlung vorzunehmen.</p>
+
+
+
+<pre class="wp-block-preformatted">cl_abap_container_utilities=&gt;fill_container_c<br>&nbsp; EXPORTING<br>&nbsp; &nbsp; im_value &nbsp; &nbsp; = ls_bape_vbak<br>&nbsp; IMPORTING<br>&nbsp; &nbsp; ex_container = ls_extension+30(960)<br>&nbsp; EXCEPTIONS<br>&nbsp; &nbsp; illegal_parameter_type = 1<br>&nbsp; &nbsp; OTHERS = 2.</pre>
+
+
+
+<h2 class="wp-block-heading">VBAKKOZ und VBAKKOZX</h2>
+
+
+
+<p>Damit die Verarbeitung letztendlich funktioniert, müssen die Strukturen VBAKKOZ und VBAKKOZX ebenfalls in gleicher Weise erweitert werden.</p>
+
+
+
+<p>Hierbei ist es wichtig, dass die Felder die gleiche Struktur haben. Fehlt in der VBAKKOZX ein Feld, dann funktioniert die Übertragung der Daten nicht.</p>
+
+
+
+<p>Gleiches gilt für die Felder der VBAP-Struktur.</p>
+
+
+
+<h2 class="wp-block-heading">SAP-Hinweis</h2>
+
+
+
+<p>Nützliche Informationen stehen in <a href="https://me.sap.com/notes/143580">SAP-Hinweis 143580</a>. </p>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/kundenfelder-in-bapi-struktur-fuellen/">Kundenfelder in BAPI-Struktur füllen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

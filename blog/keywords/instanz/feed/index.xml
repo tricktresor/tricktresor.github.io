@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Instanz Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/instanz/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 31 Aug 2018 07:24:38 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Instanz Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Global. Lokal. Egal.</title>
+		<link>/blog/global-lokal-egal/</link>
+					<comments>/blog/global-lokal-egal/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Dec 2016 21:13:54 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Objekt]]></category>
+		<category><![CDATA[Global]]></category>
+		<category><![CDATA[Lokal]]></category>
+		<category><![CDATA[klasse]]></category>
+		<category><![CDATA[Instanz]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=961091</guid>
+
+					<description><![CDATA[<p>Im Rahmen eines Projektes haben wir uns mit der dynamischen Erzeugung von Klassen beschäftigt und Stefan hat dabei einen netten Trick herausgefunden.</p>
+<p>Der Beitrag <a href="/blog/global-lokal-egal/">Global. Lokal. Egal.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im Rahmen eines Projektes haben wir uns mit der dynamischen Erzeugung von Klassen beschäftigt und Stefan hat dabei einen netten Trick herausgefunden.</p>
+<h2>Globale Klasse</h2>
+<p>Normalerweise gibt es in einem Report nur die folgenden zwei Möglichkeiten um eine Klasse zu instantiieren:</p>
+<ol>
+<li>Ein Objekt mit Referenz zu einer <strong>global</strong> definierten Klasse (SE24)</li>
+<li>Ein Objekt mit Referenz zu einer im selben Programm definierten <strong>lokalen</strong> Klasse</li>
+</ol>
+<p>Stefan hat nun eine Möglichkeit gefunden, wie man lokale Klassen, die in beliebigen Programmen definiert sind, erzeugen kann. Und das geht so:</p>
+<h2>Lokale Klasse</h2>
+<p>Wir brauchen ein Programm mit einer lokal definierten Klasse. In dem folgenden Programm werden zwei lokale Klassen definiert. Beide haben die Methode INFO.</p>
+<pre>REPORT zttloc01.
+
+CLASS lcl_local_01 DEFINITION.
+ PUBLIC SECTION.
+ METHODS info RETURNING VALUE(text) TYPE string.
+ENDCLASS.
+
+CLASS lcl_local_01 IMPLEMENTATION.
+
+METHOD info.
+ text = 'Ich bin Klasse 01'.
+ ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_local_02 DEFINITION.
+ PUBLIC SECTION.
+ METHODS info RETURNING VALUE(text) TYPE string.
+ENDCLASS.
+
+CLASS lcl_local_02 IMPLEMENTATION.
+
+METHOD info.
+ text = 'Ich bin Klasse 02'.
+ ENDMETHOD.
+ENDCLASS.</pre>
+<h2>Dynamische Erzeugung von Klasseninstanzen</h2>
+<p>Wenn man den Namen einer Klasse erst zur Laufzeit ermitteln kann, dann kann man ein Objekt dieser Klasse dynamisch wie folgt erzeugen:</p>
+<pre>DATA classname TYPE string.
+DATA object    TYPE REF TO object.
+classname = 'ZCL_CLASS_XYZ'.
+CREATE OBJECT object TYPE (classname).</pre>
+<p>Sinnvoller Weise verwendet man hierfür ein Interface, dass alle in Frage kommenden Klassen implementiert haben.</p>
+<h2>Ihr Auftritt Herr Kollege</h2>
+<p>Unser Trick besteht nun darin, dass wir den Klassennamen genauer spezifizieren. Wir geben dem Klassennamen die Information mit, in welchem Programm die Klasse vorhanden ist. Der Klassenname sieht dann zum Beispiel wie folgt aus:</p>
+<pre>\PROGRAM=ZTTLOC01\CLASS=LCL_LOCAL01</pre>
+<p>Wir müssen also nur noch die intern verwendete Struktur zusammenbasteln. Das folgende Programm erzeugt je nach Auswahl ein Objekt der im Programm ZTTLOC01 lokale definierten Klasse LCL_LOCAL_01 oder LCL_LOCAL_02.</p>
+<pre class="">REPORT zttlocaccess.
+
+PARAMETERS p_01 RADIOBUTTON GROUP cls DEFAULT 'X'.
+PARAMETERS p_02 RADIOBUTTON GROUP cls.
+PARAMETERS p_repid TYPE syrepid DEFAULT 'ZTTLOC01'.
+
+START-OF-SELECTION.
+
+ DATA classname TYPE string.
+ DATA r_object TYPE REF TO object.
+ DATA text TYPE string.
+
+CASE 'X'.
+ WHEN p_01.
+   classname = 'LCL_LOCAL_01'.
+ WHEN p_02.
+   classname = 'LCL_LOCAL_02'.
+ ENDCASE.
+
+ CONCATENATE '\PROGRAM=' p_repid '\CLASS=' classname INTO classname.
+
+ CREATE OBJECT r_object TYPE (classname).
+
+ CALL METHOD r_object-&gt;('INFO') RECEIVING text = text.
+ MESSAGE text TYPE 'I'.</pre>
+<h3>Screenshot</h3>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-07_22-04-54.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-961158 alignnone" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-07_22-04-54.jpg" alt="" width="696" height="430" srcset="/wp-content/uploads/2016/12/2016-12-07_22-04-54.jpg 696w, /wp-content/uploads/2016/12/2016-12-07_22-04-54-300x185.jpg 300w" sizes="(max-width: 696px) 100vw, 696px" /></a></p>
+<p>Das rufende Programm muss natürlich genau wissen, was es tut. Je nachdem wie dynamisch der Aufruf einzelner Methoden sein soll, können ebenfalls dynamisch ermittelte Parameter über die <a href="https://help.sap.com/saphelp_nw70/helpdata/de/08/d27c03b81011d194f60000e8353423/content.htm">Parameterliste</a> übergeben werden.</p>
+<p>Verwendet man ein Interface, dass die zu verwendenden Klassen implementieren, dann kann man verwendete Interface-Methoden direkt aufrufen.</p>
+<p>Der Beitrag <a href="/blog/global-lokal-egal/">Global. Lokal. Egal.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/global-lokal-egal/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

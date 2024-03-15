@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>submit Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/submit/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 07 Jul 2017 11:11:43 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>submit Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Exporting ALV to Memory</title>
+		<link>/blog/exporting-alv-to-memory/</link>
+					<comments>/blog/exporting-alv-to-memory/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 31 Aug 2011 14:51:59 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[submit]]></category>
+		<category><![CDATA[duet]]></category>
+		<category><![CDATA[mendocino]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=620</guid>
+
+					<description><![CDATA[<p>Eine Report-Listausgabe kann man bei einem SUBMIT mit dem Zusatz "EXPORTING LIST TO MEMORY" abgreifen. Bei einem ALV funktioniert das nat&#252;rlich nicht. Die SAP hat aber eine Funktion einegebaut, um auch nach einem SUBMIT an die erzeugt ALV-Liste zu gelangen...</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory/">Exporting ALV to Memory</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine Report-Listausgabe kann man bei einem SUBMIT mit dem Zusatz &#8220;EXPORTING LIST TO MEMORY&#8221; abgreifen. Bei einem ALV funktioniert das natürlich nicht. Die SAP hat aber eine Funktion einegebaut, um auch nach einem SUBMIT an die erzeugt ALV-Liste zu gelangen&#8230;</p>
+<p><img fetchpriority="high" decoding="async" width="602" height="359" class="alignnone size-full wp-image-4195" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d3c553de6e0.png" alt="" srcset="/wp-content/uploads/2014/01/img_52d3c553de6e0.png 602w, /wp-content/uploads/2014/01/img_52d3c553de6e0-300x178.png 300w" sizes="(max-width: 602px) 100vw, 602px" /></p>
+<h2 class="head1">EXPORTING ALV TO MEMORY</h2>
+<p>Den Zusatz &#8220;EXPORTING ALV TO MEMORY&#8221; gibt es dabei natürlich nicht&#8230;!</p>
+<p>Im Programm SALV_TEST_INTERCEPTOR_REPORT kann die Funktionalität nachvollzogen werden.</p>
+<p>Hauptbestandteil sind hierbei die folgenden drei Befehle, die den aufgerufenen ALV anweisen, seine Daten unter einer generierten GUID zu speichern:</p>
+<pre class="lang:abap decode:true ">g_guid = cl_salv_export_db_storage=&gt;create_guid( ).
+export l_mode = 'M' to memory id 'ALV_EXTRACT_MODE'.
+export l_guid = g_guid to memory id 'ALV_EXTRACT_GUID'.</pre>
+<p>Nach Aufruf des gewünschten Reports mittels SUBMIT können die Daten wieder eingelesen werden:</p>
+<pre class="lang:abap decode:true ">DATA l_xstring type xstring.
+l_xstring = cl_salv_export_db_storage=&gt;import_xmlstring( guid = g_guid ).</pre>
+<p>Entwickelt wurde diese Funktionalität zum Projekt/ Stichwort &#8220;SAP-Konnektor DUET/ Mendocino&#8221;.</p>
+<p>Das ganze fällt auch unter den Begriff &#8220;Office Suite Program&#8221;</p>
+<h2 class="head1">Office Suite Program (XAP-OSP)</h2>
+<p>Lösung, die es den Benutzern erlaubt, mühelos und schnell SAP-Geschäftsprozesse und -Daten über Microsoft Office zu bearbeiten.</p>
+<p>Duet for Microsoft Office und SAP wurde gemeinsam von Microsoft und SAP entwickelt und wird von beiden Unternehmen betreut. Die Lösung ermöglicht eine bessere Entscheidungsfindung, verbessert die Einhaltung von Prozessen und senkt Kosten.</p>
+<p>Als zusammengesetzte Anwendung vereint Duet for Microsoft Office and SAP die Enterprise Services Architecture (ESA) von SAP und Microsoft .Net in sich. Ausgewählte Prozesse und Informationen aus der mySAP Business Suite können in Microsoft Office bearbeitet werden.</p>
+<p>Aus der SAP-Hilfe: <a href="http://help.sap.com/saphelp_nw04/Helpdata/de/44/3b91f48936548fe10000000a155436/content.htm" target="_blank" rel="noopener">http://help.sap.com/saphelp_nw04/Helpdata/de/<br />
+44/3b91f48936548fe10000000a155436/content.htm</a></p>
+<p class="head1">Paket /OSP/MAIN</p>
+<p>In einem SAP System man weitere Informationen dazu, wenn man sich die untergeordneten Pakete zu /OSP/MAIN im Package Builder anschaut.</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory/">Exporting ALV to Memory</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/exporting-alv-to-memory/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

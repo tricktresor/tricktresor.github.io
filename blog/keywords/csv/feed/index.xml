@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>csv Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/csv/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:51 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>csv Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Umwandlung Struktur  CSV</title>
+		<link>/blog/umwandlung-struktur-csv/</link>
+					<comments>/blog/umwandlung-struktur-csv/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 14 Apr 2016 20:17:36 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[csv]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=431477</guid>
+
+					<description><![CDATA[<p>Für den Datenaustausch werden CSV-Dateien immer noch gerne verwendet, weil sie einfach zu erstellen und zu verwenden sind. Bei der Erstellung und beim Einlesen gibt es jedoch Tücken, die man am besten umgeht, in dem man Standardfunktionen verwendet.</p>
+<p>Der Beitrag <a href="/blog/umwandlung-struktur-csv/">Umwandlung Struktur &lt;-&gt; CSV</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Für den Datenaustausch werden CSV-Dateien immer noch gerne verwendet, weil sie einfach zu erstellen und zu verwenden sind. Bei der Erstellung und beim Einlesen gibt es jedoch Tücken, die man am besten umgeht, in dem man Standardfunktionen verwendet.</p>
+<p>Eine unkomplizierte Standardbibliothek ist die Klasse CL_RSDA_CSV_CONVERTER.</p>
+<p>Folgend ein kleines Verwendungsbeispiel</p>
+<h2>Code</h2>
+<pre>REPORT.
+
+DATA gr_conv TYPE REF TO cl_rsda_csv_converter.
+DATA gs_t000 TYPE t000.
+DATA gv_csv TYPE c LENGTH 1000.
+
+START-OF-SELECTION.
+
+ SELECT SINGLE * FROM t000 INTO gs_t000 WHERE mandt = '066'.
+
+ gr_conv = cl_rsda_csv_converter=&gt;create( i_delimiter = '"' i_separator = ';' ).
+
+ gr_conv-&gt;structure_to_csv( EXPORTING i_s_data = gs_t000
+ IMPORTING e_data = gv_csv ).
+
+ WRITE / gv_csv.</pre>
+<h2>Nachtrag</h2>
+<p>Ebenfalls einfach nutzbar ist die Klasse CL_ICF_CSV.  Mit der Methode REQUEST_FOR_WRITE_INTO_CSV kann man eine Tabelle inclusive Spaltenüberschriften ins CSV-Format konvertieren und gleichzeitig speichern. Die Methoden zum Umwandeln der Daten sind leider als PRIVATE deklariert, so dass die Klasse wirklich nur zum Umwandeln und direkten Speichern der Daten genutzt werden kann.</p>
+<p>Allerdings werden die Spaltenüberschriften hinzugelesen und als erste Zeile der CSV-Datei gespeichert.</p>
+<pre>DATA IT_DATA TYPE STANDARD TABLE OF t005.</pre>
+<pre>cl_icf_csv=&gt;request_for_write_into_csv(
+ it_data = it_data
+ iv_hdr_struct_name = 'T000'
+ iv_init_dir = 'd:\temp'
+ iv_file_name = 'testcsv.txt' ).</pre>
+<p>Der Beitrag <a href="/blog/umwandlung-struktur-csv/">Umwandlung Struktur &lt;-&gt; CSV</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/umwandlung-struktur-csv/feed/</wfw:commentRss>
+			<slash:comments>5</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

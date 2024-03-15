@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>dropdown Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/dropdown/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:03 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>dropdown Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Variantenwahl per Listbox</title>
+		<link>/blog/variantenwahl-per-listbox/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sun, 26 May 2013 14:30:16 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Selektionsbilder]]></category>
+		<category><![CDATA[dropdown]]></category>
+		<category><![CDATA[listbox]]></category>
+		<category><![CDATA[variante]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=673</guid>
+
+					<description><![CDATA[<p>Wenn Anwender in einem Report häufig verschiedene Varianten verwenden müssen, so können Sie unsere Version der Variantenauswahl verwenden. Die Varianten werden in einer Listbox dargestellt und können einfach ausgewählt werden.</p>
+<p>Der Beitrag <a href="/blog/variantenwahl-per-listbox/">Variantenwahl per Listbox</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wenn Anwender in einem Report häufig verschiedene Varianten verwenden müssen, so können Sie unsere Version der Variantenauswahl verwenden. Die Varianten werden in einer Listbox dargestellt und können einfach ausgewählt werden.</p>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/abap/Auswahl_Variante.jpg" /><br />
+Auswahl der Selektionsbildvariante per Listbox</td>
+</tr>
+</tbody>
+</table>
+<p>Vielen Dank an Ralf Wenzel!</p>
+<p>Beachten Sie auch das Programm &#8220;<a href="/wp-content/index.php?aID=489" target="_self">Variantenschnellauswahl</a>&#8220;.</p>
+<p class="head1">Coding</p>
+<p class="sap1">REPORT ZZ_VARIANT_LISTBOX.</p>
+<p class="sap1">PARAMETERS p1 TYPE char10.<br />
+PARAMETERS p2 TYPE char10.</p>
+<p class="sap1"><span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;*<br />
+* Listbox zur Auswahl der Selelektionsbild-Variante<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;*<br />
+</span>SELECTION-SCREEN BEGIN OF BLOCK var WITH FRAME TITLE text-var.<br />
+PARAMETERS pa_selva TYPE raldb_vari AS LISTBOX<br />
+VISIBLE LENGTH 40<br />
+USER-COMMAND variant.<br />
+SELECTION-SCREEN END OF BLOCK var.</p>
+<p class="sap1">INITIALIZATION.<br />
+PERFORM set_values.</p>
+<p class="sap1">AT SELECTION-SCREEN.<br />
+PERFORM set_variant.</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  set_values<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+</span>FORM set_values.</p>
+<p class="sap1">  DATA lt_varit         TYPE vrm_values.</p>
+<p class="sap1"><span style="color: #fb2412;">*== Listbox mit Varianten füllen</span><br />
+SELECT variant vtext<br />
+FROM varit INTO TABLE lt_varit<br />
+WHERE langu  = sy-langu<br />
+AND report = sy-repid.</p>
+<p class="sap1">  CALL FUNCTION &#8216;VRM_SET_VALUES&#8217;<br />
+EXPORTING<br />
+id              = &#8216;PA_SELVA&#8217;<br />
+values          = lt_varit<br />
+EXCEPTIONS<br />
+id_illegal_name = 1<br />
+OTHERS          = 2.<br />
+ENDFORM.                    &#8220;set_values</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  set_variant<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</span><br />
+FORM set_variant.</p>
+<p class="sap1">  DATA lv_selva         TYPE raldb_vari.<br />
+DATA ls_rkey          TYPE rsvarkey.</p>
+<p class="sap1">  CASE sy-ucomm.<br />
+WHEN &#8216;VARIANT&#8217;.<br />
+lv_selva        = pa_selva.<br />
+ls_rkey-report  = sy-repid.<br />
+ls_rkey-variant = lv_selva.<br />
+IF pa_selva IS INITIAL.<br />
+<span style="color: #fb2412;">*== An dieser Stelle kann man das Selektionsbild zurücksetzen,<br />
+*== wenn man mag<br />
+</span>      ENDIF.<br />
+PERFORM %_import_vari_clnt<br />
+USING    ls_rkey sy-subrc sy-mandt<br />
+CHANGING sy-subrc.<br />
+pa_selva = lv_selva.<br />
+ENDCASE.</p>
+<p class="sap1">ENDFORM.                    &#8220;set_variant</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/variantenwahl-per-listbox/">Variantenwahl per Listbox</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

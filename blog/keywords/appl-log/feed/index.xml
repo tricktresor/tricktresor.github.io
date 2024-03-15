@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Appl-Log Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/appl-log/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 07 Nov 2023 12:03:23 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Appl-Log Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Application-Log mit Kontext</title>
+		<link>/blog/application-log-mit-kontext/</link>
+					<comments>/blog/application-log-mit-kontext/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 14 Feb 2017 17:57:47 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Protokoll]]></category>
+		<category><![CDATA[Appl-Log]]></category>
+		<category><![CDATA[Application-Log]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017880</guid>
+
+					<description><![CDATA[<p>Mit dem Application-Log lassen sich standardisiert Meldungen sammeln und ausgeben. Was viele nicht wissen: die Meldungen können um eigene Felder erweitert werden. Die Zusatzinformationen werden im KONTEXT gespeichert. Dieser Kontext muss definiert und natürlich separat gefüllt werden. Im Demoprogramm&#160;SBAL_DEMO_02 kannst du nachvollziehen, wie die Programmierung erfolgen muss. Kontext Mit Kontext sind zusätzliche Felder gemeint, die zusätzlich zu jeder Meldung gesetzt werden können. Auf diese Weise lassen sich Meldungen besser gruppieren oder darstellen. Zudem können Meldungen...</p>
+<p>Der Beitrag <a href="/blog/application-log-mit-kontext/">Application-Log mit Kontext</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Mit dem Application-Log lassen sich standardisiert Meldungen sammeln und ausgeben. Was viele nicht wissen: die Meldungen können um eigene Felder erweitert werden. Die Zusatzinformationen werden im KONTEXT gespeichert. Dieser Kontext muss definiert und natürlich separat gefüllt werden.</p>
+
+
+
+<p>Im Demoprogramm&nbsp;SBAL_DEMO_02 kannst du nachvollziehen, wie die Programmierung erfolgen muss.</p>
+
+
+
+<h2 class="wp-block-heading">Kontext</h2>
+
+
+
+<p>Mit Kontext sind zusätzliche Felder gemeint, die zusätzlich zu jeder Meldung gesetzt werden können. Auf diese Weise lassen sich Meldungen besser gruppieren oder darstellen. Zudem können Meldungen an sich kürzer ausfallen. Häufig wird ein Protokoll für eine Vielzahl von gleichen Objekten erstellt (Materialnummern, Werke, Kunden, Belegnummer etc.) Anstelle der Meldung &#8220;Prüfung für Material &amp;1 (Werk &amp;2) und Charge &amp;3 wurde erfolgreich beendet.&#8221; könnten die Felder <em>Materialnummer, Werk</em> und <em>Charge</em> in einem Kontext gespeichert werden. Die Meldung lautet dann nur noch &#8220;Chargenprüfung erfolgreich.&#8221;.</p>
+
+
+
+<figure class="wp-block-image"><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-14_18-07-33.jpg"><img fetchpriority="high" decoding="async" width="767" height="180" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-14_18-07-33.jpg" alt="" class="wp-image-1017881" srcset="/wp-content/uploads/2017/02/2017-02-14_18-07-33.jpg 767w, /wp-content/uploads/2017/02/2017-02-14_18-07-33-300x70.jpg 300w" sizes="(max-width: 767px) 100vw, 767px" /></a></figure>
+
+
+
+<p>Als Kontext muss eine eigene Struktur verwendet werden. Im Demoprogramm wird die Struktur&nbsp;BAL_S_EX01 verwendet:</p>
+
+
+
+<figure class="wp-block-image"><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-14_18-14-27.jpg"><img decoding="async" width="901" height="289" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-14_18-14-27.jpg" alt="" class="wp-image-1017882" srcset="/wp-content/uploads/2017/02/2017-02-14_18-14-27.jpg 901w, /wp-content/uploads/2017/02/2017-02-14_18-14-27-300x96.jpg 300w, /wp-content/uploads/2017/02/2017-02-14_18-14-27-768x246.jpg 768w" sizes="(max-width: 901px) 100vw, 901px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">Verwendung der Felder: Meldung hinzufügen</h2>
+
+
+
+<p>Um eine Meldung dem Meldungsprotokoll hinzuzufügen, ruft man den Baustein&nbsp;&nbsp;BAL_LOG_MSG_ADD auf:</p>
+
+
+
+<pre class="wp-block-preformatted">ls_msg-msgty = sy-msgty.
+ls_msg-msgid = sy-msgid.
+ls_msg-msgno = sy-msgno.
+ls_msg-msgv1 = sy-msgv1.
+ls_msg-msgv2 = sy-msgv2.
+ls_msg-msgv3 = sy-msgv3.
+ls_msg-msgv4 = sy-msgv4.
+CALL FUNCTION 'BAL_LOG_MSG_ADD'
+  EXPORTING
+    i_s_msg = ls_msg.</pre>
+
+
+
+<p>In LS_MSG hat man die Meldungsnummer, Meldungs-ID und Meldungstyp sowie die vier Meldungsvariablen gespeichert. Möchte man den Kontext verwenden, dann muss auch das Feld LS_MSG-CONTEXT gefüllt werden:</p>
+
+
+
+<pre class="wp-block-preformatted">DATA ls_msg     TYPE bal_s_msg.
+DATA ls_context TYPE bal_s_ex01.
+
+* define context information
+ ls_context-carrid      = i_carrid.
+ ls_context-connid      = i_connid.
+ ls_context-fldate      = i_fldate.
+ ls_msg-context-tabname = 'BAL_S_EX01'.
+ ls_msg-context-value   = ls_context.</pre>
+
+
+
+<p>So kann für jede Meldung ein eigenes Set an Feldern mitgegeben werden.</p>
+
+
+
+<h2 class="wp-block-heading">Verwendung der Felder: Anzeige</h2>
+
+
+
+<p>Die Kontext-Felder werden nicht automatisch angezeigt, sondern müssen im Feldkatalog definiert werden. Damit die zusätzlichen Felder im Protokoll auftauchen, musst du sie im <em>Display Profile</em> hinzufügen. Mit dem Funktionsbaustein&nbsp;BAL_DSP_PROFILE_SINGLE_LOG_GET kannst du ein Standard-Anzeigeprofil laden und den Feldkatalog entsprechend erweitern:</p>
+
+
+
+<pre class="wp-block-preformatted">* add passenger ID to message table
+ l_s_fcat-ref_table = 'BAL_S_EX01'.
+ l_s_fcat-ref_field = 'ID'.
+ l_s_fcat-col_pos = 100.
+ APPEND l_s_fcat TO l_s_display_profile-mess_fcat.</pre>
+
+
+
+<h2 class="wp-block-heading">Verwendung der Felder: Baumanzeige</h2>
+
+
+
+<p>Ein Stärke des Application-Log ist die Darstellung der Meldung in einer Baumstruktur. Hierfür müssen die einzelnen Ebenen genau definiert werden. Das folgende Beispiel zeigt eine Aufteilung nach Fluglinien und Flügen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="768" height="688" src="/wp-content/uploads/2023/11/image-1.png" alt="" class="wp-image-1044134" srcset="/wp-content/uploads/2023/11/image-1.png 768w, /wp-content/uploads/2023/11/image-1-300x269.png 300w" sizes="(max-width: 768px) 100vw, 768px" /></figure>
+
+
+
+<p>Das Coding dafür definiert den Feldkatalog und die Sortierung für die einzelnen Ebenen. LEV1_FCAT und LEV1_SORT definieren die Felder und die Sortierung für die oberste Ebene, LEV2* für die zweite und so weiter.</p>
+
+
+
+<pre class="wp-block-preformatted"> l_s_fcat-ref_table = 'BAL_S_EX01'.
+ l_s_fcat-ref_field = 'ID'.
+ l_s_fcat-col_pos   = 1.
+ APPEND l_s_fcat TO l_s_display_profile-lev2_fcat.
+ l_s_sort-ref_table = 'BAL_S_EX01'.
+ l_s_sort-ref_field = 'ID'.
+ l_s_sort-up        = 'X'.
+ l_s_sort-spos      = 1.
+ APPEND l_s_sort TO l_s_display_profile-lev2_sort.
+ l_s_fcat-ref_table = 'BAL_S_SHOW'.
+ l_s_fcat-ref_field = 'T_MSGTY'.
+ l_s_fcat-col_pos   = 1.
+ APPEND l_s_fcat TO l_s_display_profile-lev1_fcat.
+ l_s_sort-ref_table = 'BAL_S_SHOW'.
+ l_s_sort-ref_field = 'T_MSGTY'.
+ l_s_sort-up        = 'X'.
+ l_s_sort-spos      = 1.
+ APPEND l_s_sort TO l_s_display_profile-lev1_sort.</pre>
+
+
+
+<p>Auf diese Weise ist eine schöne und ansprechende Darstellung von Meldungen leicht möglich.</p>
+
+
+
+<p>Folgende Felder des Anzeigeprofils haben Einfluss auf die Baumdarstellung:</p>
+
+
+
+<p>Das Feld TREE_ONTOP definiert, ob der Baum oben (TREE_ONTOP = X) oder links angezeigt wird (TREE_ONTOP = space).</p>
+
+
+
+<p>Mit TREE_SIZE kann die Größe des Tree-Containers definiert werden.</p>
+
+
+
+<figure class="wp-block-image"><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-14_18-56-46.jpg"><img loading="lazy" decoding="async" width="980" height="213" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-14_18-56-46.jpg" alt="" class="wp-image-1017887" srcset="/wp-content/uploads/2017/02/2017-02-14_18-56-46.jpg 980w, /wp-content/uploads/2017/02/2017-02-14_18-56-46-300x65.jpg 300w, /wp-content/uploads/2017/02/2017-02-14_18-56-46-768x167.jpg 768w" sizes="(max-width: 980px) 100vw, 980px" /></a></figure>
+<p>Der Beitrag <a href="/blog/application-log-mit-kontext/">Application-Log mit Kontext</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/application-log-mit-kontext/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

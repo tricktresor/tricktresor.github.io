@@ -1,0 +1,1591 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ABAP eigene Programme Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/abap-eigene-programme/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 23 Apr 2021 13:34:37 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ABAP eigene Programme Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Daten einer Website per HTTP ermitteln</title>
+		<link>/blog/daten-einer-website/</link>
+					<comments>/blog/daten-einer-website/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Jul 2012 20:02:59 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[cl_http_client]]></category>
+		<category><![CDATA[url]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Regex]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[color]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=649</guid>
+
+					<description><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Mithilfe der Klasse CL_HTTP_CLIENT besorgen wir uns den Quelltext einer Internetseite. Die URL muss dabei komplett angegeben werden, also inklusive http://</p>
+<h2 class="head1">Coding</h2>
+<p class="sap1">
+<pre class="lang:abap decode:true ">*:: Selection screen
+PARAMETERS p_url TYPE string LOWER CASE
+DEFAULT '/wp-content/index.php?aID=0'.
+
+START-OF-SELECTION.
+
+  PERFORM get_urls USING p_url.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_URLS
+*&amp;---------------------------------------------------------------------*
+FORM get_urls  USING  iv_url TYPE clike.
+
+*:: local data
+  DATA lv_http_url     TYPE string.
+  DATA lr_http_client  TYPE REF TO if_http_client.
+  DATA lv_html_code    TYPE string.
+
+  DATA lt_urls         TYPE STANDARD TABLE OF string
+WITH NON-UNIQUE DEFAULT KEY.
+  DATA lt_new          LIKE lt_urls.
+  DATA lv_regex        TYPE string.
+
+  DATA lv_url          TYPE string.
+  DATA lv_dummy1       TYPE string.
+  DATA lv_dummy2       TYPE string.
+
+  STATICS lt_list      TYPE HASHED TABLE OF string
+WITH UNIQUE KEY table_line.
+
+*:: create url
+  CALL METHOD cl_http_client=&gt;create_by_url
+    EXPORTING
+      url                = iv_url
+    IMPORTING
+      client             = lr_http_client
+    EXCEPTIONS
+      argument_not_found = 1
+      plugin_not_active  = 2
+      internal_error     = 3
+      OTHERS             = 4.
+  IF sy-subrc &gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to create url, Sy-Subrc;', sy-subrc.
+    STOP.
+  ENDIF.
+
+*:: Send out request
+  lr_http_client-&gt;send( ).
+
+*:: Receive result as stream
+  CALL METHOD lr_http_client-&gt;receive
+    EXCEPTIONS
+      http_communication_failure = 1
+      http_invalid_state         = 2
+      http_processing_failed     = 3
+      OTHERS                     = 4.
+
+  IF sy-subrc &lt;&gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to read data, Sy-Subrc;', sy-subrc.
+  ELSE.
+*:: Get sourcecode
+    lv_html_code = lr_http_client-&gt;response-&gt;get_cdata( ).
+    WRITE:/ iv_url COLOR 5.
+
+*:: simple method - Find urls
+    SPLIT lv_html_code AT 'href=' INTO TABLE lt_urls.
+    LOOP AT lt_urls INTO lv_url.
+      FORMAT COLOR OFF.
+      CHECK lv_url IS NOT INITIAL.
+      CHECK lv_url(1) = `"`
+      OR lv_url(1) = `'`.
+      FIND lv_url(1) IN lv_url+1 MATCH OFFSET sy-fdpos.
+      CHECK sy-subrc = 0.
+      lv_url = lv_url+1(sy-fdpos).
+
+      IF lv_url IS INITIAL.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '#'.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '/'.  "Root
+        FORMAT COLOR COL_GROUP.
+
+      ELSEIF lv_url(1) = '?'.
+        SPLIT iv_url AT '?' INTO lv_dummy1 lv_dummy2.
+        IF sy-subrc = 0.
+          CONCATENATE lv_dummy1 lv_url INTO lv_url.
+        ELSE.
+        ENDIF.
+      ELSEIF lv_url(5) = 'https' OR lv_url(5) = 'HTTPS'.
+        FORMAT COLOR COL_POSITIVE.
+      ELSEIF lv_url(4) = 'http' OR lv_url(4) = 'HTTP'.
+        FORMAT COLOR COL_NORMAL.
+      ENDIF.
+
+*:: try to find main URL in link
+      CONCATENATE '^' iv_url INTO lv_regex.
+      FIND REGEX lv_regex IN lv_url.
+      IF sy-subrc = 0.
+        FORMAT INTENSIFIED ON.
+      ELSE.
+        FORMAT INTENSIFIED OFF.
+      ENDIF.
+      WRITE: /10 lv_url.
+
+    ENDLOOP.
+    ULINE.
+
+  ENDIF.
+
+ENDFORM.                    " GET_URLS</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/daten-einer-website/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Fly-Out-Menu</title>
+		<link>/blog/fly-out-menu/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 09 Nov 2010 10:01:06 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=565</guid>
+
+					<description><![CDATA[<p>Ein Fly-Out-Mechanismus auf dem Selektionsbild mithilfe von HTML und entsprechenden Events. F&#228;hrt man mit der Maus &#252;ber einen der drei angebotenen K&#228;sten, so f&#228;hrt der Docker-Control aus und zeigt eine Auswahl an optionen, die ins Selektionsbild &#252;bernommen werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/fly-out-menu/">Fly-Out-Menu</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein Fly-Out-Mechanismus auf dem Selektionsbild mithilfe von HTML und entsprechenden Events. Fährt man mit der Maus über einen der drei angebotenen Kästen, so fährt der Docker-Control aus und zeigt eine Auswahl an optionen, die ins Selektionsbild übernommen werden können.</p>
+<p class="head1">Beschreibung</p>
+<p>Im folgenden Coding wird im Docker eine HTML-Seite angezeigt, die mittels des Javascript-Befehls <strong>OnMouseOver</strong> ein Event an SAP absetzt. Im SAP wird darauf mit einer Vergrößerung des Docking-Containers reagiert.</p>
+<p>Wählt man einen Wert aus, so wird dieser in das Selektionsbild übernommen und der Docking-Container wird wieder verkleinert.</p>
+<p>Ein OnMouseOver &#8211; OnMouseOut war leider nicht möglich, da beim Vergrößern des Docking-Containers automatisch ein &#8220;OnMouseOut&#8221; gesendet wird. Der Container würde also sofort wieder verkleinert, ohne dass man ein Auswahl treffen könnte.</p>
+<p class="head1">Zusätzliche Info: Scrollbars</p>
+<p>Mit diesem Zusatz im BODY-Tag ist es möglich, den &#8211; in diesem Fall &#8211; immer sichtbaren vertikalen Scrollbalken nur dann zu aktivieren, wenn er wirklich nötig ist:</p>
+<p>&lt;BODY style=&#8221;overflow:auto;&#8221;&gt;</p>
+<p class="head1">So sieht&#8217;s aus</p>
+<p>So ist das Fly-Out-Menu eingeklappt. Der Benutzer sieht nur die &#8220;Kategorien&#8221;</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/Flyout01.jpg" /></p>
+<p>Und hier wurde mit der Maus auf &#8220;Zahlen&#8221; gezeigt und das Menu klappt aus:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/Flyout02.jpg" /></p>
+<p class="head1">Coding</p>
+<p class="sap1">REPORT z_fly_out_menu.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Data<br />
+</span>DATA: cl_docker         TYPE REF TO cl_gui_docking_container.<br />
+CONSTANTS c_dock_open   TYPE i VALUE 400.<br />
+CONSTANTS c_dock_close  TYPE i VALUE 180.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Selection screen<br />
+</span>PARAMETERS: p_field     TYPE char10 DEFAULT &#8216;3333&#8217;.</p>
+<p class="sap1">INITIALIZATION.<br />
+PERFORM create_objects.</p>
+<p class="sap1"><span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*       CLASS lcl_event_receiver DEFINITION<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+</span>CLASS lcl_event_receiver DEFINITION.<br />
+PUBLIC SECTION.</p>
+<p class="sap1">    CLASS-METHODS:  handle_sapevent<br />
+FOR EVENT sapevent OF cl_gui_html_viewer<br />
+IMPORTING action<br />
+frame<br />
+getdata<br />
+postdata<br />
+query_table.<br />
+ENDCLASS.                    &#8220;lcl_event_receiver DEFINITION</p>
+<p class="sap1"><span style="color: #fb2412;">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+*       CLASS lcl_event_receiver IMPLEMENTATION<br />
+*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<br />
+</span>CLASS lcl_event_receiver IMPLEMENTATION.<br />
+METHOD handle_sapevent.</p>
+<p class="sap1">    IF action+1 IS NOT INITIAL.<br />
+<span style="color: #fb2412;">*** set value<br />
+</span>      p_field = action+1.<br />
+<span style="color: #fb2412;">*** close docker<br />
+</span>      CALL METHOD cl_docker-&gt;set_extension<br />
+EXPORTING<br />
+extension = c_dock_close.<br />
+ELSE.<br />
+CASE action(1).<br />
+WHEN &#8216;1&#8217;.<br />
+<span style="color: #fb2412;">*** Open Docker<br />
+</span>          CALL METHOD cl_docker-&gt;set_extension<br />
+EXPORTING<br />
+extension = c_dock_open.<br />
+WHEN &#8216;2&#8217;.<br />
+<span style="color: #fb2412;">*** Close docker<br />
+</span>          CALL METHOD cl_docker-&gt;set_extension<br />
+EXPORTING<br />
+extension = c_dock_close.<br />
+ENDCASE.<br />
+ENDIF.<br />
+ENDMETHOD.                    &#8220;handle_sapevent</p>
+<p class="sap1">ENDCLASS.                    &#8220;lcl_event_receiver IMPLEMENTATION</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Form  CREATE_OBJECTS<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+</span>FORM create_objects .</p>
+<p class="sap1">  DATA: t_events        TYPE cntl_simple_events,<br />
+wa_event        LIKE LINE OF t_events,<br />
+event_receiver  TYPE REF TO lcl_event_receiver,<br />
+t_html          TYPE STANDARD TABLE OF text8192 WITH NON-UNIQUE DEFAULT KEY,<br />
+html            LIKE LINE OF t_html,<br />
+url             TYPE text1000,<br />
+zahl            TYPE text10,<br />
+cl_html         TYPE REF TO cl_gui_html_viewer.</p>
+<p class="sap1"><span style="color: #fb2412;">*** create docker</span><br />
+CREATE OBJECT cl_docker<br />
+EXPORTING<br />
+extension               = c_dock_close<br />
+side                    = cl_gui_docking_container=&gt;dock_at_right<br />
+no_autodef_progid_dynnr = &#8216;X&#8217;.</p>
+<p class="sap1"><span style="color: #fb2412;">*** create HTML</span><br />
+CREATE OBJECT cl_html<br />
+EXPORTING<br />
+parent = cl_docker.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Register SAPEVENT</span><br />
+CALL METHOD cl_html-&gt;get_registered_events<br />
+IMPORTING<br />
+events = t_events.<br />
+wa_event-eventid    = cl_gui_html_viewer=&gt;m_id_sapevent.<br />
+wa_event-appl_event = &#8216;X&#8217;.<br />
+READ TABLE t_events TRANSPORTING NO FIELDS<br />
+WITH KEY eventid = wa_event-eventid.<br />
+IF sy-subrc &lt;&gt; 0.<br />
+APPEND wa_event TO t_events.<br />
+ENDIF.</p>
+<p class="sap1">  CALL METHOD cl_html-&gt;set_registered_events<br />
+EXPORTING<br />
+events = t_events.<br />
+SET HANDLER lcl_event_receiver=&gt;handle_sapevent FOR cl_html.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Build HTML-Code<br />
+</span>  CONCATENATE  &#8216;&lt;html&gt;&#8217;<br />
+&#8216;&lt;head&gt;&lt;title&gt;Test&lt;/title&gt;&#8217;<br />
+&#8216;&lt;script type=&#8221;text/javascript&#8221;&gt;&#8217;<br />
+&#8216; function OutOfSAPTimerStart(element) {&#8216;<br />
+&#8216;  location.href = &#8220;SAPEVENT:&#8221;+element;&#8217;<br />
+&#8216; }&#8217;<br />
+&#8216;&lt;/script&gt;&#8217;</p>
+<p class="sap1">               &#8216;&lt;/head&gt;&#8217;<br />
+&#8216;&lt;body style=&#8221;overflow:auto;&#8221;&gt;&#8217; <span style="color: #fb2412;">&#8220;Scroll bars auto&#8221;</span><br />
+&#8216;&lt;table border=&#8221;0&#8243; width=&#8221;300px&#8221;&gt;&#8217;<br />
+&#8216;&lt;tr&gt;&lt;td  onmouseover=&#8221;OutOfSAPTimerStart(&#8221;1&#8221;);&#8221; width=&#8221;150px&#8221; bgcolor=&#8221;#FF2200&#8243;&gt;&lt;h1&gt;Zahlen&lt;/h1&gt;&lt;/td&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;p&gt;Bitte wählen Sie eine Zahl aus!&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221; Eins&#8221;);&#8221;&gt;&lt;p&gt;Eins&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221; Zwei&#8221;);&#8221;&gt;&lt;p&gt;Zwei&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221; Drei&#8221;);&#8221;&gt;&lt;p&gt;Drei&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;</p>
+<p class="sap1">               &#8216;&lt;tr&gt;&lt;td  onmouseover=&#8221;OutOfSAPTimerStart(&#8221;1&#8221;);&#8221; bgcolor=&#8221;#22FF00&#8243;&gt;&lt;h1&gt;Zeichen&lt;/h1&gt;&lt;/td&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;p&gt;Bitte wählen Sie ein Zeichen aus!&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221; A&#8221;);&#8221;&gt;&lt;p&gt;Ah&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221; B&#8221;);&#8221;&gt;&lt;p&gt;Beh&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221; C&#8221;);&#8221;&gt;&lt;p&gt;Ceh&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;tr&gt;&lt;td  onmouseover=&#8221;OutOfSAPTimerStart(&#8221;1&#8221;);&#8221; bgcolor=&#8221;#0022FF&#8221;&gt;&lt;h1&gt;Tiere&lt;/h1&gt;&lt;/td&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;p&gt;Bitte wählen Sie ein Tier aus!&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221; Elefant&#8221;);&#8221;&gt;&lt;p&gt;Elefant&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221; Maus&#8221;);&#8221;&gt;&lt;p&gt;Maus&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221; Hahn&#8221;);&#8221;&gt;&lt;p&gt;Hahn&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;tr height=&#8221;60px&#8221;&gt;&lt;td&gt;&lt;h1&gt;&lt;/h1&gt;&lt;/td&gt;&#8217;<br />
+&#8216;&lt;tr&gt;&lt;td&gt;&lt;h1&gt;&lt;/h1&gt;&lt;/td&gt;&#8217;<br />
+&#8216;&lt;td&gt;&lt;a href=&#8221;#&#8221; onClick=&#8221;OutOfSAPTimerStart(&#8221;2&#8221;);&#8221;&gt;&lt;p&gt;Abbruch&lt;/p&gt;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&#8217;<br />
+&#8216;&lt;/table&gt;&#8217;<br />
+&#8216;&lt;/body&gt;&#8217;<br />
+&#8216;&lt;/html&gt;&#8217;<br />
+INTO html.</p>
+<p class="sap1">  APPEND html TO t_html.</p>
+<p class="sap1"><span style="color: #fb2412;">*** load HTML<br />
+</span>  CALL METHOD cl_html-&gt;load_data<br />
+IMPORTING<br />
+assigned_url = url<br />
+CHANGING<br />
+data_table   = t_html.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Show HTML page<br />
+</span>  CALL METHOD cl_html-&gt;show_url<br />
+EXPORTING<br />
+url = url.</p>
+<p class="sap1">ENDFORM.                    &#8221; CREATE_OBJECTS</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/fly-out-menu/">Fly-Out-Menu</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Unterprogramme ermitteln</title>
+		<link>/blog/unterprogramme-ermitteln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 09 Sep 2010 19:10:47 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=564</guid>
+
+					<description><![CDATA[<p>Dieses kleine Programm ermittelt zu einem Programm/ Modulpool alle Unterprogramme und gibt sie aus. Dies ist eventuell f&#252;r Dokumentationen ganz n&#252;tzlich.</p>
+<p>Der Beitrag <a href="/blog/unterprogramme-ermitteln/">Unterprogramme ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Dieses kleine Programm ermittelt zu einem Programm/ Modulpool alle Unterprogramme und gibt sie aus. Dies ist eventuell für Dokumentationen ganz nützlich.</p>
+<p class="text1">Alternativ kann auch der Baustein RS_PROGRAM_INDEX verwendet werden. Umd die Routine dann genauer zu lokalisieren, verwenden Sie am besten den Baustein RS_SEARCH_FORM.</p>
+
+
+<pre class="wp-block-preformatted"> <br>DATA lt_source TYPE TABLE OF string.<br>DATA lt_struc TYPE STANDARD TABLE OF sstruc.<br>DATA lt_token TYPE STANDARD TABLE OF stokes.<br>DATA lt_stats TYPE STANDARD TABLE OF sstmnt.<br>DATA lt_level TYPE STANDARD TABLE OF slevel.<br>DATA lv_index TYPE i.<br>FIELD-SYMBOLS &lt;token> TYPE stokes.<br>FIELD-SYMBOLS &lt;uprog> TYPE stokes.<br> *** Selection screen<br>PARAMETERS P_REPID TYPE REPID.<br> START-OF-SELECTION.<br> *** Read report source<br>READ REPORT p_repid INTO lt_source.<br> *** Scan report<br>SCAN ABAP-SOURCE lt_source WITH INCLUDES<br>     TOKENS     INTO lt_token<br>     STATEMENTS INTO lt_stats<br>     STRUCTURES INTO lt_struc<br>     LEVELS     INTO lt_level.<br> *** find subroutines<br>LOOP AT lt_token ASSIGNING &lt;token> WHERE str = 'FORM'.<br>  lv_index = sy-tabix + 1.<br>  READ TABLE lt_token ASSIGNING &lt;uprog> INDEX lv_index.<br>  WRITE: / &lt;uprog>-str.<br>ENDLOOP. </pre>
+<p>Der Beitrag <a href="/blog/unterprogramme-ermitteln/">Unterprogramme ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Unterprogramme auslagern</title>
+		<link>/blog/unterprogramme-auslagern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 06 Sep 2010 12:13:27 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=560</guid>
+
+					<description><![CDATA[<p>Mit diesem Report k&#246;nnen Sie Unterprogramme in eigene Includes auslagern. Die Unterprogramme werden gesucht und in jeweils ein Include ausgelagert. Das Programm dient in erster Linie dazu, die SCAN-Funktionen zur automatischen Programmanalyse zu demonstrieren.</p>
+<p>Der Beitrag <a href="/blog/unterprogramme-auslagern/">Unterprogramme auslagern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Report können Sie Unterprogramme in eigene Includes auslagern. Die Unterprogramme werden gesucht und in jeweils ein Include ausgelagert. Das Programm dient in erster Linie dazu, die SCAN-Funktionen zur automatischen Programmanalyse zu demonstrieren.</p>
+<p align="center"><strong>Die Verwendung erfolgt auf eigene Gefahr!</p>
+<p>Machen Sie zur Sicherheit eine Sicherheitskopie des zu bearbeitenden Programms!</strong></p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true ">REPORT zz_move_forms_to_include.
+************************************************************************
+*
+* Auslagern bestimmter Routinen (USEREXIT...) in eigene Includes.
+* Speziell für die SAPMV45A:
+* Die Userexit-Routinen liegen bereits in Kundenincludes, jedoch
+* gibt es nicht für jede Routine ein Include, sondern für alle 57
+* Userexitroutinen nur 8 Includes.
+* Mit diesem Programm werden die Routinen gesucht und in ein eigenes
+* Include ausgelagert. Der Name der Unterroutine ist auch der Name
+* des Includes. Es wird jedoch ZV45 anstelle der ersten 4 Zeichen
+* gesetzt.
+************************************************************************
+* zv45exit_check_xvbep_for_delet
+* 123456789012345678901234567890
+* userexit_check_xvbep_for_delet
+*----------------------------------------------------------------------*
+
+TYPE-POOLS: trwbo.
+
+DATA:
+  ls_tr_request   TYPE trwbo_request_header,
+  ls_tr_task      TYPE trwbo_request_header,
+  ls_tr_sel       TYPE trwbo_selection,
+  ls_tr_new_prop  TYPE trwbo_new_req_props,
+  lv_repid        TYPE syrepid,
+  lv_repid_merk   TYPE syrepid,
+  lv_formname(30),
+  lv_formlen      TYPE i,
+  lt_relevant_includes TYPE STANDARD TABLE OF syrepid,
+  lv_answer       TYPE c,
+  BEGIN OF lt_relevant_forms OCCURS 0,
+     incl TYPE syrepid,
+     name TYPE syrepid,
+     nnew TYPE syrepid,
+  END OF lt_relevant_forms,
+  ls_trdir        LIKE trdir,
+  ls_tadir        LIKE tadir,
+  lt_source       TYPE STANDARD TABLE OF text255,
+  ls_source       TYPE text255,
+  lt_source_new   TYPE TABLE OF text255,
+  ls_source_new   TYPE text255,
+  lt_source_main  TYPE TABLE OF text255,
+  ls_source_main  TYPE text255,
+  lt_textpool     LIKE textpool   OCCURS 0 WITH HEADER LINE,
+  lt_doku         LIKE tline      OCCURS 0 WITH HEADER LINE,
+  lt_compo        LIKE scompo     OCCURS 0 WITH HEADER LINE,
+  lr_cross_ref    LIKE cross      OCCURS 0 WITH HEADER LINE,
+  lt_includes     LIKE d010inc    OCCURS 0 WITH HEADER LINE.
+
+DATA:
+  lt_keywords     TYPE STANDARD TABLE OF char30,
+  lt_statements   LIKE sstmnt OCCURS 0 WITH HEADER LINE,
+  lt_tokens       LIKE stokex OCCURS 0 WITH HEADER LINE,
+  lv_overflow_area(65535),
+  lv_row_from     TYPE i,
+  lv_row_to       TYPE i,
+  lv_object_found TYPE c,
+  lv_mess(80)     TYPE c.
+
+*** SELECTION-SCREEN
+PARAMETERS: p_repid     TYPE syrepid  DEFAULT ''.
+PARAMETERS: p_korr      TYPE trkorr   MEMORY ID kol.
+PARAMETERS: p_devcl     TYPE devclass DEFAULT 'ZZ01'.
+PARAMETERS: p_prefix(4)               DEFAULT 'ZZ01'.
+PARAMETERS: p_update AS CHECKBOX.
+PARAMETERS: p_owrite AS CHECKBOX.
+SELECT-OPTIONS: s_incl FOR lv_repid.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_korr.
+*** F4-Auswahl für Transportauftrag
+  ls_tr_sel-reqfunctions = 'K'.
+  ls_tr_sel-reqstatus    = 'D'.
+  ls_tr_new_prop-trfunctions = 'K'.
+  CALL FUNCTION 'TR_PRESENT_REQUESTS_SEL_POPUP'
+    EXPORTING
+      iv_organizer_type    = 'T'
+      iv_username          = sy-uname
+      is_selection         = ls_tr_sel
+      is_new_request_props = ls_tr_new_prop
+    IMPORTING
+      es_selected_request  = ls_tr_request
+      es_selected_task     = ls_tr_task.
+  IF ls_tr_task-trkorr &lt;&gt; space.
+    p_korr = ls_tr_task-trkorr.
+  ENDIF.
+
+  LEAVE SCREEN.
+
+*** Programmstart
+START-OF-SELECTION.
+
+*** Transportauftrag muss vorhanden sein
+  IF p_update = 'X' AND p_korr IS INITIAL.
+    MESSAGE s000(oo) WITH 'Bitte Transportauftrag angeben!!!'.
+    STOP.
+  ENDIF.
+
+*** Ist das Programm vorhanden?
+  SELECT SINGLE * FROM tadir INTO ls_tadir
+   WHERE pgmid  = 'R3TR'
+     AND object = 'PROG'
+     AND obj_name = p_repid.
+  IF sy-subrc &gt; 0.
+*** Programm existiert nicht
+    MESSAGE i000(oo) WITH p_repid 'existiert nicht!'.
+    STOP.
+  ENDIF.
+
+*** Programminformationen holen
+  CALL FUNCTION 'RS_PROGRAM_INDEX'
+    EXPORTING
+      pg_name      = p_repid
+      without_tree = ' '
+    TABLES
+      compo        = lt_compo
+      cross_ref    = lr_cross_ref
+      inc          = lt_includes
+    EXCEPTIONS
+      syntax_error = 1
+      OTHERS       = 2.
+
+*** Alle Unterroutinen suchen, die mit USEREXIT beginnen
+  LOOP AT lt_compo WHERE type = 'U'
+*                     AND name(8) = 'USEREXIT'
+                     AND incl IN s_incl.
+*** Alle gefundenen Includes merken
+    COLLECT lt_compo-incl INTO lt_relevant_includes.
+    lt_relevant_forms-incl = lt_compo-incl.
+    lt_relevant_forms-name = lt_compo-name.
+    APPEND lt_relevant_forms.
+  ENDLOOP.
+
+*** Init
+  CLEAR lt_compo.
+  CLEAR lv_repid_merk.
+*** Vorbereitung für das Scannen des Quelltextes
+  APPEND 'FORM'    TO lt_keywords.
+  APPEND 'ENDFORM' TO lt_keywords.
+
+** Sortierung
+  SORT lt_relevant_includes.
+
+*** Gefundene Includes bearbeiten
+  LOOP AT lt_relevant_includes INTO lv_repid.
+*** In LT_Source_Main stehen am Ende die INCLUDE-Anweisungen für
+*** die erzeugten Includes
+    CLEAR lt_source_main[].
+
+*** Alle gefundenen Unterroutinen auslagern
+    LOOP AT lt_relevant_forms WHERE incl = lv_repid.
+
+*** Includenamen basteln
+      lt_relevant_forms-nnew = lt_relevant_forms-name.
+*** Ausgabe: neues Include in gelb
+      lt_relevant_forms-nnew(4)  = p_prefix.
+      ULINE.
+      FORMAT COLOR COL_TOTAL.
+      WRITE: / 'Anlage neues Include:', lt_relevant_forms-nnew.
+      FORMAT COLOR OFF.
+      MODIFY lt_relevant_forms.
+
+*** Code zusammensuchen und in neues Include auslagern
+      PERFORM extract_code USING lt_relevant_forms-incl
+                                 lt_relevant_forms-name
+                                 lt_relevant_forms-nnew.
+    ENDLOOP.
+
+*** Für alle neuen Includes die Include-Anweisungen anlegen
+    IF NOT lt_source_main[] IS INITIAL.
+      FORMAT COLOR COL_POSITIVE.
+      SKIP 2.
+      WRITE: / '***** DIESE ZEILEN ANFÜGEN AN:', lv_repid, '******'.
+      LOOP AT lt_source_main INTO ls_source.
+        WRITE: /6 ls_source.
+      ENDLOOP.
+      SKIP 2.
+      FORMAT COLOR OFF.
+    ENDIF.
+  ENDLOOP.
+
+*---------------------------------------------------------------------*
+*       FORM EXTRACT_CODE                                             *
+*---------------------------------------------------------------------*
+FORM extract_code USING fi_incl TYPE syrepid
+                        fi_name TYPE syrepid
+                        fi_nnew TYPE syrepid.
+
+  CHECK fi_incl &lt;&gt; space.
+  CLEAR lt_source_new[].
+
+  IF lv_repid_merk &lt;&gt; fi_incl.
+*** Reportsource nur nachlesen, wenn erforderlich
+    READ REPORT fi_incl INTO lt_source.
+    lv_repid_merk = fi_incl.
+*** Quelltext analysieren, um die Zeilen zu bekommen, in denen die
+***  Unterroutinen stehen
+    SCAN ABAP-SOURCE lt_source TOKENS      INTO lt_tokens
+                               STATEMENTS  INTO lt_statements
+                               OVERFLOW    INTO lv_overflow_area
+         KEYWORDS FROM lt_keywords
+         MESSAGE  INTO lv_mess
+         WITHOUT TRMAC
+         WITH ANALYSIS.
+  ENDIF.
+
+*** Im Quelltext die Unterroutine suchen und auslagern
+  CLEAR lv_object_found.
+  LOOP AT lt_statements.
+    sy-tabix = lt_statements-from + 1.
+    READ TABLE lt_tokens INDEX sy-tabix.
+    IF lt_tokens-str = fi_name.
+      lv_object_found = 'X'.
+      lv_row_from = lt_tokens-row.
+      DO.
+        ADD 1 TO sy-tabix.
+        READ TABLE lt_tokens INDEX sy-tabix.
+        IF sy-subrc = 0 AND lt_tokens-str = 'ENDFORM'.
+          lv_row_to = lt_tokens-row.
+          EXIT.
+        ELSEIF sy-subrc &gt; 0.
+          EXIT.
+        ENDIF.
+      ENDDO.
+      EXIT.
+    ENDIF.
+  ENDLOOP.
+
+*** Unterprogramm wurde auch tatsächlich gefunden
+  CHECK lv_object_found &lt;&gt; space.
+
+*** Der Zeilen-Pointer zeigt auf den Anfang der Form-Routine;
+*** Ich möchte aber auch die Kommentarzeilen vorher haben:
+  DO.
+    IF lv_row_from &gt; 1.
+      SUBTRACT 1 FROM lv_row_from.
+      READ TABLE lt_source INTO ls_source INDEX lv_row_from.
+      IF ls_source(1) &lt;&gt; '*'.
+        ADD 1 TO lv_row_from.
+        EXIT.
+      ENDIF.
+    ELSE.
+      EXIT. "From DO
+    ENDIF.
+  ENDDO.
+
+*** Quelltext der Unterroutine lesen, ausgeben und auslagern
+  LOOP AT lt_source INTO ls_source FROM lv_row_from TO lv_row_to.
+*** Kommentarzeilen hervorheben
+    CASE ls_source(1).
+      WHEN '*'. FORMAT INTENSIFIED ON.
+      WHEN OTHERS. FORMAT INTENSIFIED OFF.
+    ENDCASE.
+*** Ausgabe der Zeile
+    WRITE: /4 ls_source.
+*** Merken der Zeile für neuen Include
+    APPEND ls_source TO lt_source_new.
+  ENDLOOP.
+
+*** Include-Anweisung für das augelagerte Include erzeugen:
+  IF sy-subrc = 0.
+    CONCATENATE '*** Neues Include für'
+                fi_name INTO ls_source SEPARATED BY space.
+    APPEND ls_source TO lt_source_main.
+    CONCATENATE 'INCLUDE'
+                fi_nnew '.' INTO ls_source SEPARATED BY space.
+    APPEND ls_source TO lt_source_main.
+    APPEND '*' TO lt_source_main.
+  ENDIF.
+
+
+*** prüfen, ob der Include schon vorhanden ist.
+  SELECT SINGLE * FROM trdir INTO ls_trdir
+   WHERE name = fi_nnew.
+  IF sy-subrc = 0.
+*** Include ist vorhanden
+    FORMAT COLOR COL_NEGATIVE.
+    WRITE: / 'Programm', fi_nnew, 'ist vorhanden!'.
+    FORMAT COLOR OFF.
+    IF p_owrite = 'X'.
+*** Include soll überschrieben werden
+      WRITE: 'Wird überschrieben...' COLOR COL_TOTAL.
+    ELSE.
+      EXIT.
+    ENDIF.
+  ENDIF.
+
+  IF p_update = 'X'.
+*** Erzeugen des Includes
+    CLEAR ls_trdir.
+    ls_trdir-subc = 'I'.
+    ls_trdir-appl = 'V'.
+
+*** Beschreibung des Includes erzeugen
+    CLEAR lt_textpool[].
+    lt_textpool-id     = 'R'. "Reportbeschreibung
+    lt_textpool-key    = space.
+    CONCATENATE fi_incl ' - FORM "'
+                fi_name '"'
+           INTO lt_textpool-entry.
+    APPEND lt_textpool.
+*** Includebeschreibung und Quelltext auf die Datenbank schreiben
+    CALL FUNCTION 'RV_REPORT_WRITE'
+      EXPORTING
+        rw_langu      = sy-langu
+        rw_reportname = fi_nnew
+        rw_trdir      = ls_trdir
+      TABLES
+        rw_coding     = lt_source_new
+        rw_docu       = lt_doku
+        rw_textpool   = lt_textpool.
+*** Include in Transportauftrag aufnehmen
+    PERFORM tr_append USING fi_nnew.
+    IF sy-subrc = 0.
+      WRITE: / 'Include angelegt:', fi_nnew.
+    ENDIF.
+
+  ENDIF. "Update?
+
+ENDFORM.                    "EXTRACT_CODE
+
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  TR_APPEND
+*&amp;---------------------------------------------------------------------*
+FORM tr_append USING    fi_report TYPE syrepid.
+
+  CHECK p_update = 'X'.
+
+  CALL FUNCTION 'RS_CORR_INSERT'
+    EXPORTING
+      object              = fi_report
+      object_class        = 'ABAP'
+      mode                = 'INSERT'
+      global_lock         = 'X'
+      devclass            = p_devcl
+      korrnum             = p_korr
+      author              = sy-uname
+      master_language     = sy-langu
+    EXCEPTIONS
+      cancelled           = 1
+      permission_failure  = 2
+      unknown_objectclass = 3
+      OTHERS              = 4.
+  IF sy-subrc &lt;&gt; 0.
+    FORMAT COLOR COL_NEGATIVE.
+    WRITE: / 'Report', fi_report,
+             'wurde nicht in Korrektur', p_korr,
+             'aufgenommen!!!! Fehler:', sy-subrc.
+    FORMAT COLOR OFF.
+  ENDIF.
+
+ENDFORM.                    " TR_APPEND</pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/unterprogramme-auslagern/">Unterprogramme auslagern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Includes/ Programme generieren</title>
+		<link>/blog/includes-programme-generieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 27 Aug 2009 16:31:49 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=528</guid>
+
+					<description><![CDATA[<p>Es kommt nicht oft vor, aber wenn, ist es eine nervige Arbeit: Das Anlegen von mehreren Includes. Das Anlegen ist einfach: Per INSERT REPORT kann einfach ein Programm angelegt werden. Aber: Die Programme m&#252;ssen auch immer einer Entwicklungsklasse zugeordnet und in einen Transportauftrag aufgenommen werden...</p>
+<p>Der Beitrag <a href="/blog/includes-programme-generieren/">Includes/ Programme generieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Es kommt nicht oft vor, aber wenn, ist es eine nervige Arbeit: Das Anlegen von mehreren Includes. Das Anlegen ist einfach: Per INSERT REPORT kann einfach ein Programm angelegt werden. Aber: Die Programme müssen auch immer einer Entwicklungsklasse zugeordnet und in einen Transportauftrag aufgenommen werden&#8230;</p>
+<p class="head1">Hintergrund</p>
+<p align="center"><em>I&#8217;d rather write code that writes code than write code</em></p>
+<p>In einem Programm werden vorsorglich eine bestimmte Anzahl von Includes angelegt um darin eigenes Coding zu hinterlegen.</p>
+<p>Mit der SO10 habe ich einen Standardtext angelegt, dessen Inhalt als Coding hinterlegt wird.</p>
+<p>Um die 100 Includes nicht von Hand anlegen zu müssen, habe ich folgendes Programm geschrieben:</p>
+<h2 class="head1">Coding</h2>
+<pre class="sap1">REPORT.
+
+<span style="color: #fb2412;">*** DATA</span>
+DATA gv_number       TYPE n LENGTH 3.
+DATA gv_repid        TYPE syrepid.
+DATA gv_repti        TYPE repti.
+DATA gt_lines        TYPE STANDARD TABLE OF tline.
+DATA gs_header       TYPE thead.
+FIELD-SYMBOLS &lt;line&gt; TYPE tline.
+DATA gt_code         TYPE STANDARD TABLE OF string.
+FIELD-SYMBOLS &lt;code&gt; TYPE string.
+DATA gt_text         TYPE STANDARD TABLE OF textpool.
+FIELD-SYMBOLS &lt;text&gt; TYPE textpool.
+DATA gv_object_name  TYPE trobj_name.
+
+<span style="color: #fb2412;">*** Selection Screen</span>
+PARAMETERS p_trkorr  TYPE trkorr     OBLIGATORY.
+PARAMETERS p_devcls  TYPE devclass   DEFAULT 'ZXYZ'.
+PARAMETERS p_txtnam  TYPE tdobname   DEFAULT 'ZSAMPLE_CODE'.
+PARAMETERS p_incnam  TYPE syrepid    DEFAULT 'ZZ_INCLUDE_$$$'.
+PARAMETERS p_inctxt  TYPE repti      DEFAULT 'Coding Nummer $$$'.
+PARAMETERS p_start   TYPE n LENGTH 3 DEFAULT 100 OBLIGATORY.
+PARAMETERS p_stopp   TYPE n LENGTH 3 DEFAULT 160 OBLIGATORY.
+
+START-OF-SELECTION.
+
+  IF p_start &gt; p_stopp.
+    MESSAGE i000(oo) WITH 'Start &gt; Stopp!'.
+    STOP.
+  ENDIF.
+
+<span style="color: #fb2412;">*** set start number
+</span>  gv_number = p_start.
+
+<span style="color: #fb2412;">*** read sample coding
+</span>  CALL FUNCTION 'READ_TEXT'
+    EXPORTING
+      id       = 'ST'
+      language = sy-langu
+      name     = p_txtnam
+      object   = 'TEXT'
+    TABLES
+      lines    = gt_lines
+    EXCEPTIONS
+      OTHERS   = 8.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    STOP.
+  ENDIF.
+
+<span style="color: #fb2412;">*** process all includes
+</span>  DO.
+<span style="color: #fb2412;">*** Report name</span>
+    gv_repid = p_incnam.
+    REPLACE '$$$' WITH gv_number INTO gv_repid.
+<span style="color: #fb2412;">*** Report description</span>
+    gv_repti = p_inctxt.
+    REPLACE '$$$' WITH gv_number INTO gv_repti.
+
+<span style="color: #fb2412;">*** protocol
+</span>    WRITE: / gv_repid.
+    gv_object_name = gv_repid.
+
+<span style="color: #fb2412;">*** set code, replace &amp;REPID&amp; by reportname and $$$ by actual number
+</span>    CLEAR gt_code.
+    LOOP AT gt_lines ASSIGNING &lt;line&gt;.
+      APPEND INITIAL LINE TO gt_code ASSIGNING &lt;code&gt;.
+      &lt;code&gt; = &lt;line&gt;-tdline.
+      REPLACE '&amp;REPID&amp;' WITH gv_repid INTO &lt;code&gt;.
+      REPLACE '$$$' WITH gv_number INTO &lt;code&gt;.
+    ENDLOOP.
+
+<span style="color: #fb2412;">*** Insert report
+</span>    INSERT REPORT gv_repid FROM gt_code PROGRAM TYPE 'I'.
+    IF sy-subrc &gt; 0.
+      WRITE: 'NOK', sy-subrc.
+      STOP.
+    ELSE.
+      WRITE: 'OK'.
+
+<span style="color: #fb2412;">*** Insert textpool
+</span>      CLEAR gt_text.
+      APPEND INITIAL LINE TO gt_text ASSIGNING &lt;text&gt;.
+      &lt;text&gt;-id     = 'R'.
+      &lt;text&gt;-key    = space.
+      &lt;text&gt;-entry  = gv_repti.
+      &lt;text&gt;-length = 50.
+      INSERT textpool gv_repid FROM gt_text.
+    ENDIF.
+
+<span style="color: #fb2412;">*** set development class
+</span>    PERFORM tadir_entry.
+
+<span style="color: #fb2412;">*** Increase include number</span>
+    ADD 1 TO gv_number.
+    IF gv_number &gt; p_stopp.
+      EXIT.
+    ENDIF.
+  ENDDO.
+
+<span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  tadir_entry
+*&amp;---------------------------------------------------------------------*</span>
+FORM tadir_entry.
+
+  DATA lv_tadir_objnam TYPE sobj_name.
+  DATA lv_src_system   TYPE srcsystem.
+
+  lv_tadir_objnam = gv_object_name.
+  lv_src_system   = sy-sysid.
+
+<span style="color: #fb2412;">*** generate TADIR-Entry
+</span>  CALL FUNCTION 'TR_TADIR_INTERFACE'
+    EXPORTING
+      wi_test_modus                  = ' '
+      wi_tadir_pgmid                 = 'R3TR'
+      wi_tadir_object                = 'PROG'
+      wi_tadir_obj_name              = lv_tadir_objnam
+      wi_tadir_srcsystem             = lv_src_system
+      wi_tadir_author                = sy-uname
+      wi_tadir_devclass              = p_devcls
+      wi_set_genflag                 = 'X'
+    EXCEPTIONS
+      tadir_entry_not_existing       = 1
+      tadir_entry_ill_type           = 2
+      no_systemname                  = 3
+      no_systemtype                  = 4
+      original_system_conflict       = 5
+      object_reserved_for_devclass   = 6
+      object_exists_global           = 7
+      object_exists_local            = 8
+      object_is_distributed          = 9
+      obj_specification_not_unique   = 10
+      no_authorization_to_delete     = 11
+      devclass_not_existing          = 12
+      simultanious_set_remove_repair = 13
+      order_missing                  = 14
+      no_modification_of_head_syst   = 15
+      pgmid_object_not_allowed       = 16
+      masterlanguage_not_specified   = 17
+      devclass_not_specified         = 18
+      specify_owner_unique           = 19
+      loc_priv_objs_no_repair        = 20
+      gtadir_not_reached             = 21
+      object_locked_for_order        = 22
+      change_of_class_not_allowed    = 23
+      no_change_from_sap_to_tmp      = 24
+      OTHERS                         = 25.
+  IF sy-subrc &lt;&gt; 0.
+<span style="color: #fb2412;">*** protocol</span>
+    write: / 'Error TADIR-Entry', sy-subrc.
+    stop.
+  ELSE.
+<span style="color: #fb2412;">*** Add object to transport order</span>
+    PERFORM transport.
+  ENDIF.
+
+ENDFORM.                    "tadir_entry
+
+<span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  transport
+*&amp;---------------------------------------------------------------------*</span>
+FORM transport.
+
+<span style="color: #fb2412;">*** Data</span>
+  DATA: iko200 TYPE ko200,
+        iorder TYPE trkorr,
+        itask  TYPE trkorr.
+
+<span style="color: #fb2412;">*** Object</span>
+  iko200-pgmid    = 'R3TR'.
+  iko200-object   = 'PROG'.
+  iko200-objfunc  = space.
+  iko200-obj_name = gv_repid.
+
+<span style="color: #fb2412;">*** Check object</span>
+  CALL FUNCTION 'TR_OBJECT_CHECK'
+    EXPORTING
+      wi_ko200                = iko200
+    EXCEPTIONS
+      cancel_edit_other_error = 1
+      show_only_other_error   = 2
+      OTHERS                  = 3.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4
+            RAISING check.
+  ELSE.
+
+<span style="color: #fb2412;">*** Insert object</span>
+    CALL FUNCTION 'TR_OBJECT_INSERT'
+      EXPORTING
+        wi_order                = p_trkorr
+        wi_ko200                = iko200
+      EXCEPTIONS
+        cancel_edit_other_error = 1
+        show_only_other_error   = 2
+        OTHERS                  = 3.
+    IF sy-subrc &gt; 0.
+<span style="color: #fb2412;">*** protocol</span>
+      WRITE: 'Transport Error Insert '.
+      STOP.
+    ELSE.
+<span style="color: #fb2412;">*** commit changes</span>
+      COMMIT WORK.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.                    "transport</pre>
+<p>Der Beitrag <a href="/blog/includes-programme-generieren/">Includes/ Programme generieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Variantenschnellauswahl</title>
+		<link>/blog/variantenschnellauswahl/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 19 Jun 2008 15:56:52 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=489</guid>
+
+					<description><![CDATA[<p>Mit diesem kleinen Gimmick stellen Sie dem Anwender eine Schnellauswahl der Varianten zur Verf&#252;gung. Ausserdem wird hier demonstriert, wie die Werte einer Variante &#252;bernommen werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/variantenschnellauswahl/">Variantenschnellauswahl</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Mit diesem kleinen Gimmick stellen Sie dem Anwender eine Schnellauswahl der Varianten zur Verfügung. Ausserdem wird hier demonstriert, wie die Werte einer Variante übernommen werden können.</p>
+
+
+
+<p>Die vorhandenen Varianten werden links am Rand angezeigt und können per Doppelklick übernommen werden. Auf Wunsch kann auch die Variante sofort ausgeführt werden.</p>
+
+
+
+<p>Man könnte auch definieren, dass Varianten, die mit X beginnen, sofort ausgeführt werden, alle anderen werden nur geladen&#8230;</p>
+
+
+
+<p>Desweiteren kann nachvollzogen werden, auf welch einfache Weise in Splitter mit ALV an ein Dynpro angebunden werden kann.</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="https://tricktresor.com/wp-content/uploads/tt_images/abap/schnellvariante.jpg" alt=""/></figure>
+
+
+
+<p>Ich habe den Report etwas auf Vordermann gebracht. Die alte Version hat mit dem Funktionsbaustein&nbsp;RS_VARIANT_CONTENTS und der manuellen Zuweisung der gespeicherten Variantenwerte über Feldsymbole gearbeitet. Die neue Version habe ich einerseits auf Methoden umgestellt und zudem verwende ich den Funktionsbaustein RS_SUPPORT_SELECTIONS, der die Übernahme der Feldwerte in das Dynpro automatisch macht.</p>
+
+
+
+<h2 class="wp-block-heading">Coding &#8211; Aktuelle Variante</h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT.
+
+PARAMETERS p_eins TYPE char10.
+PARAMETERS p_zwei TYPE char10.
+
+CLASS main DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS
+      handle_double_click
+                    FOR EVENT double_click OF cl_gui_alv_grid
+        IMPORTING e_row e_column.
+    METHODS load_variants.
+    METHODS reload_variants.
+    METHODS get_variant
+      IMPORTING
+        variant_name TYPE raldb_vari.
+    METHODS refresh.
+
+  PROTECTED SECTION.
+    DATA docker          TYPE REF TO cl_gui_docking_container.
+    DATA alv              TYPE REF TO cl_gui_alv_grid.
+
+
+    DATA fcat             TYPE lvc_t_fcat.
+    DATA layout             TYPE lvc_s_layo.
+    DATA varit            TYPE STANDARD TABLE OF varit.
+
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+
+CLASS main IMPLEMENTATION.
+
+  METHOD handle_double_click.
+
+    FIELD-SYMBOLS &lt;varit> TYPE varit.
+
+    READ TABLE varit ASSIGNING &lt;varit> INDEX e_row.
+    IF sy-subrc = 0.
+      "Read Variant and assign values
+      get_variant( &lt;varit>-variant ).
+
+      "Set variant name
+      sy-slset = &lt;varit>-variant.
+
+*** execute program (activate to your own needs)
+*      CALL FUNCTION 'SAPGUI_SET_FUNCTIONCODE'
+*        EXPORTING
+*          functioncode = '=ONLI'.
+    ENDIF.
+
+  ENDMETHOD.                    "handle_double_click
+
+  METHOD load_variants.
+    " get all variants and texts
+    SELECT * FROM varit INTO TABLE varit
+     WHERE langu  = sy-langu
+       AND report = sy-repid.
+
+    CHECK sy-subrc = 0.
+
+    " Create docking container on left side
+    docker = NEW #(
+        side      = cl_gui_docking_container=>dock_at_left
+        extension = 350 ).
+
+    " Create ALV-Grid
+    alv = NEW #(
+        i_parent      = docker
+        i_appl_events = 'X' ).
+
+    " Create event receiver for double click in grid
+    SET HANDLER handle_double_click FOR alv.
+
+    " Define ALV-Grid-Layout
+    layout-no_toolbar = 'X'.
+    layout-grid_title = 'Auswahl mit Doppelklick…'(001).
+    layout-smalltitle = 'X'.
+
+    " Display ALV Grid
+    alv->set_table_for_first_display(
+      EXPORTING
+        i_structure_name = 'VARIT'
+        i_save           = space
+        i_default        = 'X'
+        is_layout        = layout
+      CHANGING
+        it_outtab        = varit
+      EXCEPTIONS
+        OTHERS           = 4 ).
+
+
+    " Get frontend catalog to modify
+    alv->get_frontend_fieldcatalog(
+      IMPORTING
+        et_fieldcatalog = fcat ).
+
+    " modify fields
+    LOOP AT fcat ASSIGNING FIELD-SYMBOL(&lt;fcat>).
+      CASE &lt;fcat>-fieldname.
+        WHEN 'MANDT'
+          OR 'REPORT'
+          OR 'LANGU'.
+          &lt;fcat>-tech      = 'X'.
+        WHEN 'VARIANT'.
+          &lt;fcat>-outputlen = '10'.
+      ENDCASE.
+    ENDLOOP.
+
+    " set modified field catalog
+    alv->set_frontend_fieldcatalog( fcat ).
+
+    " Refresh display to activate catalog
+    refresh( ).
+
+  ENDMETHOD.
+
+  METHOD refresh.
+    IF alv IS BOUND.
+      alv->refresh_table_display( ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD get_variant.
+
+    "Activate selected variant
+    CALL FUNCTION 'RS_SUPPORT_SELECTIONS'
+      EXPORTING
+        report  = sy-cprog
+        variant = variant_name
+      EXCEPTIONS
+        OTHERS  = 3.
+
+  ENDMETHOD.
+
+  METHOD reload_variants.
+
+    " set variant
+    CONCATENATE 'Gewählte Variante:' sy-slset
+           INTO DATA(vartx) SEPARATED BY space.
+
+    IF sy-msgid = 'DB'.
+      IF sy-msgno = '617'.
+        " variant has been saved
+        READ TABLE varit TRANSPORTING NO FIELDS
+              WITH KEY variant = sy-slset.
+        IF sy-subrc > 0.
+          SELECT * FROM varit APPENDING  TABLE varit
+            WHERE langu   = sy-langu
+              AND report  = sy-repid
+              AND variant = sy-slset.
+          SORT varit BY variant.
+          " Refresh display to activate catalog
+          refresh( ).
+        ENDIF.
+      ENDIF.
+
+      IF sy-msgno = '618'.
+        " Variant deleted
+        DELETE varit WHERE variant = sy-msgv1.
+        " Refresh display to activate catalog
+        refresh( ).
+      ENDIF.
+    ENDIF.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+INITIALIZATION.
+  DATA(go_main) = NEW main( ).
+  go_main->load_variants( ).
+
+AT SELECTION-SCREEN OUTPUT.
+  go_main->reload_variants( ).
+
+  " Start of program
+
+START-OF-SELECTION.
+
+  WRITE: / 'P_EINS:', p_eins.
+  WRITE: / 'P_ZWEI:', p_zwei.</pre>
+
+
+
+<h2 class="wp-block-heading">Coding &#8211; Alte Variante</h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT zz_var_grid.
+
+*** Docking container and ALV Grid to display variants
+DATA gr_docking&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO cl_gui_docking_container.
+DATA gr_alv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO cl_gui_alv_grid.
+
+
+DATA gt_fcat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE lvc_t_fcat.
+FIELD-SYMBOLS &nbsp;&nbsp;&nbsp;&nbsp; TYPE lvc_s_fcat.
+DATA gs_layo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE lvc_s_layo.
+DATA gt_varit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF varit.
+CLASS lcl_event_receiver DEFINITION DEFERRED.
+DATA gr_event_receiver&nbsp;&nbsp; TYPE REF TO lcl_event_receiver.
+
+SELECTION-SCREEN BEGIN OF BLOCK var WITH FRAME TITLE gv_vartx.
+PARAMETERS p_1.
+SELECTION-SCREEN END&nbsp;&nbsp; OF BLOCK var.
+
+*----------------------------------------------------------------------*
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+
+&nbsp; PUBLIC SECTION.
+&nbsp;&nbsp;&nbsp; METHODS:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; handle_double_click
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FOR EVENT double_click OF cl_gui_alv_grid
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING e_row e_column.
+ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "lcl_event_receiver DEFINITION
+
+*----------------------------------------------------------------------*
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+
+&nbsp; METHOD handle_double_click.
+
+&nbsp;&nbsp;&nbsp; FIELD-SYMBOLS  TYPE varit.
+
+&nbsp;&nbsp;&nbsp; READ TABLE gt_varit ASSIGNING  INDEX e_row.
+&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.
+*** Read Variant and assign values
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM get_variant USING -variant.
+
+*** Set variant name
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sy-slset = -variant.
+
+*** execute program (activate to your own needs)
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL FUNCTION 'SAPGUI_SET_FUNCTIONCODE'
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; functioncode = '=ONLI'.
+&nbsp;&nbsp;&nbsp; ENDIF.
+
+&nbsp; ENDMETHOD.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "handle_double_click
+
+ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "lcl_event_receiver IMPLEMENTATION
+
+
+AT SELECTION-SCREEN OUTPUT.
+
+*** set variant
+&nbsp; CONCATENATE 'Gewählte Variante:' sy-slset
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INTO gv_vartx SEPARATED BY space.
+
+&nbsp; IF sy-msgid = 'DB'.
+&nbsp;&nbsp;&nbsp; IF sy-msgno = '617'.
+*** variant has been saved
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READ TABLE gt_varit TRANSPORTING NO FIELDS
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WITH KEY variant = sy-slset.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc &gt; 0.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SELECT * FROM varit APPENDING&nbsp; TABLE gt_varit
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHERE langu&nbsp;&nbsp; = sy-langu
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND report&nbsp; = sy-repid
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND variant = sy-slset.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SORT gt_varit BY variant.
+*** Refresh display to activate catalog
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL METHOD gr_alv-&gt;refresh_table_display.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.
+&nbsp;&nbsp;&nbsp; ENDIF.
+
+&nbsp;&nbsp;&nbsp; IF sy-msgno = '618'.
+*** Variant deleted
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE gt_varit WHERE variant = sy-msgv1.
+*** Refresh display to activate catalog
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL METHOD gr_alv-&gt;refresh_table_display.
+&nbsp;&nbsp;&nbsp; ENDIF.
+&nbsp; ENDIF.
+
+INITIALIZATION.
+
+
+*** get all variants
+&nbsp; SELECT * FROM varit INTO TABLE gt_varit
+&nbsp;&nbsp; WHERE langu&nbsp; = sy-langu
+&nbsp;&nbsp;&nbsp;&nbsp; AND report = sy-repid.
+
+&nbsp; CHECK sy-subrc = 0.
+
+*** Create docking container on left side
+&nbsp; CREATE OBJECT gr_docking
+&nbsp;&nbsp;&nbsp; EXPORTING
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; side&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = cl_gui_docking_container=&gt;dock_at_left
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; extension = 350.
+
+*** Create ALV-Grid
+&nbsp; CREATE OBJECT gr_alv
+&nbsp;&nbsp;&nbsp; EXPORTING
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_parent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gr_docking
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_appl_events = 'X'.
+
+*** Create event receiver for double click in grid
+&nbsp; CREATE OBJECT gr_event_receiver.
+&nbsp; SET HANDLER gr_event_receiver-&gt;handle_double_click FOR gr_alv.
+
+*** Define ALV-Grid-Layout
+&nbsp; gs_layo-no_toolbar = 'X'.
+&nbsp; gs_layo-grid_title = 'Auswahl mit Doppelklick...'(001).
+&nbsp; gs_layo-smalltitle = 'X'.
+
+*** Display ALV Grid
+&nbsp; CALL METHOD gr_alv-&gt;set_table_for_first_display
+&nbsp;&nbsp;&nbsp; EXPORTING
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_structure_name = 'VARIT'
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_save&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = space
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_default&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 'X'
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; is_layout&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gs_layo
+&nbsp;&nbsp;&nbsp; CHANGING
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it_outtab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gt_varit
+&nbsp;&nbsp;&nbsp; EXCEPTIONS
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4.
+
+
+*** Get frontend catalog to modify
+&nbsp; CALL METHOD gr_alv-&gt;get_frontend_fieldcatalog
+&nbsp;&nbsp;&nbsp; IMPORTING
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; et_fieldcatalog = gt_fcat.
+
+*** modify fields
+&nbsp; LOOP AT gt_fcat ASSIGNING .
+&nbsp;&nbsp;&nbsp; CASE -fieldname.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN 'MANDT'
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OR 'REPORT'
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OR 'LANGU'.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -tech&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 'X'.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN 'VARIANT'.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -outputlen = '10'.
+&nbsp;&nbsp;&nbsp; ENDCASE.
+&nbsp; ENDLOOP.
+
+*** set modified field catalog
+&nbsp; CALL METHOD gr_alv-&gt;set_frontend_fieldcatalog
+&nbsp;&nbsp;&nbsp; EXPORTING
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it_fieldcatalog = gt_fcat.
+
+*** Refresh display to activate catalog
+&nbsp; IF gr_alv&nbsp;IS BOUND.
+&nbsp; &nbsp; CALL METHOD gr_alv-&gt;refresh_table_display.
+&nbsp; ENDIF.
+
+*** Start of program
+START-OF-SELECTION.
+
+
+&nbsp; WRITE: / 'Variante', gv_vartx.
+&nbsp; WRITE: / 'P1:', p_1.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; get_variant
+*&amp;---------------------------------------------------------------------*
+FORM get_variant USING iv_varid TYPE variant.
+
+&nbsp; DATA lt_valutab&nbsp; LIKE rsparams OCCURS 0 WITH HEADER LINE.
+&nbsp; DATA lt_objects&nbsp; LIKE vanz&nbsp;&nbsp;&nbsp;&nbsp; OCCURS 0 WITH HEADER LINE.
+&nbsp; DATA lv_seltab(20).
+
+&nbsp; FIELD-SYMBOLS  TYPE STANDARD TABLE.
+&nbsp; FIELD-SYMBOLS  TYPE ANY.
+&nbsp; FIELD-SYMBOLS  TYPE ANY.
+
+
+*** get contents of variant
+&nbsp; CALL FUNCTION 'RS_VARIANT_CONTENTS'
+&nbsp;&nbsp;&nbsp; EXPORTING
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; report&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = sy-cprog
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; variant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = iv_varid
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_import&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ' '
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; execute_direct&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ' '
+&nbsp;&nbsp;&nbsp; TABLES
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; valutab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_valutab
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OBJECTS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_objects
+&nbsp;&nbsp;&nbsp; EXCEPTIONS
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; variant_non_existent = 01
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; variant_obsolete&nbsp;&nbsp;&nbsp;&nbsp; = 02.
+
+
+&nbsp; IF sy-subrc &gt; 0.
+*** Error
+&nbsp;&nbsp;&nbsp; MESSAGE e000(oo) WITH 'Variante nicht vorhanden:' iv_varid.
+&nbsp; ELSE.
+
+
+*** Clear old values
+&nbsp;&nbsp;&nbsp; LOOP AT lt_objects.
+*** -&gt; workarea
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN (lt_objects-name) TO .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLEAR .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF lt_objects-kind = 'S'.
+*** -&gt; table
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONCATENATE lt_objects-name '[]' INTO lv_seltab.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN (lv_seltab) TO .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLEAR .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.
+
+
+*** Assign values of variant
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP AT lt_valutab WHERE selname = lt_objects-name.
+
+*** -&gt; Workarea
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN (lt_valutab-selname) TO .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK sy-subrc = 0.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CASE lt_objects-kind.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN&nbsp; 'S'.
+***
+*** SELECT-OPTIONS
+***
+
+*** -&gt; table
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONCATENATE lt_valutab-selname '[]' INTO lv_seltab.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN (lv_seltab) TO .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK sy-subrc = 0.
+*** -&gt; SIGN
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN COMPONENT 'SIGN' OF STRUCTURE  TO .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  = lt_valutab-sign.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.
+*** -&gt; OPTION
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN COMPONENT 'OPTION' OF STRUCTURE  TO .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  = lt_valutab-option.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.
+*** -&gt; LOW
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN COMPONENT 'LOW' OF STRUCTURE  TO .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  = lt_valutab-low.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.
+*** -&gt; HIGH
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN COMPONENT 'HIGH' OF STRUCTURE  TO .
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  = lt_valutab-high.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; APPEND  TO .
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN 'P'.
+
+***
+*** PARAMETER
+***
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  = lt_valutab-low.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDCASE.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDLOOP.
+&nbsp;&nbsp;&nbsp; ENDLOOP.
+
+&nbsp; ENDIF.
+
+ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "get_variant</pre>
+<p>Der Beitrag <a href="/blog/variantenschnellauswahl/">Variantenschnellauswahl</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Ausgabe von Idocs</title>
+		<link>/blog/ausgabe-von-idocs/</link>
+					<comments>/blog/ausgabe-von-idocs/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 20 May 2008 19:12:00 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[IDOCs]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=478</guid>
+
+					<description><![CDATA[<p>Um einen Gesamt&#252;berblick &#252;ber mehrere IDOCs zu bekommen, dient das folgende Programm. Es gibt die Daten von zu selektierenden IDOCs strukturiert aus.</p>
+<p>Der Beitrag <a href="/blog/ausgabe-von-idocs/">Ausgabe von Idocs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um einen Gesamt&uuml;berblick &uuml;ber mehrere IDOCs zu bekommen, dient das folgende Programm. Es gibt die Daten von zu selektierenden IDOCs strukturiert aus.<br /><P>Das Programm l&auml;sst sich einfach so modifzieren, dass die Idoc-Felder sowie der zugeh&ouml;rige Wert ausgegeben werden. In dieser Version wird der Feldname Quickinfo ausgegeben, wenn man mit dem Mauszeiger auf ein Feld zeigt.</P><P class="head1">Coding</P><P class="sap1">REPORT&nbsp; zz_idoc_show LINE-SIZE 1000.<BR>DATA gtc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF edidc.<BR>FIELD-SYMBOLS &lt;c&gt;&nbsp;&nbsp;&nbsp;&nbsp; TYPE edidc.<BR>DATA gtd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF edid4.<BR>FIELD-SYMBOLS &lt;d&gt;&nbsp;&nbsp;&nbsp;&nbsp; TYPE edid4.<BR>DATA gv_segnam&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE ddobjname.<BR>DATA gt_dfies&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF dfies.<BR>FIELD-SYMBOLS &lt;dfies&gt; TYPE dfies.y</P><P class="sap1">SELECT-OPTIONS s_docnum FOR &lt;c&gt;-docnum.<BR>SELECT-OPTIONS s_mestyp FOR &lt;c&gt;-mestyp.<BR>SELECT-OPTIONS s_idoctp FOR &lt;c&gt;-idoctp.</P><P class="sap1"><BR>START-OF-SELECTION.</P><P class="sap1">&nbsp; SELECT * FROM edidc INTO TABLE gtc UP TO 100 ROWS<BR>&nbsp;&nbsp; WHERE docnum IN s_docnum<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND mestyp IN s_mestyp<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND idoctp IN s_idoctp.</P><P class="sap1">&nbsp; IF sy-subrc = 0.</P><P class="sap1">&nbsp;&nbsp;&nbsp; SELECT * FROM edid4 INTO TABLE gtd<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FOR ALL ENTRIES IN gtc<BR>&nbsp;&nbsp;&nbsp;&nbsp; WHERE docnum = gtc-docnum.</P><P class="sap1">&nbsp;&nbsp;&nbsp; LOOP AT gtc ASSIGNING &lt;c&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORMAT COLOR COL_HEADING.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ULINE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / &#8216;|&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;c&gt;-docnum,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;c&gt;-mestyp,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;c&gt;-idoctp,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;c&gt;-cimtyp.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ULINE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORMAT COLOR OFF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP AT gtd ASSIGNING &lt;d&gt; WHERE docnum = &lt;c&gt;-docnum.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / &#8216;|&#8217; NO-GAP.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; gv_segnam = &lt;d&gt;-segnam.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLEAR gt_dfies.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;DDIF_FIELDINFO_GET&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tabname&nbsp;&nbsp; = gv_segnam<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dfies_tab = gt_dfies<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp; = 3.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP AT gt_dfies ASSIGNING &lt;dfies&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: &lt;d&gt;-sdata(&lt;dfies&gt;-outputlen) <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; QUICKINFO &lt;dfies&gt;-fieldname NO-GAP, &#8216;|&#8217; NO-GAP.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SHIFT &lt;d&gt;-sdata BY &lt;dfies&gt;-outputlen PLACES LEFT.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp; ULINE.<BR>&nbsp; ENDIF.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/ausgabe-von-idocs/">Ausgabe von Idocs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ausgabe-von-idocs/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Variabler Gruppenwechsel</title>
+		<link>/blog/variabler-gruppenwechsel/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 15 Feb 2007 13:34:10 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=401</guid>
+
+					<description><![CDATA[<p>Dieses Programm demonstriert, wie ein Gruppenwechsel variabel durchgef&#252;hrt werden kann. Je nach gew&#252;nschter Sichtweise werden die Daten in der Tabelle nach unterschiedlichen Feldern gruppiert.</p>
+<p>Der Beitrag <a href="/blog/variabler-gruppenwechsel/">Variabler Gruppenwechsel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Dieses Programm demonstriert, wie ein Gruppenwechsel variabel durchgef&uuml;hrt werden kann. Je nach gew&uuml;nschter Sichtweise werden die Daten in der Tabelle nach unterschiedlichen Feldern gruppiert.<br /><P class="head1">Ausgabe &#8220;Marke, Farbe, Motor&#8221;</P><P class="sap1">AUDI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp; BLAU&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; Diesel<BR>&nbsp;&nbsp;&nbsp;&nbsp; Erdgas<BR>BMW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp; GR&Uuml;N&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; Diesel<BR>&nbsp;&nbsp;&nbsp;&nbsp; Erdgas<BR>VW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp; BLAU&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; Diesel<BR>&nbsp; GR&Uuml;N&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; Benzin<BR>&nbsp;&nbsp;&nbsp;&nbsp; Diesel<BR>&nbsp; ROT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR></P><P class="head1">Ausgabe &#8220;Motor, Marke, Farbe&#8221;</P><P class="sap1">Benzin&nbsp;&nbsp; <BR>&nbsp; VW&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; GR&Uuml;N<BR>Diesel&nbsp;&nbsp; <BR>&nbsp; AUDI&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; BLAU<BR>&nbsp; BMW&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; GR&Uuml;N<BR>&nbsp; VW&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; BLAU<BR>&nbsp;&nbsp;&nbsp;&nbsp; GR&Uuml;N<BR>&nbsp;&nbsp;&nbsp;&nbsp; ROT <BR>Erdgas&nbsp;&nbsp; <BR>&nbsp; AUDI&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; BLAU<BR>&nbsp; BMW&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp; GR&Uuml;N<BR></P><P class="head1">Coding</P><P class="sap1">REPORT zz_Autos.</P><P class="sap1"><FONT color="#fb2412">*** Zeilentyp f&uuml;r die Daten tabelle<BR></FONT>TYPES:<BR>&nbsp; BEGIN OF ty_autos,<BR>&nbsp;&nbsp;&nbsp; marke(10) TYPE c,<BR>&nbsp;&nbsp;&nbsp; farbe(10) TYPE c,<BR>&nbsp;&nbsp;&nbsp; motor(10) TYPE c,<BR>&nbsp; END OF ty_autos.</P><P class="sap1"><FONT color="#fb2412">*** Zeilentyp f&uuml;r die Verwaltungstabelle</FONT><BR>TYPES:<BR>&nbsp; BEGIN OF ty_fields,<BR>&nbsp;&nbsp;&nbsp; feld(30),<BR>&nbsp;&nbsp;&nbsp; position type i,<BR>&nbsp;&nbsp;&nbsp; gemerkt(30),<BR>&nbsp; END OF ty_fields.</P><P class="sap1"><FONT color="#fb2412">*** Variablen</FONT><BR>DATA:<BR><FONT color="#fb2412">*** Daten</FONT><BR>&nbsp; lt_autos&nbsp; TYPE STANDARD TABLE OF ty_autos,<BR>&nbsp; ls_auto&nbsp;&nbsp; TYPE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ty_autos,<BR><FONT color="#fb2412">*** Verwaltung Gruppenwechsel</FONT><BR>&nbsp; lt_fields TYPE STANDARD TABLE OF ty_fields,<BR>&nbsp; ls_fields TYPE ty_fields.</P><P class="sap1"><BR><FONT color="#fb2412">*** Spaltenwerte</FONT><BR>FIELD-SYMBOLS &lt;f&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE ANY.<BR><FONT color="#fb2412">*** Gruppenwechsel</FONT><BR>FIELD-SYMBOLS &lt;fields&gt; TYPE ty_fields.<BR><FONT color="#fb2412">*** Autos</FONT><BR>field-symbols &lt;auto&gt;&nbsp;&nbsp; type ty_autos.</P><P class="sap1">PARAMETERS:<BR><FONT color="#fb2412">*** Spalten</FONT><BR>&nbsp; f1(30) TYPE c DEFAULT &#8216;MARKE&#8217;,<BR>&nbsp; f2(30) TYPE c DEFAULT &#8216;FARBE&#8217;,<BR>&nbsp; f3(30) TYPE c DEFAULT &#8216;MOTOR&#8217;.</P><P class="sap1">&nbsp;</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*** Testdaten erzeugen</FONT><BR>&nbsp; PERFORM testdaten.</P><P class="sap1"><FONT color="#fb2412">*** Sortierung nach Spalten</FONT><BR>&nbsp; SORT lt_autos BY (f1) (f2) (f3).</P><P class="sap1">&nbsp; IF f1 &lt;&gt; space.<BR><FONT color="#fb2412">*** Erstes Feld in Verwaltungstabelle aufnehmen</FONT><BR>&nbsp;&nbsp;&nbsp; ls_fields-feld = f1.<BR>&nbsp;&nbsp;&nbsp; ls_fields-position = 1.<BR>&nbsp;&nbsp;&nbsp; APPEND ls_fields TO lt_fields.<BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; IF f2 &lt;&gt; space.<BR><FONT color="#fb2412">*** zweites Feld in Verwaltungstabelle aufnehmen</FONT><BR>&nbsp;&nbsp;&nbsp; ls_fields-feld = f2.<BR>&nbsp;&nbsp;&nbsp; ls_fields-position = 3.<BR>&nbsp;&nbsp;&nbsp; APPEND ls_fields TO lt_fields.<BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; IF f3 &lt;&gt; space.<BR><FONT color="#fb2412">*** drittes Feld in Verwaltungstabelle aufnehmen</FONT><BR>&nbsp;&nbsp;&nbsp; ls_fields-feld = f3.<BR>&nbsp;&nbsp;&nbsp; ls_fields-position = 6.<BR>&nbsp;&nbsp;&nbsp; APPEND ls_fields TO lt_fields.<BR>&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*** Init<BR></FONT>&nbsp; CLEAR ls_auto.</P><P class="sap1"><FONT color="#fb2412">*** Daten ausgeben</FONT><BR>&nbsp; LOOP AT lt_autos&nbsp;ASSIGNING &lt;auto&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Verwaltung Gruppenwechsel: Felder<BR></FONT>&nbsp;&nbsp;&nbsp; LOOP AT lt_fields ASSIGNING &lt;fields&gt;.<BR><FONT color="#fb2412">***&nbsp;&nbsp; Spaltenwert dem Feldymbol &lt;F&gt; zuweisen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN COMPONENT &lt;fields&gt;-feld OF STRUCTURE &lt;auto&gt; TO &lt;f&gt;.<BR><FONT color="#fb2412">***&nbsp;&nbsp; Pr&uuml;fen, ob sich der Spaltenwert ge&auml;ndert hat</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF &lt;f&gt; &lt;&gt; &lt;fields&gt;-gemerkt.<BR><FONT color="#fb2412">***&nbsp;&nbsp;&nbsp;&nbsp; JA: Feldwert merken</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;fields&gt;-gemerkt = &lt;f&gt;.<BR><FONT color="#fb2412">***&nbsp;&nbsp;&nbsp;&nbsp; &#8230;und ausgeben</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: AT /&lt;fields&gt;-position &lt;f&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR><BR>&nbsp; ENDLOOP.</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; testdaten<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM testdaten.</P><P class="sap1">&nbsp; CLEAR lt_autos.<BR>&nbsp; ls_auto-marke = &#8216;VW&#8217;.<BR>&nbsp; ls_auto-farbe = &#8216;GR&Uuml;N&#8217;.<BR>&nbsp; ls_auto-motor = &#8216;Diesel&#8217;.<BR>&nbsp; APPEND ls_auto TO lt_autos.</P><P class="sap1">&nbsp; ls_auto-marke = &#8216;VW&#8217;.<BR>&nbsp; ls_auto-farbe = &#8216;ROT&#8217;.<BR>&nbsp; ls_auto-motor = &#8216;Diesel&#8217;.<BR>&nbsp; APPEND ls_auto TO lt_autos.</P><P class="sap1">&nbsp; ls_auto-marke = &#8216;VW&#8217;.<BR>&nbsp; ls_auto-farbe = &#8216;BLAU&#8217;.<BR>&nbsp; ls_auto-motor = &#8216;Diesel&#8217;.<BR>&nbsp; APPEND ls_auto TO lt_autos.</P><P class="sap1">&nbsp; ls_auto-marke = &#8216;VW&#8217;.<BR>&nbsp; ls_auto-farbe = &#8216;GR&Uuml;N&#8217;.<BR>&nbsp; ls_auto-motor = &#8216;Benzin&#8217;.<BR>&nbsp; APPEND ls_auto TO lt_autos.</P><P class="sap1">&nbsp; ls_auto-marke = &#8216;BMW&#8217;.<BR>&nbsp; ls_auto-farbe = &#8216;GR&Uuml;N&#8217;.<BR>&nbsp; ls_auto-motor = &#8216;Diesel&#8217;.<BR>&nbsp; APPEND ls_auto TO lt_autos.</P><P class="sap1">&nbsp; ls_auto-marke = &#8216;BMW&#8217;.<BR>&nbsp; ls_auto-farbe = &#8216;GR&Uuml;N&#8217;.<BR>&nbsp; ls_auto-motor = &#8216;Erdgas&#8217;.<BR>&nbsp; APPEND ls_auto TO lt_autos.</P><P class="sap1">&nbsp; ls_auto-marke = &#8216;AUDI&#8217;.<BR>&nbsp; ls_auto-farbe = &#8216;BLAU&#8217;.<BR>&nbsp; ls_auto-motor = &#8216;Erdgas&#8217;.<BR>&nbsp; APPEND ls_auto TO lt_autos.</P><P class="sap1">&nbsp; ls_auto-marke = &#8216;AUDI&#8217;.<BR>&nbsp; ls_auto-farbe = &#8216;BLAU&#8217;.<BR>&nbsp; ls_auto-motor = &#8216;Diesel&#8217;.<BR>&nbsp; APPEND ls_auto TO lt_autos.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;testdaten</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/variabler-gruppenwechsel/">Variabler Gruppenwechsel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Status-Icon</title>
+		<link>/blog/status-icon/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 09 Feb 2006 10:39:10 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Selektionsbilder]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=368</guid>
+
+					<description><![CDATA[<p>Mit Ankreuzfeldern k&#246;nnen die Zust&#228;nde "An" und "Aus" dargestellt werden. M&#246;chte man mehr Zust&#228;nde darstellen, ben&#246;tigt man Radiobuttons oder eine Listbox. Eine andere M&#246;glichkeit besteht darin, Druckkn&#246;pfe mit unterschiedlichen Symbolen zu verwenden.</p>
+<p>Der Beitrag <a href="/blog/status-icon/">Status-Icon</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit Ankreuzfeldern k&ouml;nnen die Zust&auml;nde &#8220;An&#8221; und &#8220;Aus&#8221; dargestellt werden. M&ouml;chte man mehr Zust&auml;nde darstellen, ben&ouml;tigt man Radiobuttons oder eine Listbox. Eine andere M&ouml;glichkeit besteht darin, Druckkn&ouml;pfe mit unterschiedlichen Symbolen zu verwenden.<br /><P class="text1">Das hier&nbsp;vorgestellte Programm zeigt M&ouml;glichkeiten auf, Druckkn&ouml;pfe zur einfachen Zustandsanzeige zu verwenden.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/statusicons.JPG"><BR>Beispiel zur Statusanzeige</P></TD></TR></TBODY></TABLE></P><P class="text1">Coding</P><P class="sap1">REPORT ZZSTATUSICON.<BR>INCLUDE &lt;ICON&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Selektionsbild mit drei Status-Drucktasten</FONT><BR>SELECTION-SCREEN PUSHBUTTON /1(8) PUSH01 USER-COMMAND P01.<BR>SELECTION-SCREEN PUSHBUTTON /1(8) PUSH02 USER-COMMAND P02.<BR>SELECTION-SCREEN PUSHBUTTON /1(8) PUSH03 USER-COMMAND P03.</P><P class="sap1">INITIALIZATION.<BR><FONT color="#fb2412">*** Drucktasten Vorbelegen</FONT><BR>&nbsp; PERFORM SWITCH USING PUSH01.<BR>&nbsp; PERFORM SWITCH USING PUSH02.<BR>&nbsp; PERFORM SWITCH USING PUSH03.</P><P class="sap1">AT SELECTION-SCREEN.<BR><FONT color="#fb2412">*** Drucktasten auswerten</FONT><BR>&nbsp; CHECK SY-UCOMM(1) = &#8216;P&#8217;.<BR>&nbsp; CASE SY-UCOMM.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;P01&#8217;.<BR><FONT color="#fb2412">*** Drucktaste 1</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM SWITCH USING PUSH01.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;P02&#8217;.<BR><FONT color="#fb2412">*** Drucktaste 2</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM SWITCH USING PUSH02.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;P03&#8217;.<BR><FONT color="#fb2412">*** Drucktaste 3</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM SWITCH USING PUSH03.<BR>&nbsp; ENDCASE.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM SWITCH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* Umschalten des Status: Ja &#8211; Nein &#8211; Egal<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM SWITCH USING PUSH TYPE ANY.</P><P class="sap1">&nbsp; DATA LPUSH(4).<BR>&nbsp; LPUSH = PUSH.<BR>&nbsp; CASE LPUSH.<BR>&nbsp;&nbsp;&nbsp; WHEN ICON_LED_GREEN.<BR><FONT color="#fb2412">*** Status GR&Uuml;N -&gt; ROT</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUSH = ICON_LED_RED.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONCATENATE PUSH &#8216;Nein&#8217; INTO PUSH.<BR>&nbsp;&nbsp;&nbsp; WHEN ICON_LED_RED OR SPACE.<BR><FONT color="#fb2412">*** Status ROT -&gt; GELB</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUSH = ICON_LED_YELLOW.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONCATENATE PUSH &#8216;Egal&#8217; INTO PUSH.<BR>&nbsp;&nbsp;&nbsp; WHEN ICON_LED_YELLOW.<BR><FONT color="#fb2412">*** Status GELB -&gt; GR&Uuml;N<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PUSH = ICON_LED_GREEN.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONCATENATE PUSH &#8216;Ja&#8217; INTO PUSH.<BR>&nbsp; ENDCASE.</P><P class="sap1">ENDFORM.<BR></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/status-icon/">Status-Icon</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Exits aktivieren</title>
+		<link>/blog/exits-aktivieren/</link>
+					<comments>/blog/exits-aktivieren/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 07 Feb 2006 14:14:21 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=367</guid>
+
+					<description><![CDATA[<p>Mit diesem Programm k&#246;nnen Sie Felder zu einzelnen Tabelleneintr&#228;gen &#228;ndern. Das Programm eignet sich gut, wenn eine Matrix &#252;bersichtlich dargestellt und bearbeitet werden soll.</p>
+<p>Der Beitrag <a href="/blog/exits-aktivieren/">Exits aktivieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Programm k&ouml;nnen Sie Felder zu einzelnen Tabelleneintr&auml;gen &auml;ndern. Das Programm eignet sich gut, wenn eine Matrix &uuml;bersichtlich dargestellt und bearbeitet werden soll.<br /><P class="head1">Beschreibung</P><P class="text1">&nbsp;Das folgende Programm wurde entwickelt, um Userexits zu verschiedenen Vertriebsbereichen einfach und &uuml;bersichtlich aktivieren zu k&ouml;nnen.</P><P class="text1">Es sind jedoch auch noch andere Anwendungen denkbar, bei denen eine Matrix bearbeitet werden muss.</P><P class="text1">Der Status eines jeden Feldes wird farbig dargestellt. In diesem Beispiel kann ein Feld einen der drei folgenden Status haben:</P><UL><LI><DIV class="text1"><FONT color="#fb2412"><STRONG>Rot</STRONG></FONT>:&nbsp; &nbsp;Inaktiv</DIV></LI><LI><DIV class="text1"><FONT color="#f49047"><STRONG>Gelb</STRONG></FONT>: gesperrt</DIV></LI><LI><DIV class="text1"><FONT color="#008952"><STRONG>Gr&uuml;n</STRONG></FONT>: Aktiv</DIV></LI></UL><P class="text1">Der Wechsel des Status kann beliebig erweitert werden. Im einfachsten Fall kann ein Feld &#8220;Aktiv&#8221; oder &#8220;Inaktiv&#8221; sein.&nbsp;</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/exitprog.jpg"><BR>Aktivieren von Feldinhalten</P></TD></TR></TBODY></TABLE></P><P class="text1">Hinweis</P><P class="text1">Wie Sie die ge&auml;nderten Eintr&auml;ge in einen Transportauftrag &uuml;bernehmen k&ouml;nnen, erfahren Sie hier: <A href="https://tricktresor.com/content/index.php?aID=338" target="_self">Tabelleneintr&auml;ge transportieren</A></P><P class="head1">GUI Status</P><P class="text1">Sie m&uuml;ssen zur vollen Funktionalit&auml;t noch den PF-STATUS &#8216;LIST&#8217; anlegen. Klicken Sie hierzu doppelt auf &#8216;LIST&#8217;. Mischen Sie die List-Funktionen ein (Vorlage abgleichen) und legen Sie auf die Tasten F5 den Funktionscode &#8220;LINKS&#8221; und auf und F6 den Funktionscode&nbsp;&#8220;RECHTS&#8221;. Zudem m&uuml;ssen Sie noch den Sichern-Knopf aktivieren, indem Sie den Funktionscode &#8220;SAVE&#8221; dort eintragen.&nbsp;</P><P class="head1">Coding</P><P class="sap1">REPORT ZZEXITLIST NO STANDARD PAGE HEADING LINE-SIZE 332.</P><P class="sap1">TYPES:<BR><FONT color="#fb2412">*** Tabelle mit den zu aktivierenden Eintr&auml;gen/ Feldern</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BEGIN OF ZVEXIT45,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VKORG TYPE VKORG,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Schl&uuml;sselfeld 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VTWEG TYPE VTWEG,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Schl&uuml;sselfeld 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SPART TYPE SPART,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Schl&uuml;sselfeld 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AUART TYPE AUART,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Schl&uuml;sselfeld 4<BR><FONT color="#fb2412">*** &#8211;&gt; Exits</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 01, 02, 03, 04, 05, 06, 07, 08, 09, 10,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 91, 92, 93, 94, 95, 96, 97, 98, 99,<BR><FONT color="#fb2412">*** Tabelleneintrag ge&auml;ndert?</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UPDKZ TYPE C,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; END OF ZVEXIT45.</P><P class="sap1"><BR><FONT color="#fb2412">*** Variablen</FONT><BR>DATA: GV_FELD(50)&nbsp; TYPE C,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GV_VALUE(50) TYPE C,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GV_STACO&nbsp;&nbsp;&nbsp;&nbsp; TYPE I,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GV_INDEX&nbsp;&nbsp;&nbsp;&nbsp; TYPE I,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GV_TABIX&nbsp;&nbsp;&nbsp;&nbsp; TYPE I,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GV_EXIT(2)&nbsp;&nbsp; TYPE N,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GV_STATUS&nbsp;&nbsp;&nbsp; TYPE C,<BR><FONT color="#fb2412">*** Tabelle</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; STRUC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE ZVEXIT45 OCCURS 0 WITH HEADER LINE.</P><P class="sap1"><FONT color="#fb2412">*** Konstanten<BR>*** Bitte an ge&auml;nderte Tabellenstruktur anpassen!!</FONT><BR>CONSTANTS:<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE C VALUE &#8216;|&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GK_FIRST_COL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE I VALUE 25,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GK_SCROLL_BOUNDARY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE I VALUE 26,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GK_COL_ACTIVE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE I VALUE 5,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GK_COL_INACTIVE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE I VALUE 6,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GK_COL_TEMP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE I VALUE 3,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GK_NUMBER_OF_EXITS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE I VALUE 99,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GK_NUMBER_OF_KEY_FIELDS TYPE I VALUE 5.</P><P class="sap1"><FONT color="#fb2412">*** Feldsymbol</FONT><BR>FIELD-SYMBOLS &lt;EXIT&gt;.</P><P class="sap1">&nbsp;</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*** Dummy Eintr&auml;ge erzeugen</FONT><BR>&nbsp; APPEND &#8216;000101&#8217; TO STRUC.<BR>&nbsp; APPEND &#8216;001101&#8217; TO STRUC.<BR>&nbsp; APPEND &#8216;003310&#8217; TO STRUC.<BR>&nbsp; APPEND &#8216;150050&#8217; TO STRUC.<BR>&nbsp; APPEND &#8216;160099&#8217; TO STRUC.<BR>&nbsp; APPEND &#8216;800011&#8217; TO STRUC.</P><P class="sap1"><FONT color="#fb2412">*** Ausgabe der Liste</FONT><BR>&nbsp; PERFORM LISTE.</P><P class="sap1"><BR>TOP-OF-PAGE.<BR><FONT color="#fb2412">*** Top of Page: &Uuml;berschrift ausgeben</FONT><BR>&nbsp; PERFORM TOP.</P><P class="sap1">TOP-OF-PAGE DURING LINE-SELECTION.<BR><FONT color="#fb2412">*** Top of Page: &Uuml;berschrift ausgeben</FONT><BR>&nbsp; PERFORM TOP.</P><P class="sap1">AT LINE-SELECTION.<BR><FONT color="#fb2412">*** Klick auf ein Feld:</FONT><BR>&nbsp; GET CURSOR FIELD GV_FELD VALUE GV_VALUE.<BR>&nbsp; GV_STACO = SY-STACO.<BR>&nbsp; GV_EXIT = ( SY-CUCOL &#8211; GK_FIRST_COL + SY-STACO ) / 3.<BR>&nbsp; IF GV_TABIX &gt; 0.<BR><FONT color="#fb2412">*** Einzelnen Exit aktivieren</FONT><BR>&nbsp;&nbsp;&nbsp; READ TABLE STRUC INDEX GV_TABIX.<BR>&nbsp;&nbsp;&nbsp; IF SY-SUBRC = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONCATENATE &#8216;STRUC-&#8216; GV_EXIT INTO GV_FELD.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN (GV_FELD) TO &lt;EXIT&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CASE&nbsp; &lt;EXIT&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN SPACE.<BR><FONT color="#fb2412">*** Wechseln zu &#8220;Eintrag vorgemerkt&#8221;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;EXIT&gt; = &#8216;*&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE S000(VZ) WITH &#8216;Exit&#8217; GV_EXIT &#8216;Aktivierung vorgemerkt&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;*&#8217;.<BR><FONT color="#fb2412">*** Wechseln zu &#8220;Exit aktiv&#8221;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;EXIT&gt; = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE S000(VZ) WITH &#8216;Exit&#8217; GV_EXIT &#8216;aktiviert&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;X&#8217;.<BR><FONT color="#fb2412">*** Wechseln zu &#8220;Exit deaktiv&#8221;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;EXIT&gt; = SPACE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE S000(VZ) WITH &#8216;Exit&#8217; GV_EXIT &#8216;deaktiviert&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDCASE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SPLIT GV_FELD AT &#8216;-&#8216; INTO GV_FELD GV_FELD.<BR><FONT color="#fb2412">*** Eintrag ge&auml;ndert</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; STRUC-UPDKZ = &#8216;U&#8217;.<BR><FONT color="#fb2412">*** Eintrag &auml;ndern</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY STRUC INDEX GV_TABIX TRANSPORTING UPDKZ (GV_FELD).<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLEAR GV_TABIX.<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** Gesamte Spalte umsetzen</FONT><BR>&nbsp;&nbsp;&nbsp; GV_STATUS = &#8216;$&#8217;.<BR>&nbsp;&nbsp;&nbsp; LOOP AT STRUC.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONCATENATE &#8216;STRUC-&#8216; GV_EXIT INTO GV_FELD.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN (GV_FELD) TO &lt;EXIT&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF GV_STATUS = &#8216;$&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CASE&nbsp; &lt;EXIT&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN SPACE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GV_STATUS = &#8216;*&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;*&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GV_STATUS = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GV_STATUS = SPACE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDCASE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;EXIT&gt; = GV_STATUS.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SPLIT GV_FELD AT &#8216;-&#8216; INTO GV_FELD GV_FELD.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; STRUC-UPDKZ = &#8216;U&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY STRUC TRANSPORTING UPDKZ (GV_FELD).<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp; ENDIF.<BR><FONT color="#fb2412">*** Listausgabe</FONT><BR>&nbsp; PERFORM LISTE.</P><P class="sap1">AT USER-COMMAND.<BR><FONT color="#fb2412">*** Benutzerkommando</FONT><BR>&nbsp; CASE SY-UCOMM.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;RECHTS&#8217;.<BR><FONT color="#fb2412">*** 10 Spalten nach rechts scrollen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SCROLL LIST RIGHT BY 60 PLACES.</P><P class="sap1">&nbsp;&nbsp;&nbsp; WHEN &#8216;LINKS&#8217;.<BR><FONT color="#fb2412">*** 10 Spalten nach links scrollen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SCROLL LIST LEFT&nbsp; BY 60 PLACES.</P><P class="sap1">&nbsp;&nbsp;&nbsp; WHEN &#8216;SAVE&#8217;.<BR><FONT color="#fb2412">*** Eintrag sichern<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM SICHERN.<BR>&nbsp; ENDCASE.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM LISTE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM LISTE.</P><P class="sap1"><FONT color="#fb2412">*** Eigener List-Status</FONT><BR>&nbsp; SET PF-STATUS &#8216;LIST&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Ausgabe der Tabelle</FONT><BR>&nbsp; LOOP AT STRUC.<BR>&nbsp;&nbsp;&nbsp; GV_TABIX = SY-TABIX.<BR><FONT color="#fb2412">*** Keyfelder</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: / V, STRUC-VKORG,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V, STRUC-VTWEG,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V, STRUC-SPART,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V, STRUC-AUART, V NO-GAP.</P><P class="sap1"><FONT color="#fb2412">*** Index: Anzahl Keyfelder</FONT><BR>&nbsp;&nbsp;&nbsp; GV_INDEX = GK_NUMBER_OF_KEY_FIELDS.<BR>&nbsp;&nbsp;&nbsp; DO GK_NUMBER_OF_EXITS TIMES.<BR><FONT color="#fb2412">*** Exit zuweisen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN COMPONENT GV_INDEX OF STRUCTURE STRUC TO &lt;EXIT&gt;.<BR><FONT color="#fb2412">*** Exit ausgeben</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM WRITE_EXIT USING &lt;EXIT&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ADD 1 TO GV_INDEX.<BR>&nbsp;&nbsp;&nbsp; ENDDO.<BR>&nbsp;&nbsp;&nbsp; HIDE: GV_TABIX, STRUC.<BR>&nbsp; ENDLOOP.<BR>&nbsp; CLEAR: STRUC, GV_TABIX.<BR>&nbsp; ULINE.</P><P class="sap1"><FONT color="#fb2412">*** Zur Spalte scrollen, die vor LINE-SELECTION aktiv war<BR></FONT>&nbsp; SCROLL LIST TO COLUMN GV_STACO INDEX 1.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM WRITE_EXIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM WRITE_EXIT USING FLAG&nbsp;&nbsp; TYPE C.</P><P class="sap1">&nbsp; DATA LV_COLOR&nbsp;&nbsp;&nbsp;&nbsp; TYPE I.</P><P class="sap1">&nbsp; CASE FLAG.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;X&#8217;.<BR><FONT color="#fb2412">*** Feld ist aktiv</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LV_COLOR = GK_COL_ACTIVE.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;*&#8217;.<BR><FONT color="#fb2412">*** Feld ist vorgemerkt</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LV_COLOR = GK_COL_TEMP.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216; &#8216;.<BR><FONT color="#fb2412">*** Feld ist deaktiviert</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LV_COLOR = GK_COL_INACTIVE.<BR>&nbsp; ENDCASE.</P><P class="sap1"><FONT color="#fb2412">*** Ausgabe</FONT><BR>&nbsp; WRITE: &#8216;&nbsp; &#8216; COLOR = LV_COLOR HOTSPOT ON NO-GAP, V NO-GAP.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM TOP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM TOP.</P><P class="sap1"><FONT color="#fb2412">*** Seitenindex wieder zur&uuml;cksetzen, damit keine Verzweigungsliste<BR>*** erzeugt wird<BR></FONT>&nbsp; SY-LSIND = 0.<BR><FONT color="#fb2412">*** Keyfelder nicht scrollen</FONT><BR>&nbsp; SET LEFT SCROLL-BOUNDARY COLUMN GK_SCROLL_BOUNDARY.</P><P class="sap1"><FONT color="#fb2412">*** &Uuml;berschrift</FONT><BR>&nbsp; ULINE.<BR>&nbsp; FORMAT COLOR COL_HEADING.<BR>&nbsp; WRITE: /01 V, &#8216;VKO&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AT 08 V, &#8216;VTW&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AT 13 V, &#8216;Sp&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AT 18 V, &#8216;AArt&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AT 25 V NO-GAP.</P><P class="sap1">&nbsp; DO GK_NUMBER_OF_EXITS TIMES.<BR>&nbsp;&nbsp;&nbsp; GV_INDEX = SY-INDEX.<BR><FONT color="#fb2412">*** Ausgabe der Feldnummer</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: (2) GV_INDEX NO-GAP HOTSPOT ON, V NO-GAP.<BR><FONT color="#fb2412">*** GGfs. zus&auml;tzliche Info zum Exit ermitteln und mittels QUICKINFO<BR>*** zur Verf&uuml;gung stellen</FONT><BR>&nbsp;&nbsp;&nbsp; HIDE: GV_INDEX.<BR>&nbsp; ENDDO.</P><P class="sap1">&nbsp; FORMAT COLOR OFF.<BR>&nbsp; ULINE.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM SICHERN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM SICHERN.</P><P class="sap1">&nbsp; LOOP AT STRUC WHERE UPDKZ &lt;&gt; SPACE.<BR>&nbsp;&nbsp;&nbsp; WRITE / STRUC.<BR>&nbsp; ENDLOOP.</P><P class="sap1">ENDFORM.</P></p>
+<p>Der Beitrag <a href="/blog/exits-aktivieren/">Exits aktivieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/exits-aktivieren/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

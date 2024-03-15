@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>OCX Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/ocx/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 23 Jan 2024 10:03:22 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>OCX Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Sag mir wo die Icons sind, wo sind sie geblieben?</title>
+		<link>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/</link>
+					<comments>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/#comments</comments>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Sun, 22 Dec 2013 08:20:20 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[OCX]]></category>
+		<category><![CDATA[icons]]></category>
+		<category><![CDATA[bitmap]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=4101</guid>
+
+					<description><![CDATA[<p>Eine kleine Information über die Speicherung der SAP-Icons in den Ressource-Files des SAPGUI. </p>
+<p>Der Beitrag <a href="/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/">Sag mir wo die Icons sind, wo sind sie geblieben?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der SAP GUI beinhaltet aktuell 926 Icons, die mit der Transaktion SE16 und der Tabelle ICONS angezeigt werden können. Diese reichen vom Platzhaltericon ICON_DUMMY mit der Ordnungsnummer @00@ bis zur inaktiven Datenbanktabelle ICON_DATABASE_TABLE_INA mit der Ordnungsnummer @PP@. Diese und weitere Informationen, wie z.B. Icon-Name, Beschreibung etc., sind auch in der Datei <strong>euspicld</strong> im SAP GUI für Windows Verzeichnis zu finden.</p>
+<p>Die Icons selbst sind als ImageList-Ressourcen in der Datei <strong>SAPguiRM.ocx</strong> des SAP GUI für Windows abgelegt. Die Ressourcen sind einfach nur nummeriert von 203 bis 210. Die 203 und 204 beinhalten das Standard-Design und die 207 und 208 das Corbu-Design. Mit dem <a title="Resource Hacker" href="http://www.angusj.com/" target="_blank">Resource Hacker</a> von Angus Johnson können die ImageLists einfach als binäre Dateien exportiert werden &#8211; Menü Action &gt; Save Resource as a binary file.</p>
+<figure id="attachment_4132" aria-describedby="caption-attachment-4132" style="width: 300px" class="wp-caption alignnone"><img decoding="async" class="size-medium wp-image-4132" alt="Save Icons as file" src="https://tricktresor.com/wp-content/uploads/2013/12/01_08_16_36_59-300x165.jpg" width="300" height="165" srcset="/wp-content/uploads/2013/12/01_08_16_36_59-300x165.jpg 300w, /wp-content/uploads/2013/12/01_08_16_36_59-624x343.jpg 624w, /wp-content/uploads/2013/12/01_08_16_36_59.jpg 890w" sizes="(max-width: 300px) 100vw, 300px" /><figcaption id="caption-attachment-4132" class="wp-caption-text">Save Icons as file</figcaption></figure>
+<p>Nach dem Export müssen einfach die ersten 28 Bytes dieser exportierten ImageLists gelöscht werden, um eine Windows Bitmap (BMP-Datei) zu erhalten. Das geht recht einfach mit <a title="Notepad++" href="http://notepad-plus-plus.org/" target="_blank">Notepad++</a>. Einfach die Datei mit diesem Programm öffnen und am Anfang der Datei 28 mal auf ENTF drücken&#8230;</p>
+<p>Die Extension dieser Datei ist dann natürlich in BMP umzubenennen.</p>
+<p>Auf diesem Wege erhält man Zugriff auf alle Icons des SAP GUI. Leider als Sprite-Image, das heißt, alle Icons sind in dieser Datei in einem Raster vorhanden:</p>
+<p><img fetchpriority="high" decoding="async" class="size-medium wp-image-4133 alignleft" alt="Icons" src="https://tricktresor.com/wp-content/uploads/2013/12/01_08_16_40_24-170x300.jpg" width="170" height="300" srcset="/wp-content/uploads/2013/12/01_08_16_40_24-170x300.jpg 170w, /wp-content/uploads/2013/12/01_08_16_40_24.jpg 222w" sizes="(max-width: 170px) 100vw, 170px" /></p>
+<p>Mit einem Online-Tool, wie zum Beispiel <a title="ImageSplitter" href="http://imagesplitter.net/" target="_blank">ImageSplitter</a> wäre es theoretisch möglich, die Datei in einzelne Dateien zu exportieren. Leider ist die Anzahl der Zeilen und Spalten auf 32 limitiert&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f641.png" alt="🙁" class="wp-smiley" style="height: 1em; max-height: 1em;" /> Wir benötigen aber 4 Spalten und 308 Zeilen&#8230;</p>
+<p>Der Beitrag <a href="/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/">Sag mir wo die Icons sind, wo sind sie geblieben?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Slider (2)</title>
+		<link>/blog/slider-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 08 Mar 2012 14:51:23 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[set property]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[shellstyle]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_custom_container]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[cl_gui_textedit]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<category><![CDATA[cl_gui_control]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[register events]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[OCX]]></category>
+		<category><![CDATA[class definition]]></category>
+		<category><![CDATA[class implementation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=638</guid>
+
+					<description><![CDATA[<p>Noch eine Variante des Sliders. Diesmal mithilfe einer Windows-OCX-Bibliothek. Der Slider hat keine Beschriftung, hat aber den Vorteil, dass auf eine Wert&#228;nderung sofort reagiert werden kann.</p>
+<p>Der Beitrag <a href="/blog/slider-2/">Slider (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Noch eine Variante des Sliders. Diesmal mithilfe einer Windows-OCX-Bibliothek. Der Slider hat keine Beschriftung, hat aber den Vorteil, dass auf eine Wertänderung sofort reagiert werden kann.</p>
+<h2 class="head1">Dynpro</h2>
+<p>Sie müssen das Dynpro 9000 anlegen mit folgenden &#8220;Custom Containern&#8221;:</p>
+<ul>
+<li>CONTAINER_TEXT</li>
+<li>SLIDER_TOP</li>
+<li>SLIDER_LEFT</li>
+</ul>
+<p><code> +----------------------------------------+<br />
+|  SLIDER_TOP                            |<br />
++----+----------------------------------------+<br />
+|    |                                        |<br />
+| SL |  CONTAINER_TEXT                        |<br />
+| ID |                                        |<br />
+| ER |                                        |<br />
+| _  |                                        |<br />
+| LE |                                        |<br />
+| FT |                                        |<br />
+|    |                                        |<br />
+|    |                                        |<br />
++----+----------------------------------------+</code></p>
+<h2 class="head1">Screenshot</h2>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/slider2.jpg" /><br />
+So sieht der Slider aus</td>
+</tr>
+</tbody>
+</table>
+<h2 class="head1">Coding</h2>
+<pre>REPORT.
+
+DATA: gcl_text TYPE REF TO cl_gui_textedit.
+
+*----------------------------------------------------------------------*
+* CLASS my_slider DEFINITION
+*----------------------------------------------------------------------*
+CLASS my_slider DEFINITION INHERITING FROM cl_gui_control.
+PUBLIC SECTION.
+METHODS: constructor
+IMPORTING
+value(parent) TYPE REF TO cl_gui_object
+value(name) TYPE string OPTIONAL
+value(style) TYPE i OPTIONAL
+value(orientation) TYPE i
+DEFAULT 0 " 1 = vertical
+value(maximum) TYPE i
+DEFAULT 10
+value(event_while_move) TYPE flag
+DEFAULT ' '
+EXCEPTIONS error_cntl_create
+gui_type_not_supported,
+dispatch REDEFINITION.
+EVENTS: on_change EXPORTING value(slider_position) TYPE i.
+
+DATA: event_while_move TYPE flag.
+
+PRIVATE SECTION.
+METHODS: register_events.
+
+ENDCLASS. "my_slider DEFINITION
+
+*----------------------------------------------------------------------*
+* CLASS LCL_eventreceiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_eventreceiver DEFINITION.
+PUBLIC SECTION.
+CLASS-METHODS: handle_on_change FOR EVENT on_change
+OF my_slider
+IMPORTING sender
+slider_position.
+ENDCLASS. "LCL_eventreceiver DEFINITION
+
+END-OF-SELECTION.
+PERFORM create_objects.
+CALL SCREEN 9000.
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form CREATE_OBJECTS
+*&amp;---------------------------------------------------------------------*
+FORM create_objects.
+
+DATA repid TYPE syrepid.
+DATA dynnr TYPE sydynnr.
+DATA cl_container TYPE REF TO cl_gui_custom_container.
+DATA cl_container2 TYPE REF TO cl_gui_custom_container.
+
+repid = sy-repid.
+dynnr = '9000'.
+
+CREATE OBJECT cl_container
+EXPORTING
+container_name = 'CONTAINER_TEXT'
+repid = repid
+dynnr = dynnr.
+CREATE OBJECT gcl_text
+EXPORTING
+parent = cl_container.
+
+DATA: cl_slider TYPE REF TO my_slider.
+
+CREATE OBJECT cl_container
+EXPORTING
+container_name = 'SLIDER_TOP'
+repid = repid
+dynnr = dynnr.
+CREATE OBJECT cl_slider
+EXPORTING
+parent = cl_container
+maximum = 20
+event_while_move = 'X'.
+SET HANDLER lcl_eventreceiver=&gt;handle_on_change FOR cl_slider.
+
+CREATE OBJECT cl_container
+EXPORTING
+container_name = 'SLIDER_LEFT'
+repid = repid
+dynnr = dynnr.
+CREATE OBJECT cl_slider
+EXPORTING
+parent = cl_container
+maximum = 5
+orientation = 1.
+SET HANDLER lcl_eventreceiver=&gt;handle_on_change FOR cl_slider.
+
+ENDFORM. " CREATE_OBJECTS
+
+*----------------------------------------------------------------------*
+* CLASS my_slider IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS my_slider IMPLEMENTATION.
+
+METHOD dispatch.
+
+DATA: value TYPE i.
+
+GET PROPERTY OF me-&gt;h_control-obj 'Value' = value.
+RAISE EVENT on_change EXPORTING slider_position = value.
+
+ENDMETHOD. "dispatch
+
+METHOD register_events.
+DATA: ex_event TYPE cntl_event.
+DATA: events_ex TYPE cntl_events. " table
+
+IF me-&gt;event_while_move = 'X'.
+ex_event-eventid = 1."Jede Bewegung
+ELSE.
+ex_event-eventid = 2."Nur am ende
+ENDIF.
+ex_event-is_shellevent = ' '.
+ex_event-is_systemevent = 'X'.
+
+APPEND ex_event TO events_ex.
+CALL METHOD me-&gt;set_registered_events_ex
+EXPORTING
+eventtab = events_ex.
+
+ENDMETHOD. "register_events
+
+METHOD constructor.
+DATA prog_id(80).
+
+IF parent IS INITIAL.
+RAISE error_cntl_create.
+ENDIF.
+
+CLASS cl_gui_cfw DEFINITION LOAD.
+
+* assign prog_id to get the frontend specific control
+IF NOT activex IS INITIAL.
+prog_id = 'MSComctlLib.Slider'.
+ELSEIF NOT javabean IS INITIAL.
+RAISE gui_type_not_supported.
+ENDIF.
+
+IF prog_id IS INITIAL.
+RAISE gui_type_not_supported.
+ENDIF.
+
+* Set the window styles of the control when style parameter was not
+* set with constructor call.
+* For more information on the styles see WIN32 SDK
+IF style IS INITIAL.
+* otherwise the control would be invisible and the mistake would be
+* hard to find
+style = cl_gui_control=&gt;ws_visible
++ cl_gui_control=&gt;ws_child
++ cl_gui_control=&gt;ws_clipsiblings.
+
+ENDIF.
+
+* Create the control
+CALL METHOD super-&gt;constructor
+EXPORTING
+clsid = prog_id
+shellstyle = style
+parent = parent
+lifetime = lifetime
+name = name
+EXCEPTIONS
+OTHERS = 1.
+
+IF sy-subrc &lt;&gt; 0.
+RAISE error_cntl_create.
+ENDIF.
+
+me-&gt;event_while_move = event_while_move.
+
+* Slidereigenschaften
+SET PROPERTY OF me-&gt;h_control-obj 'Max' = maximum.
+SET PROPERTY OF me-&gt;h_control-obj 'Orientation' = orientation.
+SET PROPERTY OF me-&gt;h_control-obj 'Text' = 'Tricktresor-Slider'.
+
+* register instance at framework
+CALL METHOD cl_gui_cfw=&gt;subscribe
+EXPORTING
+shellid = h_control-shellid
+ref = me
+EXCEPTIONS
+OTHERS = 1.
+
+IF sy-subrc &lt;&gt; 0.
+RAISE error_cntl_create.
+ENDIF.
+me-&gt;register_events( ).
+ENDMETHOD. "constructor
+
+ENDCLASS. "my_slider IMPLEMENTATION
+
+*----------------------------------------------------------------------*
+* CLASS LCL_eventreceiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_eventreceiver IMPLEMENTATION.
+METHOD handle_on_change.
+
+DATA text TYPE string.
+DATA: slider TYPE REF TO my_slider.
+
+slider ?= sender.
+
+WRITE slider_position TO sy-lisel LEFT-JUSTIFIED.
+IF slider-&gt;event_while_move = 'X'.
+CONCATENATE 'X-Position: Moving to' sy-lisel
+INTO text SEPARATED BY space.
+ELSE.
+CONCATENATE 'Y-Position: End of Move:' sy-lisel
+INTO text SEPARATED BY space.
+ENDIF.
+
+gcl_text-&gt;set_textstream( EXPORTING text = text ).
+ENDMETHOD. "handle_on_change
+ENDCLASS. "LCL_eventreceiver DEFINITION</pre>
+<p>Der Beitrag <a href="/blog/slider-2/">Slider (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAP DataProvider</title>
+		<link>/blog/sap-dataprovider/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 12 Sep 2011 10:05:59 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[OCX]]></category>
+		<category><![CDATA[OCX im Eigenbau]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=624</guid>
+
+					<description><![CDATA[<p>Der SAP DataProvider regelt den Datenaustausch zwischen einem OCX-Control und dem SAP-System. Leider sind die Informationen hierzu recht sp&#228;rlich. Dieser Artikel soll den Anfang machen und etwas Licht ins Dunkel bringen.</p>
+<p>Der Beitrag <a href="/blog/sap-dataprovider/">SAP DataProvider</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der SAP DataProvider regelt den Datenaustausch zwischen einem OCX-Control und dem SAP-System. Leider sind die Informationen hierzu recht sp&auml;rlich. Dieser Artikel soll den Anfang machen und etwas Licht ins Dunkel bringen.<br /><P>Zwischen Control und SAP k&ouml;nnen lediglich eine begrenzte Menge an Daten ausgetauscht werden (64KB?). Da jedoch nat&uuml;rlich auch gr&ouml;&szlig;ere Mengen verwaltet werden k&ouml;nnen m&uuml;ssen, hat die SAP den &#8220;SAP Dataprovider&#8221; gebaut. Er verwaltet die Daten, die zwischen Control und SAP ausgetauscht werden.</P><P>Da ich jedoch in Programmiersprachen wie Visual Basic bzw C++ nur sehr begrenzte Kenntnisse habe, habe ich es nicht geschafft, den Data Provider &#8220;anzuschlie&szlig;en&#8221;. Es existiert meines Wissens nach lediglich diese eine offizielle Dokumentation von der SAP: &#8220;<A href="/wp-content/downloads/OCX/SAP_DataProvider.pdf" target="_blank" Target="_blank">SAP DataProvider</A>&#8220;.</P><P>Falls jemand hier sein Gl&uuml;ck versuchen m&ouml;chte und Erfolg hat: Ich nehme gerne und dankend entsprechende Code-Schnipsel entgegen!!</P></p>
+<p>Der Beitrag <a href="/blog/sap-dataprovider/">SAP DataProvider</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>OCX selbst erstellt</title>
+		<link>/blog/ocx-selbst-erstellt/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 12 Sep 2011 09:25:59 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[OCX]]></category>
+		<category><![CDATA[OCX im Eigenbau]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=623</guid>
+
+					<description><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie eigene OCX-Dateien erstellen und einbinden k&#246;nnen. Die Beispiele sind mit VBA erstellt worden.</p>
+<p>Der Beitrag <a href="/blog/ocx-selbst-erstellt/">OCX selbst erstellt</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie eigene OCX-Dateien erstellen und einbinden können. Die Beispiele sind mit VBA erstellt worden.</p>
+<p><a title="SAP Controls im Eigenbau" href="https://tricktresor.com/wp-content/downloads/OCX/Tricktresor_SAP_Controls_im_Eigenbau.pdf" target="_blank" rel="noopener">Hier ist die ausführliche Beschreibung im PDF-Format.</a></p>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" src="/wp-content/uploads/tt_images/OCX/Bild630.jpg" alt="" /><br />
+Vorschau &#8220;SAP Controls im Eigenbau&#8221;</td>
+</tr>
+</tbody>
+</table>
+<p>Zwischen Control und SAP können lediglich eine begrenzte Menge an Daten ausgetauscht werden (64KB?). Da jedoch natürlich auch größere Mengen verwaltet werden können müssen, hat die SAP den &#8220;SAP Dataprovider&#8221; gebaut. Er verwaltet die Daten, die zwischen Control und SAP ausgetauscht werden.</p>
+<p>Da ich jedoch in Programmiersprachen wie Visual Basic bzw C++ nur sehr begrenzte Kenntnisse habe, habe ich es nicht geschafft, den Data Provider &#8220;anzuschließen&#8221;. Es existiert meines Wissens nach lediglich diese eine offizielle Dokumentation von der SAP: &#8220;<a href="/wp-content/downloads/OCX/SAP_DataProvider.pdf" target="_blank" rel="noopener">SAP DataProvider</a>&#8220;.</p>
+<p>Falls jemand hier sein Glück versuchen möchte und Erfolg hat: Ich nehme gerne und dankend entsprechende Code-Schnipsel entgegen!!</p>
+<p>Der Beitrag <a href="/blog/ocx-selbst-erstellt/">OCX selbst erstellt</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

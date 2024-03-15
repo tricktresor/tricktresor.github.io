@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>READ REPORT Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/read-report/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Jun 2018 15:59:52 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>READ REPORT Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Download von Programmen</title>
+		<link>/blog/download-von-programmen/</link>
+					<comments>/blog/download-von-programmen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Jan 2005 13:36:44 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[READ REPORT]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=310</guid>
+
+					<description><![CDATA[<p>Mit diesem Programm k&#246;nnen Sie ABAP-Programme auf ihren PC speichern. Es werden dabei die Texte als auch die Dokumentation ber&#252;cksichtigt. Jeder Report wird in einer Datei mit der Endung "ABAP" gespeichert. Zudem wird eine &#220;bersichtsdatei erstellt, in der alle heruntergeladenen Programme mit Bezeichnung aufgef&#252;hrt sind. Die Auswahl der Programme erfolgt nach Programmname, Autor oder Entwicklungsklasse.</p>
+<p>Der Beitrag <a href="/blog/download-von-programmen/">Download von Programmen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Programm kannst du ABAP-Programme auf deinen PC speichern. Es werden dabei die Texte als auch die Dokumentation berücksichtigt. Jeder Report wird in einer Datei mit der Endung &#8220;ABAP&#8221; gespeichert. Zudem wird eine Übersichtsdatei erstellt, in der alle heruntergeladenen Programme mit Bezeichnung aufgeführt sind. Die Auswahl der Programme erfolgt nach Programmname, Autor oder Entwicklungsklasse.</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p><u><strong>Tipp:</strong></u><br />
+Du kannst einen Report per Drag and Drop direkt aus dem Explorer in das TextEditControl des ABAP-Editors ziehen![/notice]</p>
+<pre class="lang:abap decode:true ">*---------------------------------------------------------------------*
+* Author: Harald Werft                                                *
+* Datum.: 15.11.1995                                                  *
+*---------------------------------------------------------------------*
+* Download von Objekten (Reports/Includes/Modulpool                   *
+*---------------------------------------------------------------------*
+* Angepasst von Enno Wulff                                            *
+* https://tricktresor.com/
+*---------------------------------------------------------------------*
+REPORT  zsysrep1.
+
+TABLES: dokil,                         "Index Doku-Tabelle
+        tadir.                         "Tabelle mit Entwicklungsklasse
+
+DATA:
+* Ausgewählte Elemente
+  prog      LIKE tadir    OCCURS 0 WITH HEADER LINE,
+
+* Inhalt
+  BEGIN OF inhalt OCCURS 0,
+    report TYPE syrepid,
+    bezei(200),
+  END OF inhalt,
+
+* Report
+  BEGIN OF t OCCURS 0,
+    line(72),
+  END OF t,
+
+* Texelemente für Report
+  te        LIKE textpool OCCURS 0 WITH HEADER LINE,
+
+* Variablen Textverarbeitung
+  texthead  LIKE thead,
+  textlines LIKE tline    OCCURS 0 WITH HEADER LINE,
+
+* Download
+  BEGIN OF tab OCCURS 0,
+    line(400),
+  END OF tab,
+
+  BEGIN OF name,
+    pfad(500),
+    datei(500),
+    erweit(5),
+  END OF name,
+  filename  LIKE rlgrap-filename.
+
+*** Selektionsbild
+PARAMETER: i_pfad(200) DEFAULT 'C:/DATENREPORT'.
+SELECT-OPTIONS i_objnam FOR tadir-obj_name.
+SELECT-OPTIONS i_devcla FOR tadir-devclass.
+SELECT-OPTIONS i_author FOR tadir-author.
+PARAMETER: i_doku AS CHECKBOX DEFAULT 'X'.
+
+************************************************************************
+START-OF-SELECTION.
+************************************************************************
+
+*** Alle Programme laut Selektionskriterium ermitteln
+  SELECT * FROM  tadir INTO TABLE prog
+   WHERE pgmid       = 'R3TR'
+     AND object      = 'PROG'
+     AND obj_name   IN i_objnam
+     AND devclass   IN i_devcla
+     AND author     IN i_author.
+
+  REFRESH inhalt.
+
+  LOOP AT prog.
+    REFRESH t.
+*** Einlesen der Reportssource
+    READ REPORT prog-obj_name INTO t.
+    IF sy-subrc = 0.
+*** Einlesen des Textpools
+      REFRESH te.
+      READ TEXTPOOL prog-obj_name INTO te LANGUAGE sy-langu.
+*** Inhaltsdatei aufbauen
+      inhalt-report = prog-obj_name.
+      inhalt-bezei  = space.
+*** Lesen der Reportbezeichnung
+      READ TABLE te WITH KEY id = 'R'.
+      IF sy-subrc = 0.
+        inhalt-bezei = te-entry.
+      ENDIF.
+      APPEND inhalt.
+*** Übergabe der Texte an die Downloadtabelle
+      LOOP AT te.
+        APPEND te(254) TO tab.
+      ENDLOOP.
+      REFRESH textlines.
+      CLEAR: textlines, texthead.
+      IF NOT i_doku IS INITIAL.
+*** Lesen Index DOKU-Tabelle
+        SELECT SINGLE * FROM  dokil
+           WHERE  id      = 'RE'
+           AND    object  = prog-obj_name
+           AND    langu   = 'D'
+           AND    typ     = 'E'.
+        IF sy-subrc = 0.
+*** Lesen der Doku falls gewünscht
+          CALL FUNCTION 'DOCU_GET'
+               EXPORTING
+                    id     = dokil-id
+                    langu  = dokil-langu
+                    object = dokil-object
+                    typ    = dokil-typ
+               IMPORTING
+                    head   = texthead
+               TABLES
+                    line   = textlines
+               EXCEPTIONS
+                    OTHERS = 1.
+          REFRESH te.
+          CLEAR te.
+*** Übertragen der Dokumentation in die Downloadtabelle
+          APPEND LINES OF textlines TO tab.
+        ENDIF.
+      ENDIF.
+      APPEND sy-uline(70) TO tab.
+      APPEND LINES OF t   TO tab.
+*** Download des Reports
+      name-pfad   = i_pfad.
+      name-datei  = prog-obj_name.
+      name-erweit = '.ABAP'.
+      CONDENSE name NO-GAPS.
+      filename    = name.
+      CALL FUNCTION 'WS_DOWNLOAD'
+           EXPORTING
+                filename            = filename
+                filetype            = 'ASC'
+                mode                = ' '
+           TABLES
+                data_tab            = tab
+           EXCEPTIONS
+                file_open_error     = 01
+                file_write_error    = 02
+                invalid_filesize    = 03
+                invalid_table_width = 04
+                invalid_type        = 05
+                no_batch            = 06
+                unknown_error       = 07.
+      PERFORM fehler_download.
+    ENDIF.
+
+  ENDLOOP.
+
+*** Ausgabe des Inhaltsverzeichnis in Datei
+  name-pfad   = i_pfad.
+  name-datei  = 'Inhalt'.
+  name-erweit = '.TXT'.
+  CONDENSE name NO-GAPS.
+  filename    = name.
+  CALL FUNCTION 'WS_DOWNLOAD'
+       EXPORTING
+            filename            = filename
+            filetype            = 'ASC'
+            mode                = ' '
+       TABLES
+            data_tab            = inhalt
+       EXCEPTIONS
+            file_open_error     = 01
+            file_write_error    = 02
+            invalid_filesize    = 03
+            invalid_table_width = 04
+            invalid_type        = 05
+            no_batch            = 06
+            unknown_error       = 07.
+  PERFORM fehler_download.
+
+END-OF-SELECTION.
+
+*---------------------------------------------------------------------*
+*       FORM FEHLER_DOWNLOAD                                          *
+*---------------------------------------------------------------------*
+* Fehlermelung und Abbruch, wenn beim Download Fehler auftraten.      *
+*---------------------------------------------------------------------*
+FORM fehler_download.
+
+  IF sy-subrc NE 0.
+    WRITE: / 'Fehler beim Download:'.
+    CASE sy-subrc.
+      WHEN 1.
+        WRITE: / 'File Open Error'.
+      WHEN 2.
+        WRITE: / 'File Write Error'.
+      WHEN 3.
+        WRITE: / 'Invalid Filesize'.
+      WHEN 4.
+        WRITE: / 'Invalid Table Width'.
+      WHEN 5.
+        WRITE: / 'Invalid Type'.
+      WHEN 6.
+        WRITE: / 'No Batch'.
+      WHEN 7.
+        WRITE: / 'Unknown'.
+    ENDCASE.
+    STOP.
+  ENDIF.
+
+ENDFORM.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/download-von-programmen/">Download von Programmen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/download-von-programmen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>having Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/having/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 27 Aug 2019 15:27:59 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>having Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SELECT WHERE nur ein Eintrag vorhanden</title>
+		<link>/blog/select-where-nur-ein-eintrag-vorhanden/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 27 Aug 2019 15:27:58 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[subquery]]></category>
+		<category><![CDATA[having]]></category>
+		<guid isPermaLink="false">/?p=1022541</guid>
+
+					<description><![CDATA[<p>Select-Befehle sind in der Regel im SAP-Umfeld einigermaßen überschaubar. Meiner Meinung nach liegt es daran, dass in der Regel Programmierer am Werk sind, aber keine SQL-Spezialisten. Zudem bietet der Open-SQL-Standard von SAP auch nur einen eingeschränkten Funktionsumfang. Selbst wenn man etwas kompliziertere Selects durchführen möchte, ist das nicht unbedingt möglich. Joins sind eine andere Geschichte. Hier toben sich Programmierer gerne einmal aus und joinen was das Zeug hält. SELECT oder ABAP? In beiden Fällen, der...</p>
+<p>Der Beitrag <a href="/blog/select-where-nur-ein-eintrag-vorhanden/">SELECT WHERE nur ein Eintrag vorhanden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Select-Befehle sind in der Regel im SAP-Umfeld einigermaßen überschaubar. Meiner Meinung nach liegt es daran, dass in der Regel Programmierer am Werk sind, aber keine SQL-Spezialisten. Zudem bietet der Open-SQL-Standard von SAP auch nur einen eingeschränkten Funktionsumfang. Selbst wenn man etwas kompliziertere Selects durchführen möchte, ist das nicht unbedingt möglich.</p>
+
+
+
+<p>Joins sind eine andere Geschichte. Hier toben sich Programmierer gerne einmal aus und joinen was das Zeug hält.</p>
+
+
+
+<h2 class="wp-block-heading">SELECT oder ABAP?</h2>
+
+
+
+<p>In beiden Fällen, der Select-Anweisung und der nachträglichen Verarbeitung, gibt es Situationen, wo beides irgendwie umständlich ist. Ein solcher Fall ist es zum Beispiel, wenn man nur die Daten selektieren möchte, von denen man erst nach einer Aggregatbildung weiß, ob man sie lesen möchte oder nicht. Also zum Beispiel: Gib mir alle Belege, zu denen nur ein Eintrag in der Positionstabelle vorhanden ist.</p>
+
+
+
+<h2 class="wp-block-heading">SUBQUERY</h2>
+
+
+
+<p>Der folgende Select ermittelt genau die Einträge, bei denen nur ein Eintrag in der VBAP vorhanden ist.</p>
+
+
+
+<pre class="wp-block-code"><code>SELECT vbeln, matnr
+  FROM vbap AS v
+ WHERE vbeln IN @s_vbeln
+   AND matnr IN @s_matnr
+   AND 1 =  ( SELECT COUNT( * ) FROM vbap
+               WHERE vbeln = v~vbeln )
+ GROUP BY vbeln, matnr
+ ORDER BY vbeln, matnr
+  INTO TABLE @DATA(list).</code></pre>
+
+
+
+<h2 class="wp-block-heading">HAVING</h2>
+
+
+
+<p>durch Zufall bin ich bei der Nachstellung des Problems auf eine andere Lösung gestoßen, bei der die Anzahl der vorhandenen Sätze mittels HAVING eingeschränkt wird.</p>
+
+
+
+<pre class="wp-block-code"><code>SELECT vbeln, sum( kwmeng ) as kwmeng, vrkme
+  FROM vbap AS v
+    WHERE vbeln IN @s_vbeln
+      AND matnr IN @s_matnr
+  GROUP BY vbeln, vrkme
+  HAVING COUNT(*) = 1
+  ORDER BY vbeln, vrkme
+  INTO TABLE @data(list).</code></pre>
+
+
+
+<p>Der Vorteil bei der HAVING-Variante ist, dass hier die Anzahl der Datensätze auch variabel abgefragt werden können. Das geht mit dem oben vorgestellten Subquery nicht.</p>
+
+
+
+<h2 class="wp-block-heading">Performancevergleich</h2>
+
+
+
+<p>Ich habe beide Varianten in zwei unterschiedlichen Systemen mit unterschiedlichen Tabellen ausprobiert und einen kleinen Performancevergleich gemacht. In der einen Version ist die Variante mit dem Subquery schneller, in der anderen Version ist HAVING schneller.</p>
+
+
+
+<p>Im Gegensatz zu einer umständlichen Analyse per Programmcoding, welcher Satz nur einmal vorhanden ist, sind beide SELECT-Versionen meiner Meinung nach eleganter. Die Performance sollte man auf jeden Fall bei jeder Version im Blick haben.</p>
+<p>Der Beitrag <a href="/blog/select-where-nur-ein-eintrag-vorhanden/">SELECT WHERE nur ein Eintrag vorhanden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

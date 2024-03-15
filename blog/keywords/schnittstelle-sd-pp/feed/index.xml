@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Schnittstelle SD-PP Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/schnittstelle-sd-pp/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 29 Nov 2013 16:59:35 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Schnittstelle SD-PP Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Zugriff auf den Prozeßauftrag</title>
+		<link>/blog/zugriff-auf-den-prozessauftrag/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 23 Mar 2004 16:44:52 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[Schnittstelle SD-PP]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=225</guid>
+
+					<description><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie aus dem Kundenauftrag heraus auf die Daten des Proze&#223;auftrags herankommen. </p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-den-prozessauftrag/">Zugriff auf den Prozeßauftrag</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie aus dem Kundenauftrag heraus auf die Daten des Proze&szlig;auftrags herankommen. <br /><P>Falls das Programm bereits auf den Fertigungsauftrag zugegriffen hat, steht der Auftrag noch im Speicher. In diesem Fall k&ouml;nnen die aktuellen Daten mit dem Funktionsbaustein <STRONG><FONT color="#fb2412">CO_BT_CAUFV_READ_WITH_KEY</FONT></STRONG> gelesen werden.</P><P>Sollten die Daten nicht vorhanden sein, l&ouml;st der Baustein eine Exception aus und die Daten m&uuml;ssen mit <STRONG><FONT color="#fb2412">VB_CP_HEADER_DATA</FONT></STRONG> von der Datenbank nachgelesen werden.</P><P>Beide Bausteine Liefern die Kopfdaten und Positionsdaten eines Auftrags zur&uuml;ck.</P><P class="head1">Coding</P><P class="sap1"><FONT color="#fb2412">*&#8211; Datendefinitionen</FONT><BR>DATA: zx_aufvd LIKE caufvd, <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; zx_afpod LIKE afpod.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Init</FONT><BR>CLEAR: zx_aufvd, zx_afpod.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Lesen aus internem Speicher</FONT><BR>CALL FUNCTION &#8216;CO_BT_CAUFV_READ_WITH_KEY&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;aufnr_act&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = l_aufnr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;no_dialog_info = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;caufvd_exp&nbsp;&nbsp;&nbsp;&nbsp; = zx_aufvd<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;afpod_exp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = zx_afpod<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>IF sy-subrc &gt; 0.<BR><FONT color="#fb2412">*&#8211; Auf den Proze&szlig;auftrag wurde noch nicht zugegriffen: Von DB lesen<BR></FONT>&nbsp;&nbsp;CALL FUNCTION &#8216;VB_CP_HEADER_DATA&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_aufnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = l_aufnr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e_caufvd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = zx_aufvd<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e_afpod&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = zx_afpod<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;order_not_found = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>ENDIF.<BR></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-den-prozessauftrag/">Zugriff auf den Prozeßauftrag</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

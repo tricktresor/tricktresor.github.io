@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Sonderzeichen Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/sonderzeichen/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:58 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Sonderzeichen Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SALV-Table mit &#8220;Grafik&#8221;</title>
+		<link>/blog/salv-table-mit-grafik/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Jun 2014 19:04:27 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[ascii]]></category>
+		<category><![CDATA[zeichensatz]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Sonderzeichen]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4891</guid>
+
+					<description><![CDATA[<p>Heute kam mir die Idee, Daten in einem ALV-Grid einmal grafisch darzustellen. Ich hatte eigentlich vor, die grafischen Zeichen aus dem DOS-Zeichensatz zu verwenden, aber diese stehen leider nicht zur Verfügung. Hier also eine Variante mit verfügbaren Sonderzeichen.</p>
+<p>Der Beitrag <a href="/blog/salv-table-mit-grafik/">SALV-Table mit &#8220;Grafik&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute kam mir die Idee, Daten in einem ALV-Grid einmal grafisch darzustellen. Ich hatte eigentlich vor, die grafischen Zeichen aus dem DOS-Zeichensatz zu verwenden:</p>
+<p><a href="http://www.torsten-horn.de/techdocs/ascii.htm"><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-4893" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_210631-300x179.jpg" alt="Bild_2014_06_26_210631" width="300" height="179" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_210631-300x179.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_26_210631-624x372.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_26_210631.jpg 626w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Leider war das nicht möglich. Ich habe mich dann für ein anderes Sonderzeichen entschieden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg"><img decoding="async" class="alignnone wp-image-4892 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg" alt="Bild_2014_06_26_200626 (2)" width="588" height="330" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg 588w, /wp-content/uploads/2014/06/Bild_2014_06_26_200626-2-300x168.jpg 300w" sizes="(max-width: 588px) 100vw, 588px" /></a></p>
+<p>Die Länge des &#8220;Balkens&#8221; wird anhand der verwenden Feldgröße von 20 Zeichen berechnet.</p>
+<p>Das Pipe-Symbol | sieht auch gut aus. Nimmt nicht so viel Platz weg&#8230;</p>
+<p><img decoding="async" class="alignnone wp-image-4894 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_210606.jpg" alt="Bild_2014_06_26_210606" width="484" height="193" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_210606.jpg 484w, /wp-content/uploads/2014/06/Bild_2014_06_26_210606-300x119.jpg 300w" sizes="(max-width: 484px) 100vw, 484px" /></p>
+<h2>Coding</h2>
+<pre>REPORT z.
+
+*== global data
+DATA:
+  BEGIN OF gs_data,
+    matnr   TYPE char10,
+    descr   TYPE text20,
+    amount  TYPE i,
+    camount TYPE char20,
+  END OF gs_data,
+  gt_data LIKE TABLE OF gs_data,
+  hex TYPE x VALUE 7.
+
+FIELD-SYMBOLS  TYPE c.
+
+*== start of program
+START-OF-SELECTION.
+  PERFORM main.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  main
+*&amp;---------------------------------------------------------------------*
+FORM main.
+
+*== local data
+  DATA lo_grid      TYPE REF TO cl_salv_table.
+  FIELD-SYMBOLS  LIKE LINE OF gt_data.
+
+*== assign special Character
+  ASSIGN hex TO  CASTING.
+
+*== Fill testdata
+  gs_data-matnr = '1000'. gs_data-descr = 'Screw'.      gs_data-amount = 120. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1300'. gs_data-descr = 'Nut 1"'.     gs_data-amount = 030. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1506'. gs_data-descr = 'Driver'.     gs_data-amount = 222. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1660'. gs_data-descr = 'Tool '.      gs_data-amount = 180. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2040'. gs_data-descr = 'Screw 0.4"'. gs_data-amount = 178. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2220'. gs_data-descr = 'Screw 0.6"'. gs_data-amount = 660. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2456'. gs_data-descr = 'Gripper'.    gs_data-amount = 066. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2660'. gs_data-descr = 'Nipper'.     gs_data-amount = 510. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2807'. gs_data-descr = 'Pincer'.     gs_data-amount = 790. APPEND gs_data TO gt_data.
+
+*== calc amount
+  LOOP AT gt_data ASSIGNING .
+    PERFORM calc CHANGING .
+  ENDLOOP.
+
+*== call SALV
+  TRY.
+      CALL METHOD cl_salv_table=&gt;factory
+        IMPORTING
+          r_salv_table = lo_grid
+        CHANGING
+          t_table      = gt_data.
+      lo_grid-&gt;display( ).
+
+    CATCH cx_salv_msg.
+      WRITE: / 'Error: ALV exception CX_SALV_MSG'.
+  ENDTRY.
+
+ENDFORM.                    "main
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  calc
+*&amp;---------------------------------------------------------------------*
+FORM calc CHANGING cs_data LIKE gs_data.
+
+*== local data
+  DATA number TYPE i.
+  DATA max TYPE i VALUE 1000.
+
+*== calculate bar
+  number = cs_data-amount * 100 / 1000 / 5.
+
+*== Fill bar
+  DO number TIMES.
+     CONCATENATE cs_data-camount  INTO cs_data-camount.
+  ENDDO.
+
+ENDFORM.                    "calc</pre>
+<p>Der Beitrag <a href="/blog/salv-table-mit-grafik/">SALV-Table mit &#8220;Grafik&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

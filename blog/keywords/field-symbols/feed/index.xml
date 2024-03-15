@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>field-symbols Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/field-symbols/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 28 Dec 2020 16:56:05 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>field-symbols Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Aggregation mit VALUE, GROUPS und FOR</title>
+		<link>/blog/aggregation-mit-value-groups-und-for/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 17 Dec 2020 16:06:24 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[GROUP BY]]></category>
+		<category><![CDATA[groups]]></category>
+		<category><![CDATA[for]]></category>
+		<category><![CDATA[field-symbols]]></category>
+		<guid isPermaLink="false">/?p=1024772</guid>
+
+					<description><![CDATA[<p>Als SAP-Programmierer hat man häufig mit Datenstrukturen zu tun, die aus einer Belegnummer und einer Positionsnummer bestehen. Hieraus ergibt sich dann häufig die Aufgabenstellung, alle Belegnummern in einer separaten Tabelle zu sammeln, also auf Belegnummer zu aggregieren. Der folgende Code-Schnipsel erledigt das für eine Tabelle mit Hilfe der VALUE-Anweisung in Verbindung mit FOR und GROUPS. Zuerst die Datenstruktur der Tabelle, die aus Belegnummer (Document = D) und Position ( Item = IT) besteht. Zum Testen...</p>
+<p>Der Beitrag <a href="/blog/aggregation-mit-value-groups-und-for/">Aggregation mit VALUE, GROUPS und FOR</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Als SAP-Programmierer hat man häufig mit Datenstrukturen zu tun, die aus einer Belegnummer und einer Positionsnummer bestehen. Hieraus ergibt sich dann häufig die Aufgabenstellung, alle Belegnummern in einer separaten Tabelle zu sammeln, also auf Belegnummer zu aggregieren.</p>
+
+
+
+<p>Der folgende Code-Schnipsel erledigt das für eine Tabelle mit Hilfe der VALUE-Anweisung in Verbindung mit FOR und GROUPS.</p>
+
+
+
+<p>Zuerst die Datenstruktur der Tabelle, die aus Belegnummer (Document = D) und Position ( Item = IT) besteht. </p>
+
+
+
+<pre class="wp-block-code"><code>TYPES: BEGIN OF _dit,
+         doc TYPE n LENGTH 10,
+         itm TYPE posnr,
+       END OF _dit,
+       _dits TYPE SORTED TABLE OF _dit WITH UNIQUE KEY doc itm.</code></pre>
+
+
+
+<p>Zum Testen fülle ich die Tabelle mit ein paar Testdaten:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(dits) = VALUE _dits(
+ ( doc = 100 itm = 1 )
+ ( doc = 100 itm = 2 )
+ ( doc = 102 itm = 2 )
+ ( doc = 103 itm = 4 )
+ ( doc = 103 itm = 5 ) ).</code></pre>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow"><p>Die VALUE-Anweisung macht übrigens einen INSERT INTO TABLE, was bedeutet, dass die einzufügenden Werte nicht sortiert vorliegen müssen!</p><p>Die folgende Anweisung verursacht also keinen Shortdump:</p><p>DATA(dits) = VALUE _dits( ( doc = 200 ) ( doc = 100 ) ).</p><cite>Info zur Anwendung VALUE</cite></blockquote>
+
+
+
+<p>Die Zielstruktur, sieht wie folgt aus:</p>
+
+
+
+<pre class="wp-block-code"><code>TYPES: BEGIN OF _doc,
+         no TYPE n LENGTH 10,
+       END OF _doc,
+       _docs TYPE SORTED TABLE OF _doc WITH UNIQUE KEY no.
+</code></pre>
+
+
+
+<p>Das Coding für die Aggregation lautet folgendermaßen:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(docs) = VALUE _docs(
+    FOR GROUPS d OF line IN dits
+      GROUP BY line-doc ( no = d ) ).</code></pre>
+
+
+
+<p>Es ist so kompakt, dass man es auch noch vertretbar in einer Zeile stehen lassen kann.</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(docs) = VALUE _docs( FOR GROUPS d OF line IN dits GROUP BY line-doc ( no = d ) ).</code></pre>
+
+
+
+<h2 class="wp-block-heading">DATA vs. FIELD-SYMBOLS</h2>
+
+
+
+<p>Die Syntax lässt zwei Schreibweisen zu: einmal mit einer Workarea (DATA) und einmal mit Feldsymbolen. In meinem Beispiel unterscheidet sich die Schreibweise also nur für ein Element:</p>
+
+
+
+<ul><li> LINE (DATA) </li><li>&lt;LINE&gt; (Field-Symbols)</li></ul>
+
+
+
+<p>Die Verwendung von Field-Symbols ist generell schneller. Die Performance hängt stark davon ab, wie breit die Tabelle ist. Bei meinem Bespiel, das nur die beiden Felder DOC und ITM enthält, ist der Vorsprung von Field-Symbols nur minimal. Ändere ich die Breite der Struktur jedoch, indem ich z.B. die Tabelle VBAP einbinde (ca. 3700 Zeichen breit), dann verlängert sich die Laufzeit bei Field-Symbols um ca. 1/3. Bei DATA ist die Laufzeit mehr als drei Mal so hoch!</p>
+
+
+
+<p>Empfehlung also: Verwende immer die Variante mit Field-Symbols! Einen praktischen Nutzen habe ich bisher noch nicht finden können. Normalerweise kann man bei der Verwendung von Feldsymbolen mit ihrer Hilfe die zugrunde liegenden Daten direkt verändern. Bei dieser Variante mit GROUPS ist das meines Wissens jedoch nicht möglich.   </p>
+
+
+
+<h2 class="wp-block-heading">Gruppierung mit SELECT</h2>
+
+
+
+<p>Seit Release 7.52 ist es möglich, einen SELECT auf eine interne Tabelle abzusetzen. Und auch so kann man natürlich gruppieren:</p>
+
+
+
+<pre class="wp-block-code"><code>SELECT DISTINCT doc AS no
+  FROM @dits AS itab
+  INTO TABLE @DATA(docs).</code></pre>
+
+
+
+<h2 class="wp-block-heading">Gruppierung mit LOOP</h2>
+
+
+
+<p>In diesem Artikel habe ich beschrieben, wie die Gruppierung bei einer LOOP-Schleife funktioniert.</p>
+
+
+
+<figure class="wp-block-embed is-type-wp-embed is-provider-tricktresor wp-block-embed-tricktresor"><div class="wp-block-embed__wrapper">
+<blockquote hcb-fetch-image-from="/blog/loop-at-itab-group-by/" class="wp-embedded-content" data-secret="gU2ZtmeY9U"><a href="/blog/loop-at-itab-group-by/">Loop At ITAB Group By</a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" title="&#8222;Loop At ITAB Group By&#8220; &#8212; Tricktresor" src="/blog/loop-at-itab-group-by/embed/#?secret=gU2ZtmeY9U" data-secret="gU2ZtmeY9U" width="600" height="338" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+</div></figure>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/aggregation-mit-value-groups-und-for/">Aggregation mit VALUE, GROUPS und FOR</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Beliebige XML-Datei in interne Tabelle einlesen</title>
+		<link>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/</link>
+					<comments>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Sep 2014 17:05:16 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[parser]]></category>
+		<category><![CDATA[itab]]></category>
+		<category><![CDATA[field-symbols]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[cl_xml_document]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5081</guid>
+
+					<description><![CDATA[<p>Viele Daten werden im XML-Format ausgetauscht. Um die Daten in SAP verarbeiten zu können, muss man parsen oder eine entsprechende Transformation "programmieren". Mit XML tue ich mich manchmal etwas schwer und bin daher froh über jede Vereinfachung.</p>
+<p>Mithilfe eines kleinen generischen Programms ist es einfach möglich, die folgende XML-Datei in eine interne Tabelle zu laden.</p>
+<p>Der Beitrag <a href="/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/">Beliebige XML-Datei in interne Tabelle einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Viele Daten werden im XML-Format ausgetauscht. Um die Daten in SAP verarbeiten zu können, muss man parsen oder eine entsprechende Transformation &#8220;programmieren&#8221;. Mit XML tue ich mich manchmal etwas schwer und bin daher froh über jede Vereinfachung.</p>
+<p>Mithilfe eines kleinen generischen Programms ist es einfach möglich, die folgende XML-Datei in eine interne Tabelle zu laden:</p>
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;hierarchie1&gt;
+&lt;hierarchie2&gt;Beispiel XML&lt;/hierarchie2&gt;
+&lt;hierarchie2&gt;Tricktresor&lt;/hierarchie2&gt;
+&lt;hierarchie2&gt;Enno Wulff&lt;/hierarchie2&gt;
+&lt;/hierarchie1&gt;
+</pre>
+<p><figure id="attachment_5082" aria-describedby="caption-attachment-5082" style="width: 487px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/09/xml_itab.png"><img fetchpriority="high" decoding="async" class="wp-image-5082 size-full" src="https://tricktresor.com/wp-content/uploads/2014/09/xml_itab.png" alt="Interne Tabelle mit XML-Daten" width="487" height="110" srcset="/wp-content/uploads/2014/09/xml_itab.png 487w, /wp-content/uploads/2014/09/xml_itab-300x67.png 300w" sizes="(max-width: 487px) 100vw, 487px" /></a><figcaption id="caption-attachment-5082" class="wp-caption-text">Screenshot aus dem Debugger</figcaption></figure></p>
+<p>Man sieht deutlich, dass die einzelnen Tags der XML-Datei sequentiell in die Tabelle übernommen wurden. Für viele Anwendungsfälle dürfte das für die weitere Verarbeitung ausreichen.</p>
+<p>[notice type=&#8217;info&#8217;]Dieses Programm erzeugt lediglich die Transformation von der XML-Struktur in eine interne Tabelle. Es erfolgt keine Ausgabe![/notice]</p>
+<h2>Coding</h2>
+<pre>REPORT.
+TYPES tyt_tab_xml TYPE TABLE OF smum_xmltb.
+
+DATA: gv_xml_xstring  TYPE          xstring,
+      gt_xml_tab      TYPE TABLE OF smum_xmltb,
+      gv_filename     TYPE          localfile,
+      go_xml_document TYPE REF TO   cl_xml_document,
+      gv_subrc        TYPE          sy-subrc,
+      gv_size         TYPE          sy-tabix.
+
+
+START-OF-SELECTION.
+
+  PERFORM display_popup CHANGING gv_filename.
+
+  PERFORM upload_xml USING gv_filename
+                     CHANGING go_xml_document
+                              gv_subrc.
+  IF gv_subrc = 0.
+
+    PERFORM parse_to_xstring USING go_xml_document
+                             CHANGING gv_xml_xstring
+                                      gv_size
+                                      gv_subrc.
+    IF gv_subrc = 0.
+      PERFORM parse_xml_to_itab USING gv_xml_xstring
+                                CHANGING gt_xml_tab.
+
+    ELSE.
+      EXIT.
+    ENDIF.
+  ELSE.
+    EXIT.
+  ENDIF.
+
+END-OF-SELECTION.
+
+FORM display_popup CHANGING cv_filename TYPE localfile.
+
+  DATA: lt_filetable TYPE filetable,
+        lv_anz_dat   TYPE i.
+
+  cl_gui_frontend_services=&gt;file_open_dialog(
+    EXPORTING
+      window_title            =     'Wählen Sie eine XML.Datei aus'    " Titel des Datei-Öffnen Dialogs
+      default_filename        =     'C:\test.xml'
+      initial_directory       =     'C:\' " Ausgangsverzeichnis
+  CHANGING
+      file_table              = lt_filetable   " Tabelle, die selektierte Dateien enthält
+      rc                      = lv_anz_dat     " Rückgabewert: Anzahl Dateien oder -1 falls Fehler auftritt
+  EXCEPTIONS
+    OTHERS                  = 5
+    ).
+
+  READ TABLE lt_filetable INTO cv_filename INDEX 1.
+
+ENDFORM.
+
+FORM upload_xml USING iv_filename        TYPE localfile
+                CHANGING co_xml_document TYPE REF TO cl_xml_document
+                         cv_subrc        TYPE sy-subrc.
+*== create the object
+  CREATE OBJECT co_xml_document.
+
+*== Upload xml file
+  co_xml_document-&gt;import_from_file(
+  EXPORTING
+    filename = iv_filename
+    RECEIVING
+    retcode = cv_subrc  ).
+
+ENDFORM.
+
+FORM parse_to_xstring USING io_xml_document  TYPE REF TO cl_xml_document
+                      CHANGING cv_xml_string TYPE xstring
+                               cv_size       TYPE sy-tabix
+                               cv_subrc      TYPE sy-subrc.
+*== Convert to xstring
+  CALL METHOD io_xml_document-&gt;render_2_xstring
+    IMPORTING
+      retcode = cv_subrc      " Returncode
+      stream  = cv_xml_string " XString (STREAM)
+      size    = cv_size.      " Anzahl Zeichen
+ENDFORM.
+
+FORM parse_xml_to_itab USING iv_xml_string TYPE xstring
+                       CHANGING ct_xml_tab TYPE tyt_tab_xml.
+
+  DATA: lt_return TYPE TABLE OF bapiret2.
+
+*== Convert XML to itab
+  CALL FUNCTION 'SMUM_XML_PARSE'
+    EXPORTING
+      xml_input = iv_xml_string
+    TABLES
+      xml_table = ct_xml_tab
+      return    = lt_return.
+  BREAK-POINT.
+
+ENDFORM.</pre>
+<h2>Übertragen der generischen in eine interne Tabelle</h2>
+<p>In unserem Beispiel muss die interne Tabelle das Feld &#8220;HIERARCHIE2&#8221; besitzen. Die Zuweisung aller XML-Werte der &#8220;Hierarchiestufe 2&#8221; werden dann dem Feld &#8220;ITAB-HIERARCHIE2&#8221; zugewiesen.</p>
+<p>[notice type=&#8217;info&#8217;]Der Aufruf der Routine muss noch hinzugefügt werden. Die zu übergebene interne Tabelle kann jeden beliebigen Typ haben. In diesem Beispiel wird der Typ TYT_ITAB verwendet.[/notice]</p>
+<pre>FORM build_itab USING it_xml_tab     TYPE tyt_tab_xml
+             CHANGING itab TYPE tyt_itab.
+
+  FIELD-SYMBOLS: &lt;ls_data_tab&gt; LIKE LINE OF itab,
+                 &lt;ls_xml_tab&gt;  LIKE LINE OF it_xml_tab,
+                 &lt;lv_value&gt;    TYPE         data.
+
+  LOOP AT it_xml_tab ASSIGNING &lt;ls_xml_tab&gt; WHERE hier EQ 2.
+    TRANSLATE &lt;ls_xml_tab&gt;-cname TO UPPER CASE.
+    IF &lt;ls_xml_tab&gt;-cname = 'HIERARCHIE2'.
+      APPEND INITIAL LINE TO itab ASSIGNING &lt;ls_data_tab&gt;.
+    ENDIF.
+    ASSIGN COMPONENT &lt;ls_xml_tab&gt;-cname OF STRUCTURE &lt;ls_data_tab&gt; TO &lt;lv_value&gt;.
+    &lt;lv_value&gt; = &lt;ls_xml_tab&gt;-cvalue.
+  ENDLOOP.
+ENDFORM..</pre>
+<p>Der Beitrag <a href="/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/">Beliebige XML-Datei in interne Tabelle einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

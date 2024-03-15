@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Martin Lüdecke, Autor auf Tricktresor</title>
+	<atom:link href="/blog/author/mludecke/feed/" rel="self" type="application/rss+xml" />
+	<link>/blog/author/mludecke/</link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 25 May 2020 11:57:29 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Martin Lüdecke, Autor auf Tricktresor</title>
+	<link>/blog/author/mludecke/</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Sprachtransporte</title>
+		<link>/blog/sprachtransporte/</link>
+		
+		<dc:creator><![CDATA[Martin Lüdecke]]></dc:creator>
+		<pubDate>Mon, 25 May 2020 11:57:29 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Blog]]></category>
+		<guid isPermaLink="false">/?p=1023615</guid>
+
+					<description><![CDATA[<p>Wenn man ein paar eigenentwickelte Transaktionen oder Reports im SAP-System in eine andere Sprache übersetzt hat, dann stellt als Nächstes sich häufig die Frage, wie diese Texte jetzt in weitere Systeme gelangen sollen. Die offensichtliche Antwort wäre, einfach noch einmal alle Objekte zu transportieren, die zu den übersetzten Transaktionen gehören. Und je nach Einstellung des Transportsystems klappt das auch ganz gut. Aber es ist schon etwas unschön, den ganzen Code noch einmal zu transportieren, wenn...</p>
+<p>Der Beitrag <a href="/blog/sprachtransporte/">Sprachtransporte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Wenn man ein paar eigenentwickelte Transaktionen oder Reports im SAP-System in eine andere Sprache übersetzt hat, dann stellt als Nächstes sich häufig die Frage, wie diese Texte jetzt in weitere Systeme gelangen sollen. Die offensichtliche Antwort wäre, einfach noch einmal alle Objekte zu transportieren, die zu den übersetzten Transaktionen gehören. Und je nach Einstellung des Transportsystems klappt das auch ganz gut. Aber es ist schon etwas unschön, den ganzen Code noch einmal zu transportieren, wenn sich eigentlich nur die Texte auf der Benutzeroberfläche geändert haben. Vor allem dann, wenn der eigene Arbeitgeber für jeden Transport, den man weiterschiebt, umfassende Qualitätsprüfungen vorschreibt. Solche Qualitätsmaßnahmen mögen zwar sinnvoll sein für Transporte, die tatsächlich die Funktionsweise einer Transaktion u. Ä. ändern – aber Übersetzungen tun dies per Definition nicht.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="1024" height="490" src="/wp-content/uploads/2020/05/LU1_Report-1024x490.jpg" alt="" class="wp-image-1023619" srcset="/wp-content/uploads/2020/05/LU1_Report-1024x490.jpg 1024w, /wp-content/uploads/2020/05/LU1_Report-300x143.jpg 300w, /wp-content/uploads/2020/05/LU1_Report-768x367.jpg 768w, /wp-content/uploads/2020/05/LU1_Report.jpg 1054w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption><em>Unser Beispielreport, auf Deutsch und auf Französisch!</em></figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Was sind Sprachtransporte?</h2>
+
+
+
+<p>Zu diesem Zweck gibt es Sprachtransporte, einen Typ von Transporten, der aus meiner Sicht viel zu selten eingesetzt wird. In Sprachtransporten werden nur die Übersetzungen transportiert, nicht die eigentlichen Entwicklungsobjekte. Das hat immense Vorteile und ist ganz einfach viel sauberer, denn man transportiert so wirklich nur dass, was transportiert werden soll. Sprachtransporte sind kein eigene Art von Transportaufträgen, sondern man verwendet einfach einen Workbenchauftrag oder einen Transport von Kopien. Zunächst zeige ich einmal kurz, wie das Ganze funktioniert, wenn man so einen Transport von Hand zusammenbaut.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="972" height="850" src="/wp-content/uploads/2020/05/LU1_SE63.jpg" alt="" class="wp-image-1023620" srcset="/wp-content/uploads/2020/05/LU1_SE63.jpg 972w, /wp-content/uploads/2020/05/LU1_SE63-300x262.jpg 300w, /wp-content/uploads/2020/05/LU1_SE63-768x672.jpg 768w, /wp-content/uploads/2020/05/LU1_SE63-400x350.jpg 400w" sizes="(max-width: 972px) 100vw, 972px" /><figcaption><em>Hier wurde der Report in SE63 übersetzt. Für die Qualität der französischen Übersetzung übernehme ich keine Garantie!</em></figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Beispiel</h2>
+
+
+
+<p>In unserem Beispiel haben wir die Textelemente des Reports <em>/LUDECKE/TESTREPORT</em> und des Datenelements <em>/LUDECKE/TESTFELD</em> aus dem Deutschen ins Französische übersetzt, einfach durch Abspringen nach SE63 aus dem jeweiligen Objekt. Dann legen wir zunächst einmal einen neuen Transportauftrag vom Typ <em>Workbenchauftrag</em> oder <em>Transport von Kopien</em> an. In die Objektliste des Transportauftrags oder der Aufgabe tragen wir nun von Hand wie unten abgebildet einige Objekt ein, in diesem Fall einen Report und ein Datenelement. Doch anstatt <em>R3TR</em> geben wir als Programm-ID hier <em>LANG</em> ein. Sobald wir die Eingabe abschließen, fragt uns das System nach einer Sprache. Hier geben wir <em>FR</em> ein.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="438" src="/wp-content/uploads/2020/05/LU1_Manueller_Transport-1024x438.jpg" alt="" class="wp-image-1023617" srcset="/wp-content/uploads/2020/05/LU1_Manueller_Transport-1024x438.jpg 1024w, /wp-content/uploads/2020/05/LU1_Manueller_Transport-300x128.jpg 300w, /wp-content/uploads/2020/05/LU1_Manueller_Transport-768x328.jpg 768w, /wp-content/uploads/2020/05/LU1_Manueller_Transport.jpg 1324w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption><em>In diesen Transport haben wir die Objekte, deren französische Texte transportiert werden sollen, manuell eingegeben.</em></figcaption></figure>
+
+
+
+<p>Für alle weiteren Objekte vom Typ <em>LANG</em>, die wir eingeben, wird jetzt automatisch <em>FR</em> eingetragen. Wir können das jedoch manuell ändern und z. B. dasselbe Objekt mehrfach eintragen, mit unterschiedlichen Sprachen. </p>
+
+
+
+<h2 class="wp-block-heading">Freigabe des Sprachtransports</h2>
+
+
+
+<p>Wenn wir jetzt diesen Transportauftrag freigeben und ins nächste System importieren, wird exakt gar nichts an den eigentlichen Objekten geändert, sondern es werden nur die Übersetzungen importiert. Wenn ein Objekt im Zielsystem nicht existiert, gibt es einen RC-8. Wenn in einem Objekt im Zielsystem die Feldlänge kürzer ist als im Quellsystem, erhält man einen RC-4. In beiden Fällen werden die betreffenden Übersetzungen beim Import übersprungen, aber alle Übersetzungen, für die keine Fehler auftraten, werden erfolgreich importiert. In unserem Beispiel wurde das Datenelement <em>/LUDECKE/TESTFELD</em> nie ins Testsystem transportiert, daher schlägt hier der Import fehl. Die Textelemente des Reports <em>/LUDECKE/TESTREPORT</em> wurden aber trotz dieses Fehlers importiert.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="118" src="/wp-content/uploads/2020/05/LU1_RC8-1024x118.jpg" alt="" class="wp-image-1023618" srcset="/wp-content/uploads/2020/05/LU1_RC8-1024x118.jpg 1024w, /wp-content/uploads/2020/05/LU1_RC8-300x35.jpg 300w, /wp-content/uploads/2020/05/LU1_RC8-768x89.jpg 768w, /wp-content/uploads/2020/05/LU1_RC8-1536x177.jpg 1536w, /wp-content/uploads/2020/05/LU1_RC8.jpg 1682w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption><em>So sieht der Fehler im Transportprotokoll aus, wenn ein Objekt, für das Übersetzungen importiert werden sollen, im Zielsystem nicht existiert.</em></figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Transaktion SLXT</h2>
+
+
+
+<p>Natürlich möchte niemand ständig einzelne Objekte in Transportaufträgen erfassen. Um also massenweise Übersetzungen in Transportaufträge zu schreiben, nutzt man die Transaktion SLXT. Diese Transaktion liest das Übersetzungsprotokoll aus, das beim Übersetzen geschrieben wird. Jedes Objekt, das man in Transaktion SE63 sichert, wird in dieses Protokoll geschrieben. Alle guten SAP-Übersetzungstools (natürlich auch die <a href="https://www.ludecke.net/de/translation-tools/overview/">Übersetzungstools von LUDECKE</a>) unterstützen dieses Übersetzungsprotokoll, und daher können mit der Transaktion SLXT auch Übersetzungen in Transportaufträge verfrachtet werden, die mit Drittanbietertools oder per Export übersetzt wurden.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="672" src="/wp-content/uploads/2020/05/LU1_SLXT-1024x672.jpg" alt="" class="wp-image-1023616" srcset="/wp-content/uploads/2020/05/LU1_SLXT-1024x672.jpg 1024w, /wp-content/uploads/2020/05/LU1_SLXT-300x197.jpg 300w, /wp-content/uploads/2020/05/LU1_SLXT-768x504.jpg 768w, /wp-content/uploads/2020/05/LU1_SLXT-1536x1007.jpg 1536w, /wp-content/uploads/2020/05/LU1_SLXT-818x537.jpg 818w, /wp-content/uploads/2020/05/LU1_SLXT-95x62.jpg 95w, /wp-content/uploads/2020/05/LU1_SLXT.jpg 1598w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption><em>In SLXT reicht es, Sprache, Transport und Zeitraum einzugeben, und schon wird ein Sprachtransport erzeugt.</em></figcaption></figure>
+
+
+
+<p>In SLXT wählt man eine oder mehrere Sprachen sowie einen Transportauftrag aus, oder man gibt, wie im Beispiel, eine Beschreibung für einen neuen Transportauftrag an. Außerdem kann man auf diverse Weise die Objekte auswählen, für die Übersetzungen transportiert werden sollen. Am einfachsten finde ich die Auswahl nach Übersetzungsdatum, denn so erwischt man meistens genau die Objekte, die man benötigt. Nach dem Ausführen des Reports wird die Nummer des Sprachtransports ausgegeben, in den die Objekte geschrieben wurden. Ein Aufgabe wird hierbei nicht angelegt – die Transportobjekte landen direkt im Transportauftrag. Diesen kann man dann analog zum manuell angelegten Auftrag transportieren.</p>
+<p>Der Beitrag <a href="/blog/sprachtransporte/">Sprachtransporte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

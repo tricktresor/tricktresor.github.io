@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>DYNP_VALUES_GET Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/dynp_values_get/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 26 Oct 2017 14:23:34 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>DYNP_VALUES_GET Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Abhängige Suchhilfe</title>
+		<link>/blog/abhaengige-suchhilfe/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Oct 2017 14:23:34 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Suchhilfen]]></category>
+		<category><![CDATA[PAI]]></category>
+		<category><![CDATA[PBO]]></category>
+		<category><![CDATA[DYNP_VALUES_GET]]></category>
+		<category><![CDATA[DYNP_VALUES_UPDATE]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018149</guid>
+
+					<description><![CDATA[<p>Immer wieder ein Thema in Selektionsbildschirmen oder Dynpros: Abhängig vom Feldwert eines anderen Feldes die Suchhilfe für die angeforderte Suchhilfe einschränken. Die wirklich einfachste Möglichkeit ist die über die Verknüpfung der Felder in einer Struktur: Feldabhängige Selektion Manchmal reicht das jedoch nicht aus oder man möchte anhand anderer Feldwerte unterschiedliche Suchhilfen aufrufen. Das folgende Coding zeigt die Möglichkeit mit Hilfe der Funktionsbausteine DYNP_VALUES_READ und DYNP_VALUES_UPDATE. Feldübertragung / PAI &#8211; PBO Eine kurze Info, warum mit den...</p>
+<p>Der Beitrag <a href="/blog/abhaengige-suchhilfe/">Abhängige Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Immer wieder ein Thema in Selektionsbildschirmen oder Dynpros: Abhängig vom Feldwert eines anderen Feldes die Suchhilfe für die angeforderte Suchhilfe einschränken.</p>
+<p>Die wirklich einfachste Möglichkeit ist die über die Verknüpfung der Felder in einer Struktur: Feldabhängige Selektion</p>
+<p>Manchmal reicht das jedoch nicht aus oder man möchte anhand anderer Feldwerte unterschiedliche Suchhilfen aufrufen. Das folgende Coding zeigt die Möglichkeit mit Hilfe der Funktionsbausteine DYNP_VALUES_READ und DYNP_VALUES_UPDATE.</p>
+<h2>Feldübertragung / PAI &#8211; PBO</h2>
+<p>Eine kurze Info, warum mit den genannten Bausteinen gearbeitet werden muss: Ein Dynpro ist ein eigenes <em>Objekt</em>. Es können zwar Feldnamen (Variablen) aus dem ABAP-Programm verwendet werden, aber diese sind erst einmal unabhängig vom Dynpro. Ebenso können im Dynpro Felder definiert werden, die im ABAP-Programm nicht bekannt sind.</p>
+<p><strong>Die Übertragung der Feldwerte erfolgt über Namensgleichheit.</strong></p>
+<p>Ein Dynpro wird im <em>PBO &#8211; Process Before Output</em> initialisiert. Hier können Feldattribute (Sichtbar, eingabebereit, &#8230;) gesetzt werden. Der GUI-Status und GUI-Titel können gesetzt bzw. geändert werden. Felder können befüllt werden bzw. werden aus dem ABAP-Programm übernommen.</p>
+<p>Danach wird das Dynpro mit den Feldern, Feldwerten und Feldattributen angezeigt.</p>
+<p>Bei Tastendruck wird das <em>PAI &#8211; Process After Input</em> ausgeführt. Hier werden geänderte Feldwerte in die ABAP-Variablen, nach Prüfung auf Richtigkeit (Datum, Festwerte etc), übernommen. Der OK-Code kann ausgewertet werden.</p>
+<p>Es gibt drei Ausnahmen von dieser Logik:</p>
+<ul>
+<li>F1-Hilfe: Die Taste F1 wird ausgeführt, ohne dass der PAI angestoßen wird.</li>
+<li>F4-Wertehilfe: Auch die F4-Hilfe bewirkt keinen PAI. Das bedeutet, dass ein soeben eingegebener Wert in ein Eingabe bereites Feld <strong>nicht</strong> in die entsprechende ABAP-Variable übernommen wird!</li>
+<li>Exit-Kommandos: Funktionen, die im GUI-Status als &#8220;Exit-Funktion&#8221; gekennzeichnet sind bewirken zwar einen PAI, jedoch ohne dass Feldprüfungen statt finden oder Feldwerte übernommen werden</li>
+</ul>
+<h2>F4-Falle</h2>
+<p>Diese Besonderheiten muss man wissen, um zu verstehen, warum bei einer F4-Hilfe die Datenübertragung zwischen Dynpro und ABAP-Programm nachprogrammiert werden muss. Wenn du im Dynpro in FELD1 einen Wert eingibst und dann, ohne eine Funktionstaste zu drücken (ENTER, F2, F3, etc.) und mit dem Cursor in das FELD2 springst, dann ist der Wert aus FELD1 noch nicht im ABAP-Programm bekannt! Wenn du nun in FELD2 die F4-Werthilfe betätigst, weiß das ABAP-Programm nichts von dem soeben eingegebenen Wert in FELD1. Der Wert muss erst mit DYNP_VALUES_READ ermittelt werden.</p>
+<p>Änderst du den Wert für FELD2, also das Feld für das du die Werthilfe aufgerufen hast, dann kannst du im ABAP-Programm dieses Feld einfach füllen. Der Transport zum Dynpro erfolgt automatisch. Wenn du allerdings ein anderes Feld ändern möchtest, dann musst du DYNP_VALUES_UPDATE verwenden.</p>
+<h2>Beispielprogramm</h2>
+<p>Das Beispielprogramm demonstriert die Verwendung von DYNP_VALUES_GET und DYNP_VALUES_UPDATE. Bei F4 im Feld P_EINS werden Werte gesetzt. Bei F4 im Feld P_ZWEI wird abhängig von P_EINS ein anderer Wert gesetzt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/abhF4.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018151" src="https://tricktresor.com/wp-content/uploads/2017/10/abhF4.png" alt="" width="454" height="223" srcset="/wp-content/uploads/2017/10/abhF4.png 454w, /wp-content/uploads/2017/10/abhF4-300x147.png 300w" sizes="(max-width: 454px) 100vw, 454px" /></a></p>
+<h2>Code</h2>
+<pre class="lang:abap decode:true">REPORT.
+
+PARAMETERS p_eins TYPE char10.
+PARAMETERS p_zwei TYPE char10.
+
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_eins.
+  PERFORM eins.
+
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_zwei.
+  PERFORM zwei.
+
+FORM eins.
+
+  DATA lt_fields TYPE STANDARD TABLE OF dynpread.
+  DATA ls_field  TYPE dynpread.
+
+  p_eins = 'Z'.
+  p_zwei = '999'.
+
+  ls_field-fieldname  = 'P_ZWEI'.
+  ls_field-fieldvalue = p_zwei.
+  APPEND ls_field TO lt_fields.
+
+  CALL FUNCTION 'DYNP_VALUES_UPDATE'
+    EXPORTING
+      dyname     = sy-cprog
+      dynumb     = sy-dynnr
+    TABLES
+      dynpfields = lt_fields
+    EXCEPTIONS
+      OTHERS     = 8.
+  IF sy-subrc = 0.
+    MESSAGE 'Feldwert gesetzt' TYPE 'S'.
+  ENDIF.
+ENDFORM.
+
+FORM zwei.
+
+  DATA lt_fields TYPE STANDARD TABLE OF dynpread.
+  DATA ls_field  TYPE dynpread.
+
+  CALL FUNCTION 'DYNP_VALUES_READ'
+    EXPORTING
+      dyname                   = sy-repid
+      dynumb                   = sy-dynnr
+      translate_to_upper       = 'X'
+      request                  = 'A'
+      perform_conversion_exits = 'X'
+    TABLES
+      dynpfields               = lt_fields
+    EXCEPTIONS
+      OTHERS                   = 11.
+
+  READ TABLE lt_fields INTO ls_field WITH KEY fieldname = 'P_EINS'.
+  IF sy-subrc = 0.
+    p_eins = ls_field-fieldvalue.
+  ENDIF.
+
+  CASE p_eins.
+    WHEN 'A'.
+      p_zwei = '1'.
+    WHEN 'B'.
+      p_zwei = '2'.
+    WHEN 'C'.
+      p_zwei = '3'.
+  ENDCASE.
+
+ENDFORM.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/abhaengige-suchhilfe/">Abhängige Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>f4 Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/f4/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 17 Aug 2023 17:01:14 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>f4 Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Pfadauswahl mit DIRECTORY_BROWSE</title>
+		<link>/blog/pfadauswahl-mit-directory-browse/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 06 Feb 2014 13:46:59 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[directory]]></category>
+		<category><![CDATA[Verzeichnis]]></category>
+		<category><![CDATA[suchhilfe]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<category><![CDATA[Selektionsbilder]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[f4]]></category>
+		<category><![CDATA[value-request]]></category>
+		<category><![CDATA[browse]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4372</guid>
+
+					<description><![CDATA[<p>Hier demonstriere ich die Verwendung der Methode CL_GUI_FRONTEND_SERVICES=>DIRECTORY_BROWSE. Eigentlich einfach zu verwenden, aber für die F4-Hilfe ist ein kleiner Trick notwendig. Zudem zeige ich, wie die Methode in einem Suchhilfe-Exit verwendet werden kann.</p>
+<p>Der Beitrag <a href="/blog/pfadauswahl-mit-directory-browse/">Pfadauswahl mit DIRECTORY_BROWSE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um einen Dateipfad auf dem Frontend auszuwählen, gibt es die Methode DIRECTORY_BROWSE der Klasse CL_GUI_FRONTEND_SERVICES. Um sie jedoch in der F4-Hilfe eines Reports sinnvoll verwenden zu können, muss man sich noch eines Tricks bedienen. Das Problem: Bei Aufruf der F4-Hilfe steht der Wert des Parameters für den die F4-Hilfe aufgerufen wurde, nicht zur Verfügung.</p>
+<p>Aus diesem Grund muss der Feldinhalt explizit mit Hilfe des Funktionsbausteins DYNP_VALUES_READ gelesen werden.</p>
+<p><img fetchpriority="high" decoding="async" width="675" height="422" class="alignnone size-full wp-image-4374" src="https://tricktresor.com/wp-content/uploads/2014/02/img_52f391e706cfb.png" alt="" srcset="/wp-content/uploads/2014/02/img_52f391e706cfb.png 675w, /wp-content/uploads/2014/02/img_52f391e706cfb-300x187.png 300w, /wp-content/uploads/2014/02/img_52f391e706cfb-624x390.png 624w" sizes="(max-width: 675px) 100vw, 675px" /></p>
+<h2>Coding</h2>
+<pre>REPORT z_test_browse_directory.
+
+*== SELECTION SCREEN
+PARAMETERS p_path  TYPE text200 OBLIGATORY LOWER CASE.
+
+*== Help Value path
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_path.
+  PERFORM f4_path.
+
+*== init
+INITIALIZATION.
+  PERFORM get_download_path.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_download_path
+*&amp;---------------------------------------------------------------------*
+FORM get_download_path.
+
+*== local data
+  DATA lv_upload_path    TYPE string.
+  DATA lv_download_path  TYPE string.
+
+*== get current download path
+  CALL METHOD cl_gui_frontend_services=&gt;get_upload_download_path
+    CHANGING
+      upload_path   = lv_upload_path
+      download_path = lv_download_path.
+
+*== set parameter
+  p_path = lv_download_path.
+
+ENDFORM.                    "get_download_path
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  f4_path
+*&amp;---------------------------------------------------------------------*
+FORM f4_path.
+
+*== local data
+  DATA lv_out    TYPE string.
+  DATA lv_in     TYPE string.
+  DATA lt_fields TYPE TABLE OF dynpread.
+  DATA ls_field  TYPE dynpread.
+
+*== get current value for path
+  ls_field = 'P_PATH'.
+  APPEND ls_field TO lt_fields.
+
+  CALL FUNCTION 'DYNP_VALUES_READ'
+    EXPORTING
+      dyname     = sy-cprog
+      dynumb     = sy-dynnr
+    TABLES
+      dynpfields = lt_fields
+    EXCEPTIONS
+      OTHERS     = 1.
+
+  IF sy-subrc = 0.
+    READ TABLE lt_fields INTO ls_field INDEX 1.
+    lv_in = ls_field-fieldvalue.
+  ENDIF.
+
+*== call popup for directory selection
+  CALL METHOD cl_gui_frontend_services=&gt;directory_browse
+    EXPORTING
+      initial_folder  = lv_in
+    CHANGING
+      selected_folder = lv_out
+    EXCEPTIONS
+      OTHERS          = 4.
+
+  IF sy-subrc = 0 AND lv_out IS NOT INITIAL.
+*== set selected path
+    p_path = lv_out.
+  ELSE.
+*== set origin path
+    p_path = lv_in.
+  ENDIF.
+
+ENDFORM.</pre>
+<h1>Verwendung in einer Suchhilfe</h1>
+<p>Einfacher und sinnvoller jedoch ist die Verwendung in einer Suchhilfe! Warum? Erstens kann die Suchhilfe an ein entsprechendes Feld einer Dictionarystruktur angebunden werden und zweitens lässt sich auch in einem Report eine Suchhilfe einfacher verwenden.</p>
+<p>Das Programm reduziert sich so auf die folgende Angabe bei dem Parameter P_PATH:</p>
+<pre>PARAMETERS p_path  TYPE string OBLIGATORY LOWER CASE <span style="color: #ff0000;">MATCHCODE OBJECT ZSH_DIRECTORY</span>.</pre>
+<p>du ahnst es schon: Die Suchhilfe heißt in diesem Fall ZSH_DIRECTORY. Um diese zu erstellen musst du folgendes tun:</p>
+<ol>
+<li>Anlage der Suchhilfe in der SE11</li>
+<li>Anlage eines Funktionsbausteins, der als Suchhilfe-Exit verwendet wird.</li>
+</ol>
+<p>Wir fangen bei 2. an:</p>
+<h2>2. Anlage Suchhilfe-Exit</h2>
+<p>Du benötigst eine Funktionsgruppe. Einfach in der SE80 eine anlegen. In diese Funktionsgruppe kopierst du den Baustein F4IF_SHLP_EXIT_EXAMPLE auf den Baustein Z_F4IF_SHLP_EXIT_DIRECTORY. Das Kopieren ist wichtig, da die Suchhilfe-Exit-Bausteine eine definierte Schnittstelle haben.</p>
+<p>Im STEP SELECT fügst du das Coding ein, dessen Kern wir bereits aus dem vorherigen Coding kennen:</p>
+<pre>  IF callcontrol-step = 'SELECT'.
+*== data (please set data definitions to top of function module!)
+    DATA lv_in TYPE string.
+    DATA lv_out TYPE string.
+    FIELD-SYMBOLS &lt;itf&gt; LIKE LINE OF shlp-interface.
+    FIELD-SYMBOLS &lt;rec&gt; LIKE LINE OF record_tab.
+*== get field value
+    READ TABLE shlp-interface WITH KEY shlpfield = 'PATH' ASSIGNING &lt;itf&gt;.
+    IF sy-subrc = 0.
+*== use field value as start directory
+      lv_in = &lt;itf&gt;-value.
+*== call popup for directory selection
+      CALL METHOD cl_gui_frontend_services=&gt;directory_browse
+        EXPORTING
+          initial_folder  = lv_in
+        CHANGING
+          selected_folder = lv_out
+        EXCEPTIONS
+          OTHERS          = 4.
+      IF sy-subrc = 0 AND lv_out IS NOT INITIAL.
+        APPEND INITIAL LINE TO record_tab ASSIGNING &lt;rec&gt;.
+        &lt;rec&gt;-string = lv_out.
+        callcontrol-step = 'RETURN'.
+      ENDIF.
+    ENDIF.
+  ENDIF.</pre>
+<p>Grob passiert folgendes:</p>
+<ol>
+<li>Wir lesen aus der Schnittstellenbeschreibung den Parameter PATH, den wir in der Suchhilfe definiert haben, aus und verwenden ihn als Startverzeichnis</li>
+<li>Aufruf der Methode DIRECTORY_BROWSE</li>
+<li>Füllen der Rückgabetabelle RECORD_TAB</li>
+<li>Setzen des Folgeschrittes RETURN um die Anzeige des gefundenen Verzeichnisses im Popup zu verhindern</li>
+</ol>
+<p>[notice type=&#8217;info&#8217;]Eventuell kann es sein, dass in dem Beispiel das Startverzeichnis nicht in die Suchhilfe übernommen wird. In dem Fall muss gegebenenfalls ebenfalls der Funktionsbaustein DYNP_VALUES_READ eingesetzt werden. Das verwendete Parametername steht in der INTERFACE-Struktur im Feld VALFIELD.[/notice]</p>
+<h2>1. Anlage der Suchhilfe</h2>
+<p>Transaktion SE11: Suchhilfe Anlegen:</p>
+<p><img decoding="async" width="414" height="359" class="alignnone size-full wp-image-4377" src="https://tricktresor.com/wp-content/uploads/2014/02/img_52f395b7a234f.png" alt="" srcset="/wp-content/uploads/2014/02/img_52f395b7a234f.png 414w, /wp-content/uploads/2014/02/img_52f395b7a234f-300x260.png 300w" sizes="(max-width: 414px) 100vw, 414px" /></p>
+<p>In der Suchhilfe muss der erstellte Funktionsbaustein als Suchhilfe-Exit eingetragen werden:</p>
+<p><img decoding="async" width="737" height="429" class="alignnone size-full wp-image-4378" src="https://tricktresor.com/wp-content/uploads/2014/02/img_52f3960b0c6f8.png" alt="" srcset="/wp-content/uploads/2014/02/img_52f3960b0c6f8.png 737w, /wp-content/uploads/2014/02/img_52f3960b0c6f8-300x174.png 300w, /wp-content/uploads/2014/02/img_52f3960b0c6f8-624x363.png 624w" sizes="(max-width: 737px) 100vw, 737px" /></p>
+<p>Der Beitrag <a href="/blog/pfadauswahl-mit-directory-browse/">Pfadauswahl mit DIRECTORY_BROWSE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

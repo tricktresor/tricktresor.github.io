@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Hierarchie Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/hierarchie/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 27 Feb 2020 07:59:06 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Hierarchie Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Hierarchiedarstellung von Controls</title>
+		<link>/blog/hierarchiedarstellung-von-controls/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 27 Feb 2020 07:59:04 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[Hierarchie]]></category>
+		<category><![CDATA[cl_column_tree_model]]></category>
+		<category><![CDATA[Controls]]></category>
+		<guid isPermaLink="false">/?p=1023256</guid>
+
+					<description><![CDATA[<p>Hierarchien sind was Tolles! Controls sind auch toll! Wir sollten sie nutzen, so lange es sie noch gibt (Stichwort Fiori, ABAP in the Cloud etc.). Deswegen ein schönes Demoprogramm zur Analyse von GUI-Controls zur Laufzeit und Darstellung als Baumstruktur mit Hilfe der Klasse CL_COLUMN_TREE_MODEL. GUI-Elemente GUI-Controls sind ActiveX-Steuerlemente, die mit dem Stichwort EnjoySAP zu SAP Release 4.6C eingeführt wurden. Sie werden auch OCX-Controls genannt. Hier gibt es im Grunde zwei unterschiedliche Arten: Container Controls Sie...</p>
+<p>Der Beitrag <a href="/blog/hierarchiedarstellung-von-controls/">Hierarchiedarstellung von Controls</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Hierarchien sind was Tolles! Controls sind auch toll! Wir sollten sie nutzen, so lange es sie noch gibt (Stichwort Fiori, ABAP in the Cloud etc.). Deswegen ein schönes Demoprogramm zur Analyse von GUI-Controls zur Laufzeit und Darstellung als Baumstruktur mit Hilfe der Klasse CL_COLUMN_TREE_MODEL.</p>
+
+
+
+<h2 class="wp-block-heading">GUI-Elemente</h2>
+
+
+
+<p>GUI-Controls sind ActiveX-Steuerlemente, die mit dem Stichwort EnjoySAP  zu SAP Release 4.6C eingeführt wurden. Sie werden auch OCX-Controls genannt. Hier gibt es im Grunde zwei unterschiedliche Arten:</p>
+
+
+
+<ul><li>Container</li><li>Controls</li></ul>
+
+
+
+<p>Sie alle haben eine Gemeinsamkeit, sie erben nämlich alle von der Hauptklasse CL_GUI_CONTROL. Verwirrender Weise erbt CL_GUI_CONTAINER von CL_GUI_CONTROL.</p>
+
+
+
+<h3 class="wp-block-heading">Container</h3>
+
+
+
+<p>Typische Container sind:</p>
+
+
+
+<ul><li>CL_GUI_CUSTOM_CONTAINER Container for customer controls in the dynpro area</li><li>CL_GUI_DIALOGBOX_CONTAINER Container for customer controls in the dynpro area</li><li>CL_GUI_DOCKING_CONTAINER Docking Control Container</li><li>CL_GUI_EASY_SPLITTER_CONTAINER Reduced Version of Splitter Container Control</li><li>CL_GUI_SIMPLE_CONTAINER Anonymous Container</li><li>CL_GUI_SPLITTER_CONTAINER Splitter Control</li></ul>
+
+
+
+<p>Etwas ungewöhnlicher ist der CL_GUI_GOS_CONTAINER für Generic Objects. Wer sich ansehen möchte, was für Schweinereien man mit diesem machen kann, sollte sich <a href="/blog/hacking-sapgui/">Hacking SAPGUI</a> ansehen.</p>
+
+
+
+<p>Container haben die Besonderheit, dass sie weitere Container oder Controls enthalten können.</p>
+
+
+
+<h3 class="wp-block-heading">Controls</h3>
+
+
+
+<p>Die meistgebrauchten Controls sind sicherlich:</p>
+
+
+
+<ul><li>CL_GUI_ALV_GRID</li><li>CL_GUI_TEXTEDIT</li><li>CL_GUI_PICTURE</li><li>CL_GUI_HTML_VIEWER</li><li>CL_GUI_TOOLBAR</li></ul>
+
+
+
+<p>Sie alle benötigen einen CL_GUI_CONTAINER, in dem sie dargestellt werden.</p>
+
+
+
+<h2 class="wp-block-heading">Control-Hierarchie</h2>
+
+
+
+<p>Ich habe ein kleines Programm geschrieben, das eine einfache Anwendung aus zwei Splittern, zwei Textedit-Controls und einem Picture-Control erstellt.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="856" height="632" src="/wp-content/uploads/2020/02/container_tree_demo.png" alt="" class="wp-image-1023258" srcset="/wp-content/uploads/2020/02/container_tree_demo.png 856w, /wp-content/uploads/2020/02/container_tree_demo-300x221.png 300w, /wp-content/uploads/2020/02/container_tree_demo-768x567.png 768w" sizes="(max-width: 856px) 100vw, 856px" /><figcaption>Container und Controls</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Hierarchieanalyse</h2>
+
+
+
+<p>Die Klasse ZCL_TRCKTRSR_CONTAINER_TREE analysiert die Objektstruktur und stellt diese hierarchisch dar. </p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="700" height="329" src="/wp-content/uploads/2020/02/container_tree_vars.png" alt="" class="wp-image-1023260" srcset="/wp-content/uploads/2020/02/container_tree_vars.png 700w, /wp-content/uploads/2020/02/container_tree_vars-300x141.png 300w" sizes="(max-width: 700px) 100vw, 700px" /><figcaption>Hierarchiedarstellung der verwendeten GUI-Controls</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Objekt-ID</h3>
+
+
+
+<p>Im Debugger sieht man die Objekt-ID der erzeugten Objekte:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="422" height="128" src="/wp-content/uploads/2020/02/SNAG-00023.png" alt="" class="wp-image-1023259" srcset="/wp-content/uploads/2020/02/SNAG-00023.png 422w, /wp-content/uploads/2020/02/SNAG-00023-300x91.png 300w" sizes="(max-width: 422px) 100vw, 422px" /><figcaption>Objekt-ID von GO_PARENT</figcaption></figure>
+
+
+
+<p>Die Objekte werden bei Programmausführung durchnummeriert und erhalten so eine eindeutige Objekt-ID. Der folgende Code ermittelt die Objekt-ID zu einem Objekt:</p>
+
+
+
+<pre class="wp-block-preformatted">DATA lo_obj TYPE REF TO cl_abap_objectdescr.
+
+lo_obj ?= cl_abap_typedescr=>describe_by_object_ref( io_object ).
+
+DATA(lv_relname) = lo_obj->get_relative_name( ).
+DATA lv_object_id TYPE i.
+CALL 'OBJMGR_GET_INFO' ID 'OPNAME' FIELD 'GET_OBJID'
+                       ID 'OBJID'  FIELD lv_object_id
+                       ID 'OBJ'    FIELD io_object.
+rv_object_name = |\{O:{ lv_object_id }*{ 
+                 lo_obj->absolute_name }|.</pre>
+
+
+
+<h2 class="wp-block-heading">github</h2>
+
+
+
+<p>Das Demoprogramm liegt bei github und kann mit Hilfe von <a href="https://github.com/larshp/abapGit">abapGit </a>heruntergeladen werden:</p>
+
+
+
+<p><a href="https://github.com/tricktresor/container_hierarchy">https://github.com/tricktresor/container_hierarchy</a></p>
+
+
+
+<h2 class="wp-block-heading">guidrasil</h2>
+
+
+
+<p>Wenn du Lust bekommen hast, dich noch weiter mit Controls zu beschäftigen, dann schaue dir meinen Control-Designer <a href="/blog/gui-designer-guidrasil/">guidrasil</a> an.</p>
+<p>Der Beitrag <a href="/blog/hierarchiedarstellung-von-controls/">Hierarchiedarstellung von Controls</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Projektsystem: Hierarchie PSP-Element ändern</title>
+		<link>/blog/projektsystem-hierarchie-psp-element-aendern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sun, 29 May 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Projektsystem]]></category>
+		<category><![CDATA[projekt]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_PROJECT_MAINTAIN]]></category>
+		<category><![CDATA[PSP-Element]]></category>
+		<category><![CDATA[Hierarchie]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=647155</guid>
+
+					<description><![CDATA[<p>PSP-Elemente können in einem Projekt hierarchisch angeordnet werden. Hier zeige ich dir, wie das mit dem BAPI_PROJECT_MAINTAIN funktioniert.</p>
+<p>Der Beitrag <a href="/blog/projektsystem-hierarchie-psp-element-aendern/">Projektsystem: Hierarchie PSP-Element ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine Projektstruktur ist zwangsläufig eine Hierarchie. Einzelne PSP-Elemente können ebenfalls hierarchisch angeordnet sein. Eine einfache Struktur sieht beispielsweise so aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-26-05.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647158" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-26-05.jpg" alt="2016-05-26_17-26-05" width="399" height="186" srcset="/wp-content/uploads/2016/05/2016-05-26_17-26-05.jpg 399w, /wp-content/uploads/2016/05/2016-05-26_17-26-05-300x140.jpg 300w" sizes="(max-width: 399px) 100vw, 399px" /></a><br />
+[notice type=&#8217;info&#8217;]Die Projektstruktur wird im SAP-Standard mit der Transaktion CJ20n bearbeitet.[/notice]<br />
+Mit dem kleinen Hierarchieänderungsprogramm soll die Struktur nun dahingehend geändert werden, dass das PSP-Element 43 unter das PSP-Element Nummer 42 gehängt wird. Der Aufruf sieht folgendermaßen aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-30-54.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647232" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-30-54.jpg" alt="2016-05-26_18-30-54" width="436" height="174" srcset="/wp-content/uploads/2016/05/2016-05-26_18-30-54.jpg 436w, /wp-content/uploads/2016/05/2016-05-26_18-30-54-300x120.jpg 300w" sizes="(max-width: 436px) 100vw, 436px" /></a></p>
+<p>Die Übergabetabelle LT_HIERARCHY:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-32-09.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647233" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-32-09.jpg" alt="2016-05-26_18-32-09" width="778" height="87" srcset="/wp-content/uploads/2016/05/2016-05-26_18-32-09.jpg 778w, /wp-content/uploads/2016/05/2016-05-26_18-32-09-300x34.jpg 300w, /wp-content/uploads/2016/05/2016-05-26_18-32-09-768x86.jpg 768w" sizes="(max-width: 778px) 100vw, 778px" /></a></p>
+<p>Das Ergebnis ist glücklicherweise wie erwartet:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-27-35.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647157" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-27-35.jpg" alt="2016-05-26_17-27-35" width="399" height="186" srcset="/wp-content/uploads/2016/05/2016-05-26_17-27-35.jpg 399w, /wp-content/uploads/2016/05/2016-05-26_17-27-35-300x140.jpg 300w" sizes="(max-width: 399px) 100vw, 399px" /></a></p>
+<h2>Hinweis</h2>
+<p>Wenn die Hierarchie geändert werden soll, dann kann dies leider nicht beliebig passieren. In jedem Fall muss immer die Hierarchie aller beteiligten PSP-Elemente definiert werden. Soll das PSP-Element Nummer 43 wieder &#8220;heraufgestuft&#8221; werden, dann müssen Nr. 42 und Nr. 43 jeweils mit &#8220;UP = P-0000004&#8221;  und &#8220;DOWN = space&#8221; an den Baustein übergeben werden. Nr. 4 muss ebenfalls übergeben werden. Hier der Aufruf für Nr. 43. Eigentlich müsste auch hier Nr. 42 berücksichtigt werden, da es ebenfalls beteiligt ist, denn es &#8220;verliert&#8221; ja sein Kind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-36-46.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647234" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-36-46.jpg" alt="2016-05-26_18-36-46" width="778" height="66" srcset="/wp-content/uploads/2016/05/2016-05-26_18-36-46.jpg 778w, /wp-content/uploads/2016/05/2016-05-26_18-36-46-300x25.jpg 300w, /wp-content/uploads/2016/05/2016-05-26_18-36-46-768x65.jpg 768w" sizes="(max-width: 778px) 100vw, 778px" /></a></p>
+<p>Dies ist das Ergebnis:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-41-13.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647161" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-41-13.jpg" alt="2016-05-26_17-41-13" width="399" height="186" srcset="/wp-content/uploads/2016/05/2016-05-26_17-41-13.jpg 399w, /wp-content/uploads/2016/05/2016-05-26_17-41-13-300x140.jpg 300w" sizes="(max-width: 399px) 100vw, 399px" /></a></p>
+<p>Wie du siehst, ist die Reihenfolge vertauscht: Erst kommt Element 43, danach 42. Eine Sortierung gibt es nicht. Die &#8220;Geschwister&#8221; müssen genau definiert werden (LEFT und RIGHT). Soll die Reihenfolge anders herum sein, also erst 42, dann 43, dann muss die Übergabetabelle folgendermaßen aussehen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-53-09.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647227" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-53-09.jpg" alt="2016-05-26_17-53-09" width="778" height="87" srcset="/wp-content/uploads/2016/05/2016-05-26_17-53-09.jpg 778w, /wp-content/uploads/2016/05/2016-05-26_17-53-09-300x34.jpg 300w, /wp-content/uploads/2016/05/2016-05-26_17-53-09-768x86.jpg 768w" sizes="(max-width: 778px) 100vw, 778px" /></a></p>
+<p>Die Geschwister müssen nicht immer definiert werden. Manchmal funktioniert eine Operation jedoch nur dann, wenn auch die Geschwister korrekt angegeben werden.</p>
+<p>Am besten ist es, die Hierarchie 100%ig genau zu definieren. Wann sich der Baustein unvollständigen Definitionen tolerant verhält und wann nicht, ist für mich nicht nachvollziehbar.</p>
+<h2>Fehler &#8220;Wurzelelement der Hierarchie darf nicht verschoben werden&#8221;</h2>
+<p><em>Fehler 469(CJ)</em></p>
+<p>Bei der Änderung der Hierarchie müssen alle beteiligten Elemente definiert werden! Wenn aus der Ausgangsposition &#8220;43 ist 42 untergeordnet&#8221; die Änderung &#8220;42 ist 43 untergeordnet&#8221; erfolgen soll, dann muss das ROOT-Element P-0000004 erwähnt werden. Das passiert in dem Demoprogramm, allerdings zeige ich den Fehler hier auf, weil er nicht auf die Fehlerursache schließen lässt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-21-16.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647231" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-21-16.jpg" alt="2016-05-26_18-21-16" width="778" height="87" srcset="/wp-content/uploads/2016/05/2016-05-26_18-21-16.jpg 778w, /wp-content/uploads/2016/05/2016-05-26_18-21-16-300x34.jpg 300w, /wp-content/uploads/2016/05/2016-05-26_18-21-16-768x86.jpg 768w" sizes="(max-width: 778px) 100vw, 778px" /></a></p>
+<h2>Code</h2>
+<pre class="lang:abap decode:true " > PARAMETERS p_projn  TYPE ps_pspid DEFAULT 'K-0000001'.
+ PARAMETERS p_root   TYPE ps_posid DEFAULT 'P-0000004'.
+ PARAMETERS p_parent TYPE ps_posid DEFAULT 'P-00000042'.
+ PARAMETERS p_child  TYPE ps_posid DEFAULT 'P-00000043'.
+ 
+ START-OF-SELECTION.
+ 
+   PERFORM go.
+ 
+ *&amp;---------------------------------------------------------------------*
+ *&amp;      Form  go
+ *&amp;---------------------------------------------------------------------*
+ FORM go.
+ 
+   DATA ls_project_def      TYPE bapi_project_definition.
+   DATA ls_project_def_upd  TYPE bapi_project_definition_up.
+   DATA lt_messages         TYPE STANDARD TABLE OF bapi_meth_message.
+   DATA ls_message          TYPE bapi_meth_message.
+   DATA ls_return           TYPE bapireturn1.
+   DATA lt_methods          TYPE STANDARD TABLE OF bapi_method_project.
+   DATA ls_method           TYPE bapi_method_project.
+   DATA lt_hierarchy        TYPE STANDARD TABLE OF bapi_wbs_hierarchie.
+   DATA ls_hierarchy        TYPE bapi_wbs_hierarchie.
+ 
+   ls_project_def-project_definition = p_projn.
+ 
+ 
+   ls_method-method     = 'Create'.
+   ls_method-objecttype = 'WBS-Hierarchy'.
+   APPEND ls_method TO lt_methods.
+ 
+ 
+   CLEAR ls_method.
+   ls_method-method     = 'SaveAndWait'.
+   APPEND ls_method TO lt_methods.
+ 
+   CLEAR ls_hierarchy.
+   ls_hierarchy-project_definition = p_projn.
+   ls_hierarchy-wbs_element        = p_root.
+   ls_hierarchy-down               = p_parent.
+   APPEND ls_hierarchy TO lt_hierarchy.
+ 
+ 
+   CLEAR ls_hierarchy.
+   ls_hierarchy-project_definition = p_projn.
+   ls_hierarchy-wbs_element        = p_parent.
+   ls_hierarchy-down               = p_child.
+   ls_hierarchy-up                 = p_root.
+   APPEND ls_hierarchy TO lt_hierarchy.
+ 
+   IF p_child IS NOT INITIAL.
+     CLEAR ls_hierarchy.
+     ls_hierarchy-project_definition = p_projn.
+     ls_hierarchy-wbs_element        = p_child.
+     ls_hierarchy-up                 = p_parent.
+     APPEND ls_hierarchy TO lt_hierarchy.
+   ENDIF.
+ 
+ 
+   CALL FUNCTION 'BAPI_PROJECT_MAINTAIN'
+     EXPORTING
+       i_project_definition     = ls_project_def
+       i_project_definition_upd = ls_project_def_upd
+     IMPORTING
+       return                   = ls_return
+     TABLES
+       e_message_table          = lt_messages
+       i_method_project         = lt_methods
+       i_wbs_hierarchie_table   = lt_hierarchy.
+ 
+   WRITE: / ls_return-message.
+   LOOP AT lt_messages INTO ls_message.
+     WRITE: / ls_message-message_text.
+   ENDLOOP.
+ 
+   CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+     EXPORTING
+       wait = abap_true.
+ 
+ ENDFORM.                    "go</pre>
+<p>Der Beitrag <a href="/blog/projektsystem-hierarchie-psp-element-aendern/">Projektsystem: Hierarchie PSP-Element ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Versteckte Befehle</title>
+		<link>/blog/versteckte-befehle/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 09 Nov 2006 14:19:42 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[versteckt]]></category>
+		<category><![CDATA[Baum]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[verwendungsnachweis]]></category>
+		<category><![CDATA[Hierarchie]]></category>
+		<category><![CDATA[aufrufhierarchie]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=390</guid>
+
+					<description><![CDATA[<p>Ab Release 4.6 sind einige Befehle aus dem ABAP-Editor verschwunden, die durchaus n&#252;tzlich sein k&#246;nnten. So konnte man z.B. einen Aufrufgraph der Unterprogramme anzeigen lassen.</p>
+<p>Der Beitrag <a href="/blog/versteckte-befehle/">Versteckte Befehle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ab Release 4.6 sind einige Befehle aus dem ABAP-Editor verschwunden, die durchaus nützlich sein könnten. So konnte man z.B. einen Aufrufgraph der Unterprogramme anzeigen lassen.</p>
+<p class="text1">Die Funktionen sind jedoch noch aktiv! Sie können sie aufrufen, indem Sie die unten aufgeführten Funktionscodes in die OK-Code-Zeile des SAPGUI eingeben.</p>
+<p class="text1">Sie müssen dabei nicht auf Groß-Klein-Schreibung achten.</p>
+<p class="text1">Die Funktionen funktionieren sogar noch im neuen Editor unter ECC 6.0!!</p>
+<h2 class="head1">Aufrufgraph &#8211; Routine ruft: UTCA</h2>
+<p class="text1">Cursor auf einer Routine positionieren; Es werden dann alle Aufrufe der aktuellen Routine gezeigt. Aufgerufen aus dem Hauptprogramm erfolgt die Auflistung aller Ereignisse mit den jeweils dort gerufenen Routinen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2006/11/utca2.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018099" src="https://tricktresor.com/wp-content/uploads/2006/11/utca2.png" alt="" width="646" height="298" srcset="/wp-content/uploads/2006/11/utca2.png 646w, /wp-content/uploads/2006/11/utca2-300x138.png 300w" sizes="(max-width: 646px) 100vw, 646px" /></a></p>
+<p>Hier die Aufrufhierarchie am Beispiel des Programms RSTXTRAN zum Transportieren von SAP-Script-Texten:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2006/11/utca1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018100" src="https://tricktresor.com/wp-content/uploads/2006/11/utca1.png" alt="" width="682" height="487" srcset="/wp-content/uploads/2006/11/utca1.png 682w, /wp-content/uploads/2006/11/utca1-300x214.png 300w, /wp-content/uploads/2006/11/utca1-240x172.png 240w" sizes="(max-width: 682px) 100vw, 682px" /></a></p>
+<h2 class="head1">Aufrufgrpah &#8211; Routine wird gerufen von: UTIN</h2>
+<p class="text1">Cursor auf einer Routine positionieren; Es wird dann angezeigt, von welchen Routinen die aktuelle Routine aufgerufen wird.</p>
+<h2 class="head1">Cross-Reference: CACR</h2>
+<p class="text1">Anzeige der Crossreference des aktuellen Programms. Aufgerufen wird das Programm RSINCL00 zur Anzeige der <em>Referenzliste</em> bzw. dem <em>Programminternen Umfeld</em>. Hier eine Ausgabe zum Standardprogramm RSUPD_ABSTAMP. Sehr schön: Es gibt eine Übersicht über die Datenbankoperationen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2006/11/cacr2.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018101" src="https://tricktresor.com/wp-content/uploads/2006/11/cacr2.png" alt="" width="574" height="472" srcset="/wp-content/uploads/2006/11/cacr2.png 574w, /wp-content/uploads/2006/11/cacr2-300x247.png 300w" sizes="(max-width: 574px) 100vw, 574px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2006/11/cacr1.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018102" src="https://tricktresor.com/wp-content/uploads/2006/11/cacr1.png" alt="" width="640" height="456" srcset="/wp-content/uploads/2006/11/cacr1.png 641w, /wp-content/uploads/2006/11/cacr1-300x214.png 300w, /wp-content/uploads/2006/11/cacr1-240x172.png 240w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2 class="head1">Data-Browser: WB_DATA_BROWSER</h2>
+<p>Cursor auf einer Datenbanktabelle positionieren; Es wird dann in die SE16 zu dieser Tabelle verzweigt.</p>
+<h2 class="head1">Strukturhierarchie: PGST</h2>
+<p class="text1">Zeigt die Strukturhierarchie des aktuellen Programms an.</p>
+<p>Der Beitrag <a href="/blog/versteckte-befehle/">Versteckte Befehle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

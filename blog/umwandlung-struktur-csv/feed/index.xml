@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:series="https://publishpress.com/"
+	
+	>
+<channel>
+	<title>
+	Kommentare zu: Umwandlung Struktur  CSV	</title>
+	<atom:link href="/blog/umwandlung-struktur-csv/feed/" rel="self" type="application/rss+xml" />
+	<link>/blog/umwandlung-struktur-csv/</link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:51 +0000</lastBuildDate>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+	<item>
+		<title>
+		Von: greutter		</title>
+		<link>/blog/umwandlung-struktur-csv/#comment-2681</link>
+
+		<dc:creator><![CDATA[greutter]]></dc:creator>
+		<pubDate>Fri, 16 Dec 2016 09:18:01 +0000</pubDate>
+		<guid isPermaLink="false">https://tricktresor.com/?p=431477#comment-2681</guid>
+
+					<description><![CDATA[Hallo zusammen,
+
+Klasse CL_RSDA_CSV_CONVERTER habe ich schon einmal verwendet. Sie hat leider einen kleinen Haken. Leere Felder werden mit space gefüllt, also z. B. &quot; &quot;.
+
+Im Constructor wird dafür ein Attribut gesetzt: CONCATENATE me-&#062;delimiter me-&#062;delimiter INTO me-&#062;initial_char SEPARATED BY space.
+
+Leider ist me-&#062;initial_char als privat definiert, sodass man diese Einstellung nicht ändern kann. BO Data Services erwartet für leere Felder &quot;&quot;, somit muss man hier ein bisschen tricksen.
+
+Grüße,
+Markus]]></description>
+			<content:encoded><![CDATA[<p>Hallo zusammen,</p>
+<p>Klasse CL_RSDA_CSV_CONVERTER habe ich schon einmal verwendet. Sie hat leider einen kleinen Haken. Leere Felder werden mit space gefüllt, also z. B. &#8221; &#8220;.</p>
+<p>Im Constructor wird dafür ein Attribut gesetzt: CONCATENATE me-&gt;delimiter me-&gt;delimiter INTO me-&gt;initial_char SEPARATED BY space.</p>
+<p>Leider ist me-&gt;initial_char als privat definiert, sodass man diese Einstellung nicht ändern kann. BO Data Services erwartet für leere Felder &#8220;&#8221;, somit muss man hier ein bisschen tricksen.</p>
+<p>Grüße,<br />
+Markus</p>
+]]></content:encoded>
+		
+			</item>
+		<item>
+		<title>
+		Von: Enno Wulff		</title>
+		<link>/blog/umwandlung-struktur-csv/#comment-2669</link>
+
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 May 2016 11:15:27 +0000</pubDate>
+		<guid isPermaLink="false">https://tricktresor.com/?p=431477#comment-2669</guid>
+
+					<description><![CDATA[Als Antwort auf &lt;a href=&quot;/blog/umwandlung-struktur-csv/#comment-2668&quot;&gt;bdegel&lt;/a&gt;.
+
+Der Header passt 100%ig, denn du hast in iv_hdr_struct_name die Tabelle T000 angegeben...]]></description>
+			<content:encoded><![CDATA[<p>Als Antwort auf <a href="/blog/umwandlung-struktur-csv/#comment-2668">bdegel</a>.</p>
+<p>Der Header passt 100%ig, denn du hast in iv_hdr_struct_name die Tabelle T000 angegeben&#8230;</p>
+]]></content:encoded>
+		
+			</item>
+		<item>
+		<title>
+		Von: bdegel		</title>
+		<link>/blog/umwandlung-struktur-csv/#comment-2668</link>
+
+		<dc:creator><![CDATA[bdegel]]></dc:creator>
+		<pubDate>Wed, 11 May 2016 06:34:14 +0000</pubDate>
+		<guid isPermaLink="false">https://tricktresor.com/?p=431477#comment-2668</guid>
+
+					<description><![CDATA[Hallo Enno,
+
+nach einer Klasse wie CL_ICF_CSV habe ich schon eine Weil gesucht, klasse !
+Jetzt habe ich bei folgendendem Beispiel im CSV eine unpassende Headerzeile (bin noch ABAP-Anfänger, sorry für den Lieschen-Müller-Ansatz):
+
+TYPES:  BEGIN OF TY_CUSTOMER_LIST,
+          BUKRS TYPE KNB1-BUKRS,
+          KUNNR TYPE KNA1-KUNNR,
+          ALTKN TYPE KNB1-ALTKN,
+          NAME1 TYPE KNA1-NAME1,
+          NAME2 TYPE KNA1-NAME2,
+          PSTLZ TYPE KNA1-PSTLZ,
+          ORT01 TYPE KNA1-ORT01,
+          STRAS TYPE KNA1-STRAS,
+          MAHNS TYPE KNB5-MAHNS,
+          MADAT TYPE KNB5-MADAT,
+          EIKTO TYPE KNVV-EIKTO,
+        END OF TY_CUSTOMER_LIST.
+
+DATA: lt_customerlist TYPE TABLE OF TY_CUSTOMER_LIST, msg TYPE string.
+
+SELECT
+  KNB1~BUKRS,
+  KNA1~KUNNR,
+  KNB1~ALTKN,
+  KNA1~NAME1,
+  KNA1~NAME2,
+  KNA1~PSTLZ,
+  KNA1~ORT01,
+  KNA1~STRAS,
+  KNB5~MAHNS,
+  KNB5~MADAT,
+  KNVV~EIKTO
+  FROM KNA1
+  LEFT OUTER JOIN KNB1 ON KNB1~KUNNR = KNA1~KUNNR
+  LEFT OUTER JOIN KNB5 ON KNB5~KUNNR = KNA1~KUNNR
+  LEFT OUTER JOIN KNVV ON KNVV~KUNNR = KNA1~KUNNR
+  INTO TABLE @lt_customerlist
+  WHERE KNB1~BUKRS = &#039;2100&#039;.
+
+* Tabelle ausgeben, wenn Datensätze vorhanden
+IF sy-dbcnt &#062; 0.
+  msg = sy-dbcnt.
+  CONCATENATE msg &#039;Datensätze gefunden&#039; INTO msg.
+  MESSAGE msg TYPE &#039;I&#039;.
+
+* CSV-Klasse
+  cl_icf_csv=&#062;request_for_write_into_csv(
+    it_data = tbCustomerList
+    iv_hdr_struct_name = &#039;T000&#039;
+    iv_init_dir = &#039;d:\temp&#039;
+    iv_file_name = &#039;CustomerList.txt&#039; ).
+ENDIF.
+
+In der ausgegebenen CSV steht dann folgender, so gar nicht passender Header:
+
+MANDT;MTEXT;ORT01;MWAER;ADRNR;CCCATEGORY;CCCORACTIV;CCNOCLIIND;CCCOPYLOCK;CCNOCASCAD;CCSOFTLOCK;CCORIGCONT;CCIMAILDIS;CCTEMPLOCK;CHANGEUSER;CHANGEDATE;LOGSYS
+
+Was mache ich da falsch bzw. wie mache ich es richtig ?
+
+Grüße,
+Bernd]]></description>
+			<content:encoded><![CDATA[<p>Hallo Enno,</p>
+<p>nach einer Klasse wie CL_ICF_CSV habe ich schon eine Weil gesucht, klasse !<br />
+Jetzt habe ich bei folgendendem Beispiel im CSV eine unpassende Headerzeile (bin noch ABAP-Anfänger, sorry für den Lieschen-Müller-Ansatz):</p>
+<p>TYPES:  BEGIN OF TY_CUSTOMER_LIST,<br />
+          BUKRS TYPE KNB1-BUKRS,<br />
+          KUNNR TYPE KNA1-KUNNR,<br />
+          ALTKN TYPE KNB1-ALTKN,<br />
+          NAME1 TYPE KNA1-NAME1,<br />
+          NAME2 TYPE KNA1-NAME2,<br />
+          PSTLZ TYPE KNA1-PSTLZ,<br />
+          ORT01 TYPE KNA1-ORT01,<br />
+          STRAS TYPE KNA1-STRAS,<br />
+          MAHNS TYPE KNB5-MAHNS,<br />
+          MADAT TYPE KNB5-MADAT,<br />
+          EIKTO TYPE KNVV-EIKTO,<br />
+        END OF TY_CUSTOMER_LIST.</p>
+<p>DATA: lt_customerlist TYPE TABLE OF TY_CUSTOMER_LIST, msg TYPE string.</p>
+<p>SELECT<br />
+  KNB1~BUKRS,<br />
+  KNA1~KUNNR,<br />
+  KNB1~ALTKN,<br />
+  KNA1~NAME1,<br />
+  KNA1~NAME2,<br />
+  KNA1~PSTLZ,<br />
+  KNA1~ORT01,<br />
+  KNA1~STRAS,<br />
+  KNB5~MAHNS,<br />
+  KNB5~MADAT,<br />
+  KNVV~EIKTO<br />
+  FROM KNA1<br />
+  LEFT OUTER JOIN KNB1 ON KNB1~KUNNR = KNA1~KUNNR<br />
+  LEFT OUTER JOIN KNB5 ON KNB5~KUNNR = KNA1~KUNNR<br />
+  LEFT OUTER JOIN KNVV ON KNVV~KUNNR = KNA1~KUNNR<br />
+  INTO TABLE @lt_customerlist<br />
+  WHERE KNB1~BUKRS = &#8216;2100&#8217;.</p>
+<p>* Tabelle ausgeben, wenn Datensätze vorhanden<br />
+IF sy-dbcnt &gt; 0.<br />
+  msg = sy-dbcnt.<br />
+  CONCATENATE msg &#8216;Datensätze gefunden&#8217; INTO msg.<br />
+  MESSAGE msg TYPE &#8216;I&#8217;.</p>
+<p>* CSV-Klasse<br />
+  cl_icf_csv=&gt;request_for_write_into_csv(<br />
+    it_data = tbCustomerList<br />
+    iv_hdr_struct_name = &#8216;T000&#8217;<br />
+    iv_init_dir = &#8216;d:\temp&#8217;<br />
+    iv_file_name = &#8216;CustomerList.txt&#8217; ).<br />
+ENDIF.</p>
+<p>In der ausgegebenen CSV steht dann folgender, so gar nicht passender Header:</p>
+<p>MANDT;MTEXT;ORT01;MWAER;ADRNR;CCCATEGORY;CCCORACTIV;CCNOCLIIND;CCCOPYLOCK;CCNOCASCAD;CCSOFTLOCK;CCORIGCONT;CCIMAILDIS;CCTEMPLOCK;CHANGEUSER;CHANGEDATE;LOGSYS</p>
+<p>Was mache ich da falsch bzw. wie mache ich es richtig ?</p>
+<p>Grüße,<br />
+Bernd</p>
+]]></content:encoded>
+		
+			</item>
+		<item>
+		<title>
+		Von: Enno Wulff		</title>
+		<link>/blog/umwandlung-struktur-csv/#comment-2657</link>
+
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 28 Jan 2016 11:49:10 +0000</pubDate>
+		<guid isPermaLink="false">https://tricktresor.com/?p=431477#comment-2657</guid>
+
+					<description><![CDATA[Als Antwort auf &lt;a href=&quot;/blog/umwandlung-struktur-csv/#comment-2656&quot;&gt;helwie&lt;/a&gt;.
+
+&quot;Batch&quot; und &quot;PC&quot; schliessen sich aus. Nicht zwingend, aber das ist nur mit viel Aufwand zu realisieren.
+Verwende ein Gruppenlaufwerk oder lasse den Job dir die Datei per Mail schicken.
+Gruß
+Enno]]></description>
+			<content:encoded><![CDATA[<p>Als Antwort auf <a href="/blog/umwandlung-struktur-csv/#comment-2656">helwie</a>.</p>
+<p>&#8220;Batch&#8221; und &#8220;PC&#8221; schliessen sich aus. Nicht zwingend, aber das ist nur mit viel Aufwand zu realisieren.<br />
+Verwende ein Gruppenlaufwerk oder lasse den Job dir die Datei per Mail schicken.<br />
+Gruß<br />
+Enno</p>
+]]></content:encoded>
+		
+			</item>
+		<item>
+		<title>
+		Von: helwie		</title>
+		<link>/blog/umwandlung-struktur-csv/#comment-2656</link>
+
+		<dc:creator><![CDATA[helwie]]></dc:creator>
+		<pubDate>Thu, 28 Jan 2016 11:46:32 +0000</pubDate>
+		<guid isPermaLink="false">https://tricktresor.com/?p=431477#comment-2656</guid>
+
+					<description><![CDATA[Hallo Enno,
+
+mal angenommen, ich würde in einer Query  die o.g. Methode zur Erzeugung der csv-Daten nutzen wollen. 
+Ist es möglich, die Query dann per Batch-Job einzustellen, damit die csv-Datei nach einem noch anzugebenen Pfad lokal auf meinem Laufwerk abgelegt werden kann?
+Falls ja, wie genau müsste ich dann vorgehen?
+
+Gruß
+Helwie]]></description>
+			<content:encoded><![CDATA[<p>Hallo Enno,</p>
+<p>mal angenommen, ich würde in einer Query  die o.g. Methode zur Erzeugung der csv-Daten nutzen wollen.<br />
+Ist es möglich, die Query dann per Batch-Job einzustellen, damit die csv-Datei nach einem noch anzugebenen Pfad lokal auf meinem Laufwerk abgelegt werden kann?<br />
+Falls ja, wie genau müsste ich dann vorgehen?</p>
+<p>Gruß<br />
+Helwie</p>
+]]></content:encoded>
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,2242 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ABAP 740 Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/programmierung/abap-740/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 21 Sep 2021 15:54:51 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ABAP 740 Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Modernes ABAP  &#8211; Ein Beispiel</title>
+		<link>/blog/modernes-abap-ein-beispiel/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 29 Nov 2019 16:28:04 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[corresponding]]></category>
+		<category><![CDATA[switch]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[COND]]></category>
+		<guid isPermaLink="false">/?p=1022972</guid>
+
+					<description><![CDATA[<p>Die Neuerungen im ABAP-Umfeld sind inzwischen bereits einige Jahre alt. Über den VALUE Operator, der mit Release 7.40 eingeführt wurde, hat Horst Keller bereits 2013 gebloggt. Trotzdem werden einige der neuen Befehle nur sparsam eingesetzt. Das liegt einerseits daran, dass man sich wirklich an die Verwendung gewöhnen muss, andererseits ist man vielleicht unsicher, welche Gefahren (Performance) sie bergen. Ich persönlich finde zudem, dass ein übermäßiger Einsatz der Befehle, die sehr vielfältig untereinander geschachtelt werden können,...</p>
+<p>Der Beitrag <a href="/blog/modernes-abap-ein-beispiel/">Modernes ABAP  &#8211; Ein Beispiel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Die Neuerungen im ABAP-Umfeld sind inzwischen bereits einige Jahre alt. Über den VALUE Operator, der mit Release 7.40 eingeführt wurde, hat Horst Keller bereits <a href="https://blogs.sap.com/2013/05/27/abap-news-for-release-740-constructor-operator-value/">2013 gebloggt</a>. Trotzdem werden einige der neuen Befehle nur sparsam eingesetzt. Das liegt einerseits daran, dass man sich wirklich an die Verwendung gewöhnen muss, andererseits ist man vielleicht unsicher, welche Gefahren (Performance) sie bergen. Ich persönlich finde zudem, dass ein übermäßiger Einsatz der Befehle, die sehr vielfältig untereinander geschachtelt werden können, auch schnell nicht mehr <em>schön</em> aussehen und zudem schwer zu überblicken sind.</p>
+
+
+
+<p>Aber um mal wieder einen Beitrag zu schreiben und weil es vielleicht doch <em>elegant</em> ist, eine komplexe Aufgabe in nur <em>einer Zeile</em> zu lösen, stelle ich dir heute folgende Lösung vor.</p>
+
+
+
+<h2 class="wp-block-heading">Interne Tabelle kopieren</h2>
+
+
+
+<p>Nehmen wir an, wir hätten eine Tabelle mit einer <em>Materialnummer</em>, einer <em>gewünschten Menge</em> (QTY) und der <em>verfügbaren Menge</em> (AVQ). Für die Anzeige im SALV-Grid soll die Tabelle noch um den Materialkurztext erweitert werden und Einträge, bei denen die gewünschte Menge von der verfügbaren Menge abweicht, sollen farblich gekennzeichnet werden.</p>
+
+
+
+<h3 class="wp-block-heading">Datenstrukturen</h3>
+
+
+
+<p>Die Strukturen der Quelltabelle (SRC) und der Zieltabelle (TGT) sehen wie folgt aus:</p>
+
+
+
+<pre class="wp-block-code"><code>  TYPES: BEGIN OF _src,
+           mat TYPE c LENGTH 1, "material number
+           qty TYPE i, "requested qty
+           avq TYPE i, "available qty
+         END OF _src,
+         _src_t TYPE STANDARD TABLE OF _src WITH EMPTY KEY,
+
+         BEGIN OF _tgt,
+           mat TYPE c LENGTH 1,
+           qty TYPE i,
+           avq TYPE c LENGTH 2,
+           txt TYPE maktx,
+           col TYPE lvc_t_scol,
+         END OF _tgt,
+         _tgt_t TYPE STANDARD TABLE OF _tgt WITH EMPTY KEY.</code></pre>
+
+
+
+<h2 class="wp-block-heading">Testdaten</h2>
+
+
+
+<p>Die Tabelle, die ich in die Ausgabetabelle für das SALV-Grid kopieren möchte, wird mit ein paar Testdaten gefüllt:</p>
+
+
+
+<pre class="wp-block-code"><code>  DATA(src) = VALUE _src_t(
+      ( mat = 'A' qty = 10 avq = 10 )
+      ( mat = 'B' qty = 20 avq = 15 )
+      ( mat = 'C' qty = 30 avq = 30 ) ).</code></pre>
+
+
+
+<h2 class="wp-block-heading">Hilfsklasse</h2>
+
+
+
+<p>Mit der folgenden Hilfsklasse wird der Text zu einem Material ermittelt:</p>
+
+
+
+<pre class="wp-block-code"><code>CLASS mat DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS text
+      IMPORTING mat          TYPE char1
+      RETURNING VALUE(descr) TYPE string.
+ENDCLASS.
+
+CLASS mat IMPLEMENTATION.
+  METHOD text.
+    descr = SWITCH #( mat
+      WHEN 'A' THEN `Antenna`
+      WHEN 'B' THEN `Brain`
+      WHEN 'C' THEN `Case`
+      ELSE `unknown` ).
+  ENDMETHOD.
+ENDCLASS.</code></pre>
+
+
+
+<h3 class="wp-block-heading">Herkömmliche Vorgehensweise</h3>
+
+
+
+<p>Das althergebrachte Coding ohne neue ABAP-Features könnte wie folgt aussehen: </p>
+
+
+
+<pre class="wp-block-code"><code>  DATA tgt1     TYPE _tgt_t.
+  DATA tgt_line TYPE _tgt.
+  DATA col_line TYPE lvc_s_scol.
+
+  LOOP AT src INTO DATA(src_line).
+    CLEAR tgt_line.
+    MOVE-CORRESPONDING src_line TO tgt_line.
+    tgt_line-txt = mat=&gt;text( tgt_line-mat ).
+    IF tgt_line-qty &lt;&gt; tgt_line-avq.
+      CLEAR col_line.
+      col_line-fname = space.
+      col_line-color-col = 6.
+      APPEND col_line TO tgt_line-col.
+    ENDIF.
+    append tgt_line to tgt1.
+  ENDLOOP.</code></pre>
+
+
+
+<h3 class="wp-block-heading">Neue Vorgehensweise</h3>
+
+
+
+<p>Mit Hilfe der neuen ABAP-Features VALUE, COND, FOR und CORRESPONDING habe ich die folgende Lösung erarbeitet:</p>
+
+
+
+<pre class="wp-block-code"><code>  DATA(tgt) = VALUE _tgt_t( FOR line IN src (
+      VALUE #( BASE CORRESPONDING #( line )
+      txt = mat=&gt;text( line-mat )
+      col = COND #( LET color = VALUE lvc_t_scol( ) IN
+                WHEN line-qty &lt;&gt; line-avq 
+                  THEN VALUE #( ( fname = '' color-col = 6 ) ) )
+      ) ) ).</code></pre>
+
+
+
+<p>Auffällig sind folgende Dinge:</p>
+
+
+
+<ul><li>Das Coding ist deutlich kürzer</li><li>Es sind keine Variablendeklarationen notwendig</li><li>Es sieht einigermaßen <em>konfus </em>aus</li></ul>
+
+
+
+<p>Schön ist auf jeden Fall, dass mit Hilfe <em>eines</em> Befehls, bzw. einer Befehlskette, Daten von einer Tabelle in eine andere kopiert werden können und sozusagen nebenbei weitere Feldmanipulationen vorgenommen werden können.</p>
+
+
+
+<h3 class="wp-block-heading">VALUE</h3>
+
+
+
+<p>Den Value-Befehl habe ich lieben gelernt, denn er macht es in vielfältigen Situationen einfach, Daten in eine Struktur oder Tabelle einzufügen. Und zwar ohne dass eine Datendeklaration notwendig wäre.</p>
+
+
+
+<p>Der Value-Befehl wird direkt gefolgt von der Typendefinition, die verwendet werden soll. Wenn die Typendefinition implizit ermittelbar ist, zum Beispiel, weil die Daten an eine bereits definierte Variable übergeben werden, dann reicht die Angabe des &#8220;#&#8221;. In meinem Beispiel möchte ich aber gerade die Datendefinition durch den VALUE-Befehl definieren, also gebe ich den zu verwendenden Tabellentyp an:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) VALUE _tgt_t( ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">FOR</h3>
+
+
+
+<p>In der VALUE-Angabe führe ich einen LOOP über die Quelltabelle aus und kopiere die Felder der Quelltabelle in die Zieltabelle mittels CORRESPONDING:</p>
+
+
+
+<pre class="wp-block-code"><code>  DATA(tgt) = VALUE _tgt_t( 
+    FOR line IN src (
+      CORRESPONDING #( line ) ) ).</code></pre>
+
+
+
+<p>Der Befehl FOR line IN src entspricht also in etwa dem Befehl:</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT src INTO DATA(line).</code></pre>
+
+
+
+<h3 class="wp-block-heading">CORRESPONDING</h3>
+
+
+
+<p>Eine Herausforderung war es, zusätzlich zu CORRESPONDING noch weitere Felder anderweitig belegen zu können. Das folgende Coding funktioniert nämlich nicht:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) = VALUE _tgt_t( 
+  FOR line IN src (
+    CORRESPONDING #( line )
+    txt = mat=&gt;text( line-mat ) ) ).</code></pre>
+
+
+
+<p>Hier muss mit einer erneuten VALUE-Operation gearbeitet werden:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) = VALUE _tgt_t(
+  FOR line IN src (
+    VALUE #( BASE CORRESPONDING #( line )
+    txt = mat=&gt;text( line-mat ) ) ) ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">COND</h3>
+
+
+
+<p>Nun haben wir bereits die Tabelle kopiert und zusätzlich den Materialtext dazu gelesen. Zusätzlich möchte ich noch die COLOR-Tabelle füllen, wenn sich die angeforderte Menge von der verfügbaren Menge unterscheidet. Diese Anforderung habe ich mit COND realisiert:</p>
+
+
+
+<pre class="wp-block-code"><code>col = COND #( LET color = VALUE lvc_t_scol( ) IN
+        WHEN line-qty &lt;&gt; line-avq
+          THEN VALUE #( ( fname = '' color-col = 6 ) ) )</code></pre>
+
+
+
+<p>Alleine diesen Befehl finde ich deutlich komplexer als eine zuvor ausgeführten IF-Anweisung. COND ist allerdings notwendig, wenn der Code Inline ausgeführt werden soll. Zudem ist er sehr mächtig, denn es können verschiedene Bedingungen abgefragt werden. Er entspricht also in etwa einer verschachtelten IF &#8211; ELSEIF &#8211; ELSE Struktur.</p>
+
+
+
+<h3 class="wp-block-heading">SWITCH</h3>
+
+
+
+<p>Den Switch-Befehl, der in etwa einer CASE-Anweisung entspricht, habe ich nicht mehr in der Kopier-Anweisung unter bekommen&#8230; Die Arbeitsweise lässt sich jedoch gut in der Hilfsmethode MAT=&gt;TEXT( ) ersehen.</p>
+
+
+
+<h2 class="wp-block-heading">Ausgabe </h2>
+
+
+
+<p>Die Ausgabe der aufbereiteten Tabelle erfolgt mit Hilfe des SALV-Grid:</p>
+
+
+
+<pre class="wp-block-code"><code>  TRY.
+      cl_salv_table=&gt;factory(
+        IMPORTING
+          r_salv_table   = DATA(salv)
+        CHANGING
+          t_table        = tgt ).
+      DATA(cols) = salv-&gt;get_columns( ).
+      cols-&gt;set_color_column( 'COL' ).
+      salv-&gt;display( ).
+    CATCH cx_salv_msg.
+      MESSAGE 'error salv' TYPE 'I'.
+  ENDTRY.</code></pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="465" height="72" src="/wp-content/uploads/2019/11/salv1.png" alt="" class="wp-image-1022973" srcset="/wp-content/uploads/2019/11/salv1.png 465w, /wp-content/uploads/2019/11/salv1-300x46.png 300w" sizes="(max-width: 465px) 100vw, 465px" /><figcaption>Ausgabe der kopierten Tabelle</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Zu der vorgestellten Lösung und allgemein möchte ich folgendes anmerken:</p>
+
+
+
+<h3 class="wp-block-heading">Formatierung</h3>
+
+
+
+<p>Formatierung ist alles!</p>
+
+
+
+<p>Die neuen ABAP-Features sind so komplex und können im Grunde <em>endlos</em> verschachtelt werden. Deswegen ist es notwendig, den Quelltext so zu formatieren, dass deutlich wird, welche Befehle und Sequenzen zusammengehören. Erschwerend kommt hinzu, dass für die neuen Befehle kein Pretty-Print möglich ist. Man muss also selber entscheiden, was noch in eine Zeile passt und was wie weit eingerückt werden sollte.</p>
+
+
+
+<p>Wenn das obige Coding sinnlos formatiert wird, dann sieht es wirklich sehr unübersichtlich aus:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) = VALUE _tgt_t( FOR line IN src (  VALUE #( BASE 
+      CORRESPONDING #( line )  txt = mat=&gt;text( line-mat )
+          col = COND #( LET color =  VALUE lvc_t_scol( ) 
+        IN WHEN line-qty &lt;&gt; line-avq 
+             THEN VALUE #( ( fname = '' color-col = 6 ) ) ) ) ) ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">Anzahl der Verwendungen</h3>
+
+
+
+<p>Wenn die Zuweisungen oder Ermittlungen, die durch die neuen ABAP-Features gemacht werden sozusagen <em>einmalig</em> sind, dann sind sie eine elegante Möglichkeit, die Programmierung kürzer zu machen. Sobald die Ergebnisse jedoch vielschichtiger werden oder die Abfragen komplexer, dann ist es sinnvoll, die entsprechenden Anweisungen entweder vorab berechnet oder in Funktionen ausgelagert werden. </p>
+
+
+
+<h3 class="wp-block-heading">Debugging</h3>
+
+
+
+<p>Was man immer im Hinterkopf behalten sollte ist, dass das Debuggen komplexer Anweisungsketten deutlich erschwert wird. Man kann zwar im Debugger die Schrittweite setzen, die ein Debuggen der Einzelteile ermöglicht, allerdings ist dies sehr mühsam. Es kann kein Break-Point innerhalb einer Anweisungskette gesetzt werden.</p>
+
+
+
+<h3 class="wp-block-heading">Anwendung</h3>
+
+
+
+<p>Auf jeden Fall sollte man sich mit den neuen Befehlen beschäftigen und diese in die tägliche Arbeit einfließen lassen. Es übt und erleichtert in vielen Fällen die Arbeit. Nur so lernt man, fremden Code zu verstehen und wann und wie man die neuen Befehle selber am sinnvollsten einsetzt. </p>
+
+
+
+<p>Eine gute Möglichkeit, um auf dem Laufenden zu bleiben und auch um die Anwendung der ABAP-Features zu verstehen, ist, <a href="https://people.sap.com/horst.keller">Horst Keller</a> auf <a href="https://people.sap.com/horst.keller#content:blogposts">blogs.sap.com</a> zu folgen.</p>
+<p>Der Beitrag <a href="/blog/modernes-abap-ein-beispiel/">Modernes ABAP  &#8211; Ein Beispiel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>GUI-Designer &#8220;guidrasil&#8221;</title>
+		<link>/blog/gui-designer-guidrasil/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 17 Oct 2018 17:19:56 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_picture]]></category>
+		<category><![CDATA[guidrasil]]></category>
+		<category><![CDATA[GUI-Designer]]></category>
+		<category><![CDATA[rtti]]></category>
+		<category><![CDATA[cl_gui_textedit]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019340</guid>
+
+					<description><![CDATA[<p>Vor langer Zeit habe ich mich mit der automatischen und generischen Erzeugung und Verwaltung von SAPGUI-Controls beschäftigt. Aus dieser Beschäftigung heraus ist der GUI-Designer entstanden, den ich guidrasil getauft habe. Folge mir in die Welt der Controls und Container...</p>
+<p>Der Beitrag <a href="/blog/gui-designer-guidrasil/">GUI-Designer &#8220;guidrasil&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Vor langer Zeit habe ich mich mit der automatischen und generischen Erzeugung und Verwaltung von <em>SAPGUI-Controls</em> beschäftigt.</p>
+<h2>Was sind Controls?</h2>
+<p>Controls sind ActiveX-Komponenten (auch OCX-Komponenten genannt), die im SAPGUI verwendet werden können und mit diesem ausgeliefert werden. Diese Windows-Komponenten werden über entsprechende Klassen im SAP angesprochen und erzeugt. Die Erzeugung erfolgt in der Regel ähnlich:</p>
+<ol>
+<li>CREATE OBJECT &lt;object reference&gt;</li>
+<li>&lt;object reference&gt;-SET_&#8230;.</li>
+<li>Manche Controls benötigen noch ein explizites DISPLAY.</li>
+</ol>
+<p>Die typischen GUI-Controls sind:</p>
+<ul>
+<li>CL_GUI_ALV_GRID</li>
+<li>CL_GUI_TEXTEDIT</li>
+<li>CL_GUI_PICTURE</li>
+<li>CL_GUI_CALENDAR</li>
+<li>CL_GUI_HTML_VIEWER</li>
+<li>CL_GUI_SIMPLE_TREE</li>
+<li>CL_GUI_COLUMN_TREE</li>
+<li>CL_GUI_LIST_TREE</li>
+</ul>
+<p>Controls benötigen einen Container, in dem sie platziert werden können. Lustiger Weise erben die Container-Klassen von der gleichen Klasse wie die Controls selber: CL_GUI_CONTROL. Die Container erben dann alle von CL_GUI_CONTAINER:</p>
+<ul>
+<li>CL_GUI_DOCKING_CONTAINER</li>
+<li>CL_GUI_CUSTOM_CONTAINER</li>
+<li>CL_GUI_DIALOGBOX_CONTAINER</li>
+</ul>
+<p>Eine Sonderstellung nehmen die Splitter-Controls ein, denn sie stellen ebenfalls wieder Container zur Verfügung:</p>
+<ul>
+<li>CL_GUI_SPLITTER_CONTAINER</li>
+<li>CL_GUI_EASY_SPLITTER_CONTAINER</li>
+</ul>
+<h3>Programmierung von Controls</h3>
+<p>Eine typische Programmierung sieht wie folgt aus:</p>
+<ul>
+<li>Erzeuge einen Container</li>
+<li>Erzeuge das Control in diesem Container</li>
+<li>Setze Eigenschaften des Controls</li>
+</ul>
+<p>In diesem <a href="https://tricktresor.com/blog/dockingcontainer/">Demoprogramm</a> zeige ich kurz, wie ein Textedit-Control in einem Docking-Container aufgebaut wird.</p>
+<h3>Setzen von Eigenschaften</h3>
+<p>Die Ansteuerung der Controls ist natürlich immer unterschiedlich, da sich die Control unterscheiden. Ein Picture-Control ist nun mal immer read-only, Ein Textedit-Control nicht. Das ist auch genau das Problem: Wenn ich ein Control häufig verwende, dann kenne ich die Eigenschaften und notwendigen Attribute. Wenn nicht, dann muss ich suchen. Zudem ist die Aktivierung von Attributen manchmal per BOOLEAN notwendig (X und space) und manchmal verlangt das Control &#8220;1&#8221; und &#8220;0&#8221;.</p>
+<h2>Idee eines GUI-Designers</h2>
+<p>Da die Controls alle von der Klasse CL_GUI_CONTROL abstammen, ist es möglich jedes Control über eine generelle Methodenschnittstelle zu erzeugen. Ich kann also einer Methode irgend einen Container übergeben (egal, ob Docking-Container, Custom-Container oder Dialogbox) und das Control wieder zurück bekommen. Oder ich kann ein Control erzeugen und es in einer Tabelle speichern.</p>
+<p>Das folgende Beispielprogramm macht genau das: Durch die Einstellungen auf dem Selektionsbildschirm wird definiert, welche Art von Control auf welcher Seite angedockt werden soll. Mit &lt;ENTER&gt; werden der Container sowie das Control erzeugt und in einer internen Tabelle abgelegt:</p>
+<p><img fetchpriority="high" decoding="async" class="alignnone size-large wp-image-1019345" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil-demo01-1024x773.png" alt="" width="640" height="483" srcset="/wp-content/uploads/2018/10/guidrasil-demo01-1024x773.png 1024w, /wp-content/uploads/2018/10/guidrasil-demo01-300x226.png 300w, /wp-content/uploads/2018/10/guidrasil-demo01-768x580.png 768w, /wp-content/uploads/2018/10/guidrasil-demo01.png 1378w" sizes="(max-width: 640px) 100vw, 640px" /></p>
+<h3>Demoprogramm</h3>
+<pre>REPORT zguidrsail_demo_generic_ctrl.
+
+SELECTION-SCREEN BEGIN OF BLOCK ctrl WITH FRAME TITLE TEXT-ctl.
+PARAMETERS p_text RADIOBUTTON GROUP ctrl DEFAULT 'X'.
+PARAMETERS p_icon RADIOBUTTON GROUP ctrl.
+SELECTION-SCREEN END OF BLOCK ctrl.
+
+SELECTION-SCREEN BEGIN OF BLOCK side WITH FRAME TITLE TEXT-sid.
+PARAMETERS p_left RADIOBUTTON GROUP side DEFAULT 'X'.
+PARAMETERS p_rigt RADIOBUTTON GROUP side.
+PARAMETERS p_botm RADIOBUTTON GROUP side.
+SELECTION-SCREEN END OF BLOCK side.
+
+CLASS ctrl_demo DEFINITION.
+  PUBLIC SECTION.
+    METHODS add_text
+      IMPORTING
+        side TYPE i.
+    METHODS add_icon
+      IMPORTING
+        side TYPE i.
+  PROTECTED SECTION.
+    TYPES: BEGIN OF ts_object,
+             container TYPE REF TO cl_gui_container,
+             control   TYPE REF TO cl_gui_control,
+           END OF ts_object.
+
+    DATA objects TYPE STANDARD TABLE OF ts_object.
+    METHODS append_control
+      IMPORTING
+        container TYPE REF TO cl_gui_container
+        control   TYPE REF TO cl_gui_control.
+
+ENDCLASS.
+
+CLASS ctrl_demo IMPLEMENTATION.
+  METHOD add_text.
+    DATA(parent) = NEW cl_gui_docking_container( side = side ratio = 20 ).
+    DATA(textedit) = NEW cl_gui_textedit( parent = parent ).
+    textedit-&gt;set_text_as_stream( VALUE texttab( ( tdline = `This is a demonstration` ) ) ).
+    append_control( container = parent control = textedit ).
+  ENDMETHOD.
+  METHOD add_icon.
+    DATA(parent) = NEW cl_gui_docking_container( side = side ratio = 20 ).
+    DATA(icon) = NEW cl_gui_picture( parent = parent ).
+    icon-&gt;load_picture_from_sap_icons( icon_message_question ).
+    icon-&gt;set_display_mode( cl_gui_picture=&gt;display_mode_fit_center ).
+    append_control( container = parent control = icon ).
+  ENDMETHOD.
+  METHOD append_control.
+    APPEND VALUE #( container = container control = control ) TO objects.
+  ENDMETHOD.
+ENDCLASS.
+
+INITIALIZATION.
+  DATA(demo) = NEW ctrl_demo( ).
+
+AT SELECTION-SCREEN.
+
+  CASE 'X'.
+    WHEN p_left.
+      DATA(side) = cl_gui_docking_container=&gt;dock_at_left.
+    WHEN p_rigt.
+      side = cl_gui_docking_container=&gt;dock_at_right.
+    WHEN p_botm.
+      side = cl_gui_docking_container=&gt;dock_at_bottom.
+  ENDCASE.
+
+  CASE 'X'.
+    WHEN p_text.
+      demo-&gt;add_text( side = side ).
+    WHEN p_icon.
+      demo-&gt;add_icon( side = side ).
+  ENDCASE.</pre>
+<h3>Dynamische Verwaltung</h3>
+<p>Da ich nun alle erzeugten Container und Controls in einer Tabelle habe, kann ich auch auf die Objekte und deren Eigenschaften zugreifen. Ich könnte zum Beispiel die Tabelle durchgehen und fragen: Ist im Feld CONTAINER ein Objekt der Klasse CL_GUI_DOCKING_CONTAINER? Wenn ja, frage ich das Control nach seinen wichtigen Eigenschaften: RATIO und SIDE:</p>
+<pre>IF itab-container IS INSTANCE OF cl_gui_docking_container.
+  DATA dock TYPE REF TO cl_gui_docking_container.
+  dock ?= itab-container.
+  DATA(side) = dock-&gt;get_docking_side( ).
+  dock-&gt;get_ratio( ratio = DATA(ratio) ).
+ENDIF.</pre>
+<p>Auf diese Weise könnte ich mir alle wichtigen Eigenschaften eines Controls beschaffen und speichern.</p>
+<h3>Dynamische Erzeugung</h3>
+<p>Mit Hilfe von RTTI (Run Time Type Information) in Form der Klasse CL_ABAP_TYPEDESCR kann ich sogar den Klassennamen des Objektes ermitteln:</p>
+<p>DATA(clsnam) = cl_abap_typedescr=&gt;describe_by_object_ref( itab-container )-&gt;get_relative_name( ).<br />
+Wenn ich diesen habe, dann ich das Objekt auch dynamisch erzeugen:</p>
+<pre>DATA: container TYPE REF TO cl_gui_container, 
+      exc_ref TYPE REF TO cx_root.
+
+DATA: ptab TYPE abap_parmbind_tab.
+
+ptab = VALUE #( 
+                ( name  = 'SIDE' 
+                  kind  = cl_abap_objectdescr=&gt;exporting 
+                  value = REF #( side ) ) 
+                ( name  = 'RATIO' 
+                  kind  = cl_abap_objectdescr=&gt;exporting 
+                  value = REF #( ratio ) ) ).
+
+TRY. 
+    CREATE OBJECT container TYPE (clsnam) 
+      PARAMETER-TABLE ptab. 
+  CATCH cx_sy_create_object_error INTO exc_ref. 
+    MESSAGE exc_ref-&gt;get_text( ) TYPE 'I'. 
+ENDTRY.</pre>
+<p>Eine dynamische Erzeugung ist jedoch gar nicht notwendig, denn ich kenne ja den Klassennamen und kann die Erzeugung wiederum an eine Erbauer-Klasse auslagern.</p>
+<h2>guidrasil</h2>
+<p>Nach dem oben beschriebenen Prinzip funktioniert der GUI-Designer ungefähr. Eine wichtige Eigenschaft ist jedoch, dass man erst auswählen muss, auf welcher Seite man einen Docking-Container erstellen möchte. In diesem Docking-Container wird dann ein Splitter erzeugt, der oben eine Toolbar integriert und unten erneut einen leeren Container anzeigt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_02.png"><img decoding="async" class="alignnone size-full wp-image-1019347" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_02.png" alt="" width="663" height="392" srcset="/wp-content/uploads/2018/10/guidrasil_02.png 663w, /wp-content/uploads/2018/10/guidrasil_02-300x177.png 300w" sizes="(max-width: 663px) 100vw, 663px" /></a></p>
+<p>&nbsp;</p>
+<p>In der Toolbar kann man dann die gewünschten Controls oder Splitter-Container auswählen. Der GUI-Designer merkt sich, welche Objekte an welcher Stelle erzeugt werden. Das Erzeugen der einzelnen Controls sowie das Speichern der unterstützten Eigenschaften übernimmt die Erbauer-Klasse, die es für jedes Control gibt.</p>
+<p>Zusätzlich stellt die Erbauer-Klasse auch noch einen Dialog zur Verfügung, in dem die Eigenschaften des Control eingestellt werden können.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019346" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png" alt="" width="340" height="200" srcset="/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png 340w, /wp-content/uploads/2018/10/guidrasil_ctrl_function_icon-300x176.png 300w" sizes="(max-width: 340px) 100vw, 340px" /></a></p>
+<h2>I&#8217;d rather write code that writes code than write code</h2>
+<p>Eine weitere Eigenschaft der Erbauer-Klasse ist, dass jede Erbauer-Klasse ja genau weiß, wie das eigene Control erzeugt werden muss. Das heißt, es kann auch Code zur Verfügung stellen, der für die Erzeugung des Controls notwendig ist.</p>
+<p>Der GUI-Designer weiß genau, welche Controls in welcher Reihenfolge erzeugt werden müssen. Der Designer muss also nur noch jedes Control nach dem Erzeugungscode fragen&#8230;</p>
+<h2>abapGit</h2>
+<p>Der GUI-Designer guidrasil ist verfügbar per <a href="https://github.com/larshp/abapGit">abapGit</a> auf <a href="https://github.com/tricktresor">Github</a>:</p>
+<p><a href="https://github.com/tricktresor/guidrasil">https://github.com/tricktresor/guidrasil</a></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/gui-designer-guidrasil/">GUI-Designer &#8220;guidrasil&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bilder aus MIME-Repository anzeigen</title>
+		<link>/blog/bilder-aus-mime-repository-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 17 Aug 2018 08:54:41 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Bild]]></category>
+		<category><![CDATA[MIME]]></category>
+		<category><![CDATA[cl_gui_picture]]></category>
+		<category><![CDATA[SMW0]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019068</guid>
+
+					<description><![CDATA[<p>Ich präsentiere: Das hässlichste Logo aller Zeiten: Allerdings hat es auch einen Vorteil: Taucht dieses Bild irgendwo auf, weiß man sofort: Es handelt sich um ein Demo-Programm. SAP-Web-Repository Das Bild ist im SAP-Web Repository gespeichert. Dieses Repository wird mit Transaktion SMW0 aufgerufen. Zur Auswahl stehen &#8220;HTML-Schablonen&#8221; und &#8220;Binäre Daten&#8221;. Wähle &#8220;Binäre Daten&#8221; aus: Wenn du weißt, wie der Name des Bildes lautet, kannst du diesen vorbelegen: Die entsprechenden Dateien im Web-Repository werden angezeigt: Einlesen eines...</p>
+<p>Der Beitrag <a href="/blog/bilder-aus-mime-repository-anzeigen/">Bilder aus MIME-Repository anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Ich präsentiere: Das hässlichste Logo aller Zeiten:</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/08/enjoysap_logo_original.png"><img loading="lazy" decoding="async" width="556" height="148" src="https://tricktresor.com/wp-content/uploads/2018/08/enjoysap_logo_original.png" alt="" class="wp-image-1019070" srcset="/wp-content/uploads/2018/08/enjoysap_logo_original.png 556w, /wp-content/uploads/2018/08/enjoysap_logo_original-300x80.png 300w" sizes="(max-width: 556px) 100vw, 556px" /></a></figure>
+
+
+
+<p>Allerdings hat es auch einen Vorteil: Taucht dieses Bild irgendwo auf, weiß man sofort: Es handelt sich um ein Demo-Programm.</p>
+
+
+
+<h2 class="wp-block-heading">SAP-Web-Repository</h2>
+
+
+
+<p>Das Bild ist im SAP-Web Repository gespeichert. Dieses Repository wird mit Transaktion SMW0 aufgerufen. Zur Auswahl stehen &#8220;HTML-Schablonen&#8221; und &#8220;Binäre Daten&#8221;. Wähle &#8220;Binäre Daten&#8221; aus:</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/08/smw0_1.png"><img loading="lazy" decoding="async" width="410" height="229" src="https://tricktresor.com/wp-content/uploads/2018/08/smw0_1.png" alt="" class="wp-image-1019074" srcset="/wp-content/uploads/2018/08/smw0_1.png 410w, /wp-content/uploads/2018/08/smw0_1-300x168.png 300w, /wp-content/uploads/2018/08/smw0_1-71x40.png 71w" sizes="(max-width: 410px) 100vw, 410px" /></a></figure>
+
+
+
+<p>Wenn du weißt, wie der Name des Bildes lautet, kannst du diesen vorbelegen:</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/08/smw0_2.png"><img loading="lazy" decoding="async" width="677" height="245" src="https://tricktresor.com/wp-content/uploads/2018/08/smw0_2.png" alt="" class="wp-image-1019073" srcset="/wp-content/uploads/2018/08/smw0_2.png 677w, /wp-content/uploads/2018/08/smw0_2-300x109.png 300w" sizes="(max-width: 677px) 100vw, 677px" /></a></figure>
+
+
+
+<p>Die entsprechenden Dateien im Web-Repository werden angezeigt:</p>
+
+
+
+<figure class="wp-block-image"><img loading="lazy" decoding="async" width="674" height="272" src="https://tricktresor.com/wp-content/uploads/2018/08/smw0_3.png" alt="" class="wp-image-1019072" srcset="/wp-content/uploads/2018/08/smw0_3.png 674w, /wp-content/uploads/2018/08/smw0_3-300x121.png 300w" sizes="(max-width: 674px) 100vw, 674px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Einlesen eines Web-Repository-Objektes</h2>
+
+
+
+<p>Das Einlesen und des Bildes erfolgt mit Hilfe der Funktionsbausteine WWW_GET_MIME_OBJECT und DP_CREATE_URL. Das Beispielprogramm zeigt das Bild in einem Docking-Container auf dem Selektionsbild an:</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2018/08/enjoysap_logo.png"><img loading="lazy" decoding="async" width="615" height="359" src="https://tricktresor.com/wp-content/uploads/2018/08/enjoysap_logo.png" alt="" class="wp-image-1019069" srcset="/wp-content/uploads/2018/08/enjoysap_logo.png 615w, /wp-content/uploads/2018/08/enjoysap_logo-300x175.png 300w, /wp-content/uploads/2018/08/enjoysap_logo-148x85.png 148w, /wp-content/uploads/2018/08/enjoysap_logo-193x112.png 193w, /wp-content/uploads/2018/08/enjoysap_logo-71x40.png 71w" sizes="(max-width: 615px) 100vw, 615px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT.
+
+PARAMETERS dummy.
+
+CLASS mime_picture DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS get IMPORTING name TYPE clike RETURNING VALUE(url) TYPE w3url.
+ENDCLASS.
+
+CLASS mime_picture IMPLEMENTATION.
+  METHOD get.
+
+    DATA query_table TYPE STANDARD TABLE OF w3query.
+    DATA query_line TYPE w3query.
+    DATA html_table TYPE STANDARD TABLE OF w3html .
+    DATA html_line TYPE w3html .
+    DATA return_code TYPE w3param-ret_code.
+    DATA content_type TYPE  w3param-cont_type.
+    DATA content_length TYPE  w3param-cont_len.
+    DATA pic_data TYPE STANDARD TABLE OF w3mime .
+
+    query_line-name = '_OBJECT_ID'.
+    query_line-value = name.
+    APPEND query_line TO query_table.
+
+    CALL FUNCTION 'WWW_GET_MIME_OBJECT'
+      TABLES
+        query_string        = query_table
+        html                = html_table
+        mime                = pic_data
+      CHANGING
+        return_code         = return_code
+        content_type        = content_type
+        content_length      = content_length
+      EXCEPTIONS
+        object_not_found    = 1
+        parameter_not_found = 2
+        OTHERS              = 3.
+
+    CALL FUNCTION 'DP_CREATE_URL'
+      EXPORTING
+        type     = 'image'
+        subtype  = cndp_sap_tab_unknown
+        size     = content_length
+        lifetime = cndp_lifetime_transaction
+      TABLES
+        data     = pic_data
+      CHANGING
+        url      = url
+      EXCEPTIONS
+        OTHERS   = 1.
+
+  ENDMETHOD.
+ENDCLASS.
+
+INITIALIZATION.
+
+  DATA(go_pic) = NEW cl_gui_picture(
+                  parent = NEW cl_gui_docking_container(
+                                 side  = cl_gui_docking_container=&gt;dock_at_bottom
+                                 ratio = 80 ) ).
+  go_pic-&gt;load_picture_from_url( mime_picture=&gt;get( 'ENJOYSAP_LOGO' ) ). 
+  go_pic-&gt;set_display_mode( cl_gui_picture=&gt;display_mode_fit ).</pre>
+
+
+
+<h2 class="wp-block-heading">Obsoleter Baustein WWW_GET_MIME_OBJECT</h2>
+
+
+
+<p>Anstelle der beiden Funktionsbausteine WWW_GET_MIME_OBJECT (als obsolet gekennzeichnet) und DP_CREATE_URL kann auch der Funktionsbaustein DP_PUBLISH_WWW_URL verwendet werden. Das Coding wird hierdurch deutlich schlanker:</p>
+
+
+
+<pre class="wp-block-code"><code>METHOD get.
+    
+    CALL FUNCTION 'DP_PUBLISH_WWW_URL'
+      EXPORTING
+        objid                 = conv W3OBJID( name )
+        lifetime              = cndp_lifetime_transaction
+      IMPORTING
+        url                   = url
+      EXCEPTIONS
+        OTHERS                = 1.
+
+  ENDMETHOD.</code></pre>
+<p>Der Beitrag <a href="/blog/bilder-aus-mime-repository-anzeigen/">Bilder aus MIME-Repository anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Mehrfachselektion mit Menu</title>
+		<link>/blog/mehrfachselektion-mit-menu/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 09 Jan 2018 13:00:30 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Mehrfachselektion]]></category>
+		<category><![CDATA[Menü]]></category>
+		<category><![CDATA[Markieren]]></category>
+		<category><![CDATA[abapGit]]></category>
+		<category><![CDATA[toolbar]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018290</guid>
+
+					<description><![CDATA[<p>Möchte man dem Anwender die Möglichkeit geben, aus einer Liste mehrere Einträge auszuwählen, so fällt einem sicherlich zuerst das ALV-Grid ein, in dem man die Einträge per Zeilenmarkierung oder Checkbox markieren kann.  Eine Lösung mit der vertikalen Anordnung einer Toolbar (CL_GUI_TOOLBAR) und Menu (CL_CTMENU) käme auch in Frage, nähme jedoch genau so viel Platz ein, wie ein ALV-Grid. Letztendlich kam jedoch eine Variante mit dem CL_CTMENU und heraus.</p>
+<p>Der Beitrag <a href="/blog/mehrfachselektion-mit-menu/">Mehrfachselektion mit Menu</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Möchte man dem Anwender die Möglichkeit geben, aus einer Liste mehrere Einträge auszuwählen, so fällt einem sicherlich zuerst das ALV-Grid ein, in dem man die Einträge per Zeilenmarkierung oder Checkbox markieren kann. Etwas aufgepeppt könnte es so aussehen wie in diesem Beitrag: <a href="https://tricktresor.com/blog/moderne-ui-mit-altem-sapgui-und-alv-grid/">Moderne UI mit altem SAPGUI und ALV-Grid</a>. Diese Variante nimmt allerdings einiges an Platz ein. Eine Lösung mit der vertikalen Anordnung einer Toolbar (CL_GUI_TOOLBAR) und Menu (CL_CTMENU) käme auch in Frage, nähme jedoch genau so viel Platz ein, wie ein ALV-Grid. Vorteil wäre noch, dass man Drucktasten als &#8220;gedrückt&#8221; definieren und dem Anwender so eine gute Rückmeldung geben könnte.</p>
+<p>Das Demoprogramm SAPTOOLBAR_DEMO1 zeigt, wie es aussehen könnte (Drucktaste &#8220;+ check&#8221;):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/toolbar2.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018292" src="https://tricktresor.com/wp-content/uploads/2018/01/toolbar2.png" alt="" width="635" height="495" srcset="/wp-content/uploads/2018/01/toolbar2.png 635w, /wp-content/uploads/2018/01/toolbar2-300x234.png 300w, /wp-content/uploads/2018/01/toolbar2-117x91.png 117w" sizes="(max-width: 635px) 100vw, 635px" /></a></p>
+<h2>Menu</h2>
+<p>Bei der Anforderung, mehrere Einträge aus einer Liste von Optionen auswählen zu können, kam ich auf die Idee, das CL_CTMENU dafür zu verwenden. In einem Menü kann man nämlich einzelne Einträge so markieren, dass sie als &#8220;ausgewählt&#8221; zu erkennen sind. Sie haben dann einen &#8220;Punkt&#8221; vor dem Eintrag stehen. Den ersten Gedanken daran habe ich jedoch wieder verworfen, denn bei einer Liste mit mehreren Einträgen, kann es ziemlich mühselig sein, für jede zu wählende Option das Menü anzuklicken, die entsprechende Option zu wählen um dann das Menü erneut anzuklicken.</p>
+<p>Als zweiten Gedanken hatte ich jedoch die Idee, sofort nach Auswahl eines Eintrags das Ereignis &#8220;Dropdown ausgewählt&#8221; erneut zu feuern, so dass das &#8211; nun jedoch geänderte Menü &#8211; dem Anwender erneut angezeigt wird. Erfreulicherweise hat dies sogar funktioniert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/toolbar.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018291" src="https://tricktresor.com/wp-content/uploads/2018/01/toolbar.png" alt="" width="274" height="192" srcset="/wp-content/uploads/2018/01/toolbar.png 274w, /wp-content/uploads/2018/01/toolbar-200x140.png 200w" sizes="(max-width: 274px) 100vw, 274px" /></a></p>
+<h2>blogs.sap.com</h2>
+<p>Hier noch eine kleine Abhandlung auf <a href="https://blogs.sap.com/2018/01/09/variations-of-selecting-multiple-options-from-a-list/">blogs.sap.com</a> von mir, bei der ich noch andere Arten der Mehrfachselektion aufzeige.</p>
+<h2>abapGit</h2>
+<p><a href="https://github.com/tricktresor/multiple_selections">https://github.com/tricktresor/multiple_selections</a></p>
+<h2>Code</h2>
+<p>Das unten stehende Beispielprogramm demonstriert die Funktionsweise. Ich verwende an einigen Stellen die neuen Möglichkeiten von ABAP 7.40 und ABAP 7.50.</p>
+<p>Um das Modul auch sinnvoll einsetzen zu können, fehlen noch Methoden um die möglichen Optionen zu übergeben und die letztendlich gewählten Einträge wieder zurück zu liefern.</p>
+<pre class="lang:abap decode:true">PROGRAM zz_menu_demo.
+
+
+CLASS lcl_main DEFINITION.
+  PUBLIC SECTION.
+    METHODS display.
+
+  PROTECTED SECTION.
+    TYPES: BEGIN OF ty_option,
+             value   TYPE char10,
+             text    TYPE string,
+             checked TYPE boolean_flg,
+           END OF ty_option.
+    DATA: mytoolbar    TYPE REF TO cl_gui_toolbar,
+          menupos_x    TYPE i,
+          menupos_y    TYPE i,
+          options      TYPE STANDARD TABLE OF ty_option,
+          menu_dynamic TYPE REF TO cl_ctmenu.
+    METHODS build_menu.
+    METHODS on_function_selected FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING fcode sender.
+    METHODS on_dropdown_clicked  FOR EVENT dropdown_clicked OF cl_gui_toolbar
+      IMPORTING fcode posx posy sender.
+ENDCLASS.                    "lcl_my_event_handler DEFINITION
+
+
+
+CLASS lcl_main IMPLEMENTATION.
+
+  METHOD build_menu.
+
+    IF menu_dynamic IS INITIAL.
+      "Create menu
+      CREATE OBJECT menu_dynamic.
+    ELSE.
+      "Clear all entries before rebuild
+      menu_dynamic-&gt;clear( ).
+    ENDIF.
+
+    LOOP AT options ASSIGNING FIELD-SYMBOL(&lt;option&gt;).
+      "add menu entry with current status
+      menu_dynamic-&gt;add_function( fcode   = CONV #( &lt;option&gt;-value )
+                                  checked = &lt;option&gt;-checked
+                                  text    = CONV #( &lt;option&gt;-text ) ).
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD display.
+
+    "Create docker on Top of the screen
+    DATA(docker) = NEW cl_gui_docking_container( side = cl_gui_docking_container=&gt;dock_at_top extension = 30 ).
+
+    "create toolbar object
+    mytoolbar = NEW #( parent = docker ).
+
+    "register events
+    mytoolbar-&gt;set_registered_events( VALUE #( ( eventid = cl_gui_toolbar=&gt;m_id_function_selected )
+                                               ( eventid = cl_gui_toolbar=&gt;m_id_dropdown_clicked ) ) ).
+
+    "Set handler
+    SET HANDLER on_function_selected FOR mytoolbar.
+    SET HANDLER on_dropdown_clicked  FOR mytoolbar.
+
+    "set initial values
+    options = VALUE #( ( value = 'ONE'   text = 'Option One' )
+                       ( value = 'TWO'   text = 'Option Two' )
+                       ( value = 'THREE' text = 'Option Three' )
+                       ( value = 'FOUR'  text = 'Option Four' ) ).
+    "Build menu
+    build_menu( ).
+
+    "Add button for selecting options
+    mytoolbar-&gt;add_button( EXPORTING
+                             icon             = 'ICON_TOOL'
+                             fcode            = 'CHOOSE'
+                             butn_type        = '1'
+                             text             = 'Select options'
+                             quickinfo        = 'Select some options...'
+                           EXCEPTIONS
+                             cntb_error_fcode = 1 ).
+
+  ENDMETHOD.
+
+  METHOD on_function_selected.
+
+    "switch option entry
+    LOOP AT options ASSIGNING FIELD-SYMBOL(&lt;option&gt;).
+      IF &lt;option&gt;-value = fcode.
+        IF &lt;option&gt;-checked = abap_true.
+          &lt;option&gt;-checked = abap_false.
+        ELSE.
+          &lt;option&gt;-checked = abap_true.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+
+    "rebuild menu
+    build_menu( ).
+
+    "raise event dropdown clicked again
+    sender-&gt;dispatch( cargo = 'mytoolbar' eventid = cl_gui_toolbar=&gt;m_id_dropdown_clicked is_shellevent = abap_false ).
+
+    "Set coordinates of menu
+    sender-&gt;track_context_menu(
+         context_menu = menu_dynamic
+         posx         = menupos_x
+         posy         = menupos_y ).
+
+  ENDMETHOD.                    "lcl_my_event_handler
+
+  METHOD on_dropdown_clicked.
+
+    IF fcode = 'CHOOSE'.
+      "call of dropdown: remember current position for displaying menu
+      menupos_x = posx.
+      menupos_y = posy.
+    ENDIF.
+
+    "Set coordinates
+    mytoolbar-&gt;track_context_menu(
+        context_menu = menu_dynamic
+        posx         = posx
+        posy         = posy ).
+
+  ENDMETHOD.                    "lcl_my_event_handler
+
+ENDCLASS.                    "lcl_my_event_handler IMPLEMENTATION
+
+
+INITIALIZATION.
+
+  new lcl_main( )-&gt;display( ).
+
+
+  PARAMETERS p_test.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/mehrfachselektion-mit-menu/">Mehrfachselektion mit Menu</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Simple Tree Model mit User-Object</title>
+		<link>/blog/simple-tree-model-mit-user-object/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 09 Nov 2017 18:16:20 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap740]]></category>
+		<category><![CDATA[cl_simple_tree_model]]></category>
+		<category><![CDATA[Tree-Control]]></category>
+		<category><![CDATA[Model]]></category>
+		<category><![CDATA[NEW]]></category>
+		<category><![CDATA[abap750]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018219</guid>
+
+					<description><![CDATA[<p>Baumdarstellungen sind immer eine Herausforderung. Allerdings eine spannende, finde ich. Mit der Klasse CL_SIMPLE_TREE_MODEL zeige ich, wie du einfach auf Informationen zu einem Knoten zugreifen kannst. </p>
+<p>Der Beitrag <a href="/blog/simple-tree-model-mit-user-object/">Simple Tree Model mit User-Object</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bäume sind immer interessant, finde ich. Sie sind nicht so eintönig gleichmäßig wie die meisten Listen. Der CL_SIMPLE_TREE_MODEL hat jedoch zudem auch in der Programmierung eine schöne Besonderheit: Zu jedem Knoten kann die Instanz einer beliebigen Klasse übergeben werden. Mit der Methode NODE_GET_USER_OBJECT kann man sich dann die Instanz geben lassen und hiermit weiter arbeiten.</p>
+<h2>Tree-Ausgabe</h2>
+<p>Als Beispielaufgabe habe ich mir die folgende gestellt: Zeige alle Materialien zu einer Selektion nach Materialart unterteilt an. Also: Hauptknoten &#8211; Materialart &#8211; Materialien. Die Selektion der Daten erfolgt im Selektionsbild des Reports bei AT SELECTION-SCREEN. Auf unserem IDES-System haben ich nur ein paar Dutzend Materialien, da geht die Selektion zügig.</p>
+<p>Mit Doppelklick auf einen Eintrag soll &#8211; je nach Knotenart &#8220;Materialart&#8221; oder &#8220;Materialnummer&#8221; &#8211; die jeweilige Information ausgegeben werden. Es muss also bei dem Knoten &#8220;Materialart&#8221; eine andere Klasse verwendet werden, als bei der Knotenart &#8220;Materialnummer&#8221;.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/11/cl_simple_tree_model.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018221" src="https://tricktresor.com/wp-content/uploads/2017/11/cl_simple_tree_model.png" alt="" width="725" height="358" srcset="/wp-content/uploads/2017/11/cl_simple_tree_model.png 725w, /wp-content/uploads/2017/11/cl_simple_tree_model-300x148.png 300w" sizes="(max-width: 725px) 100vw, 725px" /></a></p>
+<p>Zusätzlich zur Demonstration des CL_SIMPLE_TREE_MODEL habe ich versucht, möglichst viele neue Sprachbefehle zu verwenden. Gerade bei der Verwendung des User-Objects macht der Befehl NEW zur Instantiierung einer Klasse die Programmierung wirklich elegant.</p>
+<h2>User-Object</h2>
+<p>für das User-Object habe ich eine Hauptklasse LCL_USER_OBJECT_MARA definiert:</p>
+<pre class="lang:abap decode:true">CLASS lcl_user_object_mara DEFINITION ABSTRACT.
+  PUBLIC SECTION.
+    DATA mara TYPE mara.
+    METHODS constructor IMPORTING i_mara TYPE mara.
+    METHODS get_text.
+ENDCLASS.
+
+CLASS lcl_user_object_mara IMPLEMENTATION.
+  METHOD constructor.
+    mara = i_mara.
+  ENDMETHOD.
+  METHOD get_text.
+    SELECT SINGLE maktx FROM makt INTO @DATA(text)
+     WHERE matnr = @mara-matnr
+       AND spras = @sy-langu.
+    IF sy-subrc = 0.
+      MESSAGE text TYPE 'I'.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.</pre>
+<p>Die Klasse hat nur das Attribut MARA, das bei der Erzeugung mitgegeben werden muss und die Methode GET_TEXT mit der ein Text zum Objekt ermittelt wird.</p>
+<p>Da ich die Klasse als ABSTRAKT definiert habe, kann ich diese Klasse nicht instantiieren. Das geht nur bei den von dieser Klasse abgeleiteten Klassen:</p>
+<pre class="lang:abap decode:true">CLASS lcl_user_object_mtart DEFINITION INHERITING FROM lcl_user_object_mara.
+  PUBLIC SECTION.
+    METHODS get_text REDEFINITION.
+ENDCLASS.
+CLASS lcl_user_object_mtart IMPLEMENTATION.
+  METHOD get_text.
+    MESSAGE |Materialart { mara-mtart }|  TYPE 'I'.
+  ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_user_object_matnr DEFINITION INHERITING FROM lcl_user_object_mara.
+  PUBLIC SECTION.
+ENDCLASS.</pre>
+<p>In der Klasse <em>MTART</em> redefiniere ich die Methode &#8220;GET_TEXT&#8221; um einen eigenen Text für <em>Materialart</em> zu bekommen.</p>
+<p>Die Klasse <em>MATNR</em> ist nur eine leere Hülle, da sie alles andere von der Hauptklasse erbt.</p>
+<p>Natürlich hätte ich auch zwei komplett unterschiedliche und voneinander unabhängige Klassen definieren können.</p>
+<h2>Hauptprogramm</h2>
+<p>Das Hauptprogramm besteht nur den Selektionsparametern und aus zwei Ereignissen:</p>
+<ol>
+<li>dem Ereignis INITIALIZATION, in dem ich den Docking-Container erzeuge und</li>
+<li>dem Ereignis AT SELECTION-SCREEN, in dem ich die Daten selektiere und den Baum erzeuge</li>
+</ol>
+<pre class="lang:abap decode:true">REPORT z_simple_tree_model.
+
+DATA s_mara TYPE mara.
+
+SELECT-OPTIONS s_matnr FOR s_mara-matnr.
+SELECT-OPTIONS s_mtart FOR s_mara-mtart.
+
+[...Klassendefinition...]
+
+INITIALIZATION.
+  lcl_main=&gt;create_docker( ).
+
+AT SELECTION-SCREEN.
+  TRY.
+      lcl_main=&gt;get_data( ).
+      lcl_main=&gt;create_tree( ).
+      lcl_main=&gt;add_nodes( ).
+    CATCH lcx_error.
+      MESSAGE 'Fehler bei Selektion' TYPE 'I'.
+  ENDTRY.</pre>
+<h2>Hauptklasse</h2>
+<p>Die Klasse LCL_MAIN, in der die Logik des Programms vorhanden ist, besteht aus diesen vier Methoden:</p>
+<ol>
+<li>Create_Docker</li>
+<li>Create_Tree</li>
+<li>Get_Data</li>
+<li>Add_Nodes</li>
+</ol>
+<p>Zusätzlich gibt es noch die Methode zur Ereignisbehandlung des Doppelklicks auf einen Knoten: Handle_Node_Double_Click.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/11/cl_simple_tree_model-se80.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018220" src="https://tricktresor.com/wp-content/uploads/2017/11/cl_simple_tree_model-se80.png" alt="" width="331" height="372" srcset="/wp-content/uploads/2017/11/cl_simple_tree_model-se80.png 331w, /wp-content/uploads/2017/11/cl_simple_tree_model-se80-267x300.png 267w" sizes="(max-width: 331px) 100vw, 331px" /></a></p>
+<h3>Create_Docker</h3>
+<p>So simple:</p>
+<pre class="lang:abap decode:true">    IF docker IS INITIAL.
+      docker = NEW #( side = cl_gui_docking_container=&gt;dock_at_bottom ratio = 50 ).
+    ENDIF.</pre>
+<p>&nbsp;</p>
+<h3>Get_Data</h3>
+<p>Ebenfalls nicht spektakulär:</p>
+<pre class="lang:abap decode:true">    SELECT * FROM mara INTO TABLE t_mara
+     WHERE matnr IN s_matnr
+       AND mtart IN s_mtart.
+    IF sy-subrc &gt; 0.
+      RAISE EXCEPTION TYPE lcx_error.
+    ENDIF.</pre>
+<p>Zur Fehlerbehandlung habe ich eine eigene Exception-class erstellt:</p>
+<pre class="lang:abap decode:true">CLASS lcx_error DEFINITION INHERITING FROM cx_no_check.
+ENDCLASS.</pre>
+<h3>Create_Tree</h3>
+<p>Bei der Erzeugung des CL_SIMPLE_TREE_MODEL bin ich auf die erste Hürde gestoßen, denn die Erzeugung des Control läuft etwas anders, als bei den meisten anderen GUI-Controls. Normalerweise instantiiert man das GUI-Control unter Angabe des Containers in das das Control eingefügt werden soll (Parameter PARENT). Nicht so bei dieser Klasse. Hier wird erst das Tree-Objekt erzeugt und danach mit der Methode CREATE_TREE_CONTROL an den PARENT-Container gehängt:</p>
+<pre class="lang:abap decode:true">    IF tree IS BOUND.
+      tree-&gt;delete_all_nodes( ).
+    ELSE.
+      tree   = NEW #( node_selection_mode = cl_simple_tree_model=&gt;node_sel_mode_single ).
+      tree-&gt;create_tree_control( EXPORTING parent = docker ).
+
+      tree-&gt;set_registered_events(
+              EXPORTING events = VALUE #(
+                 ( eventid = cl_simple_tree_model=&gt;eventid_node_double_click appl_event = space ) ) ).
+
+      SET HANDLER handle_node_double_click FOR tree.
+    ENDIF.
+
+    tree-&gt;add_node(
+             node_key = 'Root'                              "#EC NOTEXT
+             isfolder = 'X'
+             text     = 'Materialien zur Selektion' ).</pre>
+<p>Das Event Doppelklick wird hier ebenfalls registriert und der event handler dafür installiert. Zusätzlich wird der Hauptknoten ROOT eingefügt.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3>Add_Nodes</h3>
+<p>Mit der Methode ADD_NODE des Tree-Controls werden einzelne Knoten in den Baum eingehängt. Immer unter Angabe des Knoten-ID, des übergeordneten Knotens, Text und ein paar anderen. An dieser Stelle kann das User-Object übergeben werden, dass dann zur Knoten-ID zur Verfügung steht:</p>
+<pre class="lang:abap decode:true">    DATA l_mtart TYPE mtart.
+
+    SORT t_mara BY mtart matnr.
+
+    LOOP AT t_mara INTO DATA(mara).
+
+      IF l_mtart &lt;&gt; mara-mtart.
+        l_mtart = mara-mtart.
+        "Knoten MATERIALART
+        tree-&gt;add_node(
+            node_key = CONV #( mara-mtart )
+            relative_node_key = 'Root'
+            relationship = cl_simple_tree_model=&gt;relat_last_child
+            isfolder = 'X'
+            text     = |Materialart { mara-mtart } |
+            user_object = NEW lcl_user_object_mtart( i_mara = mara ) ).
+      ENDIF.
+
+      "Knoten MATERIALNUMMER
+      tree-&gt;add_node(
+          node_key          = |{ mara-matnr ALPHA = OUT }|
+          relative_node_key = CONV #( mara-mtart )
+          relationship      = cl_simple_tree_model=&gt;relat_last_child
+          isfolder          = space
+          text              = |{ mara-matnr ALPHA = OUT }|
+          user_object       = NEW lcl_user_object_matnr( i_mara = mara ) ).
+
+    ENDLOOP.
+
+    tree-&gt;expand_root_nodes( ).</pre>
+<h2>Ereignisbehandler</h2>
+<p>Im Ereignisbehandler prüfen wir, welchen Objekttyp das User-Object hat, um gegebenenfalls anders reagieren zu können:</p>
+<pre class="lang:abap decode:true ">    DATA o_user_object_matnr TYPE REF TO lcl_user_object_matnr.
+    DATA o_user_object_mtart TYPE REF TO lcl_user_object_mtart.
+    DATA o_object TYPE REF TO object.
+
+    tree-&gt;node_get_user_object( EXPORTING node_key    = node_key
+                                IMPORTING user_object = o_object ).
+
+    IF o_object IS INSTANCE OF lcl_user_object_mtart.
+      o_user_object_mtart ?= o_object.
+      o_user_object_mtart-&gt;get_text( ).
+      EXIT.
+    ENDIF.
+
+    IF o_object IS INSTANCE OF lcl_user_object_matnr.
+      o_user_object_matnr ?= o_object.
+      o_user_object_matnr-&gt;get_text( ).
+      EXIT.
+    ENDIF.</pre>
+<p>In diesem Fall verwenden wir zwar für MTART und MATNR die gleiche Methode GET_TEXT, aber hier könnte man je Objekt eine andere Funktion ausführen. Falls im ABAP Release die Syntax IS INSTANCE OF noch nicht verfügbar ist, muss mit TRY &#8211; CATCH geprüft werden, ob der Cast zwischen OBJECT und User-Object erfolgreich war oder nicht:</p>
+<pre class="lang:abap decode:true ">    TRY.
+        o_user_object_matnr ?= o_object.
+        o_user_object_matnr-&gt;get_text( ).
+      CATCH cx_sy_move_cast_error.
+    ENDTRY.</pre>
+<h2>Das komplette Programm</h2>
+<pre class="lang:abap decode:true ">REPORT zdemo_simple_tree_model.
+
+
+DATA s_mara TYPE mara.
+
+SELECT-OPTIONS s_matnr FOR s_mara-matnr.
+SELECT-OPTIONS s_mtart FOR s_mara-mtart.
+
+CLASS lcx_error DEFINITION INHERITING FROM cx_no_check.
+ENDCLASS.
+
+CLASS lcl_user_object_mara DEFINITION ABSTRACT.
+  PUBLIC SECTION.
+    DATA mara TYPE mara.
+    METHODS constructor IMPORTING i_mara TYPE mara.
+    METHODS get_text.
+ENDCLASS.
+
+CLASS lcl_user_object_mara IMPLEMENTATION.
+  METHOD constructor.
+    mara = i_mara.
+  ENDMETHOD.
+  METHOD get_text.
+    SELECT SINGLE maktx FROM makt INTO @DATA(text)
+     WHERE matnr = @mara-matnr
+       AND spras = @sy-langu.
+    IF sy-subrc = 0.
+      MESSAGE text TYPE 'I'.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_user_object_mtart DEFINITION INHERITING FROM lcl_user_object_mara.
+  PUBLIC SECTION.
+    METHODS get_text REDEFINITION.
+ENDCLASS.
+
+CLASS lcl_user_object_mtart IMPLEMENTATION.
+  METHOD get_text.
+    MESSAGE |Materialart { mara-mtart }|  TYPE 'I'.
+  ENDMETHOD.
+ENDCLASS.
+CLASS lcl_user_object_matnr DEFINITION INHERITING FROM lcl_user_object_mara.
+  PUBLIC SECTION.
+ENDCLASS.
+
+
+
+CLASS lcl_main DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS get_data.
+    CLASS-METHODS create_tree.
+    CLASS-METHODS add_nodes.
+    CLASS-METHODS create_docker.
+    CLASS-METHODS handle_node_double_click
+      FOR EVENT node_double_click
+                  OF cl_simple_tree_model
+      IMPORTING node_key.
+
+    CLASS-DATA docker TYPE REF TO cl_gui_docking_container.
+    CLASS-DATA tree   TYPE REF TO cl_simple_tree_model.
+    CLASS-DATA t_mara TYPE STANDARD TABLE OF mara.
+    CLASS-DATA s_mara TYPE mara.
+
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+  METHOD create_docker.
+    IF docker IS INITIAL.
+      docker = NEW #( side = cl_gui_docking_container=&gt;dock_at_bottom ratio = 50 ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD handle_node_double_click.
+
+    DATA o_user_object_matnr TYPE REF TO lcl_user_object_matnr.
+    DATA o_user_object_mtart TYPE REF TO lcl_user_object_mtart.
+    DATA o_object TYPE REF TO object.
+
+    tree-&gt;node_get_user_object( EXPORTING node_key    = node_key
+                                IMPORTING user_object = o_object ).
+
+    IF o_object IS INSTANCE OF lcl_user_object_mtart.
+      o_user_object_mtart ?= o_object.
+      o_user_object_mtart-&gt;get_text( ).
+      EXIT.
+    ENDIF.
+
+    IF o_object IS INSTANCE OF lcl_user_object_matnr.
+      o_user_object_matnr ?= o_object.
+      o_user_object_matnr-&gt;get_text( ).
+      EXIT.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD get_data.
+
+    SELECT * FROM mara INTO TABLE t_mara
+     WHERE matnr IN s_matnr
+       AND mtart IN s_mtart.
+    IF sy-subrc &gt; 0.
+      RAISE EXCEPTION TYPE lcx_error.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD create_tree.
+
+    IF tree IS BOUND.
+      tree-&gt;delete_all_nodes( ).
+    ELSE.
+      tree   = NEW #( node_selection_mode = cl_simple_tree_model=&gt;node_sel_mode_single ).
+      tree-&gt;create_tree_control( EXPORTING parent = docker ).
+
+      tree-&gt;set_registered_events(
+              EXPORTING events = VALUE #(
+                 ( eventid = cl_simple_tree_model=&gt;eventid_node_double_click appl_event = space ) ) ).
+
+      SET HANDLER handle_node_double_click FOR tree.
+    ENDIF.
+
+    tree-&gt;add_node(
+             node_key = 'Root'                              "#EC NOTEXT
+             isfolder = 'X'
+             text     = 'Materialien zur Selektion' ).
+
+  ENDMETHOD.
+
+  METHOD add_nodes.
+
+    DATA l_mtart TYPE mtart.
+
+    SORT t_mara BY mtart matnr.
+
+    LOOP AT t_mara INTO DATA(mara).
+
+      IF l_mtart &lt;&gt; mara-mtart.
+        l_mtart = mara-mtart.
+        "Knoten MATERIALART
+        tree-&gt;add_node(
+            node_key = CONV #( mara-mtart )
+            relative_node_key = 'Root'
+            relationship = cl_simple_tree_model=&gt;relat_last_child
+            isfolder = 'X'
+            text     = |Materialart { mara-mtart } |
+            user_object = NEW lcl_user_object_mtart( i_mara = mara ) ).
+      ENDIF.
+
+      "Knoten MATERIALNUMMER
+      tree-&gt;add_node(
+          node_key          = |{ mara-matnr ALPHA = OUT }|
+          relative_node_key = CONV #( mara-mtart )
+          relationship      = cl_simple_tree_model=&gt;relat_last_child
+          isfolder          = space
+          text              = |{ mara-matnr ALPHA = OUT }|
+          user_object       = NEW lcl_user_object_matnr( i_mara = mara ) ).
+      .
+
+    ENDLOOP.
+
+    tree-&gt;expand_root_nodes( ).
+
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+
+INITIALIZATION.
+  lcl_main=&gt;create_docker( ).
+
+AT SELECTION-SCREEN.
+  TRY.
+      lcl_main=&gt;get_data( ).
+      lcl_main=&gt;create_tree( ).
+      lcl_main=&gt;add_nodes( ).
+    CATCH lcx_error.
+      MESSAGE 'Fehler bei Selektion' TYPE 'I'.
+  ENDTRY.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/simple-tree-model-mit-user-object/">Simple Tree Model mit User-Object</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>REDUCE + SWITCH + COND [ABAP740]</title>
+		<link>/blog/reduce-switch-cond-abap740/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 03 May 2017 13:07:57 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[string]]></category>
+		<category><![CDATA[abap740]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[switch]]></category>
+		<category><![CDATA[CONV]]></category>
+		<category><![CDATA[COND]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018016</guid>
+
+					<description><![CDATA[<p>Heute im Code-Dojo hatte ich die Aufgabe gestellt, eine Funktion zu schreiben, die einen String mit variabel zu bestimmender Länge und zufälligen Zeichenfolgen aus Zahlen und Buchstaben zurück liefert. Zum Beispiel &#8220;I71B7HJ4BG&#8221; oder &#8220;6EE17ICBF54IE486EHD8&#8221;. Idee Mit VALUE und FOR sollte ein String Zeichen für Zeichen zusammengesetzt werden. Mit einer Zufallsfunktion sollte ermittelt werden, ob ein Buchstabe oder eine Zahl eingesetzt werden soll. Per SWITCH sollte ebenfalls eine Zufallsfunktion aufgerufen werden, die eine Zahl bzw. einen Buchstaben...</p>
+<p>Der Beitrag <a href="/blog/reduce-switch-cond-abap740/">REDUCE + SWITCH + COND [ABAP740]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute im Code-Dojo hatte ich die Aufgabe gestellt, eine Funktion zu schreiben, die einen String mit variabel zu bestimmender Länge und zufälligen Zeichenfolgen aus Zahlen und Buchstaben zurück liefert. Zum Beispiel &#8220;I71B7HJ4BG&#8221; oder &#8220;6EE17ICBF54IE486EHD8&#8221;.</p>
+<h2>Idee</h2>
+<p>Mit VALUE und FOR sollte ein String Zeichen für Zeichen zusammengesetzt werden. Mit einer Zufallsfunktion sollte ermittelt werden, ob ein Buchstabe oder eine Zahl eingesetzt werden soll. Per SWITCH sollte ebenfalls eine Zufallsfunktion aufgerufen werden, die eine Zahl bzw. einen Buchstaben zurück liefert.. Per String-Konkatenation sollten die zufälligen Zeichen zusammengesetzt werden.</p>
+<h2>Abweichung</h2>
+<p>die Aufgabe lässt sich mit VALUE nicht lösen. Stattdessen muss REDUCE genommen werden.</p>
+<h2>Code</h2>
+<p>Für jede Stelle des zu generierenden Strings (FOR &#8211; UNTIL &#8211; NEXT) wird eine Funktion RND_TYPE aufgerufen. Diese gibt zufällig den Wert TRUE oder FALSE zurück. Per SWITCH-Anweisung wird entschieden, ob eine Zahl (FALSE) oder ein Buchstabe (TRUE) generiert werden soll. Das generierte Zeichen wird per String-Konkatenation Zeichen für Zeichen zusammengebaut.</p>
+<p>&nbsp;</p>
+<pre class="lang:abap decode:true">REPORT.
+
+CLASS main DEFINITION.
+   PUBLIC SECTION.
+     DATA rnd_num TYPE REF TO cl_abap_random_int.
+     DATA rnd_chr TYPE REF TO cl_abap_random_int.
+     METHODS constructor.
+     METHODS rnd_type
+       RETURNING VALUE(type) TYPE boolean.
+     METHODS create_random_string
+       IMPORTING max           TYPE i
+       RETURNING VALUE(string) TYPE string.
+     METHODS get_random_char
+       RETURNING VALUE(char) TYPE char01.
+     METHODS get_random_number
+       RETURNING VALUE(number) TYPE numc01.
+ ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+   METHOD constructor.
+     rnd_chr = cl_abap_random_int=&gt;create( seed = CONV #( sy-uzeit ) min = 0 max = 25 ).
+     rnd_num = cl_abap_random_int=&gt;create( seed = CONV #( sy-uzeit ) min = 0 max = 9 ).
+   ENDMETHOD.
+   METHOD rnd_type.
+
+    type = COND #( LET random = get_random_number( ) IN
+                    WHEN random &lt;= 5 THEN abap_true
+                    ELSE abap_false ).
+   ENDMETHOD.
+
+  METHOD get_random_char.
+     DATA(offset) = rnd_num-&gt;get_next( ).
+     char = sy-abcde+offset(1).
+   ENDMETHOD.
+
+  METHOD get_random_number.
+     number = rnd_num-&gt;get_next( ).
+   ENDMETHOD.
+
+  METHOD create_random_string.
+
+    string = REDUCE #( INIT text = ``
+                        FOR i = 1
+                        UNTIL i &gt; max
+                        NEXT text = text &amp;&amp; SWITCH #( rnd_type( )
+                                              WHEN abap_true  THEN get_random_char( )
+                                              WHEN abap_false THEN get_random_number( ) ) ).
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+PARAMETERS p_len type i DEFAULT 10.
+PARAMETERS p_str TYPE char20 MODIF ID a.
+
+AT SELECTION-SCREEN OUTPUT.
+   LOOP AT SCREEN.
+     CASE screen-group1.
+       WHEN 'A'.
+         screen-input = '0'.
+         MODIFY SCREEN.
+     ENDCASE.
+   ENDLOOP.
+
+AT SELECTION-SCREEN.
+   p_str = NEW main( )-&gt;create_random_string( p_len ).</pre>
+<h2>Lessons Learned</h2>
+<p>Mit REDUCE können Operationen auf einen Datentyp &#8220;reduziert&#8221; werden. Mit VALUE funktioniert das nicht.</p>
+<pre class="lang:abap decode:true">string = REDUCE #( INIT text = ``
+                   FOR i = 1
+                   UNTIL i &gt; max
+                   NEXT text = text &amp;&amp; SWITCH #( rnd_type( )
+                                         WHEN abap_true  THEN get_random_char( )
+                                         WHEN abap_false THEN get_random_number( ) ) ).</pre>
+<p>Mit SWITCH können nur Exakte Werte abgefragt werden (wie bei CASE auch mit OR verknüpft). Es sind jedoch keine &#8220;Größer-/ Kleiner-Vergleiche&#8221; möglich.</p>
+<pre class="lang:abap decode:true ">[...] SWITCH #( rnd_type( )
+        WHEN abap_true  THEN get_random_char( )
+        WHEN abap_false THEN get_random_number( ) ) ).</pre>
+<p>Mit COND können beliebige Bedingungen geprüft werden. Allerdings muss hier jede Bedingung separat angegeben werden. Wenn der abzufragende Wert das Ergebnis einer Funktion ist, so sollte mit LET gearbeitet werden, um nicht für jede Bedingung die Funktion aufrufen zu müssen.</p>
+<pre class="lang:abap decode:true">var = COND #( LET random = get_random_number( ) IN
+              WHEN random &lt;= 5 THEN abap_true
+              ELSE abap_false ).</pre>
+<p>Die implizite Typ-Definition mit INIT (bei der REDUCE-Anweisung) ist mit Vorsicht zu genießen! Ich hatte aus Gewohnheit einen leeren &#8220;String&#8221; mit Hochkomma-Space-Hochkomma definiert. In Wirklichkeit hatte ich damit aber einen CHAR(1)-Feld definiert und die Funktion hat immer nur ein Zeichen zurück geliefert. Die String-Konkatenation hat diesen fest definierten Typ also nicht automatisch erweitert, so wie es beim String der Fall ist. Erst die Verwendung eines <em>echten</em> Strings durch die Backticks &#8220; liefert das gewünschte Ergebnis.</p>
+<p>Es kann auch der Typ direkt angegeben werden (INIT text TYPE string) aber dann ist keine Vorbelegung mehr möglich. Eine implizite Definition durch Vorbelegung ist dann jedoch wieder durch die Verwendung von CONV möglich: INIT text = CONV string( &#8216;hallo&#8217; )</p>
+<p>Bei der FOR-Funktion (FOR i = 1) muss das Hochzählen der Variable (THEN i + 1) nicht zwingend definiert werden! Wird THEN nicht angegeben, so wird implizit die Inkrementierung um Eins vorgenommen:</p>
+<pre class="lang:abap decode:true ">[...] FOR i = 1 UNTIL i &gt; 10 [...]</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/reduce-switch-cond-abap740/">REDUCE + SWITCH + COND [ABAP740]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ABAP 740-Features unter der Lupe</title>
+		<link>/blog/abap-740-features-unter-der-lupe/</link>
+					<comments>/blog/abap-740-features-unter-der-lupe/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 Apr 2017 15:12:16 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[standard table]]></category>
+		<category><![CDATA[sorted table]]></category>
+		<category><![CDATA[GROUP BY]]></category>
+		<category><![CDATA[WHERE]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017998</guid>
+
+					<description><![CDATA[<p>Aus einer einfachen Anfängerfrage im abapforum.com hat sich eine recht spannende Antwortserie entwickelt, die auf die neuen Sprachfeatures von ABAP740 eingeht. Ich habe diese einmal zusammen gefasst und auch Laufzeitmessungen durchgeführt. Die Frage Die Frage von debianfan lautete: Wie ermittele ich die Anzahl von Datensätzen bestimmter Ausprägung in einer internen Tabelle? Die interne Tabelle NAMES besteht nur aus den Feldern NAME (string) TF (boolean) Die folgenden Lösungen sind teilweise vereinfacht und ohne DATA-Definitionen. Die einzelnen...</p>
+<p>Der Beitrag <a href="/blog/abap-740-features-unter-der-lupe/">ABAP 740-Features unter der Lupe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Aus einer einfachen Anfängerfrage im <a href="http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21900&amp;p=82019">abapforum.com</a> hat sich eine recht spannende Antwortserie entwickelt, die auf die neuen Sprachfeatures von ABAP740 eingeht. Ich habe diese einmal zusammen gefasst und auch Laufzeitmessungen durchgeführt.</p>
+<h2>Die Frage</h2>
+<p>Die Frage von debianfan lautete: Wie ermittele ich die Anzahl von Datensätzen bestimmter Ausprägung in einer internen Tabelle?</p>
+<p>Die interne Tabelle NAMES besteht nur aus den Feldern</p>
+<ul>
+<li>NAME (string)</li>
+<li>TF (boolean)</li>
+</ul>
+<p>Die folgenden Lösungen sind teilweise vereinfacht und ohne DATA-Definitionen. Die einzelnen lauffähigen Lösungen sind unten im Beispielprogramm ersichtlich.</p>
+<h2>Lösung 1 &#8211; 2xLOOP+WHERE(DATA)</h2>
+<p>Die einfachste und auf der Hand liegende Antwort von Tron war:</p>
+<pre class="">LOOP AT names INTO name WHERE tf = abap_true.
+  ADD 1 TO zaehler_true.
+ENDLOOP.
+
+LOOP AT names INTO name WHERE tf = abap_false.
+  ADD 1 TO zaehler_false.
+ENDLOOP.
+</pre>
+<p>Die Lösung ist einfach und verständlich.</p>
+<p>Der Einwand von Ralf war, dass bei WHERE die gesamte Tabelle durchlaufen werden muss, wenn kein Index verwendet wird. Das kann sich bei großen Tabellen negativ auf die Laufzeit auswirken.</p>
+<p>Mein Gedanke war, dass ich zwei LOOPs nicht schön finde und außerdem ein LOOP mit einer Case-Anweisung noch einen Tacken einfacher und deutlich sein müsste. Dazu später mehr.</p>
+<h2>Lösung 2 &#8211; FILTER</h2>
+<p>Haubi hat dann den Vorschlag gemacht, die einzelnen Einträge mittels FILTER zu zählen:</p>
+<pre class=""> DATA(lv_true)  = lines( FILTER #( names WHERE tf = abap_true ) ).
+ DATA(lv_false) = lines( FILTER #( names WHERE tf = abap_false ) ).</pre>
+<p>Diese Lösung finde ich sehr schlank und gut lesbar. Was mich hier stört, ist, dass durch FILTER alle verarbeiteten Tabelleneinträge kopiert werden. Es werden alle Datensätze die der WHERE-Anweisung entsprechen in eine neue Tabelle kopiert. Die Tabelle ist zwar temporär und wird nur für die Zeit der Verarbeitung des FILTER-Befehls verwendet, aber bei großen Tabellen kann sich die zusätzliche Speicherlast negativ auswirken.</p>
+<h2>Lösung 3 &#8211; REDUCE</h2>
+<p>Ich wollte dann unbedingt noch eins drauf setzen und eine Lösung haben, die auch bei vielen Ausprägungen von TF funktioniert und die Werte von TF nicht bekannt sind. Zudem wollte ich komplett die neuen Sprachfeatures verwenden.</p>
+<p>Bei beiden vorhergehenden Lösungen fand ich es nicht gut, dass gezielt im Programm auf ABAP_TRUE und ABAP_FALSE abgefragt wurde. In diesem Beispiel ist es in Ordnung, weil das die Vorgabe war. Der häufigere Fall ist jedoch, dass eine Gruppe viele und gegebenenfalls nicht bekannte Ausprägungen hat (Verkaufsorganisation, Datum, Materialnummer, etc.).</p>
+<p>Meine Lösung bestand dann aus einer Kombination aus VALUE und REDUCE:</p>
+<pre class=""> DATA(sum) = VALUE ttf( FOR GROUPS grp OF &lt;name&gt; IN names
+                        WHERE ( name IS NOT INITIAL )
+                        GROUP BY ( tf = &lt;name&gt;-tf )
+                          ( tf    = grp
+                            count = REDUCE #( INIT i = 0
+                                       FOR name IN names
+                                       WHERE ( tf = grp )
+                                       NEXT i = i + 1 ) ) ).</pre>
+<p>Diese Lösung baut eine Tabelle auf aus TF und COUNT, so dass alle Gruppenwerte mit der entsprechenden Anzahl Einträge in der Tabelle SUM landen.</p>
+<p>Eigentlich müsste diese Lösung die langsamste sein, denn es werden zuerst die Gruppen gebildet. Dafür muss die gesamte Tabelle durchlaufen werden. Dann werden zu jedem Gruppeneintrag erneut die zugehörigen Einträge gelesen und gezählt. Deswegen wollte ich zuerst gar keine Laufzeitmessung machen. Die Herausforderung für mich war in erster Linie, die Problemstellung mit den neuen Sprachfeatures abzubilden, da ich mich mit der Syntax eher schwer tue.</p>
+<h2>Lösung 4 &#8211; 1xLOOP+WHERE(DATA)</h2>
+<p>Ich habe mit den vorhandenen drei Lösungen ein Testprogramm geschrieben um die Laufzeit mit der Transaktion SAT analysieren zu können.</p>
+<p>Allerdings habe ich gemerkt, dass ich die Lösung von Tron falsch übernommen hatte, nämlich folgendermaßen:</p>
+<pre class="">LOOP AT names INTO name.
+  CASE name-tf.
+    WHEN abap_true.
+      ADD 1 TO zaehler_true.
+    WHEN abap_false.
+      ADD 1 TO zaehler_false.
+  ENDCASE.
+ENDLOOP.</pre>
+<p>Anstatt zweier LOOPs hatte ich nur einen LOOP und eine CASE-Abfrage.</p>
+<p>Da ich die schon dabei war zu testen, wollte ich Trons Code genau so übernehmen, da ich davon ausging, dass meine Variante mit CASE schneller sein würde. Allerdings war dem nicht so&#8230;</p>
+<h2>Update</h2>
+<p>Zusätzlich zu den LOOP-Lösungen, die mit dem Zusatz INTO workarea arbeiten, habe ich noch die Varianten mit ASSIGNING (Feldsymbol) und TRANSPORTING NO FIELDS aufgenommen.</p>
+<h2>Lösung 5 &#8211; 1xLOOP+CASE(Fieldsymbol)</h2>
+<p>Die Lösung mit einem LOOP und CASE-Anweisung jedoch mit LOOP-ASSIGNING.</p>
+<h2>Lösung 6 &#8211; 2xLOOP+WHERE(Fieldsymbol)</h2>
+<p>Die Lösung mit zwei LOOPs und entsprechender WHERE-Bedingung jedoch mit LOOP-ASSIGNING.</p>
+<h2>Lösung 7 &#8211; 2xLOOP+WHERE(ohne Feldtransport)</h2>
+<p>Die Lösung mit zwei LOOPs und entsprechender WHERE-Bedingung jedoch mit dem Zusatz TRANSPORTING NO FIELDS.</p>
+<h2>Laufzeitanalyse</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018001" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg" alt="" width="748" height="269" srcset="/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg 748w, /wp-content/uploads/2017/04/2017-04-26_17-13-33-300x108.jpg 300w" sizes="(max-width: 748px) 100vw, 748px" /></a></p>
+<p>&nbsp;</p>
+<p>Der Vollständigkeit halber habe ich die Messung auch noch einmal mit der Variante &#8220;SORTED TABLE&#8221; durchgeführt. Und wieder war ich überrascht: Die Variante mit Sorted Table ist deutlich langsamer als die Variante mit Standard Table&#8230;</p>
+<p>Hier das Ergebnis der Laufzeitmessungen mit 100.000 Datensätzen und STANDARD TABLE:</p>
+<pre class="">Variante          Laufzeit
+P01_REDUCE         76.602
+P02_FILTER         36.755
+P03_LOOP_CASE      33.891
+P04_LOOP_WHERE     27.282
+P05_LOOP_CASE_FS   25.097
+P06_LOOP_WHERE_FS  18.805
+P07_LOOP_WHERE_NO  17.774
+</pre>
+<h2>abapgit</h2>
+<p>Eine aktuelle Version der Lösungen (inzwischen erweitert auf den Vergleich mit SORTED TABLE) findest du im github <a href="https://github.com/tricktresor/">Tricktresor-Repository</a>:</p>
+<p><a href="https://github.com/tricktresor/loop_performance_comparison">https://github.com/tricktresor/loop_performance_comparison</a></p>
+<h2>Code</h2>
+<p>Methode rnd_name baut aus zufälligen Buchstaben Fantasienamen auf.</p>
+<p>Methode rnd_bool liefert per Zufall den Wert TRUE oder FALSE zurück.</p>
+<p>Die Methoden p01 &#8211; p07 enthalten die jeweils erwähnten Lösungsvarianten.</p>
+<pre class="">REPORT.
+" http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21900&amp;p=82017#p82017
+
+PARAMETERS p TYPE i DEFAULT 100000.
+
+CLASS help DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS rnd_name RETURNING VALUE(name) TYPE string.
+ CLASS-METHODS rnd_bool RETURNING VALUE(tf) TYPE boolean.
+ CLASS-METHODS class_constructor.
+ CLASS-METHODS p01_reduce.
+ CLASS-METHODS p02_filter.
+ CLASS-METHODS p03_loop_case.
+ CLASS-METHODS p04_loop_where.
+ CLASS-METHODS p05_loop_case_fs.
+ CLASS-METHODS p06_loop_where_fs.
+ CLASS-METHODS p07_loop_where_no.
+ PROTECTED SECTION.
+ CLASS-DATA rnd TYPE REF TO cl_abap_random.
+ TYPES:
+ BEGIN OF lst_names,
+ name TYPE string,
+ tf TYPE abap_bool,
+ END OF lst_names,
+ ltt_names TYPE STANDARD TABLE OF lst_names
+ WITH NON-UNIQUE KEY name
+ WITH NON-UNIQUE SORTED KEY key_tf COMPONENTS tf.
+
+* ltt_names TYPE SORTED TABLE OF lst_names
+* WITH NON-UNIQUE KEY name
+* WITH NON-UNIQUE SORTED KEY key_tf COMPONENTS tf.
+ CLASS-DATA names TYPE ltt_names.
+ENDCLASS.
+
+CLASS help IMPLEMENTATION.
+ METHOD class_constructor.
+ rnd = cl_abap_random=&gt;create( ).
+ names = VALUE ltt_names( FOR i = 1 THEN i + 1 WHILE i &lt;= p
+ ( name = help=&gt;rnd_name( ) tf = help=&gt;rnd_bool( ) ) ).
+
+ ENDMETHOD.
+
+ METHOD rnd_name.
+ DATA(len) = rnd-&gt;intinrange( low = 5 high = 40 ).
+ DO len TIMES.
+ DATA(pos) = rnd-&gt;intinrange( low = 0 high = 25 ).
+ name = name &amp;&amp; sy-abcde+pos(1).
+ ENDDO.
+ ENDMETHOD.
+
+ METHOD rnd_bool.
+ CASE rnd-&gt;intinrange( low = 0 high = 1 ).
+ WHEN 0.
+ tf = abap_false.
+ WHEN 1.
+ tf = abap_true.
+ ENDCASE.
+ ENDMETHOD.
+
+ METHOD p01_reduce.
+ TYPES:
+ BEGIN OF stf,
+ tf TYPE abap_bool,
+ count TYPE i,
+ END OF stf,
+ ttf TYPE SORTED TABLE OF stf WITH UNIQUE KEY tf.
+
+ DATA(sum) = VALUE ttf( FOR GROUPS grp OF &lt;name&gt; IN names
+ WHERE ( name IS NOT INITIAL )
+ GROUP BY ( tf = &lt;name&gt;-tf )
+ ( tf = grp
+ count = REDUCE #( INIT i = 0
+ FOR name IN names
+ WHERE ( tf = grp )
+ NEXT i = i + 1 ) ) ).
+* cl_demo_output=&gt;display_data( sum ).
+ ENDMETHOD.
+
+ METHOD p02_filter.
+ DATA(lv_true) = lines( FILTER #( names USING KEY key_tf WHERE tf = abap_true ) ).
+ DATA(lv_false) = lines( FILTER #( names USING KEY key_tf WHERE tf = abap_false ) ).
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p03_loop_case.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names INTO DATA(name).
+ CASE name-tf.
+ WHEN abap_true. ADD 1 TO lv_true.
+ WHEN abap_false. ADD 1 TO lv_false.
+ ENDCASE.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p04_loop_where.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names INTO DATA(name) WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names INTO name WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p05_loop_case_fs.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names ASSIGNING FIELD-SYMBOL(&lt;name&gt;).
+ CASE &lt;name&gt;-tf.
+ WHEN abap_true. ADD 1 TO lv_true.
+ WHEN abap_false. ADD 1 TO lv_false.
+ ENDCASE.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p06_loop_where_fs.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names ASSIGNING FIELD-SYMBOL(&lt;name&gt;) WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names ASSIGNING &lt;name&gt; WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p07_loop_where_no.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names TRANSPORTING NO FIELDS WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names TRANSPORTING NO FIELDS WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+
+ENDCLASS.
+
+START-OF-SELECTION.
+
+
+ help=&gt;p01_reduce( ).
+ help=&gt;p02_filter( ).
+ help=&gt;p03_loop_case( ).
+ help=&gt;p04_loop_where( ).
+ help=&gt;p05_loop_case_fs( ).
+ help=&gt;p06_loop_where_fs( ).
+ help=&gt;p07_loop_where_no( ).</pre>
+<p>Der Beitrag <a href="/blog/abap-740-features-unter-der-lupe/">ABAP 740-Features unter der Lupe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/abap-740-features-unter-der-lupe/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Moderne UI mit altem SAPGUI und ALV-Grid</title>
+		<link>/blog/moderne-ui-mit-altem-sapgui-und-alv-grid/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 25 Apr 2017 18:10:35 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[hotspot]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[switch]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[parameter]]></category>
+		<category><![CDATA[checkbox]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017986</guid>
+
+					<description><![CDATA[<p>Ich habe eine kleine Spielerei gebaut, weil ich eine Möglichkeit brauchte um Parameter ein- und auszuschalten. Die normale Methode mit &#8220;X&#8221; und &#8220;Space&#8221; oder Checkbox fand ich langweilig und mir kam die Idee, dass es möglich sein müsste, eine etwas modernere Art der Darstellung möglich sein müsste. Sowas in dieser Art: Bild: http://pixabay.com/ Neue UI Natürlich sind die grafischen Möglichkeiten etwas beschränkt, aber die Funktionalität, wie man sie von jedem aktuellen Smartphone kennt, müsste machbar...</p>
+<p>Der Beitrag <a href="/blog/moderne-ui-mit-altem-sapgui-und-alv-grid/">Moderne UI mit altem SAPGUI und ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich habe eine kleine Spielerei gebaut, weil ich eine Möglichkeit brauchte um Parameter ein- und auszuschalten. Die normale Methode mit &#8220;X&#8221; und &#8220;Space&#8221; oder Checkbox fand ich langweilig und mir kam die Idee, dass es möglich sein müsste, eine etwas modernere Art der Darstellung möglich sein müsste.</p>
+<p>Sowas in dieser Art:</p>
+<p><a href="https://pixabay.com/de/schalter-kontakt-schaltfl%C3%A4che-auf-1531504/"><img loading="lazy" decoding="async" class="alignnone wp-image-1017987 size-medium" src="https://tricktresor.com/wp-content/uploads/2017/04/switch-1531504_640-300x300.png" alt="" width="300" height="300" srcset="/wp-content/uploads/2017/04/switch-1531504_640-300x300.png 300w, /wp-content/uploads/2017/04/switch-1531504_640-150x150.png 150w, /wp-content/uploads/2017/04/switch-1531504_640-83x83.png 83w, /wp-content/uploads/2017/04/switch-1531504_640.png 640w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Bild: <a href="http://pixabay.com/">http://pixabay.com/</a></p>
+<h2>Neue UI</h2>
+<p>Natürlich sind die grafischen Möglichkeiten etwas beschränkt, aber die Funktionalität, wie man sie von jedem aktuellen Smartphone kennt, müsste machbar sein. In Frage kam nur der ALV-Grid (CL_GUI_ALV_GRID). Ich habe mit dem CL_SALV_TABLE angefangen, aber hier lassen sich die Rahmenlinien nicht ausblenden; das geht leider nur im ALV-Grid.</p>
+<p>Und tatsächlich:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-48-36.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1017988" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-48-36.jpg" alt="" width="505" height="76" srcset="/wp-content/uploads/2017/04/2017-04-25_19-48-36.jpg 505w, /wp-content/uploads/2017/04/2017-04-25_19-48-36-300x45.jpg 300w" sizes="(max-width: 505px) 100vw, 505px" /></a></p>
+<p>Ich habe noch mit ein paar anderen Varianten herumgespielt, aber das Prinzip ist immer das gleiche:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-52-05.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1017989" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-52-05.jpg" alt="" width="505" height="76" srcset="/wp-content/uploads/2017/04/2017-04-25_19-52-05.jpg 505w, /wp-content/uploads/2017/04/2017-04-25_19-52-05-300x45.jpg 300w" sizes="(max-width: 505px) 100vw, 505px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-51-25.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1017990" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-51-25.jpg" alt="" width="505" height="76" srcset="/wp-content/uploads/2017/04/2017-04-25_19-51-25.jpg 505w, /wp-content/uploads/2017/04/2017-04-25_19-51-25-300x45.jpg 300w" sizes="(max-width: 505px) 100vw, 505px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-50-29.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1017991" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-25_19-50-29.jpg" alt="" width="505" height="76" srcset="/wp-content/uploads/2017/04/2017-04-25_19-50-29.jpg 505w, /wp-content/uploads/2017/04/2017-04-25_19-50-29-300x45.jpg 300w" sizes="(max-width: 505px) 100vw, 505px" /></a></p>
+<h2>Beschreibung</h2>
+<p>Das Programm baut aus der Parametertabelle eine neue Parametertabelle, die jeweils für ON und OFF ein eigenes Feld für ein Icon hat. Für die Felder wurde die Hotspot-Funktionalität gesetzt, damit man per Klick den Zustand des Schalters ändern kann.</p>
+<p>Um die Funktion &#8220;wasserdicht&#8221; zu machen, müsste noch verhindert werden, dass die Spaltenbreite verändert werden kann (passiert schnell beim Klicken auf die ausgeblendete Rahmenlinie in der Mitte):</p>
+<p><a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">Geschützte Methoden nutzen</a> für die Methode  SET_RESIZE_COLS.</p>
+<h2>Code</h2>
+<pre class="">REPORT zz_swwwwwwitch.
+
+"Dummy parameter do display docker
+PARAMETERS p.
+
+CLASS main DEFINITION.
+ PUBLIC SECTION.
+   INCLUDE &lt;cl_alv_control&gt;.
+   TYPES: BEGIN OF ty_param,
+            name TYPE string,
+            text TYPE string,
+            status TYPE boolean,
+          END OF ty_param,
+          ty_params TYPE STANDARD TABLE OF ty_param WITH NON-UNIQUE DEFAULT KEY.
+
+   METHODS init_grid IMPORTING parent TYPE REF TO cl_gui_container.
+   METHODS add_parameter
+     IMPORTING name TYPE clike
+       text TYPE clike OPTIONAL
+       status TYPE boolean OPTIONAL.
+   METHODS get_params
+     RETURNING VALUE(parameters) TYPE ty_params.
+
+   "Settings color
+   CONSTANTS color_on TYPE i VALUE col_positive.
+   CONSTANTS color_off TYPE i VALUE col_negative.
+
+   "Settings icons
+* CONSTANTS status_icon_on TYPE icon_text VALUE icon_businav_szenario.
+* CONSTANTS status_icon_off TYPE icon_text VALUE icon_businav_szenario.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE icon_led_green.
+* CONSTANTS status_icon_off TYPE icon_text VALUE icon_led_red.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE ICON_oo_class.
+* CONSTANTS status_icon_off TYPE icon_text VALUE ICON_oo_class.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE ICON_oo_object.
+* CONSTANTS status_icon_off TYPE icon_text VALUE ICON_oo_class.
+
+ CONSTANTS status_icon_on TYPE icon_text VALUE icon_ps_network_activity.
+ CONSTANTS status_icon_off TYPE icon_text VALUE icon_ps_network_activity.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE ICON_add_row.
+* CONSTANTS status_icon_off TYPE icon_text VALUE ICON_remove_row.
+
+* CONSTANTS status_icon_on TYPE icon_text VALUE icon_org_unit.
+* CONSTANTS status_icon_off TYPE icon_text VALUE icon_org_unit.
+
+   TYPES: BEGIN OF ty_ui_param,
+     name TYPE string,
+     text TYPE string,
+     status_on TYPE icon_text,
+     status_off TYPE icon_text,
+     t_color TYPE lvc_t_scol,
+     t_style TYPE lvc_t_styl,
+   END OF ty_ui_param,
+   ty_ui_params TYPE STANDARD TABLE OF ty_ui_param.
+
+ PROTECTED SECTION.
+   DATA grid TYPE REF TO cl_gui_alv_grid.
+   DATA params TYPE ty_params.
+   DATA ui_params TYPE ty_ui_params.
+
+   METHODS set_ui.
+   METHODS set_color
+     IMPORTING status TYPE boolean
+     RETURNING VALUE(color) TYPE lvc_t_scol.
+   METHODS handle_click FOR EVENT hotspot_click OF cl_gui_alv_grid
+     IMPORTING e_row_id.
+
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+
+ METHOD init_grid.
+
+ "Local data
+ DATA fieldcat TYPE lvc_t_fcat.
+ DATA field TYPE lvc_s_fcat.
+ DATA layout TYPE lvc_s_layo.
+
+ "Transform parameter data to display UI
+ set_ui( ).
+
+ "Create grid in given container
+ CREATE OBJECT grid
+   EXPORTING
+     i_parent = parent.
+
+ "Set fields
+ CLEAR field.
+ field-fieldname = 'NAME'.
+ field-outputlen = 20.
+ field-colddictxt = 'Parameter'.
+ field-style = alv_style_font_bold.
+ APPEND field TO fieldcat.
+
+ CLEAR field.
+ field-fieldname = 'TEXT'.
+ field-outputlen = 40.
+ field-colddictxt = 'Description'.
+ APPEND field TO fieldcat.
+
+ CLEAR field.
+ field-fieldname = 'STATUS_ON'.
+ field-outputlen = 4.
+ field-colddictxt = 'On'.
+ field-hotspot = abap_true.
+ field-icon = abap_true.
+ field-fix_column = abap_true.
+ APPEND field TO fieldcat.
+
+ CLEAR field.
+ field-fieldname = 'STATUS_OFF'.
+ field-outputlen = 4.
+ field-colddictxt = 'Off'.
+ field-hotspot = abap_true.
+ field-icon = abap_true.
+ field-fix_column = abap_true.
+ APPEND field TO fieldcat.
+
+ "Layout
+ layout-stylefname = 'T_STYLE'.
+ layout-ctab_fname = 'T_COLOR'.
+ layout-no_toolbar = abap_true.
+ layout-no_headers = abap_true.
+
+ "Display Grid
+ grid-&gt;set_table_for_first_display(
+   EXPORTING
+     is_layout = layout
+   CHANGING
+     it_outtab = ui_params
+     it_fieldcatalog = fieldcat
+   EXCEPTIONS
+     OTHERS = 4 ).
+
+   "Set handler
+   SET HANDLER handle_click FOR grid.
+
+ ENDMETHOD.
+
+ METHOD get_params.
+   "return current settings
+   parameters = params.
+ ENDMETHOD.
+
+ METHOD add_parameter.
+   "add parameter to parameter table
+   APPEND VALUE #( name   = name
+                   text   = text
+                   status = status ) TO params.
+ ENDMETHOD.
+
+ METHOD set_color.
+
+   CASE status.
+     WHEN abap_true.
+       "set color for switched on
+       color = VALUE #( ( fname = 'STATUS_OFF' color-col = color_on )
+                        ( fname = 'STATUS_ON' color-col = color_on ) ).
+     WHEN abap_false.
+       "set color for switched off
+       color = VALUE #( ( fname = 'STATUS_OFF' color-col = color_off )
+                        ( fname = 'STATUS_ON' color-col = color_off ) ).
+   ENDCASE.
+
+ ENDMETHOD.
+
+
+ METHOD set_ui.
+
+ "for each parameter
+ LOOP AT params INTO DATA(param).
+
+   "check if ui entry exists
+   READ TABLE ui_params ASSIGNING FIELD-SYMBOL(&lt;ui_param&gt;) WITH KEY name = param-name.
+   IF sy-subrc &gt; 0.
+
+   CASE param-status.
+     WHEN abap_true.
+       "set parameter switched on
+       APPEND VALUE #( name = param-name
+                       text = param-text
+                       status_on = status_icon_on
+                       status_off = 'ON'
+                       t_color = set_color( abap_true )
+                       t_style = VALUE #( ( fieldname = 'STATUS_ON' style2 = alv_style2_no_border_right )
+                                          ( fieldname = 'STATUS_OFF' style2 = alv_style2_no_border_left ) )
+                     ) TO ui_params ASSIGNING &lt;ui_param&gt;.
+
+     WHEN abap_false.
+     "set parameter switched off
+       APPEND VALUE #( name = param-name
+                       text = param-text
+                       status_on = 'OFF'
+                       status_off = status_icon_off
+                       t_color = set_color( abap_false )
+                       t_style = VALUE #( ( fieldname = 'STATUS_ON' style2 = alv_style2_no_border_right )
+                                          ( fieldname = 'STATUS_OFF' style2 = alv_style2_no_border_left ) )
+                     ) TO ui_params ASSIGNING &lt;ui_param&gt;.
+
+   WHEN abap_undefined.
+     "Set parameter not yet defined
+     APPEND VALUE #( name = param-name
+                     text = param-text
+                     status_on = space
+                     status_off = space
+                     t_style = VALUE #( ( fieldname = 'STATUS_ON' style2 = alv_style2_no_border_right )
+                                        ( fieldname = 'STATUS_OFF' style2 = alv_style2_no_border_left ) )
+                   ) TO ui_params ASSIGNING &lt;ui_param&gt;.
+
+       ENDCASE.
+     ENDIF.
+   ENDLOOP.
+ ENDMETHOD.
+
+ METHOD handle_click.
+ "read parameter entries
+ READ TABLE ui_params ASSIGNING FIELD-SYMBOL(&lt;ui_param&gt;) INDEX e_row_id-index.
+ READ TABLE params ASSIGNING FIELD-SYMBOL(&lt;param&gt;) WITH KEY name = &lt;ui_param&gt;-name.
+
+ IF &lt;ui_param&gt;-status_on = status_icon_on OR
+   &lt;ui_param&gt;-status_on = status_icon_off.
+   "set switch to OFF
+   &lt;ui_param&gt;-status_on = 'OFF'.
+   &lt;ui_param&gt;-status_off = status_icon_off.
+   &lt;ui_param&gt;-t_color = set_color( abap_false ).
+   &lt;param&gt;-status = abap_false.
+ ELSE.
+   "Set switch to ON
+   &lt;ui_param&gt;-status_on = status_icon_on.
+   &lt;ui_param&gt;-status_off = 'ON'.
+   &lt;ui_param&gt;-t_color = set_color( abap_true ).
+   &lt;param&gt;-status = abap_true.
+ ENDIF.
+ "Make changes visible
+ grid-&gt;refresh_table_display( i_soft_refresh = abap_true ).
+ ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+
+ DATA(main) = NEW main( ).
+
+ main-&gt;add_parameter( name = 'DISPLAY_TECH_DESCR' text = 'Display technical description' status = abap_true ).
+ main-&gt;add_parameter( name = 'DISPLAY_VALUES' text = 'Display values' status = abap_false ).
+ main-&gt;add_parameter( name = 'AUTOSAVE' text = 'Autosave' status = abap_true ).
+ main-&gt;add_parameter( name = 'INST_CALC' text = 'Instant calculation' status = abap_undefined ).
+
+ main-&gt;init_grid( NEW cl_gui_docking_container( ratio = 60 side = cl_gui_docking_container=&gt;dock_at_bottom ) ).
+
+AT SELECTION-SCREEN.
+ "Enter on selection screen displays current parameters
+ DATA(params) = main-&gt;get_params( ).
+ cl_demo_output=&gt;display_data( params ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/moderne-ui-mit-altem-sapgui-und-alv-grid/">Moderne UI mit altem SAPGUI und ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Preisfindung im Kundenauftrag von außen anstossen</title>
+		<link>/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Mar 2017 20:25:15 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_SALESORDER_CHANGE]]></category>
+		<category><![CDATA[Vertriebsbeleg]]></category>
+		<category><![CDATA[Preisfindung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017958</guid>
+
+					<description><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus: Userexit in SAPMV45A anpassen Parameter setzen BAPI aufrufen Parameter zurücknehmen Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:...</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus:</p>
+<ol>
+<li>Userexit in SAPMV45A anpassen</li>
+<li>Parameter setzen</li>
+<li>BAPI aufrufen</li>
+<li>Parameter zurücknehmen</li>
+</ol>
+<p>Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:</p>
+<ol>
+<li>EXPORT TO MEMORY und IMPORT FROM MEMORY</li>
+<li>Öffentliches Attribut der eigenen globalen Klasse</li>
+</ol>
+<h2>Anlage der globalen Klasse</h2>
+<p>Als erstes musst du eine Klasse anlegen mit der die neue Preisfindung durchgeführt werden soll. In meinem Beispiel heißt sie ZCL_SD_NP (New Pricing).</p>
+<p>Lege das öffentliche Klassenattribut KNPRS vom Typ KNPRS an (static). Das ist die Preisfindungsart, mit der die Art der neuen Preisfindung gesteuert werden kann.</p>
+<h2>Quelltext (relevanter Teil ) in MV45AFZB:</h2>
+<pre class="">FORM userexit_new_pricing_vbap CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL.  
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBAP</pre>
+<pre class="">FORM userexit_new_pricing_vbkd CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL. 
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBKD</pre>
+<h2>Quelltext Klasse</h2>
+<p>Nun brauchen wir noch die Methode TRIGGER_NEW_PRICING</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png"><img loading="lazy" decoding="async" class="size-full wp-image-1017959 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png" alt="" width="776" height="177" srcset="/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png 776w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-300x68.png 300w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-768x175.png 768w" sizes="(max-width: 776px) 100vw, 776px" /></a></p>
+<pre class="">DATA: 
+  ls_bapisdh1x  TYPE bapisdh1x,
+  lt_pos        TYPE STANDARD TABLE OF bapisditm WITH NON-UNIQUE DEFAULT KEY,
+  lt_posx       TYPE STANDARD TABLE OF bapisditmx WITH NON-UNIQUE DEFAULT KEY,
+  lt_return     TYPE bapiret2_t.
+FIELD-SYMBOLS: 
+  &lt;ls_pos&gt;      LIKE LINE OF lt_pos,
+  &lt;ls_posx&gt;     LIKE LINE OF lt_posx.
+
+
+CLEAR ct_bapiret2.
+knprs = iv_knprs.
+*--------------------------------------------------------------------*
+* Get all positions to be redermined
+*--------------------------------------------------------------------*
+SELECT posnr AS itm_number werks AS plant
+INTO CORRESPONDING FIELDS OF TABLE lt_pos
+FROM vbap
+WHERE vbeln = iv_vbeln_va.
+
+LOOP AT lt_pos ASSIGNING &lt;ls_pos&gt;.
+APPEND INITIAL LINE TO lt_posx ASSIGNING &lt;ls_posx&gt;.
+&lt;ls_posx&gt;-itm_number = &lt;ls_pos&gt;-itm_number.
+&lt;ls_posx&gt;-updateflag = 'U'.
+ENDLOOP.
+
+ls_bapisdh1x-updateflag = 'U'.
+CALL FUNCTION 'BAPI_SALESORDER_CHANGE'
+  EXPORTING
+    salesdocument    = iv_vbeln_va
+    order_header_inx = ls_bapisdh1x
+  TABLES
+    return           = ct_bapiret2
+    order_item_in    = lt_pos
+    order_item_inx   = lt_posx
+  EXCEPTIONS
+    ERROR_MESSAGE = 1.
+
+CLEAR knprs.  " Only once
+
+TRY.
+    DATA(ls_return) = ct_bapiret2[ type = 'E' ].
+    CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
+    RAISE EXCEPTION TYPE zcx_my_exception.
+  CATCH CX_SY_ITAB_LINE_NOT_FOUND.
+    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+ENDTRY.
+</pre>
+<p>Durch Aufruf der Methode ZCL_SD_NP=&gt;TRIGGER_NEW_PRICING( &#8230; ) kannst du nun einen Beleg dazu bewegen, eine neue Preisfindung durchzuführen.</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Controls stapeln</title>
+		<link>/blog/controls-stapeln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Mar 2017 19:56:15 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[control]]></category>
+		<category><![CDATA[sichtbarkeit]]></category>
+		<category><![CDATA[set_visible]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[cl_gui_control]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017943</guid>
+
+					<description><![CDATA[<p>Heute ist mir wieder eine kleine Spielerei unter die Finger gekommen, die einerseits wichtige Grundlagen zeigt und andererseits eine nette Spielerei ist, die durchaus einen Nutzwert hat. Es geht um die Anzeige und Steuerung von Controls.</p>
+<p>Der Beitrag <a href="/blog/controls-stapeln/">Controls stapeln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute ist mir wieder eine kleine Spielerei unter die Finger gekommen, die einerseits wichtige Grundlagen zeigt und andererseits eine nette Spielerei ist, die durchaus einen Nutzwert hat. Es geht um die Anzeige und Steuerung von Controls.</p>
+<p>Um ein Control anzeigen zu können, benötigt man einen Container. In diesem Beispiel verwende ich einen Docking-Container.</p>
+<pre class="">go_dock = NEW #( side = cl_gui_docking_container=&gt;dock_at_right ratio = 80 ).</pre>
+<p>In diesen Container hänge ich ein Text-Control.</p>
+<pre class="">go_text = NEW #( parent = go_dock ).</pre>
+<p>Allerdings ist das noch nichts Besonderes.</p>
+<h2>Controls stapeln</h2>
+<p>Besonders wird es, wenn ich noch ein ALV-Grid und noch ein Picture-Control in den gleichen Container packe.</p>
+<pre class="">" ALV-Grid
+go_grid = NEW #( i_parent = go_dock ).
+go_grid-&gt;set_table_for_first_display(
+  EXPORTING i_structure_name = 'T000'
+  CHANGING it_outtab = gt_data_alv ).
+
+" Picture
+go_pic = NEW cl_gui_picture( parent = go_dock ).</pre>
+<p>Die Controls sind nun gewissermaßen gestapelt. Sie liegen übereinander in dem Container. Das zuletzt instantiierte Control wird angezeigt. Die anderen Controls sind jedoch noch da! Und sie sind auch nutzbar. Man muss lediglich die jeweils darüber liegenden Controls auf &#8220;nicht sichtbar&#8221; stellen.</p>
+<p>Jedes Control hat die Methode SET_VISIBLE mit der man die Sichtbarkeit eines Controls steuern kann (Vererbung von CL_GUI_CONTROL). Jeder Container hat übrigens ebenfalls diese Eigenschaft (denn auch diese erben von CL_GUI_CONTROL)! Das heißt, es kann auch ein Docking-Container komplett ausgeblendet werden, ohne dass er wirklich &#8220;weg&#8221; ist.</p>
+<p>In seltenen Fällen kann man sich diesen Umstand zu Nutze machen. Bei diesem Trick verwende ich ein ähnliches Verfahren: Werte aus Excel per DOI (unsichtbar). Hier wird nur nicht der Container unsichtbar geschaltet, sondern das Control wird an ein Standard-Dynpro gehängt, dass nicht angezeigt wird.</p>
+<p>Man kann also dadurch, dass man nur das gewünschte Control auf &#8220;sichtbar&#8221; und alle anderen auf &#8220;unsichtbar&#8221; stellt, zwischen den einzelnen Control hin- und her schalten. Es ist dementsprechend nicht notwendig, das im Container befindliche Control zu zerstören und das neue aufzubauen um einen Wechsel zu realisieren.</p>
+<h2>Beliebter Fehler</h2>
+<p>Den Zustand, den ich hier bewusst und mit voller Absicht herbei führe, ist wahrscheinlich schon häufig die Ursache vieler verzweifelter Stunden im Debugger und einiger grauer Haare gewesen. Häufig passiert es nämlich (nicht nur Anfängern, sondern auch Profis!), dass man ein und dasselbe Control mehrfach instantiiert und dem gleichen Container zuordnet. Das macht SAP auch klaglos mit und stellt die neuen Control-Instanzen immer wieder in den Container hinein. Sichtbar ist einzig und allein das zuerst erzeugte Control.</p>
+<p>Das ist genau das tückische daran, denn durch diesen Umstand ergeben sich eine Vielzahl von Symptomen, die man sich auch nach stundenlangem Debugging häufig nicht erklären kann:</p>
+<ul>
+<li>Geänderte Daten werden nicht im ALV-Grid angezeigt</li>
+<li>Datenänderungen werden vom ALV nicht in die interne Tabelle übernommen</li>
+<li>Doppelklick funktioniert nicht mehr</li>
+<li>Änderungen am Control werden nicht sichtbar (geändertes Bild, Icon, aktualisierte Website, &#8230;)</li>
+</ul>
+<p>Sofern man daran denkt, dass der Fehler einer Mehrfach-Instantiierung vielleicht vorliegen könnte, kann man sehr leicht prüfen, ob das wirklich der Fall ist. Jeder Container hat das Attribut CHILDREN. In dieser Tabelle werden die dem Container zugeordneten Controls verwaltet:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-36-42.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017947 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-36-42.jpg" alt="" width="288" height="199" /></a></p>
+<p>Wenn man in seinem Programm zwar den Container nur einmal erzeugt, aber bei jedem Tastendruck (PAI) eventuell ein neues Control, dann könnte es so aussehen, wie hier:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-42-31.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017948 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-42-31.jpg" alt="" width="295" height="327" srcset="/wp-content/uploads/2017/03/2017-03-29_21-42-31.jpg 295w, /wp-content/uploads/2017/03/2017-03-29_21-42-31-271x300.jpg 271w" sizes="(max-width: 295px) 100vw, 295px" /></a></p>
+<p>[notice type=&#8217;info&#8217;]TIPP<br />
+In den meisten Fällen ist es sinnvoll und ausreichend, wenn man abfragt, ob der Container bereits erzeugt wurde. Falls er noch nicht erzeugt wurde (Programmstart etc.), dann erzeugt man den Container und auch gleich das Control.[/notice]</p>
+<p>Häufig treten solche Fehler auf, wenn man Codezeilen von einer Routine oder Methode in ein Programm-Ereignis kopiert oder umgekehrt. Auf einmal befindet sich der Codeabschnitt, der vorher nur einmal aufgerufen wurde, an einer Stelle im Programm, die mehrmals durchlaufen wird.</p>
+<h2>Screenshots</h2>
+<p>Die Anzeige wird über die entsprechenden Radiobuttons gesteuert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-17.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017946 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-17.jpg" alt="" width="690" height="525" srcset="/wp-content/uploads/2017/03/2017-03-29_21-37-17.jpg 690w, /wp-content/uploads/2017/03/2017-03-29_21-37-17-300x228.jpg 300w" sizes="(max-width: 690px) 100vw, 690px" /></a> <a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-37.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017945 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-37.jpg" alt="" width="690" height="525" srcset="/wp-content/uploads/2017/03/2017-03-29_21-37-37.jpg 690w, /wp-content/uploads/2017/03/2017-03-29_21-37-37-300x228.jpg 300w" sizes="(max-width: 690px) 100vw, 690px" /></a> <a href="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-48.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-1017944 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/2017-03-29_21-37-48.jpg" alt="" width="690" height="525" srcset="/wp-content/uploads/2017/03/2017-03-29_21-37-48.jpg 690w, /wp-content/uploads/2017/03/2017-03-29_21-37-48-300x228.jpg 300w" sizes="(max-width: 690px) 100vw, 690px" /></a></p>
+<h2>Code</h2>
+<pre class="">REPORT zz_switch_controls.
+
+
+*== Data
+DATA gt_data_alv TYPE STANDARD TABLE OF t000 WITH NON-UNIQUE DEFAULT KEY.
+DATA go_dock TYPE REF TO cl_gui_docking_container.
+DATA go_text TYPE REF TO cl_gui_textedit.
+DATA go_grid TYPE REF TO cl_gui_alv_grid.
+DATA go_pic TYPE REF TO cl_gui_picture.
+
+*== Selektionsbild
+PARAMETERS: rb_text RADIOBUTTON GROUP rb1 DEFAULT 'X' USER-COMMAND space,
+ rb_grid RADIOBUTTON GROUP rb1,
+ rb_pic RADIOBUTTON GROUP rb1.
+
+AT SELECTION-SCREEN.
+ "steuern der controls
+  CASE 'X'.
+    WHEN rb_grid. 
+      go_text-&gt;set_visible( space ).
+      go_pic-&gt;set_visible( space ).
+      go_grid-&gt;set_visible( 'X' ).
+    WHEN rb_text.
+      go_text-&gt;set_visible( 'X' ).
+      go_pic-&gt;set_visible( space ).
+      go_grid-&gt;set_visible( space ).
+    WHEN rb_pic.
+      go_text-&gt;set_visible( space ).
+      go_pic-&gt;set_visible( 'X' ).
+      go_grid-&gt;set_visible( space ).
+  ENDCASE.
+
+INITIALIZATION.
+
+*== Docker
+ go_dock = NEW #( side = cl_gui_docking_container=&gt;dock_at_right ratio = 80 ).
+
+*== Textedit
+ go_text = NEW #( parent = go_dock ).
+
+*== ALV-Grid
+ SELECT *
+ INTO TABLE gt_data_alv
+ FROM t000.
+
+ go_grid = NEW #( i_parent = go_dock ).
+ go_grid-&gt;set_table_for_first_display(
+     EXPORTING i_structure_name = 'T000'
+     CHANGING it_outtab = gt_data_alv ).
+
+*== Picture
+ go_pic = NEW cl_gui_picture( parent = go_dock ).
+ go_pic-&gt;load_picture_from_sap_icons( icon_booking_ok ).
+ go_pic-&gt;set_display_mode( cl_gui_picture=&gt;display_mode_fit ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/controls-stapeln/">Controls stapeln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>REUSE_ALV_GRID_DISPLAY Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/reuse_alv_grid_display/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 06 Jun 2014 15:48:30 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>REUSE_ALV_GRID_DISPLAY Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Get_Globals</title>
+		<link>/blog/get_globals/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Dec 2011 15:30:09 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[register events]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[REUSE_ALV_GRID_DISPLAY]]></category>
+		<category><![CDATA[GET_GLOBALS_FROM_SLVC_FULLSCR]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Reuse-Bibliothek]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[usercommand]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=632</guid>
+
+					<description><![CDATA[<p>Der Baustein REUSE_ALV_GRID_DISPLAY dient eigentlich dazu, eine Tabelle auf einfachste Art und Weise anzuzeigen. Manchmal m&#246;chte man aber doch auf die verwendete Klasse CL_GUI_ALV_GRID zugreifen k&#246;nnen da bestimmte Funktionen nur hier und nicht im REUSE-Baustein m&#246;glich sind. </p>
+<p>Der Beitrag <a href="/blog/get_globals/">Get_Globals</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der Baustein REUSE_ALV_GRID_DISPLAY dient eigentlich dazu, eine Tabelle auf einfachste Art und Weise anzuzeigen. Manchmal möchte man aber doch auf die verwendete Klasse CL_GUI_ALV_GRID zugreifen können da bestimmte Funktionen nur hier und nicht im REUSE-Baustein möglich sind.</p>
+<p>Möglich ist das durch die Verwendung des Funktionsbausteins GET_GLOBALS_FROM_SLVC_FULLSCR. Der Baustein muss in einem Caller-Exit aufgerufen werden und liefert eine Referenz auf das verwendete Grid zurück.</p>
+<p>In diesem Beispiel zeigen wir, wie Sie mit Hilfe des Bausteins ein Kontext-Menü im REUSE-Grid verwenden können.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2011/12/Bild_2014_06_06_170623.jpg"><img fetchpriority="high" decoding="async" class="alignnone wp-image-4775 size-full" src="https://tricktresor.com/wp-content/uploads/2011/12/Bild_2014_06_06_170623.jpg" alt="Bild_2014_06_06_170623" width="355" height="142" srcset="/wp-content/uploads/2011/12/Bild_2014_06_06_170623.jpg 355w, /wp-content/uploads/2011/12/Bild_2014_06_06_170623-300x120.jpg 300w" sizes="(max-width: 355px) 100vw, 355px" /></a></p>
+<p>In dem Report wird für die Spalte &#8220;Bezeichnung&#8221; bei Rechtsklick ein Kontext-Menü eingeblendet. Der entsprechende Funktionscode wird im ALV-Exit &#8220;USER_COMMAND&#8221; ausgewertet.</p>
+<h2>Coding</h2>
+<pre>REPORT.
+DATA gt_data TYPE STANDARD TABLE OF t005t.
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS: handle_context_menu_req
+                       FOR EVENT context_menu_request OF cl_gui_alv_grid
+                       IMPORTING e_object sender.
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+  METHOD handle_context_menu_req.
+    DATA lr_menu   TYPE REF TO cl_ctmenu.
+    DATA lr_grid   TYPE REF TO cl_gui_alv_grid.
+    DATA ls_row    TYPE lvc_s_row.
+    DATA ls_col    TYPE lvc_s_col.
+    DATA fcode     TYPE ui_func.
+    DATA ftext     TYPE gui_text.
+    DATA ls_data   TYPE t005t.
+    
+    sender-&gt;get_current_cell( IMPORTING  es_row_id = ls_row
+                                         es_col_id = ls_col ).
+    CLEAR ls_data.
+    READ TABLE gt_data INTO ls_data INDEX ls_row-index.
+    CASE ls_col-fieldname.
+      WHEN 'LANDX'.
+*-- Kontext-Menu nur für das Feld "Bezeichnung"
+        lr_menu ?= e_object.
+        lr_menu-&gt;clear( ).
+        fcode = 'EDIT'.
+        ftext = 'Edit Entry'.
+        lr_menu-&gt;add_function( fcode = fcode
+                               text  = ftext ).
+                               fcode = 'SHOW'.    
+        CONCATENATE 'Show' ls_data-landx INTO ftext SEPARATED BY space.
+        lr_menu-&gt;add_function( fcode = fcode
+                               text  = ftext ).
+      WHEN OTHERS.
+        EXIT.
+    ENDCASE.
+  ENDMETHOD.                    "handle_context_menu_req
+ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+START-OF-SELECTION.
+  PERFORM get_data.
+  PERFORM display.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_data
+*&amp;---------------------------------------------------------------------*
+FORM get_data.
+  SELECT * FROM t005t
+    INTO TABLE gt_data UP TO 100 ROWS
+   WHERE spras = sy-langu.
+ENDFORM.                    "get_data
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  display
+*&amp;---------------------------------------------------------------------*
+FORM display.
+  DATA lt_events TYPE slis_t_event.
+
+  PERFORM set_events CHANGING lt_events.
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+       EXPORTING
+         i_callback_program = sy-cprog
+         i_structure_name   = 'T005T'
+         it_events          = lt_events
+       TABLES
+         t_outtab           = gt_data
+       EXCEPTIONS
+         program_error      = 1
+         OTHERS             = 2.
+ENDFORM.                    "display
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  set_events
+*&amp;---------------------------------------------------------------------*
+FORM set_events CHANGING ct_events TYPE slis_t_event.
+
+  FIELD-SYMBOLS: &lt;ls_event&gt; TYPE slis_alv_event.
+  DATA: l_event  TYPE lvc_fname.
+
+  CALL FUNCTION 'REUSE_ALV_EVENTS_GET'
+       EXPORTING
+         i_list_type     = 4
+       IMPORTING
+         et_events       = ct_events
+       EXCEPTIONS
+         list_type_wrong = 1
+         OTHERS          = 2.
+  IF sy-subrc = 0.
+    READ TABLE ct_events ASSIGNING &lt;ls_event&gt;
+          WITH KEY name = 'CALLER_EXIT'.
+    IF sy-subrc EQ 0.
+      CONCATENATE 'ALV_EVENT_' &lt;ls_event&gt;-name
+             INTO &lt;ls_event&gt;-form.
+    ENDIF.
+    READ TABLE ct_events ASSIGNING &lt;ls_event&gt;
+          WITH KEY name = 'USER_COMMAND'.
+    IF sy-subrc EQ 0.
+      CONCATENATE 'ALV_EVENT_' &lt;ls_event&gt;-name
+             INTO &lt;ls_event&gt;-form.
+    ENDIF.
+  ENDIF.
+ENDFORM.                    "set_events
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  alv_event_caller_exit
+*&amp;---------------------------------------------------------------------*
+FORM alv_event_caller_exit USING cs_data TYPE slis_data_caller_exit..
+
+  DATA: lr_grid TYPE REF TO cl_gui_alv_grid.
+
+  CALL FUNCTION 'GET_GLOBALS_FROM_SLVC_FULLSCR'
+       IMPORTING
+         e_grid = lr_grid.
+  SET HANDLER lcl_event_receiver=&gt;handle_context_menu_req FOR lr_grid.
+
+ENDFORM.                    "alv_event_caller_exit
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  alv_event_user_command
+*&amp;---------------------------------------------------------------------*
+FORM alv_event_user_command USING r_ucomm     LIKE sy-ucomm
+                                  rs_selfield TYPE slis_selfield.
+  CASE r_ucomm.
+    WHEN 'EDIT'.
+      MESSAGE i000(oo) WITH 'EDIT!!'.
+    WHEN 'SHOW'.
+      MESSAGE s000(oo) WITH 'Wurde angezeigt!'.
+  ENDCASE.
+ENDFORM.                    "alv_event_user_command</pre>
+<p>Der Beitrag <a href="/blog/get_globals/">Get_Globals</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

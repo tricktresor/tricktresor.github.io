@@ -1,0 +1,988 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Dokumentation Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/dokumentation/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 14 Nov 2022 14:18:40 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Dokumentation Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Speak!</title>
+		<link>/blog/speak/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 03 May 2016 09:53:55 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[get property]]></category>
+		<category><![CDATA[ole]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[Agenten]]></category>
+		<category><![CDATA[set property]]></category>
+		<category><![CDATA[call method]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=634</guid>
+
+					<description><![CDATA[<p>SAP kann sprechen. Mit der Microsoft Speech API 5.3</p>
+<p>Der Beitrag <a href="/blog/speak/">Speak!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>SAP kann sprechen. Mit der Microsoft Speech API 5.3</p>
+<figure id="attachment_608883" aria-describedby="caption-attachment-608883" style="width: 500px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2012/02/2016-05-03_11-51-10.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-608883" src="https://tricktresor.com/wp-content/uploads/2012/02/2016-05-03_11-51-10.jpg" alt="https://pixabay.com/de/sound-welle-stimme-h%C3%B6ren-856770/" width="500" height="300" srcset="/wp-content/uploads/2012/02/2016-05-03_11-51-10.jpg 500w, /wp-content/uploads/2012/02/2016-05-03_11-51-10-300x180.jpg 300w" sizes="(max-width: 500px) 100vw, 500px" /></a><figcaption id="caption-attachment-608883" class="wp-caption-text">https://pixabay.com/de/sound-welle-stimme-h%C3%B6ren-856770/</figcaption></figure>
+<p>Auf der Seite <a href="http://abapdn.blogspot.com/" target="_blank">http://abapdn.blogspot.com/</a> bin ich auf folgenden interessanten Code gestoßen:</p>
+<pre>INCLUDE ole2incl.
+DATA : v_objole      TYPE ole2_object,
+       v_objolevoice TYPE ole2_object,
+       v_strtotalk   TYPE string.
+
+CREATE OBJECT v_objolevoice 'SAPI.SpVoice'.
+
+SET PROPERTY OF v_objolevoice 'Volume' = 80.
+SET PROPERTY OF v_objolevoice 'Rate' = -1.
+
+v_strtotalk = 'This is great'.
+
+CALL METHOD OF v_objolevoice 'Speak' = v_objole
+EXPORTING #1 = v_strtotalk.
+
+FREE: v_objolevoice,v_objole.</pre>
+<p>Und SAP kann sprechen&#8230; Leider ist es mir nicht gelungen, andere Stimmen zu aktivieren. Es spricht standardmäßig &#8220;Anna&#8221; (&#8220;Mary&#8221; laut Doku). Es müsste aber auch noch &#8220;Mike&#8221; vorhanden sein.</p>
+<h2>Get Voice</h2>
+<p>Mit diesem Code-Schnipsel kann man die eingestellte Stimme ermitteln.</p>
+<pre>DATA v_voicename TYPE string.
+DATA v_voice     TYPE ole2_object.
+GET PROPERTY OF v_objolevoice 'Voice' = v_voice.
+CALL METHOD OF v_voice 'GetDescription' = v_voicename.</pre>
+<p>Umgestellt werden kann die Stimme leider nicht, denn dafür müsste man per OLE ein indiziertes Array ansprechen, was aber nicht geht. Aufgrund von Lizenzproblemen ist häufig aber auch nur eine Sprache (und Stimme) installiert.</p>
+<h2>Asynchrone Sprachausgabe</h2>
+<p>In der Defaulteinstellung wird die Verarbeitung erst fort gesetzt, wenn die Sprachausgabe beendet ist. Mit dem Parameter SVSFlagAsync der Methode SPEAK kann die Sprachausgabe jedoch auch asynchron erfolgen. Das ist beispielsweise dann sinnvoll, wenn eine per MESSAGE ausgegebene Meldung auch gesprochen werden soll. Die Meldung sollte dann natürlich nicht erst erscheinen, wenn sie bereits vorab einmal komplett gesprochen wurde&#8230;</p>
+<pre>CALL METHOD OF v_objolevoice 'Speak' = v_objolevoice
+EXPORTING #1 = v_strtotalk
+#2 = 1.  "SVSFlagsAsync</pre>
+<h2>Links</h2>
+<p>Hier der Link zum Artikel:<br />
+<a href="http://abapdn.blogspot.com/2010/09/sap-knows-how-to-speak.html" target="_blank">http://abapdn.blogspot.com/2010/09/sap-knows-how-to-speak.html</a></p>
+<p>Und hier der Link zur API-Dokumentation:<br />
+<a href="http://msdn.microsoft.com/en-us/library/ms723614(v=vs.85).aspx" target="_blank">http://msdn.microsoft.com/en-us/library/ms723614(v=vs.85).aspx</a></p>
+<h1>Kürzer!</h1>
+<p>Hier noch eine kürzere <a title="NES | code.google.com" href="https://code.google.com/p/nes-abapgames/wiki/Hello_World">Variante von Nalon</a>:</p>
+<pre>DATA ovoice TYPE ole2_object.
+CREATE OBJECT ovoice 'SAPI.SpVoice'.
+IF sy-subrc = 0.
+  CALL METHOD OF ovoice 'Speak'
+    EXPORTING #1 = 'Ich will sprechen'.
+ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/speak/">Speak!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Schwarz. Kompakt. Hilfreich. Espresso-Tutorials</title>
+		<link>/blog/schwarz-kompakt-hilfreich-espresso-tutorials/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 29 Jan 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[tutorial]]></category>
+		<category><![CDATA[buch]]></category>
+		<category><![CDATA[epub]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[ebook]]></category>
+		<category><![CDATA[BW]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5235</guid>
+
+					<description><![CDATA[<p>Espresso-Tutorials hat sich auf Themen aus dem Finanzbereich spezialisiert. Aber auch Themen zu Produktionsplanung, BW, CRM und einige mehr stellt der Verlag bereit. Das Angebot soll zudem stark in Richtung Programmierung ausgebaut werden. Auch viele Video-Tutorials erleichtern bei vielen Themen den Einstieg in die Materie.</p>
+<p>Der Beitrag <a href="/blog/schwarz-kompakt-hilfreich-espresso-tutorials/">Schwarz. Kompakt. Hilfreich. Espresso-Tutorials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Unser Medienpartner, der Espresso Tutorials Verlag, hat sein SAP E-Book und SAP Videoangebot weiter ausgebaut.</p>
+<p>Für eine Flatrate von 99 Euro (inkl. MwSt.) erhältst du für ein Jahr Zugang zu allen SAP Inhalten des Verlags.</p>
+<p>Espresso-Tutorials hat sich auf Themen aus dem Finanzbereich spezialisiert. Aber auch Themen zu Produktionsplanung, BW, CRM und einige mehr stellt der Verlag bereit. Das Angebot soll zudem stark in Richtung Programmierung ausgebaut werden. Die Video-Tutorials erleichtern bei vielen Themen den Einstieg in die Materie.</p>
+<p>Auf jeden Fall eine spannende Sache.</p>
+<p>Die Nachschlagewerke können mittels PC, iOS und Android abgerufen werden.</p>
+<p>Gerade die Nutzung mit mobilen Endgeräten dürfte für SAP-Berater, SAP-Experten und Freelancern interessant sein, um von überall darauf zuzugreifen. Für das Jahr 2015 sind bereits mehr als zwanzig zusätzliche Titel zur Veröffentlichung angekündigt. Auch die Neuerscheinungen sollen allen Abonnenten sofort nach Veröffentlichung zugänglich gemacht werden.</p>
+<p>Mit dem Gutscheincode &#8220;<strong><span style="color: #0000ff;">915-885-313</span></strong>&#8221; sparst du 10 Euro Gebühr im ersten Jahr!</p>
+<p>Die enthaltenen Buch- und Videotitel, Konditionen, ein Informationsvideo und eine Bestellmöglichkeit findest du hier:</p>
+<p><a href="http://onleihe.espresso-tutorials.com/"><img decoding="async" class="alignnone size-medium wp-image-5241" src="https://tricktresor.com/wp-content/uploads/2015/01/ET_Webbanner_300x125_2-300x125.jpg" alt="ET_Webbanner_300x125_2" width="300" height="125" /></a></p>
+<p><a href="http://onleihe.espresso-tutorials.com/">http://onleihe.espresso-tutorials.com/</a></p>
+<p>Der Beitrag <a href="/blog/schwarz-kompakt-hilfreich-espresso-tutorials/">Schwarz. Kompakt. Hilfreich. Espresso-Tutorials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid-Erweiterung &#8220;Langtext&#8221;</title>
+		<link>/blog/alv-grid-erweiterung-langtext/</link>
+					<comments>/blog/alv-grid-erweiterung-langtext/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 13 Jun 2014 19:07:40 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[BAdI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4811</guid>
+
+					<description><![CDATA[<p>Immer mal wieder stolpere ich über kleine Perlen im SAP-Standard. Diese Perle ist evtl. in einem älteren System noch nicht vorhanden, aber die Funktionalität finde ich sehr nett. Gut zu wissen, dass es sowas gibt.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-erweiterung-langtext/">ALV-Grid-Erweiterung &#8220;Langtext&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute war Tag der Ablenkung. Nachdem ich in der CL_GUI_ALV_GRID-Klasse etwas herum experimentiert hatte, bin ich nun auch noch über eine Ableitung dieser Klasse mit der Erweiterung <em>Automatische Langtextermittlung</em> gestoßen: Die Klasse heißt CL_ALV_GRID_XT, das zugehörige Demoprogramm lautet R_ALV_GRID_XT.</p>
+<p>Um zu verstehen, was SAP in diesem Fall mit <em>Langtext</em> meint, habe ich eine abgespeckte Demoversion geschrieben. In diesem Programm wird die Tabelle TVKO, die die Definition der Verkaufsorganisationen enthält. Mit der automatischen Langtextermittlung  können Felder definiert werden, die entweder einen beschreibenden Text in einer zugehörigen Customizingtabelle haben, oder bei dem die Werte als Festwerte in der Domäne hinterlegt sind.</p>
+<p>Der Parameter <em>KEEP = X</em> bewirkt, dass das Schlüsselfeld angezeigt wird. Bei <em>KEEP = space</em> wird das Feld automatisch ausgeblendet und es wird nur das Feld mit dem Langtext angezeigt.</p>
+<p>[notice type = &#8216;info&#8217;]Zusätzlich gibt es die Option <em>Ausgabe optimieren</em>. Wird diese Option aktiviert, dann werden bei der Ausgabe alle komplett leeren Spalten ausgeblendet. Ein nettes Feature![/notice]</p>
+<h2>Beschreibung</h2>
+<p>Das Demoprogramm liest die Tabelle TVKO. Die Beschreibung der Verkaufsorganisationen stehen in der Texttabelle TVKOT. Um diese in einem ALV anzuzeigen müsste man entweder einen View bemühen oder die Texte aus der Tabelle manuell nachlesen. Diese Arbeit nimmt uns die Option <em>Automatische Langtextermittlung</em> ab. Um nicht extra eine neue Tabelle bzw. einen Feldkatalog aufbauen zu müssen, verwende ich vorhandene Felder, in die die Langtexte geschrieben werden. Der Name der VKORG kommt in das Feld TXNAM_KOP, der zugehörige Festwert zum Feld BSTYP ins Feld TXNAM_SDB.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_200629.jpg"><img decoding="async" class="alignnone size-full wp-image-4812" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_200629.jpg" alt="Bild_2014_06_13_200629" width="724" height="126" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_200629.jpg 724w, /wp-content/uploads/2014/06/Bild_2014_06_13_200629-300x52.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_200629-624x108.jpg 624w" sizes="(max-width: 724px) 100vw, 724px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT.
+
+PARAMETER p_optim  TYPE xfeld DEFAULT 'X'.
+PARAMETER p_ltxt   TYPE xfeld DEFAULT 'X'.
+PARAMETER p_keep   TYPE xfeld DEFAULT 'X'.
+
+
+DATA gt_autotext   TYPE alv_auto_text_t.
+DATA gt_data       TYPE STANDARD TABLE OF tvko.
+DATA gr_alv        TYPE REF TO cl_alv_grid_xt.
+DATA gr_container  TYPE REF TO cl_gui_custom_container.
+
+
+START-OF-SELECTION.
+  PERFORM start_of_selection.
+
+*---------------------------------------------------------------------*
+*       Form  start_of_selection
+*---------------------------------------------------------------------*
+*       Start program execution
+*---------------------------------------------------------------------*
+FORM start_of_selection.
+
+  PERFORM get_data.
+
+  IF p_ltxt IS NOT INITIAL.
+    PERFORM prep_auto_text.
+  ENDIF.
+
+  CALL SCREEN 100.
+
+ENDFORM.                    "start_of_selection
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  prep_auto_text
+*&amp;---------------------------------------------------------------------*
+FORM prep_auto_text.
+
+  DATA ls_autotext LIKE LINE OF gt_autotext.
+
+  ls_autotext-keep_fieldname_visible = p_keep.
+  ls_autotext-fieldname              = 'VKORG'.
+  ls_autotext-fieldname_longtext     = 'TXNAM_KOP'.
+  INSERT ls_autotext INTO TABLE gt_autotext.
+
+  ls_autotext-keep_fieldname_visible = p_keep.
+  ls_autotext-fieldname              = 'BSTYP'.
+  ls_autotext-fieldname_longtext     = 'TXNAM_SDB'.
+  INSERT ls_autotext INTO TABLE gt_autotext.
+
+ENDFORM.                    "prep_auto_text
+*---------------------------------------------------------------------*
+*       Form  get_data
+*---------------------------------------------------------------------*
+*       Select application data (here SFLIGHT)
+*---------------------------------------------------------------------*
+FORM get_data.
+
+  FIELD-SYMBOLS &lt;data&gt; LIKE LINE OF gt_data.
+
+*== read all sales organizations
+  SELECT * FROM tvko INTO TABLE gt_data.
+
+*== clear fields that shall contain the long text
+  LOOP AT gt_data ASSIGNING <data>.
+    CLEAR &lt;data&gt;-txnam_kop.
+    CLEAR &lt;data&gt;-txnam_sdb.
+  ENDLOOP.
+
+ENDFORM.                    "get_data
+
+*----------------------------------------------------------------------*
+*       Module  d0100_init  OUTPUT
+*----------------------------------------------------------------------*
+*       Initialize ALV Grid screen
+*----------------------------------------------------------------------*
+MODULE d0100_init OUTPUT.
+
+  SET: PF-STATUS '100',
+       TITLEBAR  '100'.
+
+  CHECK gr_container IS INITIAL.
+
+
+*== Create ALV container
+  CREATE OBJECT gr_container
+    EXPORTING
+      container_name = 'ALV_GRID'.
+
+*== Create ALV grid
+  CREATE OBJECT gr_alv
+    EXPORTING
+      i_parent          = gr_container
+      i_optimize_output = p_optim
+      it_auto_text_det  = gt_autotext.
+
+
+* Display ALV data
+  CALL METHOD gr_alv-&gt;set_table_for_first_display
+    EXPORTING
+      i_save                        = 'A'
+      i_structure_name              = 'TVKO'
+    CHANGING
+      it_outtab                     = gt_data
+    EXCEPTIONS
+      invalid_parameter_combination = 1
+      program_error                 = 2
+      too_many_lines                = 3
+      OTHERS                        = 4.
+
+ENDMODULE.                 " d0100_init  OUTPUT
+
+*----------------------------------------------------------------------*
+*       Module  d0100_exit  INPUT
+*----------------------------------------------------------------------*
+MODULE d0100_exit INPUT.
+
+  CALL METHOD: gr_alv-&gt;free,
+               gr_container-&gt;free.
+
+  LEAVE TO SCREEN 0.
+ENDMODULE.                 " d0100_exit  INPUT</pre>
+<h2>Dynpro</h2>
+<p>Das Dynpro 100 muss angelegt werden und der GUI-Status &#8220;100&#8221; ebenfalls. Das PAI-Modul anzupassen, so dass es funktioniert, sollte ein Kinderspiel sein.</p>
+<p>[notice type=&#8217;info&#8217;]Der SAP-Demoreport bietet noch eine Funktionalität mit BAdI <em>BADI_ALV_GRID_XT </em>(Transaktion SE18). Diese werde ich mir evtl. demnächst noch einmal anschauen und berichten. Die Dokumentation verspricht einiges: &#8220;Es ist Ihnen mit Hilfe dieser Daten möglich, kundeneigene Felder im Grid zu füllen, den Feldkatalog zu ändern und sich auf Events des Grid<br />
+Controls zu registrieren, z.B. TOOLBAR oder USER_COMMAND.[/notice]</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/alv-grid-erweiterung-langtext/">ALV-Grid-Erweiterung &#8220;Langtext&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/alv-grid-erweiterung-langtext/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Exporting vs. Returning. Gibt es da Unterschiede?</title>
+		<link>/blog/exporting-vs-returning-gibt-es-da-unterschiede/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 03 Apr 2014 15:15:43 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Performance]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4685</guid>
+
+					<description><![CDATA[<p>Es gibt Funktionalitäten und Prozesse, die man häufig einfach verwendet und nicht im Entferntesten auf die Idee kommt, dass hier Performance relevantes Potential schlummert. Bei der Parameterübergabe schlummert so einiges... </p>
+<p>Der Beitrag <a href="/blog/exporting-vs-returning-gibt-es-da-unterschiede/">Exporting vs. Returning. Gibt es da Unterschiede?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein Kollege ist kürzlich bei der Überarbeitung seines Programmes über eine Meldung aus dem Code Inspector gestolpert:</p>
+<p>[notice type=&#8217;alert&#8217;]==&gt; Der Typ des RETURNING-Parameters &#8220;RETURN_VALUE&#8221; enthält eine oder mehrere Strings (Siehe Test-Dokumentation).[/notice]</p>
+<p>Die Meldung hat verwundert, da die Übergabe eines Strings als RETURNING-Parameter eigentlich nichts &#8220;Böses&#8221; ist. Die Erklärung der Meldung ist jedoch einleuchtend:</p>
+<p>[boxes type=&#8217;light&#8217; title=&#8217;Inperformante Parameterübergabe&#8217;]Bei der Parameter-Übergabe in ABAP gibt es die Modi Referenz-Übergabe (keine oder Kennzeichnung reference(PARAM)) und Wert-Übergabe (Kennzeichnung value(PARAM) ). Es gilt allgemein die Regel, dass Wert-Übergabe immer langsamer als Referenz-Übergabe ist. Der Performance-Nachteil ist immer mindestens 40 % und kann abhängig vom Datentyp und Datenvolumen auf mehrere 1000 % Prozent steigen.</p>
+<p>STR: Der Typ des VALUE-Parameters enthält keine Tabellen aber Strings. In diesem Fall findet bei Parameter-Übergabe ein String-Sharing statt, was aber relativ aufwändig ist. Der Performance-Nachteil gegenüber Referenz-Übergabe beträgt hier bei ca. 700 %. Dieser Wert gilt nur für den Fall dass der Parameter nicht geändert wird. Erfolgt eine Änderung steigt dieser Wert noch weiter an.[/boxes]</p>
+<p>[boxes type=&#8217;light&#8217; title=&#8217;Rückgabe-Parameter (RETURNING)&#8217;]Da RETURNING-Parameter immer VALUE-Parameter sind, ist hier eine Performance-Verbesserung nur durch Änderung der Parameter-Art möglich. Der RETURNING-Value-Parameter muss in einen EXPORTING-Reference-Parameter umgewandelt werden.[/boxes]</p>
+<h2>String-Sharing</h2>
+<p>Die Erklärung des Code Inspectors scheint schlüssig. Mit einem Testprogramm wollte ich die Performance-Unterschiede testen. Das Programm verwendet zwei Methoden, die jeweils einen String zurück geben. Vor Ausführung kann festgelegt werden, wie groß der String werden soll (Parameter P_LENTH) und wie oft die Methoden ausgeführt werden sollen (Parameter P_TIMES).</p>
+<p>Es ist schnell ersichtlich, dass bei Zunahme der String-Größe die Ausführungszeit tatsächlich signifikant steigt. Bei kurzen Strings (~100 Bytes) ist die RETURNING-Variante etwa 25% langsamer.<br />
+[accordian]<br />
+[accordian_list title=&#8217;Testprogramm &lt;&lt;hier aufklappen&gt;&gt;&#8217;]</p>
+<pre>REPORT.
+
+PARAMETERS p_times  TYPE i DEFAULT 10000.
+PARAMETERS p_length TYPE i DEFAULT 10000.
+
+*----------------------------------------------------------------------*
+*       CLASS l DEFINITION
+*----------------------------------------------------------------------*
+CLASS l DEFINITION.
+  PUBLIC SECTION.
+    CLASS-DATA teststring TYPE string.
+    CLASS-METHODS ret RETURNING value(val) TYPE string.
+    CLASS-METHODS imp EXPORTING val TYPE string.
+    CLASS-METHODS testdata IMPORTING len TYPE i.
+ENDCLASS.                    "l DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS l IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS l IMPLEMENTATION.
+  METHOD testdata.
+    DO len TIMES.
+      CONCATENATE teststring 'A' INTO teststring.
+    ENDDO.
+  ENDMETHOD.                    "class_constructor
+
+  METHOD ret.
+    val = teststring.
+  ENDMETHOD.                    "ret
+
+  METHOD imp.
+    val = teststring.
+  ENDMETHOD.                    "imp
+ENDCLASS.                    "l IMPLEMENTATION
+
+*== data
+DATA start TYPE i.
+DATA stopp TYPE i.
+DATA result TYPE i.
+DATA string TYPE string.
+
+START-OF-SELECTION.
+
+  l=&gt;testdata( p_length ).
+*== test RETURNING
+  GET RUN TIME FIELD start.
+  DO p_times TIMES.
+    string = l=&gt;ret( ).
+  ENDDO.
+  GET RUN TIME FIELD stopp.
+
+  result = stopp - start.
+  WRITE: / 'Returning', result.
+
+*== Test EXPORTING
+  GET RUN TIME FIELD start.
+  DO p_times TIMES.
+    l=&gt;imp( IMPORTING val = string ).
+  ENDDO.
+  GET RUN TIME FIELD stopp.
+
+  result = stopp - start.
+  WRITE: / 'Exporting', result.</pre>
+<p>[/accordian_list]<br />
+[/accordian]</p>
+<h2>Fazit</h2>
+<p>Im Normalfall würde ich bei Rückgabe eines String-Feldes immer die RETURNING-Variante wählen, da sie &#8220;schöner&#8221; ist. Die direkte Wertübergabe, die RETURNING möglich macht, macht das Coding eleganter und verständlicher. Wenn mit großen Strings gearbeitet wird und diese Verarbeitung zudem sehr oft durchgeführt wird, solltest du dich jedoch an diesen Artikel erinnern&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Der Beitrag <a href="/blog/exporting-vs-returning-gibt-es-da-unterschiede/">Exporting vs. Returning. Gibt es da Unterschiede?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Shortcode implementieren</title>
+		<link>/blog/shortcode-implementieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Jan 2014 10:54:21 +0000</pubDate>
+				<category><![CDATA[Wordpress]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4332</guid>
+
+					<description><![CDATA[<p>In diesem Artikel erkläre ich, wie man einen Wordpress-shortcode ohne Hilfsmittel in der functions.php hinzufügt. Der Shortcode kann dann in allen Wordpress-Seiten und Beiträgen verwendet werden.</p>
+<p>Der Beitrag <a href="/blog/shortcode-implementieren/">Shortcode implementieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In dem Artikel <a title="Shortcode Exec PHP [Plugin]" href="https://tricktresor.com/blog/shortcode-exec-php-plugin/" target="_blank">Shortcode Exec PHP</a> habe ich gezeigt, wie man mithilfe des gleichnamigen Plugins selbst Shortcodes erstellen kann. So erstelle Shortcodes haben den Vorteil, dass man sie an einer Stelle im WordPress-Backend wieder finden kann. Der Nachteil ist, dass man ein weiteres Plugin benötigt.</p>
+<p>Wer also einmal einen Shortcode definieren möchte und ansonsten keine &#8220;Shortcode-Verwaltung&#8221; benötigt, kann einen Shortcode auch in der functions.php hinzufügen:</p>
+<pre>function show_time_code($atts, $content = null) {
+    $uhrzeit = date("H:i“, time());
+    return '&lt;i&gt;' . $content . ' ' . $uhrzeit . '&lt;/i&gt;'; 
+}</pre>
+<pre>add_shortcode("show_time","show_time_code");</pre>
+<p>Aufgerufen wird der shortcode dann mit:</p>
+<pre>[show_time]Uhrzeit:[/show_time]</pre>
+<p>Das Ergebnis sieht dann in etwa so aus:</p>
+<pre>Uhrzeit: 12:43</pre>
+<div>[notice type=&#8217;info&#8217;]Die komplette Dokumentation zu der WordPress-Funktion <a title="Shortcode API | WordPress Codex" href="http://codex.wordpress.org/Shortcode_API" target="_blank">add_shortcode gibt es im WordPress Codex</a>.[/notice]</div>
+<p>Der Beitrag <a href="/blog/shortcode-implementieren/">Shortcode implementieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>BinFile2ABAP</title>
+		<link>/blog/binfile2abap/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Tue, 20 Nov 2012 20:12:02 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=660</guid>
+
+					<description><![CDATA[<p>Dateien jeglichen Formats als ABAP-Funktionsbaustein bereitstellen: Viele Informationen sind in unterschiedlichen Dateien gespeichert und liegen h&#228;ufig in unterschiedlichsten Formaten vor. Dabei k&#246;nnen jedoch diese Informationen f&#252;r den Endanwender oftmals von gro&#223;er Bedeutung sein und dann entsteht die Frage, wie k&#246;nnen diese Informationen zum Endanwender gelangen. BinFile2ABAP bietet die M&#246;glichkeit dieses Problem zu l&#246;sen. </p>
+<p>Der Beitrag <a href="/blog/binfile2abap/">BinFile2ABAP</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><strong>Dateien jeglichen Formats als ABAP-Source bereitstellen</strong></p>
+<p>Viele Informationen sind in unterschiedlichen Dateien gespeichert und liegen häufig in unterschiedlichsten Formaten vor. Dabei können jedoch diese Informationen für den Endanwender oftmals von großer Bedeutung sein und dann entsteht die Frage, wie können diese Informationen zum Endanwender gelangen. BinFile2ABAP bietet eine Möglichkeit dieses Problem zu lösen, neben dem MIME Repository.</p>
+<figure id="attachment_931639" aria-describedby="caption-attachment-931639" style="width: 300px" class="wp-caption alignnone"><img loading="lazy" decoding="async" class="size-medium wp-image-931639" src="https://tricktresor.com/wp-content/uploads/2012/11/stefanschnell_binfile2abap001-300x277.jpg" alt="BinFile2ABAP" width="300" height="277" srcset="/wp-content/uploads/2012/11/stefanschnell_binfile2abap001-300x277.jpg 300w, /wp-content/uploads/2012/11/stefanschnell_binfile2abap001-768x708.jpg 768w, /wp-content/uploads/2012/11/stefanschnell_binfile2abap001.jpg 902w" sizes="(max-width: 300px) 100vw, 300px" /><figcaption id="caption-attachment-931639" class="wp-caption-text">BinFile2ABAP</figcaption></figure>
+<p>Mit BinFile2ABAP kann jede Datei in ein ABAP-Funktionsbaustein eingebettet werden. Die Datei wird dazu in ein ABAP-Quellcode umgewandelt und als Funktionsbaustein, Report oder Form-Routine bereit gestellt. Mit Aufruf dieses Funktionsbausteines, Report oder Form-Routine wird die eingebettete Datei auf dem Präsentationsserver gespeichert und, je nach Operationsart, kopiert, ausgeführt oder bei einer COM-DLL auch registriert. Wenn die Operationsart mit synchronen Modus und Löschung gewählt wurde, wird die gespeicherte Datei nach der Ausführung auch wieder gelöscht.</p>
+<p>Weitere Optionen sind die Nutzung eines alternativen Pfades, wenn das SAP-Arbeitsverzeichnis nicht gepflegt ist, und die Nutzung eines alternativen Programmnamens, hier saplogon.exe, im Falle scharfer Umgebungsrestriktionen auf dem Präsentationsserver. Selbst in äußerst geschlossenen Umgebungen kann dieses Vorgehen verwendet. Diverse Tests in Citrix-Umgebungen mit produktiven Systemen haben dies bewiesen.</p>
+<p>Darüber hinaus kann BinFile2ABAP die Dateien auch als JSON-Datei bereitstellen. Auf diesem Wege kann eine Backend-Anbindung via OData für UI5 simuliert werden.</p>
+<p>Mit dieser Möglichkeit kann der Entwickler auf einfachste Weise die Informationen integrieren und ausliefern. Dem Endanwender kann so die Information punktgenau zur Verfügung gestellt werden. Jeder Dateityp kann in ein ABAP-Programm integriert werden, z.B. Adobe Portable Document Format (PDF) oder Flash, Compiled HTML Help (CHM), alle Bild-, Sound- und Video-Formate usw. usw.</p>
+<p>So kann beispielsweise eine Trainingsdokumentation zu einem Programm ein- und angebunden werden. Der Aufruf der Dokumentation wird mit einem Button verknüpft und wenn der Endanwender diesen Button betätigt, wird die Trainingsdokumentation im PDF-Format geöffnet und vom lokalen Adobe Reader angezeigt.</p>
+<p>BinFile2ABAP ist Freeware und kann von <a href="http://www.stschnell.de/">www.stschnell.de</a> heruntergeladen werden, oder alternativ <a title="hier" href="http://www.stschnell.de/binfile2abap.zip" target="_blank">hier</a> der direkte Link.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/binfile2abap/">BinFile2ABAP</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Dokumentation anzeigen (2)</title>
+		<link>/blog/dokumentation-anzeigen-2/</link>
+					<comments>/blog/dokumentation-anzeigen-2/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 May 2010 13:15:43 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[style]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=543</guid>
+
+					<description><![CDATA[<p>Update f&#252;r die Anzeige der Dokumentation im Docking Container. Die Routine wurde erweitert und HTML so aufbereitet, dass die Doku wie die SAP-Dokumentation aussieht.</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen-2/">Dokumentation anzeigen (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Update für die Anzeige der Dokumentation im Docking Container. Die Routine wurde erweitert und HTML so aufbereitet, dass die Doku wie die SAP-Dokumentation aussieht.</p>
+<p>In dieser Version stelle ich Ihnen eine fertige Methode vor, die nur noch im Zeitpunkt 19 des Tabellenpflegedialoges oder in Zeitpunkt 03 des Viewclusters eingebunden werden muss.</p>
+<p>Die Aufbereitung erfolgt analog zu der SAP-Doku und sieht &#8220;etwas schicker&#8221; aus:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Tabellenpflegedialog/hc_328.jpg" /></p>
+<p>Zusätzlich kann eine alternative Dokumentation übergeben werden, die angezeigt wird, wenn die Doku zur Tabelle nicht vorhanden ist.</p>
+<h2 class="head1">Vorbereitungen</h2>
+<h3 class="head2">Methode anlegen</h3>
+<p>Legen Sie sich eine Klasse, wie z.B. ZCL_MAINTENANCE_TOOLS an und implementieren Sie die statische PUBLIC-Methode SHOW_DOCU:</p>
+<p>Importing-Parameter:</p>
+<ul>
+<li>IV_TABLE TYPE C &#8220;Tabellenname&#8221;</li>
+<li>IV_ALDOC  TYPE C &#8220;Alternative Dokumentation SE61&#8221;</li>
+</ul>
+<h3 class="head2">Globale Attribute</h3>
+<p>Legen Sie folgende statische private Attribute an:</p>
+<pre class="lang:abap decode:true ">GR_DOCK    Type Ref To CL_GUI_DOCKING_CONTAINER
+GR_HTML    Type Ref To CL_GUI_HTML_VIEWER
+GV_TABLE   Type C</pre>
+<h3 class="head1">Aufruf Tabellenpflegedialog</h3>
+<h3 class="text1">Zeitpunkt 19</h3>
+<p class="sap1">  CALL METHOD zcl_maintenance_tools=&gt;show_docu<br />
+EXPORTING<br />
+iv_table = vcl_akt_view<br />
+iv_aldoc = &#8216;ZZT_ALTDOC_TABLE_ZZABC&#8217;.</p>
+<h2 class="head1">Aufruf Viewcluster</h2>
+<h3 class="text1">Zeitpunkt 03</h3>
+<p class="sap1">  IF master_name = x_header-viewname.<br />
+CALL METHOD zcl_maintenance_tools=&gt;show_docu<br />
+EXPORTING<br />
+iv_table = x_header-viewname.<br />
+ENDIF.</p>
+<p class="text1"><strong><u>HINWEIS:<br />
+</u></strong>Die alternative Dokumentation muss in der SE61 als &#8220;Text im Dialog&#8221; angelegt werden.</p>
+<h2 class="head1">Eigene Anpassungen</h2>
+<p class="text1">Leider werden in den gerufenen Standard-Routinen nicht alle HTML-Tags &#8220;schön&#8221; angepasst. Die Tabellendefinitionen werden zum Beispiel nicht geändert.</p>
+<p class="text1">Hier kann man aber manuell einfach Abhilfe schaffen:</p>
+<pre class="lang:abap decode:true ">*** set table cells to size 2
+      REPLACE ALL  OCCURRENCES OF '&lt;td&gt;' IN TABLE lt_html
+         WITH '&lt;td&gt;&lt;font FACE="Arial" SIZE=2&gt;'.        
+*** set table border "dashed" and grey background
+      REPLACE ALL  OCCURRENCES OF '&lt;table&gt;' IN TABLE lt_html
+         WITH '&lt;table style="border:thin dashed blue" width="100%" cellpadding=3 bgcolor=#E0E0E0&gt;'.</pre>
+<p class="text1">Das Ergebnis sieht dann so aus:</p>
+<p class="text1"><img decoding="async" src="/wp-content/uploads/tt_images/table_doku.jpg" /></p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true ">METHOD show_docu.
+
+*** Local data
+  DATA lt_lines            TYPE STANDARD TABLE OF tline.
+  DATA ls_header           TYPE thead.
+  DATA lt_html             TYPE STANDARD TABLE OF  htmlline.
+  DATA lv_url              TYPE c LENGTH 500.
+  DATA lv_table            TYPE doku_obj.
+  DATA lv_spras            TYPE sylangu.
+  DATA lt_conv_charformats TYPE TABLE OF tline.
+  DATA lt_conv_parformats  TYPE TABLE OF tline.
+
+
+*** has anything changed??
+  CHECK gv_table &lt;&gt; iv_table.
+
+  lv_table = iv_table.
+
+***  Read table docu
+  CALL FUNCTION 'DOCU_GET'
+    EXPORTING
+      id     = 'TB'
+      langu  = sy-langu
+      object = lv_table
+    IMPORTING
+      head   = ls_header
+    TABLES
+      line   = lt_lines
+    EXCEPTIONS
+      OTHERS = 5.
+  IF sy-subrc &gt; 0.
+*** try other language
+    CASE sy-langu.
+      WHEN 'D'.
+        lv_spras = 'E'.
+      WHEN 'E'.
+        lv_spras = 'D'.
+      WHEN 'F'.
+        lv_spras = 'E'.
+    ENDCASE.
+*** read docu in other language
+    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'TB'
+        langu  = lv_spras
+        object = lv_table
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = lt_lines
+      EXCEPTIONS
+        OTHERS = 5.
+  ENDIF.
+
+***  Read alternative docu
+  IF lt_lines IS INITIAL AND iv_aldoc IS NOT INITIAL.
+*** read alternative docu (Dialog Text)
+    lv_table = iv_aldoc.
+    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'DT'
+        langu  = sy-langu
+        object = lv_table
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = lt_lines
+      EXCEPTIONS
+        OTHERS = 5.
+    IF sy-subrc &gt; 0.
+*** read alternative docu (Dialog Text) in different language
+      CALL FUNCTION 'DOCU_GET'
+        EXPORTING
+          id     = 'DT'
+          langu  = lv_spras
+          object = lv_table
+        IMPORTING
+          head   = ls_header
+        TABLES
+          line   = lt_lines
+        EXCEPTIONS
+          OTHERS = 5.
+
+    ENDIF.
+  ENDIF.
+
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Build controls
+*** _______________________________________________________________ ***
+***                                                                 ***
+
+  IF gr_dock IS INITIAL.
+*** create docking container
+    CREATE OBJECT gr_dock
+      EXPORTING
+        side                    = cl_gui_docking_container=&gt;dock_at_right
+        extension               = 400
+        no_autodef_progid_dynnr = 'X'.
+  ENDIF.
+
+
+  IF lt_lines IS INITIAL.
+*** No doku: Set controls to invisible
+    IF gr_html IS BOUND.
+      CALL METHOD gr_html-&gt;set_visible
+        EXPORTING
+          visible = space.
+    ENDIF.
+
+    IF gr_dock IS BOUND.
+      CALL METHOD gr_dock-&gt;set_visible
+        EXPORTING
+          visible = space.
+    ENDIF.
+  ELSE.
+*** Doku exists: Set controls visible
+    IF gr_html IS BOUND.
+      CALL METHOD gr_html-&gt;set_visible
+        EXPORTING
+          visible = 'X'.
+    ENDIF.
+    IF gr_dock IS BOUND.
+      CALL METHOD gr_dock-&gt;set_visible
+        EXPORTING
+          visible = 'X'.
+    ENDIF.
+  ENDIF.
+
+
+  IF lt_lines IS NOT INITIAL.
+*** doku exists:
+    IF gr_html IS INITIAL.
+*** Create HTML-Control
+      CREATE OBJECT gr_html
+        EXPORTING
+          parent = gr_dock.
+    ENDIF.
+
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Convert character and parameter formats
+*** _______________________________________________________________ ***
+***                                                                 ***
+    IF lt_conv_parformats IS INITIAL.
+      PERFORM build_mapping_tables   IN PROGRAM rshtmimg_2
+       TABLES lt_conv_charformats
+              lt_conv_parformats.
+    ENDIF.
+
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Convert Docu to HTML
+*** _______________________________________________________________ ***
+***                                                                 ***
+
+    CALL FUNCTION 'CONVERT_ITF_TO_HTML'
+      EXPORTING
+        i_header           = ls_header
+      TABLES
+        t_itf_text         = lt_lines
+        t_html_text        = lt_html
+        t_conv_charformats = lt_conv_charformats
+        t_conv_parformats  = lt_conv_parformats
+      EXCEPTIONS
+        syntax_check       = 1
+        replace            = 2
+        illegal_header     = 3
+        OTHERS             = 4.
+    IF sy-subrc = 0.
+
+*** Convert Tables
+      PERFORM convert_tables IN PROGRAM rshtmimg_2 TABLES lt_html.
+*** Set colours (Make text look like SAP documentation)
+      PERFORM set_colors     IN PROGRAM rshtmimg_2 TABLES lt_html.
+
+*** Push data to control
+      CALL METHOD gr_html-&gt;load_data
+        IMPORTING
+          assigned_url = lv_url
+        CHANGING
+          data_table   = lt_html
+        EXCEPTIONS
+          OTHERS       = 4.
+
+      IF sy-subrc = 0.
+*** _______________________________________________________________ ***
+***                                                                 ***
+***  Display HTML-Text
+*** _______________________________________________________________ ***
+***                                                                 ***
+
+        CALL METHOD gr_html-&gt;show_url
+          EXPORTING
+            url = lv_url.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+ENDMETHOD.
+
+</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen-2/">Dokumentation anzeigen (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokumentation-anzeigen-2/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dokumentation anzeigen</title>
+		<link>/blog/dokumentation-anzeigen/</link>
+					<comments>/blog/dokumentation-anzeigen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 06 May 2009 19:23:35 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Viewcluster]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Eigenes]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=520</guid>
+
+					<description><![CDATA[<p>Der Tabellenpflegedialog hat einige kleine Ungereimtheiten. Dazu geh&#246;rt zum Beispiel auch, dass man keine M&#246;glichkeiten hat, die Dokumentation der Tabelle anzusehen. W&#228;re das so, so k&#246;nnte man hier den Zweck und Pflegehinweise hinterlegen. Mit einer kleinen Programmierung - die zwecks Mehrfachverwendung einfach in einer Methode gekapselt werden kann - wird dem Anwender die Hilfe in einem Docking-Fenster angezeigt.</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen/">Dokumentation anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der Tabellenpflegedialog hat einige kleine Ungereimtheiten. Dazu gehört zum Beispiel auch, dass man keine Möglichkeiten hat, die Dokumentation der Tabelle anzusehen. Wäre das so, so könnte man hier den Zweck und Pflegehinweise hinterlegen. Mit einer kleinen Programmierung &#8211; die zwecks Mehrfachverwendung einfach in einer Methode gekapselt werden kann &#8211; wird dem Anwender die Hilfe in einem Docking-Fenster angezeigt.</p>
+<p>So sieht das Ergebnis in etwa aus:<img loading="lazy" decoding="async" src="/wp-content/uploads/tt_images/Tabellenpflegedialog/eck_135.jpg" width="519" height="241" /></p>
+<h2 class="head1">Vorgehen</h2>
+<p>Gehen Sie in den Tabellenpflegedialog und wählen Sie <em>Umfeld &#8211; Modifikation &#8211; Zeitpunkte</em>.</p>
+<p>Tragen Sie dann den Zeitpunkt &#8220;19&#8221; ein:</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/Tabellenpflegedialog/eck_134.jpg" /></p>
+<p>Springen Sie in den Editor und legen Sie das folgende Coding an:</p>
+<pre class="sap1"><span style="color: #fb2412;">*** GLOBALE DATEN
+</span>DATA gr_docking TYPE REF TO cl_gui_docking_container.
+DATA gr_control TYPE REF TO cl_gui_html_viewer.
+DATA gt_lines   TYPE STANDARD TABLE OF tline.
+
+<span style="color: #fb2412;">*&amp;---------------------------------------------------------------------*
+*&amp;      Form  zz_show_docu
+*&amp;---------------------------------------------------------------------*
+</span>FORM zz_show_docu.
+
+<span style="color: #fb2412;">*** LOKALE DATEN
+</span>  DATA lv_size     TYPE i.
+  DATA ls_header   TYPE thead.
+  DATA lt_html     TYPE STANDARD TABLE OF  htmlline.
+  DATA lv_url      TYPE c LENGTH 500.
+  DATA lv_viewname TYPE dokhl-object.
+
+<span style="color: #fb2412;">*** DOCKING CONTROL BEREITS ERZEUGT?</span>
+  IF gr_docking IS INITIAL.
+    MOVE x_header-viewname TO lv_viewname.
+
+<span style="color: #fb2412;">*** Lesen der Doku zur Tabelle
+</span>    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'TB'
+        langu  = sy-langu
+        object = lv_viewname
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = gt_lines
+      EXCEPTIONS
+        OTHERS = 5.
+
+    IF gt_lines IS INITIAL.
+<span style="color: #fb2412;">*** Keine Doku da: Control mit größe 0 erzeugen</span>
+      lv_size = 0.
+    ELSE.
+<span style="color: #fb2412;">*** Doku vorhanden: Breite 400 Pixel</span>
+      lv_size = 400.
+    ENDIF.
+
+<span style="color: #fb2412;">*** Dockingcontainer erzeugen</span>
+    CREATE OBJECT gr_docking
+      EXPORTING
+        side                    = cl_gui_docking_container=&gt;dock_at_right
+        extension               = lv_size
+        no_autodef_progid_dynnr = 'X'.
+
+    IF gt_lines IS NOT INITIAL.
+
+<span style="color: #fb2412;">*** HTML-Control erzeugen</span>
+      CREATE OBJECT gr_control
+        EXPORTING
+          parent = gr_docking.
+
+<span style="color: #fb2412;">*** Doku in HTML umwandeln</span>
+      CALL FUNCTION 'CONVERT_ITF_TO_HTML'
+        EXPORTING
+          i_header       = ls_header
+        TABLES
+          t_itf_text     = gt_lines
+          t_html_text    = lt_html
+        EXCEPTIONS
+          syntax_check   = 1
+          replace        = 2
+          illegal_header = 3
+          OTHERS         = 4.
+      IF sy-subrc = 0.
+<span style="color: #fb2412;">*** HTML-Daten ins Control schieben</span>
+        CALL METHOD gr_control-&gt;load_data
+          IMPORTING
+            assigned_url = lv_url
+          CHANGING
+            data_table   = lt_html
+          EXCEPTIONS
+            OTHERS       = 4.
+        IF sy-subrc = 0.
+<span style="color: #fb2412;">*** Und HTML-Text anzeigen</span>
+          CALL METHOD gr_control-&gt;show_url
+            EXPORTING
+              url = lv_url.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.</pre>
+<p><strong><u>Hinweis:</u><br />
+</strong>Wenn man in die Tabellenpflege mit SM30 einsteigt, dann bleibt der Dockingcontainer erhalten. Machen Sie am besten eine Transaktion daraus und dann sieht es wirklich professionell aus.</p>
+<h3 class="head1">Viewcluster</h3>
+<p>Bei der Verwendung in einem Viewcluster muss der Zeitpunkt 03 verwendet werden.</p>
+<p>Viewcluster benötigen ein eigenes Programm, in dem das Coding abgelegt wird. Hier muss das Include LSVCMCOD eingebunden werden, damit Sie Zugriff auf alle notwendigen Daten des Viewclusters haben.</p>
+<p><u><strong>Tipp:<br />
+</strong></u>Lagern Sie die Funktion in eine Methode aus und übergeben Sie den Namen der gerade aktiven Tabelle (VCL_AKT_VIEW). Dann können Sie in der Methode prüfen, ob die Tabelle gewechselt wurde und in diesem Fall die entsprechende Dokumentation nachlesen.</p>
+<h3>Tipps zur Formatierung</h3>
+<p>Das Layout des Textes ist nacktes HTML und entspricht so gar nicht dem der üblichen Hilfe in SAP. Wenn du die Formatierung anpassen möchtest, kannst du dir die Klasse CL_EPSS_SAPEVENT bzw. deren Methode LINES_DISPLAY mal ansehen. Hier wird der HTML-Text für die SAP Hilfe generiert. Verwendet werden hierfür die Funktiosnbausteine SE_CONVERT_ITF_TO_HTML und EPSS_STYLE_RECEIVE. Das Umwandeln von SAP-Ikonen wurde zwar auch versuchsweise nachgebaut, ist für die Anzeige aber eher nur nettes Beiwerk.</p>
+<p>Der Beitrag <a href="/blog/dokumentation-anzeigen/">Dokumentation anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokumentation-anzeigen/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Speichern per Pflegedialog</title>
+		<link>/blog/speichern-per-pflegedialog/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 21 Jul 2008 14:50:57 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=502</guid>
+
+					<description><![CDATA[<p>Mithilfe von Pflegeviews bietet sich auch die interessante M&#246;glichkeit, Daten vor der Speicherung dem Anwender zu pr&#228;sentieren. So k&#246;nnen Daten per Datei hochgeladen werden und im Pflegedialog angezeigt werden. Hier werden automatisch Fremdschl&#252;sselpr&#252;fungen durchgef&#252;hrt und die Daten k&#246;nnen vom Anwender gepr&#252;ft und gegebenenfalls nachbearbeitet werden.</p>
+<p>Der Beitrag <a href="/blog/speichern-per-pflegedialog/">Speichern per Pflegedialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Mithilfe von Pflegeviews bietet sich auch die interessante Möglichkeit, Daten vor der Speicherung dem Anwender zu präsentieren. So können Daten per Datei hochgeladen werden und im Pflegedialog angezeigt werden. Hier werden automatisch Fremdschlüsselprüfungen durchgeführt und die Daten können vom Anwender geprüft und gegebenenfalls nachbearbeitet werden.</p>
+
+
+
+<p>Mithilfe des folgenden Codings werden zwei Tabelleneinträge zum View ZXX generiert. Um zu verhindern, dass der Anwender eigene Zeile einfügt, werden die beiden Funktionscodes &#8220;New Line&#8221; und &#8220;Kopieren&#8221; ausgeblendet.</p>
+
+
+
+<p>Damit das Ganze funktioniert, muss&nbsp;zu dem View/ der Tabelle ein Tabellenpflegedialog vorhanden sein. Entgegen der Dokumentation wird kein Pflegedialog angelegt, wenn der Parameter GENERATE_MAINT_TOOL_IF_MISSING mitgegeben wird.</p>
+
+
+
+<p class="has-luminous-vivid-amber-background-color has-background has-medium-font-size"><u><strong>TIPP:<br></strong></u>Bereits auf der Datenbank vorhandene Daten müssen das ACTION-Kennzeichen &#8220;U&#8221; bekommen. Ansonsten gibt es einen Kurzdump (INSERT_DUPREC).</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<pre class="wp-block-code"><code>TYPES: BEGIN OF ty_xx.
+        INCLUDE STRUCTURE zxx.
+        INCLUDE STRUCTURE vimflagtab.
+TYPES: END OF ty_xx.
+
+DATA lt_xx TYPE STANDARD TABLE OF ty_xx.
+DATA ls_xx TYPE ty_xx.
+DATA lt_fc TYPE STANDARD TABLE OF vimexclfun.
+
+START-OF-SELECTION.
+
+*** Funktionen "Neue Zeile" und "Kopieren" deaktivieren
+  APPEND 'NEWL' TO lt_fc.
+  APPEND 'KOPE' TO lt_fc.
+
+*** 1. neue Zeile
+  ls_xx-mandt   = sy-mandt.
+  ls_xx-feld1   = 'A1000'.
+  ls_xx-action  = 'N'.
+  APPEND ls_xx TO lt_xx.
+
+*** 1. neue Zeile
+  ls_xx-mandt   = sy-mandt.
+  ls_xx-feld1   = 'B2000'.
+  ls_xx-action  = 'N'.
+  APPEND ls_xx TO lt_xx.
+
+*** Daten präsentieren
+  CALL FUNCTION 'VIEW_MAINTENANCE_GIVEN_DATA'
+    EXPORTING
+      action                         = 'U'
+      view_name                      = 'ZXX'
+    TABLES
+      data                           = lt_xx
+      excl_cua_funct                 = lt_fc
+    EXCEPTIONS
+      OTHERS                         = 13.</code></pre>
+</div></div>
+<p>Der Beitrag <a href="/blog/speichern-per-pflegedialog/">Speichern per Pflegedialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Anzeige der Programmdokumentation</title>
+		<link>/blog/anzeige-der-programmdokumentation/</link>
+					<comments>/blog/anzeige-der-programmdokumentation/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 22 May 2008 14:14:01 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=480</guid>
+
+					<description><![CDATA[<p>Mit dem Baustein RS_TOOL_ACCESS oder DSYS_SHOW kann die Programmdokumentation angezeigt werden. Die erfolgt jedoch nur als "Liste". Sch&#246;ner ist es mit der folgenden L&#246;sung, mit der eine Programmdokumenation gleich als Druckvorschau angezeigt wird</p>
+<p>Der Beitrag <a href="/blog/anzeige-der-programmdokumentation/">Anzeige der Programmdokumentation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit dem Baustein RS_TOOL_ACCESS oder DSYS_SHOW kann die Programmdokumentation angezeigt werden. Die erfolgt jedoch nur als &#8220;Liste&#8221;. Sch&ouml;ner ist es mit der folgenden L&ouml;sung, mit der eine Programmdokumenation gleich als Druckvorschau angezeigt wird<br /><P class="head1">Beispiel</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/abap/preview.jpg"><BR>Eine Vorschau der Programmdokumentation</P></TD></TR></TBODY></TABLE></P><P class="head1">Info</P><P class="text1">Die Absatzformate werden grafisch ansprechend angezeigt. Fettschrift ist auch als solche zu erkennen. Auch die &Uuml;berschriften U1 und U2 werden umgesetzt.</P><P class="head1">Coding</P><P class="sap1">DATA lt_tlines TYPE STANDARD TABLE OF tline.<BR>DATA ls_head&nbsp;&nbsp; TYPE thead.<BR>DATA ls_opt&nbsp;&nbsp;&nbsp; TYPE itcpo.<BR>DATA ls_dokil&nbsp; TYPE dokil.</P><P class="sap1"><FONT color="#fb2412">*** Get index<BR></FONT>CALL FUNCTION &#8216;DOCU_EXIST_CHECK&#8217;<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;RE&#8217;<BR>&nbsp;&nbsp;&nbsp; langu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = sy-langu<BR>&nbsp;&nbsp;&nbsp; object&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;ZZMYREPORT&#8217;<BR>&nbsp;&nbsp;&nbsp; typ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216;<BR>&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp; docu_index = ls_dokil<BR>&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp; = 5.</P><P class="sap1">IF sy-subrc = 0.<BR><FONT color="#fb2412">*** Read docu lines</FONT><BR>&nbsp; CALL FUNCTION &#8216;DOCU_READ&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_dokil-id<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; langu&nbsp;&nbsp; = ls_dokil-langu<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; object&nbsp; = ls_dokil-object<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; typ&nbsp;&nbsp;&nbsp;&nbsp; = ls_dokil-typ<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; version = ls_dokil-version<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; head&nbsp;&nbsp;&nbsp; = ls_head<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; line&nbsp;&nbsp;&nbsp; = lt_tlines.</P><P class="sap1"><FONT color="#fb2412">*** Read printer options</FONT><BR>&nbsp; SELECT SINGLE spld FROM usr01 INTO ls_opt-tddest<BR>&nbsp;&nbsp;&nbsp; WHERE bname = sy-uname.<BR>&nbsp; IF ls_opt-tddest IS INITIAL.<BR>&nbsp;&nbsp;&nbsp; ls_opt-tddest = &#8216;LOCL&#8217;.<BR>&nbsp; ENDIF.<BR>&nbsp; ls_opt-tdprinter = &#8216;PRINTER&#8217;.<BR>&nbsp; ls_opt-tdnoprint = &#8216;X&#8217;.<BR>&nbsp; ls_opt-tdpreview = &#8216;X&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Call preview</FONT><BR>&nbsp; CALL FUNCTION &#8216;PRINT_TEXT&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; device&nbsp; = &#8216;PRINTER&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dialog&nbsp; = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; header&nbsp; = ls_head<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OPTIONS = ls_opt<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lines&nbsp;&nbsp; = lt_tlines<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp; = 11.</P><P class="sap1">ENDIF.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/anzeige-der-programmdokumentation/">Anzeige der Programmdokumentation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/anzeige-der-programmdokumentation/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

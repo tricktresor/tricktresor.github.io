@@ -1,0 +1,1072 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>toolbar Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/toolbar/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 15 Jun 2018 07:54:36 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>toolbar Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Mehrfachselektion mit Menu</title>
+		<link>/blog/mehrfachselektion-mit-menu/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 09 Jan 2018 13:00:30 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Mehrfachselektion]]></category>
+		<category><![CDATA[Menü]]></category>
+		<category><![CDATA[Markieren]]></category>
+		<category><![CDATA[abapGit]]></category>
+		<category><![CDATA[toolbar]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018290</guid>
+
+					<description><![CDATA[<p>Möchte man dem Anwender die Möglichkeit geben, aus einer Liste mehrere Einträge auszuwählen, so fällt einem sicherlich zuerst das ALV-Grid ein, in dem man die Einträge per Zeilenmarkierung oder Checkbox markieren kann.  Eine Lösung mit der vertikalen Anordnung einer Toolbar (CL_GUI_TOOLBAR) und Menu (CL_CTMENU) käme auch in Frage, nähme jedoch genau so viel Platz ein, wie ein ALV-Grid. Letztendlich kam jedoch eine Variante mit dem CL_CTMENU und heraus.</p>
+<p>Der Beitrag <a href="/blog/mehrfachselektion-mit-menu/">Mehrfachselektion mit Menu</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Möchte man dem Anwender die Möglichkeit geben, aus einer Liste mehrere Einträge auszuwählen, so fällt einem sicherlich zuerst das ALV-Grid ein, in dem man die Einträge per Zeilenmarkierung oder Checkbox markieren kann. Etwas aufgepeppt könnte es so aussehen wie in diesem Beitrag: <a href="https://tricktresor.com/blog/moderne-ui-mit-altem-sapgui-und-alv-grid/">Moderne UI mit altem SAPGUI und ALV-Grid</a>. Diese Variante nimmt allerdings einiges an Platz ein. Eine Lösung mit der vertikalen Anordnung einer Toolbar (CL_GUI_TOOLBAR) und Menu (CL_CTMENU) käme auch in Frage, nähme jedoch genau so viel Platz ein, wie ein ALV-Grid. Vorteil wäre noch, dass man Drucktasten als &#8220;gedrückt&#8221; definieren und dem Anwender so eine gute Rückmeldung geben könnte.</p>
+<p>Das Demoprogramm SAPTOOLBAR_DEMO1 zeigt, wie es aussehen könnte (Drucktaste &#8220;+ check&#8221;):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/toolbar2.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018292" src="https://tricktresor.com/wp-content/uploads/2018/01/toolbar2.png" alt="" width="635" height="495" srcset="/wp-content/uploads/2018/01/toolbar2.png 635w, /wp-content/uploads/2018/01/toolbar2-300x234.png 300w, /wp-content/uploads/2018/01/toolbar2-117x91.png 117w" sizes="(max-width: 635px) 100vw, 635px" /></a></p>
+<h2>Menu</h2>
+<p>Bei der Anforderung, mehrere Einträge aus einer Liste von Optionen auswählen zu können, kam ich auf die Idee, das CL_CTMENU dafür zu verwenden. In einem Menü kann man nämlich einzelne Einträge so markieren, dass sie als &#8220;ausgewählt&#8221; zu erkennen sind. Sie haben dann einen &#8220;Punkt&#8221; vor dem Eintrag stehen. Den ersten Gedanken daran habe ich jedoch wieder verworfen, denn bei einer Liste mit mehreren Einträgen, kann es ziemlich mühselig sein, für jede zu wählende Option das Menü anzuklicken, die entsprechende Option zu wählen um dann das Menü erneut anzuklicken.</p>
+<p>Als zweiten Gedanken hatte ich jedoch die Idee, sofort nach Auswahl eines Eintrags das Ereignis &#8220;Dropdown ausgewählt&#8221; erneut zu feuern, so dass das &#8211; nun jedoch geänderte Menü &#8211; dem Anwender erneut angezeigt wird. Erfreulicherweise hat dies sogar funktioniert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/toolbar.png"><img decoding="async" class="alignnone size-full wp-image-1018291" src="https://tricktresor.com/wp-content/uploads/2018/01/toolbar.png" alt="" width="274" height="192" srcset="/wp-content/uploads/2018/01/toolbar.png 274w, /wp-content/uploads/2018/01/toolbar-200x140.png 200w" sizes="(max-width: 274px) 100vw, 274px" /></a></p>
+<h2>blogs.sap.com</h2>
+<p>Hier noch eine kleine Abhandlung auf <a href="https://blogs.sap.com/2018/01/09/variations-of-selecting-multiple-options-from-a-list/">blogs.sap.com</a> von mir, bei der ich noch andere Arten der Mehrfachselektion aufzeige.</p>
+<h2>abapGit</h2>
+<p><a href="https://github.com/tricktresor/multiple_selections">https://github.com/tricktresor/multiple_selections</a></p>
+<h2>Code</h2>
+<p>Das unten stehende Beispielprogramm demonstriert die Funktionsweise. Ich verwende an einigen Stellen die neuen Möglichkeiten von ABAP 7.40 und ABAP 7.50.</p>
+<p>Um das Modul auch sinnvoll einsetzen zu können, fehlen noch Methoden um die möglichen Optionen zu übergeben und die letztendlich gewählten Einträge wieder zurück zu liefern.</p>
+<pre class="lang:abap decode:true">PROGRAM zz_menu_demo.
+
+
+CLASS lcl_main DEFINITION.
+  PUBLIC SECTION.
+    METHODS display.
+
+  PROTECTED SECTION.
+    TYPES: BEGIN OF ty_option,
+             value   TYPE char10,
+             text    TYPE string,
+             checked TYPE boolean_flg,
+           END OF ty_option.
+    DATA: mytoolbar    TYPE REF TO cl_gui_toolbar,
+          menupos_x    TYPE i,
+          menupos_y    TYPE i,
+          options      TYPE STANDARD TABLE OF ty_option,
+          menu_dynamic TYPE REF TO cl_ctmenu.
+    METHODS build_menu.
+    METHODS on_function_selected FOR EVENT function_selected OF cl_gui_toolbar
+      IMPORTING fcode sender.
+    METHODS on_dropdown_clicked  FOR EVENT dropdown_clicked OF cl_gui_toolbar
+      IMPORTING fcode posx posy sender.
+ENDCLASS.                    "lcl_my_event_handler DEFINITION
+
+
+
+CLASS lcl_main IMPLEMENTATION.
+
+  METHOD build_menu.
+
+    IF menu_dynamic IS INITIAL.
+      "Create menu
+      CREATE OBJECT menu_dynamic.
+    ELSE.
+      "Clear all entries before rebuild
+      menu_dynamic-&gt;clear( ).
+    ENDIF.
+
+    LOOP AT options ASSIGNING FIELD-SYMBOL(&lt;option&gt;).
+      "add menu entry with current status
+      menu_dynamic-&gt;add_function( fcode   = CONV #( &lt;option&gt;-value )
+                                  checked = &lt;option&gt;-checked
+                                  text    = CONV #( &lt;option&gt;-text ) ).
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD display.
+
+    "Create docker on Top of the screen
+    DATA(docker) = NEW cl_gui_docking_container( side = cl_gui_docking_container=&gt;dock_at_top extension = 30 ).
+
+    "create toolbar object
+    mytoolbar = NEW #( parent = docker ).
+
+    "register events
+    mytoolbar-&gt;set_registered_events( VALUE #( ( eventid = cl_gui_toolbar=&gt;m_id_function_selected )
+                                               ( eventid = cl_gui_toolbar=&gt;m_id_dropdown_clicked ) ) ).
+
+    "Set handler
+    SET HANDLER on_function_selected FOR mytoolbar.
+    SET HANDLER on_dropdown_clicked  FOR mytoolbar.
+
+    "set initial values
+    options = VALUE #( ( value = 'ONE'   text = 'Option One' )
+                       ( value = 'TWO'   text = 'Option Two' )
+                       ( value = 'THREE' text = 'Option Three' )
+                       ( value = 'FOUR'  text = 'Option Four' ) ).
+    "Build menu
+    build_menu( ).
+
+    "Add button for selecting options
+    mytoolbar-&gt;add_button( EXPORTING
+                             icon             = 'ICON_TOOL'
+                             fcode            = 'CHOOSE'
+                             butn_type        = '1'
+                             text             = 'Select options'
+                             quickinfo        = 'Select some options...'
+                           EXCEPTIONS
+                             cntb_error_fcode = 1 ).
+
+  ENDMETHOD.
+
+  METHOD on_function_selected.
+
+    "switch option entry
+    LOOP AT options ASSIGNING FIELD-SYMBOL(&lt;option&gt;).
+      IF &lt;option&gt;-value = fcode.
+        IF &lt;option&gt;-checked = abap_true.
+          &lt;option&gt;-checked = abap_false.
+        ELSE.
+          &lt;option&gt;-checked = abap_true.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+
+    "rebuild menu
+    build_menu( ).
+
+    "raise event dropdown clicked again
+    sender-&gt;dispatch( cargo = 'mytoolbar' eventid = cl_gui_toolbar=&gt;m_id_dropdown_clicked is_shellevent = abap_false ).
+
+    "Set coordinates of menu
+    sender-&gt;track_context_menu(
+         context_menu = menu_dynamic
+         posx         = menupos_x
+         posy         = menupos_y ).
+
+  ENDMETHOD.                    "lcl_my_event_handler
+
+  METHOD on_dropdown_clicked.
+
+    IF fcode = 'CHOOSE'.
+      "call of dropdown: remember current position for displaying menu
+      menupos_x = posx.
+      menupos_y = posy.
+    ENDIF.
+
+    "Set coordinates
+    mytoolbar-&gt;track_context_menu(
+        context_menu = menu_dynamic
+        posx         = posx
+        posy         = posy ).
+
+  ENDMETHOD.                    "lcl_my_event_handler
+
+ENDCLASS.                    "lcl_my_event_handler IMPLEMENTATION
+
+
+INITIALIZATION.
+
+  new lcl_main( )-&gt;display( ).
+
+
+  PARAMETERS p_test.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/mehrfachselektion-mit-menu/">Mehrfachselektion mit Menu</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Grid mit Variantenschnellzugriff (Menü)</title>
+		<link>/blog/grid-mit-variantenschnellzugriff-menue/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 16 Aug 2011 19:23:04 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[set_variant]]></category>
+		<category><![CDATA[set_frontend_fieldcatalog]]></category>
+		<category><![CDATA[cl_gui_custom_container]]></category>
+		<category><![CDATA[set_filter_criteria]]></category>
+		<category><![CDATA[register events]]></category>
+		<category><![CDATA[set_sort_criteria]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[splitter]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[cl_gui_splitter_container]]></category>
+		<category><![CDATA[BW]]></category>
+		<category><![CDATA[cl_gui_container]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[toolbar]]></category>
+		<category><![CDATA[sender]]></category>
+		<category><![CDATA[Layout]]></category>
+		<category><![CDATA[LVC_VARIANT_SELECT]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=611</guid>
+
+					<description><![CDATA[<p>Dies ist eine andere Version mit der ein Varianten-Schnellzugriff in einem ALV-Grid realisiert wurde. Dieses Programm verwaltet vier Grids und in jedem Grid werden die vorhandenen Varianten in zwei Men&#252;s angezeigt: System- und Benutzervarianten. Der Name der aktuell ausgew&#228;hlten Variante wird dabei im jeweiligen Men&#252; angezeigt. </p>
+<p>Der Beitrag <a href="/blog/grid-mit-variantenschnellzugriff-menue/">Grid mit Variantenschnellzugriff (Menü)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Dies ist eine andere Version mit der ein Varianten-Schnellzugriff in einem ALV-Grid realisiert wurde. Dieses Programm verwaltet vier Grids und in jedem Grid werden die vorhandenen Varianten in zwei Menüs angezeigt: System- und Benutzervarianten. Der Name der aktuell ausgewählten Variante wird dabei im jeweiligen Menü angezeigt.</p>
+<h2 class="head1">Screenshot</h2>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/ALV/Bild527.jpg" alt="" /></p>
+<h2 class="head1">Erklärung</h2>
+<p class="text1">Die beiden Events, die für die Umsetzung maßgeblich beteiligt sind: TOOLBAR und MENU_BUTTON.</p>
+<p class="text1">Im Event TOOLBAR werden die Menüs erstellt. In MENU_BUTTON werden die zugehörigen Untermenüs aufgebaut, wenn der Benutzer auf einen Menu-Button geklickt hat. Die Menüs in der Toolbar werden also erst zum Zeitpunkt des Anklickens aufgebaut.</p>
+<p class="text1"><img decoding="async" src="/wp-content/uploads/tt_images/ALV/Bild528.jpg" alt="" /></p>
+<p>Links die globalen Varianten, rechts Benutzervarianten</p>
+<h2>Coding</h2>
+<pre class="lang:abap decode:true ">*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZZ_GRID_VARIANT_MENU
+*&amp;---------------------------------------------------------------------*
+
+***_________________________________***
+***                                 ***
+***    https://tricktresor.com   / ***
+***_________________________________***
+***                                 ***
+
+* BESCHREIBUNG
+* ============
+* Das Programm enthält eine Klasse, mit deren Hilfe vier durch einen
+* Splitter getrennte ALV-Grids angezeigt werden
+* Es können Varianten abgespeichert werden, die dann als Schnellzugriff
+* mit einem Menü in der Toolbar aktiviert werden.
+
+* DYNPRO 100
+* ==========
+* Dynpro 100 muss angelegt werden.
+* Es muss einen CustomContainer mit Namen CONTAINER enthalten
+* Der Status "100" muss angelegt werden. Die Funktionstaste F3 muss
+* mit dem Funktionscode BACK belegt werden.
+
+* DYNPRO-ABLAUFLOGIK
+* ==================
+* PROCESS BEFORE OUTPUT.
+*   MODULE pbo.
+*
+* PROCESS AFTER INPUT.
+*   MODULE pai.
+
+REPORT zz_grid_variant.
+
+*** Class for event receiver
+CLASS lcl_event_receiver DEFINITION DEFERRED.
+
+*** global data
+DATA gr_grid1    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid2    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid3    TYPE REF TO            lcl_event_receiver.
+DATA gr_grid4    TYPE REF TO            lcl_event_receiver.
+
+DATA gv_matnr    TYPE matnr.
+DATA gt_mara     TYPE STANDARD TABLE OF mara.
+DATA gt_marc     TYPE STANDARD TABLE OF marc.
+DATA gt_mard     TYPE STANDARD TABLE OF mard.
+DATA gt_mvke     TYPE STANDARD TABLE OF mvke.
+
+DATA gr_cc       TYPE REF TO            cl_gui_custom_container.
+DATA gr_splitter TYPE REF TO            cl_gui_splitter_container.
+
+DATA gr_cont1    TYPE REF TO            cl_gui_container.
+DATA gr_cont2    TYPE REF TO            cl_gui_container.
+DATA gr_cont3    TYPE REF TO            cl_gui_container.
+DATA gr_cont4    TYPE REF TO            cl_gui_container.
+
+SELECT-OPTIONS s_matnr FOR gv_matnr.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+
+  PUBLIC SECTION.
+
+    DATA gr_grid    TYPE REF TO            cl_gui_alv_grid.
+DATA gr_cont    TYPE REF TO            cl_gui_container.
+DATA gs_variant TYPE                   disvariant.
+DATA gs_layout  TYPE                   lvc_s_layo.
+DATA gv_table   TYPE                   text80.
+
+    DATA ls_toolbar       TYPE stb_button.
+DATA ls_variant       TYPE disvariant.
+
+*** Variants
+DATA lt_ltdx          TYPE STANDARD TABLE OF ltdx.
+
+*** Variant texts
+DATA lt_ltdxt         TYPE STANDARD TABLE OF ltdxt.
+
+METHODS:
+
+*** constructor
+constructor
+IMPORTING i_handle    TYPE c
+i_container TYPE REF TO cl_gui_container
+i_title     TYPE lvc_title
+i_table     TYPE c,
+
+*** event for menu button
+handle_menu_button
+FOR EVENT menu_button OF cl_gui_alv_grid
+IMPORTING e_object e_ucomm sender,
+
+*** event for double click
+handle_double_click
+FOR EVENT double_click OF cl_gui_alv_grid
+IMPORTING e_row e_column es_row_no sender,
+
+*** event for adding buttons to toolbar
+handle_toolbar
+FOR EVENT toolbar OF cl_gui_alv_grid
+IMPORTING e_object e_interactive sender,
+
+*** event for pressed buttons
+handle_user_command
+FOR EVENT user_command OF cl_gui_alv_grid
+IMPORTING e_ucomm sender.
+
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+
+  METHOD constructor.
+
+    FIELD-SYMBOLS &lt;outtab&gt; TYPE STANDARD TABLE.
+
+    gv_table = i_table.
+ASSIGN (gv_table) TO &lt;outtab&gt;.
+CHECK sy-subrc = 0.
+
+*** Create ALV Grid
+CREATE OBJECT gr_grid
+EXPORTING
+i_parent = i_container.
+
+*** Set variant
+CLEAR gs_variant.
+gs_variant-report    = sy-repid.
+gs_variant-handle    = i_handle.
+gs_variant-username  = sy-uname.
+
+*** Layout
+gs_layout-grid_title = i_title.
+gs_layout-no_toolbar = ' '.
+
+*** Set display
+CALL METHOD gr_grid-&gt;set_table_for_first_display
+EXPORTING
+i_structure_name = i_handle
+is_variant       = gs_variant
+i_save           = 'A'
+i_default        = 'X'
+is_layout        = gs_layout
+CHANGING
+it_outtab        = &lt;outtab&gt;
+EXCEPTIONS
+OTHERS           = 4.
+
+**** Create event handler for grid
+SET HANDLER handle_user_command
+handle_toolbar
+handle_double_click
+handle_menu_button
+FOR gr_grid.
+
+*** set toolbar interactive
+CALL METHOD gr_grid-&gt;set_toolbar_interactive.
+
+  ENDMETHOD.                    "constructor
+
+  METHOD handle_double_click.
+
+    FIELD-SYMBOLS &lt;outtab&gt; TYPE STANDARD TABLE.
+FIELD-SYMBOLS &lt;outwa&gt;  TYPE ANY.
+FIELD-SYMBOLS &lt;value&gt;  TYPE ANY.
+
+    ASSIGN (gv_table) TO &lt;outtab&gt;.
+CHECK sy-subrc = 0.
+
+    CASE e_column.
+WHEN 'MATNR'.
+READ TABLE &lt;outtab&gt; ASSIGNING &lt;outwa&gt; INDEX es_row_no-row_id.
+IF sy-subrc = 0.
+ASSIGN COMPONENT e_column OF STRUCTURE &lt;outwa&gt; TO &lt;value&gt;.
+IF sy-subrc = 0.
+SET PARAMETER ID 'MAT' FIELD &lt;value&gt;.
+CALL TRANSACTION 'MM03' AND SKIP FIRST SCREEN.
+ENDIF.
+ENDIF.
+ENDCASE.
+
+  ENDMETHOD.                    "handle_double_click
+
+  METHOD handle_toolbar.
+
+    FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+**** Get actual variant
+CALL METHOD sender-&gt;get_variant
+IMPORTING
+es_variant = ls_variant.
+
+*** Read existing variants
+SELECT * FROM ltdx INTO TABLE lt_ltdx UP TO 10 ROWS
+WHERE relid  = 'LT'
+AND report = gs_variant-report
+AND handle = gs_variant-handle
+AND srtf2  = 0
+AND ( username = space
+OR  username = sy-uname )
+ORDER BY username variant.
+
+    IF sy-subrc = 0.
+*** add Separator to toolbar
+ls_toolbar-function  = 'DUMMY'.
+ls_toolbar-butn_type = '3'.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+*** Get variant texts
+SELECT * FROM ltdxt INTO TABLE lt_ltdxt
+FOR ALL ENTRIES IN lt_ltdx
+WHERE relid  = 'LT'
+AND report = gs_variant-report
+AND handle = gs_variant-handle
+AND variant = lt_ltdx-variant
+AND langu = sy-langu.
+
+*** Check if there are global variants...
+READ TABLE lt_ltdx TRANSPORTING NO FIELDS
+WITH KEY username = space.
+IF sy-subrc = 0.
+*** add menu "GLOBAL" to toolbar
+CLEAR ls_toolbar.
+IF ls_variant-variant IS NOT INITIAL AND
+ls_variant-variant(1) = '/'.
+*** If variant is actually set: Display name of variant
+READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY username = space
+variant  = ls_variant-variant.
+IF sy-subrc = 0.
+ls_toolbar-text = &lt;ltdxt&gt;-text.
+ENDIF.
+ENDIF.
+ls_toolbar-function  = 'GLOBAL'.
+ls_toolbar-icon      = icon_bw_gis.
+ls_toolbar-butn_type = '2'.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+ENDIF.
+
+*** Check if there are user specific variants...
+READ TABLE lt_ltdx TRANSPORTING NO FIELDS
+WITH KEY username = sy-uname.
+IF sy-subrc = 0.
+*** add menu "USER SPECIFIC" to toolbar
+CLEAR ls_toolbar.
+IF ls_variant-variant IS NOT INITIAL AND
+ls_variant-variant(1) &lt;&gt; '/'.
+*** If variant is actually set: Display name of variant
+READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY username = sy-uname
+variant  = ls_variant-variant.
+IF sy-subrc = 0.
+ls_toolbar-text = &lt;ltdxt&gt;-text.
+ENDIF.
+ENDIF.
+ls_toolbar-function  = 'USER'.
+ls_toolbar-icon      = icon_usergroup.
+ls_toolbar-butn_type = '2'.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+ENDIF.
+ENDIF.
+
+  ENDMETHOD.                    "handle_toolbar
+
+  METHOD handle_user_command.
+*** Set chosen variant
+
+    FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+*** data
+DATA lv_user_specific TYPE c.
+DATA ls_variant       TYPE disvariant.
+DATA ls_stable        TYPE lvc_s_stbl.
+DATA lt_fieldcat      TYPE  lvc_t_fcat.
+DATA lt_sort          TYPE  lvc_t_sort.
+DATA lt_filter        TYPE  lvc_t_filt.
+DATA ls_layout        TYPE  lvc_s_layo.
+
+*** Variant
+CLEAR ls_variant.
+ls_variant-variant = e_ucomm.
+SHIFT ls_variant-variant LEFT BY 1 PLACES.
+ls_variant-report    = gs_variant-report.
+ls_variant-handle    = gs_variant-handle.
+IF ls_variant-variant(1) &lt;&gt; '/'.
+ls_variant-username  = sy-uname.
+lv_user_specific     = 'X'.
+ENDIF.
+CALL METHOD sender-&gt;get_frontend_fieldcatalog
+IMPORTING
+et_fieldcatalog = lt_fieldcat.
+
+    CALL FUNCTION 'LVC_VARIANT_SELECT'
+EXPORTING
+i_dialog            = space
+i_user_specific     = lv_user_specific
+it_default_fieldcat = lt_fieldcat
+IMPORTING
+et_fieldcat         = lt_fieldcat
+et_sort             = lt_sort
+et_filter           = lt_filter
+CHANGING
+cs_variant          = ls_variant
+EXCEPTIONS
+wrong_input         = 1
+fc_not_complete     = 2
+not_found           = 3
+program_error       = 4
+data_missing        = 5
+OTHERS              = 6.
+IF sy-subrc = 0.
+CALL METHOD sender-&gt;set_variant( ls_variant ).
+CALL METHOD sender-&gt;set_frontend_fieldcatalog( lt_fieldcat ).
+CALL METHOD sender-&gt;set_filter_criteria( lt_filter ).
+CALL METHOD sender-&gt;set_sort_criteria( lt_sort ).
+ls_stable = 'XX'.
+CALL METHOD sender-&gt;refresh_table_display
+EXPORTING
+is_stable      = ls_stable
+i_soft_refresh = space.
+ENDIF.
+
+  ENDMETHOD.                           "handle_user_command
+
+  METHOD handle_menu_button.
+
+DATA lv_fcode         TYPE ui_func.
+DATA lv_text          TYPE gui_text.
+DATA lv_disable       TYPE c.
+DATA lv_checked       TYPE c.
+DATA lv_username      TYPE syuname.
+
+FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+CASE e_ucomm.
+WHEN 'GLOBAL'.
+lv_username = space.
+WHEN 'USER'.
+lv_username = sy-uname.
+WHEN OTHERS.
+EXIT.
+ENDCASE.
+
+*** Get actual variant
+CALL METHOD sender-&gt;get_variant
+IMPORTING
+es_variant = ls_variant.
+
+LOOP AT lt_ltdx ASSIGNING &lt;ltdx&gt; WHERE username = lv_username.
+*... get variant text
+READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY variant = &lt;ltdx&gt;-variant.
+
+*... set menu entry
+CLEAR ls_toolbar.
+lv_fcode  = '$'.
+lv_fcode+1 = &lt;ltdx&gt;-variant.
+
+*... set text
+      IF &lt;ltdxt&gt; IS ASSIGNED.
+lv_text      = &lt;ltdxt&gt;-text.
+ELSE.
+lv_text      = &lt;ltdx&gt;-variant.
+ENDIF.
+
+*... mark and disable actual variant
+IF ls_variant-variant = &lt;ltdx&gt;-variant.
+lv_disable = 'X'.
+lv_checked = 'X'.
+ELSE.
+lv_disable = space.
+lv_checked = space.
+ENDIF.
+
+*... add menu entry to menu
+CALL METHOD e_object-&gt;add_function
+EXPORTING
+disabled = lv_disable
+checked  = lv_checked
+fcode    = lv_fcode
+text     = lv_text.
+ENDLOOP.
+ENDMETHOD.                    "lcl_my_event_handler
+
+ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+
+*** _______________________________________________________ ***
+***                                                         ***
+***                 START OF PROGRAM
+*** _______________________________________________________ ***
+***                                                         ***
+
+START-OF-SELECTION.
+
+  SELECT * FROM mara INTO TABLE gt_mara UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+SELECT * FROM marc INTO TABLE gt_marc UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+SELECT * FROM mard INTO TABLE gt_mard UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+SELECT * FROM mvke INTO TABLE gt_mvke UP TO 30 ROWS
+WHERE matnr IN s_matnr.
+
+CALL SCREEN 100.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  PBO  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE pbo OUTPUT.
+
+  SET PF-STATUS '100'.
+SET TITLEBAR '100'.
+CLEAR sy-ucomm.
+
+  IF gr_cc IS INITIAL.
+CREATE OBJECT gr_cc
+EXPORTING
+container_name = 'CONTAINER'.
+ENDIF.
+
+  IF gr_splitter IS INITIAL.
+CREATE OBJECT gr_splitter
+EXPORTING
+parent  = gr_cc
+rows    = 4
+columns = 1.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 1
+column    = 1
+RECEIVING
+container = gr_cont1.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 2
+column    = 1
+RECEIVING
+container = gr_cont2.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 3
+column    = 1
+RECEIVING
+container = gr_cont3.
+
+    CALL METHOD gr_splitter-&gt;get_container
+EXPORTING
+row       = 4
+column    = 1
+RECEIVING
+container = gr_cont4.
+ENDIF.
+
+IF gr_grid1 IS INITIAL.
+CREATE OBJECT gr_grid1
+EXPORTING
+i_handle    = 'MARA'
+i_container = gr_cont1
+i_title     = 'Materialstamm'
+i_table     = 'GT_MARA'.
+ENDIF.
+
+  IF gr_grid2 IS INITIAL.
+CREATE OBJECT gr_grid2
+EXPORTING
+i_handle    = 'MARD'
+i_container = gr_cont2
+i_title     = 'Tabelle MARD'
+i_table     = 'GT_MARD'.
+ENDIF.
+
+  IF gr_grid3 IS INITIAL.
+CREATE OBJECT gr_grid3
+EXPORTING
+i_handle    = 'MARC'
+i_container = gr_cont3
+i_title     = 'Tabelle MARC'
+i_table     = 'GT_MARC'.
+ENDIF.
+
+  IF gr_grid4 IS INITIAL.
+CREATE OBJECT gr_grid4
+EXPORTING
+i_handle    = 'MVKE'
+i_container = gr_cont4
+i_title     = 'Tabelle MVKE'
+i_table     = 'GT_MVKE'.
+ENDIF.
+
+ENDMODULE.                 " PBO  OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  PAI  INPUT
+*&amp;---------------------------------------------------------------------*
+MODULE pai INPUT.
+
+  CASE sy-ucomm.
+WHEN 'BACK'.
+SET SCREEN 0. LEAVE SCREEN.
+ENDCASE.
+
+ENDMODULE.                 " PAI  INPUT</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/grid-mit-variantenschnellzugriff-menue/">Grid mit Variantenschnellzugriff (Menü)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Variantenschnellzugriff</title>
+		<link>/blog/variantenschnellzugriff/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 13 Jun 2008 19:51:46 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Layout]]></category>
+		<category><![CDATA[variante]]></category>
+		<category><![CDATA[toolbar]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=487</guid>
+
+					<description><![CDATA[<p>Layout-Varianten lassen sich im ALV-Grid komfortabel verwalten. Manchmal w&#228;re es jedoch sch&#246;n, wenn man einen schnelleren Zugriff auf die einzelnen Varianten h&#228;tte. Mit diesem Programm zeigen wir Ihnen, wie das einfach m&#246;glich ist.</p>
+<p>Der Beitrag <a href="/blog/variantenschnellzugriff/">Variantenschnellzugriff</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<figure style="width: 392px" class="wp-caption alignnone"><img decoding="async" src="/wp-content/uploads/tt_images/ALV/alvgrid_var.jpg" alt="" width="392" height="372" /><figcaption class="wp-caption-text">Zwei globale Varianten und eine Benutzervariante im Schnellzugriff</figcaption></figure>
+<p>Layout-Varianten lassen sich im ALV-Grid komfortabel verwalten. Manchmal wäre es jedoch schön, wenn man einen schnelleren Zugriff auf die einzelnen Varianten hätte. Mit diesem Programm zeige ich die, wie das einfach möglich ist.</p>
+<h2 class="head1">Vorbereitungen</h2>
+<ol>
+<li>Dynpro 100 muss angelegt und mit einem Customcontainer bestückt werden (Name: CONTAINER).</li>
+<li>Status 100 anlegen; F3, SHIFT-F3 und F12 mit Funktionscode BACK belegen.</li>
+</ol>
+<h2 class="head1">Vorgehen</h2>
+<p class="text1">Wenn du das Programm gestartet hast, definierst du dir zwei oder drei Varianten. du wirst sehen, dass diese Varianten dann in der Toolbar auftauchen. So kann wirklich schnell und komfortabel zwischen verschiedenen Sichten hin- und hergewechselt werden.</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true  ">*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZZ_GRID_VARIANT
+*&amp;---------------------------------------------------------------------*
+
+REPORT zz_grid_variant.
+
+*** Class for event receiver
+CLASS lcl_event_receiver DEFINITION DEFERRED.
+
+*** global data
+DATA gr_grid    TYPE REF TO            cl_gui_alv_grid.
+DATA gr_cont    TYPE REF TO            cl_gui_custom_container.
+DATA gr_evth    TYPE REF TO            lcl_event_receiver.
+DATA gt_vbak    TYPE STANDARD TABLE OF vbak.
+DATA gs_variant TYPE                   disvariant.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+
+  PUBLIC SECTION.
+
+    CLASS-METHODS:
+*** event for adding buttons to toolbar
+handle_toolbar
+FOR EVENT toolbar OF cl_gui_alv_grid
+IMPORTING e_object e_interactive sender,
+
+*** event for pressed buttons
+handle_user_command
+FOR EVENT user_command OF cl_gui_alv_grid
+IMPORTING e_ucomm sender.
+
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+
+  METHOD handle_toolbar.
+
+    DATA ls_toolbar       TYPE stb_button.
+DATA ls_variant       TYPE disvariant.
+
+*** Variants
+DATA lt_ltdx          TYPE STANDARD TABLE OF ltdx.
+FIELD-SYMBOLS &lt;ltdx&gt;  TYPE ltdx.
+*** Variant texts
+DATA lt_ltdxt         TYPE STANDARD TABLE OF ltdxt.
+FIELD-SYMBOLS &lt;ltdxt&gt; TYPE ltdxt.
+
+*** Set buttons for variants
+SELECT * FROM ltdx INTO TABLE lt_ltdx UP TO 10 ROWS
+WHERE relid  = 'LT'
+AND report = gs_variant-report
+AND handle = gs_variant-handle
+AND srtf2  = 0
+AND ( username = space
+OR  username = sy-uname )
+ORDER BY username variant.
+
+    IF sy-subrc = 0.
+
+*** add Seperator to toolbar
+ls_toolbar-function  = 'DUMMY'.
+ls_toolbar-butn_type = '3'. "TYPE TB_BTYPE =&gt; Domain values!
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+*** Get variant texts
+SELECT * FROM ltdxt INTO TABLE lt_ltdxt
+FOR ALL ENTRIES IN lt_ltdx
+WHERE relid  = 'LT'
+AND report = gs_variant-report
+AND handle = gs_variant-handle
+AND variant = lt_ltdx-variant
+AND langu = sy-langu.
+
+*** Get actual variant
+CALL METHOD sender-&gt;get_variant
+IMPORTING
+es_variant = ls_variant.
+
+      LOOP AT lt_ltdx ASSIGNING &lt;ltdx&gt;.
+*** get variant text
+        READ TABLE lt_ltdxt ASSIGNING &lt;ltdxt&gt;
+WITH KEY variant = &lt;ltdx&gt;-variant.
+
+*** Button to create customer order with template
+CLEAR ls_toolbar.
+ls_toolbar-function  = '$'.
+ls_toolbar-function+1 = &lt;ltdx&gt;-variant.
+IF &lt;ltdx&gt;-variant(1) = '/'.
+*** global variant
+ls_toolbar-icon      = icon_alv_variant_choose.
+ELSE.
+*** user specific variant
+ls_toolbar-icon      = icon_usergroup.
+ENDIF.
+ls_toolbar-butn_type = '0'.
+ls_toolbar-disabled  = space.
+IF &lt;ltdxt&gt; IS ASSIGNED.
+ls_toolbar-text      = &lt;ltdxt&gt;-text.
+ELSE.
+ls_toolbar-text      = &lt;ltdx&gt;-variant.
+ENDIF.
+ls_toolbar-quickinfo = space.
+IF ls_variant-variant = &lt;ltdx&gt;-variant.
+ls_toolbar-checked   = 'X'.
+ELSE.
+ls_toolbar-checked   = space.
+ENDIF.
+APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+      ENDLOOP.
+ENDIF. "Variants exist?
+
+  ENDMETHOD.                    "handle_toolbar
+
+  METHOD handle_user_command.
+
+*** data
+DATA lv_user_specific TYPE c.
+DATA ls_variant       TYPE disvariant.
+DATA ls_stable        TYPE lvc_s_stbl.
+DATA lt_fieldcat      TYPE  lvc_t_fcat.
+DATA lt_sort          TYPE  lvc_t_sort.
+DATA lt_filter        TYPE  lvc_t_filt.
+DATA ls_layout        TYPE  lvc_s_layo.
+
+*** Variant
+CLEAR ls_variant.
+ls_variant-variant = e_ucomm.
+SHIFT ls_variant-variant LEFT BY 1 PLACES.
+ls_variant-report    = gs_variant-report.
+ls_variant-handle    = gs_variant-handle.
+IF ls_variant-variant(1) &lt;&gt; '/'.
+ls_variant-username  = sy-uname.
+lv_user_specific     = 'X'.
+ENDIF.
+CALL METHOD sender-&gt;get_frontend_fieldcatalog
+IMPORTING
+et_fieldcatalog = lt_fieldcat.
+
+    CALL FUNCTION 'LVC_VARIANT_SELECT'
+EXPORTING
+i_dialog            = space
+i_user_specific     = lv_user_specific
+it_default_fieldcat = lt_fieldcat
+IMPORTING
+et_fieldcat         = lt_fieldcat
+et_sort             = lt_sort
+et_filter           = lt_filter
+CHANGING
+cs_variant          = ls_variant
+EXCEPTIONS
+OTHERS              = 6.
+IF sy-subrc = 0.
+*** set all neccessary objects of chosen variant
+      CALL METHOD sender-&gt;set_variant( ls_variant ).
+CALL METHOD sender-&gt;set_frontend_fieldcatalog( lt_fieldcat ).
+CALL METHOD sender-&gt;set_filter_criteria( lt_filter ).
+CALL METHOD sender-&gt;set_sort_criteria( lt_sort ).
+ls_stable = 'XX'.
+CALL METHOD sender-&gt;refresh_table_display
+EXPORTING
+is_stable      = ls_stable
+i_soft_refresh = space.
+ENDIF.
+
+  ENDMETHOD.                           "handle_user_command
+
+ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+
+*** _______________________________________________________ ***
+***                                                         ***
+***                 START OF PROGRAM
+*** _______________________________________________________ ***
+***                                                         ***
+
+START-OF-SELECTION.
+
+  SELECT * FROM vbak INTO TABLE gt_vbak UP TO 30 ROWS.
+
+  CALL SCREEN 100.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  PBO  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE pbo OUTPUT.
+
+  SET PF-STATUS '100'.
+  SET TITLEBAR '100'.
+  CLEAR sy-ucomm.
+  PERFORM init_grid.
+
+ENDMODULE.                 " PBO  OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  PAI  INPUT
+*&amp;---------------------------------------------------------------------*
+MODULE pai INPUT.
+
+  CASE sy-ucomm.
+WHEN 'BACK'.
+SET SCREEN 0. LEAVE SCREEN.
+ENDCASE.
+
+ENDMODULE.                 " PAI  INPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  init_grid
+*&amp;---------------------------------------------------------------------*
+FORM init_grid.
+
+  IF gr_grid IS INITIAL.
+*** create custom container
+CREATE OBJECT gr_cont
+EXPORTING
+container_name = 'CONTAINER'.
+
+*** Create ALV Grid
+CREATE OBJECT gr_grid
+EXPORTING
+i_parent = gr_cont.
+
+*** Set variant
+CLEAR gs_variant.
+gs_variant-report   = sy-repid.
+gs_variant-handle   = 'GRID'.
+gs_variant-username = sy-uname.
+
+*** Set display
+CALL METHOD gr_grid-&gt;set_table_for_first_display
+EXPORTING
+i_structure_name = 'VBAK'
+is_variant       = gs_variant
+i_save           = 'A'
+i_default        = 'X'
+CHANGING
+it_outtab        = gt_vbak
+EXCEPTIONS
+OTHERS           = 4.
+
+*** Create event handler for grid
+CREATE OBJECT gr_evth.
+SET HANDLER gr_evth-&gt;handle_user_command
+gr_evth-&gt;handle_toolbar
+FOR gr_grid.
+
+*** set toolbar interactive
+    gr_grid-&gt;set_toolbar_interactive( ).
+
+  ENDIF.
+
+ENDFORM.                    "init_grid</pre>
+<h2 class="head1">Button types</h2>
+<p>0 Button (normal)<br />
+1 Menü + Defaultbutton<br />
+2 Menü<br />
+3 Separator<br />
+4 Radiobutton<br />
+5 Auswahlknopf (Checkbox)<br />
+6 Menüeintrag</p>
+<p>Der Beitrag <a href="/blog/variantenschnellzugriff/">Variantenschnellzugriff</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

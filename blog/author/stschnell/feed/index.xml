@@ -1,0 +1,1210 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Stefan Schnell, Autor auf Tricktresor</title>
+	<atom:link href="/blog/author/stschnell/feed/" rel="self" type="application/rss+xml" />
+	<link>/blog/author/stschnell/</link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Sat, 17 Mar 2018 11:47:06 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Stefan Schnell, Autor auf Tricktresor</title>
+	<link>/blog/author/stschnell/</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>PowerShell mit ABAP nutzen</title>
+		<link>/blog/powershell-mit-abap-nutzen/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Sat, 17 Mar 2018 11:13:42 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Sapien]]></category>
+		<category><![CDATA[Integration]]></category>
+		<category><![CDATA[COM]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[PowerShell]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018396</guid>
+
+					<description><![CDATA[<p>PowerShell ist eine sehr leistungsfähige Skriptsprache. Sie wird im Standard seit Windows 7 ausgeliefert. Aktuell ist Windows 10 mit PowerShell 5 ausgestattet. Der SAP GUI für Windows bietet eine COM-Schnittstelle die von ABAP aus verwendet werden kann. Mittels dieser Schnittstelle, und einer Bibliothek von SAPIEN, besteht die Möglichkeit das PowerShell auf dem Frontend-Server von ABAP genutzt werden kann. In diesem Beitrag soll kurz eine Realisierung mit einigen Anwendungsfällen umrissen werden. Als erstes beschaffen wir uns...</p>
+<p>Der Beitrag <a href="/blog/powershell-mit-abap-nutzen/">PowerShell mit ABAP nutzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>PowerShell ist eine sehr leistungsfähige Skriptsprache. Sie wird im Standard seit Windows 7 ausgeliefert. Aktuell ist Windows 10 mit PowerShell 5 ausgestattet. Der SAP GUI für Windows bietet eine <a href="https://help.sap.com/doc/abapdocu_752_index_htm/7.52/de-de/abenole2.htm">COM-Schnittstelle</a> die von ABAP aus verwendet werden kann. Mittels dieser Schnittstelle, und einer Bibliothek von <a href="https://www.sapien.com/">SAPIEN</a>, besteht die Möglichkeit das PowerShell auf dem Frontend-Server von ABAP genutzt werden kann. In diesem Beitrag soll kurz eine Realisierung mit einigen Anwendungsfällen umrissen werden.</p>
+<p>Als erstes beschaffen wir uns die notwendigen Bibliotheken von <a href="https://www.sapien.com/">SAPIEN</a>. Einfach im Bereich My Account, nach dem Login, Download auswählen und die Bibliotheken herunter laden.</p>
+<p><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018397" src="https://tricktresor.com/wp-content/uploads/2018/03/tt001.jpg" alt="" width="274" height="187" />    <img decoding="async" class="alignnone wp-image-1018398" src="https://tricktresor.com/wp-content/uploads/2018/03/tt002-142x300.jpg" alt="" width="167" height="353" srcset="/wp-content/uploads/2018/03/tt002-142x300.jpg 142w, /wp-content/uploads/2018/03/tt002.jpg 236w" sizes="(max-width: 167px) 100vw, 167px" /></p>
+<p>Nach der Installation und Registrierung können diese sofort mit ABAP verwendet werden. Für die Registrierung einfach eine Konsole im Administratormodus öffnen und die folgenden Befehle ausführen.</p>
+<p><code>C:\Windows\Microsoft.NET\Framework\v4.0.30319\regasm.exe "C:\Program Files (x86)\SAPIEN Technologies, Inc\ActiveXPowerShell V3\\ActiveXPoshV3.dll" /codebase</code></p>
+<p><code>C:\Windows\Microsoft.NET\Framework64\v4.0.30319\regasm.exe "C:\Program Files\SAPIEN Technologies, Inc\ActiveXPowerShell V3\ActiveXPoshV3.dll" /codebase</code></p>
+<p>Hier als Beispiel der Aufruf aller installierten Services mit ihrem Status.</p>
+<pre class="font:consolas font-size:11 line-height:14 lang:abap decode:true" title="Beispielprogramm zur Nutzung von PowerShell">"-Begin-----------------------------------------------------------------
+Program zPSTest.
+
+  "-Constants-----------------------------------------------------------
+  Constants:
+    OUTPUT_CONSOLE Type i Value 0,
+    OUTPUT_WINDOW Type i Value 1,
+    OUTPUT_BUFFER Type i Value 2
+    .
+
+  "-Variables-----------------------------------------------------------
+  Data:
+    PS Type OLE2_OBJECT,
+    Result Type i,
+    strResult Type String,
+    tabResult Type Table Of String,
+    cmd Type String
+    .
+
+  "-Main----------------------------------------------------------------
+  Create Object PS 'SAPIEN.ActiveXPoSHV3'.
+  Check sy-subrc = 0 And PS-Handle &lt;&gt; 0 Or PS-Type = 'OLE2'.
+
+  Call Method Of PS 'Init' = Result Exporting #1 = 0.
+  If Result &lt;&gt; 0.
+    Free Object PS.
+    Exit.
+  EndIf.
+
+  Call Method Of PS 'IsPowerShellInstalled' = Result.
+  If Result = 0.
+    Free Object PS.
+    Exit.
+  EndIf.
+
+  Set Property Of PS 'OutputMode' = OUTPUT_BUFFER.
+
+  cmd = `Get-WmiObject -class Win32_Service | `.
+  cmd = cmd &amp;&amp;  `Format-Table -property Name,State`.
+
+  Call Method Of PS 'Execute' Exporting #1 = cmd.
+  Call Method Of PS 'OutputString' = strResult.
+
+  Split strResult At cl_abap_char_utilities=&gt;cr_lf
+    Into Table tabResult.
+
+  Loop At tabResult Into strResult.
+    Write: / strResult.
+  EndLoop.
+
+  Free Object PS.
+
+"-End-------------------------------------------------------------------</pre>
+<p>In der Variablen cmd werden die PowerShell-Befehle übergeben, in diesem Fall die Ausgabe einer formatierten Tabelle mit Name und Status aller Services über das Windows Management Instrumentarium (WMI):<br />
+<code>Get-WmiObject -class Win32_Service | Format-Table -property Name,State</code></p>
+<p><img decoding="async" class="alignnone wp-image-1018399" src="https://tricktresor.com/wp-content/uploads/2018/03/tt003-300x232.jpg" alt="" width="376" height="291" srcset="/wp-content/uploads/2018/03/tt003-300x232.jpg 300w, /wp-content/uploads/2018/03/tt003-117x91.jpg 117w, /wp-content/uploads/2018/03/tt003.jpg 421w" sizes="(max-width: 376px) 100vw, 376px" /></p>
+<p>Sollte der Aufruf nicht funktionieren, kann es sein, dass eine Standard-Sicherheitsregel den Aufruf blockiert. Zum Experimentieren können diese über den SAP Logon deaktiviert werden.</p>
+<p><img loading="lazy" decoding="async" class="alignnone wp-image-1018401 size-full" src="https://tricktresor.com/wp-content/uploads/2018/03/tt005.jpg" alt="" width="923" height="640" srcset="/wp-content/uploads/2018/03/tt005.jpg 923w, /wp-content/uploads/2018/03/tt005-300x208.jpg 300w, /wp-content/uploads/2018/03/tt005-768x533.jpg 768w, /wp-content/uploads/2018/03/tt005-200x140.jpg 200w" sizes="(max-width: 923px) 100vw, 923px" /></p>
+<p>Um den kompletten Umfang der Bibliothek einfach nutzen zu können, hier eine entsprechende Klasse.</p>
+<pre class="font:consolas font-size:11 lang:abap decode:true " title="Klasse zur einfachen Nutzung von PowerShell">"-Begin-----------------------------------------------------------------
+class Z_CL_ACTIVEXPOSHV3 definition
+  public
+  create public .
+
+  public section.
+
+    constants MC_OUTPUTCONSOLE type I value 0 ##NO_TEXT.
+    constants MC_OUTPUTWINDOW  type I value 1 ##NO_TEXT.
+    constants MC_OUTPUTBUFFER  type I value 2 ##NO_TEXT.
+    constants MC_TRUE          type I value 1 ##NO_TEXT.
+    constants MC_FALSE         type I value 0 ##NO_TEXT.
+
+  "! Loads the ActiveXPoshV3 library
+  "!
+  "! @parameter rv_result    | 1 for success, otherwise 0
+  methods LOAD_LIB
+    returning
+      value(RV_RESULT) type I .
+
+  "! Frees the ActiveXPoshV3 library
+  methods FREE_LIB .
+
+  "! Executes stored OLE activities
+  methods FLUSH .
+
+  "! Clears the internal output buffer
+  "! when the OutputMode property is set to mc_OutputBuffer
+  methods CLEAR_OUTPUT .
+
+  "! Evaluates a PowerShell expression
+  "! If the expression returns an object this function returns -1,
+  "! otherwise 0. Output, if any, is not captured or redirected.
+  "!
+  "! @parameter iv_expression | PowerShell command
+  "!
+  "! @parameter rv_result     | Result of the command
+  methods EVAL
+    importing
+      value(IV_EXPRESSION) type STRING
+    returning
+      value(RV_RESULT) type I .
+
+  "! Executes a PowerShell command or script
+  "! Output is directed according to the OutputMode property.
+  "! Variable assignments persist between calls.
+  "!
+  "! @parameter iv_command    | PowerShell command or script
+  methods EXECUTE
+    importing
+      value(IV_COMMAND) type STRING .
+
+  "! Evaluates a PowerShell expression
+  "!
+  "! @parameter iv_expression | PowerShell command
+  "!
+  "! @parameter rv_result     | Value as string
+  methods GET_VALUE
+    importing
+      value(IV_EXPRESSION) type STRING
+    returning
+      value(RV_RESULT) type STRING .
+
+  "! Initial call to instantiate a PowerShell engine
+  "! Required for any of the methods of this object to succeed.
+  "!
+  "! @parameter iv_load_profiles | Determines if your PowerShell profiles, if they exist, are executed
+  "!
+  "! @parameter rv_result        | Returns 0 if successful, otherwise &amp;lt;&amp;gt; 0
+  methods INIT
+    importing
+      value(IV_LOAD_PROFILES) type I
+    returning
+      value(RV_RESULT) type I .
+
+  "! Checks if PowerShell is installed
+  "!
+  "! @parameter rv_result       | Returns 1 if PowerShell is installed, otherwise 0
+  methods GET_IS_POWERSHELL_INSTALLED
+    returning
+      value(RV_RESULT) type I .
+
+  "! Gets the current output mode
+  "!
+  "! @parameter rv_result       | 0 = OutputConsole, 1 = OutputWindow, 2 = OutputBuffer
+  methods GET_OUTPUTMODE
+    returning
+      value(RV_RESULT) type I .
+
+  "! Sets the current output mode
+  "!
+  "! @parameter iv_mode         | 0 = OutputConsole, 1 = OutputWindow, 2 = OutputBuffer
+  methods SET_OUTPUTMODE
+    importing
+      value(IV_MODE) type I .
+
+  "! Delivers the content of the output buffer as a single string
+  "!
+  "! @parameter rv_result       | Output buffer as string
+  methods GET_OUTPUTSTRING
+    returning
+      value(RV_RESULT) type STRING .
+
+  "! Gets the desired output width in characters
+  "! PowerShell output often gets truncated, wrapped or adjusted
+  "! corresponding to the width of a console window. Since there
+  "! is not necessarily a console window available, the default
+  "! is set to 80 characters width.
+  "!
+  "! @parameter rv_result       | Width in characters
+  methods GET_OUTPUTWIDTH
+    returning
+      value(RV_RESULT) type I .
+
+  "! Sets the desired output width in characters
+  "! PowerShell output often gets truncated, wrapped or adjusted
+  "! corresponding to the width of a console window. Since there
+  "! is not necessarily a console window available, the default
+  "! is set to 80 characters width.
+  "!
+  "! @parameter iv_width       | Width in characters
+  methods SET_OUTPUTWIDTH
+    importing
+      value(IV_WIDTH) type I .
+
+  "! Reads an include as string
+  "!
+  "! @parameter iv_incl_name   | Name of the include
+  "!
+  "! @parameter rv_str_incl    | Include as string
+  methods READ_INCL_AS_STRING
+    importing
+      value(IV_INCL_NAME) type SOBJ_NAME
+    returning
+      value(RV_STR_INCL) type STRING .
+
+  "! Loads a file from the MIME repository
+  "! and copies it to the SAP GUI work directory
+  "!
+  "! @parameter iv_uri_file    | URI path of the file in the MIME repository
+  methods LOAD_FILE_FROM_MIME
+    importing
+      !IV_URI_FILE type CSEQUENCE .
+
+  "! Converts an outputstring to a string table
+  "!
+  "! @parameter iv_outputstring | String from get_outputstring
+  "!
+  "! @parameter rv_stringtable  | String in table
+  methods OUTPUTSTRING_TO_TABLE
+    importing
+      value(IV_OUTPUTSTRING) type STRING
+    returning
+      value(RT_STRINGTABLE) type Z_TAB_STRING .
+
+  PRIVATE SECTION.
+
+    METHODS isactivex
+      EXPORTING ev_result TYPE i.
+
+    DATA olib TYPE ole2_object.
+
+ENDCLASS.
+
+
+
+CLASS Z_CL_ACTIVEXPOSHV3 IMPLEMENTATION.
+
+
+
+  METHOD clear_output."-------------------------------------------------
+    CALL METHOD OF olib 'ClearOutput'.
+  ENDMETHOD.
+
+
+
+  METHOD eval."---------------------------------------------------------
+    CALL METHOD OF olib 'Eval' = rv_result
+      EXPORTING #1 = iv_expression.
+  ENDMETHOD.
+
+
+
+  METHOD execute."------------------------------------------------------
+    CALL METHOD OF olib 'Execute'
+      EXPORTING
+        #1 = iv_command.
+  ENDMETHOD.
+
+
+
+  METHOD flush."--------------------------------------------------------
+    CALL METHOD cl_gui_cfw=&gt;flush.
+  ENDMETHOD.
+
+
+
+  METHOD free_lib."-----------------------------------------------------
+    FREE OBJECT olib.
+  ENDMETHOD.
+
+
+
+  METHOD get_is_powershell_installed."----------------------------------
+    GET PROPERTY OF olib 'IsPowerShellInstalled' = rv_result.
+  ENDMETHOD.
+
+
+
+  METHOD get_outputmode."-----------------------------------------------
+    GET PROPERTY OF olib 'OutputMode' = rv_result.
+  ENDMETHOD.
+
+
+
+  METHOD get_outputstring."---------------------------------------------
+    GET PROPERTY OF olib 'OutputString' = rv_result.
+  ENDMETHOD.
+
+
+
+  METHOD get_outputwidth."----------------------------------------------
+    GET PROPERTY OF olib 'OutputWidth' = rv_result.
+  ENDMETHOD.
+
+
+
+  METHOD get_value."-----------------------------------------------------
+    CALL METHOD OF olib 'GetValue' = rv_result
+      EXPORTING #1 = iv_expression.
+  ENDMETHOD.
+
+
+
+  METHOD init."----------------------------------------------------------
+    CALL METHOD OF olib 'Init' = rv_result
+      EXPORTING #1 = iv_load_profiles.
+  ENDMETHOD.
+
+
+
+  METHOD isactivex."----------------------------------------------------
+
+    DATA hasactivex(32) TYPE c.
+
+    ev_result = 0.
+    CALL FUNCTION 'GUI_HAS_OBJECTS'
+      EXPORTING
+        object_model         = 'ACTX'
+      IMPORTING
+        return               = hasactivex
+      EXCEPTIONS
+        invalid_object_model = 1
+        OTHERS               = 2.
+    CHECK sy-subrc = 0 AND hasactivex = 'X'.
+    ev_result = 1.
+
+  ENDMETHOD.
+
+
+
+  METHOD load_file_from_mime."------------------------------------------
+
+    DATA:
+      lr_mr_api     TYPE REF TO if_mr_api,
+      lv_filedata   TYPE xstring,
+      lv_workdir    TYPE string,
+      lv_filepath   TYPE string,
+      lt_filename   TYPE STANDARD TABLE OF string,
+      lv_filename   TYPE string,
+      lt_dtab       TYPE TABLE OF x255,
+      lv_len        TYPE i,
+      lv_fileexists TYPE abap_bool
+      .
+
+    SPLIT iv_uri_file AT '/' INTO TABLE lt_filename.
+    READ TABLE lt_filename INDEX lines( lt_filename ) INTO lv_filename.
+
+    CALL METHOD cl_gui_frontend_services=&gt;get_sapgui_workdir
+      CHANGING
+        sapworkdir = lv_workdir
+      EXCEPTIONS
+        OTHERS     = 1.
+
+    lv_filepath = lv_workdir &amp;&amp; '\' &amp;&amp; lv_filename.
+
+    CALL METHOD cl_gui_frontend_services=&gt;file_exist
+      EXPORTING
+        file   = lv_filepath
+      RECEIVING
+        result = lv_fileexists
+      EXCEPTIONS
+        OTHERS = 1.
+
+    CHECK lv_fileexists = abap_false.
+
+    IF lr_mr_api IS INITIAL.
+      lr_mr_api = cl_mime_repository_api=&gt;if_mr_api~get_api( ).
+    ENDIF.
+
+    CALL METHOD lr_mr_api-&gt;get
+      EXPORTING
+        i_url     = iv_uri_file
+      IMPORTING
+        e_content = lv_filedata
+      EXCEPTIONS
+        OTHERS    = 1.
+
+    CHECK sy-subrc = 0.
+
+    CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
+      EXPORTING
+        buffer        = lv_filedata
+      IMPORTING
+        output_length = lv_len
+      TABLES
+        binary_tab    = lt_dtab.
+
+    CALL FUNCTION 'GUI_DOWNLOAD'
+      EXPORTING
+        bin_filesize = lv_len
+        filename     = lv_filepath
+        filetype     = 'BIN'
+      TABLES
+        data_tab     = lt_dtab
+      EXCEPTIONS
+        OTHERS       = 1.
+
+  ENDMETHOD.
+
+
+
+  METHOD load_lib."-----------------------------------------------------
+
+    DATA rc TYPE i VALUE 0.
+
+    rv_result = 0.
+    CALL METHOD me-&gt;isactivex IMPORTING ev_result = rc.
+    CHECK rc = 1.
+    CREATE OBJECT olib 'SAPIEN.ActiveXPoSHV3'.
+    CHECK sy-subrc = 0 AND olib-handle &lt;&gt; 0 AND olib-type = 'OLE2'.
+    rv_result = 1.
+
+  ENDMETHOD.
+
+
+
+  METHOD outputstring_to_table."----------------------------------------
+
+    FIELD-SYMBOLS:
+      &lt;lv_string&gt; TYPE string
+      .
+
+    SPLIT iv_outputstring
+      AT cl_abap_char_utilities=&gt;cr_lf
+      INTO TABLE rt_stringtable.
+    "-Delete empty lines------------------------------------------------
+    LOOP AT rt_stringtable ASSIGNING &lt;lv_string&gt;.
+      CHECK &lt;lv_string&gt; IS INITIAL.
+      DELETE rt_stringtable.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+
+  METHOD read_incl_as_string."------------------------------------------
+
+    DATA:
+      lt_tadir TYPE tadir,
+      lt_incl TYPE TABLE OF string,
+      lv_inclline TYPE string,
+      lv_retincl TYPE string
+      .
+
+    SELECT SINGLE * FROM tadir INTO lt_tadir
+      WHERE obj_name = iv_incl_name.
+    CHECK sy-subrc = 0.
+    READ REPORT iv_incl_name INTO lt_incl.
+    CHECK sy-subrc = 0.
+    LOOP AT lt_incl INTO lv_inclline.
+      lv_retincl = lv_retincl &amp;&amp; lv_inclline &amp;&amp;
+        cl_abap_char_utilities=&gt;cr_lf.
+      CLEAR lv_inclline.
+    ENDLOOP.
+    rv_str_incl = lv_retincl.
+
+  ENDMETHOD.
+
+
+
+  METHOD set_outputmode."-----------------------------------------------
+    SET PROPERTY OF olib 'OutputMode' = iv_mode.
+  ENDMETHOD.
+
+
+
+  METHOD set_outputwidth."----------------------------------------------
+    SET PROPERTY OF olib 'OutputWidth' = iv_width.
+  ENDMETHOD.
+
+
+
+ENDCLASS.
+"-End-------------------------------------------------------------------</pre>
+<p>Hier ein Beispielprogramm zum Anzeigen einer Tabelle im TableGrid von PowerShell. Die Daten werden einfach mittels eines Select gelesen und mit dem JSON-Serialisierer umgewandelt. Dann wird PowerShell geladen und initialisiert. Die JSON-Daten werden dem GridView nach einer Konvertierung über die Pipeline übergeben.</p>
+<pre class="font:consolas font-size:11 lang:abap decode:true ">"-Begin-----------------------------------------------------------------
+REPORT zposh_example2.
+
+DATA:
+  lt_sflight      TYPE STANDARD TABLE OF sflight,
+  lv_sflight_json TYPE string,
+  lo_posh         TYPE REF TO z_cl_activexposhv3,
+  lv_pscode       TYPE string,
+  lv_result       TYPE string
+  .
+
+SELECT * INTO CORRESPONDING FIELDS OF TABLE lt_sflight FROM SFLIGHT.
+lv_sflight_json = /ui2/cl_json=&gt;serialize( data = lt_sflight ).
+
+CREATE OBJECT lo_posh.
+CHECK lo_posh-&gt;load_lib( ) = lo_posh-&gt;mc_true.
+CHECK lo_posh-&gt;get_is_powershell_installed( ) = lo_posh-&gt;mc_true.
+CHECK lo_posh-&gt;init( iv_load_profiles = lo_posh-&gt;mc_false ) = 0.
+
+lo_posh-&gt;set_outputmode( lo_posh-&gt;mc_outputbuffer ).
+lo_posh-&gt;set_outputwidth( 132 ).
+lo_posh-&gt;clear_output( ).
+
+lv_pscode =
+'(''' &amp;&amp; lv_sflight_json &amp;&amp; ''' | ConvertFrom-Json) | Out-GridView'
+.
+lo_posh-&gt;execute( lv_pscode ).
+lv_result = lo_posh-&gt;get_outputstring( ).
+
+lo_posh-&gt;free_lib( ).
+
+"-End-------------------------------------------------------------------</pre>
+<p>Und so sieht es dann aus.</p>
+<p><img loading="lazy" decoding="async" class="alignnone wp-image-1018402 size-full" src="https://tricktresor.com/wp-content/uploads/2018/03/tt006.jpg" alt="" width="1432" height="761" srcset="/wp-content/uploads/2018/03/tt006.jpg 1432w, /wp-content/uploads/2018/03/tt006-300x159.jpg 300w, /wp-content/uploads/2018/03/tt006-768x408.jpg 768w, /wp-content/uploads/2018/03/tt006-1024x544.jpg 1024w" sizes="(max-width: 1432px) 100vw, 1432px" /></p>
+<p>Auf diese Art und Weise lassen sich nun sehr einfach Integrationsszenarien zwischen PowerShell und ABAP realisieren.</p>
+<p>Hier ein Beispiel zum Anzeigen von .NET-Dialogen. Das Beispiel 1 öffnet einen Dialog, im Beispiel 2 wird das Ergebnis des 1. Dialoges angezeigt und im Beispiel 3 wird ein Datei-Öffnen-Dialog angezeigt und mit Auswahl eines Bildes wird dieses in einem eigenen Dialog angezeigt.</p>
+<pre class="font:consolas font-size:11 lang:abap decode:true ">"-Begin-----------------------------------------------------------------
+REPORT zposh_example1.
+
+DATA:
+  lo_posh         TYPE REF TO z_cl_activexposhv3,
+  lv_pscode       TYPE string,
+  lv_result       TYPE string
+  .
+
+CREATE OBJECT lo_posh.
+CHECK lo_posh-&gt;load_lib( ) = lo_posh-&gt;mc_true.
+CHECK lo_posh-&gt;get_is_powershell_installed( ) = lo_posh-&gt;mc_true.
+CHECK lo_posh-&gt;init( iv_load_profiles = lo_posh-&gt;mc_false ) = 0.
+
+lo_posh-&gt;set_outputmode( lo_posh-&gt;mc_outputbuffer ).
+lo_posh-&gt;set_outputwidth( 132 ).
+lo_posh-&gt;clear_output( ).
+
+"-Example 1-------------------------------------------------------------
+lv_pscode =
+'[void][System.Reflection.Assembly]::LoadWithPartialName(`'              &amp;&amp;
+'  "Microsoft.VisualBasic");'                                            &amp;&amp;
+'[Microsoft.VisualBasic.Interaction]::MsgBox("Hello World", `'           &amp;&amp;
+'  "YesNoCancel,SystemModal,Information", "Message");'.
+lo_posh-&gt;execute( lv_pscode ).
+lv_result = lo_posh-&gt;get_outputstring( ).
+lo_posh-&gt;clear_output( ).
+
+"-Example 2-------------------------------------------------------------
+lv_pscode =
+'[System.Windows.Forms.MessageBox]::Show("' &amp;&amp; lv_result &amp;&amp; '","Button",0);'.
+lo_posh-&gt;execute( lv_pscode ).
+lv_result = lo_posh-&gt;get_outputstring( ).
+lo_posh-&gt;clear_output( ).
+
+"-Example 3-------------------------------------------------------------
+lv_pscode =
+'Function GetFileName() {'                                               &amp;&amp;
+'  $dlgOpen = New-Object System.Windows.Forms.OpenFileDialog;'           &amp;&amp;
+'  $dlgOpen.Title = "Please select a file";'                             &amp;&amp;
+'  $dlgOpen.InitialDirectory = `'                                        &amp;&amp;
+'    "C:\Users\Public\Pictures\Sample Pictures\";'                       &amp;&amp;
+'  $dlgOpen.Filter = "All Files (*.*)|*.*";'                             &amp;&amp;
+'  $dlgOpen.ShowHelp = $True;'                                           &amp;&amp;
+'  $result = $dlgOpen.ShowDialog();'                                     &amp;&amp;
+'  If($result -eq "OK") {'                                               &amp;&amp;
+'    [System.Diagnostics.Debug]::WriteLine($dlgOpen.FileName);'          &amp;&amp;
+'    Return $dlgOpen.FileName;'                                          &amp;&amp;
+'  }'                                                                    &amp;&amp;
+'}'                                                                      &amp;&amp;
+
+'[void][reflection.assembly]::LoadWithPartialName(`'                     &amp;&amp;
+'  "System.Windows.Forms");'                                             &amp;&amp;
+'$fileName = GetFileName;'                                               &amp;&amp;
+'If ([string]::IsNullOrEmpty($fileName) -eq $True) { Exit }'             &amp;&amp;
+'$file = (get-item $fileName);'                                          &amp;&amp;
+'$img = [System.Drawing.Image]::Fromfile($file);'                        &amp;&amp;
+'[System.Windows.Forms.Application]::EnableVisualStyles();'              &amp;&amp;
+'$form = new-object Windows.Forms.Form;'                                 &amp;&amp;
+'$form.Text = "Image Viewer";'                                           &amp;&amp;
+'$form.Width = $img.Size.Width;'                                         &amp;&amp;
+'$form.Height =  $img.Size.Height;'                                      &amp;&amp;
+'$pictureBox = new-object Windows.Forms.PictureBox;'                     &amp;&amp;
+'$pictureBox.Width =  $img.Size.Width;'                                  &amp;&amp;
+'$pictureBox.Height =  $img.Size.Height;'                                &amp;&amp;
+'$pictureBox.Image = $img;'                                              &amp;&amp;
+'$form.controls.add($pictureBox);'                                       &amp;&amp;
+'$form.Add_Shown( { $form.Activate() } );'                               &amp;&amp;
+'$form.ShowDialog()'.
+lo_posh-&gt;execute( lv_pscode ).
+lv_result = lo_posh-&gt;get_outputstring( ).
+
+lo_posh-&gt;free_lib( ).
+
+"-End-------------------------------------------------------------------</pre>
+<p>In diesem Fall sind die PowerShell Sourcen direkt in den ABAP-Quellcode eingebettet. Diese können jedoch auch als Include-Entwicklungsobjekt gespeichert und mit der Methode READ_INCL_AS_STRING eingelesen und der Methode EXECUTE übergeben werden. Mit diesem Ansatz kann nun die gesamte .NET-Welt in ABAP integriert werden. Jede .NET-Bibliothek kann so genutzt werden und darüber hinaus können auch <a href="https://blogs.sap.com/2013/12/15/how-to-use-vb-visual-basic-dotnet-inside-abap/">VB# resp. VB.NET</a> und C# direkt integriert werden.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/powershell-mit-abap-nutzen/">PowerShell mit ABAP nutzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAP GUI Scripting Rekorder mit Windows PowerShell</title>
+		<link>/blog/sap-gui-scripting-rekorder-mit-windows-powershell/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Tue, 22 Nov 2016 05:51:29 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=934877</guid>
+
+					<description><![CDATA[<p>Das SAP GUI Scripting API ist eine Schnittstelle zur Automatisierung von Benutzerinteraktionen mit dem SAP GUI für Windows. Das SAP GUI Scripting kann das Leben der Anwender erheblich vereinfachen in dem sich immer wiederholende Arbeiten und Aufgaben einfach automatisiert werden können. Hinter dem SAP GUI Scripting steht ein Objektmodell das den SAP GUI abbildet. Über dieses Objektmodell kann auf fast alle Objekte des SAP GUI zugegriffen werden. Eine sehr gute Einführung in das SAP GUI...</p>
+<p>Der Beitrag <a href="/blog/sap-gui-scripting-rekorder-mit-windows-powershell/">SAP GUI Scripting Rekorder mit Windows PowerShell</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das SAP GUI Scripting API ist eine Schnittstelle zur Automatisierung von Benutzerinteraktionen mit dem SAP GUI für Windows. Das SAP GUI Scripting kann das Leben der Anwender erheblich vereinfachen in dem sich immer wiederholende Arbeiten und Aufgaben einfach automatisiert werden können. Hinter dem SAP GUI Scripting steht ein Objektmodell das den SAP GUI abbildet. Über dieses Objektmodell kann auf fast alle Objekte des SAP GUI zugegriffen werden. Eine sehr gute Einführung in das SAP GUI Scripting ist <a href="http://www.sdn.sap.com/irj/scn/go/portal/prtroot/docs/library/uuid/80aaac18-2dfe-2a10-bbb1-ec9b3760ea4c?overridelayout=true">hier</a> zu finden.</p>
+<p>Die im SAP-Standard verankerten Möglichkeiten nutzen VBScript als Scripting-Sprache. Und im SAP-Hinweis 592685 wird demonstriert wie mit Hilfe der angehängten Visual Basic Anwendung die Aktionen des Anwenders in SAP GUI aufgezeichnet werden können. Die Visual Basic Plattform ist jedoch veraltet und Ansätze mit anderen (aktuellen) Scripting-Sprachen sind nicht vorhanden, mit Ausnahme des <a href="http://tracker.stschnell.de/">Scripting Tracker</a>. Aus diesem Grund habe ich einen Ansatz eines SAP GUI Scripting Rekorders in PowerShell, der aktuellen Windows Script-Sprache, erstellt. Mit dieser Basis ist es nun sehr einfach einen eigenen Rekorder zu erstellen. Hier der Code:</p>
+<pre>#-Begin-----------------------------------------------------------------
+
+  #-Includes------------------------------------------------------------
+    ."$PSScriptRoot\COM.ps1"
+
+  #-Sub Main------------------------------------------------------------
+    Function Main() {
+
+      [Reflection.Assembly]::LoadFile("$PSScriptRoot\SAPFEWSELib.dll") &gt; $Null
+
+      $SapGuiAuto = Get-Object "SAPGUI"
+      If ($SapGuiAuto -isnot [System.__ComObject]) {
+        Break
+      }
+
+      $Application = Invoke-Method $SapGuiAuto "GetScriptingEngine"
+      [SAPFEWSELib.GuiApplication]$Application =
+        [System.Runtime.InteropServices.Marshal]::CreateWrapperOfType($Application,
+        [SAPFEWSELib.GuiApplicationClass])
+      If ($Application -isnot [System.__ComObject]) {
+        Break
+      }
+
+      $Connection = $Application.Children.Item(0)
+      If ($Connection -eq $Null) {
+        Break
+      }
+      Else {
+        [SAPFEWSELib.GuiConnectionClass]$Connection =
+          [System.Runtime.InteropServices.Marshal]::CreateWrapperOfType($Connection,
+          [SAPFEWSELib.GuiConnectionClass])
+      }
+
+      $Session = $Connection.Children.Item(0)
+      If ($Session -eq $Null) {
+        Break
+      }
+      Else {
+        [SAPFEWSELib.GuiSession]$Session =
+          [System.Runtime.InteropServices.Marshal]::CreateWrapperOfType($Session,
+          [SAPFEWSELib.GuiSessionClass])
+      }
+
+      $Session.Record = $True
+      Register-ObjectEvent -InputObject $Session -EventName "Change" -SourceIdentifier "Action" &gt; $Null
+
+      While ($true) {
+        Write-Host "Waiting for event..."
+        $Event = Wait-Event -SourceIdentifier "Action" -Timeout 10
+        If ($Event -eq $Null) {
+          Write-Host "No event received for 10 seconds."
+          Break
+        }
+
+        [SAPFEWSELib.GuiSession]$RecSession =
+          [System.Runtime.InteropServices.Marshal]::CreateWrapperOfType($event.SourceArgs[0],
+          [SAPFEWSELib.GuiSessionClass])
+        #Ohne die folgende Zeile liefer PowerShell im Folgenden einen Fehler
+        $Dummy = $RecSession | Format-List | Out-String
+
+        [SAPFEWSELib.GuiComponent]$RecComponent =
+          [System.Runtime.InteropServices.Marshal]::CreateWrapperOfType($event.SourceArgs[1],
+          [SAPFEWSELib.GuiComponentClass])
+        Write-Host ( $RecComponent | Format-List | Out-String )
+        #Write-Host ( $RecComponent | Select -ExpandProperty "ID" )
+        Write-Host "Type / Method / Parameter: " $event.SourceArgs[2]
+
+        Remove-Event -SourceIdentifier "Action"
+      }
+
+      Unregister-Event -SourceIdentifier "Action"
+      $Session.Record = $False
+
+    }
+
+  #-Main----------------------------------------------------------------
+    Main
+
+#-End-------------------------------------------------------------------</pre>
+<p>Zur einfacheren Nutzung des Component Object Models (COM) habe ich ein Include erstellt, mit dem dies möglich ist.</p>
+<pre>#-Begin-----------------------------------------------------------------
+
+  #-Load assembly-------------------------------------------------------
+    [Reflection.Assembly]::LoadWithPartialName("Microsoft.VisualBasic") &gt; $Null
+
+  #-Function Create-Object----------------------------------------------
+    Function Create-Object {
+      param([String] $objectName)
+      try {
+        New-Object -ComObject $objectName
+      }
+      catch {
+        [Void] [System.Windows.Forms.MessageBox]::Show(
+          "Can't create object", "Important hint", 0)
+      }  
+    }
+
+  #-Function Get-Object-------------------------------------------------
+    Function Get-Object {
+      param([String] $objectName)
+      [Microsoft.VisualBasic.Interaction]::GetObject($objectName)
+    }
+
+  #-Sub Free-Object-----------------------------------------------------
+    Function Free-Object {
+      param([__ComObject] $object)
+      [Void] [System.Runtime.Interopservices.Marshal]::ReleaseComObject($object)
+    }
+
+  #-Function Get-Property-----------------------------------------------
+    Function Get-Property {
+      param([__ComObject] $object, [String] $propertyName)
+      $objectType = [System.Type]::GetType($object)
+      $objectType.InvokeMember($propertyName,
+        [System.Reflection.Bindingflags]::GetProperty,
+        $null, $object, $null)
+    }
+
+  #-Sub Set-Property----------------------------------------------------
+    Function Set-Property {
+      param([__ComObject] $object, [String] $propertyName, 
+        $propertyValue)
+      $objectType = [System.Type]::GetType($object)
+      [Void] $objectType.InvokeMember($propertyName,
+        [System.Reflection.Bindingflags]::SetProperty,
+        $null, $object, $propertyValue)
+    }
+
+  #-Function Invoke-Method----------------------------------------------
+    Function Invoke-Method {
+      param([__ComObject] $object, [String] $methodName,
+        $methodParameters)
+      $objectType = [System.Type]::GetType($object)
+      $output = $objectType.InvokeMember($methodName,
+        "InvokeMethod", $NULL, $object, $methodParameters)
+      if ( $output ) { $output }
+    }
+
+#-End-------------------------------------------------------------------</pre>
+<p>Weiterhin benötigt der Rekorder eine Interoperationsbibliothek für das SAP GUI Scripting. Mit Hilfe der Interop-Technik lassen sich alle klassischen, binär kompilierten Windows-Bibliotheken mit Wrappern versehen, so dass deren Programmfunktionen wie normale .NET-Programmfunktionen aufgerufen werden können. Entweder man erzeugt sich diesen Wrapper selbst mit TypLibImp, einem Tool aus dem .NET-Framework, oder man nutzt die Interoperationsbibliothek des NWBC.</p>
+<p>Vom Ablauf her ist der Rekorder sehr einfach:</p>
+<ul>
+<li>Es wird eine Verbindung zu einer SAP-Session hergestellt</li>
+<li>Dann wird das Ereignis Change registriert</li>
+<li>In einer Schleife, die nach 10 Sekunden ohne Ereignis beendet wird, werden die Informationen eines Ereignisses abgefangen</li>
+<li>Im Objekt GuiComponent sind viele Informationen zu finden</li>
+<li>Im dritten Argument des Ereignisses $event.SourceArgs[2] ist die Aktivität zu finden</li>
+</ul>
+<figure id="attachment_934878" aria-describedby="caption-attachment-934878" style="width: 289px" class="wp-caption alignnone"><img loading="lazy" decoding="async" class="size-medium wp-image-934878" src="https://tricktresor.com/wp-content/uploads/2016/11/stefanschnell_powershell_scriptrec-289x300.jpg" alt="SAP GUI Scripting Recorder in Windows PowerShell" width="289" height="300" srcset="/wp-content/uploads/2016/11/stefanschnell_powershell_scriptrec-289x300.jpg 289w, /wp-content/uploads/2016/11/stefanschnell_powershell_scriptrec.jpg 739w" sizes="(max-width: 289px) 100vw, 289px" /><figcaption id="caption-attachment-934878" class="wp-caption-text">SAP GUI Scripting Recorder in Windows PowerShell</figcaption></figure>
+<p>Mit diesem Ansatz ist es nun sehr einfach möglich einen eigenen SAP GUI Scripting Rekorder zu implementieren.</p>
+<p>Der Beitrag <a href="/blog/sap-gui-scripting-rekorder-mit-windows-powershell/">SAP GUI Scripting Rekorder mit Windows PowerShell</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>64-bit Programme mit dem SAP GUI für Windows ausführen</title>
+		<link>/blog/64-bit-programme-mit-dem-sap-gui-fuer-windows-ausfuehren/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Sun, 20 Nov 2016 17:11:28 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[x86]]></category>
+		<category><![CDATA[x64]]></category>
+		<category><![CDATA[Applikation]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=932359</guid>
+
+					<description><![CDATA[<p>Immer mehr kommen 64-bit Programme im 64-bit Windows-Umfeld zum Einsatz. 32-bit Programme, manchmal auch mit der Extension x86 versehen, werden langsam aber sicher weniger. So stellte sich mir die Frage, ob es mit dem SAP GUI für Windows, der ja bekanntlich eine 32-bit Applikation ist, möglich ist auch x64-Programme zu starten. Um Programme auf dem Frontend-Server zu starten wird aus ABAP im Normalfall die Methode Execute der Klasse cl_gui_frontend_services verwendet. Diese Methode nutzt unter Windows...</p>
+<p>Der Beitrag <a href="/blog/64-bit-programme-mit-dem-sap-gui-fuer-windows-ausfuehren/">64-bit Programme mit dem SAP GUI für Windows ausführen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Immer mehr kommen 64-bit Programme im 64-bit Windows-Umfeld zum Einsatz. 32-bit Programme, manchmal auch mit der Extension x86 versehen, werden langsam aber sicher weniger. So stellte sich mir die Frage, ob es mit dem SAP GUI für Windows, der ja bekanntlich eine 32-bit Applikation ist, möglich ist auch x64-Programme zu starten. Um Programme auf dem Frontend-Server zu starten wird aus ABAP im Normalfall die Methode Execute der Klasse cl_gui_frontend_services verwendet. Diese Methode nutzt unter Windows native die API-Funktion ShellExecute und diese kann auch x64-Programme von einem 32-bit-Prozess starten, wie <a href="https://msdn.microsoft.com/de-de/library/windows/desktop/aa384203(v=vs.85).aspx">hier</a> zu lesen ist. Also ist es kein Problem, und so ist es auch. Zum Testen habe ich den Editor notepad gestartet, wie im folgenden Code-Snippet zu sehen ist:</p>
+<pre>*-Begin-----------------------------------------------------------------
+Program zExecuteTest.
+
+  Data:
+    lr_fe_serv Type Ref To CL_GUI_FRONTEND_SERVICES.
+
+  Create Object lr_fe_serv.
+
+  Check lr_fe_serv-&gt;Get_Platform( ) = 14.
+
+  lr_fe_serv-&gt;Execute(
+    Exporting
+
+      "Das Verzeichnis Sysnative ist nur auf x64-Windows sichtbar und es
+      "kann nur mit x86-Software darauf zugegriffen werden
+      Application = '%windir%\Sysnative\notepad.exe'
+
+      "Im Verzeichnis System32 sind alle x64 Applikationen zu finden
+      "Application = '%windir%\System32\notepad.exe'
+
+      "Im Verzeichnis SysWOW64 sind alle x86 Applicationen zu finden
+      "Application = '%windir%\SysWOW64\notepad.exe'
+
+    Exceptions
+      CNTL_ERROR = 1
+      ERROR_NO_GUI = 2
+      BAD_PARAMETER = 3
+      FILE_NOT_FOUND = 4
+      PATH_NOT_FOUND = 5
+      FILE_EXTENSION_UNKNOWN = 6
+      ERROR_EXECUTE_FAILED = 7
+      SYNCHRONOUS_FAILED = 8
+      NOT_SUPPORTED_BY_GUI = 9
+      Others = 10
+    ).
+
+    If sy-subrc &lt;&gt; 0.
+
+    EndIf.
+
+*-End-------------------------------------------------------------------</pre>
+<p>Nebenbei zeigt dieses Beispiel noch wie über das virtuelle System-Verzeichnis Sysnative auf Windows-eigene 64-bit Applikationen zugegriffen werden kann. Auf diesem Wege wird das automatische Redirectoring umgangen. Ein Versuch ein Programm direkt aus dem Verzeichnis System32 aufzurufen, wie in der auskommentierten Zeile zu sehen, funktioniert so nicht, da wird man automatisch zu SysWOW64 umgeleitet und der 32-bit Pendant wird verwendet. So steht der Nutzung von x64-Software im Kontext des SAP GUI für Windows nichts entgegen.</p>
+<p>Der Beitrag <a href="/blog/64-bit-programme-mit-dem-sap-gui-fuer-windows-ausfuehren/">64-bit Programme mit dem SAP GUI für Windows ausführen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Sie haben das Recht zu schweigen&#8230; Rollen und Berechtigungen, ein kleiner Einblick</title>
+		<link>/blog/sie-haben-das-recht-zu-schweigen-rollen-und-berechtigungen-ein-kleiner-einblick/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=563051</guid>
+
+					<description><![CDATA[<p>Immer wieder erreichen uns Nachrichten dass in IT-Systemen von Unternehmen eingebrochen und Daten entwendet wurden. Damit es unauthorisierten Personen nicht leicht gemacht wird können u.a. Rollen und Berechtigungen verwendet werden, gerade im Kontext von Entwicklungen mit Schnittstellen z.B. auf Basis eines Remote Function Call (RFC). Da der Entwickler bestimmt wo, wie oder ob überhaupt Berechtigungen geprüft werden, soll diese Betrachtung das Themengebiet ein wenig beleuchten und Sensibilität schaffen. Im Fokus eines Entwicklers steht primär die...</p>
+<p>Der Beitrag <a href="/blog/sie-haben-das-recht-zu-schweigen-rollen-und-berechtigungen-ein-kleiner-einblick/">Sie haben das Recht zu schweigen&#8230; Rollen und Berechtigungen, ein kleiner Einblick</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Immer wieder erreichen uns Nachrichten dass in IT-Systemen von Unternehmen eingebrochen und Daten entwendet wurden. Damit es unauthorisierten Personen nicht leicht gemacht wird können u.a. Rollen und Berechtigungen verwendet werden, gerade im Kontext von Entwicklungen mit Schnittstellen z.B. auf Basis eines Remote Function Call (RFC). Da der Entwickler bestimmt wo, wie oder ob überhaupt Berechtigungen geprüft werden, soll diese Betrachtung das Themengebiet ein wenig beleuchten und Sensibilität schaffen.</p>
+<p>Im Fokus eines Entwicklers steht primär die Funktionalität. Daneben muss er auf die Architektur und das Design achten sowie Konventionen und Vorgehensweisen verfolgen. Berechtigungsaspekte stehen selten im Fokus, oftmals nur ein Satz in der Anforderung, wenn überhaupt. Wie schnell kann es da passieren, dass ein RFC-fähiger Funktionsbaustein ausgeliefert wird der gar keine Berechtigungsprüfung enthält. Nun könnte man an dieser Stelle entgegnen dass bei einem RFC-Aufruf standardmäßig das S_RFC-Berechtigungsobjekt geprüft wird, egal ob eine Berechtigungsprüfung enthalten ist oder nicht. Das ist richtig, jedoch beinhaltet diese Prüfung nur den Aspekt ob ein RFC-fähiger Funktionsbaustein auch via RFC durch den Benutzer aufgerufen werden darf. Dabei ist es egal um welchen Baustein es sich handelt und welchen Inhalt er liefert. Dies führt uns deutlich vor Augen, wie wichtig eine Berechtigungsprüfung in diesem Zusammenhang ist.</p>
+<p>Grundvoraussetzung für den Zugriff auf ein System ist das Vorhandensein eines Benutzers, mit Benutzerkennung und Passwort. Jedem Benutzer werden Rollen und damit Berechtigungsprofile zugeordnet.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563052" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_000-001.jpg" alt="RUB_000-001" width="680" height="113" srcset="/wp-content/uploads/2016/04/RUB_000-001.jpg 680w, /wp-content/uploads/2016/04/RUB_000-001-300x50.jpg 300w" sizes="(max-width: 680px) 100vw, 680px" /></p>
+<p>Die Berechtigungen eines Benutzers werden in der Regel nicht direkt, sondern in Form von Berechtigungsprofilen zusammengefasst. Eine Berechtigung ist eine Ermächtigung, eine bestimmte Aktion im System durchzuführen. Dies geschieht auf der Grundlage einer Gruppe von Werten für die einzelnen Felder eines Berechtigungsobjekts. Berechtigungsobjekte ermöglichen eine an mehrere Bedingungen gebundene Prüfung einer Berechtigung.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563053" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_000-002.jpg" alt="RUB_000-002" width="680" height="113" srcset="/wp-content/uploads/2016/04/RUB_000-002.jpg 680w, /wp-content/uploads/2016/04/RUB_000-002-300x50.jpg 300w" sizes="(max-width: 680px) 100vw, 680px" /></p>
+<p>Im Programm wird durch die Verwendung der entsprechenden Syntax ermittelt, ob der Benutzer eine ausreichende Berechtigung für eine bestimmte Aktivität hat, indem die im Programm vorgegebenen Feldwerte für das Berechtigungsobjekt mit den in den Berechtigungen des Benutzerstammsatzes enthaltenen Werten verglichen werden.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563054" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_000-003.jpg" alt="RUB_000-003" width="680" height="113" srcset="/wp-content/uploads/2016/04/RUB_000-003.jpg 680w, /wp-content/uploads/2016/04/RUB_000-003-300x50.jpg 300w" sizes="(max-width: 680px) 100vw, 680px" /></p>
+<p>Ein Beispiel:<br />
+<span style="font-family: 'Courier New', monospace"><b>Authority-Check</b> <b>Object</b> &#8216;Z_TEST&#8217;<br />
+</span><span style="font-family: 'Courier New', monospace"><b>  Id</b> &#8216;ACTVT&#8217; <b>Field</b> &#8217;16&#8217;.</span></p>
+<p><span style="font-family: 'Courier New', monospace"><b>If</b> sy-subrc &lt;&gt; 0.<br />
+</span><span style="font-family: 'Courier New', monospace"><b>  Exit</b>.<br />
+</span><span style="font-family: 'Courier New', monospace"><b>EndIf</b>.</span></p>
+<p>Hier wird das Berechtigungsfeld ACTVT (Aktivität) des Berechtigungsobjektes Z_TEST geprüft. Ist der Feldwert 16 dem verwendeten Benutzer zugeordnet, so ist der Systemrückgabewert (sy-subrc) gleich 0, andernfalls wird der Verarbeitungsblock verlassen.</p>
+<p>Wenden wir uns nun einem praktischem Beispiel zu. Zur Anlage eines Berechtigungsobjektes rufen wir die Transaktion SU21 (Pflege der Berechtigungsobjekte) auf. Zuerst legen wir eine Berechtigungsobjektklasse an, in der Berechtigungen gruppiert werden können.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563055" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_001.jpg" alt="RUB_001" width="584" height="174" srcset="/wp-content/uploads/2016/04/RUB_001.jpg 584w, /wp-content/uploads/2016/04/RUB_001-300x89.jpg 300w" sizes="(max-width: 584px) 100vw, 584px" /></p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563056" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_002.jpg" alt="RUB_002" width="567" height="185" srcset="/wp-content/uploads/2016/04/RUB_002.jpg 567w, /wp-content/uploads/2016/04/RUB_002-300x98.jpg 300w" sizes="(max-width: 567px) 100vw, 567px" /></p>
+<p>Nun legen wir das Berechtigungsobjekt an.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563057" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_003.jpg" alt="RUB_003" width="535" height="578" srcset="/wp-content/uploads/2016/04/RUB_003.jpg 535w, /wp-content/uploads/2016/04/RUB_003-278x300.jpg 278w" sizes="(max-width: 535px) 100vw, 535px" /></p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563058" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_004.jpg" alt="RUB_004" width="533" height="582" srcset="/wp-content/uploads/2016/04/RUB_004.jpg 533w, /wp-content/uploads/2016/04/RUB_004-275x300.jpg 275w" sizes="(max-width: 533px) 100vw, 533px" /></p>
+<p>Wir weisen dem Berechtigungsobjekt ein Berechtigungsfeld zu und die zulässigen Aktivitäten (Werte).</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563059" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_005.jpg" alt="RUB_005" width="342" height="516" srcset="/wp-content/uploads/2016/04/RUB_005.jpg 342w, /wp-content/uploads/2016/04/RUB_005-199x300.jpg 199w" sizes="(max-width: 342px) 100vw, 342px" /></p>
+<p>Als nächstes rufen wir die Transaktion PFCG (Rollenpflege) auf und legen eine neue Einzelrolle an.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563060" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_006.jpg" alt="RUB_006" width="681" height="211" srcset="/wp-content/uploads/2016/04/RUB_006.jpg 681w, /wp-content/uploads/2016/04/RUB_006-300x93.jpg 300w" sizes="(max-width: 681px) 100vw, 681px" /></p>
+<p>Wir aktivieren den Reiter Berechtigungen und legen ein neues Berechtigungsprofil an.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563061" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_008.jpg" alt="RUB_008" width="742" height="559" srcset="/wp-content/uploads/2016/04/RUB_008.jpg 742w, /wp-content/uploads/2016/04/RUB_008-300x226.jpg 300w" sizes="(max-width: 742px) 100vw, 742px" /></p>
+<p>Dann ändern wir die Berechtigungsdaten, wählen keine Vorlage aus und nehmen die manuelle Auswahl eines Berechtigungsobjektes vor. Wir ordnen die gewünschte Aktivität zu, sichern und generieren.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563062" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_010.jpg" alt="RUB_010" width="936" height="138" srcset="/wp-content/uploads/2016/04/RUB_010.jpg 936w, /wp-content/uploads/2016/04/RUB_010-300x44.jpg 300w, /wp-content/uploads/2016/04/RUB_010-768x113.jpg 768w" sizes="(max-width: 936px) 100vw, 936px" /></p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563063" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_011.jpg" alt="RUB_011" width="309" height="275" srcset="/wp-content/uploads/2016/04/RUB_011.jpg 309w, /wp-content/uploads/2016/04/RUB_011-300x267.jpg 300w" sizes="(max-width: 309px) 100vw, 309px" /></p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563064" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_012.jpg" alt="RUB_012" width="959" height="289" srcset="/wp-content/uploads/2016/04/RUB_012.jpg 959w, /wp-content/uploads/2016/04/RUB_012-300x90.jpg 300w, /wp-content/uploads/2016/04/RUB_012-768x231.jpg 768w" sizes="(max-width: 959px) 100vw, 959px" /></p>
+<p>Nun springen wir zurück, wechseln in den Reiter Benutzer und ordnen den oder die gewünschten Benutzer zu.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563065" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_013.jpg" alt="RUB_013" width="755" height="350" srcset="/wp-content/uploads/2016/04/RUB_013.jpg 755w, /wp-content/uploads/2016/04/RUB_013-300x139.jpg 300w" sizes="(max-width: 755px) 100vw, 755px" /></p>
+<p>Zu guter letzt können wir nun das Berechtigungsobjekt abfragen.</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563066" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_014.jpg" alt="RUB_014" width="722" height="379" srcset="/wp-content/uploads/2016/04/RUB_014.jpg 722w, /wp-content/uploads/2016/04/RUB_014-300x157.jpg 300w" sizes="(max-width: 722px) 100vw, 722px" /></p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-563067" src="https://tricktresor.com/wp-content/uploads/2016/04/RUB_015.jpg" alt="RUB_015" width="713" height="378" srcset="/wp-content/uploads/2016/04/RUB_015.jpg 713w, /wp-content/uploads/2016/04/RUB_015-300x159.jpg 300w" sizes="(max-width: 713px) 100vw, 713px" /></p>
+<p>Hinweis: Dieser Beitrag zeigt nur einen kleinen Teil der Möglichkeiten und soll, wie eingangs erwähnt, für das Thema sensibilisieren. Weiterhin soll er die Zusammenhänge von Rollen und Berechtigungen transparenter machen und aufzeigen wie &#8220;einfach&#8221; diese im Kontext einer Entwicklung verwendet werden können.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/sie-haben-das-recht-zu-schweigen-rollen-und-berechtigungen-ein-kleiner-einblick/">Sie haben das Recht zu schweigen&#8230; Rollen und Berechtigungen, ein kleiner Einblick</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Vergleich der Nutzung von COM-Bibliotheken in VBScript und ABAP</title>
+		<link>/blog/vergleich-der-nutzung-von-com-bibliotheken-in-vbscript-und-abap/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Mon, 28 Mar 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=551129</guid>
+
+					<description><![CDATA[<p>Component Object Model (COM) Bibliotheken fanden ihren Ursprung in der fehlenden Transparenz von Dynamic Link Libraries (DLL). Während die DLLs nach außen nur ihre Funktionsaufrufe exponieren stellen COM-Bibliotheken auch deren Parameter mit den Datentypen zur Verfügung. Zusätzlich können auch Enumerationen exponiert werden. COM-Bibliotheken sind der nächste Schritt in der DLL-Evolution. Auch der Ansatz zum Aufruf von Funktionen wurde verändert, während DLLs in den Adressraum eingeblendet und die Funktionen direkt adressiert werden nutzen COM-Bibliotheken eine abstraktere...</p>
+<p>Der Beitrag <a href="/blog/vergleich-der-nutzung-von-com-bibliotheken-in-vbscript-und-abap/">Vergleich der Nutzung von COM-Bibliotheken in VBScript und ABAP</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Component Object Model (COM) Bibliotheken fanden ihren Ursprung in der fehlenden Transparenz von Dynamic Link Libraries (DLL). Während die DLLs nach außen nur ihre Funktionsaufrufe exponieren stellen COM-Bibliotheken auch deren Parameter mit den Datentypen zur Verfügung. Zusätzlich können auch Enumerationen exponiert werden. COM-Bibliotheken sind der nächste Schritt in der DLL-Evolution. Auch der Ansatz zum Aufruf von Funktionen wurde verändert, während DLLs in den Adressraum eingeblendet und die Funktionen direkt adressiert werden nutzen COM-Bibliotheken eine abstraktere Schnittstelle. Hierfür wird u.a. die Windows-Registry genutzt in der entsprechende Einträge vorgenommen werden müssen. Leider hat sich die Erstellung und Nutzung von COM-Bibliotheken nur sehr bedeckt verhalten. SAP hat ABAP mit entsprechenden Befehlen versehen, die im Kontext des SAP GUI für Windows mit einem Dialog-Benutzer zum Einsatz gebracht werden können. Leider hat sich auch hier der Einsatz nur sehr verhalten dargestellt, oftmals setzten Entscheider lieber auf den Einsatz von teuren Server-Lösungen statt die verfügbare Leistung des Frontendservers zu nutzen. Nichts desto trotz stehen die Möglichkeiten zur Verfügung und hier möchte ich einen kleinen Vergleich der Nutzung von COM-Bibliotheken zwischen VBScript und ABAP durchführen.</p>
+<p>VBScript ist die Skriptsprache die seit langem Windows begleitet und bis zur aktuellen Version 10 verfügbar ist. VBScript ist fest mit COM verbunden und bietet beste Möglichkeiten zur einfachen Nutzung. Aus dieser Perspektive der beste Partner um die notwendigen Ausprägungen zur Nutzung mit ABAP zu vergleichen.</p>
+<p>Beginnen wir mit der Objekterzeugung (Instanzierung einer Klasse):<br />
+VBS: Set oCon = CreateObject(&#8220;ADODB.Connection&#8221;)<br />
+ABAP: Create Object oCon &#8216;ADODB.Connection&#8217;.<br />
+Das ist sehr äquivalent, deutlich ist der gleiche Ansatz zu erkennen, trotz der unterschiedlichen Sprachen.</p>
+<p>Schauen wir uns nun das Schreiben von Attributen an:<br />
+VBS: oCon.CursorLocation = adUseClient<br />
+ABAP: Set Property Of oCon &#8216;CursorLocation&#8217; = adUseClient.<br />
+Immer noch äquivalent, obwohl die Ausprägung in ABAP länger formuliert ist, aber dafür technisch präziser.<br />
+Beim Lesen von Attributen ist es genauso:<br />
+VBS: oRecSet.RecordCount<br />
+ABAP: Get Property Of oRecSet &#8216;RecordCount&#8217; = cntRec.<br />
+Hier zeigt sich allerdings ein signifikanter Unterschied, VBScript bietet die Möglichkeit der direkten Wertrückgabe mit Aufruf des Attributes. Das ist mit ABAP nicht möglich, hier müssen stets Variablen verwendet werden, das macht den Quelltext natürlich umfangreicher.</p>
+<p>Beim Methodenaufruf gestaltet es sich ähnlich:<br />
+VBS: oCon.Open &#8220;DRIVER=SQLite3 ODBC Driver;Database=C:\Dummy\MyDb.db3;&#8221;<br />
+ABAP: Call Method Of oCon &#8216;Open&#8217; Exporting<br />
+#1 = &#8216;DRIVER=SQLite3 ODBC Driver;Database=C:\Dummy\MyDb.db3;&#8217;.</p>
+<p>Last but not least die Objektzerstörung:<br />
+Set oCon = Nothing<br />
+Free Object oCon.</p>
+<p>Wie wir sehen ist der Unterschied alles in allem nicht allzu groß. Die COBOL-Ursprünge die noch in ABAP erkennbar sind machen den Quelltext umfangreicher und an manchen Stellen, je nach Einsatz, auch etwas komplexer. Generell lässt sich aber festhalten, dass die Nutzung von COM-Bibliotheken mit ABAP sich ähnlich gestaltet wie in VBScript. Wenn man die VBScript-Möglichkeiten nicht ausschöpft, kann man sehr äquivalenten Code zu ABAP erstellen und damit auf diesem Wege beispielsweise ein Prototyping der Komponenten auf dem Frontend-Server durchführen.</p>
+<p><strong>Hinweis:</strong> Zur Analyse von COM-Bibliotheken empfiehlt sich der OLE/COM Object Viewer von Microsoft. Er ist Bestandteil des Microsoft SDK für Windows und kann kostenlos geladen werden. Dies ist besonders von Vorteil um zu ermitteln ob es sich bei einem Aufruf um eine Methode oder ein Attribut handelt. Der Unterschied ist im VBScript nicht so signifikant wie in ABAP.</p>
+<p>Nun mag es der Eine oder Andere für fragwürdig halten einen solchen Vergleich vorzunehmen, ich sehe hier jedoch keine Probleme, denn ein Blick über den Tellerrand ist stets ein Gewinn.</p>
+<p>&nbsp;</p>
+<p>Hier noch der direkte Vergleich zweier äquivalenter Quelltexte. Zuerst in VBScript:</p>
+<p><code>'-Begin-----------------------------------------------------------------</code></p>
+<p><code>  '-Directives----------------------------------------------------------</code><br />
+<code>    Option Explicit</code></p>
+<p><code>  '-Constants-----------------------------------------------------------</code><br />
+<code>    Const adUseClient = 3</code></p>
+<p><code>  '-Sub Main------------------------------------------------------------</code><br />
+<code>    Sub Main()</code></p>
+<p><code>      '-Variables-------------------------------------------------------</code><br />
+<code>        Dim oCon, sSQL, i, oRecSet, oField</code></p>
+<p><code>      Set oCon = CreateObject("ADODB.Connection")</code><br />
+<code>       If Not IsObject(oCon) Then</code><br />
+<code>         Exit Sub</code><br />
+<code>       End If</code><br />
+<code>       oCon.CursorLocation = adUseClient</code><br />
+<code>       oCon.Open "DRIVER=SQLite3 ODBC Driver;Database=C:\Dummy\MyDb.db3;"</code></p>
+<p><code>      sSQL = "DROP TABLE tblTest"</code><br />
+<code>       On Error Resume Next</code><br />
+<code>       oCon.Execute sSQL</code><br />
+<code>       On Error GoTo 0</code></p>
+<p><code>      sSQL = "CREATE TABLE tblTest(ID INTEGER PRIMARY KEY, " &amp; _</code><br />
+<code>         "NAME VARCHAR(40))"</code><br />
+<code>       oCon.Execute sSQL</code></p>
+<p><code>       For i = 1 To 16</code><br />
+<code>         sSQL = "INSERT INTO tblTest VALUES( " &amp; CStr(i) &amp; _</code><br />
+<code>           ", 'Name" &amp; CStr(i) &amp; "')"</code><br />
+<code>         oCon.Execute sSQL</code><br />
+<code>       Next</code></p>
+<p><code>      sSQL = "SELECT * FROM tblTest"</code><br />
+<code>       Set oRecSet = oCon.Execute(sSQL)</code><br />
+<code>       For i = 1 To oRecSet.RecordCount</code><br />
+<code>         For Each oField In oRecSet.Fields</code><br />
+<code>           WScript.Echo oField.Name, oField.Value</code><br />
+<code>         Next</code><br />
+<code>         oRecSet.MoveNext</code><br />
+<code>       Next</code></p>
+<p><code>       oCon.Close</code><br />
+<code>       Set oCon = Nothing</code></p>
+<p><code>    End Sub</code></p>
+<p><code>  '-Main----------------------------------------------------------------</code><br />
+<code>    Main</code></p>
+<p><code>'-End-------------------------------------------------------------------</code></p>
+<p>&nbsp;</p>
+<p>Nun in ABAP:</p>
+<p><code>"-Begin-----------------------------------------------------------------</code><br />
+<code>Report ZODBC_SQLITE.</code></p>
+<p><code>  "-Constants-----------------------------------------------------------</code><br />
+<code>    Constants adUseClient Type i Value 3.</code></p>
+<p><code>  "-Variables-----------------------------------------------------------</code><br />
+<code>    Data oCon Type OLE2_OBJECT.</code><br />
+<code>     Data oRecSet Type OLE2_OBJECT.</code><br />
+<code>     Data oFields Type OLE2_OBJECT.</code><br />
+<code>     Data oField Type OLE2_OBJECT.</code><br />
+<code>     Data cntRec Type i.</code><br />
+<code>     Data cntFields Type i.</code><br />
+<code>     Data sSQL Type String.</code><br />
+<code>     Data i Type i.</code><br />
+<code>     Data j Type i.</code><br />
+<code>     Data nameField Type String.</code><br />
+<code>     Data valueField Type String.</code></p>
+<p><code>  "-Main----------------------------------------------------------------</code><br />
+<code>     Create Object oCon 'ADODB.Connection'.</code><br />
+<code>     If sy-subrc &lt;&gt; 0 Or oCon-Handle &lt;= 0 Or oCon-Type &lt;&gt; 'OLE2'..</code><br />
+<code>       Exit.</code><br />
+<code>     EndIf.</code><br />
+<code>     Set Property Of oCon 'CursorLocation' = adUseClient.</code><br />
+<code>     Call Method Of oCon 'Open' Exporting</code><br />
+<code>       #1 = 'DRIVER=SQLite3 ODBC Driver;Database=C:\Dummy\MyDb.db3;'.</code></p>
+<p><code>    sSQL = 'DROP TABLE tblTest'.</code><br />
+<code>     Call Method Of oCon 'Execute' Exporting #1 = sSQL.</code></p>
+<p><code>    sSQL = 'CREATE TABLE tblTest(ID INTEGER PRIMARY KEY, NAME VARCHAR(40))'.</code><br />
+<code>     Call Method Of oCon 'Execute' Exporting #1 = sSQL.</code></p>
+<p><code>    i = 1.</code><br />
+<code>     While i &lt;= 16.</code><br />
+<code>       sSQL = 'INSERT INTO tblTest VALUES(' &amp;&amp; i &amp;&amp; ', ''Name' &amp;&amp; i &amp;&amp; ''')'.</code><br />
+<code>       Call Method Of oCon 'Execute' Exporting #1 = sSQL.</code><br />
+<code>       i = i + 1.</code><br />
+<code>     EndWhile.</code></p>
+<p><code>    sSQL = 'SELECT * FROM tblTest'.</code><br />
+<code>     Call Method Of oCon 'Execute' = oRecSet Exporting #1 = sSQL.</code><br />
+<code>     Get Property Of oRecSet 'RecordCount' = cntRec.</code><br />
+<code>     i = 1.</code><br />
+<code>     While i &lt;= cntRec.</code><br />
+<code>       Get Property Of oRecSet 'Fields' = oFields.</code><br />
+<code>       Get Property Of oFields 'Count' = cntFields.</code><br />
+<code>       j = 0.</code><br />
+<code>       While j &lt;= cntFields - 1.</code><br />
+<code>         Get Property Of oFields 'Item' = oField Exporting #1 = j.</code><br />
+<code>         Get Property Of oField 'Name' = nameField.</code><br />
+<code>         Get Property Of oField 'Value' = valueField.</code><br />
+<code>         Write: / nameField, ` `, valueField.</code><br />
+<code>         j = j + 1.</code><br />
+<code>       EndWhile.</code><br />
+<code>       Call Method Of oRecSet 'MoveNext'.</code><br />
+<code>       i = i + 1.</code><br />
+<code>     EndWhile.</code></p>
+<p><code>    Call Method Of oCon 'Close'.</code><br />
+<code>     Free Object oCon.</code></p>
+<p><code>"-End-------------------------------------------------------------------</code></p>
+<p>Der Beitrag <a href="/blog/vergleich-der-nutzung-von-com-bibliotheken-in-vbscript-und-abap/">Vergleich der Nutzung von COM-Bibliotheken in VBScript und ABAP</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Der Beginn einer wunderbaren Freundschaft – VBScript nahtlos mit ABAP nutzen</title>
+		<link>/blog/der-beginn-einer-wunderbaren-freundschaft-vbscript-nahtlos-mit-abap-nutzen/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Fri, 16 May 2014 12:51:37 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4734</guid>
+
+					<description><![CDATA[<p>Polyglottes programmieren, also programmieren in mehreren Sprachen, ist ein eher ungewöhnliches Szenario. Programmiersprachen bieten im Regelfall einen breiten Umfang, so dass ein Integrationsszenario mit einer weiteren Programmiersprache oftmals gar nicht notwendig ist. Jedoch kann hin und wieder der Wunsch oder sogar die Notwendigkeit entstehen, aus funktionalen oder schlichten ökonomischen Erwägungen, ein solches Integrationsszenario aufzubauen. Sei es weil die verwendete Programmiersprache kein adäquates Äquivalent liefert oder weil eine solche Implementierung zu aufwendig wäre. In dieser beispielhaften Anleitung beschreibe ich die nahtlose Integration von VBScript in ABAP. </p>
+<p>Der Beitrag <a href="/blog/der-beginn-einer-wunderbaren-freundschaft-vbscript-nahtlos-mit-abap-nutzen/">Der Beginn einer wunderbaren Freundschaft – VBScript nahtlos mit ABAP nutzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Polyglottes programmieren, also programmieren in mehreren Sprachen, ist ein eher ungewöhnliches Szenario. Programmiersprachen bieten im Regelfall einen breiten Umfang, so dass ein Integrationsszenario mit einer weiteren Programmiersprache oftmals gar nicht notwendig ist. Jedoch kann hin und wieder der Wunsch oder sogar die Notwendigkeit entstehen, aus funktionalen oder schlichten ökonomischen Erwägungen, ein solches Integrationsszenario aufzubauen. Sei es weil die verwendete Programmiersprache kein adäquates Äquivalent liefert oder weil eine solche Implementierung zu aufwendig wäre. In dieser beispielhaften Anleitung beschreibe ich die nahtlose Integration von VBScript in ABAP. Zum einen eröffnen wir uns damit die Möglichkeit auf einfachem Wege auf den Präsentationsserver zuzugreifen und zum anderen können wir die VBScript-Sourcen direkt in die ABAP Development Workbench integrieren.</p>
+<p>Wie zu sehen sein wird, ist eine nahtlose Integration der Scriptsprache VBScript in ABAP möglich. Sowohl die Implementierung des VBScript-Sourcecodes als auch die Ausführung des VBScript-Codes sind ohne Systembrüche möglich. Alles lässt sich über die ABAP Development Workbench realisieren. Mit diesem Ansatz lassen sich nun ohne Probleme auch weitere Sprachen einbinden. Z.B. kann die vollständige PowerShell-Funktionalität bereitgestellt werden und damit ebenso der vollständige Zugriff auf das dotNET-Framework. Dies wird beispielhaft unter weitere Aussichten dargestellt.</p>
+<p>Hier die Anleitung als PDF-Datei: <a href="https://tricktresor.com/wp-content/uploads/2014/05/Schnell_VBScriptInsideABAP.pdf">VBScript nahtlos mit ABAP nutzen</a></p>
+<p>Der Beitrag <a href="/blog/der-beginn-einer-wunderbaren-freundschaft-vbscript-nahtlos-mit-abap-nutzen/">Der Beginn einer wunderbaren Freundschaft – VBScript nahtlos mit ABAP nutzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Simulation einer E-Mail-Anhang-Konvertierung</title>
+		<link>/blog/simulation-einer-e-mail-anhang-konvertierung/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Thu, 26 Dec 2013 08:42:45 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[e-mail]]></category>
+		<category><![CDATA[anhang]]></category>
+		<category><![CDATA[konvertierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=4104</guid>
+
+					<description><![CDATA[<p>Oft haben Entwickler das Problem, dass nicht alle Applikationen, die sie für Ihre Entwicklung benötigen, zur richtigen Zeit verfügbar sind. So kann es notwendig sein die eine oder andere Applikation zu simulieren. Hier ist ein Lösungsansatz wie eine Konvertierung von Bildern als E-Mail-Anhang simuliert werden kann, z.B. für ein ERMS (E-Mail Response Management System). Ein Beispiel: Ein Sachbearbeiter erhält eine E-Mail von einem Kunden über einen Schadensfall mit einem Foto von seiner Kamera. Das Foto...</p>
+<p>Der Beitrag <a href="/blog/simulation-einer-e-mail-anhang-konvertierung/">Simulation einer E-Mail-Anhang-Konvertierung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Oft haben Entwickler das Problem, dass nicht alle Applikationen, die sie für Ihre Entwicklung benötigen, zur richtigen Zeit verfügbar sind. So kann es notwendig sein die eine oder andere Applikation zu simulieren. Hier ist ein Lösungsansatz wie eine Konvertierung von Bildern als E-Mail-Anhang simuliert werden kann, z.B. für ein ERMS (E-Mail Response Management System).</p>
+<p>Ein Beispiel: Ein Sachbearbeiter erhält eine E-Mail von einem Kunden über einen Schadensfall mit einem Foto von seiner Kamera. Das Foto liegt aber nicht in einem gängigen Format wie jpeg oder tif vor. Für eine schnelle Schadensfallbearbeitung ist es jedoch notwendig das Foto in ein pdf zu konvertieren und zu archivieren. Für diesen Fall bietet das ERMS eine automatische Konvertierung &#8211; aber zum Entwicklungszeitpunkt ist die Konvertierung noch nicht verfügbar.</p>
+<p>Um das Format eines Bildes umzuwandeln kann nconvert verwendet werden, welches Bestandteil des frei verfügbaren <a title="XNview" href="http://www.xnview.com/de" target="_blank">XNview</a> ist. Dazu ist es notwendig nconvert mit <a title="BinFile2ABAP" href="http://www.stschnell.de/binfile2abap.htm" target="_blank">BinFile2ABAP</a> in ein ABAP Funktionsbaustein umzuwandeln. Mit diesem Funktionsbaustein und nconvertX, einer ActiveX-Bibliothek für den Präsentationsserver welche die Möglichkeit eröffnet nconvert in ABAP zu nutzen, kann eine Konvertierung simuliert werden.</p>
+<p>Laden Sie sich das folgende Datei herunter, dort finden Sie die entsprechenden ABAP-Funktionsbausteine.<br />
+<a href="http://www.stschnell.de/temp/nconvertx.zip">nconvertx.zip</a></p>
+<p>nconvert unterstützt 493 unterschiedliche Formate. Es ist ebenso möglich z.B. die Größe des Bildes zu ändern oder eine ganze Menge anderer Sachen.</p>
+<p><span style="line-height: 1.5em">Mit nconvert und nconvertX ist es sehr einfach eine E-Mail-Anhang Bildkonvertierung zu simulieren.</span></p>
+<p>Ergänzung vom 06.03.2014:<br />
+Die Datei nconvert.jpg ist nach dem Download in nconvert.zip umzubenennen und kann dann entpackt werden.<br />
+nconvertX ist nun vollständig in 32 und 64 bit Environments nutzbar &#8211; siehe auch Diskussion <a href="http://scn.sap.com/thread/3505080">hier</a>.<br />
+Eine vollständige Hilfe mit Beispielen liegt nconvertX bei.</p>
+<p>Der Beitrag <a href="/blog/simulation-einer-e-mail-anhang-konvertierung/">Simulation einer E-Mail-Anhang-Konvertierung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Sag mir wo die Icons sind, wo sind sie geblieben?</title>
+		<link>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/</link>
+					<comments>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/#comments</comments>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Sun, 22 Dec 2013 08:20:20 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[OCX]]></category>
+		<category><![CDATA[icons]]></category>
+		<category><![CDATA[bitmap]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=4101</guid>
+
+					<description><![CDATA[<p>Eine kleine Information über die Speicherung der SAP-Icons in den Ressource-Files des SAPGUI. </p>
+<p>Der Beitrag <a href="/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/">Sag mir wo die Icons sind, wo sind sie geblieben?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der SAP GUI beinhaltet aktuell 926 Icons, die mit der Transaktion SE16 und der Tabelle ICONS angezeigt werden können. Diese reichen vom Platzhaltericon ICON_DUMMY mit der Ordnungsnummer @00@ bis zur inaktiven Datenbanktabelle ICON_DATABASE_TABLE_INA mit der Ordnungsnummer @PP@. Diese und weitere Informationen, wie z.B. Icon-Name, Beschreibung etc., sind auch in der Datei <strong>euspicld</strong> im SAP GUI für Windows Verzeichnis zu finden.</p>
+<p>Die Icons selbst sind als ImageList-Ressourcen in der Datei <strong>SAPguiRM.ocx</strong> des SAP GUI für Windows abgelegt. Die Ressourcen sind einfach nur nummeriert von 203 bis 210. Die 203 und 204 beinhalten das Standard-Design und die 207 und 208 das Corbu-Design. Mit dem <a title="Resource Hacker" href="http://www.angusj.com/" target="_blank">Resource Hacker</a> von Angus Johnson können die ImageLists einfach als binäre Dateien exportiert werden &#8211; Menü Action &gt; Save Resource as a binary file.</p>
+<figure id="attachment_4132" aria-describedby="caption-attachment-4132" style="width: 300px" class="wp-caption alignnone"><img loading="lazy" decoding="async" class="size-medium wp-image-4132" alt="Save Icons as file" src="https://tricktresor.com/wp-content/uploads/2013/12/01_08_16_36_59-300x165.jpg" width="300" height="165" srcset="/wp-content/uploads/2013/12/01_08_16_36_59-300x165.jpg 300w, /wp-content/uploads/2013/12/01_08_16_36_59-624x343.jpg 624w, /wp-content/uploads/2013/12/01_08_16_36_59.jpg 890w" sizes="(max-width: 300px) 100vw, 300px" /><figcaption id="caption-attachment-4132" class="wp-caption-text">Save Icons as file</figcaption></figure>
+<p>Nach dem Export müssen einfach die ersten 28 Bytes dieser exportierten ImageLists gelöscht werden, um eine Windows Bitmap (BMP-Datei) zu erhalten. Das geht recht einfach mit <a title="Notepad++" href="http://notepad-plus-plus.org/" target="_blank">Notepad++</a>. Einfach die Datei mit diesem Programm öffnen und am Anfang der Datei 28 mal auf ENTF drücken&#8230;</p>
+<p>Die Extension dieser Datei ist dann natürlich in BMP umzubenennen.</p>
+<p>Auf diesem Wege erhält man Zugriff auf alle Icons des SAP GUI. Leider als Sprite-Image, das heißt, alle Icons sind in dieser Datei in einem Raster vorhanden:</p>
+<p><img loading="lazy" decoding="async" class="size-medium wp-image-4133 alignleft" alt="Icons" src="https://tricktresor.com/wp-content/uploads/2013/12/01_08_16_40_24-170x300.jpg" width="170" height="300" srcset="/wp-content/uploads/2013/12/01_08_16_40_24-170x300.jpg 170w, /wp-content/uploads/2013/12/01_08_16_40_24.jpg 222w" sizes="(max-width: 170px) 100vw, 170px" /></p>
+<p>Mit einem Online-Tool, wie zum Beispiel <a title="ImageSplitter" href="http://imagesplitter.net/" target="_blank">ImageSplitter</a> wäre es theoretisch möglich, die Datei in einzelne Dateien zu exportieren. Leider ist die Anzahl der Zeilen und Spalten auf 32 limitiert&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f641.png" alt="🙁" class="wp-smiley" style="height: 1em; max-height: 1em;" /> Wir benötigen aber 4 Spalten und 308 Zeilen&#8230;</p>
+<p>Der Beitrag <a href="/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/">Sag mir wo die Icons sind, wo sind sie geblieben?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Datenbankablage für ArchiveLink einrichten</title>
+		<link>/blog/datenbankablage-fuer-archivelink-einrichten/</link>
+					<comments>/blog/datenbankablage-fuer-archivelink-einrichten/#comments</comments>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Thu, 30 May 2013 07:02:31 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=674</guid>
+
+					<description><![CDATA[<p>Mit dem miniSAP wird eine komplette Basiskomponente, BC resp. SAP_BASIS, bereitgestellt. Wer im Umfeld dieser Komponente t&#228;tig ist, z.B. im Bereich des Records Management BC-SRV-RM und das miniSAP diesbez&#252;glich f&#252;r Testzwecke einsetzt, wird schnell auf die Notwendigkeit einer ArchiveLink-f&#228;higen Ablage sto&#223;en. Der folgende Beitrag beschreibt die Einrichtung einer solchen. Dar&#252;ber hinaus wird ein Programm vorgestellt, mit dem beliebige lokale Dateien archiviert werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/datenbankablage-fuer-archivelink-einrichten/">Datenbankablage für ArchiveLink einrichten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit dem miniSAP wird eine komplette Basiskomponente, BC resp. SAP_BASIS, bereitgestellt. Wer im Umfeld dieser Komponente t&auml;tig ist, z.B. im Bereich des Records Management BC-SRV-RM und das miniSAP diesbez&uuml;glich f&uuml;r Testzwecke einsetzt, wird schnell auf die Notwendigkeit einer ArchiveLink-f&auml;higen Ablage sto&szlig;en. Der folgende Beitrag beschreibt die Einrichtung einer solchen. Dar&uuml;ber hinaus wird ein Programm vorgestellt, mit dem beliebige lokale Dateien archiviert werden k&ouml;nnen.<br /><P>Zu Beginn m&ouml;chte ich kurz den Hinweis 595563 &#8211; Datenbankablage f&uuml;r ArchiveLink &#8211; erw&auml;hnen. Dieser beschreibt selbige Vorgehensweise mit &auml;hnlichen Schritten.</P><P class="head1"><EM>1. Tabelle kopieren</EM></P><P class="text1">Im ersten Schritt richten wir den Zielbereich ein, in dem die Dokumente abgelegt werden. Wie der Titel des Beitrages schon vermuten l&auml;sst, handelt es sich hierbei um eine Datenbanktabelle. Mit der Transaktion SE80 ins Paket SDOK wechseln, die Tabelle SDOKCONT1 suchen und via Kontextmen&uuml; als lokales Objekt kopieren z.B. mit dem Namen ZDOKCONT1. Danach ins eigene Paket wechseln, die Tabelle in Bearbeitung nehmen, dann die Erweiterungskategorie der Tabelle definieren, die Tabelle speichern und aktivieren. Damit haben wir die Voraussetzung geschaffen, dass Dokumente hier abgelegt werden k&ouml;nnen.</P><P><EM><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_001.jpg"></EM></P><P class="head1"><EM>2. Content Repository einrichten</EM></P><P>Im folgenden Schritt richten wir ein Content Repository ein. Damit definieren wir im miniSAP-System den Bereich &uuml;ber den mit dem Archivsystem, welches ja in unserem Fall die Tabelle aus Schritt eins ist, kommuniziert wird. Wird z.B. ein Dokument archiviert, so muss das Content Repository (CR) und ein eindeutiger Identifikator, auch Archiv-Dokument-ID (ArcDocID) genannt, definiert werden. So kann jedes Dokument eindeutig identifiziert werden. Mit der Transaktion OAC0 richten wir z.B. das Content Repository ZA ein.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_002.jpg"><BR>Content Repository: Detail</P></TD></TR></TBODY></TABLE></P><P class="head1"><EM>3. Dokumentart einrichten</EM></P><P>Eine Dokumentart definiert eine eindeutige technische Bezeichnung f&uuml;r eine bestimmte Dokumentensorte, z.B. HRICONTRAC (Human Resource Incoming Work Contract) f&uuml;r einen Arbeitsvertrag. Wir richten uns eine eigene Dokumentart mit der Transaktion OAC2 ein, z.B. ZTEXT f&uuml;r eine Textdatei beliebigen Inhalts.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_003.jpg"><BR>Dokumentart einrichten</P></TD></TR></TBODY></TABLE></P><P class="head1"><EM>4. Dokumentverkn&uuml;pfung einrichten</EM></P><P>Die definierte Dokumentart muss nun noch mit einem Business-Objekt (BO) verkn&uuml;pft werden. Ein BO beschreibt die zum ihm geh&ouml;rigen Methoden, Attribute und Schl&uuml;sselfelder im BO-Repository. Wir w&auml;hlen hier das BO SOFM (Office Document). Mit der Transaktion OAC3 wird diese Dokumentverkn&uuml;pfung eingerichtet. Hier muss dann auch das unter Schritt zwei definierte CR sowie eine Verkn&uuml;pfungstabelle angegeben werden. In dieser Verkn&uuml;pfungstabelle werden die eindeutigen Identifikatoren des archivierten Dokumentes unter dem anwendungsspezifischen Schl&uuml;ssel abgelegt. Wir w&auml;hlen hier den Standard TOA01.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_004.jpg"><BR>Neue Eintr&auml;ge</P></TD></TR></TBODY></TABLE></P><P class="head1"><EM>5. Report implementieren</EM></P><P>Mit dem nun folgenden Programm k&ouml;nnen beliebige Dokumente archiviert und deren Verkn&uuml;pfungseintr&auml;ge geschrieben werden.</P><P class="sap1">&#8220;-Begin&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>&nbsp; Report&nbsp; Z_ARCHIVEFILE.<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-Variables&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data tabFileName Type filetable.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data rc Type sy-subrc.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data UserAction Type i.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data ArcDocID Type toa01-arc_doc_id.<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-GUI&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter FileName Type sapb-sappfad Lower Case.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter ContRep Type toaar-archiv_id.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter DocTyp Type toadd-doc_type.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Selection-Screen Skip 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter BusObj Type toaom-sap_object.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter ArObj Type toaom-ar_object.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter ObjID Type sapb-sapobjid Lower Case.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Selection-Screen Skip 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Selection-Screen PushButton /1(79) ArcDoc User-Command ArcDoc.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Selection-Screen Skip 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parameter DocID Type toa01-arc_doc_id.<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-Initialization&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Initialization.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ArcDoc = &#8216;Put document into archive'(001).<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-Event press button to select file&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; At Selection-Screen On Value-Request For FileName.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Clear FileName.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Clear tabFileName.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Call Method cl_gui_frontend_services=&gt;file_open_dialog<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; window_title = &#8216;Datei zum Upload in das Archiv&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; multiselection = abap_false<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file_filter = &#8216;*.*&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changing<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; file_table = tabFileName<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rc = rc<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; user_action = UserAction.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If UserAction = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read Table tabFileName Into FileName Index 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR><BR>&nbsp;&nbsp;&nbsp; &#8220;-Main&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; At Selection-Screen.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case sy-ucomm.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When &#8216;ARCDOC&#8217;.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Call Function &#8216;ARCHIVOBJECT_CREATE_FILE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_ID = ContRep<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOCUMENT_TYPE = DocTyp<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PATH = FileName<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Importing<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_DOC_ID = ArcDocID<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exceptions<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_ARCHIV = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_COMMUNICATIONTABLE = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_UPLOAD = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_KERNEL = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS = 5.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DocID = ArcDocID.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Call Function &#8216;ARCHIV_CONNECTION_INSERT&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_ID = ContRep<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARC_DOC_ID = ArcDocID<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AR_OBJECT = ArObj<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OBJECT_ID = ObjID<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SAP_OBJECT = BusObj<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOC_TYPE = DocTyp<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exceptions<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_CONNECTIONTABLE = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS = 2.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Message &#8216;Success&#8217; Type &#8216;S&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Call Function &#8216;ARCHIVOBJECT_DELETE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_ID = ContRep<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARCHIV_DOC_ID = ArcDocID<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exceptions<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_ARCHIV = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_COMMUNICATIONTABLE = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_KERNEL = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS = 4.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Message &#8216;Connection insert not successful&#8217; Type &#8216;E&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Message &#8216;Archiving not successful&#8217; Type &#8216;E&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndCase.<BR><BR>&#8220;-End&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</P><P class="head1"><EM>6. Report testen</EM></P><P>Zugegeben ist die von mir gew&auml;hlte Object-ID nicht gerade sinnvoll, da sie eigentlich mit den Schl&uuml;sselfeldern des BO korrespondieren sollte, aber f&uuml;r einen Test reicht es aus. Nach dem Aufruf muss in der Tabelle TOA01 ein Eintrag vorliegen und in der Tabelle ZDOKCONT1 m&uuml;ssen ebenfalls Eintr&auml;ge vorhanden sein.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_006.jpg"><BR>Test des Reports</P></TD></TR></TBODY></TABLE></P><P class="head1"><EM>7. Erfolg testen</EM></P><P>Mit der Transaktion SE37 kann das FM ARCHIVOBJECT_DISPLAY aufgerufen werden. Hier ist die ArcDocID und das Content Repository zu &uuml;bergeben. Mit Ausf&uuml;hrung des FM wird der Document Viewer gestartet und das archivierte Dokument angezeigt. Sofern alles korrekt eingerichtet ist, sollte nun das Dokument sichtbar sein.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/minisap_al_007.jpg"><BR>Testumgebung ARCHIVEOBJECT_DISPLAY</P></TD></TR></TBODY></TABLE></P><P>Mit relativ wenig Aufwand kann man sich auf diesem Wege eine ArchiveLink-f&auml;hige Ablage in einem miniSAP zur Verf&uuml;gung stellen und diese auch in anderen Applikationen nutzen, z.B. dem Folders Management.</P></p>
+<p>Der Beitrag <a href="/blog/datenbankablage-fuer-archivelink-einrichten/">Datenbankablage für ArchiveLink einrichten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/datenbankablage-fuer-archivelink-einrichten/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Mein Anteil, Dein Anteil</title>
+		<link>/blog/mein-anteil-dein-anteil/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Mon, 13 May 2013 06:05:38 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=672</guid>
+
+					<description><![CDATA[<p>Im Umfeld der Systemadministration wird h&#228;ufig die Forderung erhoben, Inhalte von SAP-Tabellen einem kontinuierlichen automatischen Monitoring zu unterziehen. Die Tabelleninhalte sind dabei Bestandteil verschiedenster &#220;berwachungsperspektiven, z.B. zur Ermittlung von Fehleranteilen bzw. einfach nur zur Feststellung von bestimmten Verh&#228;ltnissen oder die Gesamtanzahl von Datens&#228;tzen in einer Tabelle. Aus den Ergebnissen leiten sich dann Aktivit&#228;ten ab, z.B. ein Alarm der zu manuellen Aktionen f&#252;hrt oder einfach nur zum Versandt einer E-Mail.</p>
+<p>Der Beitrag <a href="/blog/mein-anteil-dein-anteil/">Mein Anteil, Dein Anteil</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im Umfeld der Systemadministration wird h&auml;ufig die Forderung erhoben, Inhalte von SAP-Tabellen einem kontinuierlichen automatischen Monitoring zu unterziehen. Die Tabelleninhalte sind dabei Bestandteil verschiedenster &Uuml;berwachungsperspektiven, z.B. zur Ermittlung von Fehleranteilen bzw. einfach nur zur Feststellung von bestimmten Verh&auml;ltnissen oder die Gesamtanzahl von Datens&auml;tzen in einer Tabelle. Aus den Ergebnissen leiten sich dann Aktivit&auml;ten ab, z.B. ein Alarm der zu manuellen Aktionen f&uuml;hrt oder einfach nur zum Versandt einer E-Mail.<br /><P>Im Umfeld der Systemadministration wird h&auml;ufig die Forderung erhoben, Inhalte von SAP-Tabellen einem kontinuierlichen automatischen Monitoring zu unterziehen. Die Tabelleninhalte sind dabei Bestandteil verschiedenster &Uuml;berwachungsperspektiven, z.B. zur Ermittlung von Fehleranteilen bzw. einfach nur zur Feststellung von bestimmten Verh&auml;ltnissen oder die Gesamtanzahl von Datens&auml;tzen in einer Tabelle. Aus den Ergebnissen leiten sich dann Aktivit&auml;ten ab, z.B. ein Alarm der zu manuellen Aktionen f&uuml;hrt oder einfach nur zum Versandt einer E-Mail.</P><P>Der folgende Code ist ein remote-f&auml;higer Funktionsbaustein (FM), dem als Argument ein Tabellenname und zwei optionale SQL-Bedingungen &uuml;bergeben werden m&uuml;ssen. Die erste SQL-Bedingung kann zur Einschr&auml;nkung der Basismenge genutzt werden. Wird hier keine SQL-Bedingung &uuml;bergeben, so wird die gesamte Anzahl aller Datens&auml;tze des &uuml;bergebenen Tabellennamens verwendet. Mit der zweiten SQL-Bedingung wird dann die Menge an Datens&auml;tzen ermittelt, deren Verh&auml;ltnis ermittelt werden soll. Wird gar keine SQL-Bedingung &uuml;bergeben, so wird einfach nur die Gesamtanzahl der Datens&auml;tze in der Tabelle ermittelt.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/Attribute1.JPG"><BR>Wichtig: In den Eigenschaften Remote f&auml;higer Baustein aktivieren</P></TD></TR></TBODY></TABLE></P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/Attribute2.JPG"><BR>Importparameter</P></TD></TR></TBODY></TABLE></P><P>Die R&uuml;ckgabewerte sind dann die entsprechende Gesamtanzahl, sowie die Anzahl der Datens&auml;tze die der zweiten SQL-Bedingung entsprechen und deren Verh&auml;ltnis zueinander in Prozent.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/Attribute3.JPG"><BR>R&uuml;ckgabewerte</P></TD></TR></TBODY></TABLE></P><P>Mit diesem RFC-f&auml;higen FM wird ein einfacher Ansatz geboten, ein externes Monitoring flexibel&nbsp;und simpel zu realisieren. So k&ouml;nnen nun z.B. via Java Connector (JCo) SAP-Tabellen periodisch abgefragt und aus den Ergebnissen Aktivit&auml;ten im Rechenzentrum abgeleitet werden.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Stefan_Schnell/Result.JPG"><BR>Das Ergebnis einer Beispielverarbeitung</P></TD></TR></TBODY></TABLE></P><P class="sap1">&#8220;-Begin&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>Function zCountTableEntries.<BR>*&#8221;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR>*&#8221;*&#8221;Local Interface:<BR>*&#8221;&nbsp; IMPORTING<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(TABLENAME) TYPE&nbsp; STRING<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(SQL_CONDITION_ALL) TYPE&nbsp; STRING OPTIONAL<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(SQL_CONDITION_SEL) TYPE&nbsp; STRING OPTIONAL<BR>*&#8221;&nbsp; EXPORTING<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(COUNT_ALL) TYPE&nbsp; I<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(COUNT_SEL) TYPE&nbsp; I<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; VALUE(SEL_TO_ALL_PERCENT) TYPE&nbsp; F<BR>*&#8221;&nbsp; EXCEPTIONS<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TABLE_NOT_EXISTS<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NO_TABLE_ENTRIES<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ERROR_IN_SQL_CONDITION<BR>*&#8221;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-&nbsp; &#8220;-Important hint&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR>&#8220;-<BR>&#8220;- Don&#8217;t forget to set the Remote-Enabled Module attribute<BR>&#8220;-<BR>&#8220;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</P><P class="sap1">&nbsp;&nbsp;&nbsp; &#8220;-Interface&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp; &#8220;- Importing<BR>&nbsp;&nbsp;&nbsp; &#8220;- TABLENAME = Name of the table<BR>&nbsp;&nbsp;&nbsp; &#8220;- SQL_CONDITION_ALL = SQL condition for the table<BR>&nbsp;&nbsp;&nbsp; &#8220;- SQL_CONDITION_SEL = SQL condition for the selection<BR>&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp; &#8220;- Exporting<BR>&nbsp;&nbsp;&nbsp; &#8220;- COUNT_ALL = Count of all table entries<BR>&nbsp;&nbsp;&nbsp; &#8220;- COUNT_SEL = Count of selected entries<BR>&nbsp;&nbsp;&nbsp; &#8220;- SEL_TO_ALL_PERCENT = Proportion of selected to all entries<BR>&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp; &#8220;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</P><P class="sap1">&nbsp;&nbsp;&nbsp; &#8220;-Variables&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data Count_Tab Type i Value 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Data oRef Type Ref To cx_root.</P><P class="sap1">&nbsp;&nbsp;&nbsp; &#8220;-Main&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;-Hint&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;- Don&#8217;t forget to implement Authority-Check Object<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Count( Distinct TABNAME ) Into Count_Tab From DD02L<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Where TABNAME = TABLENAME And TABCLASS = &#8216;TRANSP&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0 And Count_Tab = 1.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If SQL_CONDITION_ALL Is Initial.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Count(*) Into COUNT_ALL From (TABLENAME).<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Count(*) Into COUNT_ALL From (TABLENAME)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Where (SQL_CONDITION_ALL).<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If SQL_CONDITION_SEL Is Not Initial.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0 And COUNT_ALL &gt; 0.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Try.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Count(*) Into COUNT_SEL From (TABLENAME)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Where (SQL_CONDITION_SEL).<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SEL_TO_ALL_PERCENT = ( COUNT_SEL / COUNT_ALL ) * 100.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Catch cx_root Into oRef.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Raise ERROR_IN_SQL_CONDITION.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndTry.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Raise NO_TABLE_ENTRIES.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Raise TABLE_NOT_EXISTS.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EndIf.</P><P class="sap1">&nbsp; EndFunction.</P><P class="sap1">&#8220;-End&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR></P></p>
+<p>Der Beitrag <a href="/blog/mein-anteil-dein-anteil/">Mein Anteil, Dein Anteil</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

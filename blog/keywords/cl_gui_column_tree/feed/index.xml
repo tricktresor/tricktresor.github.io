@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>CL_GUI_COLUMN_TREE Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_gui_column_tree/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 08 Jan 2014 08:59:49 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>CL_GUI_COLUMN_TREE Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Ereignisse</title>
+		<link>/blog/ereignisse/</link>
+					<comments>/blog/ereignisse/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Jun 2010 13:51:55 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[CL_GUI_COLUMN_TREE]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=550</guid>
+
+					<description><![CDATA[<p>Bemerkungen zu Ereignissen im ColumnTree</p>
+<p>Der Beitrag <a href="/blog/ereignisse/">Ereignisse</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bemerkungen zu Ereignissen im ColumnTree<br /><P>Bevor die Ereignisse f&uuml;r den ColumnTree registriert werden, sollte die Methode GET_REGISTERED_EVENTS aufgerufen werden.</P><P>Setzt man n&auml;mlich &#8220;einfach&#8221; das Event &#8220;Item_Double_Click&#8221;, dann wird evtl. auf einmal die Ordnerstruktur nicht mehr angezeigt! Durch das explizite Setzen mittels SET_REGISTERED_EVENTS&nbsp;wird das Event &#8220;EXPAND_NO_CHILDREN&#8221; gel&ouml;scht&#8230;</P><P>Eine Registrierung sollte also so z.B. aussehen:</P><P class="sap1"><FONT color="#fb2412">***&nbsp;data definition<BR></FONT>&nbsp; DATA lt_events TYPE cntl_simple_events.<BR>&nbsp; DATA ls_event&nbsp; TYPE cntl_simple_event.<BR><BR><FONT color="#fb2412">*** Get already registered events</FONT><BR>&nbsp; CALL METHOD gr_tree-&gt;get_registered_events<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; events = lt_events.<BR><FONT color="#fb2412"><BR>*** define the events which will be passed to the backend<BR></FONT>&nbsp; ls_event-eventid = cl_gui_column_tree=&gt;eventid_link_click.<BR>&nbsp; APPEND ls_event TO lt_events.<BR>&nbsp; ls_event-eventid = cl_gui_column_tree=&gt;eventid_item_double_click.<BR>&nbsp; APPEND ls_event TO lt_events.<BR><BR><FONT color="#fb2412">*** set events</FONT><BR>&nbsp; CALL METHOD gr_tree-&gt;set_registered_events<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; events = lt_events.<BR><BR><FONT color="#fb2412">*** set Handler <BR></FONT>&nbsp; SET HANDLER lcl_treereceiver=&gt;handle_link_click&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FOR gr_tree.<BR>&nbsp; SET HANDLER lcl_treereceiver=&gt;handle_item_double_click FOR gr_tree.<BR></P><P>Doppelte Events sind nicht schlimm, solange APPL_EVENT identisch ist, also das Kennzeichen das steuert, ob Events einen Funktionscode ausl&ouml;sen.</P><P>Besser w&auml;re es sicherlich, vorher zu pr&uuml;fen, ob das Ereignis bereits registriert ist.</P></p>
+<p>Der Beitrag <a href="/blog/ereignisse/">Ereignisse</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ereignisse/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Verwendung ColumnTree</title>
+		<link>/blog/verwendung-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Jun 2010 13:43:06 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[CL_GUI_COLUMN_TREE]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=549</guid>
+
+					<description><![CDATA[<p>Anmerkungen zur Verwendung. Vorteile, Nachteile, Besonderheiten, Anwendungsm&#246;glichkeiten des ColumnTree </p>
+<p>Der Beitrag <a href="/blog/verwendung-2/">Verwendung ColumnTree</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Anmerkungen zur Verwendung. Vorteile, Nachteile, Besonderheiten, Anwendungsmöglichkeiten</p>
+<p>Der ColumnTree bietet &#8211; im Gegensatz zum SimpleTree &#8211; sehr viele Darstellungsmöglichkeiten. Jede Zeile kann, bzw. muss einzeln &#8220;designed&#8221; werden: Für jeden Knoten muss jedes Element, das dargestellt werden soll, definiert werden: Inhalt, Länge, Farbe, Link, Druckknopf, Checkbox etc. Es kann in der Programmierung dann auf jeden Klick auf jedes Element reagiert werden.</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/Tree/hc_339.jpg" /></p>
+<p>Sollen die Spalten alle gleich sein, so muss der SALV_TREE oder CL_GUI_ALV_TREE verwendet werden.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/verwendung-2/">Verwendung ColumnTree</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Beispielprogramme</title>
+		<link>/blog/beispielprogramme-3/</link>
+					<comments>/blog/beispielprogramme-3/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Jun 2010 13:24:53 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[CL_GUI_COLUMN_TREE]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=547</guid>
+
+					<description><![CDATA[<p>Beispielprogramme von SAP</p>
+<p>Der Beitrag <a href="/blog/beispielprogramme-3/">Beispielprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Beispielprogramme von SAP<br /><P class="head2">SAPCOLUMN_TREE_CONTROL_DEMO</P><P><IMG src="/wp-content/uploads/tt_images/Tree/hc_339.jpg"></P></p>
+<p>Der Beitrag <a href="/blog/beispielprogramme-3/">Beispielprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/beispielprogramme-3/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

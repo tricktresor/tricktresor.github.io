@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>BDS Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/bds/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 13 Oct 2015 15:43:46 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>BDS Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ALV-Grid mit Logo</title>
+		<link>/blog/alv-grid-mit-logo/</link>
+					<comments>/blog/alv-grid-mit-logo/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 Feb 2007 13:39:37 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Business Documents]]></category>
+		<category><![CDATA[BDS]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=399</guid>
+
+					<description><![CDATA[<p>Ein im BDS gespeichertes Bild k&#246;nnen Sie im Header eines ALV-Grid anzeigen lassen. Das hier vorgestellte Programm macht dies.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-mit-logo/">ALV-Grid mit Logo</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein im BDS gespeichertes Bild k&ouml;nnen Sie im Header eines ALV-Grid anzeigen lassen. Das hier vorgestellte Programm macht dies.<br /><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/BDS/alv_logo.jpg"><BR>ALV-Grid mit Logo</P></TD></TR></TBODY></TABLE></P><P class="head1">Coding</P><P class="sap1">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp; Anzeige ALV-Grid mit Logo<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>REPORT&nbsp; z_alv_logo.</P><P class="sap1">TYPE-POOLS: slis.</P><P class="sap1"><FONT color="#fb2412">*** Variablen<BR></FONT>DATA:<BR>&nbsp; gt_t005t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF t005t.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*** Beispieldaten lesen</FONT><BR>&nbsp; SELECT * FROM t005t INTO TABLE gt_t005t WHERE landx LIKE &#8216;D%&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** ALV-Grid anzeigen</FONT><BR>&nbsp; CALL FUNCTION &#8216;REUSE_ALV_GRID_DISPLAY&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_callback_program&nbsp;&nbsp;&nbsp;&nbsp; = sy-cprog<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_callback_top_of_page = &#8216;CALLBACK_TOP_OF_PAGE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_structure_name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;T005T&#8217;<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t_outtab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gt_t005t<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; program_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; callback_top_of_page<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM callback_top_of_page.</P><P class="sap1"><FONT color="#fb2412">*** Datendeklaration f&uuml;r den Listenkopf</FONT><BR>&nbsp; DATA lt_listheader TYPE slis_t_listheader.<BR>&nbsp; DATA ls_listheader TYPE slis_listheader.</P><P class="sap1"><FONT color="#fb2412">*** &Uuml;berschrift</FONT><BR>&nbsp; CLEAR ls_listheader.<BR>&nbsp; ls_listheader-typ = &#8216;H&#8217;.<BR>&nbsp; ls_listheader-key = &#8216;wird nicht angezeigt&#8217;.<BR>&nbsp; ls_listheader-info = &#8216;Information&#8217;.<BR>&nbsp; APPEND ls_listheader TO lt_listheader.<BR><FONT color="#fb2412">*** Zus&auml;tzliche Information</FONT><BR>&nbsp; CLEAR ls_listheader.<BR>&nbsp; ls_listheader-typ = &#8216;S&#8217;.<BR>&nbsp; ls_listheader-key = &#8216;Quelle&#8217;.<BR>&nbsp; ls_listheader-info = &#8216;www.Tricktresor.de&#8217;.<BR>&nbsp; APPEND ls_listheader TO lt_listheader.<BR><FONT color="#fb2412">*** Zus&auml;tzliche Information</FONT><BR>&nbsp; CLEAR ls_listheader.<BR>&nbsp; ls_listheader-typ = &#8216;A&#8217;.<BR>&nbsp; ls_listheader-key = &#8216;Wird nicht angezeigt&#8217;.<BR>&nbsp; ls_listheader-info = &#8216;Bitte alle Informationen vertraulich behandeln!&#8217;.<BR>&nbsp; APPEND ls_listheader TO lt_listheader.</P><P class="sap1"><FONT color="#fb2412">*** Listenkopf setzen</FONT><BR>&nbsp; CALL FUNCTION &#8216;REUSE_ALV_COMMENTARY_WRITE&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it_list_commentary = lt_listheader<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_logo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;ENJOYSAP_LOGO&#8217;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;top</P></p>
+<p>Der Beitrag <a href="/blog/alv-grid-mit-logo/">ALV-Grid mit Logo</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/alv-grid-mit-logo/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Auf Dokument zugreifen</title>
+		<link>/blog/auf-dokument-zugreifen/</link>
+					<comments>/blog/auf-dokument-zugreifen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 Feb 2007 13:25:31 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[BDS]]></category>
+		<category><![CDATA[Business Documents]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=398</guid>
+
+					<description><![CDATA[<p>Mit diesem kurzen Programm zeigen wir Ihnen, wie Sie an das im BDS gespeicherte Bild kommen und es auf dem Dynpro ausgeben.</p>
+<p>Der Beitrag <a href="/blog/auf-dokument-zugreifen/">Auf Dokument zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem kurzen Programm zeige ich dir, wie du an das im BDS gespeicherte Bild kommst und es auf dem Dynpro ausgeben kannst.</p>
+<p>Eigene Bilder speicherst du mit der Transaktion OAER.</p>
+<h2 class="head1">Info</h2>
+<p>Zu dem folgenden Programm musst du ein Dynpro mit CustomControl anlegen. Doppelklicke dazu auf &#8220;5000&#8221; bei der Anweisung CALL SCREEN 5000.</p>
+<p>In der Elementliste des Dynpros trage zum Typ &#8220;OK&#8221; das Feld &#8220;SY-UCOMM&#8221; ein.</p>
+<h2>Ablauflogik</h2>
+<p>Die Ablauflogik sieht wie folgt aus:</p>
+<p class="sap1">PROCESS BEFORE OUTPUT.<br />
+MODULE STATUS_5000.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE USER_COMMAND_5000.</p>
+<p>Im Module &#8220;<strong>STATUS_5000</strong>&#8221; müssen Sie noch mit Doppelklick auf <strong>&#8220;5000&#8221;</strong> bei der Anweisung &#8220;<strong>SET PF-STATUS &#8216;5000&#8217;</strong>&#8221; den GUI-Status anlegen. Tragen Sie zu den Funktionscodes für den grünen Pfeil zurück, den gelben Pfeil nach oben und das rote Kreuz jeweils &#8220;BACK&#8221; ein.</p>
+<p><u><strong>Hinweis:<br />
+</strong></u>Zu einem BDS-Objekt (p_pic) können mehrere Objekte gespeichert werden. Die Methode GET_WITH_URL liefert in dem Fall mehrere URLs zurück.<br />
+Um Informationen zu den enthaltenen Dokumenten zu erhalten, benutzen Sie bitte die Methode cl_bds_document_set=&gt;<strong>GET_INFO</strong>.</p>
+<h2 class="head1">Ergebnis</h2>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" src="/wp-content/uploads/tt_images/BDS/bdspic.jpg" alt="" /><br />
+Anzeige eines Bildes aus dem BDS</td>
+</tr>
+</tbody>
+</table>
+<h2 class="head1">Code</h2>
+<p class="sap1">REPORT  z_bds_pic_show.</p>
+<p class="sap1">PARAMETERS p_pic TYPE bds_typeid DEFAULT &#8216;ENJOYSAP_LOGO&#8217;.</p>
+<p class="sap1">
+START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Benötigte Variablen</span><br />
+DATA:<br />
+lref_cont TYPE REF TO cl_gui_custom_container,<br />
+lref_img  TYPE REF TO cl_gui_picture,<br />
+lt_url    TYPE TABLE OF bapiuri,<br />
+ls_url    TYPE          bapiuri.</p>
+<p class="sap1">
+IF lref_cont IS INITIAL.<br />
+<span style="color: #fb2412;">*** Container erzeugen<br />
+*** Der Name des CustomControls auf dem Dynpro heisst &#8220;PICTURE&#8221;</span><br />
+CREATE OBJECT lref_cont<br />
+EXPORTING<br />
+container_name              = &#8216;PICTURE&#8217; .<br />
+<span style="color: #fb2412;">*** Picture Control erzeugen</span><br />
+CREATE OBJECT lref_img<br />
+EXPORTING<br />
+parent = lref_cont.<br />
+<span style="color: #fb2412;">*** Ermitteln der URL zum Bild</span><br />
+CALL METHOD cl_bds_document_set=&gt;get_with_url<br />
+EXPORTING<br />
+classname  = &#8216;PICTURES&#8217;<br />
+classtype  = &#8216;OT&#8217;<br />
+object_key = p_pic<br />
+CHANGING<br />
+uris       = lt_url.<br />
+<span style="color: #fb2412;">*** Ermittelte URL lesen</span><br />
+READ TABLE lt_url INTO ls_url INDEX 1.<br />
+<span style="color: #fb2412;">*** &#8230;und in das PictureControl laden</span><br />
+CALL METHOD lref_img-&gt;load_picture_from_url<br />
+EXPORTING<br />
+url    = ls_url-uri<br />
+EXCEPTIONS<br />
+OTHERS = 1.<br />
+ENDIF.</p>
+<p class="sap1">  CALL SCREEN 5000.</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Module  USER_COMMAND_5000  INPUT<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+</span>MODULE user_command_5000 INPUT.</p>
+<p class="sap1">  IF sy-ucomm = &#8216;BACK&#8217;.<br />
+SET SCREEN 0. LEAVE SCREEN.<br />
+ENDIF.</p>
+<p class="sap1">ENDMODULE.                 &#8221; USER_COMMAND_5000  INPUT</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Module  STATUS_5000  OUTPUT<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</span><br />
+MODULE status_5000 OUTPUT.</p>
+<p class="sap1">  SET PF-STATUS &#8216;5000&#8217;.</p>
+<p class="sap1">ENDMODULE.                 &#8221; STATUS_5000  OUTPUT</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/auf-dokument-zugreifen/">Auf Dokument zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/auf-dokument-zugreifen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dokument anlegen</title>
+		<link>/blog/dokument-anlegen/</link>
+					<comments>/blog/dokument-anlegen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 Feb 2007 12:13:47 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[BDS]]></category>
+		<category><![CDATA[Business Documents]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=397</guid>
+
+					<description><![CDATA[<p>Eine einfache Anleitung zum Speichern eines Bildes im Business Documents Server (BDS). Das Bild kann dann in einem ALV-Grid als Kopfinformation angezeigt werden.</p>
+<p>Der Beitrag <a href="/blog/dokument-anlegen/">Dokument anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine einfache Anleitung zum Speichern eines Bildes im Business Documents Server (BDS). Das Bild kann dann in einem ALV-Grid als Kopfinformation angezeigt werden.<br /><P class="head1">1. Schritt</P><P>Transaktion OAER starten.</P><P>Selektionsparameter:</P><P>Klassenname &#8220;PICTURES&#8221; <BR>Klassentyp &#8220;OT&#8221; <BR>Objektschl&uuml;ssel &#8220;Z_MEIN_BILD1&#8221; </P><P class="head1">2. Schritt</P><P class="text1">In der unteren Bildschirmh&auml;lfte alles vollst&auml;ndig expandieren und beim Knoten &#8220;Bild&#8221; einen rechten Mausklick machen und dann &#8220;Datei importieren&#8221; w&auml;hlen. Suchen Sie das Bild, dass Sie im BDS speichern m&ouml;chten.</P><P class="head1">3. Schritt</P><P>&#8220;OK&#8221; dr&uuml;cken und Bild verlassen. </P><P class="head1"><BR>4. Schritt</P><P>Schritt 1 wiederholen.&nbsp;Das importierte Bild wird angezeigt. <BR>Men&uuml;punkt: <EM>Dokument &#8211; Transportieren</EM> auch noch w&auml;hlen, damit das Ganze via Transport auch ins Produktivsystem gelangt.</P></p>
+<p>Der Beitrag <a href="/blog/dokument-anlegen/">Dokument anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokument-anlegen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

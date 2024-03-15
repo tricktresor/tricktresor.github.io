@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>select Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/select/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 27 Aug 2019 15:27:59 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>select Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SELECT WHERE nur ein Eintrag vorhanden</title>
+		<link>/blog/select-where-nur-ein-eintrag-vorhanden/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 27 Aug 2019 15:27:58 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[subquery]]></category>
+		<category><![CDATA[having]]></category>
+		<guid isPermaLink="false">/?p=1022541</guid>
+
+					<description><![CDATA[<p>Select-Befehle sind in der Regel im SAP-Umfeld einigermaßen überschaubar. Meiner Meinung nach liegt es daran, dass in der Regel Programmierer am Werk sind, aber keine SQL-Spezialisten. Zudem bietet der Open-SQL-Standard von SAP auch nur einen eingeschränkten Funktionsumfang. Selbst wenn man etwas kompliziertere Selects durchführen möchte, ist das nicht unbedingt möglich. Joins sind eine andere Geschichte. Hier toben sich Programmierer gerne einmal aus und joinen was das Zeug hält. SELECT oder ABAP? In beiden Fällen, der...</p>
+<p>Der Beitrag <a href="/blog/select-where-nur-ein-eintrag-vorhanden/">SELECT WHERE nur ein Eintrag vorhanden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Select-Befehle sind in der Regel im SAP-Umfeld einigermaßen überschaubar. Meiner Meinung nach liegt es daran, dass in der Regel Programmierer am Werk sind, aber keine SQL-Spezialisten. Zudem bietet der Open-SQL-Standard von SAP auch nur einen eingeschränkten Funktionsumfang. Selbst wenn man etwas kompliziertere Selects durchführen möchte, ist das nicht unbedingt möglich.</p>
+
+
+
+<p>Joins sind eine andere Geschichte. Hier toben sich Programmierer gerne einmal aus und joinen was das Zeug hält.</p>
+
+
+
+<h2 class="wp-block-heading">SELECT oder ABAP?</h2>
+
+
+
+<p>In beiden Fällen, der Select-Anweisung und der nachträglichen Verarbeitung, gibt es Situationen, wo beides irgendwie umständlich ist. Ein solcher Fall ist es zum Beispiel, wenn man nur die Daten selektieren möchte, von denen man erst nach einer Aggregatbildung weiß, ob man sie lesen möchte oder nicht. Also zum Beispiel: Gib mir alle Belege, zu denen nur ein Eintrag in der Positionstabelle vorhanden ist.</p>
+
+
+
+<h2 class="wp-block-heading">SUBQUERY</h2>
+
+
+
+<p>Der folgende Select ermittelt genau die Einträge, bei denen nur ein Eintrag in der VBAP vorhanden ist.</p>
+
+
+
+<pre class="wp-block-code"><code>SELECT vbeln, matnr
+  FROM vbap AS v
+ WHERE vbeln IN @s_vbeln
+   AND matnr IN @s_matnr
+   AND 1 =  ( SELECT COUNT( * ) FROM vbap
+               WHERE vbeln = v~vbeln )
+ GROUP BY vbeln, matnr
+ ORDER BY vbeln, matnr
+  INTO TABLE @DATA(list).</code></pre>
+
+
+
+<h2 class="wp-block-heading">HAVING</h2>
+
+
+
+<p>durch Zufall bin ich bei der Nachstellung des Problems auf eine andere Lösung gestoßen, bei der die Anzahl der vorhandenen Sätze mittels HAVING eingeschränkt wird.</p>
+
+
+
+<pre class="wp-block-code"><code>SELECT vbeln, sum( kwmeng ) as kwmeng, vrkme
+  FROM vbap AS v
+    WHERE vbeln IN @s_vbeln
+      AND matnr IN @s_matnr
+  GROUP BY vbeln, vrkme
+  HAVING COUNT(*) = 1
+  ORDER BY vbeln, vrkme
+  INTO TABLE @data(list).</code></pre>
+
+
+
+<p>Der Vorteil bei der HAVING-Variante ist, dass hier die Anzahl der Datensätze auch variabel abgefragt werden können. Das geht mit dem oben vorgestellten Subquery nicht.</p>
+
+
+
+<h2 class="wp-block-heading">Performancevergleich</h2>
+
+
+
+<p>Ich habe beide Varianten in zwei unterschiedlichen Systemen mit unterschiedlichen Tabellen ausprobiert und einen kleinen Performancevergleich gemacht. In der einen Version ist die Variante mit dem Subquery schneller, in der anderen Version ist HAVING schneller.</p>
+
+
+
+<p>Im Gegensatz zu einer umständlichen Analyse per Programmcoding, welcher Satz nur einmal vorhanden ist, sind beide SELECT-Versionen meiner Meinung nach eleganter. Die Performance sollte man auf jeden Fall bei jeder Version im Blick haben.</p>
+<p>Der Beitrag <a href="/blog/select-where-nur-ein-eintrag-vorhanden/">SELECT WHERE nur ein Eintrag vorhanden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Data-Aging in S4/HANA</title>
+		<link>/blog/data-aging-in-s4-hana/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Nov 2017 23:33:47 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[HANA]]></category>
+		<category><![CDATA[Data Aging]]></category>
+		<category><![CDATA[S4/HANA]]></category>
+		<category><![CDATA[select]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018228</guid>
+
+					<description><![CDATA[<p>Daten mit einem Verfallsdatum sind keine neue Erfindung. Seit Google und Co. alles speichern, was jemals irgendwo auf einem Webserver verfügbar war, ist der Wunsch da, Daten nach einer bestimmten Zeit automatisch wieder zu löschen. Was im World-Wide-Web eher persönliche Gründe hat, hat bei HANA einen sehr praktischen und handfesten Hintergrund: Speicherplatz. Datenbankkonzept HANA Der große Geschwindigkeitsdurchbruch gelingt HANA durch die InMemory-Technik bei der alle notwendigen Daten im Hauptspeicher verwaltet werden. Für die Verarbeitung im...</p>
+<p>Der Beitrag <a href="/blog/data-aging-in-s4-hana/">Data-Aging in S4/HANA</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Daten mit einem Verfallsdatum sind keine neue Erfindung. Seit Google und Co. alles speichern, was jemals irgendwo auf einem Webserver verfügbar war, ist der Wunsch da, Daten nach einer bestimmten Zeit automatisch wieder zu löschen. Was im World-Wide-Web eher persönliche Gründe hat, hat bei HANA einen sehr praktischen und handfesten Hintergrund: Speicherplatz.</p>
+<h2>Datenbankkonzept HANA</h2>
+<p>Der große Geschwindigkeitsdurchbruch gelingt HANA durch die <em>InMemory-Technik</em> bei der alle notwendigen Daten im Hauptspeicher verwaltet werden. Für die Verarbeitung im Hauptspeicher werden die Spalten von der Festplatte komplett in den Hauptspeicher geladen. Es ist nämlich ein Irrglaube, dass HANA stets und ständig alle Daten im Hauptspeicher vorhält. Die Datenspeicherung erfolgt auch weiterhin auf der Festplatte. Um so wichtiger ist es bei einer HANA-Datenbank, dass nur die Felder selektiert werden, die auch wirklich für die Verarbeitung von Bedeutung sind.</p>
+<h2>Hauptspeicher</h2>
+<p>Auch bei großen Datenmengen hat HANA kaum Probleme, diese zu verarbeiten. Aber mit wachsenden Datenbeständen wird auch eine HANA-Datenbank an ihre Grenzen kommen. Da bei der Verarbeitung die komplette Spalte einer Tabelle geladen wird, kann man sich leicht vorstellen, dass auch HANA einmal Probleme bekommen wird, alle Daten vorzuhalten.</p>
+<p>Wer eine HANA-Datenbank einsetzt oder einsetzen möchte, muss sich mittelfristig mit dem Thema Data-Aging auseinander setzen.</p>
+<h2>Datenalterung</h2>
+<p>Um diesem Trend entgegen zu wirken, gibt es das Konzept der <em>Datenalterung</em>. Die Daten werden hierbei in Partitionen verteilt, die nicht standardmäßig selektiert werden. Es gibt dann für eine Datenbanktabelle mehrere Partitionen. Eine davon enthält nur die <em>aktuellen</em> Daten. Bei einem SELECT werden nur die Daten aus dieser Partition gelesen. Alle anderen Daten sind für den Anwender &#8211; und auch für den Entwickler! &#8211; unsichtbar.</p>
+<h2>Data-Aging-Objekte</h2>
+<p>Für die Datenalterung werden zusammengehörige Tabellen unter einem Data-Aging-Object zusammengefasst. Unter diesem DA-Objekt werden alle notwendigen Einstellungen verwaltet. Für dieses Objekt wird das Analyseprogramm gestartet um den Alterungsprozess anzustoßen.</p>
+<h2>Datentemperatur</h2>
+<p>Die aktuellen Daten sind <em>heiß</em>. Daten, die normalerweise nicht mehr benötigt werden, sind <em>kalt</em>. Auch wenn sich der Begriff Temperatur eingebürgert hat, gibt es keine <em>lauwarmen</em> Daten oder  Datensätze mit einer Temperatur von 12° Celsius. Die Temperatur wird in Tagen gemessen.</p>
+<h2>Technik</h2>
+<p>Alle Tabellen, die <em>gealtert</em> werden sollen, müssen ein Feld _DATAAGING besitzen. Ist dieses Feld leer, so gehört der Datensatz zum <em>heißen</em>, also aktuellen, Datenbestand. Die Analyseprogramme setzen für die Datensätze, die nicht mehr aktuell sind, das entsprechende Datum.</p>
+<p>Die Datenbanktabelle selbst besteht aus verschiedenen Partitionen. Wie diese Partitionen aufgeteilt werden sollen, kann je Data-Aging-Objekt definiert werden. Sinnvoll sind zum Beispiel Zwei-Jahres-Partitionen. Das bedeutet, dass Daten innerhalb dieses Zeitraums in diese Partition verlegt werden. Bei der Definition der Partitionszeiträume werden alle Partitionen bereits angelegt. Es bedeutet jedoch nicht, dass die Daten auch schon darin laden. Wenn für ein Objekt definiert wird, dass es nach 5 Jahren alt ist, dann landet es auch erst nach 5 Jahren in der entsprechenden Partition.</p>
+<h2>Archivierung</h2>
+<p>Welche Daten nicht mehr benötigt werden, wird durch eine Funktionalität abgebildet, die auch bei der Archivierung verwendet wird. Da ein Datensatz für sich nicht einfach als alt (oder kalt) definiert werden kann, sondern nur im Kontext, müssen bestimmte Logiken dafür sorgen, dass die Daten richtig interpretiert werden.</p>
+<p>Es gibt Daten, die gar nicht altern. Offen Posten zum Beispiel sind immer aktuell. Bei anderen Datenobjekten muss definiert werden, anhand welchen Datums das Objekt als alt klassifiziert werden kann und welche abhängigen Datensätze dazu gehören.</p>
+<p>Der Vorteil hierbei ist, dass die grundsätzlichen Logiken durch die Archivierungsprogramme bereits vorhanden sind. Der Nachteil ist, dass es nach wie vor Beziehungen zwischen Datenobjekten gibt, die sehr schwer zu fassen sind. Der komplette Belegfluss eines Dokumentes muss dafür analysiert und bewertet werden.</p>
+<h2>Konsequenzen für die Anwender</h2>
+<p>Der Anwender soll von dem Alterungsprozess möglichst nichts mitbekommen. Er soll seine Transaktionen wie gewohnt aufrufen und damit arbeiten. Nur sieht er eben nicht mehr die Daten, die von einem Analyseprogramm als <em>alt</em> eingestuft wurden. In der Praxis wird sich zeigen, wie gut das Data-Aging funktioniert bzw. wie zufrieden der Anwender damit ist. Wenn es gut läuft, sieht der Anwender weniger Daten, was in der Regel gut ist, sofern alle relevanten Daten auf dem Bildschirm erscheinen.</p>
+<h2>Konsequenzen für die Entwicklung</h2>
+<p>Im ersten Moment hört es sich etwas strange an, dass man als Entwickler keinen vollen Zugriff mehr auf die Daten in der Datenbank hat. Ich habe im Hands-On-Workshop ein mulmiges Gefühl gehabt, als nach dem Alterungsprozess die Daten aus der SE16n einfach weg waren. In der SE16h gibt es unter S4/HANA einen neuen Menüpunkt in dem man die <em>Temperatur</em> (also das die Anzahl der Tage) einstellen kann, mit der die Daten gelesen werden sollen.</p>
+<p>In der Programmierung hat man die Möglichkeit zu einem Data-Aging-Objekt die Selektion zu beeinflussen. Vor dem Select-Befehl muss das DA-Objekt angesprochen werden und das gewünschte Alter definiert werden.</p>
+<p>Die letzten Jahre ist der Umgang mit der Datenbank leichter geworden. Joins funktionieren besser und es ist über ein Jahrzehnt her, dass ich einen Oracle-Hint verwenden musste. Die Performance ist insgesamt besser geworden; SELECT INTO CORRESPONDING FIELDS ist nur unwesentlich langsamer als der direkte Select in eine Tabelle.</p>
+<p>Zuerst dachte ich, dass nun nach diesen Vereinfachungen wieder mehr Arbeit auf den Entwickler zukommt. Für den Großteil der Entwickler wird sich jedoch nichts ändern. Der Zugriff auf die Datenbank erfolgt weiterhin über die üblichen Open-SQL-Befehle.</p>
+<p>Es kommt nun lediglich ein neues, sehr spezielles Aufgabengebiet hinzu.</p>
+<p>Eine sehr gute und detaillierte Übersicht zeigt <a href="https://people.sap.com/bartosz.jarkowski4">Bartosz Jarkowki</a> in seinem SAP-Blog <a href="https://blogs.sap.com/2016/10/03/how-to-perform-data-aging-in-s4hana/">How To Perform Data Aging in S4/HANA</a>. Weitere technische Details kannst du in dem Blogbeitrag von <a href="https://people.sap.com/jens.gleichmann3">Jens Gleichmann</a> nachlesen: <a href="https://blogs.sap.com/2017/09/13/technical-details-about-data-aging/">Technical Details About Data Aging</a>.</p>
+<p>Der Beitrag <a href="/blog/data-aging-in-s4-hana/">Data-Aging in S4/HANA</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Falle beim Left Outer Join</title>
+		<link>/blog/falle-beim-left-outer-join/</link>
+					<comments>/blog/falle-beim-left-outer-join/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 16 Jun 2017 13:26:48 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Joins]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[left outer join]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018037</guid>
+
+					<description><![CDATA[<p>Häufig sind es die Kleinigkeiten, die einem das Leben schwer machen. Die berühmten letzten 20%. Häufig bemerkt man jedoch gar nicht, dass man überhaupt ein Problem hat, weil alles scheinbar so funktioniert, wie man es sich vorstellt. Aufgabe: SELECT Die Aufgabe sollte sein: Selektiere aus Tabelle ZZT1 alle Einträge anhand der gegebenen Selektionskriterien (AREA). Lies zusätzlich mit einem LEFT OUTER JOIN alle Einträge aus Tabelle ZZT2, die über das Feld LINK verknüpft sind hinzu. Einträge...</p>
+<p>Der Beitrag <a href="/blog/falle-beim-left-outer-join/">Falle beim Left Outer Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Häufig sind es die Kleinigkeiten, die einem das Leben schwer machen. Die berühmten letzten 20%. Häufig bemerkt man jedoch gar nicht, dass man überhaupt ein Problem hat, weil alles scheinbar so funktioniert, wie man es sich vorstellt.</p>
+<h2>Aufgabe: SELECT</h2>
+<p>Die Aufgabe sollte sein: Selektiere aus Tabelle ZZT1 alle Einträge anhand der gegebenen Selektionskriterien (AREA). Lies zusätzlich mit einem LEFT OUTER JOIN alle Einträge aus Tabelle ZZT2, die über das Feld LINK verknüpft sind hinzu. Einträge aus Tabelle ZZT2 mit gesetztem Löschkennzeichen dürfen nicht berücksichtigt werden.</p>
+<h2>Demodaten</h2>
+<p>Die folgenden Demodaten stehen zur Verfügung:</p>
+<ul>
+<li>Tabelle ZZT1</li>
+<li>Tabelle ZZT2</li>
+</ul>
+<p>Selektionskriterium soll sein: AREA = TEST</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/06/SNAG-0002.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018041" src="https://tricktresor.com/wp-content/uploads/2017/06/SNAG-0002.png" alt="" width="558" height="310" srcset="/wp-content/uploads/2017/06/SNAG-0002.png 558w, /wp-content/uploads/2017/06/SNAG-0002-300x167.png 300w, /wp-content/uploads/2017/06/SNAG-0002-71x40.png 71w" sizes="(max-width: 558px) 100vw, 558px" /></a></p>
+<h3>Tabelle ZZT1 (links)</h3>
+<table border="1" cellpadding="4">
+<thead>
+<tr>
+<td style="text-align: center;" width="151"><strong>KEY1</strong></td>
+<td style="text-align: center;" width="151"><strong>TEXT</strong></td>
+<td style="text-align: center;" width="151"><strong>LINK</strong></td>
+<td style="text-align: center;" width="151"><strong>AREA</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;" width="151">1</td>
+<td style="text-align: center;" width="151">Eins</td>
+<td style="text-align: center;" width="151">A</td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">2</td>
+<td style="text-align: center;" width="151">Zwei</td>
+<td style="text-align: center;" width="151">B</td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">3</td>
+<td style="text-align: center;" width="151">Drei</td>
+<td style="text-align: center;" width="151">C</td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">4</td>
+<td style="text-align: center;" width="151">Vier</td>
+<td style="text-align: center;" width="151"></td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">5</td>
+<td style="text-align: center;" width="151">Fünf</td>
+<td style="text-align: center;" width="151">A</td>
+<td style="text-align: center;" width="151">NEU</td>
+</tr>
+</tbody>
+</table>
+<h3>Tabelle ZTT2 (rechts)</h3>
+<table border="1" cellpadding="4">
+<thead>
+<tr>
+<td style="text-align: center;" width="201"><strong>LINK</strong></td>
+<td style="text-align: center;" width="201"><strong>TEXT</strong></td>
+<td style="text-align: center;" width="201"><strong>LOEVM</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;" width="201">A</td>
+<td style="text-align: center;" width="201">Info A</td>
+<td style="text-align: center;" width="201"></td>
+</tr>
+<tr>
+<td style="text-align: center;" width="201">B</td>
+<td style="text-align: center;" width="201">Info B</td>
+<td style="text-align: center;" width="201">X</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="201">C</td>
+<td style="text-align: center;" width="201">Info C</td>
+<td style="text-align: center;" width="201"></td>
+</tr>
+</tbody>
+</table>
+<h2>Überlegungen</h2>
+<p>Wenn aus Tabelle ZZT1 alle Einträge selektiert werden, bei denen das Feld AREA mit &#8220;TEST&#8221; gefüllt ist, dann erwarte ich, dass die folgenden Einträge selektiert werden: 1, 2, 3 und 4.</p>
+<p>Zusätzlich muss bei den Einträgen 1 und 3 der LINK_TEXT gefüllt sein, denn diese Einträge verweisen auf Einträge in Tabelle ZZT2, die keine Löschvormerkung haben.</p>
+<h3>Erster Versuch</h3>
+<p>Der erste Wurf sieht folgendermaßen aus:</p>
+<pre class="lang:abap decode:true">SELECT z1~key1,
+       z1~text,
+       z1~link,
+       z1~area,
+       z2~text AS link_text
+  FROM zzt1 AS z1
+  LEFT OUTER JOIN zzt2 AS z2 ON z1~link = z2~link
+  INTO TABLE @DATA(t_data)
+ WHERE z1~area  = 'TEST'.
+   AND z2~loevm = @space.</pre>
+<p>Der SELECT ist syntaktisch (!) fehlerfrei, liefert jedoch leider ein falsches Ergebnis:</p>
+<table title="ABAP Data" border="1" summary="data display" cellpadding="4">
+<thead>
+<tr class="header">
+<td><strong>KEY1</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>LINK</strong></td>
+<td><strong>AREA</strong></td>
+<td><strong>LINK_TEXT</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr class="body">
+<td><span class="nowrap">1</span></td>
+<td><span class="nowrap">Eins</span></td>
+<td><span class="nowrap">A</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info A</span></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">3</span></td>
+<td><span class="nowrap">Drei</span></td>
+<td><span class="nowrap">C</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info C</span></td>
+</tr>
+</tbody>
+</table>
+<h3>Zweiter Versuch</h3>
+<p>Ohne die Einschränkung über die WHERE-Bedingung auf der rechten Seite (AND z2~loevm = @space) funktioniert die Selektion wie erwartet.</p>
+<p>Das ist nicht ganz das, was ich erwartet habe&#8230; Ich habe mich dann damit beschäftigt, warum das Ergebnis so aussieht und warum Ergebniszeilen fehlen. Beziehungsweise habe ich zuerst versucht, das richtige Ergebnis zu bekommen. Der richtige Select lautet so:</p>
+<pre class="lang:abap decode:true ">SELECT z1~key1,
+       z1~text,
+       z1~link,
+       z1~area,
+       z2~text AS link_text
+  FROM zzt1 AS z1
+  LEFT OUTER JOIN zzt2 AS z2 ON z1~link = z2~link
+                            AND z2~loevm = @space
+  INTO TABLE @DATA(t_data)
+ WHERE z1~area = 'TEST'.</pre>
+<p><strong>Ergebnis:</strong></p>
+<table title="ABAP Data" border="1" summary="data display" cellpadding="4">
+<thead>
+<tr class="header">
+<td><strong>KEY1</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>LINK</strong></td>
+<td><strong>AREA</strong></td>
+<td><strong>LINK_TEXT</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr class="body">
+<td><span class="nowrap">1</span></td>
+<td><span class="nowrap">Eins</span></td>
+<td><span class="nowrap">A</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info A</span></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">2</span></td>
+<td><span class="nowrap">Zwei</span></td>
+<td><span class="nowrap">B</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">3</span></td>
+<td><span class="nowrap">Drei</span></td>
+<td><span class="nowrap">C</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info C</span></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">4</span></td>
+<td><span class="nowrap">Vier</span></td>
+<td></td>
+<td><span class="nowrap">TEST</span></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>Lessons learned</h2>
+<p>Bei einem LEFT OUTER JOIN darf die WHERE-Bedingung keine Einschränkung auf die rechte Tabelle haben. In der <a href="https://help.sap.com/http.svc/rc/abapdocu_750_index_htm/7.50/de-DE/abapselect_join.htm">Hilfe zum JOIN</a> steht:</p>
+<blockquote><p>Eine WHERE-Bedingung für eine SELECT-Anweisung mit Joins wirkt auf die durch die Joins gebildete Ergebnismenge.</p></blockquote>
+<p>Ich deute das so, dass die WHERE-Bedingung sozusagen erst nachträglich angewendet wird. Wobei das für mich ein Zirkelschluss ist, den ich nicht verstehe. Zudem enthält die Ergebnismenge ja gar kein Feld &#8220;LOEVM&#8221;.</p>
+<p>Auf jeden Fall sollte man die Verwendung beziehungsweise die gesammelten Daten eines LEFT OUTER JOINS sehr genau prüfen. Schnell schleicht sich hier ein Fehler ein, mit dem man nicht gerechnet hat.</p>
+<p>Der Beitrag <a href="/blog/falle-beim-left-outer-join/">Falle beim Left Outer Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/falle-beim-left-outer-join/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Ist das gültig? (2)</title>
+		<link>/blog/ist-das-gueltig-2/</link>
+					<comments>/blog/ist-das-gueltig-2/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 05 Dec 2016 10:16:13 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Datum]]></category>
+		<category><![CDATA[Gültig-ab]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[Gültigkeit]]></category>
+		<category><![CDATA[Sub-Query]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=956837</guid>
+
+					<description><![CDATA[<p>Ist das gültig - jetzt erst recht? Dies ist eine Korrektur zum zuvor erschienenen Artikel "Ist das gültig?". Ein wichtiges Merkmal des Tricktresors ist es, dass ich die Beispiele auf das Wesentliche reduziere. Das ist beim letzten mal leicht schief gegangen...</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig-2/">Ist das gültig? (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>So. da bin ich im letzten Beitrag <a href="https://tricktresor.com/blog/ist-das-gueltig/">Ist das gültig?</a> etwas über das Ziel hinaus geschossen&#8230; Ein Merkmal des Tricktresors ist es, dass ich die Beispiele auf das Wesentlich und nur absolut Notwendige reduziere. So bleiben die Tricks einfach und klar. Im letzten Beitrag habe ich jedoch etwas zu viel reduziert und der Trick ist für das Beispiel sogar komplizierter als notwendig.</p>
+<h2>Klarstellung</h2>
+<p>Natürlich kann man von einem definierten Eintrag sehr einfach den zuletzt &#8211; bzw. aktuell &#8211; gültigen Eintrag ermitteln. Ingo hat darauf hin gewiesen, dass die folgende Variante doch deutlich einfacher ist als die von mir vorgestellte:</p>
+<pre class="">SELECT * FROM ztt_datum
+ UP TO 1 ROWS
+ INTO ls_datum
+ WHERE gueltig_ab &lt;= p_datum
+ ORDER BY gueltig_ab DESCENDING.
+ENDSELECT.</pre>
+<p>Recht hat er.</p>
+<p>Eigentlich wollte ich auch auf eine andere etwas komplexere Variante heraus. Nämlich die, bei der es nicht den einen Eintrag gibt, sondern eine unbestimmte Menge von Einträgen. Das könnten zum Beispiel alle gültigen Materialien eines Werkes sein oder Konten eines Buchungskreises sein.</p>
+<h2>Nächster Versuch</h2>
+<p>Für das neue Beispiel habe ich die folgende Tabelle erstellt:</p>
+<p>ZTT_DATUM2</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-05_10-51-52.jpg"><img decoding="async" class="size-full wp-image-956838 alignnone" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-05_10-51-52.jpg" alt="2016-12-05_10-51-52" width="226" height="172" /></a></p>
+<p>Aus dieser Tabelle möchte ich alle zu einem Datum gültigen Gruppen ermitteln. Das funktioniert gut mit dem Befehl DELETE ADJACENT DUPLICATES:</p>
+<pre class="">SELECT * FROM ztt_datum2 INTO TABLE @DATA(lt_datum)
+ WHERE datab &lt;= @p_datum
+ ORDER BY gruppe ASCENDING,
+          datab  DESCENDING.
+
+DELETE ADJACENT DUPLICATES FROM lt_datum COMPARING gruppe.</pre>
+<p>Es spricht nichts dagegen, diese Variante zu verwenden. Aber: Alles, was man mit einem Befehl anstelle von zweien lösen kann, ist irgendwie cooler. Zumal es immer <em>schöner</em> ist, nur die Daten zu lesen, die auch wirklich gebraucht werden.</p>
+<h2>Sub-query</h2>
+<p>Aus diesem Grund jetzt die wirklich hilfreiche und sinnvolle Variante mithilfe eines Sub-Queries:</p>
+<pre class="">SELECT * FROM ztt_datum2 AS z1 INTO TABLE @DATA(lt_datum)
+ WHERE datab &lt;= @p_datum
+   AND datab  = ( SELECT MAX( datab ) FROM ztt_datum2
+                   WHERE gruppe = z1~gruppe
+                     AND datab &lt;= @p_datum ).</pre>
+<p>Der Clou bei dieser Variante ist, dass man sich in der WHERE-Bedingung der Hauptselektion mit einem Sub-Query auf die jeweilige GRUPPE bezieht und hierfür das höchste Datum ermittelt.</p>
+<p>Von der Performance her kann es sein, dass die herkömmliche  Variante sogar schneller ist. Da man diesen Select jedoch wahrscheinlich nur für sehr kleine Datenmengen verwenden wird, dürfte die Geschwindigkeit hier zu vernachlässigen sein.</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig-2/">Ist das gültig? (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ist-das-gueltig-2/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>SELECT fieldname AS &#8230; INTO CORRESPONDING FIELDS</title>
+		<link>/blog/select-fieldname-as-into-corresponding-fields/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Jan 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[AS]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5209</guid>
+
+					<description><![CDATA[<p>Pfiffige Verwendung des AS-Zusatzes beim Select eines Feldwertes in mehrere andere Felder.</p>
+<p>Der Beitrag <a href="/blog/select-fieldname-as-into-corresponding-fields/">SELECT fieldname AS &#8230; INTO CORRESPONDING FIELDS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein kleiner Trick für Zwischendurch: Häufig ist es erwünscht, dass man den Inhalt eines Datenbankfeldes gleichzeitig in mehrere andere Felder einlesen möchte. Paradebeispiel für diese Anforderung dürfte der dynamische Aufbau eines ALV-Feldkataloges sein um die Bezeichnung eines dynamischen Elementes in die Felder SCRTEXT_S, SCRTEXT_M und SCRTEXT_L zu setzen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/01/delete-exercise-515757_640.jpg"><img decoding="async" class="alignnone size-medium wp-image-5233" src="https://tricktresor.com/wp-content/uploads/2015/01/delete-exercise-515757_640-300x200.jpg" alt="delete-exercise-515757_640" width="300" height="200" srcset="/wp-content/uploads/2015/01/delete-exercise-515757_640-300x200.jpg 300w, /wp-content/uploads/2015/01/delete-exercise-515757_640.jpg 640w, /wp-content/uploads/2015/01/delete-exercise-515757_640-624x416.jpg 624w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Normalerweise wird man so etwas finden:</p>
+<pre>SELECT bezei FROM xyz INTO ls_fieldcat-scrtext_l WHERE ...
+ls_fieldcat-scrtext_s = ls_fieldcat-scrtext_l.
+ls_fieldcat-scrtext_m = ls_fieldcat-scrtext_l.</pre>
+<p>Mithilfe des AS-Zusatzes funktioniert das ohne Hilfszuweisungen:</p>
+<pre>SELECT bezei AS scrtext_l 
+       bezei AS scrtext_m
+       bezei AS scrtext_s
+  FROM xyz 
+  INTO CORRESPONDING FIELDS OF gs_xyz WHERE ...</pre>
+<p>Voila. Nicht weniger Code, aber eleganter.</p>
+<p>Der Beitrag <a href="/blog/select-fieldname-as-into-corresponding-fields/">SELECT fieldname AS &#8230; INTO CORRESPONDING FIELDS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Interne Tabelle mit COMPONENTS</title>
+		<link>/blog/interne-tabelle-mit-components/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2012 15:03:25 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_abap_tabledescr]]></category>
+		<category><![CDATA[cl_abap_structdescr]]></category>
+		<category><![CDATA[cl_abap_elemdescr]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[create data]]></category>
+		<category><![CDATA[assign]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=657</guid>
+
+					<description><![CDATA[<p>Hier wird eine interne Tabelle anhand von einer beliebigen Anzahl Feldern generiert.</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-mit-components/">Interne Tabelle mit COMPONENTS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier wird eine interne Tabelle anhand von einer beliebigen Anzahl Feldern generiert.</p>
+<p>Die Tabelle, aus der die Daten gelesen werden sollen, muss angegeben werden. Dann müssen die Felder EINZELN in der Select-Option eingetragen werden. Die Feldnamen müssen mit dem Namen des Datenelements übereinstimmen.</p>
+<p>Eine schönere Version wäre die Komponenten der angegebenen Tabelle zu ermitteln (CL_ABAP_STRUCTDESCR-&gt;GET_COMPONENTS).</p>
+<p><strong><span style="text-decoration: underline;">Achtung:</span><br />
+</strong>Es erfolgt keine Prüfung ob die Felder in der Tabelle vorhanden sind! Wenn Feldnamen angegeben werden, die nicht in der angegebenen Tabelle existieren, kommt es zu einem Dump!</p>
+<p>Es erfolgt keine Ausgabe der Daten!</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true  ">*== Create internal table dynamically by given fields
+ DATA: gr_element   TYPE REF TO cl_abap_elemdescr,
+ gr_struc     TYPE REF TO cl_abap_structdescr,
+ gr_table     TYPE REF TO cl_abap_tabledescr,
+ gt_comp      TYPE cl_abap_structdescr=&gt;component_table,
+ gs_comp      LIKE LINE OF lt_comp,
+ gr_data      TYPE REF TO data,
+ gt_fields    TYPE STANDARD TABLE OF string,
+ hf_fieldname TYPE fieldname.
+
+FIELD-SYMBOLS &lt;table&gt; TYPE ANY TABLE.
+
+*== selection screen
+ PARAMETERS p_table TYPE tabname DEFAULT 'MARA'.
+ SELECT-OPTIONS s_fields FOR hf_fieldname.
+ 
+
+START-OF-SELECTION.
+
+  LOOP AT s_fields.
+ CLEAR: gs_comp.
+
+*== Element Description for field
+ gr_element ?= cl_abap_elemdescr=&gt;describe_by_name( s_fields-low ).
+ *== Field name
+ gs_comp-name = s_fields-low.
+ *== Field type (element)
+ gs_comp-type = gr_element.
+ *== add element to components table
+ APPEND gs_comp TO gt_comp.
+
+*== add column to selection table
+ APPEND s_fields-low TO gt_fields.
+
+  ENDLOOP.
+
+*== Create structure/ work area
+ gr_struc = cl_abap_structdescr=&gt;create( gt_comp ).
+
+*== create table by structure reference
+ gr_table = cl_abap_tabledescr=&gt;create(
+ p_line_type  = gr_struc
+ p_table_kind = cl_abap_tabledescr=&gt;tablekind_std
+ p_unique     = abap_false ).
+
+*== create data handle for table
+ CREATE DATA gr_data TYPE HANDLE gr_table.
+
+*== assign data to table-pointer
+ ASSIGN gr_data-&gt;* TO &lt;table&gt;.
+
+*== Select data into dynamic internal table
+ SELECT (gt_fields) FROM  (p_table)
+ INTO CORRESPONDING FIELDS OF TABLE &lt;table&gt;
+ UP TO 10 ROWS.</pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-mit-components/">Interne Tabelle mit COMPONENTS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

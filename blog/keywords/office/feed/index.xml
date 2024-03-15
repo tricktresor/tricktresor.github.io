@@ -1,0 +1,1066 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Office Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/office/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 24 Aug 2018 09:40:57 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Office Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ABAP2XLS</title>
+		<link>/blog/abap2xls/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Feb 2014 17:00:52 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[sap]]></category>
+		<category><![CDATA[zelle]]></category>
+		<category><![CDATA[arbeitsblatt]]></category>
+		<category><![CDATA[spreadsheet]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[sheet]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[formatierung]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[farben]]></category>
+		<category><![CDATA[ole]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4487</guid>
+
+					<description><![CDATA[<p>Eines der größten und beliebtesten Open Source Projekte für SAP ist zweifelsohne ABAP2XLS. Mit diesem kostenlosen Tool lassen sich einfach und im Hintergrund (!!) echte Excel-Dateien erstellen. Wer viel Excel-Dateien erstellen muss, sollte sich auf jeden Fall dieses geniale Tool anschauen!</p>
+<p>Der Beitrag <a href="/blog/abap2xls/">ABAP2XLS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Excel-Dateien lassen sich ohne weiteres aus SAP heraus erzeugen. Es gibt die Möglichkeit, dies per <a title="OLE &amp; Excel | Tricktresor" href="https://tricktresor.com/?s=ole+excel">OLE (Object Linking and Embedding)</a> oder mittels <a title="DOI &amp; Excel | Tricktresor" href="https://tricktresor.com/?s=doi+excel">DOI (Desktop Office Integration)</a> tun. Diese beiden Methoden haben jedoch zwei große Nachteile:</p>
+<ol>
+<li>Die Anwendung/ Erstellung von Excel-Dateien ist recht kompliziert und aufwändig</li>
+<li>Dateien können nur Online, also im Dialog mit dem Anwender erzeugt werden. Die Erzeugung von Excel-Dateien im Hintergrund ist nicht möglich.</li>
+</ol>
+<p><img decoding="async" class="alignleft size-medium wp-image-4488" alt="ABAP2XLS - Angry Birds" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_17_41_32-300x165.jpg" width="300" height="165" srcset="/wp-content/uploads/2014/02/02_20_17_41_32-300x165.jpg 300w, /wp-content/uploads/2014/02/02_20_17_41_32.jpg 558w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<p><a title="ABAP2XLS | Homepage" href="http://ivanfemia.github.io/abap2xlsx/">ABAP2XLS</a> bildet die meisten Funktionen &#8211; und das sind sehr viele!! &#8211; mit eigenen Klassen und Methoden ab. Die Entwicklung wird von einer Gruppe sehr engagierter SAP-Programmierer stetig weiter geführt und verbessert.</p>
+<p>Eine kurze Übersicht über die Funktionen und das Entwicklerteam gibt es im <a title="ABAP2XLS | SCN" href="http://scn.sap.com/community/abap/blog/2010/07/12/abap2xlsx--generate-your-professional-excel-spreadsheet-from-abap">SCN &#8211; ABAP2XLS</a>. Die Möglichkeiten sind wirklich fantastisch. Es können jede Menge Funktionen und Formatierungen vorgenommen werden.</p>
+<h2>Demo-Programm</h2>
+<p>Folgendes Demo-Programm zeigt, wie einfach es ist, eine Excel-Datei mithilfe von ABAP2XLS zu erzeugen:</p>
+<pre>REPORT  zdemo_excel1.
+
+DATA: lo_excel                TYPE REF TO zcl_excel,
+      lo_worksheet            TYPE REF TO zcl_excel_worksheet,
+      lo_hyperlink            TYPE REF TO zcl_excel_hyperlink,
+      column_dimension        TYPE REF TO zcl_excel_worksheet_columndime.
+
+CONSTANTS: gc_save_file_name TYPE string VALUE '01_HelloWorld.xlsx'.
+INCLUDE zdemo_excel_outputopt_incl.
+
+START-OF-SELECTION.
+  " Creates active sheet
+  CREATE OBJECT lo_excel.
+
+  " Get active sheet
+  lo_worksheet = lo_excel-&gt;get_active_worksheet( ).
+  lo_worksheet-&gt;set_cell( ip_column = 'B' ip_row = 2 ip_value = 'Hello world' ).
+  lo_worksheet-&gt;set_cell( ip_column = 'B' ip_row = 3 ip_value = sy-datum ).
+  lo_worksheet-&gt;set_cell( ip_column = 'C' ip_row = 3 ip_value = sy-uzeit ).
+  lo_hyperlink = zcl_excel_hyperlink=&gt;create_external_link( iv_url = 'http://www.abap2xlsx.org/' ).
+  lo_worksheet-&gt;set_cell( ip_column = 'B' ip_row = 4 ip_value = 'Click here to visit abap2xlsx homepage' ip_hyperlink = lo_hyperlink ).
+
+  column_dimension = lo_worksheet-&gt;get_column_dimension( ip_column = 'B' ).
+  column_dimension-&gt;set_width( ip_width = 11 ).
+
+*** Create output
+  lcl_output=&gt;output( lo_excel ).</pre>
+<p>Die Umfangreiche Demo-Sammlung ist in einem eigenen Show-Center untergebracht, in dem der Quelltext als auch die Ausgabe angezeigt werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_17_56_18.jpg"><img decoding="async" class="alignnone  wp-image-4489" alt="ABAP2XLS Democenter" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_17_56_18.jpg" width="100%" srcset="/wp-content/uploads/2014/02/02_20_17_56_18.jpg 1176w, /wp-content/uploads/2014/02/02_20_17_56_18-300x105.jpg 300w, /wp-content/uploads/2014/02/02_20_17_56_18-768x269.jpg 768w, /wp-content/uploads/2014/02/02_20_17_56_18-1024x359.jpg 1024w" sizes="(max-width: 1176px) 100vw, 1176px" /></a></p>
+<p>Der Beitrag <a href="/blog/abap2xls/">ABAP2XLS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Exporting ALV to Memory2</title>
+		<link>/blog/exporting-alv-to-memory2/</link>
+					<comments>/blog/exporting-alv-to-memory2/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 12 Sep 2011 14:54:53 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[if_ixml_stream_factory]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[if_ixml_document]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[if_ixml_parser]]></category>
+		<category><![CDATA[cl_alv_table_create=>create_dynamic_table]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[demoprogramme]]></category>
+		<category><![CDATA[if_ixml]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=625</guid>
+
+					<description><![CDATA[<p>Wir greifen den Trick - nach SUBMIT an die ALV-Daten im Office-Format zu gelangen - noch einmal auf und zeigen, wie man aus dem XML-String eine Tabelle erh&#228;lt.</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory2/">Exporting ALV to Memory2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wir greifen den Trick &#8211; nach SUBMIT an die ALV-Daten im Office-Format zu gelangen &#8211; noch einmal auf und zeigen, wie man aus dem XML-String eine Tabelle erhält.</p>
+<p>In diesem Beispiel rufen wir das Beispielprogramm BCALV_FULLSCREEN_DEMO auf, um mittels ALV-Grid Daten zu erzeugen.</p>
+<p>Die Flugdatenbank muss natürlich gefüllt sein!!</p>
+<p><img decoding="async" class="alignnone size-medium wp-image-4193" src="https://tricktresor.com/wp-content/uploads/2011/09/01_13_11_46_26-300x140.jpg" alt="BCALV_FULLSCREEN_DEMO" width="300" height="140" srcset="/wp-content/uploads/2011/09/01_13_11_46_26-300x140.jpg 300w, /wp-content/uploads/2011/09/01_13_11_46_26-624x292.jpg 624w, /wp-content/uploads/2011/09/01_13_11_46_26.jpg 727w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<p>Die grundlegenden Bestandteile sind bereits im vorherigen Artikel erläutert worden. In diesem Programm zeigen wir, wie man die im XML-Format vorliegenden Daten in eine interne Tabelle umwandelt.</p>
+<p>Das XML-Ergebnis wird dabei Ereignisgesteuert bearbeitet. Das bedeutet: Die XML-Tags werden Stück für Stück durchlaufen und im Programm wird entsprechend darauf reagiert.</p>
+<p class="head1">XML</p>
+<p>Die zurückgelieferte XML-Struktur, die die Tabelle beschreibt ist recht komplex. Hier ist die Beispiel-XML-Datei zu sehen: <a href="http://pastebin.com/XkgctkJA" target="_blank" rel="noopener">http://pastebin.com/XkgctkJA</a></p>
+<p>Uns interessieren jedoch nur die folgenden Tags:</p>
+<p class="head2">Anzahl der Spalten</p>
+<p class="sap1">&lt;Table&gt;&lt;Column/&gt;&lt;Column/&gt;&lt;/Table&gt;</p>
+<p class="head2">Zellen und Zelleninhalte</p>
+<p class="sap1">&lt;Cell&gt;&lt;Data&gt;Inhalt&lt;/data&gt;&lt;/cell&gt;</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true ">REPORT  zz_export_alv_to_memory_demo01.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_xml DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_xml DEFINITION.
+
+  PUBLIC SECTION.
+CLASS-METHODS call_report  IMPORTING iv_repid TYPE syrepid
+iv_list  TYPE char1.
+
+    CLASS-METHODS create_table IMPORTING iv_fields TYPE i
+EXPORTING ed_table TYPE REF TO data.
+
+    CLASS-METHODS display_data IMPORTING it_table TYPE STANDARD TABLE PREFERRED PARAMETER it_table.
+
+ENDCLASS.                    "lcl_xml DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_xml IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_xml IMPLEMENTATION.
+
+  METHOD call_report.
+
+*== Data
+DATA lv_guid   TYPE guid_32.
+DATA ls_params TYPE rsparams.
+DATA lt_params TYPE TABLE OF rsparams.
+
+*== Create and export GUIID for ALV
+lv_guid = cl_salv_export_db_storage=&gt;create_guid( ).
+EXPORT l_mode = 'M' TO MEMORY ID 'ALV_EXTRACT_MODE'.
+EXPORT l_guid = lv_guid TO MEMORY ID 'ALV_EXTRACT_GUID'.
+
+*== Call Report
+    SUBMIT (iv_repid)
+WITH SELECTION-TABLE lt_params
+AND RETURN.                                       "#EC CI_SUBMIT
+
+    DATA lv_xstring           TYPE xstring.
+DATA lr_stream_factory    TYPE REF TO if_ixml_stream_factory.
+DATA lr_ixml              TYPE REF TO if_ixml.
+DATA lr_istream           TYPE REF TO if_ixml_istream.
+DATA lr_doc               TYPE REF TO if_ixml_document.
+DATA lr_parser            TYPE REF TO if_ixml_parser.
+DATA lv_events            TYPE i.
+DATA lv_number_of_fields  TYPE i.
+
+    DATA lr_event             TYPE REF TO if_ixml_event.
+DATA lv_type              TYPE i.
+DATA lv_current_node      TYPE string.
+DATA lv_current_value     TYPE string.
+DATA lv_cell_index        TYPE i.
+
+*== Import XML-data from AVL and convert to stream
+lv_xstring        = cl_salv_export_db_storage=&gt;import_xmlstring
+( guid  = lv_guid ).
+lr_ixml           = cl_ixml=&gt;create( ).
+lr_stream_factory = lr_ixml-&gt;create_stream_factory( ).
+lr_istream        = lr_stream_factory-&gt;create_istream_xstring
+( string = lv_xstring ).
+
+    lr_doc            = lr_ixml-&gt;create_document( ).
+
+*== Create parser for document
+    lr_parser   = lr_ixml-&gt;create_parser(
+document       = lr_doc
+istream        = lr_istream
+stream_factory = lr_stream_factory ).
+
+*== deactivate DOM generation
+lr_parser-&gt;set_dom_generating( space ).
+
+*== data for dynamically generated internal table
+DATA ld_table            TYPE REF TO data.
+FIELD-SYMBOLS &lt;table&gt;    TYPE STANDARD TABLE.
+FIELD-SYMBOLS &lt;row&gt;      TYPE ANY. "line of &lt;table&gt;.
+FIELD-SYMBOLS &lt;cell&gt;     TYPE string.
+
+*== define Parser events
+lv_events = if_ixml_event=&gt;co_event_element_pre2
++ if_ixml_event=&gt;co_event_element_post
++ if_ixml_event=&gt;co_event_text_post.
+
+*== Register XML-Events
+lr_parser-&gt;set_event_subscription( lv_events ).
+
+    DO.
+
+*== get next event (XML-tag)
+lr_event = lr_parser-&gt;parse_event( ).
+IF lr_event IS INITIAL.
+EXIT.
+ENDIF.
+
+*== get type of event
+lv_type = lr_event-&gt;get_type( ).
+*== New element
+CASE lv_type.
+WHEN if_ixml_event=&gt;co_event_element_pre2.
+*===&gt; Event "PRE2"
+lv_current_node = lr_event-&gt;get_name( ).
+IF iv_list &lt;&gt; space.
+WRITE: / lv_current_node.
+ENDIF.
+
+          CASE lv_current_node.
+WHEN 'Column'.
+*=====&gt; New Column: Add column counter
+ADD 1 TO lv_number_of_fields.
+
+            WHEN 'Row'.
+*=====&gt; New Row
+IF &lt;table&gt; IS NOT ASSIGNED.
+*=====&gt; Create table if not done yet
+create_table( EXPORTING iv_fields = lv_number_of_fields
+IMPORTING ed_table  = ld_table ).
+
+                ASSIGN ld_table-&gt;* TO &lt;table&gt;.
+ENDIF.
+
+*=====&gt; Insert new table line
+APPEND INITIAL LINE TO &lt;table&gt; ASSIGNING &lt;row&gt;.
+CLEAR lv_cell_index.
+
+            WHEN 'Cell'.
+*======&gt; new cell data:
+ADD 1 TO lv_cell_index.
+ASSIGN COMPONENT lv_cell_index
+OF STRUCTURE &lt;row&gt; TO &lt;cell&gt;.
+ENDCASE.
+
+        WHEN if_ixml_event=&gt;co_event_text_post.
+*===&gt; Event "TEXT"
+CASE lv_current_node.
+WHEN 'Data'.
+*=====&gt; get cell value and assign to table cell
+&lt;cell&gt; = lr_event-&gt;get_value( ).
+ENDCASE.
+
+          IF iv_list &lt;&gt; space.
+lv_current_value = lr_event-&gt;get_value( )..
+WRITE lv_current_value COLOR COL_TOTAL.
+ENDIF.
+
+        WHEN if_ixml_event=&gt;co_event_element_post.
+*===&gt; Event "POST"
+IF iv_list &lt;&gt; space.
+lv_current_node = lr_event-&gt;get_name( ).
+WRITE: lv_current_node COLOR COL_GROUP.
+ENDIF.
+
+      ENDCASE.
+ENDDO.
+
+*== Display table
+    IF &lt;table&gt; IS ASSIGNED.
+display_data( &lt;table&gt; ).
+ENDIF.
+
+  ENDMETHOD.                    "call_report
+
+METHOD create_table.
+
+*== field catalog
+    DATA lt_fcat             TYPE lvc_t_fcat.
+FIELD-SYMBOLS &lt;fcat&gt;     TYPE lvc_s_fcat.
+
+*== create field catalog for internal table
+    DO iv_fields TIMES.
+*== cell
+APPEND INITIAL LINE TO lt_fcat ASSIGNING &lt;fcat&gt;.
+&lt;fcat&gt;-fieldname = sy-index.
+CONDENSE &lt;fcat&gt;-fieldname.
+&lt;fcat&gt;-tabname   = 'GT_TABLE'.
+&lt;fcat&gt;-inttype   = 'g'. "String
+ENDDO.
+
+*== generate internal table from given field catalog
+CALL METHOD cl_alv_table_create=&gt;create_dynamic_table
+EXPORTING
+it_fieldcatalog           = lt_fcat
+IMPORTING
+ep_table                  = ed_table
+EXCEPTIONS
+generate_subpool_dir_full = 1
+OTHERS                    = 2.
+
+  ENDMETHOD.                    "create_table
+
+  METHOD display_data.
+
+*== Data
+DATA lv_col          TYPE i.
+FIELD-SYMBOLS &lt;row&gt;  TYPE ANY.
+FIELD-SYMBOLS &lt;cell&gt; TYPE string.
+
+*== Display all table lines
+LOOP AT it_table ASSIGNING &lt;row&gt;.
+NEW-LINE.
+DO.
+*== Display each table cell
+ASSIGN COMPONENT sy-index OF STRUCTURE &lt;row&gt; TO &lt;cell&gt;.
+IF sy-subrc = 0.
+lv_col = ( sy-index - 1 ) * 21.
+WRITE AT lv_col(19)  &lt;cell&gt; COLOR COL_POSITIVE.
+ELSE.
+EXIT. "from do
+ENDIF.
+ENDDO.
+ENDLOOP.
+ENDMETHOD.                    "display_data
+
+ENDCLASS.                    "lcl_xml IMPLEMENTATION
+
+***___________________________________________________________________
+***
+*** SELECTION SCREEN
+***___________________________________________________________________
+***
+
+SELECTION-SCREEN BEGIN OF BLOCK reps   WITH FRAME TITLE text-var.
+PARAMETERS p_repid TYPE syrepid        DEFAULT 'BCALV_FULLSCREEN_DEMO'.
+PARAMETERS p_data  RADIOBUTTON GROUP x DEFAULT 'X'.
+PARAMETERS p_list  RADIOBUTTON GROUP x.
+SELECTION-SCREEN END OF BLOCK reps.
+
+START-OF-SELECTION.
+
+*== Start report
+lcl_xml=&gt;call_report( EXPORTING iv_repid = p_repid
+iv_list  = p_list ).
+
+</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory2/">Exporting ALV to Memory2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/exporting-alv-to-memory2/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>DOI-Trace</title>
+		<link>/blog/doi-trace/</link>
+					<comments>/blog/doi-trace/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 09 Sep 2011 16:55:24 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Office-Integration]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=622</guid>
+
+					<description><![CDATA[<p>Mithilfe eines Programms kann ein Trace f&#252;r die Desktop-Office-Integration aktiviert oder deaktiviert werden. Der Trace kann bei der Fehlersuche behilflich sein.</p>
+<p>Der Beitrag <a href="/blog/doi-trace/">DOI-Trace</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mithilfe eines Programms kann ein Trace für die Desktop-Office-Integration aktiviert oder deaktiviert werden. Der Trace kann bei der Fehlersuche behilflich sein.</p>
+<p>Rufen Sie das Programm SAPR_OFFICE_INTEGRATION_TRACE in der Transaktion SE38 auf. Sie können dann einzelne Funktionen an- und ausschalten:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/DOI/Bild627.jpg" /></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/doi-trace/">DOI-Trace</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/doi-trace/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Exporting ALV to Memory</title>
+		<link>/blog/exporting-alv-to-memory/</link>
+					<comments>/blog/exporting-alv-to-memory/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 31 Aug 2011 14:51:59 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[submit]]></category>
+		<category><![CDATA[duet]]></category>
+		<category><![CDATA[mendocino]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=620</guid>
+
+					<description><![CDATA[<p>Eine Report-Listausgabe kann man bei einem SUBMIT mit dem Zusatz "EXPORTING LIST TO MEMORY" abgreifen. Bei einem ALV funktioniert das nat&#252;rlich nicht. Die SAP hat aber eine Funktion einegebaut, um auch nach einem SUBMIT an die erzeugt ALV-Liste zu gelangen...</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory/">Exporting ALV to Memory</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine Report-Listausgabe kann man bei einem SUBMIT mit dem Zusatz &#8220;EXPORTING LIST TO MEMORY&#8221; abgreifen. Bei einem ALV funktioniert das natürlich nicht. Die SAP hat aber eine Funktion einegebaut, um auch nach einem SUBMIT an die erzeugt ALV-Liste zu gelangen&#8230;</p>
+<p><img fetchpriority="high" decoding="async" width="602" height="359" class="alignnone size-full wp-image-4195" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d3c553de6e0.png" alt="" srcset="/wp-content/uploads/2014/01/img_52d3c553de6e0.png 602w, /wp-content/uploads/2014/01/img_52d3c553de6e0-300x178.png 300w" sizes="(max-width: 602px) 100vw, 602px" /></p>
+<h2 class="head1">EXPORTING ALV TO MEMORY</h2>
+<p>Den Zusatz &#8220;EXPORTING ALV TO MEMORY&#8221; gibt es dabei natürlich nicht&#8230;!</p>
+<p>Im Programm SALV_TEST_INTERCEPTOR_REPORT kann die Funktionalität nachvollzogen werden.</p>
+<p>Hauptbestandteil sind hierbei die folgenden drei Befehle, die den aufgerufenen ALV anweisen, seine Daten unter einer generierten GUID zu speichern:</p>
+<pre class="lang:abap decode:true ">g_guid = cl_salv_export_db_storage=&gt;create_guid( ).
+export l_mode = 'M' to memory id 'ALV_EXTRACT_MODE'.
+export l_guid = g_guid to memory id 'ALV_EXTRACT_GUID'.</pre>
+<p>Nach Aufruf des gewünschten Reports mittels SUBMIT können die Daten wieder eingelesen werden:</p>
+<pre class="lang:abap decode:true ">DATA l_xstring type xstring.
+l_xstring = cl_salv_export_db_storage=&gt;import_xmlstring( guid = g_guid ).</pre>
+<p>Entwickelt wurde diese Funktionalität zum Projekt/ Stichwort &#8220;SAP-Konnektor DUET/ Mendocino&#8221;.</p>
+<p>Das ganze fällt auch unter den Begriff &#8220;Office Suite Program&#8221;</p>
+<h2 class="head1">Office Suite Program (XAP-OSP)</h2>
+<p>Lösung, die es den Benutzern erlaubt, mühelos und schnell SAP-Geschäftsprozesse und -Daten über Microsoft Office zu bearbeiten.</p>
+<p>Duet for Microsoft Office und SAP wurde gemeinsam von Microsoft und SAP entwickelt und wird von beiden Unternehmen betreut. Die Lösung ermöglicht eine bessere Entscheidungsfindung, verbessert die Einhaltung von Prozessen und senkt Kosten.</p>
+<p>Als zusammengesetzte Anwendung vereint Duet for Microsoft Office and SAP die Enterprise Services Architecture (ESA) von SAP und Microsoft .Net in sich. Ausgewählte Prozesse und Informationen aus der mySAP Business Suite können in Microsoft Office bearbeitet werden.</p>
+<p>Aus der SAP-Hilfe: <a href="http://help.sap.com/saphelp_nw04/Helpdata/de/44/3b91f48936548fe10000000a155436/content.htm" target="_blank" rel="noopener">http://help.sap.com/saphelp_nw04/Helpdata/de/<br />
+44/3b91f48936548fe10000000a155436/content.htm</a></p>
+<p class="head1">Paket /OSP/MAIN</p>
+<p>In einem SAP System man weitere Informationen dazu, wenn man sich die untergeordneten Pakete zu /OSP/MAIN im Package Builder anschaut.</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory/">Exporting ALV to Memory</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/exporting-alv-to-memory/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>TXT-öffnen und als XLSX speichern</title>
+		<link>/blog/txt-oeffnen-und-als-xlsx-speichern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 08 Jul 2011 14:26:00 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=602</guid>
+
+					<description><![CDATA[<p>Hauptbestandteil dieses Demoprogramms ist die Methode "OpenText" mit der Text-Dateien eingelesen werden k&#246;nnen, deren Felder durch Trennzeichen voneinader getrennt sind.</p>
+<p>Der Beitrag <a href="/blog/txt-oeffnen-und-als-xlsx-speichern/">TXT-öffnen und als XLSX speichern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hauptbestandteil dieses Demoprogramms ist die Methode &#8220;OpenText&#8221; mit der Text-Dateien eingelesen werden können, deren Felder durch Trennzeichen voneinader getrennt sind.</p>
+<p>Dieser Report öffnet die Textdatei und speichert sie als XLSX-Datei wieder ab.</p>
+<p>Es werden folgende Trennzeichen berücksichtigt:</p>
+<ul>
+<li>Tabulator</li>
+<li>Semikolon</li>
+<li>Komma</li>
+<li>Doppelpunkt</li>
+</ul>
+<p>Sollte die zu erzeugende Datei bereits vorhanden sein, so wird sie ohne Nachfrage überschrieben. Soll der Anwender gefragt werden, ob die Datei überschrieben werden soll oder nicht, so muss</p>
+<p class="sap1">SET PROPERTY OF excel &#8216;DisplayAlerts&#8217; = 1</p>
+<p>gesetzt oder ganz weg gelassen werden (DisplayAlerts = 1 ist der Default).</p>
+<h2 class="head1">Code</h2>
+<pre>REPORT zz_open_text_and_save_xlsx.
+TYPE-POOLS ole2.
+*== screen
+PARAMETERS p_file TYPE string DEFAULT 'D:text.txt'.
+PARAMETERS p_saveas TYPE string DEFAULT 'D:text2'.
+START-OF-SELECTION.
+*== data
+ DATA: excel TYPE ole2_object,
+       workbook TYPE ole2_object,
+       active_window TYPE ole2_object,
+       sheet TYPE ole2_object.
+*== create excel application
+ CREATE OBJECT excel 'EXCEL.APPLICATION'.
+*== do not display excel
+ SET PROPERTY OF excel 'Visible' = 0.
+*== get workbook
+ CALL METHOD OF excel 'Workbooks' = workbook.
+*== open file as text to convert
+ CALL METHOD OF workbook 'OPENTEXT'
+      EXPORTING
+         #1 = p_file "file to open
+         #2 = 2 "origin
+         #3 = 2 "start row
+         #4 = 1 "data
+         #5 = 1 "text qualifier
+         #6 = 0 "consecutive delimiter
+         #7 = 1 "Separator: tab
+         #8 = 1 "Separator: semicolon
+         #9 = 1 "Separator: comma
+         #10 = 0 "Separator: space
+         #11 = 1 "Separator: other
+         #12 = ':'. "Separator: specify other char
+*== get active sheet.
+ GET PROPERTY OF excel 'ActiveSheet' = sheet.
+
+*== overwrite existing file w/o prompting
+ SET PROPERTY OF excel 'DisplayAlerts' = 0.
+
+*== save as XLSX
+ CALL METHOD OF sheet 'SAVEAS'
+      EXPORTING
+         #1 = p_saveas
+         #2 = 51.
+
+*== get active window
+ CALL METHOD OF excel 'ACTIVEWINDOW' = active_window.
+*== set active_window visible
+ SET PROPERTY OF active_window 'VISIBLE' = 1.
+*== close active_window without saving
+ CALL METHOD OF active_window 'CLOSE'
+      EXPORTING #1 = 0.
+*== close workbook
+ CALL METHOD OF workbook 'CLOSE'.
+*== close excel application
+ CALL METHOD OF excel 'QUIT'.
+*== free all used objects
+ FREE OBJECT sheet.
+ FREE OBJECT workbook.
+ FREE OBJECT excel.
+ FREE OBJECT active_window.</pre>
+<p>Der Beitrag <a href="/blog/txt-oeffnen-und-als-xlsx-speichern/">TXT-öffnen und als XLSX speichern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Excelblätter exportieren</title>
+		<link>/blog/excelblaetter-exportieren/</link>
+					<comments>/blog/excelblaetter-exportieren/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 16 Jul 2009 13:20:43 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Excel]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[Office-Tricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=525</guid>
+
+					<description><![CDATA[<p>Falls Sie die Daten aus einer Excel-Datei exportieren wollen, dann geht das in der Regel recht einfach: Speichern unter... Format wählen und schon ist die Datei gespeichert. Wenn jedoch mehrere Excel-Blätter exportiert werden sollen, dann kann man dies mit einem kleinen Makro erledigen.</p>
+<p>Der Beitrag <a href="/blog/excelblaetter-exportieren/">Excelblätter exportieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Falls Sie die Daten aus einer Excel-Datei exportieren wollen, dann geht das in der Regel recht einfach: Speichern unter&#8230; Format w&auml;hlen und schon ist die Datei gespeichert. Wenn jedoch mehrere Excel-Bl&auml;tter exportiert werden sollen, dann kann man dies mit einem kleinen Makro erledigen.<br /><P class="head1">Makro</P><P>Das Makro sieht dann folgenderma&szlig;en aus:</P><P class="sap1">Sub Export()<BR><BR>&nbsp; Dim wb As Excel.Workbook<BR>&nbsp; Dim sh As Excel.Worksheet<BR>&nbsp; Dim i As Integer, sheets As Integer<BR><BR>&nbsp; Set wb = ActiveWorkbook<BR>&nbsp; sheets = wb.sheets.Count<BR><BR>&nbsp; For i = 1 To sheets<BR>&nbsp;&nbsp;&nbsp;&nbsp; wb.sheets(i).Range(&#8220;A1&#8221;, &#8220;A1&#8221;).EntireRow.Delete<BR>&nbsp;&nbsp;&nbsp;&nbsp; wb.sheets(i).SaveAs&nbsp;&#8220;C:/export&#8221; &amp; wb.sheets(i).Name &amp; &#8220;.txt&#8221;, XlFileFormat.xlTextWindows<BR>&nbsp; Next<BR><BR>&nbsp; i = i &#8211; 1<BR>&nbsp; MsgBox (i &amp; &#8221; Bl&auml;tter exportiert&#8221;)<BR><BR>End Sub</P><P>In diesem Fall werden die Bl&auml;tter im Textformat exportiert.</P><P class="head1">Tipp</P><P>Sie k&ouml;nnen die erzeugten Text-Dateien &uuml;brigens einfach zu einer Textdatei zusammen f&uuml;gen. Rufen Sie in der Eingabeaufforderung den folgenden Befehl auf:</P><P class="sap1">copy sheet1.txt + sheet2.txt + sheet3.txt sheet_all.txt</P><P>Es werden dann alle genannten Dateien zu einer Datei &#8220;sheet_all.txt&#8221; zusammen gef&uuml;gt. </P></p>
+<p>Der Beitrag <a href="/blog/excelblaetter-exportieren/">Excelblätter exportieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/excelblaetter-exportieren/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>The Tao Of Programming ~ English Version</title>
+		<link>/blog/english-version/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 17 Mar 2004 01:05:49 +0000</pubDate>
+				<category><![CDATA[Das Tao der Programmierung]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Jobs]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[tao]]></category>
+		<category><![CDATA[Tree]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=220</guid>
+
+					<description><![CDATA[<p>Die englische Version des "Tao of Programming"</p>
+<p>Der Beitrag <a href="/blog/english-version/">The Tao Of Programming ~ English Version</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die englische Originalversion des &#8220;Tao Of Programming&#8221;</p>
+<p class="head1" align="center">The  Tao  Of  Programming</p>
+<p class="text1" align="center">Translated   By Geoffrey James</p>
+<p class="head1" align="center">Table of Contents</p>
+<p class="text1">Book  1   &#8212;   The Silent Void</p>
+<p>Book  2   &#8212;   The Ancient Masters</p>
+<p>Book  3   &#8212;   Design</p>
+<p>Book  4   &#8212;   Coding</p>
+<p>Book  5   &#8212;   Maintenance</p>
+<p>Book  6   &#8212;   Management</p>
+<p>Book  7   &#8212;   Corporate Wisdom</p>
+<p>Book  8   &#8212;   Hardware and Software</p>
+<p>Book  9   &#8212;   Epilogue</p>
+<p class="head1" align="center">The Silent Void  &#8211; Book One</p>
+<p align="left">                   Thus spake the master programmer:<br />
+&#8220;When you have learned to snatch the error code from the trap<br />
+frame, it will be time for you to leave.&#8221;</p>
+<p align="left">                                  1.1</p>
+<p> Something mysterious is formed, born in the silent void. Waiting alone<br />
+and unmoving, it is at once still and yet in constant motion. It is<br />
+the source of all programs. I do not know its name, so I will call it<br />
+the Tao of Programming.</p>
+<p>If the Tao is great, then the operating system is great. If the<br />
+operating system is great, then the compiler is great. If the compiler<br />
+is great, then the application is great. The user is pleased and their<br />
+is harmony in the world.</p>
+<p>The Tao of Programming flows far away and returns on the wind of<br />
+morning.</p>
+<p>1.2</p>
+<p>The Tao gave birth to machine language. Machine language gave birth to<br />
+the assembler.</p>
+<p>The assembler gave birth to the compiler. Now their are ten thousand<br />
+languages.</p>
+<p>Each language has its purpose, however humble. Each language expresses<br />
+the Yin and Yang of software. Each language has its place within the<br />
+Tao.</p>
+<p>But do not program in COBOL if you can avoid it.</p>
+<p>1.3</p>
+<p>In the beginning was the Tao. The Tao gave birth to Space and Time.<br />
+Therefore Space and Time are Yin and Yang of programming.</p>
+<p>Programmers that do not comprehend the Tao are always running out of<br />
+time and space for there programs. Programmers that comprehend the<br />
+Tao always have enough time and space to accomplish their goals.</p>
+<p>How could it be otherwise?</p>
+<p>1.4</p>
+<p>The wise programmer is told about Tao and follows it. The average<br />
+programmer is told about Tao and searches for it. The foolish<br />
+programmer is told about Tao and laughs at is.</p>
+<p>If it were not for laughter, there would be no Tao.</p>
+<p>The highest sounds are hardest to hear. Going forward is a way to<br />
+retreat. Great talent shows itself late in life. Even a perfect<br />
+program still has bugs.</p>
+<p class="head1" align="center">The Ancient Masters &#8211; Book Two</p>
+<p>                   Thus Spake the Master Programmer:<br />
+&#8220;After three days without programming, life becomes meaningless.&#8221;</p>
+<p>2.1</p>
+<p>The programmers of old were mysterious and profound. We cannot fathom<br />
+their thoughts, so all we do is describe their appearance.</p>
+<p>Aware, like a fox crossing the water. Alert, like a general on the<br />
+battlefield. Kind, like a hostess greeting her guests. Simple, like<br />
+uncarved blocks of wood. Opaque , like black pools in darkened caves.</p>
+<p>Who can tell the secrets of their hearts and minds?</p>
+<p>The answer exists only in Tao.</p>
+<p>2.2</p>
+<p>Grand Master Turing once dreamed that he was a machine. When he awoke<br />
+he exclaimed:</p>
+<p>&#8220;I don&#8217;t know whether I am Turing dreaming that I am a machine,<br />
+or a machine dreaming that I am Turing!.&#8221;</p>
+<p>2.3</p>
+<p>A programmer from a very large computer company went to a software<br />
+conference and then returned to report to his manager, saying: &#8220;What<br />
+sort of programmers work for other companies? They behaved badly and<br />
+were unconcerned with appearances.  There hair was long and unkept<br />
+and their clothes were wrinkled and old. They crashed out hospitality<br />
+suite and they made rude noises during my presentation.&#8221;</p>
+<p>The manager said: &#8220;I should have never sent you to the conference.<br />
+Those programmers live beyond the physical world. They consider life<br />
+absurd, an accidental coincidence. They come and go without knowing<br />
+limitations. Without a care, they live only for their programs. Why<br />
+should they bother with social conventions?</p>
+<p>They are alive within the Tao.&#8221;</p>
+<p>2.4</p>
+<p>A novice asked the Master: &#8220;Here is a programmer that never designs,<br />
+documents or tests his programs. Yet all who know him consider him<br />
+one of the best programmer in the world. Why is this?&#8221;</p>
+<p>The Master replies: &#8220;That programmer has mastered the Tao. He has<br />
+gone beyond the need for design; he does not become angry when the<br />
+system crashes, but accepts the universe without concern. He has gone<br />
+beyond the need for documentation; he no longer cares if anyone else<br />
+sees his code. He has gone beyond the need for testing; each of his<br />
+programs are perfect within themselves, serene and elegant, their<br />
+purpose self-evident.  Truly, he has entered the mystery of Tao.&#8221;</p>
+<p class="head1" align="center">Design &#8211; Book Three</p>
+<p>                   Thus spake the Master Programmer:<br />
+&#8220;When the program is being tested, it is too late to make design<br />
+changes.&#8221;</p>
+<p>3.1</p>
+<p>There once was a man who went to a computer trade show.  Each day as<br />
+he entered, the man told the guard at the door:</p>
+<p>&#8220;I am a great thief, renowned for my feats of shoplifting. Be<br />
+forewarned, for this trade show shall not escape unplundered.&#8221;</p>
+<p>This speech disturbed the guard greatly, because there were millions<br />
+of dollars of computer equipment inside, so he watched the man<br />
+carefully. But the man merely wandered from booth to booth, humming<br />
+quietly to himself.</p>
+<p>When the man left, the guard took him aside and searched his clothes,<br />
+but nothing was to be found.</p>
+<p>On the next day of the trade show, the man returned and chided the<br />
+guard saying: &#8220;I escaped with a vast booty yesterday, but today will<br />
+be even better.&#8221; So the guard watched him ever more closely, but to<br />
+no avail.</p>
+<p>On the final day of the trade show, the guard could restrain his<br />
+curiosity no longer. &#8220;Sir Thief,&#8221; he said, &#8220;I am so perplexed, I<br />
+cannot live in peace. Please enlighten me. What is it that you are<br />
+stealing?&#8221;</p>
+<p>The man smiled. &#8220;I am stealing ideas,&#8221; he said.</p>
+<p>3.2</p>
+<p>There once was a master programmer who wrote unstructured programs. A<br />
+novice programmer, seeking to imitate him, also began to write<br />
+unstructured programs. When the novice asked the master to evaluate<br />
+his progress, the master criticized him for writing unstructured<br />
+programs, saying &#8220;What is appropriate for the master is not<br />
+appropriate for the novice. You must understand Tao before<br />
+transcending structure.&#8221;</p>
+<p>3.3</p>
+<p>There was once a programmer who was attached to the court of the<br />
+warlord of Wu. The warlord asked the programmer: &#8220;Which is easier to<br />
+design: an accounting package or an operating system?&#8221;</p>
+<p>&#8220;An operating system,&#8221; replied the programmer.</p>
+<p>The warlord uttered an exclamation of disbelief. &#8220;Surely an<br />
+accounting package is trivial next to the complexity of an operating<br />
+system,&#8221; he said.</p>
+<p>&#8220;Not so,&#8221; said the programmer, &#8220;when designing an accounting package,<br />
+the programmer operates as a mediator between people having different<br />
+ideas: how it must operate, how its reports must appear, and how it<br />
+must conform to the tax laws. By contrast, an operating system is not<br />
+limited by outside appearances. When designing an operating system,<br />
+the programmer seeks the simplest harmony between machine and ideas.<br />
+This is why an operating system is easier to design.&#8221;</p>
+<p>The warlord of Wu nodded and smiled. &#8220;That is all good and well, but<br />
+which is easier to debug?&#8221;</p>
+<p>The programmer made no reply.</p>
+<p>3.4</p>
+<p>A manager went to the master programmer and showed him the<br />
+requirements document for a new application. The manager asked the<br />
+master: &#8220;How long will it take to design this system if I assign five<br />
+programmers to it?&#8221;</p>
+<p>&#8220;It will take one year,&#8221; said the master promptly.</p>
+<p>&#8220;But we need this system immediately or even sooner! How long will it<br />
+take if I assign ten programmers to it?&#8221;</p>
+<p>The master programmer frowned. &#8220;In that case, it will take two<br />
+years.&#8221;</p>
+<p>&#8220;And what if I assign a hundred programmers to it?&#8221;</p>
+<p>The master programmer shrugged. &#8220;Then the design will never be<br />
+completed,&#8221; he said.</p>
+<p class="head1" align="center">Coding &#8211; Book Four</p>
+<p>                    Thus spake the master programmer:<br />
+&#8220;A well-written program is its own heaven; a poorly-written<br />
+program is its own hell.&#8221;</p>
+<p>4.1</p>
+<p>A program should be light and agile, its subroutines connected like a<br />
+string of pearls. The spirit and intent of the program should be<br />
+retained throughout. There should be neither too little or too much,<br />
+neither needless loops nor useless variables, neither lack of<br />
+structure nor overwhelming rigidity.</p>
+<p>A program should follow the &#8216;Law of Least Astonishment&#8217;. What is this<br />
+law? It is simply that the program should always respond to the user<br />
+in the way that astonishes him least.</p>
+<p>A program, no matter how complex, should act as a single unit. The<br />
+program should be directed by the logic within rather than by outward<br />
+appearances.</p>
+<p>If the program fails in these requirements, it will be in a state of<br />
+disorder and confusion. The only way to correct this is to rewrite<br />
+the program.</p>
+<p>4.2</p>
+<p>A novice asked the master: &#8220;I have a program that sometime runs and<br />
+sometimes aborts. I have followed the rules of programming, yet I am<br />
+totally baffled. What is the reason for this?&#8221;</p>
+<p>The master replied: &#8220;You are confused because you do not understand<br />
+Tao. Only a fool expects rational behavior from his fellow humans.<br />
+Why do you expect it from a machine that humans have constructed?<br />
+Computers simulate determinism; only Tao is prefect.</p>
+<p>The rules of programming are transitory; only Tao is eternal.<br />
+Therefore you must contemplate Tao before you receive enlightenment.&#8221;</p>
+<p>&#8220;But how will I know when I have received enlightenment?&#8221; asked the<br />
+novice.</p>
+<p>&#8220;Your program will then run correctly,&#8221; replied the master.</p>
+<p>4.3</p>
+<p>A master was explaining the nature of Tao of to one of his novices,</p>
+<p>&#8220;The Tao is embodied in all software &#8212; regardless of how<br />
+insignificant,&#8221; said the master.</p>
+<p>&#8220;Is the Tao in a hand-held calculator?&#8221; asked the novice.</p>
+<p>&#8220;It is,&#8221; came the reply.</p>
+<p>&#8220;Is the Tao in a video game?&#8221; continued the novice.</p>
+<p>&#8220;It is even in a video game,&#8221; said the master.</p>
+<p>&#8220;And is the Tao in the DOS for a personal computer?&#8221;</p>
+<p>The master coughed and shifted his position slightly. &#8220;The lesson<br />
+is over for today,&#8221; he said.</p>
+<p>4.4</p>
+<p>Prince Wang&#8217;s programmer was coding software. His fingers danced upon<br />
+the keyboard. The program compiled without an error message, and the<br />
+program ran like a gentle wind.</p>
+<p>&#8220;Excellent!&#8221; the Prince exclaimed, &#8220;Your technique is faultless!&#8221;</p>
+<p>&#8220;Technique?&#8221; said the programmer turning from his terminal, &#8220;What I<br />
+follow is Tao &#8212; beyond all techniques! When I first began to program<br />
+I would see before me the whole problem in one mass. After three<br />
+years I no longer saw this mass. Instead, I used subroutines. But now<br />
+I see nothing. My whole being exists in a formless void. My senses<br />
+are idle.  My spirit, free to work without plan, follows its own<br />
+instinct. In short, my program writes itself. True, sometimes there<br />
+are difficult problems. I see them coming, I slow down, I watch<br />
+silently. Then I change a single line of code and the difficulties<br />
+vanish like puffs of idle smoke. I then compile the program. I sit<br />
+still and let the joy of the work fill my being. I close my eyes for<br />
+a moment and then log off.&#8221;</p>
+<p>Prince Wang said, &#8220;Would that all of my programmers were as wise!&#8221;</p>
+<p class="head1" align="center">Maintenance &#8211; Book Five</p>
+<p>                   Thus spake the master programmer:<br />
+&#8220;Though a program be but three lines long, someday it will have to<br />
+be maintained.&#8221;</p>
+<p>5.1</p>
+<p>A well-used door needs no oil on its hinges.<br />
+A swift-flowing stream does not grow stagnant.<br />
+Neither sound nor thoughts can travel through a vacuum.<br />
+Software rots if not used.</p>
+<p>These are great mysteries.</p>
+<p>5.2</p>
+<p>A manager asked a programmer how long it would take him to finish<br />
+the program on which he was working. &#8220;I will be finished tomorrow,&#8221;<br />
+the programmer promptly replied.</p>
+<p>&#8220;I think you are being unrealistic,&#8221; said the manager, &#8220;Truthfully,<br />
+how long will it take?&#8221;</p>
+<p>The programmer thought for a moment. &#8220;I have some features that I<br />
+wish to add. This will take at least two weeks,&#8221; he finally said.</p>
+<p>&#8220;Even that is too much to expect,&#8221; insisted the manager, &#8220;I will be<br />
+satisfied if you simply tell me when the program is complete.&#8221;</p>
+<p>The programmer agreed to this.</p>
+<p>Several years later, the manager retired. On the way to his<br />
+retirement lunch, he discovered the programmer asleep at his<br />
+terminal. He had been programming all night.</p>
+<p>5.3</p>
+<p>A novice programmer was once assigned to code simple financial<br />
+package.</p>
+<p>The novice worked furiously for many days, but when his master<br />
+reviewed his program, he discovered that it contained a screen<br />
+editor, a set of generalized graphics routines, an artificial<br />
+intelligence interface, but not the slightest mention of anything<br />
+financial.</p>
+<p>When the master asked about this, the novice became indignant.<br />
+&#8220;Don&#8217;t be so impatient,&#8221; he said, &#8221; I&#8217;ll put in the financial stuff<br />
+eventually.&#8221;</p>
+<p>5.4</p>
+<p>Does a good farmer neglect a crop he has planted?<br />
+Does a good teacher overlook even the most humble student?<br />
+Does a good father allow a single child to starve?<br />
+Does a good programmer refuse to maintain his code?</p>
+<p class="head1" align="center">Management &#8211; Book Six</p>
+<p>                   Thus spake the master programmer:<br />
+&#8220;Let the programmer be many and the managers few &#8212; then all will<br />
+be productive.&#8221;</p>
+<p>6.1</p>
+<p>When managers hold endless meetings, the programmers write games.<br />
+When accountants talk of quarterly profits, the development budget<br />
+is about to be cut. When senior scientists talk blue sky, the clouds<br />
+are about to roll in.</p>
+<p>Truly, this is not the Tao of Programming.</p>
+<p>When managers make commitments, game programs are ignored. When<br />
+accountants make long-range plans, harmony and order are about to<br />
+be restored. When senior scientists address the problems at hand,<br />
+the problems will soon be solved.</p>
+<p>Truly, this is the Tao of Programming.</p>
+<p>6.2</p>
+<p>Why are programmers non-productive? Because their time is wasted<br />
+in meetings.</p>
+<p>Why are programmers rebellious? Because the management interferes<br />
+to much.</p>
+<p>Why are the programmers resigning one by one? Because they are<br />
+burnt out.</p>
+<p>Having worked for poor management, they no longer value their jobs.</p>
+<p>6.3</p>
+<p>A manager was about to be fired, but a programmer who worked for<br />
+him invented a new program that became popular and sold well. As<br />
+a result, the manager retained his job.</p>
+<p>The manager tries to give the programmer a bonus, but the programmer<br />
+refused it, saying, &#8220;I wrote the program because I thought it was<br />
+an interesting concept, and thus I expect no reward.&#8221;</p>
+<p>The manager upon hearing this remarked, &#8220;This programmer, though he<br />
+holds a position of small esteem, understands well the proper duty<br />
+of an employee. Lets promote him to the exalted position of<br />
+management consultant!&#8221;</p>
+<p>But when told this, the programmer once more refused, saying,<br />
+&#8220;I exist so that I can program. If I were promoted, I would do<br />
+nothing but waste everyone&#8217;s time. Can I go now? I have a program<br />
+that I&#8217;m working on.&#8221;</p>
+<p>6.4</p>
+<p>A manager went to his programmers and told them: &#8220;As regards to<br />
+your work hours: you are going to have to come in at nine in the<br />
+morning and leave at five in the afternoon.&#8221; At this, all of them<br />
+became angry and several resigned on the spot.&#8221;</p>
+<p>So the manager said: &#8220;All right, in that case you may set your own<br />
+working hours, as long as you finish your projects on schedule.&#8221;<br />
+The programmers, now satisfied, began to come in at noon and work<br />
+to the wee hours of the morning.</p>
+<p class="head1" align="center">Corporate Wisdom &#8211; Book Seven</p>
+<p>                   Thus spake the master programmer:<br />
+&#8220;You can demonstrate a program for a corporate executive, but<br />
+you can&#8217;t make him computer literate.&#8221;</p>
+<p>7.1</p>
+<p>A novice asked the master: &#8220;In the east there is a great tree-<br />
+structure that men call &#8216;Corporate Headquarters&#8217;. It is bloated<br />
+out of shape with vice presidents and accountants.  It issues a<br />
+multitude of memos, each saying &#8216;Go, Hence!&#8217; or &#8216;Go, Hither!&#8217; and<br />
+nobody knows what is meant. Every year new names are put onto the<br />
+branches, but all to no avail. How can such an unnatural entity<br />
+exist?&#8221;</p>
+<p>The master replies: &#8220;You perceive this immense structure and are<br />
+disturbed that it has no rational purpose. Can you not take<br />
+amusement from its endless gyrations?  Do you not enjoy the<br />
+untroubled ease of programming beneath its sheltering branches?<br />
+Why are you bothered by its uselessness?&#8221;</p>
+<p>7.2</p>
+<p>In the east there is a shark which is larger than all other fish.<br />
+It changes into a bird whose wings are like clouds filling the sky.<br />
+When this bird moves across the land, it brings a message from<br />
+Corporate Headquarters. This message it drops into the midst of the<br />
+programmers, like a seagull making its mark upon the beach. Then the<br />
+bird mounts on the wind and, with the blue sky at its back, returns<br />
+home.</p>
+<p>The novice programmer stares in wonder at the bird, for he<br />
+understands it not. The average programmer dreads the coming of the<br />
+bird, for he fears its message. The master programmer continues to<br />
+work at his terminal, for he does not know that the bird has come<br />
+and gone.</p>
+<p>7.3</p>
+<p>The Magician of the Ivory Tower brought his latest invention for<br />
+the master programmer to examine. The magician wheeled a large<br />
+black box into the master&#8217;s office while the master waited in<br />
+silence.</p>
+<p>&#8220;This is an integrated, distributed, general-purpose workstation,&#8221;<br />
+began the magician, &#8220;ergonomically designed with a proprietary<br />
+operating system, sixth generation languages, and multiple state of<br />
+the art user interfaces. It took my assistants several hundred man<br />
+years to construct. Is it not amazing.&#8221;</p>
+<p>The master raised his eyebrows slightly. &#8220;It is indeed amazing,&#8221; he<br />
+said.</p>
+<p>&#8220;Corporate Headquarters has commanded,&#8221; continued the magician,<br />
+&#8220;that everyone use this workstation as a platform for new programs.<br />
+Do you agree to this?&#8221;</p>
+<p>&#8220;Certainly,&#8221; replied the master, &#8221; I will have it transported to the<br />
+data center immediately!&#8221; And the magician returned to his tower,<br />
+well pleased.</p>
+<p>Several days later, a novice wandered into the office of the master<br />
+programmer and said, &#8220;I cannot find the listing for my new program.<br />
+Do you know where it might be?&#8221;</p>
+<p>&#8220;Yes,&#8221; replied the master, &#8220;the listings are stacked on the platform<br />
+in the data center.&#8221;</p>
+<p>7.4</p>
+<p>The master programmer moves form program to program without fear.<br />
+No change in management can harm him. He will not be fired, even if<br />
+the project is cancelled. Why is this? He is filled with Tao.</p>
+<p class="head1" align="center">Hardware and Software &#8211; Book Eight</p>
+<p>                   Thus spake the master programmer:<br />
+&#8220;Without the wind, the grass does not move. Without software,<br />
+hardware is useless.&#8221;</p>
+<p>8.1</p>
+<p>A novice asked the master: &#8220;I perceive that one computer company is<br />
+much larger than all others. It towers above its competition like a<br />
+giant among dwarfs. Any one of its divisions could comprise an entire<br />
+business. Why is this so?&#8221;</p>
+<p>The master replied, &#8220;Why do you ask such foolish questions? That<br />
+company is large because it is large. If it only made hardware,<br />
+nobody would buy it. If it only made software, nobody would use it.<br />
+If it only maintained systems, people would treat it like a servant.<br />
+But because it combines all of these things, people think it one of<br />
+the gods! By not seeking to strive, it conquers without effort.&#8221;</p>
+<p>8.2</p>
+<p>A master programmer passed a novice programmer one day. The master<br />
+noted the novice&#8217;s preoccupation with a hand-held computer game.<br />
+&#8220;Excuse me&#8221;, he said, &#8220;may I examine it?&#8221;</p>
+<p>The novice bolted to attention and handed the device to the master. I<br />
+see that the device claims to have three levels of play: Easy, Medium<br />
+and Hard&#8221;, said the master. &#8220;Yet every such device has another level<br />
+of play, where the device seeks not to conquer the human, nor to be<br />
+conquered by the human.&#8221;</p>
+<p>&#8220;Pray, great master&#8221;, implored the novice, &#8220;how does one find this<br />
+mysterious settings?&#8221;</p>
+<p>The master dropped the device to the ground and crushed it under<br />
+foot.  And suddenly the novice was enlightened.</p>
+<p>8.3</p>
+<p>There was once a programmer who worked upon microprocessors. &#8220;Look at<br />
+how well off I am here,&#8221; he said to a mainframe programmer who came<br />
+to visit, &#8220;I have my own operating system and file storage device. I<br />
+do not have to share my resources with anyone. The software is self-<br />
+consistant and easy-to-use. Why do you not quit your present job and<br />
+join me here?&#8221;</p>
+<p>The mainframe programmer then began to describe his system to his<br />
+friend, saying &#8220;The mainframe sits like an ancient sage meditating in<br />
+the midst of the data center. Its disk drives lie end-to-end like a<br />
+great ocean of machinery. The software is as multifaceted as a<br />
+diamond, and as convoluted as a primeval jungle. The programs, each<br />
+unique, move through the system like a swift-flowing river. That is<br />
+why I am happy where I am.&#8221;</p>
+<p>The microcomputer programmer, upon hearing this, fell silent. But the<br />
+two programmers remained friends until the end of their days.</p>
+<p>8.4</p>
+<p>Hardware met Software on the road to Changtse. Software said: &#8220;You<br />
+are Yin and I am Yang. If we travel together we will become famous<br />
+and earn vast sums of money.&#8221; And so the set forth together, thinking<br />
+to conquer the world.</p>
+<p>Presently they met Firmware, who was dressed in tattered rage and<br />
+hobbled along propped on a thorny stick. Firmware said to them: &#8220;The<br />
+Tao lies beyond Yin and Yang. It is silent and still as a pool of<br />
+water. It does not seek fame, therefore nobody knows its presence. It<br />
+does not seek fortune, for it is complete within itself. It exists<br />
+beyond space and time.&#8221;</p>
+<p>Software and Hardware , ashamed, returned to their homes.</p>
+<p class="head1" align="center">Epilogue &#8211; Book Nine</p>
+<p>                   Thus spake the Master Programmer:<br />
+&#8220;Time for you to leave.&#8221;</p>
+<p>Der Beitrag <a href="/blog/english-version/">The Tao Of Programming ~ English Version</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Posteingang über Tabellen lesen</title>
+		<link>/blog/posteingang-ueber-tabellen-lesen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 11 Jul 2003 16:17:06 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[Posteingang lesen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=86</guid>
+
+					<description><![CDATA[<p>Lesen des SAP-Office "Posteingangs" &#252;ber Tabellen. Je vielf&#228;ltiger die Meldungen im Posteingang sind, desto aufwendiger wird zwar die Programmierung, aber um einfache Textnachrichten auszulesen -- und die Berechtigungspr&#252;fung zu umgehen!!! -- reicht das Programm aus.</p>
+<p>Der Beitrag <a href="/blog/posteingang-ueber-tabellen-lesen/">Posteingang über Tabellen lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Lesen des SAP-Office &#8220;Posteingangs&#8221; &uuml;ber Tabellen. Je vielf&auml;ltiger die Meldungen im Posteingang sind, desto aufwendiger wird zwar die Programmierung, aber um einfache Textnachrichten auszulesen &#8212; und die Berechtigungspr&uuml;fung zu umgehen!!! &#8212; reicht das Programm aus.<br /><P class="sap1">REPORT zposteingang.<BR><FONT color="#fb2412">*** &#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR>*** Lesen Posteingang &uuml;ber Tabellen<BR>*** Keine Berechtigungspr&uuml;fung!!!!!<BR>*** &#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</FONT></P><P class="sap1">TYPE-POOLS icon.</P><P class="sap1">DATA:</P><P class="sap1">&nbsp; hex_0d&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE x VALUE &#8216;0D&#8217;,<BR>&nbsp; hex_0a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE x VALUE &#8216;0A&#8217;,<BR>&nbsp; hex_return(2) TYPE x VALUE &#8216;0D0A&#8217;,</P><P class="sap1">&nbsp; BEGIN OF t_test OCCURS 0,<BR>&nbsp;&nbsp;&nbsp; line(255),<BR>&nbsp; END OF t_test,</P><P class="sap1">&nbsp; l_souc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE souc,<BR>&nbsp; l_soud&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE soud,<BR>&nbsp; l_sood&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE sood,<BR>&nbsp; t_sofm&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE sofm OCCURS 0 WITH HEADER LINE,</P><P class="sap1">&nbsp; t_docs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE sood4 OCCURS 0 WITH HEADER LINE,<BR>&nbsp; l_docs&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE sood4,</P><P class="sap1">&nbsp; t_folder_cont LIKE somt&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t_object_cont LIKE soli&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t_object_head LIKE soli&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t_object_para LIKE selc&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t_object_parb LIKE soop1 OCCURS 0 WITH HEADER LINE,<BR>&nbsp; l_object_id&nbsp;&nbsp; LIKE soodk.</P><P class="sap1">PARAMETERS: p_uname TYPE xubname DEFAULT sy-uname.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Benutzerinformation lesen<BR></FONT>&nbsp; SELECT SINGLE * FROM souc INTO l_souc WHERE sapnam = p_uname.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Mappen-Information des Benutzers lesen<BR></FONT>&nbsp; SELECT SINGLE * FROM soud INTO l_soud<BR>&nbsp;&nbsp; WHERE usrtp = l_souc-usrtp<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND usryr = l_souc-usryr<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND usrno = l_souc-usrno.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Posteingangsmappe zur weiteren Verarbeitung ausw&auml;hlen<BR></FONT>&nbsp; l_object_id-objtp = &#8216;FOL&#8217;.<BR>&nbsp; l_object_id-objyr = l_soud-inbyr.<BR>&nbsp; l_object_id-objno = l_soud-inbno.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Alle Inhalte dieser Mappe lesen<BR></FONT>&nbsp; SELECT * FROM sofm INTO TABLE t_sofm<BR>&nbsp;&nbsp; WHERE foltp = &#8216;FOL&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND folyr = l_soud-inbyr<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND folno = l_soud-inbno.</P><P class="sap1">&nbsp; LOOP AT t_sofm.<BR><FONT color="#fb2412">*&#8211; Header-Information zu dieser Mappe lesen<BR></FONT>&nbsp;&nbsp;&nbsp; SELECT SINGLE * FROM sood INTO l_sood<BR>&nbsp;&nbsp;&nbsp;&nbsp; WHERE objtp = t_sofm-doctp<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND objyr = t_sofm-docyr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND objno = t_sofm-docno.</P><P class="sap1"><FONT color="#fb2412">*&#8211; &Uuml;berschrift ausgeben<BR></FONT>&nbsp;&nbsp;&nbsp; FORMAT COLOR COL_TOTAL.<BR>&nbsp;&nbsp;&nbsp; WRITE: / l_sood-objnam, l_sood-objdes.<BR><FONT color="#fb2412">*&#8211; Status<BR></FONT>&nbsp;&nbsp;&nbsp; CASE t_sofm-objrd.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;X&#8217;.<BR><FONT color="#fb2412">*&#8211; Dokument wurde gelesen<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE icon_mail_sap_read AS ICON.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN space.<BR><FONT color="#fb2412">*&#8211; Dokument wurde noch nicht gelesen<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE icon_mail_sap_unread AS ICON.<BR>&nbsp;&nbsp;&nbsp; ENDCASE.<BR>&nbsp;&nbsp;&nbsp; FORMAT COLOR OFF.</P><P class="sap1">&nbsp;&nbsp;&nbsp; MOVE-CORRESPONDING t_sofm TO l_docs.<BR>&nbsp;&nbsp;&nbsp; MOVE-CORRESPONDING l_sood TO l_docs.</P><P class="sap1">&nbsp;&nbsp;&nbsp; l_object_id-objtp = t_sofm-doctp.<BR>&nbsp;&nbsp;&nbsp; l_object_id-objyr = t_sofm-docyr.<BR>&nbsp;&nbsp;&nbsp; l_object_id-objno = t_sofm-docno.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Dokumenteninhalt lesen (Ohne Berechtigungspr&uuml;fung)<BR></FONT>&nbsp;&nbsp;&nbsp; PERFORM data_select(sapfsso1) TABLES t_object_head<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t_object_cont<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t_object_para<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t_object_parb<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; USING l_object_id<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sy-subrc.<BR><FONT color="#fb2412">*&#8211; Dokument ausgeben<BR></FONT>&nbsp;&nbsp;&nbsp; LOOP AT t_object_cont.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DO.<BR><FONT color="#fb2412">*&#8211; CarriageReturn + NewLine herausfiltern<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; REPLACE hex_return WITH &#8216;~&#8217; INTO t_object_cont-line.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc &gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDDO.<BR><FONT color="#fb2412">*&#8211; Zeilenumbruch<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SPLIT t_object_cont-line AT &#8216;~&#8217; INTO TABLE t_test.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP AT t_test.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: /4 t_test-line.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp; SKIP 1.</P><P class="sap1">&nbsp; ENDLOOP.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/posteingang-ueber-tabellen-lesen/">Posteingang über Tabellen lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Posteingang mit Standardbausteinen lesen</title>
+		<link>/blog/posteingang-mit-standardbausteinen-lesen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 11 Jul 2003 16:11:40 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[Posteingang lesen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=85</guid>
+
+					<description><![CDATA[<p>Lesen des Posteingangs mit Standardbausteinen. Hier sind Sie auf der sicheren Seite, wenn es um die Aufbereitung der Meldungen geht. Auch Berechtigungen und Vertreter-Einstellungen werden hier &#252;berpr&#252;ft.</p>
+<p>Der Beitrag <a href="/blog/posteingang-mit-standardbausteinen-lesen/">Posteingang mit Standardbausteinen lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Lesen des Posteingangs mit Standardbausteinen. Hier sind Sie auf der sicheren Seite, wenn es um die Aufbereitung der Meldungen geht. Auch Berechtigungen und Vertreter-Einstellungen werden hier &uuml;berpr&uuml;ft.<br /><P class="sap1">REPORT zz_posteingang_lesen.<BR><FONT color="#fb2412">*** &#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR>*** Lesen Posteingang mit Standardfunktionsbausteinen und<BR>*** dementsprechend auch mit Berechtigungspr&uuml;fung&#8230;<BR>*** &#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</FONT></P><P class="sap1">DATA:</P><P class="sap1">&nbsp; hex_0d TYPE x VALUE &#8216;0D&#8217;,<BR>&nbsp; hex_0a TYPE x VALUE &#8216;0A&#8217;,<BR>&nbsp; hex_return(2) TYPE x VALUE &#8216;0D0A&#8217;,</P><P class="sap1">&nbsp; BEGIN OF t_test OCCURS 0,<BR>&nbsp;&nbsp;&nbsp; line(255),<BR>&nbsp; END OF t_test,</P><P class="sap1">&nbsp; t_docs LIKE sood4 OCCURS 0 WITH HEADER LINE,<BR>&nbsp; l_docs LIKE sood4,</P><P class="sap1">&nbsp; t_folder_cont LIKE somt&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t_object_cont LIKE soli&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t_object_head LIKE soli&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t_object_para LIKE selc&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t_object_parb LIKE soop1 OCCURS 0 WITH HEADER LINE,<BR>&nbsp; l_object_id LIKE soodk.</P><P class="sap1">PARAMETERS: p_uname TYPE xubname DEFAULT sy-uname.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Benutzerinformation</FONT><BR>&nbsp; CALL FUNCTION &#8216;SO_DOCUMENTS_MANAGER&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; activity&nbsp;&nbsp;&nbsp; = &#8216;READ&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; office_user = p_uname<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; documents&nbsp;&nbsp; = t_docs.</P><P class="sap1">&nbsp; LOOP AT t_docs.</P><P class="sap1">&nbsp;&nbsp;&nbsp; l_object_id-objtp = t_docs-foltp.<BR>&nbsp;&nbsp;&nbsp; l_object_id-objyr = t_docs-folyr.<BR>&nbsp;&nbsp;&nbsp; l_object_id-objno = t_docs-folno.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Mappeninformation lesen</FONT><BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;SO_FOLDER_READ&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; object_id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = l_object_id<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; owner&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = p_uname<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; folder_cont&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = t_folder_cont<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; active_user_not_exist&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; communication_failure&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; component_not_available&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; folder_not_exist&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; operation_no_authorization = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; owner_not_exist&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; substitute_not_active&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 7<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; substitute_not_defined&nbsp;&nbsp;&nbsp;&nbsp; = 8<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; system_failure&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 9<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 10<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 11.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR><FONT color="#fb2412">*&#8211; Fehler beim Lesen der Mappe</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Fehler&#8217;, l_object_id-objtp,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_object_id-objyr,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_object_id-objno.</P><P class="sap1">&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*&#8211; Inhalt der Mappe &#8220;Posteingang&#8221;<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP AT t_folder_cont.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Dokumentinformation ausgeben</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORMAT COLOR COL_TOTAL.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / t_folder_cont-docnam,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t_folder_cont-docdes.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORMAT COLOR OFF.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Lesen des Inhalts vorbereiten</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_docs-foltp = t_folder_cont-foltp.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_docs-folyr = t_folder_cont-folyr.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_docs-folno = t_folder_cont-folno.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_docs-objtp = t_folder_cont-doctp.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_docs-objyr = t_folder_cont-docyr.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_docs-objno = t_folder_cont-docno.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Inhalt des Dokuments lesen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;SO_DOCUMENT_REPOSITORY_MANAGER&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; method&nbsp;&nbsp; = &#8216;GETCONTENT&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; objcont&nbsp; = t_object_cont<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; objhead&nbsp; = t_object_head<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHANGING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; document = l_docs.<BR><FONT color="#fb2412">*&#8211; Inhalt ausgeben</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP AT t_object_cont.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DO.<BR><FONT color="#fb2412">*&#8211; CarriageReturn + LineFeed herausfiltern<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; REPLACE hex_return WITH &#8216;~&#8217; INTO t_object_cont-line.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc &gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDDO.<BR><FONT color="#fb2412">*&#8211; Zeilenumbruch<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SPLIT t_object_cont-line AT &#8216;~&#8217; INTO TABLE t_test.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP AT t_test.<BR><FONT color="#fb2412">*&#8211; Textzeilen ausgeben<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: /3 t_test-line.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDLOOP.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">&nbsp; ENDLOOP.</P></p>
+<p>Der Beitrag <a href="/blog/posteingang-mit-standardbausteinen-lesen/">Posteingang mit Standardbausteinen lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

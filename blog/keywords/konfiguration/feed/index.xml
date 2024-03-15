@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Konfiguration Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/konfiguration/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:00 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Konfiguration Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Adresse im Kundenauftrag geändert?</title>
+		<link>/blog/adresse-im-kundenauftrag-geaendert/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 19 Mar 2014 13:54:11 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Änderungsbelege]]></category>
+		<category><![CDATA[Konfiguration]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4643</guid>
+
+					<description><![CDATA[<p>In einem Kundenauftrag kann die Adresse eines Partners geändert werden. Häufig werden zum Beispiel in der Adresse des Warenempfängers noch zusätzliche Informationen hinterlegt. Leider werden diese Änderungen nicht in den Änderungsbelegen zum Kundenauftrag angezeigt... Hier verraten wir dir, wie du trotzdem sehen kannst, welche Änderungen gemacht wurden.</p>
+<p>Der Beitrag <a href="/blog/adresse-im-kundenauftrag-geaendert/">Adresse im Kundenauftrag geändert?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Kundenauftrag kann die Adresse eines Partners geändert werden. Häufig werden zum Beispiel in der Adresse des Warenempfängers noch zusätzliche Informationen hinterlegt. Technisch gesehen steht in der Partnertabelle VBPA die Adressnummer aus dem Kundenstamm. Wird die Adresse geändert, bekommt der Partner eine neue Adressnummer. Diese Adressnummer verweist &#8211; wie auch die Adresse der Stammdaten &#8211; auf einen Eintrag in der Tabelle ADRC.</p>
+<h2>Änderungsbelege Fehlanzeige?</h2>
+<p>Möchte man die Änderungen eines Partner aus dem Kundenauftrag nachvollziehen, so funktioniert dies leider nicht über die aus dem Auftrag wählbare Anzeige der Änderungen im Menü <em>Umfeld &#8211; Änderungen</em>. Warum man sich hier nicht auf die Anzeige der Änderungen verlassen kann, sondern sich einen Tricks bedienen muss, wird ein Geheimnis der SAP bleiben.</p>
+<h2>Änderungen ermitteln</h2>
+<p>Um die Partneränderungen zu ermitteln, musst du zuerst die Adressnummer (Feld ADRNR) aus der Tabelle VBPA zum Auftrag ermitteln. Also: SE16n aufrufen, Belegnummer eingeben, auf gewünschte Partnerart einschränken (WE für Warenempfänger) und die Adressnummer &#8211; oder -nummern bei unterschiedlichen Partnern auf Positionseben &#8211;  in die Zwischenablage kopieren.</p>
+<p>Mit diesen Adressnummern &#8220;im Gepäck&#8221; musst du erst einmal den genauen <em>Objektwert</em> ermitteln. Der Objektwert (OBJECTID) ist die Nummer, für die eine Änderung gespeichert wird. Zu der OBJECTID benötigst du noch das Änderungsbelegobjekt (OBJECTCLAS) <strong>ADRESSE</strong>.</p>
+<p>Normalerweise ist der Objektwert gleich dem Objekt selbst, also z.B. der Nummer des Auftrags. Im Falle der Adressnummer wird jedoch noch die <em>Adressgruppe</em>. Die Adressnummer ist zwar auch ohne die Adressgruppe eindeutig, sie wird jedoch im Änderungsbeleg benötigt.</p>
+<p>Also: Mit SE16n in die Tabelle CDHDR schauen, hier am Beispiel der Adressnummer 9001234567:</p>
+<pre>OBJECTCLAS ADRESSE
+OJBECTID   *9001234567</pre>
+<p>Das Ergebnis kann zum Beispiel den Objektwert BP  9001234567 (Gruppe BP) oder SD019001234567 (Gruppe SD01) ergeben.</p>
+<p>Diese Nummer benötigst du nun, um die Änderungsbelege zu dieser Adressnummer anzeigen zu lassen: Rufe Report RSSCD200 auf:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_19_14_51_40.jpg"><img decoding="async" class="alignnone size-medium wp-image-4644" alt="RSSCD200" src="https://tricktresor.com/wp-content/uploads/2014/03/03_19_14_51_40-300x159.jpg" width="300" height="159" srcset="/wp-content/uploads/2014/03/03_19_14_51_40-300x159.jpg 300w, /wp-content/uploads/2014/03/03_19_14_51_40.jpg 575w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Nach Start des Reports &#8211; und sofern Änderungen vorhanden sind &#8211; siehst du die Liste mit den Änderungen.</p>
+<p>[notice type=&#8217;info&#8217;]Wenn du dir nicht sicher bist, ob die Adresse geändert wurde: Das Adresskennzeichen (Feld VBAP-ADRDA) sagt dir, ob es sich bei der Adressnummer um die Adressnummer des Stammsatzes handelt (ADRDA = D) oder ob die Adresse nachträglich geändert wurde (ADRDA = E). Je nach Konfiguration und Anwendung können auch andere Kennzeichen verwendet werden. Diese sind in der Werthilfe zum Feld ADRDA hinterlegt.[/notice]</p>
+<p>Der Beitrag <a href="/blog/adresse-im-kundenauftrag-geaendert/">Adresse im Kundenauftrag geändert?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Ändern der Konfiguration im Dialog</title>
+		<link>/blog/aendern-der-konfiguration-im-dialog/</link>
+					<comments>/blog/aendern-der-konfiguration-im-dialog/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 26 Sep 2006 09:11:02 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[KTW]]></category>
+		<category><![CDATA[Konfiguration]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=382</guid>
+
+					<description><![CDATA[<p>Die &#196;nderung einer Konfiguration ist mit wenigen Funktionsbausteinen programmiert. das Beispielprogramm zeigt Ihnen, wie die Konfiguration einer Auftragsposition im Dialog ge&#228;ndert werden kann.</p>
+<p>Der Beitrag <a href="/blog/aendern-der-konfiguration-im-dialog/">Ändern der Konfiguration im Dialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die &Auml;nderung einer Konfiguration ist mit wenigen Funktionsbausteinen programmiert. das Beispielprogramm zeigt Ihnen, wie die Konfiguration einer Auftragsposition im Dialog ge&auml;ndert werden kann.<br /><P class="sap1">REPORT zsd_change_configuration.</P><P class="sap1"><FONT color="#fb2412">*** Ben&ouml;tigte Type-Pools<BR></FONT>TYPE-POOLS ibxx.</P><P class="sap1"><FONT color="#fb2412">*** Variablen</FONT><BR>DATA:<BR>&nbsp; lv_cuobj&nbsp;&nbsp;&nbsp; TYPE cuobj,<BR>&nbsp; lv_object&nbsp;&nbsp; TYPE rcuobn,<BR>&nbsp; lv_ucomm&nbsp;&nbsp;&nbsp; TYPE syucomm,<BR>&nbsp; ls_root_obj TYPE ibxx_business_object.</P><P class="sap1"><FONT color="#fb2412">*** Selektionsbild</FONT><BR>PARAMETERS:<BR>&nbsp; p_vbeln&nbsp;&nbsp;&nbsp;&nbsp; TYPE vbeln DEFAULT &#8216;11891&#8217;,<BR>&nbsp; p_posnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE posnr DEFAULT &#8216;90001&#8217;.</P><P class="sap1">START-OF-SELECTION.<BR><FONT color="#fb2412">*** Konfigurationsinstanz zur Kundenauftragsposition</FONT><BR>&nbsp; SELECT SINGLE cuobj matnr<BR>&nbsp;&nbsp;&nbsp; FROM vbap INTO (lv_cuobj, lv_object)<BR>&nbsp;&nbsp; WHERE vbeln = p_vbeln<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND posnr = p_posnr.</P><P class="sap1"><FONT color="#fb2412">*** Aufruf der Konfiguration</FONT><BR>&nbsp; CALL FUNCTION &#8216;V45CU_CONFIGURATION&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_instance&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lv_cuobj<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = sy-datum<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_display&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_object_id&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;MARA&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_object&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lv_object<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ev_return_with_functionkey&nbsp;&nbsp;&nbsp;&nbsp; = lv_ucomm<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; internal_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; instance_not_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; reference_instance_not_found&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; instance_is_a_classification&nbsp;&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_plant&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_quantity&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_connection_to_configuration = 7<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; plant_not_allowed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 8<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; material_variant_not_allowed&nbsp;&nbsp; = 9<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; internal_error_ecm&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 10<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; eoasl_not_allowed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 11<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; maxasl_not_allowed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 12<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 13.<BR>&nbsp; IF sy-subrc &lt;&gt; 0.<BR><FONT color="#fb2412">*** Fehlermeldung</FONT><BR>&nbsp;&nbsp;&nbsp; MESSAGE i000(vz)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WITH &#8216;Error&#8217; sy-subrc &#8216;calling V45CU_CONFIGURATION&#8217;.<BR>&nbsp; ELSEIF lv_ucomm = &#8216;F11&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** SICHERN</FONT></P><P class="sap1"><FONT color="#fb2412">*** Eigentlichen &#8220;Besitzer&#8221; der Konfiguration ermitteln</FONT><BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;CUCB_GET_OWNER_OF_CFG&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_instance&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lv_cuobj<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e_owner&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_root_obj<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invalid_instance&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; instance_is_a_classification = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unknown_owner&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; internal_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 5.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR><FONT color="#fb2412">*** Fehlermeldung</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE i000(vz) WITH &#8216;FEHLER GET_OWNER&#8217; lv_cuobj.<BR>&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*** Sichern der ge&auml;nderten Konfiguration</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;CUCB_CONFIGURATION_TO_DB&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; root_instance&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lv_cuobj<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; root_object&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_root_obj<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invalid_instance&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; invalid_root_instance&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_changes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; already_registered_for_update = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; instance_is_a_classification&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** Commit</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; COMMIT WORK.<BR><FONT color="#fb2412">*** Erfolgsmeldung</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE s000(vz) WITH &#8216;Konfiguration gesichert&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*** Fehlermeldung</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE i000(vz) <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WITH &#8216;FEHLER BEIM SICHERN DER KONFIGURATION&#8217; sy-subrc.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp; ENDIF.</P></p>
+<p>Der Beitrag <a href="/blog/aendern-der-konfiguration-im-dialog/">Ändern der Konfiguration im Dialog</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/aendern-der-konfiguration-im-dialog/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Lesen der Konfiguration</title>
+		<link>/blog/lesen-der-konfiguration/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 01 Apr 2004 20:20:50 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Verkauf]]></category>
+		<category><![CDATA[Konfiguration]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=238</guid>
+
+					<description><![CDATA[<p>Hier erfahren Sie, wie man die Konfiguration am besten liest. </p>
+<p>Der Beitrag <a href="/blog/lesen-der-konfiguration/">Lesen der Konfiguration</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier erfahren Sie, wie man die Konfiguration am besten liest. <br /><P>Funktionsbausteine </P><P>CE_I_GET_CONFIGURATION</P><P>VC_I_GET_CONFIGURATION</P><P>CUXI_CONFIGURATION_GET</P><P>Die Instanz steht im Feld&nbsp;VBAP-CUOBJ.</P><P><STRONG>Der Funktionsbaustein VC_I_GET_CONFIGURATION darf seitens der SAP nicht innerhalb der Auftragsbearbeitung verwendet werden.</STRONG><BR><BR>Siehe dazu auch die OSS-Hinweise 460106 und 428343.<BR><BR>Ansonsten f&uuml;hrt die Benutzung zu DUMPs (im Idealfall) oder zu Inkonsistenzen in der Konfiguration/Datenbank,die sich erst sp&auml;ter bemerkbar machen.<BR><BR>In eigenen Programmen kann der Funktionsbaustein nat&uuml;rlich gut verwendet werden!<BR></P><P>Anstelle der Funktion VC_I_GET_CONFIGURATION sollten die Funktionen <STRONG><BR>&#8211; CUCB_GET_SINGLE_INSTANCE </STRONG>und dann<STRONG> <BR>&#8211; CUCB_GET_VALUES_FROM_INSTANCE</STRONG> <BR>verwendet werden. Diese Funktionen liefern die Bewertung einer Konfiguration im Datenbankformat. Notwendige Aufbereitungen m&uuml;ssen im Userexit bzw. in der kundeneigenen Funktion erfolgen.</P><P><HR noShade><P></P><P>Anzeige einer Konfiguration mit Funktionsbaustein <STRONG>VC_I_DISPLAY_CONFIGURATION</STRONG><BR></P></p>
+<p>Der Beitrag <a href="/blog/lesen-der-konfiguration/">Lesen der Konfiguration</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

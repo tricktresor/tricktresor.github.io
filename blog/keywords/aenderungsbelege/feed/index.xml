@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>&Auml;nderungsbelege Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/aenderungsbelege/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:03 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>&Auml;nderungsbelege Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Adresse im Kundenauftrag geändert?</title>
+		<link>/blog/adresse-im-kundenauftrag-geaendert/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 19 Mar 2014 13:54:11 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Änderungsbelege]]></category>
+		<category><![CDATA[Konfiguration]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4643</guid>
+
+					<description><![CDATA[<p>In einem Kundenauftrag kann die Adresse eines Partners geändert werden. Häufig werden zum Beispiel in der Adresse des Warenempfängers noch zusätzliche Informationen hinterlegt. Leider werden diese Änderungen nicht in den Änderungsbelegen zum Kundenauftrag angezeigt... Hier verraten wir dir, wie du trotzdem sehen kannst, welche Änderungen gemacht wurden.</p>
+<p>Der Beitrag <a href="/blog/adresse-im-kundenauftrag-geaendert/">Adresse im Kundenauftrag geändert?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Kundenauftrag kann die Adresse eines Partners geändert werden. Häufig werden zum Beispiel in der Adresse des Warenempfängers noch zusätzliche Informationen hinterlegt. Technisch gesehen steht in der Partnertabelle VBPA die Adressnummer aus dem Kundenstamm. Wird die Adresse geändert, bekommt der Partner eine neue Adressnummer. Diese Adressnummer verweist &#8211; wie auch die Adresse der Stammdaten &#8211; auf einen Eintrag in der Tabelle ADRC.</p>
+<h2>Änderungsbelege Fehlanzeige?</h2>
+<p>Möchte man die Änderungen eines Partner aus dem Kundenauftrag nachvollziehen, so funktioniert dies leider nicht über die aus dem Auftrag wählbare Anzeige der Änderungen im Menü <em>Umfeld &#8211; Änderungen</em>. Warum man sich hier nicht auf die Anzeige der Änderungen verlassen kann, sondern sich einen Tricks bedienen muss, wird ein Geheimnis der SAP bleiben.</p>
+<h2>Änderungen ermitteln</h2>
+<p>Um die Partneränderungen zu ermitteln, musst du zuerst die Adressnummer (Feld ADRNR) aus der Tabelle VBPA zum Auftrag ermitteln. Also: SE16n aufrufen, Belegnummer eingeben, auf gewünschte Partnerart einschränken (WE für Warenempfänger) und die Adressnummer &#8211; oder -nummern bei unterschiedlichen Partnern auf Positionseben &#8211;  in die Zwischenablage kopieren.</p>
+<p>Mit diesen Adressnummern &#8220;im Gepäck&#8221; musst du erst einmal den genauen <em>Objektwert</em> ermitteln. Der Objektwert (OBJECTID) ist die Nummer, für die eine Änderung gespeichert wird. Zu der OBJECTID benötigst du noch das Änderungsbelegobjekt (OBJECTCLAS) <strong>ADRESSE</strong>.</p>
+<p>Normalerweise ist der Objektwert gleich dem Objekt selbst, also z.B. der Nummer des Auftrags. Im Falle der Adressnummer wird jedoch noch die <em>Adressgruppe</em>. Die Adressnummer ist zwar auch ohne die Adressgruppe eindeutig, sie wird jedoch im Änderungsbeleg benötigt.</p>
+<p>Also: Mit SE16n in die Tabelle CDHDR schauen, hier am Beispiel der Adressnummer 9001234567:</p>
+<pre>OBJECTCLAS ADRESSE
+OJBECTID   *9001234567</pre>
+<p>Das Ergebnis kann zum Beispiel den Objektwert BP  9001234567 (Gruppe BP) oder SD019001234567 (Gruppe SD01) ergeben.</p>
+<p>Diese Nummer benötigst du nun, um die Änderungsbelege zu dieser Adressnummer anzeigen zu lassen: Rufe Report RSSCD200 auf:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_19_14_51_40.jpg"><img decoding="async" class="alignnone size-medium wp-image-4644" alt="RSSCD200" src="https://tricktresor.com/wp-content/uploads/2014/03/03_19_14_51_40-300x159.jpg" width="300" height="159" srcset="/wp-content/uploads/2014/03/03_19_14_51_40-300x159.jpg 300w, /wp-content/uploads/2014/03/03_19_14_51_40.jpg 575w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Nach Start des Reports &#8211; und sofern Änderungen vorhanden sind &#8211; siehst du die Liste mit den Änderungen.</p>
+<p>[notice type=&#8217;info&#8217;]Wenn du dir nicht sicher bist, ob die Adresse geändert wurde: Das Adresskennzeichen (Feld VBAP-ADRDA) sagt dir, ob es sich bei der Adressnummer um die Adressnummer des Stammsatzes handelt (ADRDA = D) oder ob die Adresse nachträglich geändert wurde (ADRDA = E). Je nach Konfiguration und Anwendung können auch andere Kennzeichen verwendet werden. Diese sind in der Werthilfe zum Feld ADRDA hinterlegt.[/notice]</p>
+<p>Der Beitrag <a href="/blog/adresse-im-kundenauftrag-geaendert/">Adresse im Kundenauftrag geändert?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Das ABAP Kochbuch</title>
+		<link>/blog/abap-kochbuch/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 13 Jun 2013 16:20:03 +0000</pubDate>
+				<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Änderungsbelege]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP Kochbuch]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[Generic Object Services]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=675</guid>
+
+					<description><![CDATA[<p>Das ABAP Kochbuch. Rezepte zum Nachkochen. Erstellen Sie eine komplette Ticket-Anwendung und lernen Sie dabei die nützlichsten Tools und die einfachsten Techniken für eigene Anwendungen kennen. Tipps von Profis für Profis und solche, die es werden wollen.</p>
+<p>Der Beitrag <a href="/blog/abap-kochbuch/">Das ABAP Kochbuch</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Rezepte zum Nachkochen. Erstellen Sie eine komplette Ticket-Anwendung und lernen Sie dabei die nützlichsten Tools und die einfachsten Techniken für eigene Anwendungen kennen. Es beginnt mit Tabellenpflegedialogen und Viewclustern. Dann werden etliche Module mithilfe von Enjoy-Controls erstellt. Diese werden unter Verwendung des Schubladen-Controls und eines eigens erstellten Frameworks in den Ticketdialog eingebunden. Sie erfahren etwas über Änderungsbelege, Tree-Controls, Drag&#8217;n&#8217;Drop, Smart Forms und Generic Object Services. Und auch E-Mail-Versand, Dynamische Programmierung und Webservices werden angesprochen. Da ist eigentlich für jeden etwas dabei!</p>
+<p><a href="http://www.amazon.de/dp/383622108X?tag=tricktresor07-21&amp;camp=2906&amp;creative=19474&amp;linkCode=as4&amp;creativeASIN=383622108X&amp;adid=04DF95BB2B3XJKZHC1XD&amp;&amp;ref-refURL=http%3A%2F%2Frcm-eu.amazon-adsystem.com%2Fe%2Fcm%3Flt1%3D_blank%26bc1%3D000000%26IS2%3D1%26bg1%3DFFFFFF%26fc1%3D000000%26lc1%3D0000FF%26t%3Dtricktresor07-21%26o%3D3%26p%3D8%26l%3Das4%26m%3Damazon%26f%3Difr%26ref%3Dss_til%26asins%3D383622108X"><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-4043" alt="ABAP Kochbuch" src="http://tricktresor.com/wp-content/uploads/2013/06/ABAP_Kochbuch-300x245.jpg" width="300" height="245" srcset="/wp-content/uploads/2013/06/ABAP_Kochbuch-300x245.jpg 300w, /wp-content/uploads/2013/06/ABAP_Kochbuch-624x511.jpg 624w, /wp-content/uploads/2013/06/ABAP_Kochbuch.jpg 976w" sizes="(max-width: 300px) 100vw, 300px" /></a><br />
+<a title="Das ABAP Kochbuch bei Amazon kaufen" href="http://www.amazon.de/gp/product/383622108X/ref=as_li_ss_tl?ie=UTF8&amp;camp=1638&amp;creative=19454&amp;creativeASIN=383622108X&amp;linkCode=as2&amp;tag=tricktresor07-21" target="_blank">Das ABAP Kochbuch bei Amazon</a></p>
+<p><a title="Powered by Inwerken AG" href="http://www.Inwerken.de/" target="_blank">Powered by Inwerken AG</a></p>
+<p>Der Beitrag <a href="/blog/abap-kochbuch/">Das ABAP Kochbuch</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Wichtige Bausteine</title>
+		<link>/blog/wichtige-bausteine/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 15 Mar 2011 11:34:37 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Änderungsbelege]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=583</guid>
+
+					<description><![CDATA[<p>Funktionsbausteine und Methoden aus dem Umfeld der &#196;nderungsbelege</p>
+<p>Der Beitrag <a href="/blog/wichtige-bausteine/">Wichtige Bausteine</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Funktionsbausteine und Methoden aus dem Umfeld der &Auml;nderungsbelege<br /><P class="head1">&Auml;nderungsbelege lesen</P><P>CHANGEDOCUMENT_READ</P><P class="head1">Alle &Auml;nderungen zu einem Objekt</P><P>CHANGEDOCUMENTS_TO_OBJECT</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/wichtige-bausteine/">Wichtige Bausteine</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Wichtige Tabellen</title>
+		<link>/blog/wichtige-tabellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 15 Mar 2011 11:28:04 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Änderungsbelege]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=582</guid>
+
+					<description><![CDATA[<p>Die Tabellen, die bei und von den &#196;nderungsbelegen verwendet werden.</p>
+<p>Der Beitrag <a href="/blog/wichtige-tabellen/">Wichtige Tabellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Tabellen, die bei und von den &Auml;nderungsbelegen verwendet werden.<br /><P class="head1">&Auml;nderungskopf</P><P>Tabelle CDHDR</P><P class="head1">&Auml;nderungsposition</P><P>Tabelle CDPOS</P><P class="head1">&Auml;nderungsbelegobjekte</P><P>Tabelle TCDOB</P><P>Texttabelle TCDOBT</P></p>
+<p>Der Beitrag <a href="/blog/wichtige-tabellen/">Wichtige Tabellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Wichtige Programme</title>
+		<link>/blog/wichtige-programme/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 15 Mar 2011 11:24:06 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Änderungsbelege]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=581</guid>
+
+					<description><![CDATA[<p>Wichtige Programme rund um das Thema "&#196;nderungsbelege"</p>
+<p>Der Beitrag <a href="/blog/wichtige-programme/">Wichtige Programme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wichtige Programme rund um das Thema &#8220;&Auml;nderungsbelege&#8221;<br /><P class="head1">&Auml;nderungsbelege anzeigen</P><P>Programme RSSCD100, RSSCD200</P><P class="head1">&Auml;nderungsbelege l&ouml;schen</P><P>Programm RSCDOK99</P></p>
+<p>Der Beitrag <a href="/blog/wichtige-programme/">Wichtige Programme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>LOW Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/low/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:56 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>LOW Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Ranges Tabellentyp definieren</title>
+		<link>/blog/ranges-tabellentyp-definieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 14 Aug 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[RANGES]]></category>
+		<category><![CDATA[SELECT-OPTIONS]]></category>
+		<category><![CDATA[LOW]]></category>
+		<category><![CDATA[HIGH]]></category>
+		<category><![CDATA[OPTION]]></category>
+		<category><![CDATA[Tabellentyp]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=193855</guid>
+
+					<description><![CDATA[<p>Ranges sind eine starke Waffe im SAP im Kampf um zu viele Daten (hach wie poetisch...). Leider gibt es keinen allgemeinen Datentyp RANGES. Im Coding kann ich zwar eine Ranges-Tabelle definieren, aber ich kann dies nicht in Parametern von Methoden oder Funktionsbausteinen verwenden. Hierfür muss ein separater Tabellentyp im Dictionary angelegt werden.</p>
+<p>Der Beitrag <a href="/blog/ranges-tabellentyp-definieren/">Ranges Tabellentyp definieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ranges sind eine starke Waffe im SAP im Kampf um zu viele Daten (hach wie poetisch&#8230;). Leider gibt es keinen allgemeinen Datentyp RANGES. Im Coding kann ich zwar eine Ranges-Tabelle definieren, aber ich kann dies nicht in Parametern von Methoden oder Funktionsbausteinen verwenden. Hierfür muss ein separater Tabellentyp im Dictionary angelegt werden.</p>
+<h2>RANGES Definition im Quelltext</h2>
+<p>Im Quelltext wird eine Ranges-Tabelle üblicherweise auf drei Arten definiert:</p>
+<ol>
+<li>SELECT-OPTIONS s_bukrs FOR t001-bukrs.</li>
+<li>RANGES r_bukrs FOR t001-bukrs.</li>
+<li>DATA r_bukrs TYPE RANGE OF bukrs.</li>
+</ol>
+<p>Mit jedem Befehl wird eine interne Tabelle mit folgenden Feldern angelegt:</p>
+<ul>
+<li>SIGN: Wert einschließen (I = include) oder ausschließen (E = exclude)</li>
+<li>OPTION: EQ = EQual, BT = BeTween etc.</li>
+<li>LOW: niedrigster Wert des Intervalls</li>
+<li>HIGH: höchster Wert des Intervalls (leer, wenn OPTION = EQ)</li>
+</ul>
+<p>Bei 1. und 2. wird diese Tabelle mit impliziter Kopfzeile (!) definiert.</p>
+<p>Bei 3. muss der Arbeitsbereich separat definiert werden:</p>
+<pre>DATA s_bukrs LIKE LINE OF r_bukrs.</pre>
+<h2>Namenskonvention</h2>
+<p>Die Namensgebung bei RANGES-Tabellen finde ich aus folgenden Gründen immer etwas schwierig:</p>
+<ul>
+<li>Den Prefix R für RANGES benutze ich in der Regel für Objektreferenzen. Eine lokal definierte Objektreferenz heisst dann zum Beispiel <em>LR_GRID</em>. Hier könnte ich mir behelfen, indem ich das Prefix O für Objektreferenz verwende, also <em>LO_GRID</em>.</li>
+<li>Eine RANGES-Tabelle besteht immer aus der Tabelle selbst und dem zugehörigen Arbeitsbereich. Der Arbeitsbereich kann eine Struktur sein oder aber auch ein strukturiertes Feldsymbol. Dementsprechend müsste der Prefix aus drei Stellen bestehen (Wenn man, so wie ich, jedoch immer einen zweistelligen Prefix hat, dann sieht ein dreistelliger &#8220;doof&#8221; aus):
+<ul>
+<li>LTR_BUKRS für eine lokal definierte Ranges-Tabelle</li>
+<li>LSR_BUKRS für eine lokal definierte Ranges-Workarea</li>
+</ul>
+</li>
+<li>SELECT-OPTIONS haben in der Regel einen Sonderstatus, weil ein Parameter im Selektionsbild (SELECT-OPTIONS und PARAMETER) nur acht Stellen haben darf (im Gegensatz zu Variablen, die 30 Stellen lang sein dürfen). Deswegen arbeite ich hier häufig mit S_BUKRS für SELECT-OPTIONS und P_BUKRS für PARAMETERS.</li>
+<li>Die Definition mit RANGES ist inzwischen als <em>obsolet</em> gekennzeichnet, da eine implizite Workarea definiert wird. Eine Benennung im Typ nach Prefix ist also schwer, da es ein Tabellentyp und eine Struktur gleichzeitig ist.</li>
+</ul>
+<h2>Definition im Dictionary</h2>
+<p>Durch Zufall habe ich entdeckt, dass die Anlage von RANGES-Strukturen im Dictionary (Transaktion SE11) unterstützt wird. Folgend eine kleine Bilderserie, die die Anlage einer RANGES-Tabelle im Dictionary dokumentiert:</p>
+<p>Aufruf Transaktion SE11 und <em>Datentyp</em> anlegen</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-12_13-48-47.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-193856" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-12_13-48-47.jpg" alt="2015-08-12_13-48-47" width="424" height="374" srcset="/wp-content/uploads/2015/08/2015-08-12_13-48-47.jpg 424w, /wp-content/uploads/2015/08/2015-08-12_13-48-47-300x265.jpg 300w" sizes="(max-width: 424px) 100vw, 424px" /></a></p>
+<p>Auswahl <em>Tabellentyp</em>:</p>
+<p><img decoding="async" class="alignnone size-full wp-image-193860" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-12_13-49-15.jpg" alt="2015-08-12_13-49-15" width="252" height="142" /></p>
+<p>Die Kurzbeschreibung füllen (Mussfeld!) und dann im Menü <em>Bearbeiten • Als Ranges Tabellentyp definieren</em>.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-12_14-26-04.jpg"><img decoding="async" class="alignnone size-full wp-image-193861" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-12_14-26-04.jpg" alt="2015-08-12_14-26-04" width="497" height="140" srcset="/wp-content/uploads/2015/08/2015-08-12_14-26-04.jpg 497w, /wp-content/uploads/2015/08/2015-08-12_14-26-04-300x85.jpg 300w" sizes="(max-width: 497px) 100vw, 497px" /></a></p>
+<p>Es erscheint ein anderes Dynpro und du kannst das Datenelement angeben, auf das sich die Rangestabelle beziehen soll:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-12_13-54-32.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-193859" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-12_13-51-40.jpg" alt="2015-08-12_13-51-40" width="594" height="356" srcset="/wp-content/uploads/2015/08/2015-08-12_13-51-40.jpg 594w, /wp-content/uploads/2015/08/2015-08-12_13-51-40-300x180.jpg 300w" sizes="(max-width: 594px) 100vw, 594px" /></a></p>
+<p>Den Namen des zugehörigen strukturierten Zeilentyps kannst du bereits angeben und durch Anlegen auch direkt anlegen lassen. Die notwendigen Felder werden bereits vorgegeben und du musst nur noch den Kurztext eingeben:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-12_13-54-32.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-193857" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-12_13-54-32.jpg" alt="2015-08-12_13-54-32" width="887" height="289" srcset="/wp-content/uploads/2015/08/2015-08-12_13-54-32.jpg 887w, /wp-content/uploads/2015/08/2015-08-12_13-54-32-300x98.jpg 300w" sizes="(max-width: 887px) 100vw, 887px" /></a></p>
+<h2>Tipp</h2>
+<p>Die Ranges-Tabellen müssen nicht Typ-genau sein! Du kannst für den Datentyp BUKRS auch eine Ranges-Tabelle vom Typ <em>CHAR10</em> definieren. Das referenzierte generische Datenelement muss natürlich entsprechend groß sein. Für die Verwendung mit der Materialnummer, die 18 Stellen lang ist, reicht CHAR10 selbstverständlich nicht aus.</p>
+<p>Im Dictionary gibt es bereits ein paar generische RANGES-Tabellentypen, wie zum Beispiel</p>
+<ul>
+<li>TAB_RANGE_C10</li>
+<li>TAB_RANGE_C18</li>
+</ul>
+<p>Oder entsprechende RANGES-Arbeitsbereiche:</p>
+<ul>
+<li>RANGE_C10</li>
+<li>RANGE_C18</li>
+<li>RANGE_C50</li>
+</ul>
+<h2>Alternative</h2>
+<p>Statt den Tabellentyp im Dictionary zu definieren kann man auch einen einfacheren Weg gehen. In der Public section einer Klasse kann man globale Typen definieren. Also z.b. so:</p>
+<pre>TYPES: gty_bdter_range TYPE RANGE OF bdter .</pre>
+<p>Dieser Typ kann dann in der Signatur einer Methode direkt angegeben werden. Wenn die Sichtbarkeit der Klasse passt, kann der Typ sogar in anderen Klassen weiter verwendet werden.</p>
+<p>Dann mit statischer Referenzierung, in dem Beispiel oben also:</p>
+<pre>TYPE zcl_myclass=&gt;gty_bdter_range.</pre>
+<p>Mit diesem Vorgehen kann man dann ebenfalls Daten aus SELECT-OPTIONS in Reports direkt an Klassenmethoden übergeben.</p>
+<p>Der Beitrag <a href="/blog/ranges-tabellentyp-definieren/">Ranges Tabellentyp definieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

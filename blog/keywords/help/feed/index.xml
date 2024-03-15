@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Help Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/help/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Jun 2018 22:34:44 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Help Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Pimp My Message [3] &#8211; HTML-Darstellung</title>
+		<link>/blog/pimp-my-message-3-html-darstellung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 12 Jun 2018 22:34:44 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[HTML]]></category>
+		<category><![CDATA[Help]]></category>
+		<category><![CDATA[ITF]]></category>
+		<category><![CDATA[Nachricht]]></category>
+		<category><![CDATA[Langtext]]></category>
+		<category><![CDATA[Hilfe]]></category>
+		<category><![CDATA[F1]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018826</guid>
+
+					<description><![CDATA[<p>So, nach den Grundlagen zu Meldungen und deren Langtexte, jetzt endlich mal wieder Sourcecode. Ich möchte dir zeigen, wie du den Meldungslangtext in einer Dialogbox darstellen kannst. Die Meldung soll dabei mit HTML etwas aufbereitet werden. ITF in HTML umwandeln Die Langtexte werden intern im ITF-Format gespeichert. Das bedeutet, dass das Absatzformat in der Spalte TDFORMAT und die Zeile selbst in der Spalte TDLINE gespeichert wird. Die zu Grunde liegende Struktur ist TLINE. Zu den...</p>
+<p>Der Beitrag <a href="/blog/pimp-my-message-3-html-darstellung/">Pimp My Message [3] &#8211; HTML-Darstellung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>So, nach den Grundlagen zu <a href="https://tricktresor.com/blog/pimp-my-message-1/">Meldungen</a> und deren <a href="https://tricktresor.com/blog/pimp-my-message-2-langtext-anzeigen/">Langtexte</a>, jetzt endlich mal wieder Sourcecode. Ich möchte dir zeigen, wie du den Meldungslangtext in einer Dialogbox darstellen kannst. Die Meldung soll dabei mit HTML etwas aufbereitet werden.</p>
+<h2>ITF in HTML umwandeln</h2>
+<p>Die Langtexte werden intern im ITF-Format gespeichert. Das bedeutet, dass das Absatzformat in der Spalte TDFORMAT und die Zeile selbst in der Spalte TDLINE gespeichert wird. Die zu Grunde liegende Struktur ist TLINE.</p>
+<p>Zu den Zeilen der Struktur TLINE gehören auch Kopfinformationen, die in der Struktur THEAD gehalten werden. Hier stehen zum Beispiel der Name und der Titel eines Langtextes.</p>
+<h3>Header oder nicht?</h3>
+<p>Um die interne ITF-Darstellung in HTML umzuwandeln, kann der Funktionsbaustein <!--StartFragment --> CONVERT_ITF_TO_HTML verwendet werden. Dem Baustein kann ein Flag übergeben werden, in dem ein kompletter HTML-Text erstellt wird (I_HTML_HEADER = X) oder nur der Body (I_HTML_HEADER = space). Die Verwendung zeige ich im Coding.</p>
+<h3>Umwandlung von Absatzformaten</h3>
+<p>Die intern verwendeten Absatzformate können in eigene HTML-Tags umgesetzt werden. U1 ist im ITF-Format eine Überschrift der Kategorie 1. Die Entsprechung im HTML ist das Tag h1. In der Tabelle T_CONV_PARFORMATS kann die Übersetzung definiert werden. Das Ende-Tag, zum Beispiel &lt;/h1&gt; für den Abschluss des h1-Tags, wird automatisch für das Ende der Zeile gesetzt.</p>
+<h2>Das Programm</h2>
+<p>Das hier vorgestellte Programm liest eine Nachricht sowie den Langtext der Nachricht. Das interne ITF-Format wird in HTML umgewandelt. Dabei werden die Absatzformate entsprechend umgesetzt. Die Ausgabe sieht aus wie folgt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/06/m-einfach1.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018831" src="https://tricktresor.com/wp-content/uploads/2018/06/m-einfach1.png" alt="" width="457" height="348" srcset="/wp-content/uploads/2018/06/m-einfach1.png 457w, /wp-content/uploads/2018/06/m-einfach1-300x228.png 300w" sizes="(max-width: 457px) 100vw, 457px" /></a></p>
+<p>Die Darstellung ist immer noch langweilig. Aber immerhin.</p>
+<h2>Code</h2>
+<pre class="lang:abap decode:true">REPORT.
+
+PARAMETERS p_msgno TYPE symsgno DEFAULT '313'.
+
+CLASS lcl_info DEFINITION.
+  PUBLIC SECTION.
+    METHODS show.
+    METHODS get_message_short RETURNING VALUE(rv_message) TYPE string.
+    METHODS get_message_long RETURNING VALUE(rt_html) TYPE htmltable.
+  PROTECTED SECTION.
+    CLASS-METHODS build_box.
+    CLASS-DATA mo_box TYPE REF TO cl_gui_dialogbox_container.
+    CLASS-DATA mo_html TYPE REF TO cl_gui_html_viewer.
+    DATA mv_short TYPE string.
+    DATA mt_long  TYPE htmltable.
+    CLASS-METHODS handle_close FOR EVENT close OF cl_gui_dialogbox_container.
+    METHODS show_message.
+ENDCLASS.
+
+CLASS lcl_info IMPLEMENTATION.
+
+  METHOD show.
+    build_box( ).
+    mv_short = get_message_short( ).
+    mt_long  = get_message_long( ).
+    show_message( ).
+  ENDMETHOD.
+  METHOD get_message_short.
+    MESSAGE ID sy-msgid
+          TYPE sy-msgty
+        NUMBER sy-msgno
+          WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4
+          INTO rv_message.
+  ENDMETHOD.
+
+  METHOD build_box.
+    IF mo_box IS INITIAL.
+      mo_box  = NEW #( width = 900 height = 400 top = 20 left = 400 ).
+      mo_html = NEW #( parent = mo_box ).
+      SET HANDLER handle_close FOR mo_box.
+    ENDIF.
+    mo_box-&gt;set_caption( sy-title ).
+  ENDMETHOD.
+
+  METHOD show_message.
+    DATA lv_url TYPE c LENGTH 1000.
+    mo_html-&gt;load_data( EXPORTING encoding = 'utf-8'
+                        IMPORTING assigned_url = lv_url
+                        CHANGING data_table = mt_long ).
+    mo_html-&gt;show_data( url = lv_url ).
+  ENDMETHOD.
+
+  METHOD handle_close.
+    mo_box-&gt;set_visible( space ).
+  ENDMETHOD.
+
+  METHOD get_message_long.
+
+    DATA ls_header           TYPE thead.
+
+    DATA lt_itf_text         TYPE STANDARD TABLE OF tline.
+    DATA lt_html_text        TYPE STANDARD TABLE OF htmlline.
+    DATA lv_object           TYPE dokhl-object.
+    
+    "Namen der Nachricht erstellen
+    CALL FUNCTION 'DOCU_OBJECT_NAME_CONCATENATE'
+      EXPORTING
+        docu_id  = 'NA'
+        element  = sy-msgid
+        addition = sy-msgno
+      IMPORTING
+        object   = lv_object.
+
+    "Langtext zur Doku lesen
+    CALL FUNCTION 'DOCU_GET'
+      EXPORTING
+        id     = 'NA'
+        langu  = sy-langu
+        object = lv_object
+      IMPORTING
+        head   = ls_header
+      TABLES
+        line   = lt_itf_text
+      EXCEPTIONS
+        OTHERS = 5.
+
+    "Absatzformate umwandeln
+    DATA(lt_conv_parformats) = VALUE tline_t(
+                   ( tdformat = 'U1' tdline = '&lt;h1&gt;' )
+                   ( tdformat = 'U2' tdline = '&lt;h2&gt;' )
+                   ( tdformat = 'AS'  tdline = '&lt;p&gt;' ) ).
+
+    CALL FUNCTION 'CONVERT_ITF_TO_HTML'
+      EXPORTING
+        i_header          = ls_header
+        i_html_header     = abap_true
+      TABLES
+        t_itf_text        = lt_itf_text
+        t_html_text       = rt_html
+        t_conv_parformats = lt_conv_parformats
+      EXCEPTIONS
+        OTHERS            = 4.
+
+  ENDMETHOD.
+
+
+ENDCLASS.
+
+AT SELECTION-SCREEN.
+
+  NEW lcl_info( )-&gt;show( ) .</pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/pimp-my-message-3-html-darstellung/">Pimp My Message [3] &#8211; HTML-Darstellung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Nachrichten]]></series:name>
+	</item>
+	</channel>
+</rss>

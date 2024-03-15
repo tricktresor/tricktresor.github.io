@@ -1,0 +1,2137 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ALV-Grid Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/alv-grid/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 03 Mar 2023 17:41:08 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ALV-Grid Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ALV-Grid Tabelle direkt ändern</title>
+		<link>/blog/alv-grid-tabelle-direkt-aendern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 03 Mar 2023 17:26:06 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[interface]]></category>
+		<category><![CDATA[Friends]]></category>
+		<category><![CDATA[Navigationsprofil]]></category>
+		<guid isPermaLink="false">/?p=1041994</guid>
+
+					<description><![CDATA[<p>Bei einem ALV-Grid wird die anzuzeigende Datentabelle der Methode SET_TABLE_FOR_FIRST_DISPLAY mitgegeben. Eine Änderung kann eigentlich nur aus der aufrufenden Klasse oder im Ereignis DATA_CHANGED erfolgen. Wird die Datentabelle im Programm geändert, so muss die Methode REFRESH_TABLE_DISPLAY aufgerufen werden, damit die Änderungen auch im Frontend angezeigt werden. In einigen Fällen kann es jedoch erforderlich sein, die Daten von außen zu ändern. Dies ist jedoch nicht möglich, da das Attribut MT_OUTTAB, das die Datenreferenz zur Datentabelle hält,...</p>
+<p>Der Beitrag <a href="/blog/alv-grid-tabelle-direkt-aendern/">ALV-Grid Tabelle direkt ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Bei einem ALV-Grid wird die anzuzeigende Datentabelle der Methode SET_TABLE_FOR_FIRST_DISPLAY mitgegeben. Eine Änderung kann eigentlich nur aus der aufrufenden Klasse oder im Ereignis DATA_CHANGED erfolgen. Wird die Datentabelle im Programm geändert, so muss die Methode REFRESH_TABLE_DISPLAY aufgerufen werden, damit die Änderungen auch im Frontend angezeigt werden. </p>
+
+
+
+<p>In einigen Fällen kann es jedoch erforderlich sein, die Daten <em>von außen </em>zu ändern. Dies ist jedoch nicht möglich, da das Attribut MT_OUTTAB, das die Datenreferenz zur Datentabelle hält, geschützt (protected) ist. Zudem werden die folgenden beiden öffentlichen Methoden, die es ermöglichen könnten, die Daten zu ändern, nicht unterstützt:</p>
+
+
+
+<ul>
+<li>SET_DATA_CELLS</li>
+
+
+
+<li>CHANGE_DATA_FROM_INSIDE</li>
+</ul>
+
+
+
+<p>Wenn ich diese verwende, erhalte ich den Shortdump ASSERTION_FAILED in Klasse CL_DATAPTABLECACHE.</p>
+
+
+
+<p>Glücklicherweise gibt es das <a href="/blog/if-you-wanna-be-my-lover-das-friends-konzept/">If you wanna be my lover – Das FRIENDS-Konzept</a>. Das können wir uns zunutze machen, indem wir die ALV-Grid-Instanz an eine Klasse übergeben, die mit CL_GUI_ALV_GRID befreundet ist und uns die Datenreferenz von MT_OUTTAB zurückgeben lassen. </p>
+
+
+
+<h2 class="wp-block-heading">Friends-Klasse</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">CLASS alv_data DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES if_alv_rm_grid_friend .
+    CLASS-METHODS get_outtab
+      IMPORTING
+        ir_grid          TYPE REF TO cl_gui_alv_grid
+      RETURNING
+        VALUE(ro_outtab) TYPE REF TO data.
+
+ENDCLASS.
+
+CLASS alv_data IMPLEMENTATION.
+  METHOD get_outtab.
+    ro_outtab = ir_grid->mt_outtab.
+  ENDMETHOD.
+ENDCLASS.</pre>
+
+
+
+<h2 class="wp-block-heading">Nutzung</h2>
+
+
+
+<p>Wenn wir also die Instanz eines ALV-Grids haben, dann können wir dieses an die Klasse ALV_DATA=&gt;GET_OUTTAB übergeben und erhalten eine nutzbare Datenreferenz. Diese Datenreferenz können wir zu einem Feldsymbol zuweisen:</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">DATA(my_outtab) = alv_data=>get_outtab( my_grid ).
+FIELD-SYMBOLS &lt;outtab> TYPE TABLE.
+ASSIGN my_outtab->* TO &lt;outtab>.</pre>
+
+
+
+<h2 class="wp-block-heading">Anwendungsbeispiel &#8220;Navigationsprofil&#8221;</h2>
+
+
+
+<p>Wenn du dich bisher gefragt hast, wo zum Geier man sowas machen wollen würde, dann schau dir dieses Beispiel an. Es gibt die Funktionalität <a href="https://erp-up.de/navigationsprofil-im-alv-grid-control/">Navigationsprofil</a>. Mit dieser Funktionalität kannst du ein ALV-Grid erweitern und modifikationsfrei Funktionalitäten hinzufügen. Das kann zum Beispiel durch eine Klasse erfolgen, die das Interface IF_NAVIGATION_PROFILE implementiert. In der Methode USER_COMMAND werden eine Referenz auf die Daten und die Instanz des ALV-Grid übergeben. mit GET_SELECTED_ROWS ist es dann möglich, ausgewählte Zeilen zu ermitteln und aufgrund dieser eine andere Funktionalität aufzurufen.</p>
+
+
+
+<p>Allerdings ist es nicht möglich, die Daten selbst zu ändern. Es sei denn, du verwendest den oben genannten Trick. </p>
+
+
+
+<p>Wie das Beispiel im Detail funktioniert, kannst du mit dem Demoprogramm NAVP_DEMO_TABLE nachvollziehen. Hierzu musst du das Navigationsprofil ändern und einen Button hinzufügen. Wie genau das geht, kannst du <a href="https://blogs.sap.com/2013/04/23/how-to-use-navigation-profiles-with-classes/">hier</a> erfahren.</p>
+
+
+
+<p>Zuerst benötigst du jedoch eine Klasse, die die Datenänderungen vornimmt.</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">CLASS zcl_navigation_profile_enno DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_navigation_profile .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS ZCL_NAVIGATION_PROFILE_ENNO IMPLEMENTATION.
+
+
+* &lt;SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_NAVIGATION_PROFILE_ENNO->IF_NAVIGATION_PROFILE~USER_COMMAND
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IO_ALV                         TYPE REF TO OBJECT
+* | [--->] ID_TABLE                       TYPE REF TO DATA
+* | [--->] IS_PROFILE_KEY                 TYPE        NAVP_S_PROFILE_KEY
+* | [--->] IV_PARAMETER                   TYPE        NAVP_FUNCTION_PARAMETER
+* +--------------------------------------------------------------------------------------&lt;/SIGNATURE>
+  METHOD if_navigation_profile~user_command.
+    DATA outtab TYPE REF TO data.
+    FIELD-SYMBOLS &lt;table> TYPE table.
+
+    DATA(alv) = CAST cl_gui_alv_grid( io_alv ).
+    outtab = lcl_data=>get_outtab( alv ).
+    ASSIGN outtab->* TO &lt;table>.
+
+    DATA lt_delta TYPE lvc_t_modi.
+
+    alv->get_selected_rows( IMPORTING et_row_no = DATA(lt_row_no) ).
+
+    LOOP AT lt_row_no INTO DATA(ls_row).
+      ASSIGN &lt;table>[ ls_row-row_id ] TO FIELD-SYMBOL(&lt;line>).
+      ASSIGN COMPONENT 'FLDATE' OF STRUCTURE &lt;line> TO FIELD-SYMBOL(&lt;fldate>).
+      &lt;fldate> = sy-datum.
+    ENDLOOP.
+
+    FIELD-SYMBOLS &lt;outtab> TYPE table.
+
+    alv->refresh_table_display(
+      i_soft_refresh = abap_true
+      is_stable      = VALUE #( row = abap_true col = abap_true ) ).
+
+    alv->set_selected_rows( it_row_no = lt_row_no ).
+
+  ENDMETHOD.
+ENDCLASS.</pre>
+
+
+
+<p>Danach kannst du die neue Drucktaste anlegen:</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="1024" height="494" src="/wp-content/uploads/2023/03/image-1024x494.png" alt="" class="wp-image-1041995" srcset="/wp-content/uploads/2023/03/image-1024x494.png 1024w, /wp-content/uploads/2023/03/image-300x145.png 300w, /wp-content/uploads/2023/03/image-768x371.png 768w, /wp-content/uploads/2023/03/image.png 1096w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<p>Drucktaste &#8220;Set Date&#8221;</p>
+
+
+
+<p>Die Drucktaste wird nun &#8211; modifikationsfrei &#8211; in der Toolbar angezeigt:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="849" height="203" src="/wp-content/uploads/2023/03/image-2.png" alt="" class="wp-image-1041997" srcset="/wp-content/uploads/2023/03/image-2.png 849w, /wp-content/uploads/2023/03/image-2-300x72.png 300w, /wp-content/uploads/2023/03/image-2-768x184.png 768w" sizes="(max-width: 849px) 100vw, 849px" /></figure>
+
+
+
+<p>Wenn du Einträge markierst und die Drucktaste drückst, dann wird das Flugdatum der markierten Einträge auf das Tagesdatum gesetzt.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-tabelle-direkt-aendern/">ALV-Grid Tabelle direkt ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Negativ oder Positiv?</title>
+		<link>/blog/negativ-oder-positiv/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 29 Apr 2021 16:38:27 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">/?p=1027899</guid>
+
+					<description><![CDATA[<p>Eine Frage, die Thomas Binder aus Berlin nicht nur bezüglich seines Immunsystems beschäftigt hat, sondern auch bei der Ausgabe von Daten im ALV-Grid. Er ist dabei über eine böse Falle bei den Darstellungsmöglichkeiten des ALV-Grid gestolpert, die sich einerseits logisch erklären lässt, anderseits jedoch Fragen aufwirft, warum dieser Grund im ALV-Grid nicht einheitlich behandelt wird. Darstellung von Zahlen Thomas hatte einen stinknormalen ALV-Grid programmiert, in dem positive als auch negative Zahlen angezeigt wurden. Alles hat...</p>
+<p>Der Beitrag <a href="/blog/negativ-oder-positiv/">Negativ oder Positiv?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Eine Frage, die Thomas Binder aus Berlin nicht nur bezüglich seines Immunsystems beschäftigt hat, sondern auch bei der Ausgabe von Daten im ALV-Grid. Er ist dabei über eine böse Falle bei den Darstellungsmöglichkeiten des ALV-Grid gestolpert, die sich einerseits logisch erklären lässt, anderseits jedoch Fragen aufwirft, warum dieser Grund im ALV-Grid nicht einheitlich behandelt wird.</p>
+
+
+
+<h2 class="wp-block-heading">Darstellung von Zahlen</h2>
+
+
+
+<p>Thomas hatte einen <em>stinknormalen </em>ALV-Grid programmiert, in dem positive als auch negative Zahlen angezeigt wurden. Alles hat super funktioniert. Das Grid war sicherlich nicht so simpel wie in folgendem Beispiel, aber es illustriert gut, worum es geht:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="196" height="76" src="/wp-content/uploads/2021/04/SNAG-01551.png" alt="" class="wp-image-1027905" srcset="/wp-content/uploads/2021/04/SNAG-01551.png 196w, /wp-content/uploads/2021/04/SNAG-01551-193x76.png 193w" sizes="(max-width: 196px) 100vw, 196px" /><figcaption>ALV-Grid mit positiven und negativen Zahlen</figcaption></figure>
+
+
+
+<p>Nach einiger Zeit hat er aus der Fachabteilung die Rückmeldung bekommen, dass die Zahlen nicht stimmen würden. Er testete das zur Verfügung gestellte Beispiel und konnte keinen Fehler feststellen. Die Fachabteilung hat ihm dann einen Ausdruck zur gegeben, auf dem folgendes zu sehen war:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="197" height="97" src="/wp-content/uploads/2021/04/SNAG-01552.png" alt="" class="wp-image-1027906"/><figcaption>ALV Listausgabe</figcaption></figure>
+
+
+
+<p>Der Report wurde im Hintergrund ausgeführt und das dargestellte Grid dementsprechend als ALV-Liste ausgegeben. Wie eindeutig zu sehen ist, ist der Wert TWO, der im Grid negativ ist, in der Listausgabe auf einmal positiv.</p>
+
+
+
+<h2 class="wp-block-heading">Ursache</h2>
+
+
+
+<p>Die Ursache für den Fehler war einigermaßen schnell gefunden: Das verwendete Datenelement BWERT ist mit der Domäne WERT7 definiert. In der Domäne ist festgelegt, dass der Typ keine Vorzeichen hat:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="571" height="401" src="/wp-content/uploads/2021/04/SNAG-01553.png" alt="" class="wp-image-1027908" srcset="/wp-content/uploads/2021/04/SNAG-01553.png 571w, /wp-content/uploads/2021/04/SNAG-01553-300x211.png 300w, /wp-content/uploads/2021/04/SNAG-01553-200x140.png 200w" sizes="(max-width: 571px) 100vw, 571px" /><figcaption>Domäne WERT7</figcaption></figure>
+
+
+
+<p>Auch wenn die Ursache eindeutig ist und mit der Verwendung eines anderen Datenelementes das Problem gelöst werden konnte, ergibt sich nicht, warum der ALV-Grid die Werte unterschiedlich ausgibt. </p>
+
+
+
+<p>Jedenfalls zeigt dieses Beispiel sehr gut, wie perfide der Fehlerteufel sich manchmal verstecken kann und erinnert ein wenig an den sehr sehenswert Vortrag <a class="keychainify-checked" href="https://www.dkriesel.com/blog/2013/0802_xerox-workcentres_are_switching_written_numbers_when_scanning">Traue keinem Scan, den du nicht selbst gefälscht</a> hast von <a class="keychainify-checked" href="https://www.dkriesel.com/start">David Kriesel</a>.</p>
+
+
+
+<p>Also: Bleibt gesund und seid vorsichtig!</p>
+<p>Der Beitrag <a href="/blog/negativ-oder-positiv/">Negativ oder Positiv?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid um Sortierfunktion erweitern (Vererbung)</title>
+		<link>/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Oct 2017 18:28:09 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Redefinition]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[Sortierung]]></category>
+		<category><![CDATA[Erweiterung]]></category>
+		<category><![CDATA[Geschützte Methoden]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018153</guid>
+
+					<description><![CDATA[<p>Objektorientierte Programmierung ist häufig immer noch ein rotes Tuch für viele. Man weiß zwar, wie Methoden aufgerufen werden und dass ein Objekt mit CREATE OBJECT oder NEW erzeugt werden muss aber die Designprinzipien sind irgendwie unklar. Und SAP-Klassen sind eh unantastbar. In diesem Artikel möchte ich dir eine Möglichkeit vorstellen, wie du den SAP-Standard mit Standardmitteln, nämlich mit Hilfe der Vererbung, erweitern kannst. Ich erweitere Beispielhaft die Funktionalität des ALV-Grid.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/">ALV-Grid um Sortierfunktion erweitern (Vererbung)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Objektorientierte Programmierung ist häufig immer noch ein rotes Tuch für viele. Man weiß zwar, wie Methoden aufgerufen werden und dass ein Objekt mit CREATE OBJECT oder NEW erzeugt werden muss aber die Designprinzipien sind irgendwie unklar. Und SAP-Klassen sind eh <em>unantastbar</em>.</p>
+<p>In diesem Artikel möchte ich dir eine Möglichkeit vorstellen, wie du den SAP-Standard mit Standardmitteln, nämlich mit Hilfe der Vererbung, erweitern kannst.</p>
+<h2>Enjoy und Bedienung</h2>
+<p>Trotz der GUI-Elemente, die unter dem Schlagwort <a href="https://www.computerwoche.de/a/ein-freundlicheres-gesicht-fuer-r-3-sap-enjoy,506853"><em>ENJOY</em> </a>eingeführt wurden, sind viele Elemente immer noch nicht wirklich benutzerfreundlich. Einiges kann man ändern, anderes nicht. Eine Möglichkeit um mit Hilfe der SAP-Standardcontrols ein neues Look &amp; Feel zu erzeugen, habe ich in diesem Beitrag gezeigt: Moderne UI mit altem SAPGUI und ALV-Grid</p>
+<p>Hier habe ich das Standard-ALV-Grid verwendet, um eine neue Funktionalität zu erzeugen. Dies ist allerdings ein eigenständiges Objekt und erweitert nicht die Standardfunktionalität des ALV-Grids.</p>
+<p>Wie das Überschreiben von geschützten Methoden generell funktioniert, habe ich hier beschrieben: <a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">Geschützte Methoden nutzen</a></p>
+<p>Dieser Artikel soll zeigen, dass es sich eventuell lohnt, auch über andere Erweiterungen von SAP-Standardfunktionalitäten nachzudenken. Es gibt Funktionalitäten, die eventuell in <strong>jedem</strong> ALV-Grid hilfreich wären. Zum Beispiel das einfache Umsortieren von Einträgen.</p>
+<h3>Umsortierung mittels Drag &amp; Drop</h3>
+<p>Eine Möglichkeit ist die Sortierung mittels Drag&amp;Drop im ALV-Feldkatalog:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/alv-grid-sort.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018154" src="https://tricktresor.com/wp-content/uploads/2017/10/alv-grid-sort.png" alt="" width="595" height="450" srcset="/wp-content/uploads/2017/10/alv-grid-sort.png 595w, /wp-content/uploads/2017/10/alv-grid-sort-300x227.png 300w" sizes="(max-width: 595px) 100vw, 595px" /></a></p>
+<p>Die Bedienung ist hier zwar auch gewöhnungsbedürftig, denn ein Eintrag, der umsortiert werden soll, muss erst mit einem Klick markiert und kann dann erst mittels Drag &amp; Drop an eine andere Stelle verschoben werden, aber immerhin.</p>
+<h3>Umsortierung mit Funktionstasten</h3>
+<p>Eine andere Möglichkeit wäre das Verschieben von Einträgen mit Funktionstasten. Folgender Screenshot ist aus dem unten stehenden Demo-Programm. Das ALV-Grid wurde um die Funktionstasten &#8220;Sort Up&#8221; und &#8220;Sort Down&#8221; erweitert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/alv2.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018155" src="https://tricktresor.com/wp-content/uploads/2017/10/alv2.png" alt="" width="801" height="296" srcset="/wp-content/uploads/2017/10/alv2.png 801w, /wp-content/uploads/2017/10/alv2-300x111.png 300w, /wp-content/uploads/2017/10/alv2-768x284.png 768w, /wp-content/uploads/2017/10/alv2-800x296.png 800w" sizes="(max-width: 801px) 100vw, 801px" /></a></p>
+<p>Wie das im Einzelnen geht, erkläre ich gleich.</p>
+<h2>Redefinition</h2>
+<p>eine wirklich starke Waffe des objektorientierten Sprachumfangs ist die Vererbung. Sofern die anzupassende Klasse nicht als &#8220;Final&#8221; definiert wurde, können <em>geschützte</em> und <em>öffentliche</em> Methoden redefiniert werden. Leider wird bei Anlage einer Klasse das Kennzeichen &#8220;Final&#8221; vorbelegt, so dass der Programmierer dieses aktiv entfernen muss. Ist dieses Kennzeichen gesetzt, funktioniert die Ableitung bzw. Vererbung nicht.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/klasse_final.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018156" src="https://tricktresor.com/wp-content/uploads/2017/10/klasse_final.png" alt="" width="504" height="340" srcset="/wp-content/uploads/2017/10/klasse_final.png 504w, /wp-content/uploads/2017/10/klasse_final-300x202.png 300w" sizes="(max-width: 504px) 100vw, 504px" /></a></p>
+<p>Die Klasse CL_GUI_ALV_GRID allerdings darf vererbt werden, denn sie ist nicht als final gekennzeichnet. Nichts desto Trotz muss bei Klassen sehr genau definiert werden, welche Methoden vererbt werden dürfen und welche nicht.</p>
+<h2>Funktion &#8220;Umsortieren&#8221;</h2>
+<p>Die neue Funktion nenne ich &#8220;Umsortieren&#8221;, denn es ist keine Sortieren-Funktion, die man aus dem Standard kennt. Um Einträge umsortieren zu können, wird in der Regel im SAP mit einem Sortierfeld gearbeitet, das der Anwender manuell pflegen muss. Dazu wird häufig in Zehnerschritten gearbeitet, um später Einträge einfügen zu können. Einträge in dieser Form in eine andere Reihenfolge zu bringen ist in der Regel sehr mühselig.</p>
+<p>Die Idee ist, dass der Anwender einen Eintrag markieren kann und diesem mit den Funktionstasten &#8220;Sort Up&#8221; und Sort Down&#8221; in der Liste hoch und runter verschieben kann. Ein Feld, in der die aktuelle Reihenfolge festgehalten wird, brauchen wir natürlich trotzdem.</p>
+<h2>Vererbung</h2>
+<p>Ich möchte die Klasse CL_GUI_ALV_GRID also für meine Zwecke missbrauchen und muss sie deswegen ableiten bzw. vererben. Dazu lege ich in der Transaktion SE80 oder SE24 eine neue Klasse an: ZCL_GUI_ALV_GRID_SORT und gebe als Oberklasse zu zu beerbende Klasse CL_GUI_ALV_GRID an:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018157" src="https://tricktresor.com/wp-content/uploads/2017/10/class1.png" alt="" width="661" height="229" srcset="/wp-content/uploads/2017/10/class1.png 661w, /wp-content/uploads/2017/10/class1-300x104.png 300w, /wp-content/uploads/2017/10/class1-660x229.png 660w" sizes="(max-width: 661px) 100vw, 661px" /></a></p>
+<h2>Sortierfeld</h2>
+<p>Der Programmierer muss angeben können, welches Feld für die Sortierung der Einträge verwendet werden soll. In diesem Feld wird dann die automatische Nummerierung anhand der Reihenfolge gesetzt. Ich lege dafür die Methode SET_SORT_FIELD an mit dem Übergabeparameter FIELDNAME.</p>
+<p>Diese Methode muss vor SET_TABLE_FOR_FIRST_DISPLAY aufgerufen werden, damit die Umsortierfunktionalität von Anfang an zur Verfügung steht.</p>
+<p>Das Sortierfeld merke ich mir im Attribut MV_SORT_FIELD.</p>
+<h2>Ereignis TOOLBAR</h2>
+<p>Da ich das Ereignis TOOLBAR nutzen möchte, um die neuen Funktionstasten einzubauen, muss ich es für meine abgeleitete Klasse registrieren:</p>
+<pre class="lang:abap decode:true">SET HANDLER on_toolbar FOR me.</pre>
+<p>Zusätzlich benötige ich eine Methode, die beim Auslösen des Ereignisses angesprungen wird: ON_TOOLBAR. Diese Methode muss als Ereignisbehandler für das Ereignis TOOLBAR definiert werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class2.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018158" src="https://tricktresor.com/wp-content/uploads/2017/10/class2.png" alt="" width="420" height="383" srcset="/wp-content/uploads/2017/10/class2.png 420w, /wp-content/uploads/2017/10/class2-300x274.png 300w" sizes="(max-width: 420px) 100vw, 420px" /></a></p>
+<p>Der Methode stehen nun theoretisch alle Parameter des Ereignisses zur Verfügung. Allerdings müssen diese manuell übernommen werden. Die Drucktaste &#8220;Ereignisparameter&#8221; in der Sicht &#8220;Parameter&#8221; erledigt das für mich:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class3.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018159" src="https://tricktresor.com/wp-content/uploads/2017/10/class3.png" alt="" width="830" height="256" srcset="/wp-content/uploads/2017/10/class3.png 830w, /wp-content/uploads/2017/10/class3-300x93.png 300w, /wp-content/uploads/2017/10/class3-768x237.png 768w" sizes="(max-width: 830px) 100vw, 830px" /></a></p>
+<p>In der Methode füge ich die Drucktasten SORT_UP und SORT_DOWN der Toolbar hinzu.</p>
+<pre class="lang:abap decode:true">  METHOD on_toolbar.
+
+    check mv_sort_field is NOT INITIAL.
+
+    APPEND VALUE #(   function  = 'Sort_down'
+                      icon      = icon_next_page
+                      quickinfo = space
+                      butn_type = if_sat_ui_button_types=&gt;normal
+                      disabled  = space
+                      text      = 'Sort down'
+                      checked   = space ) TO e_object-&gt;mt_toolbar.
+    APPEND VALUE #(   function  = 'Sort_up'
+                      icon      = icon_previous_page
+                      quickinfo = space
+                      butn_type = if_sat_ui_button_types=&gt;normal
+                      disabled  = space
+                      text      = 'Sort up'
+                      checked   = space ) TO e_object-&gt;mt_toolbar.
+
+  ENDMETHOD.</pre>
+<h2>Redefinition DISPATCH</h2>
+<p>Um intern auf die Drucktasten reagieren zu können, muss ich die Methode DISPATCH redefinieren und meine Drucktasten SORT_UP und SORT_DOWN für das Ereignis TOOLBAR_BUTTON_CLICK abfangen.</p>
+<p>In allen anderen Fällen muss die Methode DISPATCH der abgeleiteten Klasse aufgerufen werden (SUPER-&gt;DISPATCH).</p>
+<p>Im Falle des Ereignisses TOOLBAR_BUTTON_CLICK muss ich mir noch die Ereignisparameter besorgen in denen der Funktionscode der Drucktaste steht (Methode GET_EVENT_PARAMETER).</p>
+<p>Nun gilt es noch, folgendes zu tun:</p>
+<ul>
+<li>Abfrage auf die Funktionscodes SORT_UP und SORT_DOWN</li>
+<li>Zugriff auf die Datentabelle erhalten</li>
+<li>Ermitteln der aktuellen Cursorposition</li>
+<li>Umsortieren des Eintrags</li>
+<li>Neunummerierung</li>
+<li>Cursor auf die umsortierte Zeile setzen</li>
+<li>Anzeige aktualisieren</li>
+</ul>
+<pre class="lang:abap decode:true">  METHOD dispatch.
+
+    DATA action TYPE string.
+    CASE eventid.
+      WHEN evt_toolbar_button_click.
+        CALL METHOD get_event_parameter
+          EXPORTING
+            parameter_id = 0
+            queue_only   = space
+          IMPORTING
+            parameter    = action.
+        CALL METHOD cl_gui_cfw=&gt;flush.
+        CASE action.
+          WHEN 'Sort_up'.
+            CALL METHOD get_current_cell
+              IMPORTING
+                es_row_id = DATA(ls_row)
+                es_row_no = DATA(ls_row_no).
+            FIELD-SYMBOLS &lt;outtab&gt; TYPE table.
+            ASSIGN mt_outtab-&gt;* TO &lt;outtab&gt;.
+            IF ls_row-index &gt; 1.
+              READ TABLE &lt;outtab&gt; ASSIGNING FIELD-SYMBOL(&lt;outline&gt;) INDEX ls_row-index.
+              DATA(indx) = ls_row-index - 1.
+              ASSIGN COMPONENT 2 OF STRUCTURE &lt;outline&gt; TO FIELD-SYMBOL(&lt;value&gt;).
+              IF sy-subrc = 0.
+                INSERT &lt;outline&gt; INTO &lt;outtab&gt; INDEX indx.
+                indx = indx + 2.
+                DELETE &lt;outtab&gt; INDEX indx.
+                indx = indx - 2.
+
+                LOOP AT &lt;outtab&gt; ASSIGNING &lt;outline&gt;.
+                  ASSIGN COMPONENT mv_sort_field OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+                  &lt;value&gt; = sy-tabix.
+                ENDLOOP.
+                refresh_table_display( is_stable = VALUE #( col = abap_true row = abap_true ) i_soft_refresh = abap_true ).
+                set_selected_rows( it_row_no = VALUE #( ( row_id = indx ) ) ).
+              ENDIF.
+            ENDIF.
+            EXIT.
+          WHEN 'Sort_down'.
+            CALL METHOD get_current_cell
+              IMPORTING
+                es_row_id = ls_row
+                es_row_no = ls_row_no.
+            ASSIGN mt_outtab-&gt;* TO &lt;outtab&gt;.
+            IF ls_row-index &lt; lines( &lt;outtab&gt; ).
+              READ TABLE &lt;outtab&gt; ASSIGNING &lt;outline&gt; INDEX ls_row-index.
+              indx = ls_row-index + 2.
+              ASSIGN COMPONENT 2 OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+              IF sy-subrc = 0.
+                INSERT &lt;outline&gt; INTO &lt;outtab&gt; INDEX indx.
+                indx = indx - 2.
+                DELETE &lt;outtab&gt; INDEX indx.
+                indx = indx + 1.
+                LOOP AT &lt;outtab&gt; ASSIGNING &lt;outline&gt;.
+                  ASSIGN COMPONENT mv_sort_field OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+                  &lt;value&gt; = sy-tabix.
+                ENDLOOP.
+
+                refresh_table_display( is_stable = VALUE #( col = abap_true row = abap_true ) i_soft_refresh = abap_true ).
+                set_selected_rows( it_row_no = VALUE #( ( row_id = indx ) ) ).
+              ENDIF.
+            ENDIF.
+            EXIT.
+        ENDCASE.
+    ENDCASE.
+
+
+    super-&gt;dispatch(
+      EXPORTING
+        cargo             = cargo
+        eventid           = eventid
+        is_shellevent     = is_shellevent
+        is_systemdispatch = is_systemdispatch
+      EXCEPTIONS
+        cntl_error        = 1
+        OTHERS            = 2 ).
+
+  ENDMETHOD.</pre>
+<h2>Testprogramm</h2>
+<p>In folgendem Testprogramm kannst du die Verwendung des neuen Standards sehen. Du siehst, dass trotz meines Eingriffs in die Toolbar weiterhin Drucktasten hinzugefügt werden können:</p>
+<pre class="lang:abap decode:true">REPORT zz_alv_grid_sort.
+
+DATA gs_data TYPE vbak.
+
+SELECT-OPTIONS s_vbeln FOR gs_data-vbeln.
+
+
+CLASS main DEFINITION.
+  PUBLIC SECTION.
+    TYPES ty_data       TYPE vbak.
+
+    TYPES ty_data_t     TYPE STANDARD TABLE OF ty_data
+                             WITH DEFAULT KEY.
+
+    DATA ms_data        TYPE ty_data.
+    DATA mt_data        TYPE ty_data_t.
+
+    DATA mr_grid        TYPE REF TO zcl_gui_alv_grid_sort.
+    METHODS start.
+  PROTECTED SECTION.
+    METHODS selection.
+    METHODS display.
+    METHODS handle_toolbar      FOR EVENT toolbar
+                  OF cl_gui_alv_grid
+      IMPORTING e_object.
+    METHODS handle_user_command FOR EVENT user_command
+                  OF cl_gui_alv_grid
+      IMPORTING e_ucomm sender.
+
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+
+  METHOD handle_user_command.
+
+    DATA lt_rows TYPE lvc_t_row.
+    DATA ls_row   TYPE lvc_s_row.
+    DATA ls_data  TYPE ty_data.
+
+    CASE e_ucomm.
+      WHEN 'USER01'.
+        sender-&gt;get_selected_rows( IMPORTING et_index_rows = lt_rows ).
+        LOOP AT lt_rows INTO ls_row.
+          READ TABLE mt_data INTO ls_data INDEX ls_row-index.
+          IF sy-subrc = 0.
+            MESSAGE i000(oo) WITH 'Usercommand 01: Beleg' ls_data-vbeln.
+          ENDIF.
+        ENDLOOP.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD handle_toolbar.
+
+    DATA: ls_toolbar  TYPE stb_button.
+
+*** Trenner
+    CLEAR ls_toolbar.
+    MOVE 3 TO ls_toolbar-butn_type.
+    APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+*** Icon “Test”
+    CLEAR ls_toolbar.
+    MOVE icon_generate              TO ls_toolbar-icon.
+    MOVE 'USER01'                   TO ls_toolbar-function.
+    MOVE 'User 01'                  TO ls_toolbar-quickinfo.
+    MOVE 'Userbutton 01'            TO ls_toolbar-text.
+    APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+  ENDMETHOD.
+
+
+  METHOD start.
+    selection( ).
+    display( ).
+  ENDMETHOD.
+
+  METHOD selection.
+    SELECT * FROM vbak INTO TABLE mt_data UP TO 10 ROWS.
+  ENDMETHOD.
+
+  METHOD display.
+
+    WRITE 'DUMMY'.
+
+    CREATE OBJECT mr_grid
+      EXPORTING
+        i_parent      = cl_gui_container=&gt;screen0
+        i_appl_events = space.
+
+    mr_grid-&gt;set_sort_field( 'ERNAM' ).
+
+    SET HANDLER handle_toolbar      FOR mr_grid.
+    SET HANDLER handle_user_command FOR mr_grid.
+
+
+    DATA lv_structure_name    TYPE dd02l-tabname VALUE 'VBAK'.
+    DATA ls_variant           TYPE disvariant.
+    DATA lv_save              TYPE char01 VALUE 'U'.
+    DATA lv_default           TYPE char01 VALUE abap_true.
+    DATA ls_layout            TYPE lvc_s_layo.
+
+    ls_layout-sel_mode       = 'A'.
+    ls_layout-grid_title     = 'Titel'.
+
+    mr_grid-&gt;set_table_for_first_display(
+      EXPORTING
+        i_structure_name              = lv_structure_name
+        is_variant                    = ls_variant
+        i_save                        = lv_save
+        i_default                     = lv_default
+        is_layout                     = ls_layout
+      CHANGING
+        it_outtab                     = mt_data ).
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+START-OF-SELECTION.
+  NEW main( )-&gt;start( ).</pre>
+<p>&nbsp;</p>
+<h2>Ergebnis</h2>
+<p>Du kannst nun den Cursor auf einen Eintrag stellen und durch Klicken auf &#8220;Sort Up&#8221; oder &#8220;Sort Down&#8221; den Eintrag umsortieren. Die Sortierung wird in dem Feld &#8220;ERNAM &#8211; Angelegt von&#8221; vorgehalten.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class4.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018161" src="https://tricktresor.com/wp-content/uploads/2017/10/class4.png" alt="" width="753" height="335" srcset="/wp-content/uploads/2017/10/class4.png 753w, /wp-content/uploads/2017/10/class4-300x133.png 300w" sizes="(max-width: 753px) 100vw, 753px" /></a></p>
+<h2>Fazit</h2>
+<p>Die Änderung von SAP-Standardfunktionen ist möglich. Allerdings ist das erstens nicht immer so einfach, wie in diesem Artikel beschrieben. In der Regel muss man genau und langwierig debuggen und prüfen, wo welche Methoden verwendet werden können. Zudem müssen die Funktionen natürlich ausgiebig getestet werden. Immerhin sollen sie genau wie die Standardfunktionalität zuverlässig funktionieren.</p>
+<p>Des Weiteren sollten Funktionen, die wirklich in einer Vielzahl von eigenen Programmierungen eingesetzt werden sauber ausprogrammiert werden. In dem hier vorgestellten Beispiel sollte zum Beispiel sichergestellt werden, dass das Feld mit der Sortierung auch wirklich im Feldkatalog vorhanden ist. Die Benutzereigene Sortierung muss irgendwie berücksichtigt werden.</p>
+<p>Zudem sollte es natürlich möglich sein, auch mehrere Zeilen zu markieren und diese en bloc zu verschieben. Das hängt aber wiederum von der Programmierung ab, ob wirklich mehrere Zeilen markiert werden dürfen oder nicht.</p>
+<p>Ebenso wäre die Eingangs erwähnte Sortierung mittels Drag &amp; Drop sinnvoll. Diese könnte dann allerdings einer anderen vom Programmierer erstellten Drag &amp; Drop Funktionalität in die Quere kommen.</p>
+<p>Allerdings lohnt es sich, hier Aufwand zu investieren, denn die erweiterte Funktionalität kann eventuell viele separate Programmierungen überflüssig machen oder vorhandene Programmierungen auf einfache Weise benutzerfreundlicher machen.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/">ALV-Grid um Sortierfunktion erweitern (Vererbung)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</title>
+		<link>/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 10 Oct 2016 07:58:22 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=865485</guid>
+
+					<description><![CDATA[<p>Der SALV wird inzwischen gerne von Programmierern verwendet, da einiges einfacher und einleuchtender ist, als beim ALV-Grid. Allerdings ist auch vieles komplizierter und überhaupt nicht einleuchtend. Zudem hat der SALV einige Funktionen nicht, die der ALV-Grid schon lange zur Verfügung stellt, wie zum Beispiel Editierbarkeit. Ich brauchte neulich in einem Projekt das Ereignis "Verzögertes Reagieren auf Markierungen" in einem SALV-Grid. Leider bietet der SALV dieses Event nicht an.</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/">Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der SALV wird inzwischen gerne von Programmierern verwendet, da einiges einfacher und einleuchtender ist, als beim ALV-Grid. Allerdings ist auch vieles komplizierter und überhaupt nicht einleuchtend. Zudem hat der SALV einige Funktionen nicht, die der ALV-Grid schon lange zur Verfügung stellt, wie zum Beispiel Editierbarkeit. Ich brauchte neulich in einem Projekt das Ereignis &#8220;Verzögertes Reagieren auf Markierungen&#8221; in einem SALV-Grid. Leider bietet der SALV dieses Event nicht an. <a href="http://abapblog.com/articles/thoughts/109-sap-teched-developer-hero-2016">Developer Hero 2016 Łukasz Pęgiel</a> hat mir das unten stehende Coding zur Verfügung gestellt. <strong>Vielen Dank dafür!</strong></p>
+<h2>Was macht das Ereignis Delayed_Changed_Sel_Callback?</h2>
+<p>Das Ereignis wird immer dann &#8211; verzögert! &#8211; ausgelöst, wenn der Anwender die Markierung im Grid ändert, also zum Beispiel Zeilen, Spalten oder einzelne Zellen markiert. Standardmäßig ist die <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/ee/c8e068d52611d2b468006094192fe3/content.htm">Verzögerung von DELAYED_CHANGED_SEL_CALLBACK auf 1,5 Sekunden </a>eingestellt. Die Funktionalität kann dafür verwendet werden, um Daten anhand der markierten Zellen nachzulesen und anzuzeigen, ohne dass der Anwender eine weitere Taste drücken muss. 1,5 Sekunden sind allerdings häufig eine zu lange Zeit, denn häufig wechselt ein Anwender kurz vor dieser Zeitspanne die Markierung wieder, weil er der Meinung war, dass nun eh nichts mehr passiert. Wie diese Einstellung geändert werden kann, habe ich in dem Beispiel AUTOSUMME beschrieben.</p>
+<h2>Was ist nun der Trick?</h2>
+<p>Der Trick, um an die Events des unterliegenden ALV-Grids zu gelangen, liegt darin, das Ereignis AFTER_REFRESH FOR ALL INSTANCES zu registrieren, also auf alle aktuell instanziierten Grids anzuwenden. Zusätzlich muss der implizit immer vorhandene Importing-Parameter SENDER bei der Definition angegeben werden:</p>
+<pre> METHODS evh_refresh FOR EVENT after_refresh
+      OF cl_gui_alv_grid
+      IMPORTING sender.</pre>
+<p>In dem unten stehenden Programm wird ein einfacher SALV mit Daten aus der Flugdatenbank erzeugt. Es wird das Ereignis AFTER_REFRESH registriert um in diesem Ereignis für den SENDER &#8211; also das im SALV verwendete ALV-Grid &#8211; das eigentliche Ereignis Delayed_Change_Sel_Callback zu registrieren. Wird die Markierung im Grid geändert, so wird diese Meldung ausgegeben:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-865553" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg" alt="2016-10-10_09-46-32" width="637" height="385" srcset="/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg 637w, /wp-content/uploads/2016/10/2016-10-10_09-46-32-300x181.jpg 300w" sizes="(max-width: 637px) 100vw, 637px" /></a></p>
+<p>[notice type=&#8217;info&#8217;]Wer eine Alternative zu SALV und ALV-Grid sucht, der sollte sich das Open-Source-Tool <a href="http://abapblog.com/falv">FALV</a> von Łukasz ansehen![/notice]</p>
+<h2>Achtung</h2>
+<p>Der Zusatz FOR ALL INSTANCES greift wirklich bei ALLEN Instanzen des ALV-Grid!! Deswegen sollte er wirklich nur mit Bedacht benutzt werden und du solltest dir der möglichen Seiteneffekte bewusst sein, denn viele interne Funktionen des SALV und ALV-Grids nutzen ebenfalls wieder ein Grid (Auswahl Feldkatalog, Auswahl Layout etc.). So kann es zu ungewollten Reaktionen &#8211; zum Beispiel bei der Änderung des Layouts &#8211; kommen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-865551" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg" alt="2016-10-10_09-11-13" width="829" height="556" srcset="/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg 829w, /wp-content/uploads/2016/10/2016-10-10_09-11-13-300x201.jpg 300w, /wp-content/uploads/2016/10/2016-10-10_09-11-13-768x515.jpg 768w" sizes="(max-width: 829px) 100vw, 829px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zsalv_grid_events.
+
+CLASS lcl_grid_trick DEFINITION.
+
+ PUBLIC SECTION.
+
+ DATA spfli TYPE STANDARD TABLE OF spfli.
+ DATA salv TYPE REF TO cl_salv_table.
+
+ METHODS create_salv.
+ METHODS evh_refresh FOR EVENT after_refresh
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ METHODS evh_delayed_selection
+ FOR EVENT delayed_changed_sel_callback
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ PRIVATE SECTION.
+ DATA mv_event_registered TYPE boolean.
+
+ENDCLASS.
+
+CLASS lcl_grid_trick IMPLEMENTATION.
+
+ METHOD create_salv.
+
+ SELECT * UP TO 100 ROWS
+ INTO CORRESPONDING FIELDS OF TABLE @spfli
+ FROM spfli.
+
+ cl_salv_table=&gt;factory(
+ IMPORTING
+ r_salv_table = salv
+ CHANGING
+ t_table = spfli ).
+
+ salv-&gt;get_functions( )-&gt;set_default( abap_true ).
+
+ SET HANDLER evh_refresh FOR ALL INSTANCES.
+
+ salv-&gt;display( ).
+
+ ENDMETHOD.
+
+ METHOD evh_refresh.
+
+ CHECK mv_event_registered = abap_false.
+ SET HANDLER evh_delayed_selection FOR sender.
+ sender-&gt;register_delayed_event( i_event_id = cl_gui_alv_grid=&gt;mc_evt_delayed_change_select ).
+ mv_event_registered = abap_true.
+
+ ENDMETHOD.
+
+ METHOD evh_delayed_selection.
+
+ DATA lr_type_description TYPE REF TO cl_abap_typedescr.
+ lr_type_description = cl_abap_typedescr=&gt;describe_by_object_ref( sender ).
+ MESSAGE i001(00)
+ WITH 'Delayed Selection; SENDER ist vom Typ '
+ lr_type_description-&gt;absolute_name.
+
+ ENDMETHOD.
+
+ENDCLASS.
+
+START-OF-SELECTION.
+
+ DATA(output) = NEW lcl_grid_trick( ).
+ output-&gt;create_salv( ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/">Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Autosumme in ALV-Grid &#8211; Version 2</title>
+		<link>/blog/autosumme-in-alv-grid-version-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2016 18:16:47 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Autosumme]]></category>
+		<category><![CDATA[Friend]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[interface]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=861505</guid>
+
+					<description><![CDATA[<p>Im vorherigen Artikel&#160;Autosumme in ALV-Grid (Version 1)&#160;habe ich euch gezeigt, wie man das Ereignis&#160;set_delay_change_selection nutzen kann, um die Summe von markierten Zellen eines ALV-Grids herausfinden kann. Diese Methode hat leider zwei Nachteile: Wie kann man nun dieser Herausforderung begegnen? Es gibt zwei Varianten. Die erste Variante habe ich hier bereits beschrieben. Die Lösung ist in diesem Fall, dass man eine eigene Klasse von CL_GUI_ALV_GRID ableitet (erben lässt) und dann eine neue Methode erstellt, die diese...</p>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-2/">Autosumme in ALV-Grid &#8211; Version 2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Im vorherigen Artikel&nbsp;<a href="https://tricktresor.com/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid (Version 1)</a>&nbsp;habe ich euch gezeigt, wie man das Ereignis&nbsp;set_delay_change_selection nutzen kann, um die Summe von markierten Zellen eines ALV-Grids herausfinden kann. Diese Methode hat leider zwei Nachteile:</p>
+
+
+
+<ol>
+<li>Die Reaktionszeit&nbsp;des Ereignisses <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/ee/c8e068d52611d2b468006094192fe3/content.htm">Delayed_Changed_Sel_Callback</a>&nbsp;ist auf 1,5 Sekunden voreingestellt. Das ist viel zu lange, um schnell mal eben einige Werte zu prüfen</li>
+
+
+
+<li>Es funktioniert nur, wenn die Datentabelle bekannt ist, denn die Datentabelle des ALV-Grid MT_OUTTAB ist geschützt. Auf sie kann also nicht zugegriffen werden. Es ist demnach nicht möglich, eine Methode zu schreiben, die die Grid-Instanz einfach entgegen nimmt und darauf die Funktion Autosumme anwendet.</li>
+</ol>
+
+
+
+<p>Wie kann man nun dieser Herausforderung begegnen? Es gibt zwei Varianten. Die erste Variante habe ich <a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">hier</a> bereits beschrieben. Die Lösung ist in diesem Fall, dass man eine eigene Klasse von CL_GUI_ALV_GRID ableitet (erben lässt) und dann eine neue Methode erstellt, die diese geschützte Methode aufruft.</p>
+
+
+
+<p>Die andere Variante ist hier von Lukasz Pegiel beschrieben:&nbsp;http://abapblog.com/articles/tricks/105-how-to-access-private-or-protected-data-and-methods-of-cl-gui-alv-grid</p>
+
+
+
+<p>In dieser Variante wird einfach das Interface&nbsp;if_alv_rm_grid_friend eingebunden. Hierdurch wird die eigene Klasse als &#8220;Freund des ALV-Grid&#8221; bekannt gemacht. Und als Freund ist es möglich, auf die geschützten Attribute und Methoden zuzugreifen!</p>
+
+
+<p>[notice type=&#8217;info&#8217;]Vielen Dank an dieser Stelle an Lukasz, der mir sehr geholfen hat, diesen Trick Wirklichkeit werden zu lassen! Ich kann jedem nur empfehlen einen oder besser: mehrere Blicke auf seinen <a href="http://abapblog.com/">ABAPBlog</a> zu werfen.  Besonders hervorzuheben ist seine Entwicklung <a href="http://abapblog.com/falv">Fast ALV-Grid</a>. [/notice]</p>
+
+
+
+<figure class="wp-block-image"><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg"><img loading="lazy" decoding="async" width="856" height="274" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg" alt="2016-10-07_19-06-25" class="wp-image-861506" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg 856w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-300x96.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-768x246.jpg 768w" sizes="(max-width: 856px) 100vw, 856px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">1. Verbesserung:&nbsp;Änderung der Reaktionszeit</h2>
+
+
+
+<p>Um das Event zu behandeln und die markierten Zellen auszulesen, bedarf es keiner großen Tricks. Allerdings ist die Reaktionszeit Das ist deutlich zu lange. Mit Hilfe der Methode&nbsp;set_delay_change_selection kann die Reaktionszeit geändert werden. Diese Methode ist allerdings PROTECTED, also geschützt.</p>
+
+
+
+<p>Wir müssen also das oben genannte Interface einbinden und haben so Zugriff auf die Methode&nbsp;set_delay_change_selection mit der man die Reaktionszeit in Millisekunden einstellen kann.</p>
+
+
+
+<h2 class="wp-block-heading">2. Verbesserung: Zugriff auf die Datentabelle des ALV-Grid</h2>
+
+
+
+<p>Zusätzlich wollte ich an das geschützte Attribute MT_OUTTAB heran, um die aktuellen Daten auszulesen. Auf diese Weise ist es möglich, ein universelles Tool zu schreiben, dass mit jedem ALV-Grid zusammen arbeitet und nicht nur lokal.</p>
+
+
+
+<h2 class="wp-block-heading">Wie sieht&#8217;s aus?</h2>
+
+
+
+<p>Beide Verbesserungen sind in dieser Version 2 des Codes enthalten. Das Programm besteht nun aus zwei Klassen:</p>
+
+
+
+<ol>
+<li>Die Klasse, LCL_MAIN, die den Grid verwendet und darstellt.</li>
+
+
+
+<li>Die Klasse LCL_AUTOSUMME, die die eigentliche Funktionalität zur Verfügung stellt.</li>
+</ol>
+
+
+
+<p>LCL_AUTOSUMME kann nun also als globale Klasse universell eingesetzt werden. Jedes Grid, dass die Autosummenfunktion verwenden möchte, muss sich in der Klasse mit der Methode REGISTER registrieren. Und dann kann&#8217;s los gehen&#8230;!</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT.
+
+PARAMETERS p_total TYPE p DECIMALS 2.
+
+CLASS lcl_autosumme DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES if_alv_rm_grid_friend .
+    CLASS-METHODS register IMPORTING ir_grid TYPE REF TO cl_gui_alv_grid.
+  PROTECTED SECTION.
+    CLASS-METHODS handle_delayed_selection
+      FOR EVENT delayed_changed_sel_callback
+                  OF cl_gui_alv_grid
+      IMPORTING sender.
+ENDCLASS.
+
+CLASS lcl_autosumme IMPLEMENTATION.
+  METHOD register.
+    "Set handler
+    SET HANDLER handle_delayed_selection FOR ir_grid.
+    "set delayed selection time
+    ir_grid->set_delay_change_selection( time = 100 ).   " Time in Milliseconds
+    "register event for delayed selection
+    ir_grid->register_delayed_event( ir_grid->mc_evt_delayed_change_select ).
+
+  ENDMETHOD.
+
+  METHOD handle_delayed_selection.
+
+    "Local data
+    DATA lt_cells            TYPE lvc_t_cell.
+    DATA ls_cell             LIKE LINE OF lt_cells.
+    DATA lv_total            TYPE p DECIMALS 2.
+    DATA lv_val_type         TYPE c.
+    DATA lv_index            TYPE n LENGTH 2.
+    DATA lv_tablename        TYPE string.
+    DATA lt_grouplevels      TYPE lvc_t_grpl.
+    DATA ls_grouplevel       LIKE LINE OF lt_grouplevels.
+
+    FIELD-SYMBOLS &lt;ref_data> TYPE REF TO data.
+    FIELD-SYMBOLS &lt;table>    TYPE table.
+    FIELD-SYMBOLS &lt;warea>    TYPE any.
+    FIELD-SYMBOLS &lt;val>      TYPE any.
+
+    "data references to sub totals tables
+    DATA ld_ct01             TYPE REF TO data.
+    DATA ld_ct02             TYPE REF TO data.
+    DATA ld_ct03             TYPE REF TO data.
+    DATA ld_ct04             TYPE REF TO data.
+    DATA ld_ct05             TYPE REF TO data.
+    DATA ld_ct06             TYPE REF TO data.
+    DATA ld_ct07             TYPE REF TO data.
+    DATA ld_ct08             TYPE REF TO data.
+    DATA ld_ct09             TYPE REF TO data.
+
+    "get selected cells (selection via CTRL + Y)
+    sender->get_selected_cells( IMPORTING et_cell = lt_cells ).
+
+    "If there is only one cell selected, we do not need to sum that...
+    CHECK lines( lt_cells ) > 1.
+
+    "Read all cell values
+    LOOP AT lt_cells INTO ls_cell.
+
+      "in case of rowtype (normal cell, total or subtotal) assign correct data table
+      CASE ls_cell-row_id-rowtype(1).
+          "Total sum of all
+        WHEN 'T'.
+          ASSIGN sender->mt_ct00 TO &lt;ref_data>.
+          ls_cell-row_id-index = 1.
+          "subtotals
+        WHEN 'S'.
+          sender->get_subtotals( IMPORTING
+                                  ep_collect01 = ld_ct01
+                                  ep_collect02 = ld_ct02
+                                  ep_collect03 = ld_ct03
+                                  ep_collect04 = ld_ct04
+                                  ep_collect05 = ld_ct05
+                                  ep_collect06 = ld_ct06
+                                  ep_collect07 = ld_ct07
+                                  ep_collect08 = ld_ct08
+                                  ep_collect09 = ld_ct09
+                                  et_grouplevels = lt_grouplevels ).
+
+          lv_index = ls_cell-row_id-rowtype+4(2).
+          lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+          ASSIGN (lv_tablename) TO &lt;ref_data>.
+
+          READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+          IF sy-subrc = 0.
+            ls_cell-row_id-index = ls_grouplevel-cindx_from.
+          ENDIF.
+          "Normal cell value
+        WHEN space.
+          ASSIGN sender->mt_outtab TO &lt;ref_data>.
+      ENDCASE.
+
+      "assign specified data table
+      ASSIGN &lt;ref_data>->* TO &lt;table>.
+
+      "Only read table line when index changes
+      AT NEW row_id.
+        READ TABLE &lt;table> ASSIGNING &lt;warea> INDEX ls_cell-row_id-index.
+      ENDAT.
+      "Assign selected fieldname of workarea
+      ASSIGN COMPONENT ls_cell-col_id OF STRUCTURE &lt;warea> TO &lt;val>.
+      IF sy-subrc = 0.
+        "check correct type of field: Only numeric fields will be taken
+        DESCRIBE FIELD &lt;val> TYPE lv_val_type.
+        CASE lv_val_type.
+          WHEN 'P'  "Packed
+            OR 'N'  "Numchar
+            OR 'b'  "Integer
+            OR 'a'  "decfloat
+            OR 'e'  "decfloat
+            OR 'F'. "Float?
+            "add cell value to total
+            ADD &lt;val> TO lv_total.
+        ENDCASE.
+      ENDIF.
+    ENDLOOP.
+
+    IF lv_total IS NOT INITIAL.
+      "There were numeric fields selected and therefor we have a total to show:
+      MESSAGE s000(oo) WITH 'TOTAL:' space lv_total.
+      p_total = lv_total.
+    ENDIF.
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_main DEFINITION.
+
+  PUBLIC SECTION.
+*    INTERFACES if_alv_rm_grid_friend .
+    METHODS start.
+  PROTECTED SECTION.
+    DATA mr_grid TYPE REF TO cl_gui_alv_grid.
+    DATA mt_data TYPE STANDARD TABLE OF spfli.
+    DATA mv_data_table TYPE tabname VALUE 'SPFLI'.
+    DATA mr_dock TYPE REF TO cl_gui_docking_container.
+    METHODS create_docker.
+    METHODS create_grid.
+    METHODS select_data.
+    METHODS register_autosumme.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+  METHOD start.
+    select_data( ).
+    create_docker( ).
+    create_grid( ).
+    register_autosumme( ).
+  ENDMETHOD.
+
+  METHOD create_docker.
+    "Create Docking container at bottom
+    CREATE OBJECT mr_dock
+      EXPORTING
+        side                    = cl_gui_docking_container=>dock_at_bottom
+        ratio                   = 90
+        no_autodef_progid_dynnr = abap_false.
+
+  ENDMETHOD.
+
+  METHOD create_grid.
+    "Create ALV-Grid
+    CREATE OBJECT mr_grid
+      EXPORTING
+        i_appl_events = abap_true
+        i_parent      = mr_dock.
+
+    "and display data
+    mr_grid->set_table_for_first_display(
+      EXPORTING
+        i_structure_name = mv_data_table
+      CHANGING
+        it_outtab        = mt_data ).
+
+    "Set focus on grid so user can directly scroll and select cells via CTRL+Y
+    cl_gui_container=>set_focus( mr_grid ).
+
+  ENDMETHOD.
+
+  METHOD select_data.
+    "Select data
+    SELECT * FROM (mv_data_table) INTO TABLE mt_data UP TO 100 ROWS.
+  ENDMETHOD.
+
+  METHOD register_autosumme.
+    lcl_autosumme=>register( mr_grid ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+  DATA(gr_main) = NEW lcl_main( ).
+  gr_main->start( ).</pre>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-2/">Autosumme in ALV-Grid &#8211; Version 2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Autosumme in ALV-Grid &#8211; Version 1</title>
+		<link>/blog/autosumme-in-alv-grid-version-1/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2016 17:50:59 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=861138</guid>
+
+					<description><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&#038;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen...!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&amp;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen&#8230;!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Ich erinnerte mich an das Event delayed_changed_sel_callback, mit dem man eine Selektion im Grid verzögert auswerten konnte. Mit Hilfe der Tastenkombination STRG+Y kann man einzelne Zellen markieren. Diese Funktionen wollte ich nutzen, um die markierten Zellenwerte auszulesen und zu summieren.</p>
+<p>Herausgekommen ist das unten stehende Programm. Der eigentliche Teil, die Summierung der Zellen, steht komplett in der Methode HANDLE_DELAYED_SELECTION.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861506" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg" alt="2016-10-07_19-06-25" width="856" height="274" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg 856w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-300x96.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-768x246.jpg 768w" sizes="(max-width: 856px) 100vw, 856px" /></a></p>
+<h2>Vorgehen</h2>
+<p>Event delayed_changed_sel_callback registrieren und einen Eventhandler in der Klasse zuordnen (Handle_Delayed_Selection).</p>
+<p>Wie kommt man an die markierten Zellen heran? Dafür gibt es die Methode Get_Selected_Cells. Sie liefert eine Tabelle zurück, in der die markierten Feldnamen und der Zeilenindex stehen. Mittels READ TABLE und ASSIGN COMPONENT kann man also auf einen Zellwert zugreifen.</p>
+<p>Nun muss noch mittels DESCRIBE FIELD geprüft werden, ob es sich um ein Feld mit einem numerischen Wert handelt. Wenn das der Fall ist, kann der Wert der Zelle aufsummiert werden.</p>
+<p>&nbsp;</p>
+<h2>Normale Zellen vs. Summenzeilen</h2>
+<p>Das Vorgehen bei einem ALV-Grid, in dem keine Summen oder Zwischensummen gebildet wurden, ist einfach und erfolgt nach dem oben genannten Schema. Eine Herausforderung sind jedoch die (Zwischen-) Summenstufen gewesen. Diese werden im ALV-Grid in eigenen &#8211; geschützten &#8211; Tabellen verwaltet:</p>
+<table>
+<tbody>
+<tr>
+<td>Tabelle</td>
+<td>Bedeutung</td>
+<td>Bemerkung</td>
+</tr>
+<tr>
+<td>MT_CT00</td>
+<td>Summetabelle</td>
+<td>Sie enthält in der Regel nur einen Eintrag. Ausnahme: Es sind in der Summierung der Feldwerte unterschiedliche Einheiten vorhanden.</td>
+</tr>
+<tr>
+<td>MT_CT01</td>
+<td>Zwischensummentabelle 1</td>
+<td>Erste Zwischensummenstufe</td>
+</tr>
+<tr>
+<td>MT_CTnn</td>
+<td>Zwischensummentabelle n</td>
+<td>Tabellen für Zwischensummenstufe nn</td>
+</tr>
+<tr>
+<td>MT_CT09</td>
+<td>Zwischensummentabelle 9</td>
+<td>9 ist die höchste Stufe. Mehr Zwischensummen können nicht erstellt werden.</td>
+</tr>
+</tbody>
+</table>
+<p>Immerhin gibt es in diesem Fall eine Methode, mit der man sich die Zwischensummentabellen &#8211; bzw. eine Referenz auf diese &#8211; besorgen kann: <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/9e/2c7b38180fee45e10000009b38f8cf/content.htm">Get_Subtotals</a>. Im Feld ROW_ID-ROWTYPE der Zellen-Tabelle steht, ob es sich um die Totals-Tabelle handelt (1. Zeichen = T) oder eine Zwischensumme (1. Zeichen = S). Nicht gruppierte Zellen haben den Eintrag SPACE.</p>
+<p>Eine Selektion auf ein Summenfeld liefert zum Beispiel diesen ROWTYPE: S 0101X0000000001. Der Vierstellige Code nach dem S sagt aus, um welche Hierarchiestufe es sich handelt (Stellen 1 und 2 des Codes). Die Stellen 3 und 4 des Codes sagen aus, in welcher Tabelle das markierte Feld steht. In diesem Fall ist es Level 1 der Hierarchie und Tabelle MT_CT01.</p>
+<p>Anhand dieses Code kann man also herausfinden, in welcher Zwischensummentabelle nachgeschaut werden muss. Dies tue ich hier:</p>
+<pre>lv_index = ls_cell-row_id-rowtype+4(2).
+lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ASSIGN (lv_tablename) TO &lt;ref_data&gt;.</pre>
+<p>Nachdem wir nun wissen, in welcher Tabelle wir nachsehen müssen um den markierten Zellwert zu finden, müssen wir nun noch den richtigen Index ermitteln. Dieser wird leider nicht mitgegeben, sondern muss aus der Tabelle GROUPLEVELS, die über Get_Subtotals geliefert wird, ermittelt werden:</p>
+<pre>READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+IF sy-subrc = 0.
+  ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ENDIF.</pre>
+<h2></h2>
+<p><strong>Achtung!</strong> Das Programm funktioniert nur, wenn es sich um <em>reine</em> (Zwischen-) Summen handelt! Zwischensummen, die aus mehreren Zeilen bestehen weil sich die zugehörige Einheit unterscheidet, können (noch) nicht erkannt werden. Hier muss ich noch etwas forschen&#8230;</p>
+<h2>Zwischensummen bilden</h2>
+<p>Ein kurzer Hinweis, wie man im ALV-Grid Zwischensummen bildet:</p>
+<p>Wähle als erstes mindestens eine Spalte über die du dann mit Hilfe des Summenicons <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861510" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg" alt="2016-10-07_19-48-00" width="34" height="20" /></a> eine Summe bildest. Danach kannst du weitere Spalten markieren und mit dem Zwischensummenicon <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861511" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg" alt="2016-10-07_19-49-31" width="34" height="20" /></a> die Spalten definieren, über die zusätzlich eine Zwischensumme erstellt werden soll.</p>
+<h2>Aufrisssummenstufe</h2>
+<p>Über die Aufrisssummenstufe kannst du einfach festlegen, dass nur Zwischensummenzeilen einer bestimmten Hierarchie angezeigt werden sollen:</p>
+<p>Auswahl im Menü:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861508" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg" alt="2016-10-07_19-41-49" width="336" height="137" srcset="/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg 336w, /wp-content/uploads/2016/10/2016-10-07_19-41-49-300x122.jpg 300w" sizes="(max-width: 336px) 100vw, 336px" /></a></p>
+<p>Auswahl der Hierarchieebene:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861509" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg" alt="2016-10-07_19-06-45" width="364" height="208" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg 364w, /wp-content/uploads/2016/10/2016-10-07_19-06-45-300x171.jpg 300w" sizes="(max-width: 364px) 100vw, 364px" /></a></p>
+<p>Anzeige der gewählten Zwischensummen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861507" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg" alt="2016-10-07_19-22-39" width="847" height="139" srcset="/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg 847w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-300x49.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-768x126.jpg 768w" sizes="(max-width: 847px) 100vw, 847px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zz_alv_autosumme.
+
+PARAMETERS p_total TYPE p DECIMALS 2.
+
+CLASS lcl_main DEFINITION.
+
+ PUBLIC SECTION.
+ METHODS start.
+ PROTECTED SECTION.
+ DATA mr_grid TYPE REF TO cl_gui_alv_grid.
+ DATA mt_data TYPE STANDARD TABLE OF spfli.
+ DATA mv_data_table TYPE tabname VALUE 'SPFLI'.
+ DATA mr_dock TYPE REF TO cl_gui_docking_container.
+ METHODS create_docker.
+ METHODS create_grid.
+ METHODS handle_delayed_selection
+ FOR EVENT delayed_changed_sel_callback
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ METHODS register_events.
+ METHODS select_data.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+ METHOD start.
+ select_data( ).
+ create_docker( ).
+ create_grid( ).
+ register_events( ).
+ ENDMETHOD.
+
+ METHOD create_docker.
+ "Create Docking container at bottom
+ CREATE OBJECT mr_dock
+ EXPORTING
+ side = cl_gui_docking_container=&gt;dock_at_bottom
+ ratio = 90
+ no_autodef_progid_dynnr = abap_false.
+
+ ENDMETHOD.
+
+ METHOD create_grid.
+ "Create ALV-Grid
+ CREATE OBJECT mr_grid
+ EXPORTING
+ i_appl_events = abap_true
+ i_parent = mr_dock.
+
+ "and display data
+ mr_grid-&gt;set_table_for_first_display(
+ EXPORTING
+ i_structure_name = mv_data_table
+ CHANGING
+ it_outtab = mt_data ).
+
+ "Set focus on grid so user can directly scroll and select cells via CTRL+Y
+ cl_gui_container=&gt;set_focus( mr_grid ).
+
+ ENDMETHOD.
+ METHOD handle_delayed_selection.
+
+ "Local data
+ DATA lt_cells TYPE lvc_t_cell.
+ DATA ls_cell LIKE LINE OF lt_cells.
+ DATA lv_total TYPE p DECIMALS 2.
+ DATA lv_val_type TYPE c.
+ DATA lv_index TYPE n LENGTH 2.
+ DATA lv_tablename TYPE string.
+ DATA lt_grouplevels TYPE lvc_t_grpl.
+ DATA ls_grouplevel LIKE LINE OF lt_grouplevels.
+
+ FIELD-SYMBOLS &lt;ref_data&gt; TYPE REF TO data.
+ FIELD-SYMBOLS &lt;table&gt; TYPE table.
+ FIELD-SYMBOLS &lt;warea&gt; TYPE any.
+ FIELD-SYMBOLS &lt;val&gt; TYPE any.
+
+ "data references to sub totals tables
+ DATA ld_ct00 TYPE REF TO data.
+ DATA ld_ct01 TYPE REF TO data.
+ DATA ld_ct02 TYPE REF TO data.
+ DATA ld_ct03 TYPE REF TO data.
+ DATA ld_ct04 TYPE REF TO data.
+ DATA ld_ct05 TYPE REF TO data.
+ DATA ld_ct06 TYPE REF TO data.
+ DATA ld_ct07 TYPE REF TO data.
+ DATA ld_ct08 TYPE REF TO data.
+ DATA ld_ct09 TYPE REF TO data.
+
+ "get selected cells (selection via CTRL + Y)
+ sender-&gt;get_selected_cells( IMPORTING et_cell = lt_cells ).
+
+ "If there is only one cell selected, we do not need to sum that...
+ CHECK lines( lt_cells ) &gt; 1.
+
+ "Read all cell values
+ LOOP AT lt_cells INTO ls_cell.
+
+ "in case of rowtype (normal cell, total or subtotal) assign correct data table
+ CASE ls_cell-row_id-rowtype(1).
+ "Total sum of all
+ WHEN 'T'.
+ sender-&gt;get_subtotals( IMPORTING ep_collect00 = ld_ct00 ).
+
+ ASSIGN ld_ct00 TO &lt;ref_data&gt;.
+ ls_cell-row_id-index = 1.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "subtotals
+ WHEN 'S'.
+ sender-&gt;get_subtotals( IMPORTING
+ ep_collect01 = ld_ct01
+ ep_collect02 = ld_ct02
+ ep_collect03 = ld_ct03
+ ep_collect04 = ld_ct04
+ ep_collect05 = ld_ct05
+ ep_collect06 = ld_ct06
+ ep_collect07 = ld_ct07
+ ep_collect08 = ld_ct08
+ ep_collect09 = ld_ct09
+ et_grouplevels = lt_grouplevels ).
+
+ lv_index = ls_cell-row_id-rowtype+4(2).
+ lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ ASSIGN (lv_tablename) TO &lt;ref_data&gt;.
+
+ READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+ IF sy-subrc = 0.
+ ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ ENDIF.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "Normal cell value
+ WHEN space.
+ ASSIGN mt_data TO &lt;table&gt;.
+ ENDCASE.
+
+
+ "Only read table line when index changes
+ AT NEW row_id.
+ READ TABLE &lt;table&gt; ASSIGNING &lt;warea&gt; INDEX ls_cell-row_id-index.
+ ENDAT.
+ "Assign selected fieldname of workarea
+ ASSIGN COMPONENT ls_cell-col_id OF STRUCTURE &lt;warea&gt; TO &lt;val&gt;.
+ IF sy-subrc = 0.
+ "check correct type of field: Only numeric fields will be taken
+ DESCRIBE FIELD &lt;val&gt; TYPE lv_val_type.
+ CASE lv_val_type.
+ WHEN 'P' "Packed
+ OR 'N' "Numchar
+ OR 'b' "Integer
+ OR 'a' "decfloat
+ OR 'e' "decfloat
+ OR 'F'. "Float?
+ "add cell value to total
+ ADD &lt;val&gt; TO lv_total.
+ ENDCASE.
+ ENDIF.
+ ENDLOOP.
+
+ IF lv_total IS NOT INITIAL.
+ "There were numeric fields selected and therefor we have a total to show:
+ MESSAGE s000(oo) WITH 'TOTAL:' space lv_total.
+ "Parameterfeld ebenfalls füllen
+ p_total = lv_total.
+ ENDIF.
+ ENDMETHOD.
+
+ METHOD register_events.
+ "Set handler
+ SET HANDLER handle_delayed_selection FOR mr_grid.
+ "register event for delayed selection
+ mr_grid-&gt;register_delayed_event( mr_grid-&gt;mc_evt_delayed_change_select ).
+ ENDMETHOD.
+
+ METHOD select_data.
+ "Select data
+ SELECT * FROM (mv_data_table) INTO TABLE mt_data UP TO 100 ROWS.
+ ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+ DATA(gr_main) = NEW lcl_main( ).
+ gr_main-&gt;start( ).</pre>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAP-Demoprogramme</title>
+		<link>/blog/sap-demoprogramme/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 31 May 2016 08:26:29 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Workshop]]></category>
+		<category><![CDATA[Dynamische Dokumente]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[Demo-Programme]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tree]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=431</guid>
+
+					<description><![CDATA[<p>Demoprogramme der SAP. CALENDAR_CONTROL CONTEXT_MENU_DYNPR CONTEXT_MENU_LIST CUSTOM_CONTROL DIALOGBOX_CONTROL DOCKING_CONTROL DRAG_DROP_EDIT_TREE DRAG_DROP_TREE_MULTI  DROPDOWN_LISTBOX HTML_VIEWER HTML_VIEWER_WORKSHOP PICTURE_CONTROL SAP_LIST_TREE SPLITTER_CONTROL SUBSCREEN TABLE_CONTROL TOOLBAR_DIALOGBOX</p>
+<p>Der Beitrag <a href="/blog/sap-demoprogramme/">SAP-Demoprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Demoprogramme der SAP. CALENDAR_CONTROL CONTEXT_MENU_DYNPR CONTEXT_MENU_LIST CUSTOM_CONTROL DIALOGBOX_CONTROL DOCKING_CONTROL DRAG_DROP_EDIT_TREE DRAG_DROP_TREE_MULTI DROPDOWN_LISTBOX HTML_VIEWER HTML_VIEWER_WORKSHOP PICTURE_CONTROL SAP_LIST_TREE SPLITTER_CONTROL SUBSCREEN TABLE_CONTROL TOOLBAR_DIALOGBOX</p>
+<p>[notice type=&#8217;info&#8217;]Viele DEMO-Programme finden sich im Paket SLIS!</p>
+<p>Demoprogramme beginnen häufig mit DEMO* oder RSDEMO* [/notice]</p>
+<h2 class="head1">Toolbar</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_TOOLBAR_DIALOGBOX</div>
+</li>
+<li>SAPTOOLBAR_IN_SPLITTER</li>
+<li>SAPTOOLBAR_DEMO1</li>
+<li>BCALV_GRID_07</li>
+</ul>
+<h2 class="head1">ALV-Grid</h2>
+<ul>
+<li>BCALV*</li>
+<li><span style="color: #fb2412;"><strong>BCALV_VERIFY_DATATYPES</strong></span><br />
+Das Mega-Test-Programm für jegliche Optionen des ALV-Grid</li>
+<li><span style="color: #fb2412;"><strong>BCALV_TEST_SUITE</strong><br />
+</span>Viele Funktionen in einem Programm</li>
+</ul>
+<h2 class="head1">ALV-Tree</h2>
+<ul>
+<li>SAPSIMPLE_TREE_CONTROL_DEMO</li>
+<li>R_ALV_TREE_TOOLBAR_MANAGER</li>
+<li>BCALV_GRID_DND_TREE</li>
+<li>BCALV_GRID_DND_TREE_SIMPLE</li>
+<li>BCALV_TEST_COLUMN_TREE</li>
+<li>BCALV_TEST_SIMPLE_TREE</li>
+<li>BCALV_TREE_01</li>
+<li>BCALV_TREE_02</li>
+<li>BCALV_TREE_03</li>
+<li>BCALV_TREE_04</li>
+<li>BCALV_TREE_05</li>
+<li>BCALV_TREE_06</li>
+<li>BCALV_TREE_DEMO</li>
+<li>BCALV_TREE_DND</li>
+<li>BCALV_TREE_DND_MULTIPLE</li>
+<li>BCALV_TREE_EVENT_RECEIVER</li>
+<li>BCALV_TREE_EVENT_RECEIVER01</li>
+<li>BCALV_TREE_ITEMLAYOUT</li>
+<li>BCALV_TREE_MOVE_NODE_TEST</li>
+<li>BCALV_TREE_SIMPLE_DEMO</li>
+<li>Doku:<br />
+<a href="http://help.sap.com/printdocu/core/print46b/de/data/de/pdf/BCCITREE.pdf" target="_blank" rel="noopener noreferrer">http://help.sap.com/printdocu/core/print46b/de/<br />
+data/de/pdf/BCCITREE.pdf</a></li>
+</ul>
+<h2 class="head1">Dialogbox</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_DIALOGBOX_CONTROL</div>
+</li>
+<li>
+<div class="text1">RSDEMO_TOOLBAR_DIALOGBOX</div>
+</li>
+</ul>
+<h2 class="head1">Drawer (Vertikales Tabstrip)</h2>
+<ul>
+<li>
+<div class="text1">RSBPT_CONTAINER_BAR_3</div>
+</li>
+</ul>
+<h2 class="head1">Context Menu</h2>
+<ul>
+<li>RSDEMO_CONTEXT_MENU_DYNPR</li>
+<li>
+<div class="text1">RSDEMO_CONTEXT_MENU_LIST</div>
+</li>
+<li>
+<div class="text1">R_ALV_TREE_TOOLBAR_MANAGER</div>
+</li>
+</ul>
+<h2 class="head1">Grafik</h2>
+<ul>
+<li>
+<div class="text1">GRAPHICS_GUI_CE_DEMO</div>
+</li>
+</ul>
+<h2 class="head1">Drag and Drop</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_DRAG_DROP_EDIT_TREE</div>
+</li>
+<li>
+<div class="text1">RSDEMO_DRAG_DROP_TREE_MULTI</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_DRAGDROP</div>
+</li>
+<li>
+<div class="text1">BCALV_GRID_DND_TREE</div>
+</li>
+<li>
+<div class="text1">BCALV_GRID_DND_TREE_SIMPLE</div>
+</li>
+<li>
+<div class="text1">SAPCALENDAR_DRAG_DROP</div>
+</li>
+<li>
+<div class="text1">BCALV_TEST_DRAG_DROP_02</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_TEST_EVENTS</div>
+</li>
+</ul>
+<h2 class="head1">Textedit</h2>
+<ul>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_1</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_3</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_DEMO_DRAGDROP</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_TEST_1</div>
+</li>
+<li>
+<div class="text1">SAPTEXTEDIT_TEST_2</div>
+</li>
+<li>
+<div class="text1"><span style="line-height: 1.5em;">SAPTEXTEDIT_TEST_EVENTS</span></div>
+</li>
+<li>SAPBTFEDITOR_DEMO Demonstriert die Verwendung des BTF-Editors</li>
+<li>SAPBTFFRAMEWORK_DEMO</li>
+</ul>
+<h2 class="head2">HTML</h2>
+<ul>
+<li>
+<div class="text1">SAPHTML_SCRIPT_DEMO</div>
+<div class="text1"></div>
+</li>
+<li>
+<div class="text1">RSDEMO_HTML_VIEWER</div>
+</li>
+<li>
+<div class="text1">RSDEMO_HTML_VIEWER_WORKSHOP</div>
+</li>
+<li>RSTXHTML</li>
+<li>SAPHTML_DEMO_CN</li>
+<li>SAPHTML_DEMO1</li>
+<li>SAPHTML_EVENTS_DEMO</li>
+<li>SAPHTML_LONGTEXT_DEMO</li>
+<li>SAPHTML_R3HTTP_DEMO</li>
+<li>SAPHTML_R3HTTP_XML</li>
+<li>SAPHTML_SCRIPT_DEMO</li>
+<li>SAPHTML_SET_GUI_CHARSET</li>
+<li>SAPHTML_SSO_DEMO</li>
+<li>SAPHTML_UI_DEMO</li>
+<li>SAPHTML_USE_DEFAULT_CHARSET</li>
+<li>SAPHTMLPAGEEDITOR_DEMO1</li>
+</ul>
+<h2 class="head1">Dynamische Dokumente/ ABAP-Renderer</h2>
+<table style="height: 115px;" width="665">
+<tbody>
+<tr>
+<td>
+<ul>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_FLOW</span></li>
+</ul>
+</td>
+<td>Demonstriert die Verwendung der Element FLOW des Gestaltungsobjekts</td>
+</tr>
+<tr>
+<td>
+<ul>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_GRID</span></li>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_GRID_1</span></li>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_DEMO_LAYOUT_GRID_2</span></li>
+</ul>
+</td>
+<td style="vertical-align: top;">Demonstriert die Verwendung der Element GRID des Gestaltungsobjekts</td>
+</tr>
+<tr>
+<td>
+<ul>
+<li><span style="font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px;">SALV_FORM_TEST</span></li>
+</ul>
+</td>
+<td> Testprogramm für das ALV Gestaltungsobjekt</td>
+</tr>
+</tbody>
+</table>
+<h2 class="head1">Mail</h2>
+<ul>
+<li>
+<div class="text1">RSSOHTMLGIF (Sehr schönen Beispiel, um eine HTML Seite mit eingebundenen Bildern zu versenden)</div>
+</li>
+</ul>
+<h2 class="head1">Calendar</h2>
+<ul>
+<li>RSDEMO_CALENDAR_CONTROL</li>
+<li>SAPCALENDAR_DRAG_DROP</li>
+</ul>
+<h2 class="head1">Sonstige</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_CUSTOM_CONTROL</div>
+</li>
+<li>
+<div class="text1">RSDEMO_EVENT_ON_FIELD</div>
+</li>
+<li>
+<div class="text1">RSDEMO_DOCKING_CONTROL</div>
+</li>
+<li>
+<div class="text1">RSDEMO_DROPDOWN_LISTBOX</div>
+</li>
+<li>
+<div class="text1">RSDEMO_EASY_SPLITTER_CONTROL</div>
+</li>
+<li>RSDEMO_PICTURE_CONTROL</li>
+<li>
+<div class="text1">RSDEMO_SAP_LIST_TREE</div>
+</li>
+<li>
+<div class="text1">RSDEMO_SPLITTER_CONTROL</div>
+</li>
+<li>TEST_FRONTEND_SERVICES</li>
+<li>DEMO_COLORSEL</li>
+</ul>
+<h2 class="head1">Old-Fashioned</h2>
+<ul>
+<li>
+<div class="text1">RSDEMO_SUBSCREEN</div>
+</li>
+<li>
+<div class="text1">RSDEMO_TABLE_CONTROL</div>
+</li>
+<li>RSDEOM02 (Table Control)</li>
+<li>DEMO_LIST_FORMAT_COLOR_1 Farben in Listen</li>
+<li>DEMO_LIST_FORMAT_COLOR_2 Verwendung von Farben in Listen</li>
+</ul>
+<h2>Grafik</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2007/08/2016-05-31_10-13-35.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-654991" src="https://tricktresor.com/wp-content/uploads/2007/08/2016-05-31_10-13-35.jpg" alt="2016-05-31_10-13-35" width="615" height="477" srcset="/wp-content/uploads/2007/08/2016-05-31_10-13-35.jpg 615w, /wp-content/uploads/2007/08/2016-05-31_10-13-35-300x233.jpg 300w" sizes="(max-width: 615px) 100vw, 615px" /></a></p>
+<p>Report RGRAPALL listet die folgenden Grafikbeispiele auf:</p>
+<ul>
+<li>BARCBO01 Demoprogramm: Balkenplan im Anzeigemodus</li>
+<li>BARCBO02 Demoprogramm: Balkenplan im Pflegemodus</li>
+<li>BARCBO03 Demoprogramm: Balkenplan im Pflegemodus (Plantafel)</li>
+<li>BARCBO04 Demoprogramm: Gegenseitiges Aktualisieren von Balkenplan und Dynpro</li>
+<li>BARCOCX1 Demoprogramm: Balkenplancontrol</li>
+<li>DEMO_GFW_PRES_SHOW Anwendungsbeispiel für den Funktionsbaustein GFW_PRES_SHOW</li>
+<li>DEMO_GFW_PRES_SHOW_MULT Anwendungsbeispiel für den Funktionsbaustein GFW_PRES_SHOW_MULT</li>
+<li>GFW_DEMO_HIER1 GFW: Demonstration einer einfachen Hierarchiegrafik mit SAP-Tree</li>
+<li>GFW_DEMO_HIER2 GFW: Demonstration einer Hierarchiegrafik (4 in Splitter, Drag&amp;Drop)</li>
+<li>GFW_DEMO_HIER3 GFW: Demonstration einer Hierarchie-/Präsentationsgrafik (Drag&amp;Drop)</li>
+<li>GFW_DEMO_PRES GFW: Demonstration von GFW mit sichtbarem Datencontainer</li>
+<li>GFW_DEMO_PRES1 GFW: Demonstration von Präsentationsgrafiken mit GFW</li>
+<li>GFW_PROG_BAR GFW: Programmierbeispiel für ein Balkendiagramm</li>
+<li>GFW_PROG_COLUMNS_AND_TI GFW: Programmierbeispiel für ein Balkendiagramm mit Zeitachse</li>
+<li>GFW_PROG_HISTOGRAM GFW: Programmierbeispiel für ein Histogramm</li>
+<li>GFW_PROG_LABELS GFW: Programmierbeispiel für dieselben Beschriftungen, lange Beschr.</li>
+<li>GFW_PROG_MTA GFW: Programmierbeispiel für eine Meilensteintrendanalyse</li>
+<li>GFW_PROG_PIE GFW: Programmierbeispiel für ein Kreisdiagramm</li>
+<li>GFW_PROG_POINT_WITH_LAB GFW: Programmierbeispiel für Diagramm mit gekennzeichnetem Punkt</li>
+<li>GFW_PROG_TIME_AXIS GFW: Programmierbeispiel für ein Punktdiagramm mit Zeitachse</li>
+<li>GFW_PROG_TUTORIAL GFW: Programmierbeispiel für eine einfache PräsGrafik = GFW-Tutorial</li>
+<li>GFW_PROG_SPEEDOMETER GFW: Programmierbeispiel für ein Balkendiagramm<br />
+<a href="https://tricktresor.com/wp-content/uploads/2016/05/SNAG-0001.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018035" src="https://tricktresor.com/wp-content/uploads/2016/05/SNAG-0001.png" alt="" width="531" height="417" srcset="/wp-content/uploads/2016/05/SNAG-0001.png 531w, /wp-content/uploads/2016/05/SNAG-0001-300x236.png 300w, /wp-content/uploads/2016/05/SNAG-0001-117x91.png 117w" sizes="(max-width: 531px) 100vw, 531px" /></a></li>
+<li>GRBMAT_1 Demoprogramm: Pushbuttongrafik</li>
+<li>GRBMAT_2 Demoprogramm: Pushbuttongrafik / 2</li>
+<li>GRBUSG_1 Demoprogramm: SAP-Präsentationsgrafik 2D</li>
+<li>GRBUSG_2 Demoprogramm: SAP-Präsentationsgrafik 3D</li>
+<li>GRBUSG_3 Demoprogramm: Präsentationsgrafik Umsatzvergleich</li>
+<li>GRBUSG_4 Demoprogramm: Präsentationsgrafik 2D &#8211; 3D &#8211; 4D</li>
+<li>GRCNETC1 Demoprogramm: Ansteuern des Clustereditors im Anzeigemodus</li>
+<li>GRCNETC2 Demoprogramm: Ansteuern des Clustereditors (erweiterte Version)</li>
+<li>GRGANT_2 Demoprogramm: Gantt-Diagramm / 2</li>
+<li>GRHIER_1 Demoprogramm: Hierarchiegrafik</li>
+<li>GRHIER_2 Demoprogramm: Hierarchie</li>
+<li>GRHPGL_1 Demoprogramm: HPGL-Display</li>
+<li>GRPORT_0 Demonstration Portfolio-Grafik</li>
+<li>GRSTAT_1 Demoprogramm: Trigonometrische Funktionen mit der Statistikgrafik</li>
+<li>GRSTAT_2 Demoprogramm: Funktionsdarstellung mit der Statistikgrafik</li>
+<li>HIER_BO1 Demoprogramm: Hierarchiegrafik im Anzeigemodus</li>
+<li>HIER_BO2 Demoprogramm: Hierarchiegrafik im Pflegemodus</li>
+<li>NETZOCX1 Demoprogramm: Netzplancontrol</li>
+<li>NETZOCX2 Demoprogramm: Netzplancontrol mit Callbackverarbeitung</li>
+<li>NETZ_BO1 Demoprogramm: Netzplangrafik im Anzeigemodus</li>
+<li>NETZ_BO2 Demoprogramm: Netzplangrafik im Pflegemodus</li>
+<li>NETZ_BO3 Demoprogramm: Netzplangrafik im Pflegemodus (erweiterte Form)</li>
+</ul>
+<p>Der Beitrag <a href="/blog/sap-demoprogramme/">SAP-Demoprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SimDia² &#8211; Neue Version des besten SAP-Import-Tools</title>
+		<link>/blog/simdia2-neue-version-des-besten-sap-import-tools/</link>
+					<comments>/blog/simdia2-neue-version-des-besten-sap-import-tools/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 22 Jul 2015 04:00:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[datenerfassung]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Datenimport]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Import]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[TableControl]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=163546</guid>
+
+					<description><![CDATA[<p>Über ein Jahr sind seit der Veröffentlichung meines Test-Berichts zu SimDia² vergangen. Dort habe ich die Version 2.5 getestet. Seitdem wurden vom Hersteller ERSAsoft bereits zwei neue Versionen veröffentlicht. Höchste Zeit also für ein Update. Die aktuelle Version ist 2.7.</p>
+<p>Der Beitrag <a href="/blog/simdia2-neue-version-des-besten-sap-import-tools/">SimDia² &#8211; Neue Version des besten SAP-Import-Tools</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Über ein Jahr sind seit der Veröffentlichung meines <a href="https://ersasoft.de/de/simdia/?s=tt">Test-Berichts zu SimDia²</a> vergangen. Dort habe ich die Version 2.5 getestet. Seitdem wurden vom Hersteller <a href="https://ersasoft.de/de/?s=tt">ERSAsoft</a> bereits zwei neue Versionen veröffentlicht. Höchste Zeit also für ein Update. Die aktuelle <a href="https://ersasoft.de/de/simdia/?s=tt">Version ist 2.7</a>.</p>
+<h2><strong>Update</strong></h2>
+<p>Neben vielen Kleinigkeiten wurden zwei recht große Funktionen implementiert. Zunächst zu den &#8220;Kleinigkeiten&#8221;, die jedoch das Leben noch einfacher machen:</p>
+<ul>
+<li>Pause-Button: Die aktuelle Aufzeichnung kann unterbrochen werden, um zum Beispiel nachschauen zu können, ob bereits bestimmte Daten vorhanden sind.</li>
+<li>Gesteigerte Performance, insbesondere bei großen Datenmengen</li>
+<li>Benutzung der F4-Hilfe während der Aufzeichnung</li>
+<li>Mehrsprachigkeit</li>
+<li>Verbesserte Unterstützung von eingabebereiten ALV-Grid</li>
+</ul>
+<p>Die zwei großen Änderungen sind:</p>
+<ul>
+<li>Dynamische Maßnahmen</li>
+<li>Berechtigungsverwaltung</li>
+</ul>
+<p>Mit den<em> dynamischen Maßnahmen</em> ist es nun möglich, SAP-Aktionen dynamisch (sprich: für jeden Datensatz der Excel-Datei unterschiedlich) in Abhängigkeit der Datenkonstellation in SAP und/oder Excel auszuführen &#8211; oder dies eben nicht zu tun.</p>
+<p>Zusammen mit der verbesserten Auswahlmöglichkeit bzw. Positionierbarkeit auf einem TableControl (s.u.) lassen sich z.B. Materialstämme sehr einfach anpassen.</p>
+<p>Bereits mit der vorigen Version wurde SimDia² ein recht weit reichendes Verwaltungstool spendiert, um die Berechtigungen für das Programm sehr differenziert festzulegen. Dies dürfte vor allem in größeren Organisationen nicht ganz unwichtig sein.</p>
+<p>Die Berechtigungsverwaltung erlaubt es einem Administrator, festzulegen, welcher Windows-Benutzer Skripte erstellen oder lediglich ausführen darf.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/07/2015-07-21_22-47-39.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-166925" src="https://tricktresor.com/wp-content/uploads/2015/07/2015-07-21_22-47-39-300x255.jpg" alt="Simdia² - Admin" width="300" height="255" srcset="/wp-content/uploads/2015/07/2015-07-21_22-47-39-300x255.jpg 300w, /wp-content/uploads/2015/07/2015-07-21_22-47-39.jpg 760w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Eine Übersicht über alle Verbesserungen findest du im <a href="https://ersasoft.de/de/ressourcen/newsletter-archiv/?s=tt">Newsletter-Archiv von SimDia²</a>.</p>
+<h2><strong>Technik</strong></h2>
+<p>SimDia² ist zwar nach wie vor ein reines Windows-Programm. Das Programm-Fenster legt sich mittlerweile aber nicht mehr nur einfach <span style="text-decoration: underline;">über</span> den SAP GUI sondern wird fest ans SAP GUI „angetackert“. Für mich ein kleiner, für die einfache Bedienung aber nicht unwichtiger Punkt.</p>
+<h2><strong>Anwendung &#8211; Funktionalität </strong></h2>
+<p>In TableControls ist die Suche nach dem Identifikations-Merkmal jetzt nicht mehr auf die erste Spalte eingeschränkt. Vielmehr kann jetzt in einer beliebigen Spalte nach einer zu ändernden Tabellenzeile gesucht werden. Darüber hinaus kann jetzt auch z.B. in SUB-Fenstern, wie z.B. der Sichtenauswahl der Transaktion MM01/MM02&#8230;) gezielt nach der auszuwählenden Sicht gesucht werden, auch wenn sich diese je nach Material an unterschiedlichsten Positionen befindet.</p>
+<h2><strong>Pro und Contra</strong></h2>
+<p>Zwar können mit SimDia² immer noch keine Abfragen oder Verzweigungen programmiert werden (was ja eigentlich auch der Programm-Philosophie „Daten importieren ohne programmieren“ widersprechen würde). Aber immerhin lassen sich jetzt auch auf einfache Weise Buttons (und auch Tabs) abhängig von den Excel-Daten betätigen. Und damit sind wir dann doch schon (fast) bei der Möglichkeit, Abfragen oder Verzweigungen zu erstellen (das Wort „Programmieren“ vermeide ich bewusst, denn da gehört doch noch ein wenig mehr dazu.).</p>
+<p>Anhand eines <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial7">Videos</a> auf der SimDia²-Homepage wird z.B. gezeigt, wie aufgrund der Excel-Daten ein Button betätigt werden kann, um fallweise in einem dadurch ausgelösten Popup zusätzliche Daten zu erfassen.</p>
+<h2>Fazit</h2>
+<p>Nach wie vor ist <a href="https://ersasoft.de/de/simdia/?s=tt">Simdia²</a> ein einfach gehaltenes Tool, das jedoch sehr mächtig ist. Als Programmierer möchte ich natürlich für jede wiederkehrende Aufgabe ein ABAP-Programm schreiben. Solange es jedoch lediglich darum geht, aus einer Excel-Tabelle einfache Daten in ein SAP-System zu bekommen, ist Simdia² fast jeder Programmierung überlegen.</p>
+<p>Schon wenn nur ein paar wenige (einfache) Datenübernahmeprogramme geschrieben werden müssen, komme ich wahrscheinlich bereits in Erklärungsnot, warum ich denn dafür nicht eine Simdia-Lizenz gekauft hätte.</p>
+<p>Alleine dadurch, dass der Fachbereich selbst schnell und einfach definieren kann, welche Daten wo abgelegt werden sollen, können zwei Fliege mit einer (Simdia²-) Klappe geschlagen werden:</p>
+<ol>
+<li>Die IT wird entlastet. Es muss keine Anforderung definiert werden, die dann geprüft und umgesetzt werden muss.</li>
+<li>Der Fachbereich kann sich selbst helfen und ist nicht auf freie Kapazitäten der IT angewiesen</li>
+</ol>
+<p>Häufig werden Anforderungen gar nicht an die IT herangetragen, weil von vornherein feststeht, dass für solche kleinen Aufgaben kaum Zeit übrig ist.</p>
+<p>Ich habe von Fachabteilungen gehört, die sich mit einer geeigneten Batchinput-Datei und der Word-Serienbrief-Funktion geholfen haben, um Daten in ihr SAP-System zu bekommen. Im Gegensatz dazu ist Simdia² wirklich ein Kinderspiel!</p>
+<p></p>
+<h2>Tricktresor- Bonus</h2>
+<p>Nach wie vor bietet ERSAsoft allen Tricktresor-Lesern einen Nachlass von 5% an. Fülle einfach das unten stehende Formular aus und du bekommst den erwähnten Nachlass gewährt.</p>
+<p><strong>Du wirst dich wundern, was mit Simdia in deinem Unternehmen möglich ist!</strong></p>
+<p><span style="line-height: 1.5em;">[accordian]</span></p>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>[contact-form-7]</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p></p>
+<p>Der Beitrag <a href="/blog/simdia2-neue-version-des-besten-sap-import-tools/">SimDia² &#8211; Neue Version des besten SAP-Import-Tools</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/simdia2-neue-version-des-besten-sap-import-tools/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>SAP und der Rechtsklick</title>
+		<link>/blog/sap-und-der-rechtsklick/</link>
+					<comments>/blog/sap-und-der-rechtsklick/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 03 Jun 2015 10:06:52 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[Klick]]></category>
+		<category><![CDATA[Kontextmenü]]></category>
+		<category><![CDATA[Einstellungen]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=110262</guid>
+
+					<description><![CDATA[<p>Viele Neuerungen schleichen sich unbemerkt ein, da sie unter der Oberfläche statt finden oder sogar erst explizit aktiviert werden müssen. Dieser Bericht soll ein kleiner Streifzug durch die aktuellen kleinen Niederungen der Optionen, Rechtsklicke und Kontextmenüs sein.</p>
+<p>Der Beitrag <a href="/blog/sap-und-der-rechtsklick/">SAP und der Rechtsklick</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Jeder kennt sicherlich ein paar Einstellungen im GUI oder im ABAP-Editor, die für das eine oder andere gut sind. Die Optionen und Möglichkeiten sind jedoch recht vielfältig und ständigen Veränderungen unterworfen. Das führt dazu, dass</p>
+<ul>
+<li>man schnell eine Option übersieht</li>
+<li>eine Änderung gar nicht ins Auge fällt</li>
+<li>man selektiv schaut, ob eine Option gerade für das aktuelle Problem passend sein könnte</li>
+</ul>
+<p>In jedem Fall ist es schwierig, alle Optionen, Einstellungen, Tricks, Tastaturkürzel und Kniffe parat zu haben. Aus diesen Grund &#8211; und weil ein Kollege mich gerade auf einen Klick aufmerksam machte, den ich noch nicht kannte &#8211; möchte ich euch gerne ein paar Klicks und Einstellungen aus verschiedenen Bereichen vorstellen.</p>
+<h2>ABAP-Editor</h2>
+<h3>Zeile verschieben</h3>
+<p>Eine Zeile &#8211; oder markierter Bereich &#8211; kann im Quelltext durch Drücken der Tastenkombination STRG+ALT+Cursor hoch nach oben geschoben werden. Gleiches funktioniert mit STRG+ALT+Cursor runter natürlich auch in die andere Richtung.<br />
+[notice type=&#8217;alert&#8217;]Oha! Da habe ich euch ja was erzählt&#8230; Ich habe die Tastenkombination in einer VM ausprobiert und dort funktionieren sie. Leider ist die Tastenkombination von Windows vorbelegt: <em>Schwenken in die Richtung der Pfeiltasten</em>. Damit erlebt man sein blaues Wunder und der Bildschirm steht Kopf.</p>
+<p>Um die Funktion sinnvoll nutzen zu können, musst du im Editor den Befehlen <em>Edit.MoveLinesUp</em> und <em>Edit.MoveLinesDown</em> eine andere Tastenkombination zuweisen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_17-13-19.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-110566" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_17-13-19-300x188.jpg" alt="EditMoveLines" width="300" height="188" srcset="/wp-content/uploads/2015/06/2015-06-03_17-13-19-300x188.jpg 300w, /wp-content/uploads/2015/06/2015-06-03_17-13-19.jpg 709w" sizes="(max-width: 300px) 100vw, 300px" /></a> Ich habe mich für STRG+SHIFT+Cursor Hoch/ Runter entschieden[/notice]</p>
+<h3>TRANSLATE TO UPPER</h3>
+<p>Den ABAP-Befehl kennt sicherlich jeder Programmierer. Im ABAP-Editor gibt es eine Tastenkombination dafür: STRG+U (Upper). Die Verwandlung in Kleinbuchstaben erfolgt durch STRG+L (Lower). Das ist besonders dann hilfreich, wenn man einen Teil des Quelltextes als Übergabeparameter für eine Funktion benötigt, zum Beispiel den Strukturnamen zur Übergabe als String an den ALV-Grid. Text zwischen die Hochkommas kopieren, STRG+U und der Strukturname steht in Großbuchstaben dort.</p>
+<h3>Copy and Paste mit Historie</h3>
+<p>Eine von mir häufig verwendete Option ist die Tastenkombination STRG+SHIFT+V zum Einfügen von zuvor kopierten Texten. Mit dieser Option kannst du im Editor einen Text aus einer Methode kopieren (zum Beispiel die Datendeklaration), einen zweiten Text kopieren (zum Beispiel der zugehörige Funktionsaufruf) und kannst dann in einer anderen Methode die Daten nacheinander mittels STRG+SHIFT+V wieder einfügen.</p>
+<h3>Additives Copy And Paste</h3>
+<p>Theoretisch gibt es in den Einstellungen des Editors die Möglichkeit, die Funktion CopyAndAppend einer Tastenkombination zuzuweisen. Hiermit ist es &#8211; theoretisch &#8211; möglich, mehrere Textstellen durch CopyAndAppend an den bereits im Zwischenspeicher vorhandenen Text anzufügen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_12-51-02.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-110265 size-full" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_12-51-02.jpg" alt="CopyAndAppend" width="599" height="352" srcset="/wp-content/uploads/2015/06/2015-06-03_12-51-02.jpg 599w, /wp-content/uploads/2015/06/2015-06-03_12-51-02-300x176.jpg 300w" sizes="(max-width: 599px) 100vw, 599px" /></a></p>
+<p>In der Praxis funktioniert dies jedoch nicht zuverlässig. Schade eigentlich&#8230;</p>
+<h2>ALV-Grid</h2>
+<p>Der ALV-Grid steckt voller Geheimnisse. Nicht nur bei der Programmierung desselben sondern auch an der Oberfläche. Einige vorgestellten Tricks dürften vom aktuellen Release abhängig sein. Von daher kann es sein, dass die Tricks bei dir leider nicht funktionieren&#8230;</p>
+<h3>Innereien</h3>
+<p>Für die Analyse von Fehlern kann es notwendig sein, etwas über die verwendeten Einstellungen eines ALV-Grids zu wissen. Klicke hierfür auf einen nicht verwendeten Bereich <strong>im Grid</strong>, also zum Beispiel ganz nach unten scrollen und dann in den grauen Bereich, bei gedrückter SHIFT-Taste mit der rechten Maustaste doppelt. Es werden dir dann Informationen und Fehlermeldungen zum Grid angezeigt, die normalerweise nur Programmierern zugänglich sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_12-59-24.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-110331 size-full" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_12-59-24.jpg" alt="Grid-Einstellungen" width="578" height="228" srcset="/wp-content/uploads/2015/06/2015-06-03_12-59-24.jpg 578w, /wp-content/uploads/2015/06/2015-06-03_12-59-24-300x118.jpg 300w" sizes="(max-width: 578px) 100vw, 578px" /></a></p>
+<h3>Feldkatalog</h3>
+<p>Bei der Filterung oder Sortierung im ALV-Grid-Layout wird nur die Beschreibung der Feldnamen angezeigt. Das ist manchmal irreführend oder nicht eindeutig. Inzwischen gibt es die Möglichkeit, sich per Kontextmenü die technischen Feldnamen einblenden zu lassen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-05-09.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-110332 size-full" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-05-09.jpg" alt="Feldkatalog1" width="684" height="497" srcset="/wp-content/uploads/2015/06/2015-06-03_13-05-09.jpg 684w, /wp-content/uploads/2015/06/2015-06-03_13-05-09-300x218.jpg 300w" sizes="(max-width: 684px) 100vw, 684px" /></a></p>
+<p>Die Anzeige sieht dann aus wie folgt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-05-52.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-110333" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-05-52.jpg" alt="Feldkatalog2" width="595" height="450" srcset="/wp-content/uploads/2015/06/2015-06-03_13-05-52.jpg 595w, /wp-content/uploads/2015/06/2015-06-03_13-05-52-300x227.jpg 300w" sizes="(max-width: 595px) 100vw, 595px" /></a></p>
+<h3>Control-Services</h3>
+<p>In den SAPGUI-Optionen (ALT+F12) lassen sich Control-Services einstellen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-08-49.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-110334" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-08-49.jpg" alt="Control-Services" width="839" height="577" srcset="/wp-content/uploads/2015/06/2015-06-03_13-08-49.jpg 839w, /wp-content/uploads/2015/06/2015-06-03_13-08-49-300x206.jpg 300w" sizes="(max-width: 839px) 100vw, 839px" /></a></p>
+<p>Im Kontextmenü des ALV-Grid erscheint dann das zusätzliche Menü &#8220;Services &#8211; Suchen&#8221;. Der Text in der markierten Zelle wird damit über &#8211; in diesem Beispiel &#8211; Google gesucht.</p>
+<h2>Dynpro</h2>
+<h3>Eingabefelder und Historie</h3>
+<p>Der SAPGUI entscheidet selbst, für welche Felder eine Eingabehistorie aktiviert wird und für welche nicht. Mit STRG+Rechtsklick kannst du dies selbst steuern:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-26-19.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-110336" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-26-19-300x201.jpg" alt="Eingabehistorie" width="300" height="201" srcset="/wp-content/uploads/2015/06/2015-06-03_13-26-19-300x201.jpg 300w, /wp-content/uploads/2015/06/2015-06-03_13-26-19-480x320.jpg 480w, /wp-content/uploads/2015/06/2015-06-03_13-26-19.jpg 839w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Entwicklung</h2>
+<h3>SE24 &#8211; Class Browser</h3>
+<p>Eventuell lohnt sich mal wieder ein Blick in die Einstellungen der Workbench? Hier kannst du einstellen, dass Methoden aus Interfaces gruppiert dargestellt werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-22-02.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-110337" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-22-02-272x300.jpg" alt="Einstellungen SE24" width="272" height="300" srcset="/wp-content/uploads/2015/06/2015-06-03_13-22-02-272x300.jpg 272w, /wp-content/uploads/2015/06/2015-06-03_13-22-02.jpg 567w" sizes="(max-width: 272px) 100vw, 272px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-22-42.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-110338" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-03_13-22-42-300x146.jpg" alt="SE24 Gruppierung INTF" width="300" height="146" srcset="/wp-content/uploads/2015/06/2015-06-03_13-22-42-300x146.jpg 300w, /wp-content/uploads/2015/06/2015-06-03_13-22-42.jpg 850w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Ich finde die Option sehr hilfreich.</p>
+<h2>Sonstiges</h2>
+<p>Hast du auch Kniffe, die sonst kaum jemand kennt, oder die du sehr hilfreich findest? Dann hinterlasse bitte einen Kommentar! Ich freue mich über geheime Einstellungen; gerne auch aus anderen Bereichen (MM, SD, etc)!</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/sap-und-der-rechtsklick/">SAP und der Rechtsklick</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/sap-und-der-rechtsklick/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Magic Filter</title>
+		<link>/blog/magic-filter/</link>
+					<comments>/blog/magic-filter/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sun, 10 May 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[Filter]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=75508</guid>
+
+					<description><![CDATA[<p>In Transaktionen mit mehreren ALV-Grids kann das Kontrollieren von Daten schwierig sein, wenn zwischen Grids hin- und her gesprungen werden muss und jedes Mal die Filter angepasst werden müssen.  Mit Magic Filter gehört das der Vergangenheit an. Mehr im Text.</p>
+<p>Der Beitrag <a href="/blog/magic-filter/">Magic Filter</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Vor kurzem war ich genervt von einer Anwendung, in der Daten in mehreren ALV-Grids angezeigt wurden. Die unterschiedlichen Grids haben teilweise gleiche Felder. Vielleicht ähnlich eines Cockpits in dem verschiedene Sichten zu Materialien angezeigt werden (Materialstamm, Werks-Sichten, Bestände auf Lagerortebene etc.)</p>
+<p>Bei der Analyse bzw. Fehlersuche musste ich in mehreren Grids einen Filter setzen, z.B. auf das Werk. Das bei verschiedenen Grids ist zwar recht schnell gemacht, aber als ich es öfters machen musste, nervte es schon ziemlich.</p>
+<h2>Magic Filter</h2>
+<p>Dabei hatte ich die Idee, einen Filter global über alle verwendeten Grids zu setzen. Die Idee hat sich in dem unten zur Verfügung gestellten Programm manifestiert. Die Funktionalität ist in der Klasse gekapselt. Der Rest des Codes dient nur dazu, einen dreigeteilten Splitter mit jeweils einem Grid darstellen zu können.</p>
+<p>Jedes Grid registriert sich am Magic-Filter-Controller. In P_FIELD kann ein Feldname gesetzt werden &#8211; z.B. WERKS &#8211; und in S_VALUES können die Werte eingeschränkt werden. Mit &lt;ENTER&gt; wird der Filter auf alle registrierten Grids angewendet.</p>
+<p>Sofern ein Feld nicht im Feldkatalog des Grids ist, wird es vor dem Setzen des Filters gelöscht.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/2015-05-08_18-51-36.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-75509" src="https://tricktresor.com/wp-content/uploads/2015/05/2015-05-08_18-51-36-300x181.png" alt="2015-05-08_18-51-36" width="300" height="181" srcset="/wp-content/uploads/2015/05/2015-05-08_18-51-36-300x181.png 300w, /wp-content/uploads/2015/05/2015-05-08_18-51-36.png 913w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zz_magic_filter.
+
+class lcl_magic_filter DEFINITION DEFERRED.
+DATA gr_gfil      TYPE REF TO lcl_magic_filter.
+DATA gv_value     TYPE c LENGTH 20.
+
+DATA gs_filter    TYPE lvc_s_filt.
+DATA gt_filter    TYPE lvc_t_filt.
+
+DATA gr_docker    TYPE REF TO cl_gui_docking_container.
+
+DATA gr_splitter1 TYPE REF TO cl_gui_easy_splitter_container.
+DATA gr_splitter2 TYPE REF TO cl_gui_easy_splitter_container.
+
+DATA gr_cont1     TYPE REF TO cl_gui_container.
+DATA gr_cont2     TYPE REF TO cl_gui_container.
+DATA gr_cont3     TYPE REF TO cl_gui_container.
+DATA gr_cont4     TYPE REF TO cl_gui_container.
+
+DATA gr_grid1     TYPE REF TO cl_gui_alv_grid.
+DATA gr_grid2     TYPE REF TO cl_gui_alv_grid.
+DATA gr_grid3     TYPE REF TO cl_gui_alv_grid.
+
+TYPES: BEGIN OF ty_1,
+         matnr TYPE matnr,
+         werks TYPE werks_d,
+         lgort TYPE lgort_d,
+         mtart TYPE mtart,
+       END OF ty_1.
+
+TYPES: BEGIN OF ty_2,
+         matnr TYPE matnr,
+         mtart TYPE mtart,
+       END OF ty_2.
+
+TYPES: BEGIN OF ty_3,
+         werks TYPE werks_d,
+         lgort TYPE lgort_d,
+       END OF ty_3.
+
+DATA gt_1 TYPE STANDARD TABLE OF ty_1.
+DATA gt_2 TYPE STANDARD TABLE OF ty_2.
+DATA gt_3 TYPE STANDARD TABLE OF ty_3.
+
+DATA gs_1 TYPE ty_1.
+DATA gs_2 TYPE ty_2.
+DATA gs_3 TYPE ty_3.
+
+
+CLASS lcl_magic_filter DEFINITION.
+
+  PUBLIC SECTION.
+
+    METHODS register
+      IMPORTING
+        ir_grid TYPE REF TO cl_gui_alv_grid .
+    METHODS set_filter
+      IMPORTING
+        filter TYPE lvc_t_filt .
+  PROTECTED SECTION.
+
+    TYPES:
+      BEGIN OF ty_object,
+        grid   TYPE REF TO cl_gui_alv_grid,
+        fcat   TYPE lvc_t_fcat,
+        filter TYPE lvc_t_filt,
+        status TYPE c LENGTH 1,
+      END OF ty_object .
+    TYPES:
+      ty_objects TYPE STANDARD TABLE OF ty_object .
+
+    DATA mt_objects TYPE ty_objects .
+    DATA mt_filter TYPE lvc_t_filt .
+
+    METHODS set_filter_on_objects .
+
+ENDCLASS.
+
+
+
+CLASS lcl_magic_filter IMPLEMENTATION.
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_GFIL_CONTROLLER-&gt;REGISTER
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IR_GRID                        TYPE REF TO CL_GUI_ALV_GRID
+* +--------------------------------------------------------------------------------------
+  METHOD register.
+
+    DATA ls_object LIKE LINE OF mt_objects.
+
+    READ TABLE mt_objects TRANSPORTING NO FIELDS WITH KEY grid = ir_grid.
+    IF sy-subrc &gt; 0.
+*== Objekt hinzufügen
+      ls_object-grid   = ir_grid.
+      ls_object-status = '1'.
+      ir_grid-&gt;get_frontend_fieldcatalog( IMPORTING et_fieldcatalog = ls_object-fcat ).
+      APPEND ls_object TO mt_objects.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_GFIL_CONTROLLER-&gt;SET_FILTER
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] FILTER                         TYPE        LVC_T_FILT
+* +--------------------------------------------------------------------------------------
+  METHOD set_filter.
+
+    mt_filter = filter.
+    set_filter_on_objects( ).
+
+  ENDMETHOD.
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Protected Method ZCL_GFIL_CONTROLLER-&gt;SET_FILTER_ON_OBJECTS
+* +-------------------------------------------------------------------------------------------------+
+* +--------------------------------------------------------------------------------------
+  METHOD set_filter_on_objects.
+
+    DATA lt_filter TYPE lvc_t_filt.
+    DATA lv_index TYPE i.
+
+*== Set filter
+    LOOP AT mt_objects ASSIGNING FIELD-SYMBOL(&lt;object&gt;).
+      lt_filter = mt_filter.
+
+      LOOP AT lt_filter ASSIGNING FIELD-SYMBOL(&lt;filter&gt;).
+        lv_index = sy-tabix.
+        READ TABLE &lt;object&gt;-fcat TRANSPORTING NO FIELDS WITH KEY fieldname = &lt;filter&gt;-fieldname.
+        IF sy-subrc &gt; 0.
+          DELETE lt_filter INDEX lv_index.
+        ENDIF.
+        &lt;object&gt;-grid-&gt;set_filter_criteria( lt_filter ).
+      ENDLOOP.
+      &lt;object&gt;-grid-&gt;refresh_table_display( is_stable = VALUE #( col = 'X' row = 'X' )
+                                            i_soft_refresh = space ).
+    ENDLOOP.
+
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+PARAMETER p_field TYPE fieldname.
+SELECT-OPTIONS s_values FOR gv_value.
+
+INITIALIZATION.
+
+  CREATE OBJECT gr_gfil.
+
+  PERFORM create_base.
+  PERFORM create_1.
+  PERFORM create_2.
+  PERFORM create_3.
+
+
+
+AT SELECTION-SCREEN.
+
+  CLEAR gs_filter.
+  CLEAR gt_filter.
+  gs_filter-fieldname = p_field.
+  LOOP AT s_values.
+    gs_filter-low    = s_values-low.
+    gs_filter-sign   = s_values-sign.
+    gs_filter-option = s_values-option.
+    APPEND gs_filter TO gt_filter.
+  ENDLOOP.
+
+  gr_gfil-&gt;set_filter( gt_filter ).
+
+START-OF-SELECTION.
+
+FORM create_base.
+
+
+  CREATE OBJECT gr_docker
+    EXPORTING
+      side                    = cl_gui_docking_container=&gt;dock_at_bottom
+      ratio                   = 80
+      no_autodef_progid_dynnr = abap_true.
+
+
+  CREATE OBJECT gr_splitter1
+    EXPORTING
+      parent        = gr_docker
+      orientation   = 0
+      sash_position = 50.
+
+  gr_cont1 = gr_splitter1-&gt;top_left_container.
+  gr_cont4 = gr_splitter1-&gt;bottom_right_container.
+
+  CREATE OBJECT gr_splitter2
+    EXPORTING
+      parent        = gr_cont4
+      orientation   = 1
+      sash_position = 50.
+
+  gr_cont2 = gr_splitter2-&gt;top_left_container.
+  gr_cont3 = gr_splitter2-&gt;bottom_right_container.
+
+ENDFORM.
+
+FORM create_1.
+
+  DATA ls_fcat TYPE lvc_s_fcat.
+  DATA lt_fcat TYPE lvc_t_fcat.
+
+  gs_1-matnr = 'A'.
+  gs_1-werks = '1000'.
+  gs_1-lgort = 'A001'.
+  gs_1-mtart = 'FERT'.
+  APPEND gs_1 TO gt_1.
+
+  gs_1-matnr = 'B'.
+  gs_1-werks = '1000'.
+  gs_1-lgort = 'A001'.
+  gs_1-mtart = 'HALB'.
+  APPEND gs_1 TO gt_1.
+
+  gs_1-matnr = 'C'.
+  gs_1-werks = '2000'.
+  gs_1-lgort = 'B001'.
+  gs_1-mtart = 'FERT'.
+  APPEND gs_1 TO gt_1.
+
+  gs_1-matnr = 'C'.
+  gs_1-werks = '1000'.
+  gs_1-lgort = 'A001'.
+  gs_1-mtart = 'FERT'.
+  APPEND gs_1 TO gt_1.
+
+  gs_1-matnr = 'D'.
+  gs_1-werks = '1000'.
+  gs_1-lgort = 'B001'.
+  gs_1-mtart = 'HALB'.
+  APPEND gs_1 TO gt_1.
+
+  ls_fcat-fieldname = 'MATNR'.
+  ls_fcat-rollname  = 'MATNR'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'WERKS'.
+  ls_fcat-rollname  = 'WERKS_D'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'LGORT'.
+  ls_fcat-rollname  = 'LGORT_D'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'MTART'.
+  ls_fcat-rollname  = 'MTART'.
+  APPEND ls_fcat TO lt_fcat.
+
+  PERFORM create_grid USING gr_cont1 lt_fcat gt_1.
+
+ENDFORM.
+
+FORM create_2.
+
+  DATA ls_fcat TYPE lvc_s_fcat.
+  DATA lt_fcat TYPE lvc_t_fcat.
+
+  gs_2-matnr = 'A'.
+  gs_2-mtart = 'FERT'.
+  APPEND gs_2 TO gt_2.
+  gs_2-matnr = 'B'.
+  gs_2-mtart = 'HALB'.
+  APPEND gs_2 TO gt_2.
+  gs_2-matnr = 'C'.
+  gs_2-mtart = 'FERT'.
+  APPEND gs_2 TO gt_2.
+  gs_2-matnr = 'D'.
+  gs_2-mtart = 'HALB'.
+  APPEND gs_2 TO gt_2.
+
+
+  ls_fcat-fieldname = 'MATNR'.
+  ls_fcat-rollname  = 'MATNR'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'MTART'.
+  ls_fcat-rollname  = 'MTART'.
+  APPEND ls_fcat TO lt_fcat.
+
+  PERFORM create_grid USING gr_cont2 lt_fcat gt_2.
+
+ENDFORM.
+
+FORM create_3.
+
+  DATA ls_fcat TYPE lvc_s_fcat.
+  DATA lt_fcat TYPE lvc_t_fcat.
+
+
+  gs_3-werks = '1000'.
+  gs_3-lgort = 'A001'.
+  APPEND gs_3 TO gt_3.
+  gs_3-werks = '2000'.
+  gs_3-lgort = 'A001'.
+  APPEND gs_3 TO gt_3.
+  gs_3-werks = '1000'.
+  gs_3-lgort = 'B001'.
+  APPEND gs_3 TO gt_3.
+  gs_3-werks = '2000'.
+  gs_3-lgort = 'B001'.
+  APPEND gs_3 TO gt_3.
+
+
+
+  ls_fcat-fieldname = 'WERKS'.
+  ls_fcat-rollname  = 'WERKS_D'.
+  APPEND ls_fcat TO lt_fcat.
+  ls_fcat-fieldname = 'LGORT'.
+  ls_fcat-rollname  = 'LGORT_D'.
+  APPEND ls_fcat TO lt_fcat.
+
+  PERFORM create_grid USING gr_cont3 lt_fcat gt_3.
+
+ENDFORM.
+
+FORM create_grid USING ir_container TYPE REF TO cl_gui_container
+                       it_fcat      TYPE lvc_t_fcat
+                       it_table     TYPE table.
+
+  DATA lr_grid TYPE REF TO cl_gui_alv_grid.
+
+  CREATE OBJECT lr_grid
+    EXPORTING
+      i_parent = ir_container.
+
+  lr_grid-&gt;set_table_for_first_display(
+    CHANGING
+      it_outtab                     = it_table
+      it_fieldcatalog               = it_fcat ).
+
+  gr_gfil-&gt;register( lr_grid ).
+
+ENDFORM.
+
+</object></object></filter></object></filter></object></pre>
+<p>Der Beitrag <a href="/blog/magic-filter/">Magic Filter</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/magic-filter/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>&amp;sap_edit Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/sap_edit/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 28 Mar 2019 14:18:12 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>&amp;sap_edit Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SE16 austricksen</title>
+		<link>/blog/se16-austricksen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 05 May 2003 22:49:52 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[se16]]></category>
+		<category><![CDATA[se16n]]></category>
+		<category><![CDATA[tabelle editieren]]></category>
+		<category><![CDATA[&sap_edit]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Debugging]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=34</guid>
+
+					<description><![CDATA[<p>In der SE16 k&#246;nnen eigentlich keine Eintr&#228;ge ge&#228;ndert werden, wenn ein Pflegedialog f&#252;r die Tabelle existiert oder die Tabellenklasse ein &#228;ndern nicht zul&#228;sst. Mit Debugging-BErechtigung geht das aber doch!</p>
+<p>Der Beitrag <a href="/blog/se16-austricksen/">SE16 austricksen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In der SE16 können eigentlich keine Einträge geändert werden, wenn ein Pflegedialog für die Tabelle existiert oder die Tabellenklasse ein ändern nicht zulässt. Mit Debugging-BErechtigung geht das aber doch!</p>
+<p>Wenn Sie die Berechtigung zum Debuggen und Feldinhalte ändern haben, dann können Sie relativ einfach Tabelleneinträge ändern.</p>
+<p>Starten Sie die Tabellenanzeige mit <strong>SE16</strong>, geben Ihre Selektionskriterien ein und führen die Suche aus. In der Übersicht markieren Sie die Einträge, die Sie ändern möchten.</p>
+<p>Geben Sie nun in der OK-Code-Zeile &#8220;<span style="color: #fb2412;">/h</span>&#8221; ein, drücken Sie &lt;Enter&gt;  und machen dann einen Doppelklick auf einen markierten Eintrag.</p>
+<p>Sie gelangen in den Debug-Modus. Drücken Sie hier einmal F7 für die Funktion &#8220;Return&#8221;, geben dann in der Feldzeile die Variable &#8220;CODE&#8221; ein. Der Inhalt ist bisher &#8220;SHOW&#8221;. Ändern Sie ihn in &#8220;<span style="color: #fb2412;">EDIT</span>&#8221; und führen das Programm mit F8 weiter aus.</p>
+<p>Sie können nun die markierten Einträge nach belieben ändern.</p>
+<p>Einziger Wermutstropfen: <span style="color: #f49047;">Die Fremdschlüsselprüfung ist aktiv.</span> Sie können also nur Einträge in die Felder schreiben, die durch eine eventuell aktivierte Fremdschlüsselprüfung aktivert sind.</p>
+<h2 class="head2">Nachtrag</h2>
+<p>In neueren Releases muss folgendermaßen vorgegangen werden:</p>
+<p>Um den Edit Mode der SE16 herbei zu führen muss im Unterprogramm  SET_STATUS_VAL ein Breakpoint gesetzt werden: in Zeile 34 &#8211; if code = &#8216;SHOW&#8217;</p>
+<p>Hier kann dann wie gehabt der CODE auf EDIT oder INSR gesetzt werden.</p>
+<h2 class="head1">Einträge editieren mit SE16n</h2>
+<p><a class="hoverZoomLink" href="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130602.jpg"><img decoding="async" class="alignnone size-medium wp-image-4879 hoverZoomLink" src="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130602-300x125.jpg" alt="Bild_2014_06_25_130602" width="300" height="125" srcset="/wp-content/uploads/2003/05/Bild_2014_06_25_130602-300x125.jpg 300w, /wp-content/uploads/2003/05/Bild_2014_06_25_130602.jpg 343w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Das Ändern von Einträgen mit der <strong>SE16N</strong> ist ebenfalls sehr einfach: Geben Sie einfach, nachdem Sie die zu ändernde Tabelle eingetragen haben, den Funktionscode</p>
+<p class="sap1">&amp;SAP_EDIT</p>
+<p>in die OK-Code-Zeile ein. Es wird dann die Meldung &#8220;SAP-Editierfunktion wurde aktiviert&#8221; ausgegeben und Sie können die Einträge berabeiten.</p>
+<p><span style="color: #fb2412;">Auch in der SE16N ist die Fremdschlüsselprüfung aktiv.</span> Diese kann aber ausgeschaltet werden: Im Selektionsbild der SE16N geben Sie den Funktionscode</p>
+<p class="sap1">&amp;SAP_NO_CHECK</p>
+<p>ein. Dann ist die Fremdschlüsselprüfung deaktiviert. <strong>Diese Funktion ist natürlich mit Vorsicht zu genießen, denn in der Regel haben Fremdschlüsselprüfungen ihren Sinn!!</strong></p>
+<h2 class="head1">Protokoll</h2>
+<p>Die Änderungen, die mit der Transaktion SE16N gemacht werden, werden protokolliert. Diese Änderungen können mit dem <strong>Programm RKSE16N_CD</strong><br />
+ausgewertet werden.</p>
+<h2>Hinweis 1420281</h2>
+<p>In diesem Hinweis ist beschrieben, wie die Editierfunktionalität &amp;sap_edit wieder abgeschaltet werden kann. Ab Release 6.00 wird diese Änderung mit Support Packages 17 &amp; 18 ausgeliefert. Eine Nutzung der funktion &amp;sap_edit ist dann nicht mehr möglich.</p>
+<p>Um trotzdem eine Tabellen ändern zu können, kann man sich &#8211; Feldänderungen im Debugging erlaubt vorausgesetzt &#8211; wie folgt behelfen:</p>
+<ol>
+<li>Aufruf der Transaktion SE16N</li>
+<li>Eingabe des Tabellennamens</li>
+<li>Einschränkung der Werte im Selektionsbild</li>
+<li>/h in OK-Codezeile eingeben (Debugging aktiveren) und Enter drücken</li>
+<li>Selektion ausführen (Funktionstaste F8)</li>
+<li>Im Debugger die Felder gd-edit und gd-sapedit auf X ändern (Siehe Screenshot)</li>
+<li>F8 drücken um fortzufahren</li>
+</ol>
+<p><a href="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130639.jpg"><img fetchpriority="high" decoding="async" class="alignnone wp-image-4878 size-full" src="https://tricktresor.com/wp-content/uploads/2003/05/Bild_2014_06_25_130639.jpg" alt="Bild_2014_06_25_130639" width="483" height="128" srcset="/wp-content/uploads/2003/05/Bild_2014_06_25_130639.jpg 483w, /wp-content/uploads/2003/05/Bild_2014_06_25_130639-300x79.jpg 300w" sizes="(max-width: 483px) 100vw, 483px" /></a></p>
+<h2>Funktionsbaustein SE16N_INTERFACE</h2>
+<p>Noch einfacher lässt sich die Transaktion SE16n &#8220;austricksen&#8221;, indem du gleich den zu Grunde liegenden Funktionsbaustein SE16N_INTERFACE in der SE37 im Testmodus aufrufst.</p>
+<p>Hier kannst du die beiden Parameter I_EDIT und I_SAPEDIT direkt mit einem X vorbelegen.</p>
+<p>Nachteil bei dieser Variante: Es wird sofort die Ergebnisliste ausgegeben, du kannst also keine Vorselektion machen. Das heißt, <em>machen</em> kannst du sie schon, jedoch nur einigermaßen umständlich über den Parameter IT_AND_SELFIELDS.</p>
+<p>Der Beitrag <a href="/blog/se16-austricksen/">SE16 austricksen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

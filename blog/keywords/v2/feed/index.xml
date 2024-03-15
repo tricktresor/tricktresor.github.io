@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>V2 Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/v2/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 07 Dec 2018 14:18:01 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>V2 Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Popup nach verbuchten Daten</title>
+		<link>/blog/popup-nach-verbuchten-daten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Dec 2018 14:17:59 +0000</pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Verbucher]]></category>
+		<category><![CDATA[Verbuchung]]></category>
+		<category><![CDATA[V1]]></category>
+		<category><![CDATA[V2]]></category>
+		<category><![CDATA[TH_POPUP]]></category>
+		<category><![CDATA[UPDATE TASK]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019580</guid>
+
+					<description><![CDATA[<p>Verbuchungsbausteine gehören zu einem SAP-System dazu. In den meisten Anwendungen werden sie kaum noch benötigt oder verwendet. Wenn man sie jedoch verwendet, sollte man wissen, wie. Ich zeige dir hier, wie du den V2-Verbucher geschickt einsetzen kannst.</p>
+<p>Der Beitrag <a href="/blog/popup-nach-verbuchten-daten/">Popup nach verbuchten Daten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Trotz UI5, Webservices und HANA sind Verbuchungsbausteine nach wie vor ein wichtiger Bestandteil eines SAP-Systems. Ein Verbuchungsbaustein ist ein Funktionsbaustein mit der Eigenschaft &#8220;Verbucher&#8221;. </p>
+
+
+
+<figure class="wp-block-image"><img fetchpriority="high" decoding="async" width="438" height="419" src="https://tricktresor.com/wp-content/uploads/2018/12/th_popup2.png" alt="" class="wp-image-1019582" srcset="/wp-content/uploads/2018/12/th_popup2.png 438w, /wp-content/uploads/2018/12/th_popup2-300x287.png 300w" sizes="(max-width: 438px) 100vw, 438px" /><figcaption>Eigenschaften eines Funktionsbausteins</figcaption></figure>
+
+
+
+<p>Ein Verbuchungsbaustein kann wie ein ganz normaler Funktionsbaustein aufgerufen werden. Allerdings kann ein Verbuchungsbaustein keine Rückgabeparameter besitzen, denn mit Aufruf in der Verbuchung &#8211; Zusatz IN UPATE TASK &#8211; wird die Ausführung an einen anderen Prozess übergeben. Läuft bei einem Verbuchungsbaustein etwas schief, dann gibt es einen Kurzdump.</p>
+
+
+
+<h2 class="wp-block-heading">Verbucher</h2>
+
+
+
+<p>Die Verbucherfunktionalität wird in erster Linie dafür genutzt, um das aufwändige Speichern im Hintergrund durchführen zu lassen, so dass der Anwender schnell weiter arbeiten kann. Die Daten, die an die Verbuchung übergeben werden, müssen &#8220;wasserdicht&#8221;, also in sich stimmig und korrekt sein. Es geht also nicht mehr um Prüfungen, sondern um das reine Speichern der Daten. Je nach Prozess kann die Speicherung ziemlich lange dauern. In SAP-Standardanwendungen hat man manchmal das Phänomen, dass man einen Beleg speichert und ihn sofort wieder ändern möchte. Der Beleg befindet sich jedoch noch in der Verbuchung und ist noch gesperrt. </p>
+
+
+
+<h2 class="wp-block-heading">V1- und V2-Verbucher</h2>
+
+
+
+<p>Es gibt V1-Verbucher und V2-Verbucher. Die V1-Verbucher enthalten wichtige Daten, die in jedem Fall verbucht werden müssen und die auch schnellstmöglich verbucht werden sollen. V2-Verbucher werden eingesetzt für zum Beispiel das Fortschreiben von Statistikdaten. Wenn die Statistikdaten nicht vollständig sind, ist es nicht so schlimm. Es rechtfertigt zum Beispiel in keinem Fall, dass der zugehörige Beleg deswegen nicht verbucht werden kann.</p>
+
+
+
+<p>V1-Verbucher haben Vorrang vor V2-Verbuchern. Ein V2-Verbucher wird also erst dann ausgeführt, wenn alle zugehörigen V1-Verbucher erfolgreich verbucht worden sind. Bricht ein V1-Prozess ab, dann werden alle zugehörigen Bausteine, die sich in der Verbuchung befinden, ebenfalls abgebrochen.</p>
+
+
+
+<h2 class="wp-block-heading">V2-Verbucher missbrauchen</h2>
+
+
+
+<p>Bei einigen Prozessen kann das Verbuchen der Daten extrem lange dauern und deswegen sinnvoll sein, den Benutzer nach Beendigung des Buchungsprozesses zu informieren. </p>
+
+
+
+<p>Hierfür kann man den V2-Verbucher sozusagen missbrauchen. Man startet einfach die notwendigen V1-Verbucher und registriert am Ende noch einen V2-Verbucher, der mit Hilfe des Baustein TH_POPUP eine Meldung ausgibt. </p>
+
+
+
+<h3 class="wp-block-heading">TH_POPUP</h3>
+
+
+
+<p>Der Funktionsbaustein TH_POPUP ist ein kleines Systempopup, dass einen Benutzer sofort informiert. Der Benutzer muss dafür im SAP-System angemeldet sein.</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" width="239" height="172" src="https://tricktresor.com/wp-content/uploads/2018/12/th_popup1.png" alt="" class="wp-image-1019581"/><figcaption>TH_POPUP in Aktion</figcaption></figure>
+
+
+
+<p>Du kannst also diesen TH_POPUP in einem V2-Verbuchungsbaustein aufrufen:</p>
+
+
+
+<pre class="wp-block-preformatted">  CALL FUNCTION 'TH_POPUP'<br>    EXPORTING<br>      client  = sy-mandt<br>      user    = sy-uname<br>      message = 'Verbuchung beendet!'.</pre>
+
+
+
+<p>Durch die Reihenfolge ist sichergestellt, dass das Popup erst aufgerufen wird, nachdem alle V1-Verbucher, also der Verbuchungsprozess ansich, beendet wurde.</p>
+
+
+
+<h2 class="wp-block-heading">Aufruf</h2>
+
+
+
+<p>Um die Verbuchung anzustoßen, muss zwingend ein COMMIT WORK erfolgen. Der implizit am Ende eines Programms ausgeführte Commit ist nicht ausreichend!</p>
+
+
+
+<pre class="wp-block-preformatted">  CALL FUNCTION 'Z_TEST_BOOK' IN UPDATE TASK.<br>  CALL FUNCTION 'Z_TEST_BOOK_POPUP' IN UPDATE TASK.<br>  COMMIT WORK.</pre>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/popup-nach-verbuchten-daten/">Popup nach verbuchten Daten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

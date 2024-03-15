@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Materialwirtschaft Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/module/materialwirtschaft/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:57 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Materialwirtschaft Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Selektion für MD04/ MD06 + MS04/06 eingrenzen</title>
+		<link>/blog/selektion-fuer-md04-md06-ms0406-eingrenzen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 29 Jul 2016 15:47:54 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[BAdI]]></category>
+		<category><![CDATA[MD04]]></category>
+		<category><![CDATA[md06]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=750280</guid>
+
+					<description><![CDATA[<p>Je nach Größe und aufkommen in Werk und Dispobereich dauert die Auswertung in den Transaktionen recht lange. Die Standardselektion erlaubt es leider nur sehr begrenzt die Ergebnismenge einzugrenzen – Select-Options vermisst man gänzlich. Dies lässt sich jedoch anpassen...</p>
+<p>Der Beitrag <a href="/blog/selektion-fuer-md04-md06-ms0406-eingrenzen/">Selektion für MD04/ MD06 + MS04/06 eingrenzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Je nach Größe und aufkommen in Werk und Dispobereich dauert die Auswertung in den Transaktionen recht lange. Die Standardselektion erlaubt es leider nur sehr begrenzt die Ergebnismenge einzugrenzen – Select-Options vermisst man gänzlich. Der Benutzer wird oft gezwungen die komplette Liste aufzubauen und anschließend mit Filtern die Datenmenge einzugrenzen.<br />
+Zum Glück bietet die SAP uns hier die Möglichkeit die Situation mittels BAdI MD_EXCLUDE_MATERIAL zu verbessern. Der BAdI erlaubt es im Einstiegsbild einen zusätzlichen Reiter „Zusatzselektion“ einzubinden und dort ein eigenes Dynpro mit einem Selektionsbild einzubinden.</p>
+<h2>Link zur SAP-Doku</h2>
+<p>https://help.sap.com/erp_hcm_ias_2013_01/helpdata/de/45/188147e1235d79e10000000a11466f/content.htm</p>
+<blockquote><p>„SAP empfiehlt, sich stark an der Beispielimplementierung zu orientieren und einen speziellen kundenspezifischen Report analog dem Report RMD07_BADI_SCREEN_EXTENSION01 mit Selektionsscreen 347 und Auswahl-Formroutine zu definieren. Der Selektions-Subscreen muss dann in der Screen-Erweiterung den leeren Subscreen 347 ersetzen, während die Auswahl-Formroutine innerhalb der Methode EXCLUDE_MATERIAL_EVAL aufgerufen werden muss.“</p></blockquote>
+<h2>Demoreport der SAP</h2>
+<p>Report RMD07_BADI_SCREEN_EXTENSION01</p>
+<h2>Beispiel</h2>
+<p>Beispielsweise könnte das wie folgt aussehen:</p>
+<figure id="attachment_750281" aria-describedby="caption-attachment-750281" style="width: 547px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2016/07/2016-07-29_17-35-45.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-750281" src="https://tricktresor.com/wp-content/uploads/2016/07/2016-07-29_17-35-45.jpg" alt="Erweiterung der Selektionsoptionen bei MD04" width="547" height="444" srcset="/wp-content/uploads/2016/07/2016-07-29_17-35-45.jpg 547w, /wp-content/uploads/2016/07/2016-07-29_17-35-45-300x244.jpg 300w" sizes="(max-width: 547px) 100vw, 547px" /></a><figcaption id="caption-attachment-750281" class="wp-caption-text">Erweiterung der Selektionsoptionen bei MD04</figcaption></figure>
+<p>Vor der Auswertung der Dispositionsdaten wird dann für jedes Material im Dispobereich die BAdI-Methode gerufen und die Möglichkeit gegeben das Material aus der Auswertung auszuschließen.<br />
+Unbefriediegend dabei ist, dass die „Speichern“ Funktion des Standards die Eingabewert im Subscreen nicht mit speichert und entsprechend beim Start der Transaktion nicht wiederherstellt. Zum Glück erlaubt uns das Sel-Screen Eventing die entsprechenden Zeitpunkte ebenfalls abzuhandeln und das so zu ermöglichen. *** Einmalig beim Start der Transaktion gespeicherte Daten wiederherstellen via FuBa RS_SUPPORT_SELECTIONS</p>
+<pre>CASE sy-ucomm. 
+  WHEN 'YES'. 
+*** Wiederherstellen Selektionsbild via FuBa RS_SUPPORT_SELECTIONS wenn 
+*** der Benutzer zurück aus der Auswertung kommt. 
+  WHEN 'SAVP'. 
+*** Speichern des Selektionsbild via FuBa RS_REFRESH_FROM_SELECTOPTIONS 
+*** und RS_CHANGE_CREATED_VARIANT_255 bzw. RS_CREATE_VARIANT_255 
+ENDCASE.</pre>
+<p>Der Beitrag <a href="/blog/selektion-fuer-md04-md06-ms0406-eingrenzen/">Selektion für MD04/ MD06 + MS04/06 eingrenzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>MD04 Start/Freigabedatum anzeigen</title>
+		<link>/blog/md04-startfreigabedatum-anzeigen/</link>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Sun, 31 Jan 2016 15:34:37 +0000</pubDate>
+				<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[Module]]></category>
+		<category><![CDATA[Starttermin]]></category>
+		<category><![CDATA[Trick]]></category>
+		<category><![CDATA[MD04]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=142419</guid>
+
+					<description><![CDATA[<p>In der Bedarfs/Bestandsliste stehen alle Banfen und Planaufträge. Schön nach Datum sortiert mit dem Hinweis wann das Material im Werk sein soll. Speziell bei plangesteuerter Disposition &#8211; mit Bedarfen in der Zukunft &#8211; stellt sich aber oftmals die Frage wann man denn die Banf in eine Bestellung umwandeln muss. Hierzu kann man die im Standard ausgeblendete Spalte &#8220;Start-/Freigabedatum&#8221; einblenden lassen. Dort steht dann das Datum des Bedarfstermins minus der Wiederbeschaffungszeit, also der Tag an dem...</p>
+<p>Der Beitrag <a href="/blog/md04-startfreigabedatum-anzeigen/">MD04 Start/Freigabedatum anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In der Bedarfs/Bestandsliste stehen alle Banfen und Planaufträge. Schön nach Datum sortiert mit dem Hinweis wann das Material im Werk sein soll.<br />
+Speziell bei plangesteuerter Disposition &#8211; mit Bedarfen in der Zukunft &#8211; stellt sich aber oftmals die Frage wann man denn die Banf in eine Bestellung umwandeln muss.</p>
+<p>Hierzu kann man die im Standard ausgeblendete Spalte &#8220;Start-/Freigabedatum&#8221; einblenden lassen.<br />
+Dort steht dann das Datum des Bedarfstermins minus der Wiederbeschaffungszeit, also der Tag an dem die Banf spätestens umgesetzt werden soll.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/07/d11.jpg"><img decoding="async" class="alignnone size-medium wp-image-142492" src="https://tricktresor.com/wp-content/uploads/2015/07/d11-300x105.jpg" alt="MD04" width="300" height="105" srcset="/wp-content/uploads/2015/07/d11-300x105.jpg 300w, /wp-content/uploads/2015/07/d11.jpg 594w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Zum Einblenden muss man mit dem Mauszeiger genau zwischen 2 Spalten bis sich der Mauszeiger von &#8220;verschieben/Größe ändern&#8221; zu &#8220;einblenden&#8221; ändert.<br />
+(2 parallele Balken mit Pfeilen nach links und rechts) (neben dem Feld &#8220;Dispoelement&#8221;). Dieses Vorgehen muss 2 mal wiederholt werden, bis die Spalte &#8220;Start-/Freigabedatum&#8221; erscheint.</p>
+<p>Danach kann das Layout gespeichert werden.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/07/d2.jpg"><img decoding="async" class="alignnone size-medium wp-image-142421" src="https://tricktresor.com/wp-content/uploads/2015/07/d2-300x165.jpg" alt="Layout speichern MD04" width="300" height="165" srcset="/wp-content/uploads/2015/07/d2-300x165.jpg 300w, /wp-content/uploads/2015/07/d2.jpg 940w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>wie immer &#8220;aktivieren&#8221; und schon wird die Spalte dauerhaft eingeblendet.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/07/d3.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-142422" src="https://tricktresor.com/wp-content/uploads/2015/07/d3-250x300.jpg" alt="Layout aktivieren" width="250" height="300" srcset="/wp-content/uploads/2015/07/d3-250x300.jpg 250w, /wp-content/uploads/2015/07/d3.jpg 446w" sizes="(max-width: 250px) 100vw, 250px" /></a></p>
+<p>Kleiner Trick &#8211; große Hilfe <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>AWI, 06/2015</p>
+<h3>Transaktionen</h3>
+<p>MD04</p>
+<p>Der Beitrag <a href="/blog/md04-startfreigabedatum-anzeigen/">MD04 Start/Freigabedatum anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>GLD Entwicklung</title>
+		<link>/blog/gld-entwicklung/</link>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Tue, 09 Dec 2014 06:00:00 +0000</pubDate>
+				<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[Module]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[Buchung]]></category>
+		<category><![CDATA[Preise]]></category>
+		<category><![CDATA[Durchschnittspreis]]></category>
+		<category><![CDATA[Materialbeleg]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5170</guid>
+
+					<description><![CDATA[<p>Oftmals die Gretchenfrage als MMler. Wie kam es dazu, dass der gleitende Durchschnittspreis Achterbahn fährt.</p>
+<p>Der Beitrag <a href="/blog/gld-entwicklung/">GLD Entwicklung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Oftmals die Gretchenfrage als MMler.<br />
+Wie ist es dazu gekommen, dass der gleitende Durchschnittspreis (GLD) eines Materials sich verändert hat? Welcher Materialbeleg ist schuld daran?</p>
+<p>Einflussfaktoren gibt es viele. Die üblichen Verdächtigen sind:</p>
+<ul>
+<li>Bestellungen</li>
+<li>Rechnungen</li>
+<li>Retourenbestellungen</li>
+<li>Gutschriften</li>
+<li>Umbewertungen</li>
+<li>&#8220;wilde MIGO Buchungen&#8221; mit Wertangabe <em>(ja das geht&#8230;)</em></li>
+<li>Umlagerungen &#8220;Werk an Werk&#8221;</li>
+<li>&#8230;</li>
+</ul>
+<p>Die Transaktion S_P00_07000139 aus dem Thailändischen Steuerrecht (?) zeigt wenigstens halbwegs, wie und mit welchem Beleg sich der GLD verändert hat.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/12/S_P00_07000139.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5174" src="https://tricktresor.com/wp-content/uploads/2014/12/S_P00_07000139-245x300.png" alt="S_P00_07000139" width="245" height="300" srcset="/wp-content/uploads/2014/12/S_P00_07000139-245x300.png 245w, /wp-content/uploads/2014/12/S_P00_07000139.png 566w" sizes="(max-width: 245px) 100vw, 245px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/12/gld_entwicklung.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5171" src="https://tricktresor.com/wp-content/uploads/2014/12/gld_entwicklung-300x119.png" alt="gld_entwicklung" width="300" height="119" srcset="/wp-content/uploads/2014/12/gld_entwicklung-300x119.png 300w, /wp-content/uploads/2014/12/gld_entwicklung-1024x407.png 1024w, /wp-content/uploads/2014/12/gld_entwicklung-624x248.png 624w, /wp-content/uploads/2014/12/gld_entwicklung.png 1335w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>1&#8211;&gt; 2 &#8211;&gt; 3Wert und Menge ergeben den GLD<br />
+4&#8211;&gt;5 Bestandswert reduziert um Buchungswert ergibt den neuen GLD</p>
+<p>Im Layout kann man sich noch diverse Zusatzinformationen einblenden lassen.</p>
+<h3>Tabellen rund um das Thema GLD:</h3>
+<table>
+<tbody>
+<tr>
+<td>MBEW</td>
+<td>Materialbewertung</td>
+</tr>
+<tr>
+<td>MBEWH</td>
+<td>Materialbewertung Historie</td>
+</tr>
+<tr>
+<td>QBEW</td>
+<td>Projektbestand</td>
+</tr>
+<tr>
+<td>EBEW</td>
+<td>Kundeneinzel- / Transitbestand</td>
+</tr>
+</tbody>
+</table>
+<h3>sinnvolle OSS Hinweise zur Transaktion:</h3>
+<table>
+<tbody>
+<tr>
+<td>1327549</td>
+</tr>
+<tr>
+<td>1175356</td>
+</tr>
+</tbody>
+</table>
+<h2>Alternative</h2>
+<p>Mithilfe des Programms <a href="https://wiki.scn.sap.com/wiki/display/ERPSCM/Unexpected+changes+in+the+Moving+Average+Price+-+MBMAPCHANGES">MBMAPCHANGES </a>kann die Entwicklung des gleitenden Durchschnittspreises ebenfalls nachvollzogen werden. Das Programm ist dokumentiert. Nachfolgend die ersten Absätze der Programmdokumentation:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/12/2016-11-02_13-04-49.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-903107 alignright" src="https://tricktresor.com/wp-content/uploads/2014/12/2016-11-02_13-04-49.jpg" alt="2016-11-02_13-04-49" width="530" height="353" srcset="/wp-content/uploads/2014/12/2016-11-02_13-04-49.jpg 530w, /wp-content/uploads/2014/12/2016-11-02_13-04-49-300x200.jpg 300w, /wp-content/uploads/2014/12/2016-11-02_13-04-49-480x320.jpg 480w" sizes="(max-width: 530px) 100vw, 530px" /></a></p>
+<h3>Kurztext</h3>
+<p>Änderungsanalyse für gleitenden Durchschnittspreis</p>
+<h3>Verwendung</h3>
+<p>Dieser Report dient zum Bereitstellen eines Werkzeugs, das die Analyse von Änderungen am gleitenden Durchschnittspreis für bestimmte Materialen ermöglicht. Es können zahlreiche Belege vorhanden sein, die den V-Preis ändern: Materialbelege, Rechnungsbelege, Kontenpflegebelege, Material-Ledger-Belege, Fertigungsabrechnungsbelege usw. Daher ist es nicht immer einfach, zu ermitteln, warum und wie der V-Preis geändert wurde. Dieses Werkzeug stellt einen zentralen Zugriffspunkt zur Anzeige aller dieser Belege zur Verfügung und ermöglicht es Endbenutzern, einen Schwellenwert &amp; zu ermitteln, über dem die Änderungen des gleitenden Durchschnittspreises als signifikant betrachtet werden.</p>
+<h3>Funktionsumfang</h3>
+<p>Der Report kann für beide Preissteuerungsarten S und V ausgeführt werden. Die statistischen GLD-Änderungen an standardpreisgesteuerten Materialien sind jedoch nicht immer verlässlich und daher sollten diese Beleglisten und -kennzahlen entsprechend interpretiert werden. (Siehe Abschnitt &#8220;Änderungen des statistischen gleitenden Durchschnittspreises&#8221;)</p>
+<p>Es ist möglich, über einen Doppelklick auf Zeilen der Ausgabeliste zu den entsprechenden Referenzbelegen zu navigieren.<br />
+Wenn ein Doppelklick auf die Statussymbole ausgeführt wird, wird ein Dialogfenster mit zusätzlichen Informationen und weiteren Navigationsoptionen zu den Referenzbelegen oder der Anwendungsdokumentation geöffnet.</p>
+<h4>Legende anzeigen:</h4>
+<ul style="list-style-type: square;">
+<li><strong>Blaue Zeilen:</strong><br />
+Belege, in denen die Preisänderungen in den Prozentsatz des hervorgehobenen Schwellenwerts fallen.</li>
+<li><strong>Rote Zeilen:</strong><br />
+Belege, in denen die Preisänderung eines V-preisgesteuerten Materials den Prozentsatz des Schwellenwerts übersteigt.<br />
+(Siehe Abschnitt &#8220;Signifikante Änderungen des gleitenden Durchschnittspreises&#8221;)</li>
+<li><strong>Gelbe Zeilen:</strong><br />
+Belege, in denen die Preisänderung eines S-preisgesteuerten Materials den Prozentsatz des Schwellenwerts übersteigt.<br />
+(Siehe Abschnitt &#8220;Änderungen des statistischen gleitenden Durchschnittspreises&#8221;)</li>
+<li><strong>Gelbe Zeilen mit roter Hervorhebung:</strong><br />
+In der vorherigen Periode gebuchten Belege, in denen die Preisänderung den Prozentsatz des Schwellenwerts übersteigt.<br />
+(Siehe Abschnitt &#8220;Rückbuchungsszenarios&#8221;)</li>
+<li><strong>Gelbe Zeilen mit blauer Hervorhebung:</strong><br />
+In der vorherigen Periode gebuchten Belege, in denen die Preisänderungen in den Prozentsatz des hervorgehobenen Schwellenwerts fallen.<br />
+(Siehe Abschnitt &#8220;Rückbuchungsszenarios&#8221;)</li>
+</ul>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/gld-entwicklung/">GLD Entwicklung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Customizing übersetzen</title>
+		<link>/blog/customizing-uebersetzen/</link>
+					<comments>/blog/customizing-uebersetzen/#comments</comments>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Sat, 29 Nov 2014 00:00:00 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<category><![CDATA[Übersetzung]]></category>
+		<category><![CDATA[Rollout]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5154</guid>
+
+					<description><![CDATA[<p>Neuer Rollout &#8211; Neues Glück. Spätestens beim ersten internationalen Rollout kommt die Frage auf welche Customizing Objekte zu übersetzen sind. In der SPRO ist &#8211; etwas versteckt &#8211; eine sehr nützliche Standard-Funktion. &#160; &#160;</p>
+<p>Der Beitrag <a href="/blog/customizing-uebersetzen/">Customizing übersetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Neuer Rollout &#8211; Neues Glück.<br />
+Spätestens beim ersten internationalen Rollout kommt die Frage auf welche Customizing Objekte zu übersetzen sind.<br />
+In der SPRO ist &#8211; etwas versteckt &#8211; eine sehr nützliche Standard-Funktion.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/Spro-übersetzung.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5155" src="https://tricktresor.com/wp-content/uploads/2014/11/Spro-übersetzung-259x300.png" alt="Spro übersetzung" width="259" height="300" srcset="/wp-content/uploads/2014/11/Spro-übersetzung-259x300.png 259w, /wp-content/uploads/2014/11/Spro-übersetzung-624x720.png 624w, /wp-content/uploads/2014/11/Spro-übersetzung.png 846w" sizes="(max-width: 259px) 100vw, 259px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/uebersetzung2.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5156" src="https://tricktresor.com/wp-content/uploads/2014/11/uebersetzung2-300x234.png" alt="uebersetzung2" width="300" height="234" srcset="/wp-content/uploads/2014/11/uebersetzung2-300x234.png 300w, /wp-content/uploads/2014/11/uebersetzung2-624x487.png 624w, /wp-content/uploads/2014/11/uebersetzung2.png 907w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/customizing-uebersetzen/">Customizing übersetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/customizing-uebersetzen/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>MM Konditionen lieferantenabhängig umbenennen</title>
+		<link>/blog/mm-konditionen-lieferantenabhaengig-umbenennen-trickskniffe-mm/</link>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Tue, 18 Nov 2014 10:33:56 +0000</pubDate>
+				<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[MM]]></category>
+		<category><![CDATA[SD]]></category>
+		<category><![CDATA[Einkauf]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5128</guid>
+
+					<description><![CDATA[<p>Oftmals wird vom Einkauf ein Blumenstrauß an Konditionen gefordert um diverse Zusatzkosten oder Rabatte erfassen zu können.<br />
+Dieser Beitrag zeigt, wie man MM Konditionen im Standard lieferantenspezifisch umbenennen kann.</p>
+<p>Der Beitrag <a href="/blog/mm-konditionen-lieferantenabhaengig-umbenennen-trickskniffe-mm/">MM Konditionen lieferantenabhängig umbenennen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Oftmals wird vom Einkauf ein Blumenstrauß an Konditionen gefordert um diverse Zusatzkosten oder Rabatte erfassen zu können.<br />
+Sägekostenzuschlag, Anbruchzuschlag, Maut, Sonderkosten, Rüstkosten, Sonderrüstkosten, &#8220;China-Verpackung&#8221;, 10-Jahres-Rabatt, Verhandelter Preis, Angebotspreis, Messepreis, Messerabatt  usw. usw. usw.<br />
+Bei jedem Lieferanten werden diese Konditionen unterschiedlich benannt.</p>
+<p>Technisch sind diese meistens absolut identisch ausgeprägt und im schlimmsten Fall auch noch prozentual, absolut und mengenbezogen multipliziert angelegt.</p>
+<p>Eine kaum bekannte und gut versteckte Funktion im Einkaufsinfosatz (ME12) ermöglicht die Umbenennung von Konditionen.<br />
+Genau das richtige Werkzeug um diese Anforderung abzudecken ohne das Kalkschema unnötig aufzublähen.</p>
+<h3>Ablauf:</h3>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition1.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5134" src="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition1-300x141.png" alt="MM_Kurztext Kondition1" width="300" height="141" srcset="/wp-content/uploads/2014/11/MM_Kurztext-Kondition1-300x141.png 300w, /wp-content/uploads/2014/11/MM_Kurztext-Kondition1.png 608w" sizes="(max-width: 300px) 100vw, 300px" /></a><a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition6.png"><br />
+</a>Im Infosatz &#8211;&gt; Konditionen &#8211;&gt; eine Kondition erfassen (funktioniert natürlich auch mit dem PB00 Preis)</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition2.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5133" src="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition2-300x123.png" alt="MM_Kurztext Kondition2" width="300" height="123" srcset="/wp-content/uploads/2014/11/MM_Kurztext-Kondition2-300x123.png 300w, /wp-content/uploads/2014/11/MM_Kurztext-Kondition2.png 609w" sizes="(max-width: 300px) 100vw, 300px" /></a><br />
+Zusätz &#8211;&gt; Kurztext zur Konditionsart<a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition5.png"><br />
+</a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition3.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5132" src="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition3-300x147.png" alt="MM_Kurztext Kondition3" width="300" height="147" srcset="/wp-content/uploads/2014/11/MM_Kurztext-Kondition3-300x147.png 300w, /wp-content/uploads/2014/11/MM_Kurztext-Kondition3-624x307.png 624w, /wp-content/uploads/2014/11/MM_Kurztext-Kondition3.png 631w" sizes="(max-width: 300px) 100vw, 300px" /></a> <a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition4.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5131" src="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition4-300x117.png" alt="MM_Kurztext Kondition4" width="300" height="117" srcset="/wp-content/uploads/2014/11/MM_Kurztext-Kondition4-300x117.png 300w, /wp-content/uploads/2014/11/MM_Kurztext-Kondition4.png 623w" sizes="(max-width: 300px) 100vw, 300px" /></a><a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition5.png"><br />
+</a>Dort &#8220;Neue Einträge&#8221; aus dem Menü anwählen und die Kondition entsprechend umbenennen.<a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition5.png"><br />
+</a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition5.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5130" src="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition5-300x137.png" alt="MM_Kurztext Kondition5" width="300" height="137" srcset="/wp-content/uploads/2014/11/MM_Kurztext-Kondition5-300x137.png 300w, /wp-content/uploads/2014/11/MM_Kurztext-Kondition5.png 604w" sizes="(max-width: 300px) 100vw, 300px" /></a><a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition5.png"><br />
+</a>Im Infosatz sieht man sofort das gewünschte Ergebnis.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition6.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5129" src="https://tricktresor.com/wp-content/uploads/2014/11/MM_Kurztext-Kondition6-300x160.png" alt="MM_Kurztext Kondition6" width="300" height="160" srcset="/wp-content/uploads/2014/11/MM_Kurztext-Kondition6-300x160.png 300w, /wp-content/uploads/2014/11/MM_Kurztext-Kondition6-1024x547.png 1024w, /wp-content/uploads/2014/11/MM_Kurztext-Kondition6-624x333.png 624w, /wp-content/uploads/2014/11/MM_Kurztext-Kondition6.png 1177w" sizes="(max-width: 300px) 100vw, 300px" /></a><br />
+Entsprechend wird der neue Konditions-Kurztext in der Bestellung und je nach Formular auch auf dem Papier angezeigt.</p>
+<h4>Tipps am Rande:</h4>
+<table>
+<tbody>
+<tr>
+<td><strong>Modul</strong></td>
+<td><strong>Transaktion</strong></td>
+<td><strong>Funktion</strong></td>
+</tr>
+<tr>
+<td>MM</td>
+<td>m/03</td>
+<td>Konditionstabelle anlegen</td>
+</tr>
+<tr>
+<td>MM</td>
+<td>m/04</td>
+<td>Konditionstabelle ändern</td>
+</tr>
+<tr>
+<td>MM</td>
+<td>m/05</td>
+<td>Konditionstabelle pflegen</td>
+</tr>
+<tr>
+<td>MM</td>
+<td>m/06</td>
+<td>Konditionsarten MM pflegen</td>
+</tr>
+<tr>
+<td>MM</td>
+<td>m/07</td>
+<td>Zugriffsfolgen</td>
+</tr>
+<tr>
+<td>MM</td>
+<td>m/08</td>
+<td>MM Kalkulationsschema</td>
+</tr>
+<tr>
+<td>SD</td>
+<td>vok0</td>
+<td>Im Menü dieser Transaktion findet sich so ziemlich alles zu SD Konditionen.<br />
+Gibt es leider nicht für die MM Seite <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f641.png" alt="🙁" class="wp-smiley" style="height: 1em; max-height: 1em;" /></td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p>AWI 18.11.2014</p>
+<p>Der Beitrag <a href="/blog/mm-konditionen-lieferantenabhaengig-umbenennen-trickskniffe-mm/">MM Konditionen lieferantenabhängig umbenennen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Kleinigkeiten</title>
+		<link>/blog/kleinigkeiten-4/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 02 Oct 2008 15:09:40 +0000</pubDate>
+				<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[Einkauf]]></category>
+		<category><![CDATA[MM - Einkauf]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=510</guid>
+
+					<description><![CDATA[<p>Einige kleine Tipps rund um den Einkauf...</p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-4/">Kleinigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Einige kleine Tipps rund um den Einkauf&#8230;<br /><SPAN lang="DE"><P class="head1">ALV Grid Control im Einkaufsreporting verwenden</P><P>In den Benutzerdaten den Parameter <STRONG>ME_USE_GRID = X</STRONG> hinterlegen, dann werden die Auswertungen im Einkaufsreporting als ALV Grid Control ausgegeben. </P></SPAN></p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-4/">Kleinigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Kleinigkeiten</title>
+		<link>/blog/kleinigkeiten-3/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 08 Apr 2008 17:18:11 +0000</pubDate>
+				<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[MM]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=472</guid>
+
+					<description><![CDATA[<p>Hier sammeln wir Kleinigkeiten rund um Materialst&#228;mme, Warenbewegungen, Bewertungsklassen &#38; Co.</p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-3/">Kleinigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier sammeln wir Kleinigkeiten rund um Materialst&auml;mme, Warenbewegungen, Bewertungsklassen &amp; Co.<br /><P class="head1">Transaktion RWBE</P><P>Mit dieser Transaktion k&ouml;nnen Sie sich die Best&auml;nde zu mehreren Materialst&auml;mmen ansehen. Auf Wunsch auch als Baumdarstellung.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-3/">Kleinigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Material per BAPI ändern</title>
+		<link>/blog/material-per-bapi-aendern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 27 Jan 2004 17:31:15 +0000</pubDate>
+				<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[MM]]></category>
+		<category><![CDATA[Materialstamm]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=169</guid>
+
+					<description><![CDATA[<p>&#196;nderung eines Material mittels BAPI. Wem der Baustein MATERIAL_MAINTAIN_DARK zu undurchschaubar ist, der kommt mit diesem BAPI sicherlich besser klar.</p>
+<p>Der Beitrag <a href="/blog/material-per-bapi-aendern/">Material per BAPI ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>&Auml;nderung eines Material mittels BAPI. Wem der Baustein MATERIAL_MAINTAIN_DARK zu undurchschaubar ist, der kommt mit diesem BAPI sicherlich besser klar.<br /><P>Der Funktionsbaustein <STRONG>BAPI_MATERIAL_SAVEDATA </STRONG>kann gut verwendet werden, um den Kurztext eines Materials zu &auml;ndern:</P><P>Hierzu muss die Tabelle <STRONG>MATERIALDESCRIPTION </STRONG>entsprechend gef&uuml;llt werden.</P><P>Nat&uuml;rlich k&ouml;nnen auch&nbsp;andere Felder mit diesem BAPI ge&auml;ndert werden. Schauen Sie in die Dokumentation f&uuml;r eine genaue Beschreibung.</P></p>
+<p>Der Beitrag <a href="/blog/material-per-bapi-aendern/">Material per BAPI ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Materialsichten als Baumstruktur anzeigen</title>
+		<link>/blog/materialsichten-als-baumstruktur-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 05 Dec 2003 16:38:43 +0000</pubDate>
+				<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[MM]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=161</guid>
+
+					<description><![CDATA[<p>Der Materialstamm zu mehreren Materialien l&#228;sst sich komfortabel mit einem SAP-Standardprogramm anzeigen. Die Ausf&#252;hrung in einem Kundensystem ist zwar nicht vorgesehen, aber der Report l&#228;sst sich ja auch kopieren...</p>
+<p>Der Beitrag <a href="/blog/materialsichten-als-baumstruktur-anzeigen/">Materialsichten als Baumstruktur anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der Materialstamm zu mehreren Materialien l&auml;sst sich komfortabel mit einem SAP-Standardprogramm anzeigen. Die Ausf&uuml;hrung in einem Kundensystem ist zwar nicht vorgesehen, aber der Report l&auml;sst sich ja auch kopieren&#8230;<br /><P>Mit dem Report <STRONG>RMMMTREE</STRONG> ist es m&ouml;glich, sich die Materialsichten zu mehreren Materialst&auml;mmen anzeigen zu lassen.</P><P>In der INITIALIZATION-Section wird zwar gepr&uuml;ft, ob es sich um ein SAP-eigenes System handelt, dies kann aber mit Debugging-Berechtigung und der Berechtigung einen Feldwert zu &auml;ndern umgangen werden.</P><P>Wenn Sie diesen Report hilfreich finden, k&ouml;nnen Sie ihn ja auch kopieren und den Aufruf RH_CHECK_SYSTEM_TYPE entfernen.</P><P>Zus&auml;tzlich m&uuml;ssen Sie noch Ihren Programmnamen in der Zeile</P><FONT size="2"><P class="sap1">PROG LIKE SY-REPID VALUE &#8216;RMMTREE&#8217;,</P><P>eintragen, damit Sie mit einem Doppelklick die Dateninhalte aus der Baumstruktur aufrufen k&ouml;nnen.</P></FONT></p>
+<p>Der Beitrag <a href="/blog/materialsichten-als-baumstruktur-anzeigen/">Materialsichten als Baumstruktur anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Massenpflege</title>
+		<link>/blog/massenpflege/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 25 Aug 2003 20:21:33 +0000</pubDate>
+				<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[Chargen]]></category>
+		<category><![CDATA[MM]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=126</guid>
+
+					<description><![CDATA[<p>Massenpflege von Chargen. Diese Transaktion ist anscheinend noch nicht ins Men&#252; eingebunden.</p>
+<p>Der Beitrag <a href="/blog/massenpflege/">Massenpflege</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Massenpflege von Chargen. Diese Transaktion ist anscheinend noch nicht ins Men&uuml; eingebunden.<br />Mit der Transaktion <FONT>MSC5N </FONT>k&ouml;nnen Chargen massenweise ge&auml;ndert werden. Die Transaktion h&auml;lt auf der linken Seite die selektierten Chargen in einer Baumstruktur, w&auml;hrend im rechten Teil des Dynpros ge&auml;ndert werden kann.</p>
+<p>Der Beitrag <a href="/blog/massenpflege/">Massenpflege</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

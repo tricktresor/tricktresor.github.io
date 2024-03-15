@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Gruppenstufe Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/gruppenstufe/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:52 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Gruppenstufe Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Gruppensummenstufenberechnung</title>
+		<link>/blog/gruppensummenstufenberechnung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 15 Dec 2015 22:06:40 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Gruppe]]></category>
+		<category><![CDATA[Gruppenstufe]]></category>
+		<category><![CDATA[refresh]]></category>
+		<category><![CDATA[soft-refresh]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=389721</guid>
+
+					<description><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten...</p>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten&#8230;</p>
+<p>Vielen Dank an Stefan, der sich die Mühe gemacht hat, ein Minimaldemo zu erstellen.</p>
+<h2>Gruppenstufen</h2>
+<p>Nach dem Start des Demoprogramms erscheint ein &#8220;normaler&#8221; ALV mit Daten aus der Flugdatenbank:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" rel="attachment wp-att-389724"><img fetchpriority="high" decoding="async" class="alignnone wp-image-389724 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" alt="2015-12-15_22-48-55" width="741" height="327" srcset="/wp-content/uploads/2015/12/2015-12-15_22-48-55.png 741w, /wp-content/uploads/2015/12/2015-12-15_22-48-55-300x132.png 300w" sizes="(max-width: 741px) 100vw, 741px" /></a></p>
+<p>Bei normaler Summierung und Bildung von Gruppenstufen, gibt es keine Bezeichnung der gebildeten Gruppen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" rel="attachment wp-att-389725"><img decoding="async" class="alignnone size-full wp-image-389725" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" alt="2015-12-15_22-50-50" width="740" height="285" srcset="/wp-content/uploads/2015/12/2015-12-15_22-50-50.png 740w, /wp-content/uploads/2015/12/2015-12-15_22-50-50-300x116.png 300w" sizes="(max-width: 740px) 100vw, 740px" /></a></p>
+<p>Die Bildung der Gruppenbezeichnung kann sehr komplex werden. Das Beispiel demonstriert die Bezeichnung der Gruppenstufen im Feld &#8220;PLANETYPE&#8221;:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" rel="attachment wp-att-389723"><img decoding="async" class="alignnone wp-image-389723 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" alt="2015-12-15_22-41-44" width="752" height="322" srcset="/wp-content/uploads/2015/12/2015-12-15_22-41-44.png 752w, /wp-content/uploads/2015/12/2015-12-15_22-41-44-300x128.png 300w" sizes="(max-width: 752px) 100vw, 752px" /></a></p>
+<p>&nbsp;</p>
+<h2>Code</h2>
+<pre>REPORT zdemo_alv_summenzeilen.
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_helper DEFINITION FINAL.
+ PUBLIC SECTION.
+
+ CLASS-METHODS: read_data,
+ display,
+ handle_after_user_command FOR EVENT after_user_command OF cl_gui_alv_grid,
+ summenzeilen_anpassen.
+
+ CLASS-DATA: mo_grid TYPE REF TO cl_gui_alv_grid,
+ mt_data TYPE STANDARD TABLE OF saplane WITH NON-UNIQUE DEFAULT KEY.
+ENDCLASS. "lcl_helper DEFINITION
+
+
+START-OF-SELECTION.
+ lcl_helper=&gt;read_data( ).
+
+END-OF-SELECTION.
+ lcl_helper=&gt;display( ).
+
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_helper IMPLEMENTATION.
+
+ METHOD read_data.
+
+ SELECT *
+ INTO TABLE mt_data
+ FROM saplane.
+
+ ENDMETHOD. "read_data
+
+ METHOD display.
+
+ DATA: ls_variant TYPE disvariant.
+ WRITE:/ 'Wenn man das hier liest, ist ein interner Fehler aufgetreten'. "#EC NOTEXT
+
+*--------------------------------------------------------------------*
+* ALV erzeugen
+*--------------------------------------------------------------------*
+ CREATE OBJECT mo_grid
+ EXPORTING
+ i_parent = cl_gui_container=&gt;screen0
+ EXCEPTIONS
+ OTHERS = 1.
+
+*--------------------------------------------------------------------*
+* Event AFTER_USER_COMMAND nutzbar machen
+* Da sehr viele Usercommands ( auch SAP-Usercommands ) implizit einen
+* full-refresh des Grid durchführen, müssen wir uns stets dahinter klemmen
+* um unsere eigene Zwischensummenzeilengenerierung zu erhalten
+*--------------------------------------------------------------------*
+ SET HANDLER handle_after_user_command FOR mo_grid.
+
+*--------------------------------------------------------------------*
+* Defaultlayouts ermöglichen, um Zwischensummen ohne Userinteraktion zu demonstrieren
+*--------------------------------------------------------------------*
+ ls_variant-handle = '0001'.
+ ls_variant-report = sy-repid.
+
+*--------------------------------------------------------------------*
+* Anzeigen des grid
+*--------------------------------------------------------------------*
+ mo_grid-&gt;set_table_for_first_display( EXPORTING
+ i_structure_name = 'SAPLANE'
+ is_variant = ls_variant
+ i_save = 'A'
+ i_default = 'X'
+ CHANGING
+ it_outtab = mt_data
+ EXCEPTIONS
+ OTHERS = 1 ).
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "display
+
+ METHOD handle_after_user_command.
+*--------------------------------------------------------------------*
+* SAP hat evtl. noch keinen Refresh gemacht.
+* Daher würden Änderungen, die in der Methode summenzeilen_anpassen
+* gemacht und dann mit soft-refresh an den Grid gereicht würden im
+* Nachgang durch den ausstehenden full-refresh zunichte gemacht, da
+* der Grid beim full refresh auch die Summen- und Zwischensummenzeilen
+* neu generiert
+* Daher wird der full-refresh jetzt explizit vor unserer Anpassung
+* ausgeführt und der nachfolgende soft_refresh lässt unsere
+* Summenzeilen stehen.
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = ' ' ).
+
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "handle_AFTER_USER_COMMAND
+
+ METHOD summenzeilen_anpassen.
+
+ DATA: lr_data_summe TYPE REF TO data,
+ lr_data_zwischensumme TYPE REF TO data,
+ lt_grouplevels TYPE lvc_t_grpl, "#EC NEEDED Normalerweise braucht man das um gezielt die Zwischensummen zu manipulieren
+ lv_tabix TYPE numc2.
+
+ FIELD-SYMBOLS: &lt;lt_data&gt; LIKE mt_data,
+ &lt;ls_data&gt; LIKE LINE OF &lt;lt_data&gt;.
+*--------------------------------------------------------------------*
+* Zwischensummenzeilen holen -
+*--------------------------------------------------------------------*
+ mo_grid-&gt;get_subtotals( IMPORTING
+ ep_collect00 = lr_data_summe " Summenzeile
+ ep_collect01 = lr_data_zwischensumme " Zwischensummenzeile - Stufe 1
+* EP_COLLECT02 - EP_COLLECT09 Zwischensummenzeilen - Stufe 2-9
+ et_grouplevels = lt_grouplevels ). " Informationen welche Zwischensummenzeile(n) zu welchen Gridzeilen gehören
+
+*--------------------------------------------------------------------*
+* Hier kann das jetzt hinreichend komplex werden
+* Zur Demo werde ich in alle Summen und Zwischensummen im Feld
+* "PLANETYPE" etwas einfüllen
+*--------------------------------------------------------------------*
+ IF lr_data_summe IS BOUND.
+ ASSIGN lr_data_summe-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe1-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+ IF lr_data_zwischensumme IS BOUND.
+ ASSIGN lr_data_zwischensumme-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe2-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+
+*--------------------------------------------------------------------*
+* ALV-Anzeige neu aufbauen lassen, ohne Zwischensummen vom ALV generieren zu lassen
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = 'X' ).
+
+ ENDMETHOD. "summenzeilen_anpassen
+ENDCLASS. "lcl_helper IMPLEMENTATION</pre>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

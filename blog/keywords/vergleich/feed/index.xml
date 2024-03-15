@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>VERGLEICH Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/vergleich/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 10 Oct 2017 11:47:50 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>VERGLEICH Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Fibonacci</title>
+		<link>/blog/fibonacci/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 10 Oct 2017 10:58:46 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Performance]]></category>
+		<category><![CDATA[VERGLEICH]]></category>
+		<category><![CDATA[Fibonacci]]></category>
+		<category><![CDATA[Berechnung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018140</guid>
+
+					<description><![CDATA[<p>Ein kleiner Vergleich von verschiedenen Berechnungsarten für Fibonacci-Zahlen in ABAP. Die Unterschiede sind enorm...</p>
+<p>Der Beitrag <a href="/blog/fibonacci/">Fibonacci</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein kleines Beispielprogramm um die verschiedenen Arten der Berechnung von Fibonacci-Zahlen und deren Geschwindigkeit zu demonstrieren.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/fibonacci.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018141" src="https://tricktresor.com/wp-content/uploads/2017/10/fibonacci.png" alt="" width="586" height="248" srcset="/wp-content/uploads/2017/10/fibonacci.png 586w, /wp-content/uploads/2017/10/fibonacci-300x127.png 300w" sizes="(max-width: 586px) 100vw, 586px" /></a></p>
+<p>Ursprünglich habe ich das Programm auf Grund eines Beitrags im ABAP-Forum geschrieben (der aber leider gelöscht wurde) und um die verschiedenen Arten der Berechnung zu vergleichen. Hauptsächlich sollte es ein Vergleich sein zwischen der rekursiven und der iterativen Variante. Dazu gekommen ist dann noch eine Lösung, die mit einer internen Tabelle arbeitet. Ausschlaggebend für die Veröffentlichung war dann ein Beispiel von Lars Hvam dafür, wie man <strong>nicht</strong> programmieren sollte. Wie man an den Ergebnissen sieht, auch im Sinne der schlechten Performance&#8230;</p>
+<h2>Code</h2>
+<pre class="lang:abap decode:true" title="Berechnung Fibonacci-Zahlen">REPORT zz_fibonacci.
+
+DATA result_f TYPE f.
+DATA start    TYPE i.
+DATA stopp    TYPE i.
+DATA i        TYPE i.
+
+PARAMETERS p_n       TYPE i.
+PARAMETERS p_reku RADIOBUTTON GROUP b USER-COMMAND space.
+PARAMETERS p_iter RADIOBUTTON GROUP b.
+PARAMETERS p_tabl RADIOBUTTON GROUP b.
+PARAMETERS p_hvam RADIOBUTTON GROUP b.
+PARAMETERS p_res  TYPE text50 MODIF ID x.
+PARAMETERS p_time TYPE i      MODIF ID x.
+
+CLASS lcl_fibonacci DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS calc_rekursiv IMPORTING n TYPE i RETURNING VALUE(result) TYPE f.
+    CLASS-METHODS calc_iterativ IMPORTING n TYPE i RETURNING VALUE(result) TYPE f.
+    CLASS-METHODS calc_read_table IMPORTING x TYPE i RETURNING VALUE(result) TYPE f.
+    CLASS-METHODS calc_hvam IMPORTING n TYPE i RETURNING VALUE(r) TYPE f.
+  PRIVATE SECTION.
+    CLASS-METHODS f IMPORTING i TYPE f RETURNING VALUE(f) TYPE f.
+ENDCLASS.
+
+CLASS lcl_fibonacci IMPLEMENTATION.
+
+  METHOD calc_iterativ.
+
+    DATA f1 TYPE f VALUE 0.
+    DATA f2 TYPE f VALUE 1.
+    DATA x  TYPE f VALUE 0.
+
+    IF n &lt;= 0.
+      result = 0.
+    ELSEIF n = 1.
+      result = 1.
+    ELSE.
+      x = n - 1.
+      DO x TIMES.
+        result = f1 + f2.
+        f1 = f2.
+        f2 = result.
+
+      ENDDO.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD calc_rekursiv.
+    DATA f TYPE f.
+    f = n.
+    result = f( f ).
+  ENDMETHOD.
+
+  METHOD calc_read_table.
+    "http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21045
+
+    TYPES BEGIN OF ts_fibonacci.        "Strukturtyp
+    TYPES n         TYPE i.             "Zählvariable    (Spalte)
+    TYPES fib_n     TYPE i.             "Fibonacci-Zahl  (Spalte)
+    TYPES rechnung  TYPE string.        "Rechenweg       (Spalte)
+    TYPES END OF ts_fibonacci.
+
+    DATA gf_zahl1 TYPE i.
+    DATA gf_zahl1_s TYPE string.
+    DATA gf_zahl2 TYPE i.
+    DATA gf_zahl2_s TYPE string.
+    DATA gt_fibzahl TYPE TABLE OF ts_fibonacci.     "Tabelle
+    DATA gs_fib TYPE ts_fibonacci.
+
+    DO x TIMES.
+
+      IF sy-index = 1 OR sy-index = 2.
+        gs_fib-n = sy-index.
+        gs_fib-fib_n = 1.
+        gs_fib-rechnung = '-'.
+
+      ELSE.
+        READ TABLE gt_fibzahl
+        INTO gs_fib
+        INDEX sy-index - 1.
+        gf_zahl1 = gs_fib-fib_n.
+
+        READ TABLE gt_fibzahl
+        INTO gs_fib
+        INDEX sy-index - 2.
+        gf_zahl2 = gs_fib-fib_n.
+
+        gs_fib-fib_n = gf_zahl1 + gf_zahl2.
+        gs_fib-n = sy-index.
+        gf_zahl1_s = gf_zahl1.
+        gf_zahl2_s = gf_zahl2.
+        CONCATENATE gf_zahl1_s '+' gf_zahl2_s INTO gs_fib-rechnung SEPARATED BY space.
+      ENDIF.
+
+      APPEND gs_fib TO gt_fibzahl.
+      CLEAR gs_fib.
+
+    ENDDO.
+
+    READ TABLE gt_fibzahl INDEX lines( gt_fibzahl ) INTO gs_fib.
+    result = gs_fib-fib_n.
+
+  ENDMETHOD.
+
+  METHOD f.
+    DATA x TYPE f.
+    DATA y TYPE f.
+
+    IF i &lt;= 0.
+      f = 0.
+    ELSEIF i = 1.
+      f = 1.
+    ELSE.
+      x = i - 2.
+      y = i - 1.
+      f = f( x ) + f( y ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD calc_hvam.
+
+    "negative example of Lars Hvam for how _NOT_ to code!
+    "https://gist.github.com/larshp/cc5326dec8fe413bdc29e4d6b8c64b4f
+    DATA n1 TYPE i.
+    DATA n2 TYPE i.
+    DATA r1 TYPE p.
+    DATA r2 TYPE f.
+
+    n2 = n - 1.
+    n1 = n2 - 1.
+    IF n = 1.
+      r = n.
+    ELSEIF n := 2.
+      r = n - 1.
+    ELSE.
+      r2 = calc_hvam( n1 ).
+      r1 = calc_hvam( n2 ).
+    ENDIF.
+    r = r + r1 + r2.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+
+AT SELECTION-SCREEN OUTPUT.
+  LOOP AT SCREEN.
+    IF screen-group1 = 'X'.
+      screen-input = '0'.
+      MODIFY SCREEN.
+    ENDIF.
+  ENDLOOP.
+
+  GET RUN TIME FIELD start.
+  CASE abap_true.
+    WHEN p_iter.
+      result_f = lcl_fibonacci=&gt;calc_iterativ( p_n ).
+    WHEN p_reku.
+      result_f = lcl_fibonacci=&gt;calc_rekursiv( p_n ).
+    WHEN p_tabl.
+      result_f = lcl_fibonacci=&gt;calc_read_table( p_n ).
+    WHEN p_hvam.
+      result_f = lcl_fibonacci=&gt;calc_hvam( p_n ).
+  ENDCASE.
+
+  WRITE result_f TO p_res EXPONENT 0 DECIMALS 0 LEFT-JUSTIFIED.
+  GET RUN TIME FIELD stopp.
+  p_time = stopp - start.
+
+
+START-OF-SELECTION.
+
+  DO p_n TIMES.
+    i = sy-index.
+
+    GET RUN TIME FIELD start.
+    CASE abap_true.
+      WHEN p_iter.
+        result_f = lcl_fibonacci=&gt;calc_iterativ( i ).
+      WHEN p_reku.
+        result_f = lcl_fibonacci=&gt;calc_rekursiv( i ).
+      WHEN p_tabl.
+        result_f = lcl_fibonacci=&gt;calc_read_table( i ).
+    ENDCASE.
+
+    WRITE result_f TO p_res EXPONENT 0 DECIMALS 0 LEFT-JUSTIFIED.
+    WRITE: / i, p_res.
+
+  ENDDO.
+
+  GET RUN TIME FIELD stopp.
+  p_time = stopp - start.
+
+  WRITE: / 'Time:', p_time.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/fibonacci/">Fibonacci</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Komplexe Rabattfindung mit Excel</title>
+		<link>/blog/komplexe-rabattfindung-mit-excel/</link>
+		
+		<dc:creator><![CDATA[wilfried]]></dc:creator>
+		<pubDate>Thu, 17 Jul 2014 14:39:14 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[SVERWEIS]]></category>
+		<category><![CDATA[VERGLEICH]]></category>
+		<category><![CDATA[INDEX]]></category>
+		<category><![CDATA[Rabatt]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Auftragserfassung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4960</guid>
+
+					<description><![CDATA[<p>Rabattfindung mit Excel. Hier werden zwei Lösungen vorgestellt, einmal mit "Indirekt &#38; Vergleich", dann mit "Sverweis verkettet" sowie mittels "Index mit Vergleich". Die gut dokumentierte Vorgehensweise macht deutlich, wie die Funktionen in Excel zur Rabattfindung eingesetzt werden können.</p>
+<p>Der Beitrag <a href="/blog/komplexe-rabattfindung-mit-excel/">Komplexe Rabattfindung mit Excel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Am Anfang stand die praxisnahe Fragestellung einer Rabattfindung innerhalb einer Auftragserfassung. Dazu konstruierte ich mir zuerst folgende Rahmenbedingungen:</p>
+<p>Kunden sind einem Land und Artikel einer Gruppe zugeordnet.</p>
+<p>Abhängig von der Gesamtbestellmenge aller Artikel einer Gruppe, soll aus einer Rabattstaffel mit den Schlüsselfeldern Land, Gruppe und Bestellmenge der zu gewährende Rabatt ermittelt werden.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_17_160728.jpg"><img decoding="async" class="alignnone size-medium wp-image-4964" src="https://tricktresor.com/wp-content/uploads/2014/07/Bild_2014_07_17_160728-300x87.jpg" alt="Rabattfindung Excel" width="300" height="87" srcset="/wp-content/uploads/2014/07/Bild_2014_07_17_160728-300x87.jpg 300w, /wp-content/uploads/2014/07/Bild_2014_07_17_160728-1024x298.jpg 1024w, /wp-content/uploads/2014/07/Bild_2014_07_17_160728-624x181.jpg 624w, /wp-content/uploads/2014/07/Bild_2014_07_17_160728.jpg 1247w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Findung erfolgt auf drei Arten:</p>
+<ul>
+<li>Sverweis mit Indirekt &amp; Vergleich</li>
+<li>Sverweis verkettet</li>
+<li>Index mit Vergleich</li>
+</ul>
+<p>Alle drei Lösungen sind hier beschrieben:</p>
+<p><a title="Rabattfindung | PDF-Doku" href="https://tricktresor.com/wp-content/uploads/2014/07/Rabatt-abhängig-von-Land-Produktgruppe-Gruppenmenge.pdf">Rabatt abhängig von Land Produktgruppe &amp; Gruppenmenge</a></p>
+<p>In der Excel-Tabelle sind die Demo-Daten und alle Formeln enthalten:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/07/Rabatt-abhängig-von-Land-Produktgruppe-Gruppenmenge.xlsx">Rabatt abhängig von Land Produktgruppe &amp; Gruppenmenge</a></p>
+<p>Der Beitrag <a href="/blog/komplexe-rabattfindung-mit-excel/">Komplexe Rabattfindung mit Excel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Gültig-ab Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/gueltig-ab/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:48 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Gültig-ab Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Ist das gültig? (2)</title>
+		<link>/blog/ist-das-gueltig-2/</link>
+					<comments>/blog/ist-das-gueltig-2/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 05 Dec 2016 10:16:13 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Sub-Query]]></category>
+		<category><![CDATA[Datum]]></category>
+		<category><![CDATA[Gültig-ab]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[Gültigkeit]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=956837</guid>
+
+					<description><![CDATA[<p>Ist das gültig - jetzt erst recht? Dies ist eine Korrektur zum zuvor erschienenen Artikel "Ist das gültig?". Ein wichtiges Merkmal des Tricktresors ist es, dass ich die Beispiele auf das Wesentliche reduziere. Das ist beim letzten mal leicht schief gegangen...</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig-2/">Ist das gültig? (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>So. da bin ich im letzten Beitrag <a href="https://tricktresor.com/blog/ist-das-gueltig/">Ist das gültig?</a> etwas über das Ziel hinaus geschossen&#8230; Ein Merkmal des Tricktresors ist es, dass ich die Beispiele auf das Wesentlich und nur absolut Notwendige reduziere. So bleiben die Tricks einfach und klar. Im letzten Beitrag habe ich jedoch etwas zu viel reduziert und der Trick ist für das Beispiel sogar komplizierter als notwendig.</p>
+<h2>Klarstellung</h2>
+<p>Natürlich kann man von einem definierten Eintrag sehr einfach den zuletzt &#8211; bzw. aktuell &#8211; gültigen Eintrag ermitteln. Ingo hat darauf hin gewiesen, dass die folgende Variante doch deutlich einfacher ist als die von mir vorgestellte:</p>
+<pre class="">SELECT * FROM ztt_datum
+ UP TO 1 ROWS
+ INTO ls_datum
+ WHERE gueltig_ab &lt;= p_datum
+ ORDER BY gueltig_ab DESCENDING.
+ENDSELECT.</pre>
+<p>Recht hat er.</p>
+<p>Eigentlich wollte ich auch auf eine andere etwas komplexere Variante heraus. Nämlich die, bei der es nicht den einen Eintrag gibt, sondern eine unbestimmte Menge von Einträgen. Das könnten zum Beispiel alle gültigen Materialien eines Werkes sein oder Konten eines Buchungskreises sein.</p>
+<h2>Nächster Versuch</h2>
+<p>Für das neue Beispiel habe ich die folgende Tabelle erstellt:</p>
+<p>ZTT_DATUM2</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-05_10-51-52.jpg"><img decoding="async" class="size-full wp-image-956838 alignnone" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-05_10-51-52.jpg" alt="2016-12-05_10-51-52" width="226" height="172" /></a></p>
+<p>Aus dieser Tabelle möchte ich alle zu einem Datum gültigen Gruppen ermitteln. Das funktioniert gut mit dem Befehl DELETE ADJACENT DUPLICATES:</p>
+<pre class="">SELECT * FROM ztt_datum2 INTO TABLE @DATA(lt_datum)
+ WHERE datab &lt;= @p_datum
+ ORDER BY gruppe ASCENDING,
+          datab  DESCENDING.
+
+DELETE ADJACENT DUPLICATES FROM lt_datum COMPARING gruppe.</pre>
+<p>Es spricht nichts dagegen, diese Variante zu verwenden. Aber: Alles, was man mit einem Befehl anstelle von zweien lösen kann, ist irgendwie cooler. Zumal es immer <em>schöner</em> ist, nur die Daten zu lesen, die auch wirklich gebraucht werden.</p>
+<h2>Sub-query</h2>
+<p>Aus diesem Grund jetzt die wirklich hilfreiche und sinnvolle Variante mithilfe eines Sub-Queries:</p>
+<pre class="">SELECT * FROM ztt_datum2 AS z1 INTO TABLE @DATA(lt_datum)
+ WHERE datab &lt;= @p_datum
+   AND datab  = ( SELECT MAX( datab ) FROM ztt_datum2
+                   WHERE gruppe = z1~gruppe
+                     AND datab &lt;= @p_datum ).</pre>
+<p>Der Clou bei dieser Variante ist, dass man sich in der WHERE-Bedingung der Hauptselektion mit einem Sub-Query auf die jeweilige GRUPPE bezieht und hierfür das höchste Datum ermittelt.</p>
+<p>Von der Performance her kann es sein, dass die herkömmliche  Variante sogar schneller ist. Da man diesen Select jedoch wahrscheinlich nur für sehr kleine Datenmengen verwenden wird, dürfte die Geschwindigkeit hier zu vernachlässigen sein.</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig-2/">Ist das gültig? (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ist-das-gueltig-2/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

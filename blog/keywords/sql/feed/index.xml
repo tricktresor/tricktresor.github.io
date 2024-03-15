@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>SQL Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/sql/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 07 May 2020 16:32:34 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>SQL Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Selektion zur Berechtigung</title>
+		<link>/blog/selektion-zur-berechtigung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 02 Jul 2019 12:33:05 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[authority-check]]></category>
+		<category><![CDATA[Berechtigungsprüfung]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">/?p=1022316</guid>
+
+					<description><![CDATA[<p>Berechtigungsprüfungen sind mitunter sehr komplex und weisen einige Tücken auf. Mit dem hier vorgestellten Trick ist es schon mal eine Hürde weniger.</p>
+<p>Der Beitrag <a href="/blog/selektion-zur-berechtigung/">Selektion zur Berechtigung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Berechtigungen und die dazugehörigen Berechtigungsprüfungen sind eine mitunter eine knifflige Angelegenheit. Bei einzelnen Werten ist es einfach, diese mit der entsprechenden Berechtigung zu prüfen. Wenn es jedoch um Selektionen geht, bei denen der Anwender nur die Berechtigung über einen Teil der Daten hat, dann wird es schon schwieriger&#8230;</p>
+
+
+
+<h2 class="wp-block-heading">Problem &#8211; Selektionsoptionen</h2>
+
+
+
+<p>Bei dem hier beschriebenen Problem hat der Anwender bei einem Report die Möglichkeit, ein Objekt über Selektionsoptionen (SELECT-OPTIONS) einzugrenzen. Hierfür muss ich jedoch wissen, welches die zu Grunde liegende Prüftabelle mit allen existierenden Daten ist. </p>
+
+
+
+<h3 class="wp-block-heading">Beispiel Verkaufsorganisation</h3>
+
+
+
+<p>Der Anwender selektiert Verkaufsorganisationen A* und B*.  Der Anwender hat jedoch nur die Berechtigung für A200 und B330. </p>
+
+
+
+<p>In der Prüftabelle für die Verkaufsorganisationen (Tabelle TVAK) sind die folgenden Verkaufsorganisationen gepflegt:</p>
+
+
+
+<table class="wp-block-table"><tbody><tr><td><strong>Vkorg</strong></td><td><strong>Bezeichnung</strong></td></tr><tr><td>A100</td><td>Deutschland Gebiet Nord</td></tr><tr><td>A200</td><td>Deutschland Gebiet Süd </td></tr><tr><td>A300</td><td>Deutschland Gebiet West</td></tr><tr><td>A400</td><td>Deutschland Gebiet Ost</td></tr><tr><td>B330</td><td>Nord-Italien</td></tr><tr><td>B340</td><td>Süd-Italien</td></tr><tr><td>C500</td><td>Spanien</td></tr></tbody></table>
+
+
+
+<h2 class="wp-block-heading">Lösung A &#8211; Vorselektion</h2>
+
+
+
+<p>Bei dieser Lösungsvariante wird vorab geprüft, für welche Objekte der Anwender die Berechtigung hat. Man würde also die tatsächlich vorhandenen Einträge aus der Prüftabelle selektieren und für jeden Eintrag prüfen, ob der Anwender die entsprechende Berechtigung hat.</p>
+
+
+
+<p>Mit den verbleibenden Einträgen kann man entweder eine dynamische WHERE-Bedingung bauen oder baut aus diesen Einträgen eine genaue Ranges-Tabelle auf.</p>
+
+
+
+<h2 class="wp-block-heading">Lösung B &#8211; Einzelprüfung der Daten</h2>
+
+
+
+<p>Es gibt natürlich auch die relativ einfache Möglichkeit, alle Daten einzulesen und dann bei jedem einzelnen Datensatz zu prüfen, ob der Anwender berechtigt ist, ihn zu sehen. Das ist einfach zu programmieren, kann jedoch bei großen Datenmengen ein erhebliches Laufzeitproblem werden.</p>
+
+
+
+<h2 class="wp-block-heading">Unterstützung</h2>
+
+
+
+<p>Durch Zufall bin ich auf die Klasse <a href="https://help.sap.com/doc/abapdocu_751_index_htm/7.51/de-DE/abapauthority-check.htm">CL_AUTH_OBJECTS_TO_SQL</a> gestoßen. Mit Hilfe dieser Klasse wird der Lösungsweg A eingeschlagen. Allerdings ohne, dass ich als Programmierer wissen müsste, welches die Zugrunde liegende Prüftabelle ist und ohne, dass ich die WHERE-Bedingung selber erstellen müsste.</p>
+
+
+
+<p>Der Klasse müssen folgende Daten übergeben werden:</p>
+
+
+
+<ul><li>das zu prüfende Berechtigungsobjekt</li><li>die Aktivität (Anzeigen, Ändern, Löschen etc)</li><li>Ein Field Mapping (DDIC-Grundlage der Felder)</li><li>optional: Filter für die Einschränkung auf Objekte</li></ul>
+
+
+
+<p>Mit GET_SQL_CONDITION bekommt man dann die WHERE-Bedingung für die Felder zurück, für die der Anwender eine Berechtigung hat.</p>
+
+
+
+<p>Folgendes kleine Beispiel zeigt die Anwendung für die Klasse.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="554" height="280" src="/wp-content/uploads/2019/07/sql1.png" alt="" class="wp-image-1022317" srcset="/wp-content/uploads/2019/07/sql1.png 554w, /wp-content/uploads/2019/07/sql1-300x152.png 300w, /wp-content/uploads/2019/07/sql1-272x137.png 272w" sizes="(max-width: 554px) 100vw, 554px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="wp-block-code"><code>DATA h_vkorg TYPE vkorg.
+SELECT-OPTIONS s_vkorg FOR h_vkorg DEFAULT 'A100'.
+
+START-OF-SELECTION.
+
+  DATA(lo_converter_osql) = cl_auth_objects_to_sql=>create_for_open_sql( ).
+
+  lo_converter_osql->add_authorization_object( 
+    iv_authorization_object = 'V_VBAK_VKO'
+    it_activities = VALUE #(
+             ( auth_field = 'ACTVT' value = '03' ) )
+    it_field_mapping = VALUE #(
+             ( auth_field = 'VKORG'
+               view_field = VALUE #(
+                               table_ddic_name = 'VBAK'
+                               table_alias     = ''
+                               field_name      = 'VKORG' ) ) )
+    it_filter = VALUE #( FOR selopt IN s_vkorg&#91;]
+             ( auth_field = 'VKORG' low = selopt-low high = selopt-high ) ) ).
+  
+  TRY.
+      DATA(lv_where_clause) = lo_converter_osql->get_sql_condition( ).
+      IF lv_where_clause IS INITIAL.
+        MESSAGE 'Du hast die Berechtigung für alle ausgewählten Verkaufsorganisationen' TYPE 'I'.
+      ELSE.
+        cl_demo_output=>display_text( |Deine WHERE-Bedingung: { lv_where_clause }| ).
+      ENDIF.
+    CATCH cx_auth_not_authorized.
+      MESSAGE 'Keine Berechtigung für die ausgewählten Verkaufsorganisationen' TYPE 'I'.
+  ENDTRY.</code></pre>
+<p>Der Beitrag <a href="/blog/selektion-zur-berechtigung/">Selektion zur Berechtigung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Layout gegen Überschreiben schützen</title>
+		<link>/blog/alv-layout-gegen-ueberschreiben-schuetzen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 16 Jan 2014 13:44:23 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<category><![CDATA[SQL]]></category>
+		<category><![CDATA[Eigene Programme]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[Layout]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4254</guid>
+
+					<description><![CDATA[<p>Die Layoutverwaltung von ALVs ist nicht ganz einfach und hat einige Macken. In diesem Artikel erfährst du, wie ein Layout gegen unbeabsichtigtes Überschreiben geschützt werden kann.</p>
+<p>Der Beitrag <a href="/blog/alv-layout-gegen-ueberschreiben-schuetzen/">ALV-Layout gegen Überschreiben schützen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Layoutverwaltung des ALV (Grid als auch Liste) hat ein paar Macken. Eine davon ist die, dass es nur ein Berechtigungsobjekt S_ALV_LAYO gibt. Mit diesem Objekt wird definiert, ob ein Anwender Layouts ändern darf, oder nicht. Es gibt keine Unterscheidung zwischen System- und Benutzerlayouts.</p>
+<h2>Speicherung</h2>
+<p>Die Varianten werden in den Clustertabellen LTDX und LTDXT gespeichert. Benutzerlayouts müssen mit einer Zahl oder einem Buchstaben anfangen, Systemlayouts mit einem Schrägstrich. Diesen Umstand machen wir uns zu nutze, indem wir ein vorhandenes Layout einfach auf ein Layout kopieren, das mit einem Sonderzeichen beginnt, wie z.B. der Tilde. Dieses Layout kann dann nicht mehr geändert werden, da der Name unzulässig ist:</p>
+<p><img decoding="async" width="511" height="492" class="alignnone size-full wp-image-4256" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d7e09bc93a5.png" alt="" srcset="/wp-content/uploads/2014/01/img_52d7e09bc93a5.png 511w, /wp-content/uploads/2014/01/img_52d7e09bc93a5-300x288.png 300w" sizes="(max-width: 511px) 100vw, 511px" /></p>
+<h2>Layout schützen</h2>
+<p>Der folgende Programmcode liest ein vorhandenes Layout ein und speichert es unter neuem Namen ab.</p>
+<p>[notice type=&#8217;info&#8217;]Der Eintrag für die Texte im Cluster LTDXT wird nicht kopiert. Dies sollte der Vollständigkeit halber ebenfalls gemacht werden![/notice]</p>
+<pre>  DATA: gt_ltdx TYPE STANDARD TABLE OF ltdx WITH NON-UNIQUE DEFAULT KEY,
+        gs_ltdx LIKE LINE OF lt_ltdx.
+
+  PARAMETERS: p_report TYPE repid       OBLIGATORY.
+  PARAMETERS: p_handle TYPE slis_handl  OBLIGATORY.
+  PARAMETERS: p_layout TYPE slis_vari   OBLIGATORY.
+  SELECT *
+    INTO TABLE gt_ltdx
+    FROM ltdx
+    WHERE relid   = 'LT'
+      AND report  = p_report
+      AND handle  = p_handle
+      AND variant = p_layout
+      AND type    = 'F'.
+  CHECK sy-subrc = 0.
+
+*== Replace first character in variant with "unallowed" character "~"
+  gs_ltdx-variant = p_layout.
+  gs_ltdx-variant(1) = '~'.
+
+  MODIFY gt_ltdx FROM gs_ltdx TRANSPORTING variant WHERE variant &lt;&gt; gs_ltdx-variant.
+
+  TRY.
+      INSERT ltdx FROM TABLE gt_ltdx.
+      COMMIT WORK.
+      MESSAGE i000(oo) WITH 'Layout kopiert:' gs_ltdx-variant.
+    CATCH cx_sy_open_sql_db.
+      MESSAGE i000(oo) WITH 'Fehler beim Kopieren!'.
+  ENDTRY.</pre>
+<h2>Fertig</h2>
+<p>Nachdem ein Layout kopiert wurde, taucht es in der Layoutverwaltung auf und kann ausgewählt und verwendet werden. Allerdings kann es nicht mehr geändert werden, denn der Name kann aufgrund des Sonderzeichens im Dialog nicht verwendet werden.</p>
+<p><img decoding="async" width="517" height="166" class="alignnone size-full wp-image-4255" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d7d7abf260e.png" alt="" srcset="/wp-content/uploads/2014/01/img_52d7d7abf260e.png 517w, /wp-content/uploads/2014/01/img_52d7d7abf260e-300x96.png 300w" sizes="(max-width: 517px) 100vw, 517px" /></p>
+<p>[notice type=&#8217;alert&#8217;]Das Layout ist nur durch Überschreiben geschützt! Es kann jedoch nach wie vor gelöscht werden![/notice]</p>
+<h2>Komplettes Programm</h2>
+<p>Hier das komplette Programm mit Berücksichtigung der Texte und F4-Hilfe für vorhandene Layouts.</p>
+<p>[accordian]<br />
+[accordian_list title=&#8217;ZZ_PROTECT_ALV_LAYOUT&#8217;]</p>
+<pre>REPORT  zz_protect_alv_layout.
+
+DATA c_protection_character TYPE c LENGTH 1 VALUE '~'.
+
+SELECTION-SCREEN BEGIN OF BLOCK bl1 WITH FRAME TITLE text-bl1.
+PARAMETERS  p_report TYPE repid       OBLIGATORY.
+PARAMETERS: p_handle TYPE slis_handl  OBLIGATORY.
+PARAMETERS: p_layout TYPE slis_vari   OBLIGATORY.
+SELECTION-SCREEN END OF BLOCK bl1.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_layout.
+  PERFORM f4_layout.
+
+AT SELECTION-SCREEN ON p_layout.
+  IF p_layout(1)  &lt;&gt; '/'.
+    MESSAGE 'Nur ungeschütze Standardlayouts (beginnend mit /) können geschützt werden' TYPE 'E'.
+  ENDIF.
+
+START-OF-SELECTION.
+
+  PERFORM protect.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  PROTECT
+*&amp;---------------------------------------------------------------------*
+* Replace first character in ALV-Layout with "unallowed" character
+* This way this variant can't be saved any more and thus not be overwritten
+*&amp;---------------------------------------------------------------------*
+FORM protect .
+
+  DATA lt_ltdx  TYPE STANDARD TABLE OF ltdx  WITH NON-UNIQUE DEFAULT KEY.
+  DATA ls_ltdx  LIKE LINE OF lt_ltdx.
+  DATA lt_ltdxt TYPE STANDARD TABLE OF ltdxt WITH NON-UNIQUE DEFAULT KEY.
+  DATA ls_ltdxt LIKE LINE OF lt_ltdxt.
+
+*== read layout (main data)
+  SELECT * INTO TABLE lt_ltdx
+    FROM ltdx
+    WHERE relid   = 'LT'
+      AND report  = p_report
+      AND handle  = p_handle
+      AND variant = p_layout
+      AND type    = 'F'.
+  CHECK sy-subrc = 0.
+
+*--------------------------------------------------------------------*
+* Replace first character in variant with unallowed character
+*--------------------------------------------------------------------*
+  ls_ltdx-variant = p_layout.
+  ls_ltdx-variant(1) = c_protection_character.
+
+  MODIFY lt_ltdx FROM ls_ltdx TRANSPORTING variant WHERE variant &lt;&gt; ls_ltdx-variant.
+
+  TRY.
+*== Insert layout (main data)
+      INSERT ltdx FROM TABLE lt_ltdx.
+*== read layout (texts)
+      SELECT * FROM ltdxt INTO TABLE lt_ltdxt
+        WHERE relid   = 'LT'
+          AND report  = p_report
+          AND handle  = p_handle
+          AND variant = p_layout
+          AND type    = 'F'.
+      IF sy-subrc = 0.
+*== Insert Layout (text)
+        ls_ltdxt-variant = ls_ltdx-variant.
+        MODIFY lt_ltdxt FROM ls_ltdxt TRANSPORTING variant WHERE variant &lt;&gt; ls_ltdxt-variant.
+        INSERT ltdxt FROM TABLE lt_ltdxt.
+      ENDIF.
+      COMMIT WORK.
+      MESSAGE i000(oo) WITH 'Geschützte Variante' ls_ltdx-variant 'wurde neu angelegt'.
+    CATCH cx_sy_open_sql_db.
+      MESSAGE 'ALV-Layout existiert schon und wird nicht überschrieben' TYPE 'I'.
+  ENDTRY.
+
+ENDFORM.                    " PROTECT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  F4_LAYOUT
+*&amp;---------------------------------------------------------------------*
+FORM f4_layout.
+
+  DATA lv_repid      TYPE syrepid.
+  data lv_dynnr      TYPE sydynnr.
+  data lt_dynpfields TYPE STANDARD TABLE OF dynpread WITH NON-UNIQUE DEFAULT KEY.
+  DATA ls_variant    TYPE disvariant.
+
+  FIELD-SYMBOLS: &lt;ls_dynpfield&gt; LIKE LINE OF lt_dynpfields.
+
+*== Layout parameters
+  ls_variant-report  = p_report.
+  ls_variant-variant = p_layout.
+  ls_variant-handle  = p_handle.
+
+*== updating from current screen
+*--------------------------------------------------------------------*
+  lv_repid = sy-repid.
+  lv_dynnr = '1000'.
+
+  CALL FUNCTION 'DYNP_VALUES_READ'                          "#EC
+    EXPORTING
+      dyname               = lv_repid
+      dynumb               = lv_dynnr
+      translate_to_upper   = 'X'
+      request              = 'A'
+    TABLES
+      dynpfields           = lt_dynpfields
+    EXCEPTIONS             = 11.
+
+  READ TABLE lt_dynpfields WITH KEY fieldname = 'P_REPORT'   ASSIGNING &lt;ls_dynpfield&gt;.
+  IF sy-subrc = 0.
+    ls_variant-report = &lt;ls_dynpfield&gt;-fieldvalue.
+  ENDIF.
+
+  READ TABLE lt_dynpfields WITH KEY fieldname = 'P_HANDLE'   ASSIGNING &lt;ls_dynpfield&gt;.
+  IF sy-subrc = 0.
+    ls_variant-handle = &lt;ls_dynpfield&gt;-fieldvalue.
+  ENDIF.
+
+*--------------------------------------------------------------------*
+* Standard ALV-F4
+*--------------------------------------------------------------------*
+  CALL FUNCTION 'REUSE_ALV_VARIANT_F4'
+    EXPORTING
+      is_variant         = ls_variant
+      i_save             = 'X'
+      i_display_via_grid = 'X'  " Only standard variants here
+    IMPORTING
+      es_variant         = ls_variant
+    EXCEPTIONS
+      not_found          = 1
+      program_error      = 2
+      OTHERS             = 3.
+  CHECK sy-subrc = 0.
+  CHECK ls_variant-variant IS NOT INITIAL.
+  p_layout = ls_variant-variant.
+
+ENDFORM.                    " F4_LAYOUT</pre>
+<p>[/accordian_list]<br />
+[/accordian]</p>
+<p>Der Beitrag <a href="/blog/alv-layout-gegen-ueberschreiben-schuetzen/">ALV-Layout gegen Überschreiben schützen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Feld generisch umsetzen</title>
+		<link>/blog/feld-generisch-umsetzen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 21 Aug 2008 11:30:37 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=508</guid>
+
+					<description><![CDATA[<p>Aus verschiedenen Gr&#252;nden k&#246;nnte es sein, dass Sie Werte eines bestimmten Feldes auf der Datenbank &#228;ndern m&#246;chten. Normalerweise schreiben Sie dazu ein Programm, dass die Daten f&#252;r jede Tabelle einliest, das Feld &#228;ndert und die Daten wieder zur&#252;ck schreibt. Wir pr&#228;sentieren Ihnen hier eine generelle L&#246;sung...</p>
+<p>Der Beitrag <a href="/blog/feld-generisch-umsetzen/">Feld generisch umsetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Aus verschiedenen Gr&uuml;nden k&ouml;nnte es sein, dass Sie Werte eines bestimmten Feldes auf der Datenbank &auml;ndern m&ouml;chten. Normalerweise schreiben Sie dazu ein Programm, dass die Daten f&uuml;r jede Tabelle einliest, das Feld &auml;ndert und die Daten wieder zur&uuml;ck schreibt. Wir pr&auml;sentieren Ihnen hier eine generelle L&ouml;sung&#8230;<br /><P>Das folgende Programm enth&auml;lt eine Routine, mit der Sie generell ein Feld in einer beliebigen Tabelle &auml;ndern k&ouml;nnen.</P><P>Die Umsetzung m&uuml;ssen Sie f&uuml;r Ihren Fall nat&uuml;rlich anpassen. </P><P class="head2">Problemstellung</P><P>In einem CHAR(6)-Feld steht eine Nummer mit f&uuml;hrenden Nullen, z.B.&nbsp;000034. Das zugrundeliegende Datenelement soll ab auf ein zweistelliges Characterfeld umgesetzt werden. Bei einer &Auml;nderung und anschliessenden Umsetzung der Datenbank w&uuml;rden einfach die ersten beiden Stellen (00) genommen werden. Die eigentliche Information geht also verloren. Handelt es sich um ein Schl&uuml;sselfeld, so gehen gehen sogar Datens&auml;tze verloren!</P><P class="head2">L&ouml;sungsansatz</P><P>In diesem speziellen Fall wird&nbsp;die sechsstellige Nummer, die in einem Characterfeld gespeichert ist, auf eine zweistellige Nummer umgesetzt.</P><P>Da es sich um ein Schl&uuml;sselfeld handelt, werden die vorhandenen Datens&auml;tze gelesen, gel&ouml;scht, umgesetzt und anschlie&szlig;end wieder eingef&uuml;gt.</P><P class="head1">Coding</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* Report&nbsp; ZZUMS1<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>REPORT&nbsp; zzums1.</P><P class="sap1">PARAMETERS p_u1 AS CHECKBOX DEFAULT space.<BR>PARAMETERS p_u2 AS CHECKBOX DEFAULT space.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1">&nbsp; IF p_u1 &lt;&gt; space. <BR>&nbsp;&nbsp;&nbsp; PERFORM change USING &#8216;ZZTAB1&#8217;.&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; IF p_u2 &lt;&gt; space. <BR>&nbsp;&nbsp;&nbsp; PERFORM change USING &#8216;ZZTAB2&#8217;.&nbsp;&nbsp;&nbsp; <BR>&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; change<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM change USING fi_tabname.</P><P class="sap1"><FONT color="#fb2412">*** data</FONT><BR>&nbsp; DATA dref&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO data.<BR>&nbsp; FIELD-SYMBOLS &lt;table&gt; TYPE ANY TABLE.<BR>&nbsp; FIELD-SYMBOLS &lt;wa&gt;&nbsp;&nbsp;&nbsp; TYPE ANY.<BR>&nbsp; FIELD-SYMBOLS &lt;value&gt; TYPE ANY.</P><P class="sap1"><FONT color="#fb2412">*** create table dynamically</FONT><BR>&nbsp; CREATE DATA dref TYPE STANDARD TABLE OF (fi_tabname).</P><P class="sap1"><FONT color="#fb2412">*** assign referenced table to table-field-symbol</FONT><BR>&nbsp; ASSIGN dref-&gt;* TO &lt;table&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Print protocol</FONT><BR>&nbsp; WRITE: / fi_tabname.</P><P class="sap1"><FONT color="#fb2412">*** Select data into internal table</FONT><BR>&nbsp; SELECT * FROM (fi_tabname) INTO TABLE &lt;table&gt;.</P><P class="sap1">&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** in this case the field to be changed is a key field&#8230;<BR>*** delete existing entries</FONT><BR>&nbsp;&nbsp;&nbsp; DELETE (fi_tabname) FROM TABLE &lt;table&gt;.</P><P class="sap1"><FONT color="#fb2412">*** set new value for each entry</FONT><BR>&nbsp;&nbsp;&nbsp; LOOP AT &lt;table&gt; ASSIGNING &lt;wa&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASSIGN COMPONENT &#8216;FIELDNAME&#8217; OF STRUCTURE &lt;wa&gt; TO &lt;value&gt;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IF sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SHIFT &lt;value&gt; LEFT BY 4 PLACES.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.</P><P class="sap1"><FONT color="#fb2412">*** and insert changed entries</FONT><BR>&nbsp;&nbsp;&nbsp; INSERT (fi_tabname) FROM TABLE &lt;table&gt;.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** everything ok: commit changes</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: &#8216;Modify ok, Entries:&#8217;, sy-dbcnt.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; COMMIT WORK.<BR>&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*** something went wrong: rollback</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: &#8216;Modify failure!&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ROLLBACK WORK.<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** protocol</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: &#8216;Nothing selected&#8230;&#8217;.<BR>&nbsp; ENDIF.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </P></p>
+<p>Der Beitrag <a href="/blog/feld-generisch-umsetzen/">Feld generisch umsetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Join-Testprogramm</title>
+		<link>/blog/join-testprogramm/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 22 Oct 2007 19:32:35 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Joins]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=442</guid>
+
+					<description><![CDATA[<p>Jayanta Narayan Choudhuri aus Indien hat ein n&#252;tzliches Tool geschrieben, mit dem man Open-SQL als auch Native-SQL Select-Anweisungen testen kann. In einem Editor wird das SELECT-Statement eingegeben und das Ergebnis wird in einem ALV-Grid angezeigt. </p>
+<p>Der Beitrag <a href="/blog/join-testprogramm/">Join-Testprogramm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Jayanta Narayan Choudhuri aus Indien hat ein n&uuml;tzliches Tool geschrieben, mit dem man Open-SQL als auch Native-SQL Select-Anweisungen testen kann. In einem Editor wird das SELECT-Statement eingegeben und das Ergebnis wird in einem ALV-Grid angezeigt. <br /><P>In der neuen Version kann das Tool sogar als Mini-Reportwriter verwendet werden. </P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/abap/sql_1.jpg"><BR>So sieht ein Join aus</P></TD></TR></TBODY></TABLE></P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/abap/sql_2.jpg"><BR>Und das ist das Ergebnis dazu</P></TD></TR></TBODY></TABLE></P><P><A href="https://tricktresor.com/wp-content/downloads/Yes4SQL.zip" target="_blank" Target="_blank"><STRONG>Hier ist die Original ZIP-Datei mit Screenshot, Coding und Beispielen.</STRONG></A></P><P>Auf der&nbsp;der Homepage des Autors finden Sie eventuell noch weitere n&uuml;tzliche Tipps: <A href="http://www.geocities.com/ojnc" Target="_blank">http://www.geocities.com/ojnc</A></P><P>Wer die Kennwortabfrage aus dem Coding nicht selbst herausnimmt ist selber schuld und muss das Kennwort HLTHCHEK benutzen.</P></p>
+<p>Der Beitrag <a href="/blog/join-testprogramm/">Join-Testprogramm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Join über gleiche Tabelle</title>
+		<link>/blog/join-ueber-gleiche-tabelle/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 11 Oct 2007 12:59:40 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Joins]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=440</guid>
+
+					<description><![CDATA[<p>Normalerweise verwendet man einen Join, um mehrere Tabellen miteinander zu verbinden. Man kann ihn jedoch dazu missbrauchen, um unterschiedliche Eintr&#228;ge der gleichen Tabelle zu selektieren!</p>
+<p>Der Beitrag <a href="/blog/join-ueber-gleiche-tabelle/">Join über gleiche Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Normalerweise verwendet man einen Join, um mehrere Tabellen miteinander zu verbinden. Man kann ihn jedoch dazu missbrauchen, um unterschiedliche Einträge der gleichen Tabelle zu selektieren!</p>
+<p>Ein Anwendungsbeispiel wäre dieses hier: Sie haben einen Fertigungsauftrags und möchten alle Aufträge selektieren, die <strong>freigegeben</strong> und <strong>gedruckt</strong> sind.</p>
+<p>In der Tabelle JEST steht der Status zum Objekt &#8220;Auftrag&#8221;. Dabei stehen hier nicht die sprachspezifischen vierstelligen Kürzel <strong>FREI</strong> und <strong>DRUC</strong>, sondern die internen Bezeichner <strong>I0002</strong> und <strong>I0007</strong>. Die Umsetzung steht in Tabelle TJ02.</p>
+<p>Mithilfe des Alias-Zusatzes beim Join können wir die gleiche Tabelle unter verschiedenen Namen ansprechen:</p>
+<pre class="sap1">  SELECT aufk~aufnr aufk~objnr
+    INTO TABLE lt_aufnr
+    FROM aufk
+   INNER JOIN jest <span style="color: #fb2412;">AS s_frei</span> ON aufk~objnr = <span style="color: #fb2412;">s_frei</span>~objnr
+   INNER JOIN jest <span style="color: #fb2412;">AS s_druc</span> ON aufk~objnr = <span style="color: #fb2412;">s_druc</span>~objnr
+   WHERE aufk~auart   = 'ZV01'
+     AND <span style="color: #fb2412;">s_frei</span>~stat  = 'I0002' AND <span style="color: #fb2412;">s_frei</span>~inact = space
+     AND <span style="color: #fb2412;">s_druc</span>~stat  = 'I0007' AND <span style="color: #fb2412;">s_druc</span>~inact = space.
+  IF sy-subrc = 0.
+    WRITE: / sy-dbcnt, 'Aufträge mit Status FREI DRUC gefunden'.
+  ELSE.
+    WRITE: / 'Keine Aufträge gefunden mit Status FREI DRUC'.
+  ENDIF.</pre>
+<p><strong><u>Hinweis:</u></strong><br />
+In diesem speziellen Beispiel müssen Sie allerdings vorsichtig sein! Sie können den Fall nicht umkehren und alle freigegebenen Aufträge suchen, die <strong>noch nicht gedruckt wurden</strong>! In dem Fall ist nämlich der Status I0007-DRUC nicht zwingend in der Tabelle JEST vorhanden!</p>
+<p>Der Beitrag <a href="/blog/join-ueber-gleiche-tabelle/">Join über gleiche Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Feldvergleich</title>
+		<link>/blog/feldvergleich/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 10 May 2006 17:20:38 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SQL]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=371</guid>
+
+					<description><![CDATA[<p>Mit diesem Select-Befehl zeigen wir Ihnen, wie sie die Datenbank anweisen k&#246;nnen, nur die S&#228;tze zu selektieren, bei denen Felder innerhalb eines Datensatz gleich sind.</p>
+<p>Der Beitrag <a href="/blog/feldvergleich/">Feldvergleich</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Select-Befehl zeigen wir Ihnen, wie sie die Datenbank anweisen k&ouml;nnen, nur die S&auml;tze zu selektieren, bei denen Felder innerhalb eines Datensatz gleich sind.<br /><P>Nehmen wir an, Sie haben die folgende Tabelle ZADR:</P><P><TABLE width="100%"><TBODY><TR><TD width="25%"><STRONG>Name</STRONG></TD><TD width="25%"><STRONG>Wohnort</STRONG></TD><TD width="25%"><STRONG>Ort_Firma</STRONG></TD><TD width="25%"><STRONG>Telefon</STRONG></TD></TR><TR><TD>Hans</TD><TD>M&uuml;nchen</TD><TD>M&uuml;nchen</TD><TD>089 123456</TD></TR><TR><TD>Peter</TD><TD>Hamburg</TD><TD>Hamburg</TD><TD>040 666777</TD></TR><TR><TD>Maria</TD><TD>Hannover</TD><TD>Braunschweig</TD><TD>0511 100200</TD></TR></TBODY></TABLE></P><P>Sie m&ouml;chten jetzt alle Personen selektieren, die im gleichen Ort arbeiten in dem sie auch wohnen.</P><P><STRONG>Mit diesem Select geht das:</STRONG></P><P class="sap1">DATA: lt_adr LIKE zadr OCCURS 0 WITH HEADER LINE.<BR><BR>SELECT * FROM zadr <FONT color="#fb2412">AS adr</FONT><BR>&nbsp; INTO TABLE lt_adr<BR>&nbsp;WHERE <FONT color="#fb2412">adr~</FONT>wohnort = <FONT color="#fb2412">adr~</FONT>ort_firma.</P><P>&#8220;Hans&#8221; und &#8220;Peter&#8221; landen in der internen Tabelle lt_adr.</P></p>
+<p>Der Beitrag <a href="/blog/feldvergleich/">Feldvergleich</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Allgemeiner Inner Join</title>
+		<link>/blog/allgemeiner-inner-join/</link>
+					<comments>/blog/allgemeiner-inner-join/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 09 Aug 2005 20:35:11 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=348</guid>
+
+					<description><![CDATA[<p>In diesem Beitrag finden Sie einen Inner Join allgemein beschrieben. Es hilft Ihnen eventuell, die Erstellung eines Joins &#252;ber zwei oder sogar mehr Tabellen zu verstehen oder dient Ihnen als Vorlage f&#252;r Joins.</p>
+<p>Der Beitrag <a href="/blog/allgemeiner-inner-join/">Allgemeiner Inner Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beitrag finden Sie einen Inner Join allgemein beschrieben. Es hilft Ihnen eventuell, die Erstellung eines Joins &uuml;ber zwei oder sogar mehr Tabellen zu verstehen oder dient Ihnen als Vorlage f&uuml;r Joins.<br /><P class="sap1"><FONT color="#fb2412">*** Datenbeschreibung ***</FONT><BR>DATA: BEGIN OF wa_join,<BR>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; feld01 LIKE tab01-feld01,<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; feld02 LIKE tab01-feld02,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; feld03 LIKE tab02-feld01,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; feld04 LIKE tab02-feld02,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; END OF wa_join,</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;it_join&nbsp; LIKE TABLE OF wa_join.</P><P class="sap1"><FONT color="#fb2412">*** Selektionsbild ***</FONT><BR>SELECT-OPTIONS so_feld01 FOR wa_join-feld01.</P><P class="sap1"><FONT color="#fb2412">*** Selektion der Daten aus dbtab01 und dbtab02</FONT><BR>SELECT tab01~feld01 tab01~feld02 tab02~feld01 tab02~feld02<BR>&nbsp; INTO TABLE it_join<BR>&nbsp; FROM&nbsp;dbtab01 AS tab01<BR>&nbsp;INNER JOIN dbtab02 AS tab02 ON&nbsp;tab01~feld01 = tab02~feld01<BR>&nbsp;WHERE&nbsp;tab01~feld01&nbsp;IN so_feld01.<BR><BR><FONT color="#fb2412">*** Ausgabe der Daten</FONT><BR>LOOP AT it_join INTO wa_join.</P><P class="sap1">&nbsp; WRITE: / wa_join-feld01, <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; wa_join-feld02, <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; wa_join-feld03, <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; wa_join-feld04.</P><P class="sap1">ENDLOOP.</P></p>
+<p>Der Beitrag <a href="/blog/allgemeiner-inner-join/">Allgemeiner Inner Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/allgemeiner-inner-join/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>EXEC SQL</title>
+		<link>/blog/exec-sql/</link>
+					<comments>/blog/exec-sql/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 02 Oct 2004 13:29:03 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Syslog]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=283</guid>
+
+					<description><![CDATA[<p>Hier wird ein SELECT-Befehl in einer EXEC SQL-Klammer ausgef&#252;hrt. Der SELECT bietet dann mehr M&#246;glichkeiten. In diesem Beispiel wird ein gelesenes Feld in GRO&#223;-Buchstaben umgwandelt.</p>
+<p>Der Beitrag <a href="/blog/exec-sql/">EXEC SQL</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2>Open SQL vs. Native SQL</h2>
+<p>ABAP verwendet für die Datenbankzugriffe Open SQL. Das ist ein Format, das Datenbank unabhängig ist. Dadurch ist es möglich, eine durchgängige ABAP-Syntax zu haben, unabhängig davon, welche Datenbank verwendet wird.</p>
+<p>Unterschiede werden hier ganz gut erklärt:</p>
+<p><a href="https://blogs.sap.com/2006/06/26/open-sql-vs-native-sql/">https://blogs.sap.com/2006/06/26/open-sql-vs-native-sql/</a></p>
+<h3>Open SQL</h3>
+<p>Durch den Zugriff mittels Open SQL sind die Zugriffe auf die Datenbank genormt und beschnitten. Nicht jede Funktionalität, die eine Datenbank bietet, wird von Open SQL unterstützt.</p>
+<h3>Native SQL</h3>
+<p>Es können im ABAP-Umfeld Native SQL Anweisungen ausgeführt werden. Diese müssen mittels <a href="https://help.sap.com/doc/abapdocu_750_index_htm/7.50/en-US/abapexec_cursor.htm">EXEC-SQL</a> definiert werden.</p>
+<h2>Anwendungsbeispiel &#8220;upper&#8221;</h2>
+<p>Im Folgenden wird ein SELECT-Befehl in einer EXEC SQL-Klammer ausgeführt. Der SELECT bietet dann mehr Möglichkeiten. In diesem Beispiel wird ein gelesenes Feld mit dem Native SQL-Befehl &#8220;upper&#8221; in GROß-Buchstaben umgewandelt.</p>
+<p>In dem folgenden Coding wird in der Länderbezeichnung der Ländertabelle T005T, die als &#8220;lower-case&#8221; gespeichert ist, nach einem Wert gesucht.</p>
+<h2>Code</h2>
+<pre>REPORT Z.
+
+DATA:
+  itab like t005t OCCURS 0 WITH HEADER LINE,
+    BEGIN OF i_exec OCCURS 0,
+      spras LIKE t005t-spras,
+      landx LIKE t005t-landx,
+    END OF i_exec.
+
+*** Zu suchender Text in der Länderbezeichnung
+PARAMETERS: p1 LIKE t005t-landx DEFAULT '*SCH*'.
+
+START-OF-SELECTION.
+
+*** Umsetzung der Wildcards für SELECT
+TRANSLATE p1 USING '*%+_'.
+TRANSLATE p1 TO UPPER CASE.
+
+*** EXEC SQL
+EXEC SQL PERFORMING WRITE_INTO_TABLE.
+  SELECT SPRAS, LANDX, NATIO
+    INTO :ITAB-SPRAS,
+         :ITAB-LANDX,
+         :ITAB-NATIO
+    FROM T005T
+   WHERE MANDT        =    :SY-MANDT
+     AND UPPER(LANDX) LIKE :P1
+ENDEXEC.
+
+*** Ausgabe der selektierten Länder
+LOOP AT i_exec.
+  WRITE:/ i_exec.
+ENDLOOP.
+
+**************************************************
+* FORM write_into_table
+**************************************************
+FORM write_into_table.
+
+  MOVE-CORRESPONDING itab TO i_exec.
+  APPEND i_exec.
+
+ENDFORM.</pre>
+<h2>Groß-Kleinschreibung Code</h2>
+<p>Eventuell muss darauf geachtet werden, dass die Feldnamen case-sensitiv sind (MS-SQL; Hinweis 459676).</p>
+<h2>Groß-Kleinschreibung Text</h2>
+<p>Sonderzeichen und Umlaute sind problematisch. Der String &#8220;Bäcker&#8221; wird mit der Metode evtl. nicht gefunden, da der Native-SQL-Zugriff die Sonderzeichen nicht korrekt umwandelt.</p>
+<h2>SQL-Fehler</h2>
+<p>SQL-Fehler 207 oder 208 bei EXEC SQL oder ADBC-Zugriff auf Tabelle</p>
+<p>207 Invalid column name &#8216;&lt;name&gt;&#8217;.<br />
+208 Invalid object name &#8216;&lt;name&gt;&#8217;.</p>
+<p>Falls ein verkehrter Feldname angegeben wird &#8211; z.B. MANDT anstelle von CLIENT &#8211; dann wird ein Kurzdump erzeugt. Dort taucht aber nur der Fehler 207 auf. Im Syslog SM21 stehen dann genauere Informationen:</p>
+<p>Laufzeitfehler &#8220;DBIF_DSQL2_SQL_ERROR&#8221; aufgetreten.<br />
+&gt; Kurzdump &#8220;080311 131016 xserver02 _XPO_00 &#8221; erstellt.<br />
+Datenbankfehler 207 beim OPC aufgetreten<br />
+&gt; Invalid column name &#8216;MANDT&#8217;.Invalid column name<br />
+&gt; &#8216;addrnumber&#8217;.Invalid column name &#8216;name1&#8217;.</p>
+<p>Der Beitrag <a href="/blog/exec-sql/">EXEC SQL</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/exec-sql/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Unterschiedliche Einträge</title>
+		<link>/blog/unterschiedliche-eintraege/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 18 Sep 2004 13:09:50 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SQL]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=278</guid>
+
+					<description><![CDATA[<p>Aufgabe: Suchen Sie aus der Partnertabelle des Kundenstamms (KNVP) alle Kunden heraus, denen Partner der Partnerrolle "Z1" UND "Z2" zugeordnet sind. Eventuell w&#252;rde man die Partner Z1 und Z2 aller in Frage kommenden Kunden in jeweils eine Tabelle lesen und dann mittels LOOP und READ einen Abgleich programmieren. Dies ist aber sehr aufw&#228;ndig. Es geht auch mit einer "Subskalaren Query".</p>
+<p>Der Beitrag <a href="/blog/unterschiedliche-eintraege/">Unterschiedliche Einträge</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Aufgabe: Suchen Sie aus der Partnertabelle des Kundenstamms (KNVP) alle Kunden heraus, denen Partner der Partnerrolle &#8220;Z1&#8221; UND &#8220;Z2&#8221; zugeordnet sind. Eventuell würde man die Partner Z1 und Z2 aller in Frage kommenden Kunden in jeweils eine Tabelle lesen und dann mittels LOOP und READ einen Abgleich programmieren. Dies ist aber sehr aufwändig. Es geht auch mit einer &#8220;Subskalaren Query&#8221;.</p>
+<pre class="lang:abap decode:true ">*** Datendefinition
+DATA:
+  BEGIN OF itab OCCURS 0,
+    kunnr TYPE kunnr,
+    vkorg type vkorg,
+    vtweg type vtweg,
+    spart type spart,
+  END   OF itab.
+
+*** Eingabeoptionen
+SELECT-OPTIONS s_kunnr FOR  itab-kunnr.
+PARAMETERS     p_vkorg TYPE vkorg.
+
+*** Datenselektion
+SELECT distinct kunnr vkorg vtweg spart
+  FROM knvp as knvp1
+  INTO TABLE itab
+ WHERE vkorg = p_vkorg
+   AND kunnr in s_kunnr
+   AND parvw = 'Z1'
+   AND EXISTS
+     ( SELECT kunnr from knvp as knvp2
+        WHERE vkorg = knvp1~vkorg
+          AND vtweg = knvp1~vtweg
+          AND spart = knvp1~spart
+          AND kunnr = knvp1~kunnr
+          AND parvw = 'Z2'  ).
+*** Ausgabe der Ergebnisse
+LOOP AT ITAB.
+  WRITE: / itab-kunnr, 
+           itab-vkorg, 
+           itab-vtweg, 
+           itab-spart.
+ENDLOOP.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/unterschiedliche-eintraege/">Unterschiedliche Einträge</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Mega-Inner Join</title>
+		<link>/blog/mega-inner-join/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 19 May 2003 20:25:24 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=68</guid>
+
+					<description><![CDATA[<p>Ein "Inner Join" &#252;ber mehrere Tabellen, der auch noch Sinn macht: Er liest ein oder mehrere Merkmale aus einer Kundenauftragskonfiguration.</p>
+<p>Der Beitrag <a href="/blog/mega-inner-join/">Mega-Inner Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein &#8220;Inner Join&#8221; &uuml;ber mehrere Tabellen, der auch noch Sinn macht: Er liest ein oder mehrere Merkmale aus einer Kundenauftragskonfiguration.<br /><P class="text1">Das folgende Programm liest die Konfiguration eines Kundenauftrags. Obwohl die Variantenkonfiguration mittels der Klassifizierung angelegt und designed wird, werden die Daten in anderen Tabellen gespeichert. </P><P class="text1">Die Verwendung ist allerdings mit Vorsicht zu geniessen, da evtl. einzelne Werte erst aus anderen Konfigurationsdaten hergeleitet werden und gar nicht abgespeichert werden.</P><P class="text1">Verwenden Sie gegebenenfalls den Funktionsbaustein <STRONG><FONT color="#fb2412">VC_I_GET_CONFIGURATION</FONT></STRONG> um die komplette Konfiguration einer Auftragsposition zu lesen. INSTANCE ist VBAP-CUOBJ.</P><P class="text1"><STRONG>Bitte beachten Sie, dass es zwei Coding-Varianten gibt!</STRONG></P><P class="head1">Coding 1 &#8211; Objektschl&uuml;ssel</P><P class="sap1">REPORT zzconf01 .<BR><BR>DATA:<BR>&nbsp; l_objkey TYPE ibobjkey,<BR>&nbsp; lv_datts TYPE ib_valfr,<BR>&nbsp; BEGIN OF ls_erg,<BR>&nbsp;&nbsp;&nbsp; atwrt TYPE atwrt,<BR>&nbsp;&nbsp;&nbsp; atflv TYPE atflv,<BR>&nbsp;&nbsp;&nbsp; atnam TYPE atnam,<BR>&nbsp;&nbsp;&nbsp; anzdz TYPE anzdz,<BR>&nbsp;&nbsp;&nbsp; atbez TYPE atbez,<BR>&nbsp; END OF ls_erg,<BR>&nbsp; lt_erg&nbsp; like ls_erg occurs 0.<BR><BR><FONT color="#fb2412">*** Selektionsbild</FONT><BR>PARAMETERS:<BR>&nbsp; p_vbeln TYPE vbeln_va DEFAULT &#8216;123456&#8217;,<BR>&nbsp; p_posnr TYPE posnr DEFAULT &#8216;000010&#8217;.<BR>SELECT-OPTIONS:<BR>&nbsp; s_atnam&nbsp;FOR ls_erg-atnam.<BR><BR>START-OF-SELECTION.<BR><BR><FONT color="#fb2412">*** Objektschl&uuml;ssel erzeugen</FONT><BR>&nbsp;CONCATENATE p_vbeln p_posnr INTO l_objkey.</P><P class="sap1"><FONT color="#fb2412">*** Tagesdatum in Zeitstempel konvertieren</FONT><BR>&nbsp; CONVERT DATE sy-datum<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TIME sy-uzeit<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INTO TIME STAMP lv_datts TIME ZONE sy-zonlo.</P><P class="sap1"><FONT color="#fb2412">*** Werte lesen</FONT><BR>&nbsp;SELECT ibsymbol~atwrt<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ibsymbol~atflv<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cabn~atnam<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cabn~anzdz<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cabnt~atbez<BR>&nbsp;&nbsp; FROM ibsymbol<BR>&nbsp; INNER JOIN ibinvalues&nbsp;<BR>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ON ibinvalues~symbol_id = ibsymbol~symbol_id<BR>&nbsp; INNER JOIN ibin&nbsp;&nbsp;&nbsp; ON ibin~in_recno&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;= ibinvalues~in_recno<BR>&nbsp; INNER JOIN ibinown ON ibinown~instance&nbsp;&nbsp;&nbsp;&nbsp; = ibin~instance<BR>&nbsp; INNER JOIN cabn&nbsp;&nbsp;&nbsp; ON cabn~atinn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ibsymbol~atinn<BR>&nbsp; INNER JOIN cabnt &nbsp; ON cabnt~atinn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = cabn~atinn<BR>&nbsp;&nbsp; INTO TABLE lt_erg<BR>&nbsp; WHERE ibinown~objkey = l_objkey<BR>&nbsp;&nbsp;&nbsp; AND ibinown~inttyp = &#8216;0001&#8217;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Auftragsposition<BR>&nbsp;&nbsp;&nbsp; and cabn~atnam&nbsp;&nbsp;&nbsp;&nbsp; in s_atnam<BR>&nbsp;&nbsp;&nbsp; AND cabnt~spras&nbsp;&nbsp;&nbsp; = sy-langu<BR>&nbsp;&nbsp;&nbsp; AND ibin~valfr&nbsp;&nbsp;&nbsp; &lt;= lv_datts<BR>&nbsp;&nbsp;&nbsp; AND ibin~valto&nbsp;&nbsp; &nbsp;&gt;= lv_datts.<BR><BR><FONT color="#fb2412">*** Werte ausgeben<BR></FONT>LOOP AT lt_erg into ls_erg.</P><P class="sap1">&nbsp; WRITE: / ls_erg-atbez, ls_erg-atnam.<BR>&nbsp; IF ls_erg-atflv IS INITIAL.<BR>&nbsp;&nbsp;&nbsp; WRITE ls_erg-atwrt.<BR>&nbsp; ELSE.<BR>&nbsp;&nbsp;&nbsp; WRITE&nbsp; ls_erg-atflv EXPONENT 0 DECIMALS ls_erg-anzdz.<BR>&nbsp; ENDIF.</P><P class="sap1">ENDLOOP.</P><P class="head1">Coding 2 &#8211; Instanz &uuml;ber VBAP ermitteln</P><P class="text1">Selektionsbild und Vorbereitungen wie bei Coding 1.</P><P class="sap1"><FONT color="#fb2412">*** Select des Wertes aus der Konfiguration<BR>*** Werte lesen<BR></FONT>&nbsp; SELECT ibsymbol~atwrt&nbsp;&nbsp; &#8220;<FONT color="#008952">Wert Character</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ibsymbol~atflv&nbsp;&nbsp; &#8220;<FONT color="#008952">Wert numerisch (auch Datum!)<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cabn~atnam&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;<FONT color="#008952">Merkmalsname</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cabn~anzdz&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;<FONT color="#008952">Anzahl Dezimalstellen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cabnt~atbez&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;<FONT color="#008952">Bezeichnung</FONT><BR>&nbsp;&nbsp;&nbsp; FROM ibsymbol<BR>&nbsp;&nbsp; INNER JOIN ibinvalues&nbsp;&nbsp; ON ibinvalues~symbol_id = ibsymbol~symbol_id<BR>&nbsp;&nbsp; INNER JOIN ibin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ON ibin~in_recno&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ibinvalues~in_recno<BR>&nbsp;&nbsp; INNER JOIN ibinown&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ON ibinown~instance&nbsp;&nbsp;&nbsp;&nbsp; = ibin~instance<BR>&nbsp;&nbsp; INNER JOIN vbap&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ON ibinown~instance&nbsp;&nbsp;&nbsp;&nbsp; = vbap~cuobj<BR>&nbsp;&nbsp; INNER JOIN cabn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ON cabn~atinn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ibsymbol~atinn<BR>&nbsp;&nbsp; INNER JOIN cabnt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ON cabnt~atinn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = cabn~atinn<BR>&nbsp;&nbsp;&nbsp; INTO TABLE lt_erg<BR>&nbsp;&nbsp; WHERE vbap~vbeln&nbsp; = p_vbeln<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND vbap~posnr&nbsp; = p_posnr<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND cabn~atnam&nbsp; IN s_atnam<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND cabnt~spras = sy-langu<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND ibin~valfr &lt;= lv_datts<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND ibin~valto &gt;= lv_datts.</P><P class="sap1">&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** Werte&nbsp;ausgeben</FONT><BR>&nbsp;&nbsp;&nbsp; SORT lt_erg BY atnam.<BR>&nbsp;&nbsp;&nbsp; LOOP AT lt_erg INTO ls_erg.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / ls_erg-atnam,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ls_erg-atwrt,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ls_erg-atflv EXPONENT 0 DECIMALS ls_erg-anzdz NO-ZERO.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp; ENDIF.</P></p>
+<p>Der Beitrag <a href="/blog/mega-inner-join/">Mega-Inner Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

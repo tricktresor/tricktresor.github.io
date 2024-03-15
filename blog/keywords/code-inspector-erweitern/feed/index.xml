@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Code Inspector erweitern Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/code-inspector-erweitern/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 05 Feb 2014 17:01:56 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Code Inspector erweitern Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Testprogramm</title>
+		<link>/blog/testprogramm/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 06 Apr 2011 07:27:29 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[Code Inspector erweitern]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=592</guid>
+
+					<description><![CDATA[<p>Um zu überprüfen, ob unsere Prüfroutine auch funktioniert, benötigen wir ein Testprogramm. In diesem Testprogramm wird ein veralteter BAPI aufgerufen und es wird die Verwendung von BAPI_TRANSACTION_COMMIT "vergessen". Das Programm ist mit COMMIT lauffähig und legt einen Kundenauftrag an.</p>
+<p>Der Beitrag <a href="/blog/testprogramm/">Testprogramm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um zu &uuml;berpr&uuml;fen, ob unsere Pr&uuml;froutine auch funktioniert, ben&ouml;tigen wir ein Testprogramm. In diesem Testprogramm wird ein veralteter BAPI aufgerufen und es wird die Verwendung von BAPI_TRANSACTION_COMMIT &#8220;vergessen&#8221;. Das Programm ist mit COMMIT lauff&auml;hig und legt einen Kundenauftrag an.<br /><P class="head1">Coding</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp; Test-Report f&uuml;r Code Inspector Pr&uuml;fung<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>REPORT&nbsp; zzcitest.</P><P class="sap1">DATA gv_vbeln&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE vbeln.</P><P class="sap1">PARAMETERS p_kunag TYPE kunag&nbsp; DEFAULT &#8216;0000002004&#8217;.<BR>PARAMETERS p_matnr TYPE matnr&nbsp; DEFAULT &#8216;M-10&#8217;.<BR>PARAMETERS p_menge TYPE kwmeng DEFAULT &#8216;1&#8217;.<BR>PARAMETERS p_meins TYPE meins&nbsp; DEFAULT &#8216;ST&#8217;.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1">&nbsp; PERFORM createe_order USING p_kunag<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_matnr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_menge<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_meins<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;CHANGING gv_vbeln.</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; create_order<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM createe_order USING iv_kunag TYPE kunag<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_matnr TYPE matnr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_menge TYPE kwmeng<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_meins TYPE meins<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;CHANGING cv_vbeln TYPE vbeln.</P><P class="sap1"><BR>&nbsp; DATA ls_order_header_in TYPE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bapisdhead.<BR>&nbsp; DATA lt_order_items_in&nbsp; TYPE STANDARD TABLE OF bapiitemin.<BR>&nbsp; DATA lt_order_partners&nbsp; TYPE STANDARD TABLE OF bapipartnr.<BR>&nbsp; DATA ls_order_items_in&nbsp; TYPE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bapiitemin.<BR>&nbsp; DATA ls_order_partners&nbsp; TYPE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bapipartnr.<BR>&nbsp; DATA ls_return&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bapireturn.</P><P class="sap1"><BR><FONT color="#fb2412">*** HEADER DATA</FONT><BR>&nbsp; ls_order_header_in-doc_type&nbsp;&nbsp; = &#8216;TA&#8217;.<BR>&nbsp; ls_order_header_in-collect_no = &#8216;XX&#8217;.<BR>&nbsp; ls_order_header_in-sales_org&nbsp; = &#8216;1000&#8217;.<BR>&nbsp; ls_order_header_in-distr_chan = &#8217;12&#8217;.<BR>&nbsp; ls_order_header_in-division&nbsp;&nbsp; = &#8217;00&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** ITEM DATA</FONT><BR>&nbsp; ls_order_items_in-itm_number = 10.<BR>&nbsp; ls_order_items_in-material&nbsp;&nbsp; = iv_matnr.<BR>&nbsp; ls_order_items_in-req_qty&nbsp;&nbsp;&nbsp; = iv_menge * 1000.<BR>&nbsp; ls_order_items_in-sales_unit = iv_meins.<BR>&nbsp; APPEND ls_order_items_in TO lt_order_items_in.</P><P class="sap1"><FONT color="#fb2412">*** PARTNERS</FONT><BR>&nbsp; ls_order_partners-partn_role&nbsp; = &#8216;AG&#8217;.<BR>&nbsp; ls_order_partners-partn_numb&nbsp; = iv_kunag.<BR>&nbsp; APPEND ls_order_partners TO lt_order_partners.</P><P class="sap1"><FONT color="#fb2412">*** CREATE ORDER<BR></FONT>&nbsp; CALL FUNCTION &#8216;BAPI_SALESORDER_CREATEFROMDATA&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; order_header_in = ls_order_header_in<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; salesdocument&nbsp;&nbsp; = cv_vbeln<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_return<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; order_items_in&nbsp; = lt_order_items_in<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; order_partners&nbsp; = lt_order_partners.</P><P class="sap1"><BR><FONT color="#fb2412">*** Eigentlich muss der COMMIT nach einem BAPI erfolgen!<BR>*** Zu Testzwecken &#8220;vergessen&#8221; wir ihn einfach&#8230;<BR>*&nbsp; CALL FUNCTION &#8216;BAPI_TRANSACTION_COMMIT&#8217;.</FONT></P><P class="sap1"><FONT color="#fb2412">*** SHOW CREATED ORDER NUMBER</FONT><BR>&nbsp; write: / cv_vbeln.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;change_order</P></p>
+<p>Der Beitrag <a href="/blog/testprogramm/">Testprogramm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Code Inspector erweitern]]></series:name>
+	</item>
+		<item>
+		<title>Attribute</title>
+		<link>/blog/attribute/</link>
+					<comments>/blog/attribute/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 17:22:13 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[Code Inspector erweitern]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=591</guid>
+
+					<description><![CDATA[<p>Prüfungen können Attribute haben. Das sind Einstellungen, die zu einem Test vorgenommen werden können. Hier kann z.B. noch definiert werden, in welchem Umfang ein Test durchgeführt werden soll.</p>
+<p>Der Beitrag <a href="/blog/attribute/">Attribute</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Prüfungen können Attribute haben. Das sind Einstellungen, die zu einem Test vorgenommen werden können. Hier kann z.B. noch definiert werden, in welchem Umfang ein Test durchgeführt werden soll.</p>
+<p>Typische Attribute sind zum Beispiel die folgenden zur Prüfung &#8220;Analyse der WHERE-Bedingung für SELECT&#8221;:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/CodeInspector/Bild105.jpg" /></p>
+<h2 class="head1">Vorbereitung</h2>
+<p>Dem Code Inspector muss mitgeteilt werden, dass die Klasse Attribute hat. Dies geschieht in der CONSTRUCTOR-Methode:</p>
+<pre class="sap1">  has_attributes = 'X'.</pre>
+<h2 class="head2">Attribute definieren</h2>
+<p>Die Attribute müssen als öffentliche Instanzattribute der Klasse hinzugefügt werden. In diesem Beispiel verwenden wir die Felder GP_CHECK1 und GP_CHECK2:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/CodeInspector/Bild106.jpg" /></p>
+<p>Im Code Inspector erkennt man Prüfungen mit Eingabefeldern (Attributen) daran, dass neben der Prüfung ein &#8220;Werte-eingeben-Icon&#8221; erscheint:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/CodeInspector/Bild108.jpg" /></p>
+<h2 class="head1">Methode QUERY_ATTRIBUTES</h2>
+<p>Die Methode IF_CI_TEST~QUERY_ATTRIBUTES muss redefiniert werden. Hier wird das Popup angezeigt, in dem die Auswahl bzw. Anzeige der Attribute erfolgt:</p>
+<p>Mit folgendem Coding wird dieses Popup automatisch erzeugt:</p>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/CodeInspector/Bild107.jpg" /></p>
+<h2 class="head2">Coding</h2>
+<pre class="sap1">CLASS cl_ci_query_attributes DEFINITION LOAD.
+DATA:
+ l_attributes     TYPE sci_atttab,
+ l_attribute      LIKE LINE OF l_attributes,
+ l_check1         TYPE c,
+ l_check2         TYPE c,
+ l_message(72)    TYPE c.</pre>
+<pre><span style="color: #fb2412;">*-- macro to fill attributes
+</span>DEFINE fill_att.
+  get reference of &amp;1 into l_attribute-ref.
+  l_attribute-text = &amp;2.
+  l_attribute-kind = &amp;3.
+  append l_attribute to l_attributes.
+END-OF-DEFINITION.</pre>
+<pre><span style="color: #fb2412;">*-- save global attributes local
+</span>  l_check1  = gp_check1.
+  l_check2  = gp_check2.</pre>
+<pre><span style="color: #fb2412;">*-- fill attribute table
+ </span> fill_att gp_check1   'Prüfung Eins'   ' '.
+  fill_att gp_check2   'Prüfung Zwei'   'C'.</pre>
+<pre><span style="color: #fb2412;">*-- Display Popup with attributes
+ </span> IF cl_ci_query_attributes=&gt;generic(
+    p_name       = myname
+    p_title      = 'Meine Attribute'(005)
+    p_attributes = l_attributes
+    p_message    = l_message
+    p_display    = p_display ) = 'X'.
+ <span style="color: #fb2412;">*-- = 'X' --&gt; 'Exit' Button pressed on PopUp
+ </span>   RETURN.
+  ENDIF.</pre>
+<pre><span style="color: #fb2412;">*-- set attributes-ok-flag
+ </span> attributes_ok  = c_true.</pre>
+<h2 class="head2">QUERY-Table / Attributtabelle</h2>
+<p class="text1">Mit Hilfe der Methode <em>cl_ci_query_attributes=&gt;generic</em> werden die Attribute im Popup angezeigt. Zuvor müssen die Attribute mit dem Macro <em>fill_att</em> definiert werden.</p>
+<p class="text1">Folgende Einträge sind möglich in der Tabelle für die Attribute (Auszug aus der Doku zu Struktur SCI_ATTENT):</p>
+<p class="text1">Die Struktur SCI_ATTENT beschreibt Felder eines Dialoges. Die einzelnen Komponenten können folgen Werte annehmen.</p>
+<p class="text1"><strong>o   KIND</strong></p>
+<ul>
+<li>
+<div class="text1">     &#8216;G&#8217; &#8211; Gruppierung der folgenden Felder</div>
+</li>
+<li>
+<div class="text1">     &#8216;C&#8217; &#8211; Darstellung als Ankreuzfeld</div>
+</li>
+<li>
+<div class="text1">     &#8216;R&#8217; &#8211; Darstellung als Auswahlknopf (siehe auch BUTTON_GROUP)</div>
+</li>
+<li>
+<div class="text1">     &#8216;S&#8217; &#8211; Darstellung als Selektionskriterium</div>
+</li>
+<li>
+<div class="text1">     &#8216;L&#8217; &#8211; Darstellung als Listbox</div>
+</li>
+</ul>
+<p class="text1"><strong>o   REF</strong></p>
+<p class="text1">    Referenz auf das Attribut</p>
+<p class="text1"><strong>o   TEXT</strong></p>
+<p class="text1">    Beschreibung oder Titel</p>
+<p class="text1"><strong>o   BUTTON_GROUP</strong></p>
+<p class="text1">    Spezifiziert die Auswahlgruppe der ein Auswahlknopf zugeordnet ist.</p>
+<h1 class="head1">Speichern</h1>
+<p class="text1">Damit die Attribute auch gespeichert werden, müssen die beiden Methoden GET_ATTRIBUTES und PUT_ATTRIBUTES redefiniert werden. Die Namensgebung der Methoden ist meines Erachtens etwas verwirrend, denn mit GET werden die Attribute gespeichert und mit PUT gelesen&#8230;</p>
+<h2 class="head2">Methode GET_ATTRIBUTES</h2>
+<p>Speichern der Attribute:</p>
+<pre class="sap1">EXPORT gp_check1   = gp_check1
+       gp_check2   = gp_check2
+    TO DATA BUFFER p_attributes.</pre>
+<h2 class="head2">Methode PUT_ATTRIBUTES</h2>
+<p>Lesen der Attribute</p>
+<pre class="sap1">IMPORT gp_check1   = gp_check1
+       gp_check2   = gp_check2
+  FROM DATA BUFFER p_attributes.</pre>
+<h2 class="head1">Verwendung</h2>
+<p>Die Attribute können nun im Code Inspector eingegeben werden und in der Prüfroutine abgefragt werden. Sie könnten zum Beispiel das Aufspüren des fehlenden BAPI_TRANSACTION_COMMIT als Option definieren, so dass eine Prüfung auch ohne diesen Check durchgeführt werden kann.</p>
+<p>Sie können aber auch steuern, ob die Prüfung einen Fehler oder nur eine Warnung erzeugen soll und dies im Coding berücksichtigen.</p>
+<p>Der Beitrag <a href="/blog/attribute/">Attribute</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/attribute/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		
+		<series:name><![CDATA[Code Inspector erweitern]]></series:name>
+	</item>
+		<item>
+		<title>Dokumentation</title>
+		<link>/blog/dokumentation/</link>
+					<comments>/blog/dokumentation/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 16:00:41 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[Code Inspector erweitern]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=590</guid>
+
+					<description><![CDATA[<p>Eine kurze Beschreibung, wie die Dokumentation zur eigenen Code-Inspector-Prüfung zu geschehen hat.</p>
+<p>Der Beitrag <a href="/blog/dokumentation/">Dokumentation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine kurze Beschreibung, wie die Dokumentation zur eigenen Code-Inspector-Pr&uuml;fung zu geschehen hat.<br /><P>Um eine Pr&uuml;fung zu dokumentieren, wechseln Sie in die Transaktion SE61 und w&auml;hlen die Dokumentenklasse &#8220;Klassen-Attribut&#8221;. Als Klassenattribut geben Sie den Namen der erstellten Klasse ein und als Versionsnummer 0000.</P><P><IMG src="/wp-content/uploads/tt_images/CodeInspector/Bild104.jpg"></P><P><U><STRONG>INFO<BR></STRONG></U>Die Versionsnummer richtet sich nach der Version, die Sie im CONSTRUCTOR definiert haben!!</P><P>Legen Sie die Doku an und AKTIVIEREN Sie die Doku mit STRG-F11. Die Doku wird dann angezeigt, wenn Sie im Code-Inspector auf das blaue&nbsp;&nbsp;<FONT>[_<STRONG>i</STRONG>_]</FONT><FONT> </FONT>&nbsp;klicken.</P></p>
+<p>Der Beitrag <a href="/blog/dokumentation/">Dokumentation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokumentation/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		
+		<series:name><![CDATA[Code Inspector erweitern]]></series:name>
+	</item>
+		<item>
+		<title>Fehlermeldungen</title>
+		<link>/blog/fehlermeldungen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 15:48:46 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[Code Inspector erweitern]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=589</guid>
+
+					<description><![CDATA[<p>Wenn nun unsere Prüfung einen Fehler findet, dann soll dieser Fehler natürlich auch in der Ergebnisliste des Code Inspectors ausgegeben werden. Dies machen wir nun.</p>
+<p>Der Beitrag <a href="/blog/fehlermeldungen/">Fehlermeldungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wenn nun unsere Pr&uuml;fung einen Fehler findet, dann soll dieser Fehler nat&uuml;rlich auch in der Ergebnisliste des Code Inspectors ausgegeben werden. Dies machen wir nun.<br /><P>In der Methode RUN haben wir mit der Methode &#8220;INFORM&#8221; bereits Meldungen erzeugt. Diese tauchen jedoch nur als &#8220;unbekannte Meldungen&#8221; auf. Wir m&uuml;ssen also noch nachbessern!</P><P><IMG src="/wp-content/uploads/tt_images/CodeInspector/Bild102.jpg"></P><P>Wir k&ouml;nnen die Meldungen direkt in der Methode GET_MESSAGE_TEXT definieren oder wir f&uuml;llen die daf&uuml;r vorgesehene Meldungstabelle.</P><P class="head1">Meldungstabelle</P><P>In der CONSTRUCTOR-Methode f&uuml;llen wir die Meldungstabelle:</P><P class="sap1"><FONT color="#fb2412">*** MAKRO TO FILL MESSAGE TABLE<BR></FONT>&nbsp; define FILL_MESSAGE.<BR>&nbsp;&nbsp;&nbsp; clear SMSG.<BR>&nbsp;&nbsp;&nbsp; SMSG-TEST = MYNAME.<BR>&nbsp;&nbsp;&nbsp; SMSG-CODE = &amp;1.&nbsp; &#8220;message code<BR>&nbsp;&nbsp;&nbsp; SMSG-KIND = &amp;2.&nbsp; &#8220;message priority<BR>&nbsp;&nbsp;&nbsp; SMSG-TEXT = &amp;3.&nbsp; &#8220;message text<BR>&nbsp;&nbsp;&nbsp; SMSG-PCOM = &amp;4.&nbsp; &#8220;pseudocomment<BR>&nbsp;&nbsp;&nbsp; INSERT SMSG INTO TABLE SCIMESSAGES.<BR>&nbsp; end-of-definition.<BR><BR><FONT color="#fb2412">*** CODE 0001&nbsp;***<BR></FONT>&nbsp; FILL_MESSAGE &#8216;0001&#8217; &#8216;W&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;BAPI &amp;1 nicht mehr verwenden! Er ist veraltet!&#8217;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8216;&#8221;#EC CI_BAPIOLD&#8217;.<BR><FONT color="#fb2412">*** CODE 0002 ***</FONT><BR>&nbsp; FILL_MESSAGE &#8216;0002&#8217; &#8216;W&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;Aufruf BAPI ohne &amp;1!!&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;#EC CI_BAPICOM&#8217;.<BR></P><P class="head1">Methode GET_MESSAGE_TEXT</P><P class="head2">&#8230;mit Meldungstabelle</P><P>Um die im CONSTRUCTOR definierten Eintr&auml;ge nutzen zu k&ouml;nnen, reicht es, die Methode einfach nicht zu redefinieren, denn das Lesen geschieht in der beerbten Klasse:</P><P><IMG src="/wp-content/uploads/tt_images/CodeInspector/Bild103.jpg"></P><P><STRONG><U>Achtung!<BR></U></STRONG>Die hier definierte Meldungstyp (Fehler, Warnung, Info) &uuml;bersteuert den Meldungstyp aus dem Aufruf der INFORM-Methode!!</P><P class="head2">&#8230;mit definierten Meldungen</P><P>Reicht die Funktionalit&auml;t der Meldungstabelle nicht, so muss die Methode GET_MESSAGE_TEXT redefiniert und mit Leben gef&uuml;llt werden:</P><P>In folgendem Beispiel werden die beiden Meldungen 0001 und 0002 separat definiert. Alle anderen werden aus der Fehlertabelle gelesen:</P><P class="sap1">&nbsp; CASE p_code.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;0001&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_text = &#8216;BAPI ist veraltet: &amp;1&#8217;.<BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;0002&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_text = &#8216;BAPI-Aufruf ohne BAPI_TRANSACTION_COMMIT!&#8217;.<BR>&nbsp;&nbsp;&nbsp; WHEN OTHERS.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL METHOD super-&gt;get_message_text<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_test = p_test<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_code = p_code<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_text = p_text.<BR>&nbsp; ENDCASE.<BR></P><P>Hier k&ouml;nnen eventuell noch Daten nachgelesen werden.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/fehlermeldungen/">Fehlermeldungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Code Inspector erweitern]]></series:name>
+	</item>
+		<item>
+		<title>Eigene Prüfungen implementieren</title>
+		<link>/blog/eigene-pruefungen-implementieren/</link>
+					<comments>/blog/eigene-pruefungen-implementieren/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 15:47:17 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[Code Inspector erweitern]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=588</guid>
+
+					<description><![CDATA[<p>Nun wollen wir eine eigene Prüfung in den Code Inspector einbauen. Hierfür müssen wir eine der beiden Klasse CL_CI_TEST_ROOT_TEMPLATE oder CL_CI_TEST_SCAN_TEMPLATE kopieren und entsprechend ausprogrammieren.</p>
+<p>Der Beitrag <a href="/blog/eigene-pruefungen-implementieren/">Eigene Prüfungen implementieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Nun wollen wir eine eigene Pr&uuml;fung in den Code Inspector einbauen. Hierf&uuml;r m&uuml;ssen wir eine der beiden Klasse CL_CI_TEST_ROOT_TEMPLATE oder CL_CI_TEST_SCAN_TEMPLATE kopieren und entsprechend ausprogrammieren.<br /><P class="head1">Wozu eigentlich eigene Pr&uuml;fungen?</P><P class="text1">Vielleicht fragen Sie sich die ganze Zeit, wozu Sie &uuml;berhaupt eigene Pr&uuml;fungen ben&ouml;tigen sollten, da ja bereits viele wichtige Checks im Standard vorhanden sind&#8230; </P><P class="text1">Erstens ist es immer gut zu wissen, dass es &uuml;berhaupt geht. Zweitens gibt es eine Vielzahl von Pr&uuml;fungen, die man vornehmen k&ouml;nnte:</P><UL><LI><DIV class="text1">Verweist die &Auml;nderung im Programmkopf auf eine g&uuml;ltige Ticket-Nummer?</DIV><LI><DIV class="text1">Wurde beim Update bestimmter kundeneigener Tabellen darauf geachtet auch eine zweite zwingend notwendige Tabelle anzupassen?</DIV><LI><DIV class="text1">Wurde ein Update auf eine Tabelle vorgenommen, f&uuml;r die nur ein bestimmter Funktionsbaustein verwendet werden soll?</DIV><LI><DIV class="text1">Wurde eine Tabelle gelesen, die besser mit einem Methode gelesen werden sollte, da bei dieser Tabelle in der Regel immer auch Daten nachgelesen werden m&uuml;ssen, deren Beschaffung sehr performance-kritisch ist?</DIV><LI><DIV class="text1">Wurde eine Programm&auml;nderung in einem anderen externen Tool ebenfalls dokumentiert?</DIV><LI><DIV class="text1">Wird eine Standard-SAP-Klasse verwendet, f&uuml;r die es jedoch eine kundeneigene vererbte Klasse gibt, die wichtige Sonderfunktionen enth&auml;lt?</DIV></LI></UL><P class="text1">Die Liste lie&szlig;e sich noch weiter f&uuml;hren. Jedes Unternehmen hat spezifische Anforderungen, deren Einhaltung durch automatische Tests gut gepr&uuml;ft werden kann.</P><P class="head1">Aufgabe</P><P>Kommen wir nun zu des Pudels Kern oder wie das so sch&ouml;n hei&szlig;t: Wir legen eine eigene Pr&uuml;fung an. Da der Code Inspector&nbsp;ja helfen soll, die Programmqualit&auml;t zu verbessern und den Anwender auf Fehler hinzuweisen, wollen wir eine Pr&uuml;fung implementieren, die den Programmierer</P><OL><LI>auf nicht zu verwendende BAPIs (da veraltet) hinweist und <LI>&uuml;berpr&uuml;ft, ob nach einem BAPI auch ein BAPI_TRANSACTION_COMMIT erfolgt.</LI></OL><P>Erstere Pr&uuml;fung kann wichtig sein, da bestimmte Funktionen in einigen BAPIs vielleicht nicht funktionieren oder diese BAPIs nicht mehr gewartet werden. </P><P>Zweitere Pr&uuml;fung soll helfen, einen weit verbreiteten Anf&auml;ngerfehler zu vermeiden: Das fehlende explizite COMMIT bei einem BAPI, der &Auml;nderungen ausf&uuml;hrt.</P><P class="head1">Klasse anlegen</P><P>Als erstes kopieren wir die Klasse <STRONG>CL_CI_TEST_SCAN_TEMPLATE</STRONG> auf <STRONG>Z_CL_CI_TEST_SCAN_TT1</STRONG>.</P><P>Diese Klasse erbt von <STRONG>CL_CI_TEST_SCAN</STRONG>. Die folgenden drei Methoden sind bereits vorhanden und m&uuml;ssen angepasst (redefiniert)&nbsp;werden:</P><P class="head2">Methode CONSTRUCTOR</P><P>Zuerst passen wir den Konstruktor an. Hier wird definiert, wie der Test hei&szlig;t, und welcher Kategorie er zugeordnet ist:</P><P class="sap1">&nbsp; super-&gt;constructor( ).<BR>&nbsp; description&nbsp;&nbsp;&nbsp; = &#8216;Tricktresor BAPI&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;required<BR>&nbsp; category&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;Z_CL_CI_CATEGORY_TT&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;required<BR>&nbsp; version&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;000&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;required<BR>&nbsp; has_attributes = &#8216; &#8216;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;optional<BR>&nbsp; attributes_ok&nbsp; = &#8216; &#8216;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;optional<BR>&nbsp; myname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;Z_CL_CI_TEST_SCAN_TT1&#8217;.&nbsp;&nbsp;&nbsp; &#8220;own name<BR></P><P class="text1">Nachdem die Klasse aktiviert wurde und in <FONT color="#fb2412">Transaktion SCI in der Test-Verwaltung aktiviert</FONT> wurde, ist die neue Pr&uuml;fung bereits in der Pr&uuml;fvariante sichtbar:</P><P><IMG src="/wp-content/uploads/tt_images/CodeInspector/Bild100.jpg"></P><P>Damit die Pr&uuml;fung allerdings auch funktioniert, m&uuml;ssen wir nat&uuml;rlich noch etwas mehr unternehmen&#8230;</P><P class="head2">Methode RUN</P><P>Hier erfolgt die eigentlich Pr&uuml;fung anhand des Quelltextes. Es stehen einerseits der Quelltext als auch die Aufsplittung des Quelltextes in TOKENS zur Verf&uuml;gung.</P><P>Sollte der Check der allererste&nbsp;in der&nbsp;Liste der auszuf&uuml;hrenden&nbsp;Pr&uuml;fungen sein, so muss erst einmal die&nbsp;Referenz auf das Pr&uuml;fobjekt geholt werden:</P><P class="sap1">&nbsp; IF ref_scan IS INITIAL.<BR>&nbsp;&nbsp;&nbsp; CHECK get( ) = &#8216;X&#8217;.<BR>&nbsp; ENDIF.<BR></P><P>Nun nehmen wir den Quellcode in die&nbsp;Mangel&nbsp;und suchen veraltete BAPIs&#8230; Zuerst die Datendeklaration:</P><P class="sap1"><FONT color="#fb2412">*** DATA</FONT><BR>&nbsp; FIELD-SYMBOLS &lt;token&gt; TYPE stokesx.<BR>&nbsp; DATA ls_token1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE stokesx.<BR>&nbsp; DATA ls_token2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE stokesx.<BR>&nbsp; DATA lv_tabix1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE i.<BR>&nbsp; DATA lv_tabix2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE i.<BR>&nbsp; DATA lv_level&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE i.<BR>&nbsp; DATA lv_include&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE program.<BR>&nbsp; DATA l_errcnt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE sci_errcnt.<BR>&nbsp; DATA lv_objname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE c LENGTH 50.<BR>&nbsp; DATA lv_bapi_used&nbsp;&nbsp;&nbsp;&nbsp; TYPE c.<BR>&nbsp; DATA lv_bapi_commit&nbsp;&nbsp; TYPE c.<BR></P><P class="head2">Beschreibung</P><P>Nun kommt das Coding, in dem wir zuerst nach dem Vorkommen von &#8220;CALL FUNCTION&#8221; und dann nach dem verwendeten Funktionsbaustein suchen. Wenn es sich bei dem Funktionsbaustein um enen BAPI handelt (Funktionsbaustein beginnt mit &#8220;BAPI&#8221;), dann pr&uuml;fen wir, ob der Baustein irgend etwas mit Daten&auml;nderungen zu tun hat. Das tun wir ganz trivial indem wir den Namen nach &#8220;CREATE&#8221; oder &#8220;CHANGE&#8221; durchsuchen. </P><P>Desweiteren merken wir uns die Verwendung des Funktionsbausteins &#8220;BAPI_TRANSACTION_COMMIT&#8221; mit dem &Auml;nderungen mit BAPIs zwingend best&auml;tigt werden m&uuml;ssen.</P><P>Eine direkte&nbsp;Programmfolge von BAPI und COMMIT pr&uuml;fen wir nicht, da sie zu umfangreich w&auml;re. Unsere Pr&uuml;fung w&uuml;rde also nicht erkennen, dass nach BAPI_CHANGE_1 zwar einen&nbsp;COMMIT abgesetzt wird, aber nach BAPI_CREATE_2&nbsp;keiner. Wird pr&uuml;fen nur, ob <STRONG>&uuml;berhaupt</STRONG> ein BAPI_TRANSACTION_COMMIT im Programm vorhanden ist.</P><P><STRONG><U>ANMERKUNG:</U></STRONG><BR>Die Pr&uuml;fungen erfolgen hier nun explizit auf einen BAPI, der im Programm hart codiert ist. Im &#8220;wahren Leben&#8221; w&auml;re eine Tabelle, in der die&nbsp;zu pr&uuml;fenden BAPIs aufgef&uuml;hrt werden, sicherlich sinnvoller.</P><P class="head2">Coding</P><P class="sap1"><FONT color="#fb2412">*** seach for &#8220;CALLS&#8221;</FONT><BR>&nbsp; LOOP AT ref_scan-&gt;tokens ASSIGNING &lt;token&gt;<BR>&nbsp;&nbsp;&nbsp; WHERE type = &#8216;I&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND str = &#8216;CALL&#8217;.<BR><FONT color="#fb2412">*** Check next token<BR></FONT>&nbsp;&nbsp;&nbsp; lv_tabix1 = sy-tabix + 1.<BR>&nbsp;&nbsp;&nbsp; READ TABLE ref_scan-&gt;tokens INTO ls_token1 INDEX lv_tabix1.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc = 0 AND ls_token1-str = &#8216;FUNCTION&#8217;.<BR><FONT color="#fb2412">*** Command is CALL FUNCTION&#8230;<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_tabix2 = sy-tabix + 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READ TABLE ref_scan-&gt;tokens INTO ls_token2 INDEX lv_tabix2.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** Get call level and current include<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP AT ref_scan-&gt;statements INTO statement_wa<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHERE from &lt;= ls_token2-row AND to &gt;= ls_token2-row.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_level = statement_wa-level.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_include = get_include( p_level = lv_level ).<BR><FONT color="#fb2412">*** transform name of function module as it is stored with<BR>*** leading and ending inverted comma<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_objname = ls_token2-str.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TRANSLATE lv_objname USING &#8221;&#8217; &#8216;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SHIFT lv_objname LEFT DELETING LEADING space.<BR><FONT color="#fb2412">*** called BAPI?<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF lv_objname(4) = &#8216;BAPI&#8217;.<BR><FONT color="#fb2412">*** Does the BAPI make changes?<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF lv_objname CS &#8216;CREATE&#8217; OR<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_objname CS &#8216;CHANGE&#8217;.<BR><FONT color="#fb2412">*** =&gt; yes: (=&gt; Commit needed!!)<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_bapi_used = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR><FONT color="#fb2412">*** Check for several BAPIS<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CASE lv_objname.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;BAPI_SALESORDER_CREATEFROMDATA&#8217;.<BR><FONT color="#fb2412">*** send message<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inform( p_sub_obj_type = &#8216;PROG&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_sub_obj_name&nbsp; = lv_include<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_line&nbsp;&nbsp;&nbsp;&nbsp; = ls_token2-row<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_column&nbsp;&nbsp; = ls_token2-col<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_errcnt&nbsp;&nbsp; = l_errcnt<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_kind&nbsp;&nbsp;&nbsp;&nbsp; = c_warning<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_test&nbsp;&nbsp;&nbsp;&nbsp; = myname<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_code&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;0001&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_param_1&nbsp; = ls_token2-str<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_param_2&nbsp; = space<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_param_3&nbsp; = space<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_param_4&nbsp; = space ).<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;BAPI_TRANSACTION_COMMIT&#8217;.<BR><FONT color="#fb2412">*** Commit coded<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_bapi_commit = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDCASE. &#8220;BAPI name<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.&nbsp;&nbsp;&nbsp;&nbsp; &#8220;BAPI?<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;name of function module found<BR>&nbsp;&nbsp;&nbsp; ENDIF.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Call Function found<BR>&nbsp; ENDLOOP.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;token &#8220;CALL&#8221;<BR><BR><FONT color="#fb2412">*** If a BAPI is used that creates or changes an<BR>*** object but no Commit-Statement found: Inform user<BR></FONT>&nbsp; IF lv_bapi_used &lt;&gt; space AND lv_bapi_commit = space.<BR>&nbsp;&nbsp;&nbsp; inform( p_sub_obj_type = &#8216;PROG&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_sub_obj_name&nbsp; = trdir-name<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_line&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_column&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_errcnt&nbsp;&nbsp; = l_errcnt<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_kind&nbsp;&nbsp;&nbsp;&nbsp; = c_warning<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_test&nbsp;&nbsp;&nbsp;&nbsp; = myname<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_code&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;0002&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_param_1&nbsp; = &#8216;BAPI_TRANSACTION_COMMIT&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_param_2&nbsp; = space<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_param_3&nbsp; = space<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p_param_4&nbsp; = space ).<BR>&nbsp; ENDIF.<BR></P><P>Auf die Verwendung der Methode &#8220;INFORM&#8221; gehen wir im n&auml;chsten Artikel &#8220;Fehlermeldungen&#8221;&nbsp;n&auml;her ein.</P><P><U><STRONG>INFO:</STRONG></U><BR>In der Variablen REF_INCLUDE steht der aktuelle Quellcode!</P><P class="head2">Methode GET_MESSAGE_TEXT</P><P>Auf diese Methode gehen wir auf der n&auml;chsten Seite &#8220;Fehlermeldungen&#8221; genauer ein.</P></p>
+<p>Der Beitrag <a href="/blog/eigene-pruefungen-implementieren/">Eigene Prüfungen implementieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/eigene-pruefungen-implementieren/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		
+		<series:name><![CDATA[Code Inspector erweitern]]></series:name>
+	</item>
+		<item>
+		<title>Eigener Hierarchieknoten</title>
+		<link>/blog/eigener-hierarchieknoten/</link>
+					<comments>/blog/eigener-hierarchieknoten/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 15:40:57 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[Code Inspector erweitern]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=587</guid>
+
+					<description><![CDATA[<p>Die Prüfungen des Code Inspectors sind in unterschiedliche Bereiche gegliedert. Wenn Sie eigene Prüfungen implentieren, sollten Sie sich auch einen eigenen Bereich gönnen.</p>
+<p>Der Beitrag <a href="/blog/eigener-hierarchieknoten/">Eigener Hierarchieknoten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Pr&uuml;fungen des Code Inspectors sind in unterschiedliche Bereiche gegliedert. Wenn Sie eigene Pr&uuml;fungen implentieren, sollten Sie sich auch einen eigenen Bereich g&ouml;nnen.<br /><P>Die Bereiche im Code Inspector sind nach Funktionalit&auml;t in Bereichen geordnet:</P><P><IMG src="/wp-content/uploads/tt_images/CodeInspector/01_checks.jpg"></P><P class="head1">Eigene Kategorie erstellen</P><P>Wir legen f&uuml;r unsere Pr&uuml;fungen nun eine eigene Kategorie an. Diese Kategorie wird als neuer Ordner im Baum angezeigt unter den Sie Ihre Pr&uuml;fungen einh&auml;ngen k&ouml;nnen.</P><P>Hierzu ben&ouml;tigen wir eine Klasse, die von <STRONG>CL_CI_CATEGORY_ROOT</STRONG> erbt.</P><P>Dazu legen wir in der Transaktion&nbsp;<STRONG>SE24</STRONG> eine &#8220;gew&ouml;hnliche ABAP-Klasse an&#8221;: <STRONG>Z_CL_CI_CATEGORY_TT</STRONG>&nbsp;und wechseln zum Reiter &#8220;Eigenschaften&#8221;. Als &#8220;Superklasse&#8221; definieren wir &#8220;<STRONG>CL_CI_CATEGORY_ROOT</STRONG>&#8221; und aktivieren die Klasse.</P><P>Nun m&uuml;ssen wir im <STRONG>CONSTRUCTOR</STRONG> noch festlegen, wie die Kategorie hei&szlig;en und welcher Kategorie sie untergeordnet sein soll.</P><P>Bei &#8220;Methoden&#8221; klicken wir auf &#8220;Konstruktor anlegen&#8221; und hinterlegen das folgende Coding:</P><P class="sap1"><FONT color="#fb2412">*** Call super constructor</FONT><BR>&nbsp; super-&gt;constructor( ).<BR><FONT color="#fb2412">*** description of folder<BR></FONT>&nbsp; description = &#8216;Tricktresor Pr&uuml;fungen&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR><FONT color="#fb2412">*** parent folder to which it should get linked.<BR></FONT>&nbsp; category&nbsp;&nbsp;&nbsp; = &#8216;CL_CI_CATEGORY_TOP&#8217;.&nbsp;&nbsp;&nbsp;<BR><FONT color="#fb2412">*** position of folder<BR></FONT>&nbsp; position&nbsp;&nbsp;&nbsp; = &#8216;900&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </P><P>Das Coding bedarf wohl keiner weiteren Erkl&auml;rung&#8230; Klasse aktivieren und schon haben wir eine eigene Kategorie. Fast. Denn wir m&uuml;ssen die Klasse noch im Code Inspector&nbsp;bekannt geben.</P><P>Hierzu wechseln wir in die Transaktion SCI und gehen &uuml;ber das Men&uuml; &#8220;<EM>Springen &#8211; Verwaltung von &#8211; Tests</EM>&#8221; zur Testverwaltung.</P><P>In der Liste sind alle Pr&uuml;fungen und Kategorien zu sehen. Die eben erstelle Kategorien-Klasse ist nat&uuml;rlich noch nicht aktiv. Eintrag markieren und sichern.</P><P><IMG src="/wp-content/uploads/tt_images/CodeInspector/Bild098.jpg"></P><P class="head1">Pr&uuml;fvariante</P><P>Ob die erstellte Kategorie nun auftaucht, k&ouml;nnen wir pr&uuml;fen, indem wir wieder in das Einstiegsbild des CI wechseln und eine Pr&uuml;fvariante ZTT1 anlegen.</P><P>Es sind noch keine Checks zugeordnet, deswegen wird der Bereich nicht als Ordner angezeigt:</P><P><IMG src="/wp-content/uploads/tt_images/CodeInspector/Bild099.jpg"></P></p>
+<p>Der Beitrag <a href="/blog/eigener-hierarchieknoten/">Eigener Hierarchieknoten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/eigener-hierarchieknoten/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		
+		<series:name><![CDATA[Code Inspector erweitern]]></series:name>
+	</item>
+		<item>
+		<title>Grundlagen</title>
+		<link>/blog/grundlagen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Apr 2011 15:32:59 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[Code Inspector erweitern]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=586</guid>
+
+					<description><![CDATA[<p>Hier erfahren Sie kurz etwas über die Grundlagen des Code Inspectors.</p>
+<p>Der Beitrag <a href="/blog/grundlagen/">Grundlagen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier erfahren Sie kurz etwas &uuml;ber die Grundlagen des Code Inspectors.<br /><P>Der <A href="http://Code/ Inspector" target="_blank" Target="_blank">Code Inspector</A> ist ein m&auml;chtiges Werkzeug. Richtig eingestellt und konsequent genutzt kann das Tool helfen, qualitativ hochwertige Programme zu erstellen. Er weist auf unperformante und kritische Anweisungen hin oder hilft bei der Einhaltung von Programmierrichtlinien. </P><P>Die bereits im System installierten Checks reichen von schlichter Textsuche &uuml;ber die Einhaltung von Namenskovnetionen von Variablen und Parametern bis hin zu komplexen performancekritischen Datenbankoperationen.</P><P>Gestartet wird der Code Inspector&nbsp;mit der Transaktion SCI oder aus dem Editor &uuml;ber das Men&uuml; &#8220;<EM>Programm &#8211; Pr&uuml;fen &#8211; Code Inspector</EM>&#8220;.</P><P>In diesem Artikel werde ich nur kurz auf die einzelnen Funktionen eingehen. Weiteres entnehmen Sie bitte der Hilfe.</P><P class="head1">Inspektion</P><P>Eine Inspektion umfasst eine definierte Menge von Objekten, die mit einer bestimmten Pr&uuml;fvariante gepr&uuml;ft werden kann. Als Ergebnis bekommt man eine Liste in der die gefundenen Fehler detailliert aufgelistet werden. </P><P class="head2">Pr&uuml;fungen</P><P>Die Pr&uuml;fungen selbst sind in der Regel gut dokumentiert, so dass man erstens erkennen kann, was welche Pr&uuml;fung macht und zweitens bei einem Fehler auch erf&auml;hrt, wie dieser behoben werden kann.</P><P class="head2">Pseudo-Kommentare</P><P>Sollten Pr&uuml;fungen unberechtigterweise &#8220;anschlagen&#8221;, so kann die Verwendung mittels Pseudokommentaren im Coding &#8211;&nbsp;zum Beispiel&nbsp;<FONT>&#8220;#EC CI_CCALL</FONT> &#8211; explizit erlaubt werden.</P><P class="head2">Test</P><P>Eine &#8220;Inspektion&#8221; kann nur einmal laufen. Wenn der Test erneut durchgef&uuml;hrt werden soll, so muss eine neue Version erzeugt werden und der Test kann erneut durchgef&uuml;hrt werden. </P><P class="head1">Objektmenge</P><P>Mit einer Objektmenge definiert man eine bestimmte Menge an zu pr&uuml;fenden Objekten. Die Objektmenge kann anhand unterschiedlichster Kriterien zusammen gestellt werden: Paket, Verantwortlicher, Objektnamen (Programme, Klassen, Funktionsgruppen usw.).</P><P class="head1">Pr&uuml;fvariante</P><P>In der&nbsp;Pr&uuml;fvariante wird eingestellt, welche Pr&uuml;fungen durchlaufen werden sollen. So kann z.B. eine &#8220;technische&#8221; Variante erstellt werden, mit der Updates, LOOPs und Select-Anweisungen gecheckt werden und eine &#8220;Verwaltungsvariante&#8221; mit deren Hilfe die Einhaltung von Namenskonventionen gepr&uuml;ft wird.</P><P class="head2">Checks</P><P>Die Checks, die im CI zur Verf&uuml;gung stehen, sind sehr vielf&auml;ltig und in der Regel gut dokumentiert.</P></p>
+<p>Der Beitrag <a href="/blog/grundlagen/">Grundlagen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Code Inspector erweitern]]></series:name>
+	</item>
+	</channel>
+</rss>

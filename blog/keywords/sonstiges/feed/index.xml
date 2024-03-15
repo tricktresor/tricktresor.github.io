@@ -1,0 +1,924 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Sonstiges Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/sonstiges/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 26 Sep 2018 15:49:22 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Sonstiges Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>List-Ereignisse aus ALV</title>
+		<link>/blog/list-ereignisse-aus-alv/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 14 Aug 2012 18:34:50 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[callback]]></category>
+		<category><![CDATA[usercommand]]></category>
+		<category><![CDATA[hotspot]]></category>
+		<category><![CDATA[suppress dialog]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=653</guid>
+
+					<description><![CDATA[<p>Hin und wieder stolpert man einfach &#252;ber kleinere oder gr&#246;&#223;ere Fallen im SAP-System. So auch dann, wenn man aus dem REUSE-ALV-Grid abspringt um eine Listausgabe zu machen und meint, man k&#246;nne von dort die guten alten Verzweigungslisten nutzen (AT LINE-SELETION). Weit gefehlt, denn...</p>
+<p>Der Beitrag <a href="/blog/list-ereignisse-aus-alv/">List-Ereignisse aus ALV</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hin und wieder stolpert man einfach über kleinere oder größere Fallen im SAP-System. So auch dann, wenn man aus dem REUSE-ALV-Grid abspringt um eine Listausgabe zu machen und meint, man könne von dort die guten alten Verzweigungslisten nutzen (AT LINE-SELETION). Weit gefehlt, denn&#8230;</p>
+<p><span style="line-height: 1.5em;">Aber fangen wir noch mal von vorne an: Folgendes kleine Programm gibt mithilfe des REUSE-ALV-Grid-Bausteins eine ALV-Grid-Liste aus. Per Doppelklick kann man Details zu einem Eintrag anzeigen lassen. Diese Details werden als einfache Liste ausgegeben. Zugegeben, modern ist das nicht, aber die Listausgabe hat auch ihre Vorteile: Sie ist flexibel und lässt sich ohne Feldkatalog darstellen.</span></p>
+<h1>Coding Eins</h1>
+<pre>REPORT.
+TYPE-POOLS slis.
+
+DATA gt_data       TYPE STANDARD TABLE OF t005t.
+DATA gs_data       TYPE                   t005t.
+DATA gv_fieldname  TYPE c LENGTH 40.
+DATA gv_fieldvalue TYPE c LENGTH 40.
+
+SELECT-OPTIONS: s_land1 FOR gs_data-land1.
+
+*** Duble click in list ***
+AT LINE-SELECTION.
+
+*** field values
+  GET CURSOR FIELD  gv_fieldname VALUE  gv_fieldvalue.
+
+  CASE sy-lsind.
+    WHEN 1.
+      WRITE: / 'Mehr Informationen zu Land', gs_data-landx HOTSPOT ON.
+
+  ENDCASE.
+
+*** Start of program ***
+START-OF-SELECTION.
+
+  PERFORM selection.
+  PERFORM display.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  selection
+*&amp;---------------------------------------------------------------------*
+FORM selection.
+  SELECT * FROM t005t INTO TABLE gt_data
+   WHERE land1 IN s_land1
+     AND spras = sy-langu.
+ENDFORM.                    "selection
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  display
+*&amp;---------------------------------------------------------------------*
+FORM display.
+
+*** Data
+  DATA lt_fcat         TYPE lvc_t_fcat.
+  FIELD-SYMBOLS &lt;fcat&gt; TYPE lvc_s_fcat.
+
+*** get fieldcatalog
+  CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_buffer_active        = space
+      i_structure_name       = 'T005T'
+      i_client_never_display = 'X'
+      i_bypassing_buffer     = 'X'
+    CHANGING
+      ct_fieldcat            = lt_fcat
+    EXCEPTIONS
+      inconsistent_interface = 1
+      program_error          = 2
+      OTHERS                 = 3.
+
+*** set hotspot and colours
+  LOOP AT lt_fcat ASSIGNING &lt;fcat&gt;.
+    IF &lt;fcat&gt;-fieldname = 'LAND1'.
+      &lt;fcat&gt;-hotspot = 'X'.
+      &lt;fcat&gt;-emphasize = 'C400'.
+    ENDIF.
+  ENDLOOP.
+
+*** display
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY_LVC'
+    EXPORTING
+      i_bypassing_buffer      = 'X'
+      i_buffer_active         = space
+      i_callback_program      = sy-cprog
+      i_callback_user_command = 'CALLBACK_ALV_USERCOMMAND'
+      it_fieldcat_lvc         = lt_fcat
+    TABLES
+      t_outtab                = gt_data
+    EXCEPTIONS
+      program_error           = 1
+      OTHERS                  = 2.
+<span style="line-height: 1.6em;">ENDFORM.                    "anzeige</span>
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  callback_alv_usercommand
+*&amp;---------------------------------------------------------------------*
+FORM callback_alv_usercommand
+    USING r_ucomm     LIKE sy-ucomm
+          rs_selfield TYPE slis_selfield.
+
+  CASE r_ucomm.
+    WHEN '&amp;IC1'.
+      READ TABLE gt_data INTO gs_data INDEX rs_selfield-tabindex.
+      IF sy-subrc = 0.
+        LEAVE TO LIST-PROCESSING.
+        SET PF-STATUS space.
+        WRITE: / 'Land', gs_data-landx HOTSPOT ON.
+      ENDIF.
+  ENDCASE.
+
+ENDFORM.                    "callback_alv_usercommand</pre>
+<h2>Warum funktioniert der Doppelklick in der Liste nicht?</h2>
+<p>Wenn Sie das Programm ausführen, werden Sie merken, dass der Doppelklick aus dem ALV wunderbar funktioniert. Auch die Listausgabe funktioniert einwandfrei. Doch obwohl wir die Zeile mit &#8220;HOTSPOT ON&#8221; ausgeben, was normalerweise das Ereignis &#8220;AT LINE-SELECTION&#8221; aktiviert, klappt dies nicht mehr.</p>
+<h2>Die Lösung</h2>
+<p>Wenn Sie über das Menü &#8220;System &#8211; Status&#8221; schauen, dann werden Sie feststellen, dass Sie sich entweder &#8220;in gar keinem Programm mehr befinden&#8221; oder in der Funktionsgruppe des Reuse-Bausteins SAPLSLVC_FULLSCREEN.</p>
+<p>Sie springen zwar in die Routine CALLBACK_ALV_USERCOMMAND, allerdings hat sich das Hauptprogramm durch den Aufruf des Funktionsbausteins geändert.</p>
+<p>Dies ist auch der Grund, warum AT LINE-SELECTION nicht funktioniert, denn hier haben Sie das Coding ja nicht hinterlegt, sondern in Ihrem Programm.</p>
+<p>Was also tun: Die Lösung ist: Sie müssen dafür sorgen, dass sie bei der Listausgabe in Ihrem Programm bleiben bzw. in Ihre Programm zurück kehren.</p>
+<p>Das tun Sie, indem Sie die Liste nicht im CALLBACK_ALV_USERCOMMAND ausgebene, sondern mithilfe von CALL SCREEN in ein Dynpro Ihres Programms springen:</p>
+<h1>Coding Zwei</h1>
+<p>Ersetzen Sie die Callbackroutine:</p>
+<pre>*&amp;---------------------------------------------------------------------*
+*&amp;      Form  callback_alv_usercommand
+*&amp;---------------------------------------------------------------------*
+FORM callback_alv_usercommand
+    USING r_ucomm     LIKE sy-ucomm
+          rs_selfield TYPE slis_selfield.
+
+  CASE r_ucomm.
+    WHEN '&amp;IC1'.
+      READ TABLE gt_data INTO gs_data INDEX rs_selfield-tabindex.
+      IF sy-subrc = 0.
+        CALL SCREEN 100.                                                
+      ENDIF.
+  ENDCASE.
+
+ENDFORM.                    "callback_alv_usercommand
+
+Dafür müssen Sie aber natürlich das Dynpro 100 anlegen. tun Sie das und implementieren Sie die folgenden beiden in der Ablauflogik verwendeten Module:
+
+Ablauflogik
+
+PROCESS BEFORE OUTPUT.
+  MODULE status_0100.
+*
+PROCESS AFTER INPUT.
+  MODULE user_command_0100.
+
+PBO + PAI
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  STATUS_0100  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE status_0100 OUTPUT.
+
+  SUPPRESS DIALOG.
+
+ENDMODULE.                 " STATUS_0100  OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  USER_COMMAND_0100  INPUT
+*&amp;---------------------------------------------------------------------*
+MODULE user_command_0100 INPUT.
+
+  CASE sy-ucomm.
+    WHEN 'BACK' OR '%EX' OR 'RW'.
+      SET SCREEN 0. LEAVE SCREEN.
+    WHEN OTHERS.
+      LEAVE TO LIST-PROCESSING.
+      SET PF-STATUS space.
+      WRITE: / 'Land', gs_data-landx HOTSPOT ON.
+  ENDCASE.
+
+ENDMODULE.                 " USER_COMMAND_0100  INPUT</pre>
+<p>Erklärung</p>
+<p>Durch SUPPRESS DIALOG wird das PBO übersprungen und es wird sofort in das PAI verzweigt. Hier erfolgt ein LEAVE TO LIST-PROCESSING um eine Liste ausgeben zu können.</p>
+<p>Der &#8220;SET-PF-STATUS space&#8221; muss sein, um den Standard-List-Status zu verwenden. Ansonsten wäre noch der Status des ALV-Grid aktiv.</p>
+<p>Nun befinden wir uns wieder in unserem Programm und AT LINE-SELECTION wird durchlaufen.</p>
+<p>Der Beitrag <a href="/blog/list-ereignisse-aus-alv/">List-Ereignisse aus ALV</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Slider (2)</title>
+		<link>/blog/slider-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 08 Mar 2012 14:51:23 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_textedit]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<category><![CDATA[cl_gui_control]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[register events]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[OCX]]></category>
+		<category><![CDATA[class definition]]></category>
+		<category><![CDATA[class implementation]]></category>
+		<category><![CDATA[set property]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[shellstyle]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_custom_container]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=638</guid>
+
+					<description><![CDATA[<p>Noch eine Variante des Sliders. Diesmal mithilfe einer Windows-OCX-Bibliothek. Der Slider hat keine Beschriftung, hat aber den Vorteil, dass auf eine Wert&#228;nderung sofort reagiert werden kann.</p>
+<p>Der Beitrag <a href="/blog/slider-2/">Slider (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Noch eine Variante des Sliders. Diesmal mithilfe einer Windows-OCX-Bibliothek. Der Slider hat keine Beschriftung, hat aber den Vorteil, dass auf eine Wertänderung sofort reagiert werden kann.</p>
+<h2 class="head1">Dynpro</h2>
+<p>Sie müssen das Dynpro 9000 anlegen mit folgenden &#8220;Custom Containern&#8221;:</p>
+<ul>
+<li>CONTAINER_TEXT</li>
+<li>SLIDER_TOP</li>
+<li>SLIDER_LEFT</li>
+</ul>
+<p><code> +----------------------------------------+<br />
+|  SLIDER_TOP                            |<br />
++----+----------------------------------------+<br />
+|    |                                        |<br />
+| SL |  CONTAINER_TEXT                        |<br />
+| ID |                                        |<br />
+| ER |                                        |<br />
+| _  |                                        |<br />
+| LE |                                        |<br />
+| FT |                                        |<br />
+|    |                                        |<br />
+|    |                                        |<br />
++----+----------------------------------------+</code></p>
+<h2 class="head1">Screenshot</h2>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" alt="" src="/wp-content/uploads/tt_images/slider2.jpg" /><br />
+So sieht der Slider aus</td>
+</tr>
+</tbody>
+</table>
+<h2 class="head1">Coding</h2>
+<pre>REPORT.
+
+DATA: gcl_text TYPE REF TO cl_gui_textedit.
+
+*----------------------------------------------------------------------*
+* CLASS my_slider DEFINITION
+*----------------------------------------------------------------------*
+CLASS my_slider DEFINITION INHERITING FROM cl_gui_control.
+PUBLIC SECTION.
+METHODS: constructor
+IMPORTING
+value(parent) TYPE REF TO cl_gui_object
+value(name) TYPE string OPTIONAL
+value(style) TYPE i OPTIONAL
+value(orientation) TYPE i
+DEFAULT 0 " 1 = vertical
+value(maximum) TYPE i
+DEFAULT 10
+value(event_while_move) TYPE flag
+DEFAULT ' '
+EXCEPTIONS error_cntl_create
+gui_type_not_supported,
+dispatch REDEFINITION.
+EVENTS: on_change EXPORTING value(slider_position) TYPE i.
+
+DATA: event_while_move TYPE flag.
+
+PRIVATE SECTION.
+METHODS: register_events.
+
+ENDCLASS. "my_slider DEFINITION
+
+*----------------------------------------------------------------------*
+* CLASS LCL_eventreceiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_eventreceiver DEFINITION.
+PUBLIC SECTION.
+CLASS-METHODS: handle_on_change FOR EVENT on_change
+OF my_slider
+IMPORTING sender
+slider_position.
+ENDCLASS. "LCL_eventreceiver DEFINITION
+
+END-OF-SELECTION.
+PERFORM create_objects.
+CALL SCREEN 9000.
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form CREATE_OBJECTS
+*&amp;---------------------------------------------------------------------*
+FORM create_objects.
+
+DATA repid TYPE syrepid.
+DATA dynnr TYPE sydynnr.
+DATA cl_container TYPE REF TO cl_gui_custom_container.
+DATA cl_container2 TYPE REF TO cl_gui_custom_container.
+
+repid = sy-repid.
+dynnr = '9000'.
+
+CREATE OBJECT cl_container
+EXPORTING
+container_name = 'CONTAINER_TEXT'
+repid = repid
+dynnr = dynnr.
+CREATE OBJECT gcl_text
+EXPORTING
+parent = cl_container.
+
+DATA: cl_slider TYPE REF TO my_slider.
+
+CREATE OBJECT cl_container
+EXPORTING
+container_name = 'SLIDER_TOP'
+repid = repid
+dynnr = dynnr.
+CREATE OBJECT cl_slider
+EXPORTING
+parent = cl_container
+maximum = 20
+event_while_move = 'X'.
+SET HANDLER lcl_eventreceiver=&gt;handle_on_change FOR cl_slider.
+
+CREATE OBJECT cl_container
+EXPORTING
+container_name = 'SLIDER_LEFT'
+repid = repid
+dynnr = dynnr.
+CREATE OBJECT cl_slider
+EXPORTING
+parent = cl_container
+maximum = 5
+orientation = 1.
+SET HANDLER lcl_eventreceiver=&gt;handle_on_change FOR cl_slider.
+
+ENDFORM. " CREATE_OBJECTS
+
+*----------------------------------------------------------------------*
+* CLASS my_slider IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS my_slider IMPLEMENTATION.
+
+METHOD dispatch.
+
+DATA: value TYPE i.
+
+GET PROPERTY OF me-&gt;h_control-obj 'Value' = value.
+RAISE EVENT on_change EXPORTING slider_position = value.
+
+ENDMETHOD. "dispatch
+
+METHOD register_events.
+DATA: ex_event TYPE cntl_event.
+DATA: events_ex TYPE cntl_events. " table
+
+IF me-&gt;event_while_move = 'X'.
+ex_event-eventid = 1."Jede Bewegung
+ELSE.
+ex_event-eventid = 2."Nur am ende
+ENDIF.
+ex_event-is_shellevent = ' '.
+ex_event-is_systemevent = 'X'.
+
+APPEND ex_event TO events_ex.
+CALL METHOD me-&gt;set_registered_events_ex
+EXPORTING
+eventtab = events_ex.
+
+ENDMETHOD. "register_events
+
+METHOD constructor.
+DATA prog_id(80).
+
+IF parent IS INITIAL.
+RAISE error_cntl_create.
+ENDIF.
+
+CLASS cl_gui_cfw DEFINITION LOAD.
+
+* assign prog_id to get the frontend specific control
+IF NOT activex IS INITIAL.
+prog_id = 'MSComctlLib.Slider'.
+ELSEIF NOT javabean IS INITIAL.
+RAISE gui_type_not_supported.
+ENDIF.
+
+IF prog_id IS INITIAL.
+RAISE gui_type_not_supported.
+ENDIF.
+
+* Set the window styles of the control when style parameter was not
+* set with constructor call.
+* For more information on the styles see WIN32 SDK
+IF style IS INITIAL.
+* otherwise the control would be invisible and the mistake would be
+* hard to find
+style = cl_gui_control=&gt;ws_visible
++ cl_gui_control=&gt;ws_child
++ cl_gui_control=&gt;ws_clipsiblings.
+
+ENDIF.
+
+* Create the control
+CALL METHOD super-&gt;constructor
+EXPORTING
+clsid = prog_id
+shellstyle = style
+parent = parent
+lifetime = lifetime
+name = name
+EXCEPTIONS
+OTHERS = 1.
+
+IF sy-subrc &lt;&gt; 0.
+RAISE error_cntl_create.
+ENDIF.
+
+me-&gt;event_while_move = event_while_move.
+
+* Slidereigenschaften
+SET PROPERTY OF me-&gt;h_control-obj 'Max' = maximum.
+SET PROPERTY OF me-&gt;h_control-obj 'Orientation' = orientation.
+SET PROPERTY OF me-&gt;h_control-obj 'Text' = 'Tricktresor-Slider'.
+
+* register instance at framework
+CALL METHOD cl_gui_cfw=&gt;subscribe
+EXPORTING
+shellid = h_control-shellid
+ref = me
+EXCEPTIONS
+OTHERS = 1.
+
+IF sy-subrc &lt;&gt; 0.
+RAISE error_cntl_create.
+ENDIF.
+me-&gt;register_events( ).
+ENDMETHOD. "constructor
+
+ENDCLASS. "my_slider IMPLEMENTATION
+
+*----------------------------------------------------------------------*
+* CLASS LCL_eventreceiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_eventreceiver IMPLEMENTATION.
+METHOD handle_on_change.
+
+DATA text TYPE string.
+DATA: slider TYPE REF TO my_slider.
+
+slider ?= sender.
+
+WRITE slider_position TO sy-lisel LEFT-JUSTIFIED.
+IF slider-&gt;event_while_move = 'X'.
+CONCATENATE 'X-Position: Moving to' sy-lisel
+INTO text SEPARATED BY space.
+ELSE.
+CONCATENATE 'Y-Position: End of Move:' sy-lisel
+INTO text SEPARATED BY space.
+ENDIF.
+
+gcl_text-&gt;set_textstream( EXPORTING text = text ).
+ENDMETHOD. "handle_on_change
+ENDCLASS. "LCL_eventreceiver DEFINITION</pre>
+<p>Der Beitrag <a href="/blog/slider-2/">Slider (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>FQDN ermitteln</title>
+		<link>/blog/fqdn-ermitteln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 13 Feb 2012 18:21:42 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=635</guid>
+
+					<description><![CDATA[<p>mit folgendem Snippet ist es m&#246;glich den FQDN eines SAP-Systems zur Laufzeit zu ermitteln. Diese Information ist f&#252;r diejenigen wichtig, die BSPs o.&#228;. dynamisch rufen wollen. Sollte das SAP nicht mit FQDN parametrisiert sein, wird statt dessen die IP-Adresse verwendet.</p>
+<p>Der Beitrag <a href="/blog/fqdn-ermitteln/">FQDN ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>mit folgendem Snippet ist es m&ouml;glich den FQDN eines SAP-Systems zur Laufzeit zu ermitteln. Diese Information ist f&uuml;r diejenigen wichtig, die BSPs o.&auml;. dynamisch rufen wollen. Sollte das SAP nicht mit FQDN parametrisiert sein, wird statt dessen die IP-Adresse verwendet.<br /><P>Am Ende steht in der Variablen GV_URL entweder FQDN + PORT oder IP + PORT.</P><P class="sap1">TYPES: BEGIN OF kernel_version,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; key&nbsp;&nbsp;&nbsp; TYPE c LENGTH 21,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; data&nbsp;&nbsp; TYPE c LENGTH 69,<BR>&nbsp;&nbsp;&nbsp;&nbsp; END OF&nbsp;&nbsp; kernel_version.<BR><FONT color="#fb2412">*&#8211; global object declaration</FONT><BR>DATA:<BR>&nbsp; gr_client&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO if_http_client,<BR>&nbsp; gt_html&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE w3htmltab,<BR>&nbsp; gv_url&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE string, <BR>&nbsp; gt_server&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF msxxlist,<BR>&nbsp; gs_server&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE msxxlist,<BR>&nbsp; gv_hostname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE string,<BR>&nbsp; gv_portnumber&nbsp;&nbsp;&nbsp;&nbsp; TYPE string,<BR>&nbsp; gv_val&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE slic_sysid,<BR>&nbsp; gt_kernel_version TYPE STANDARD TABLE OF kernel_version,<BR>&nbsp; gw_kernel_version TYPE kernel_version.</P><P class="sap1">INITIALIZATION.<BR><FONT color="#fb2412">*&#8212; get all servers</FONT><BR>&nbsp; CALL FUNCTION &#8216;TH_SERVER_LIST&#8217;<BR>&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp; list&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gt_server<BR>&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp; no_server_list&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<BR>&nbsp; LOOP AT gt_server[] INTO gs_server.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp; &#8212; read http data &#8212;&#8212;&#8212;&#8212;&#8212;</FONT><BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;TH_GET_VIRT_HOST_DATA&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DESTINATION gs_server-name<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; protocol&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hostname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gv_hostname<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; port&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gv_portnumber<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; internal_error = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3.<BR>&nbsp;&nbsp;&nbsp; CASE sy-subrc.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN 0.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8212; read SYSID &#8212;&#8212;&#8212;&#8212;-</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;SLIC_GET_SYSTEM_ID&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; systemid = gv_val.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8212; read all core data &#8212;&#8211;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL &#8216;SAPCORE&#8217; ID &#8216;ID&#8217; FIELD &#8216;VERSION&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ID &#8216;TABLE&#8217; FIELD gt_kernel_version[].<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8212; read ip-address &#8212;&#8212;&#8211;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READ TABLE gt_kernel_version[] INTO gw_kernel_version <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WITH KEY key = &#8216;IP address&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF gv_hostname CS &#8216;.&#8217;.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8212; hostname is FQDN &#8212;&#8212;-</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; gv_url = gv_hostname.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONCATENATE &#8216;http://&/#8217; gv_url &#8216;:&#8217; gv_portnumber INTO gv_url.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8212; hostname is not FQDN &#8212;</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; gv_url = gw_kernel_version-data.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONCATENATE &#8216;http://&/#8217; gv_url &#8216;:&#8217; gv_portnumber INTO gv_url.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN 1.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; raise NOT_AUTHORIZED.</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN 2.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RAISE no_valid_date.</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN 3.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN 4.<BR>&nbsp;&nbsp;&nbsp; ENDCASE.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; sy-subrc<BR>&nbsp; ENDLOOP.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; AT gt_server[]</P></p>
+<p>Der Beitrag <a href="/blog/fqdn-ermitteln/">FQDN ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>TablePainter</title>
+		<link>/blog/tablepainter/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 06 Jul 2011 10:46:17 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=601</guid>
+
+					<description><![CDATA[<p>Die Klasse CL_GUI_TABLEPAINTER wird bei den Smartforms verwendet um Tabellen zu zeichnen und zu editieren. </p>
+<p>Der Beitrag <a href="/blog/tablepainter/">TablePainter</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Klasse CL_GUI_TABLEPAINTER wird bei den Smartforms verwendet um Tabellen zu zeichnen und zu editieren. <br /><P>SAP stellt mit dem Programm SAPTABLEPAINTER_DEMO eine recht unfertige Demo zur Verf&uuml;gung. Der Editor wird angezeigt und eine Tabelle wird dargestellt. Diese kann jedoch nicht ge&auml;ndert werden und es kann auch keine neue Tabelle eingef&uuml;gt werden.</P><P>Das Control CL_GUI_TABLEPAINTER ist aber wohl auch wirklich nur in Spezialf&auml;llen sinnvoll.</P><P><IMG src="https://tricktresor.com/wp-content/uploads/tt_images/screenshots/Bild416.jpg"></P><P>&nbsp;</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/tablepainter/">TablePainter</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Colour Picker</title>
+		<link>/blog/colour-picker/</link>
+					<comments>/blog/colour-picker/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Jun 2011 15:39:47 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=600</guid>
+
+					<description><![CDATA[<p>SAP bietet einen Colour-Picker an, mit dessen Hilfe der Anwender Farben oder Linien ausw&#228;hlen kann. </p>
+<p>Der Beitrag <a href="/blog/colour-picker/">Colour Picker</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>SAP bietet einen Colour-Picker an, mit dessen Hilfe der Anwender Farben oder Linien ausw&auml;hlen kann. <br /><P>Das Demoprogramm hei&szlig;t: DEMO_COLORSEL</P><P><IMG src="/wp-content/uploads/tt_images/abap/Bild394.jpg"></P></p>
+<p>Der Beitrag <a href="/blog/colour-picker/">Colour Picker</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/colour-picker/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Folgebildsteuerung</title>
+		<link>/blog/folgebildsteuerung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 03 May 2011 17:22:01 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=595</guid>
+
+					<description><![CDATA[<p>Hier werden kurz die Tools der SAP zur Folgebildsteuerung in Modulpools aufgelistet. Die Tools kommen zum Beispiel in der Auftragsbearbeitung SAPMV45A zum Einsatz.</p>
+<p>Der Beitrag <a href="/blog/folgebildsteuerung/">Folgebildsteuerung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier werden kurz die Tools der SAP zur Folgebildsteuerung in Modulpools aufgelistet. Die Tools kommen zum Beispiel in der Auftragsbearbeitung SAPMV45A zum Einsatz.<br /><P class="head1">Transaktion VFBS</P><P>Folgebildsteuerung. Hier wird die Bildschirmsteuerung abgebildet</P><P class="head1">Transaktion VOVB</P><P>Pflege der Bildfolgegruppen (Nur Auftr&auml;ge, Angebote, Vertr&auml;ge =&gt; VBAK).<BR></P><P class="head1">Transaktion VOV8</P><P>Pflege der Belegarten. Hier kann die Standardbildschirmfolge zur Auftragsart eingestellt werden.</P><P class="head1">Funktionsbaustein SCREEN_SEQUENCE_CONTROL</P><P>Ermittlung des Folgebildes</P></p>
+<p>Der Beitrag <a href="/blog/folgebildsteuerung/">Folgebildsteuerung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bildschirmauflösung des Computers ermitteln</title>
+		<link>/blog/bildschirmaufloesung-des-computers-ermitteln/</link>
+					<comments>/blog/bildschirmaufloesung-des-computers-ermitteln/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 03 May 2011 17:13:30 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<category><![CDATA[Bildschirmauflösung]]></category>
+		<category><![CDATA[cl_gui_props_consumer]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=594</guid>
+
+					<description><![CDATA[<p>Mit diesem kurzen Coding l&#228;sst sich die Bildschirmaul&#246;sung des Computers ermitteln</p>
+<p>Der Beitrag <a href="/blog/bildschirmaufloesung-des-computers-ermitteln/">Bildschirmauflösung des Computers ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem kurzen Coding lässt sich die Bildschirmaulösung des Computers ermitteln</p>
+<p>Klein aber fein:</p>
+<pre class="lang:abap decode:true ">DATA ref_consumer     TYPE REF TO cl_gui_props_consumer.
+DATA s_metric_factors TYPE cntl_metric_factors.
+
+ref_consumer     = cl_gui_props_consumer=&gt;create_consumer( ).
+s_metric_factors = ref_consumer-&gt;get_metric_factors( ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/bildschirmaufloesung-des-computers-ermitteln/">Bildschirmauflösung des Computers ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bildschirmaufloesung-des-computers-ermitteln/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Infozeile</title>
+		<link>/blog/infozeile/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 01 Mar 2011 11:01:58 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<category><![CDATA[SAP-Skript]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=580</guid>
+
+					<description><![CDATA[<p>Der alte Text-Editor unterst&#252;tzt eine Funktion, mit der Zeilen eines Textes als nicht eingebbar zu definieren. Diese Funktion wird beispielsweise im QM-Modul verwendet, wo Text&#228;nderungen um "User - Datum - Uhrzeit" erg&#228;nzt werden.</p>
+<p>Der Beitrag <a href="/blog/infozeile/">Infozeile</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der alte Text-Editor unterst&uuml;tzt eine Funktion, mit der Zeilen eines Textes als nicht eingebbar zu definieren. Diese Funktion wird beispielsweise im QM-Modul verwendet, wo Text&auml;nderungen um &#8220;User &#8211; Datum &#8211; Uhrzeit&#8221; erg&auml;nzt werden.<br /><P>Ein SAP-Skript-Text besteht immer aus einer Formatspalte und einer Text-Spalte. In der Formatspalte steht das &#8220;Absatzformat&#8221;. In den einfachsten F&auml;llen steht hier &#8220;*&#8221; was bedeutet, dass das Standardabsatzformat des gerade verwendeten Stils benutzt wird.</P><P class="head1">Gesperrte Zeilen</P><P>Per Programm l&auml;sst sich jedoch eine &#8220;Funktionalit&auml;t&#8221; in den Text schmuggeln, die eine Zeile nicht mehr eingebbar darstellt.&nbsp;SAP nennt dies &#8220;gesperrte Zeilen&#8221; oder auch &#8220;Templatezeile&#8221;.&nbsp;Hierzu m&uuml;ssen Sie die gesamte Zeile um zwei Zeichen nach rechts verschieben und die Formatspalte &#8220;&gt; &#8221; eintragen.</P><P>Aus folgendem Text:</P><P class="sap1"><FONT>AS</FONT> <FONT>Dies ist ein Text</FONT></P><P>wird dann:</P><P class="sap1"><FONT>&gt;&nbsp;</FONT> <FONT>ASDies ist ein Text</FONT></P><P>Die Zeile wird dann folgenderma&szlig;en dargestellt:</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/SAPScript/Bild022.jpg"><BR>Die oberste Zeile ist gesperrt</P></TD></TR></TBODY></TABLE></P><P>Gesperrte Zeilen k&ouml;nnen nicht bearbeitet und nicht gel&ouml;scht werden. Sie eignen sich also ideal f&uuml;r Informationen, die per Programm in den Text eingef&uuml;gt werden k&ouml;nnen und vom Anwender nicht ge&auml;ndert werden sollen.</P><P><STRONG><U>HINWEIS<BR></U></STRONG>Dieser Trick funktioniert nat&uuml;rlich in einem TextEditControl nicht mehr. Hierf&uuml;r m&uuml;sste man die Logik der gesperrten Zeilen nachprogrammieren!</P><P class="head1">Funktionsbausteine</P><P class="head2">TEXT_CREATE_HISTORY_LINE</P><P>Dieser Funktionsbaustein erzeugt eine Infozeile aus Datum, Uhrzeit, SAP-Anmeldename +&nbsp;Realname + Telefonnummer:</P><P class="sap1">* 01.02.2011 08:15:26 Enno Wulff (EWULFF) Tel. -999</P></p>
+<p>Der Beitrag <a href="/blog/infozeile/">Infozeile</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Drawer</title>
+		<link>/blog/drawer/</link>
+					<comments>/blog/drawer/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 04 Jan 2011 15:26:48 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=572</guid>
+
+					<description><![CDATA[<p>Ein neues und bisher wenig beachtetes Control ist das "Schubladen-Control" CL_GUI_CONTAINER_BAR, ein vertikales TabStrip-Modul f&#252;r Controls. In diesem Beispiel werden die Reports aus bestimmten Bereichen gesucht und in "Schubladen angezeigt". Das Original von www.sapnet.ru habe ich ein wenig schlanker und universeller gemacht.</p>
+<p>Der Beitrag <a href="/blog/drawer/">Drawer</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein neues und bisher wenig beachtetes Control ist das &#8220;Schubladen-Control&#8221; CL_GUI_CONTAINER_BAR, ein vertikales TabStrip-Modul für Controls. In diesem Beispiel werden die Reports aus bestimmten Bereichen gesucht und in &#8220;Schubladen angezeigt&#8221;. Das Original von www.sapnet.ru habe ich ein wenig schlanker und universeller gemacht.</p>
+<p class="text1">In diesem Beispiel wird an den Selection-Screen ein Docking-Container angehängt, der das DrawerControl beinhaltet.</p>
+<p class="text1">Es werden Programme aus bestimmten Bereichen angezeigt, die per Klick aufgerufen werden können.</p>
+<h2 class="head1">Coding</h2>
+<pre class="sap1">REPORT ZZ_DRAWER.
+* original <a href="http://www.sapnet.ru/viewtopic.php?t=1953" target="_blank" rel="noopener">http://www.sapnet.ru/viewtopic.php?t=1953</a>
+TABLES: trdir.
+DATA: cc_drawer      TYPE REF TO cl_gui_docking_container,
+      c_drawer       TYPE REF TO cl_gui_container_bar,
+      c_container    TYPE REF TO cl_gui_container,
+      l_caption      TYPE sbptcaptn,
+      lt_captions    TYPE sbptcaptns,
+      l_icon         TYPE swd_icon,
+      lt_icons       TYPE swd_icons,
+      ok_code        TYPE sy-ucomm,
+      id             TYPE i,
+      repid          TYPE sy-repid,
+      dynnr          TYPE sy-dynnr.
+<span style="color: #fb2412;">* Display data
+</span>TYPES: BEGIN OF ty_data ,
+         name LIKE trdir-name,
+         cnam LIKE trdir-cnam,
+         cdat LIKE trdir-cdat,
+      END OF ty_data.
+DATA : g_alv          TYPE REF TO cl_gui_alv_grid,
+       g_alv_all      TYPE REF TO cl_gui_alv_grid,
+       gs_data        TYPE ty_data,
+       gt_data        TYPE STANDARD TABLE OF ty_data.
+
+CLASS lcl_application DEFINITION DEFERRED.
+CLASS cl_gui_cfw      DEFINITION LOAD.
+
+DATA: c_application   TYPE REF TO lcl_application,
+      c_alv           TYPE REF TO lcl_application.
+
+PARAMETERS test.
+<span style="color: #fb2412;">*---------------------------------------------------------------------*
+* CLASS lcl_application DEFINITION
+*---------------------------------------------------------------------*
+</span>CLASS lcl_application DEFINITION.
+
+  PUBLIC SECTION.
+    METHODS:
+       on_click FOR EVENT clicked OF cl_gui_container_bar
+                IMPORTING
+                  id
+                  container,
+                  on_hotspot_click FOR EVENT
+                  hotspot_click OF cl_gui_alv_grid IMPORTING
+                  e_row_id
+                  e_column_id.
+
+ENDCLASS. "lcl_application DEFINITION
+
+<span style="color: #fb2412;">*---------------------------------------------------------------------*
+* CLASS lcl_application IMPLEMENTATION
+*---------------------------------------------------------------------*
+</span>CLASS lcl_application IMPLEMENTATION.
+
+  METHOD on_click.
+    DATA: l_fcode TYPE ui_func,
+    l_link TYPE swd_htmlco,
+    l_quickinfo TYPE iconquick.
+    DATA:
+    lx_variant TYPE disvariant,
+    lt_alv_cat TYPE lvc_t_fcat,
+    lx_alv_cat TYPE lvc_s_fcat,
+    lx_alv_lay TYPE lvc_s_layo.
+    DEFINE m_fieldcat.
+      add 1 to lx_alv_cat-col_pos.
+      lx_alv_cat-fieldname = &amp;1.
+      case lx_alv_cat-fieldname.
+        when 'NAME'.
+          lx_alv_cat-key = 'X'.
+          lx_alv_cat-hotspot = 'X'.
+          lx_alv_cat-scrtext_m = 'Program Name'.
+          lx_alv_cat-colddictxt = 'M'.
+          lx_alv_cat-tipddictxt = 'M'.
+        when 'CNAM'.
+          lx_alv_cat-key = ''.
+          lx_alv_cat-hotspot = ''.
+          lx_alv_cat-scrtext_m = 'Created By'.
+          lx_alv_cat-colddictxt = 'M'.
+          lx_alv_cat-tipddictxt = 'M'.
+        when 'CDAT'.
+          lx_alv_cat-key = ''.
+          lx_alv_cat-hotspot = ''.
+          lx_alv_cat-scrtext_m = 'Created On'.
+          lx_alv_cat-colddictxt = 'M'.
+          lx_alv_cat-tipddictxt = 'M'.
+      endcase.
+      lx_alv_cat-ref_field = &amp;2.
+      lx_alv_cat-ref_table = &amp;3.
+      append lx_alv_cat to lt_alv_cat.
+    END-OF-DEFINITION.
+
+    DATA lv_cat TYPE c LENGTH 20.
+
+    CASE id.
+      WHEN 1.
+        lv_cat = 'ZSD%'.
+      WHEN 2.
+        lv_cat = 'ZMM%'.
+      WHEN 3.
+        lv_cat = 'ZPP%'.
+      WHEN 4.
+        lv_cat = 'ZFI%'.
+      WHEN 5.
+        lv_cat = 'Z%'.
+    ENDCASE.
+
+    FREE : g_alv.
+    IF g_alv IS INITIAL.
+      CREATE OBJECT g_alv
+        EXPORTING
+          i_parent = container.
+<span style="color: #fb2412;">*Fill gt_data</span>
+      REFRESH gt_data[].
+      SELECT name cnam cdat FROM trdir INTO CORRESPONDING FIELDS OF
+      TABLE gt_data
+      WHERE name LIKE lv_cat.
+<span style="color: #fb2412;">*Fill the field catalog
+</span>      REFRESH lt_alv_cat[].
+      m_fieldcat 'NAME' 'NAME' 'TRDIR'.
+      m_fieldcat 'CNAM' 'CNAM' 'TRDIR'.
+      m_fieldcat 'CDAT' 'CDAT' 'TRDIR'.
+<span style="color: #fb2412;">*Layout
+</span>      CLEAR lx_alv_lay.
+      lx_alv_lay-zebra = 'X'.
+      lx_alv_lay-cwidth_opt = 'X'.
+      lx_alv_lay-sel_mode = ' '.
+      lx_alv_lay-no_toolbar = 'X'.
+      lx_alv_lay-no_headers = 'X'.
+      lx_variant-report = sy-cprog.
+<span style="color: #fb2412;">*Display
+</span>      CALL METHOD g_alv-&gt;set_table_for_first_display
+        EXPORTING
+          is_variant                    = lx_variant
+          is_layout                     = lx_alv_lay
+        CHANGING
+          it_outtab                     = gt_data
+          it_fieldcatalog               = lt_alv_cat
+        EXCEPTIONS
+          invalid_parameter_combination = 1
+          program_error                 = 2
+          too_many_lines                = 3
+          OTHERS                        = 4.
+      IF c_alv IS INITIAL.
+        CREATE OBJECT c_alv.
+      ENDIF.
+      SET HANDLER c_alv-&gt;on_hotspot_click FOR g_alv.
+      cl_gui_container=&gt;set_focus( g_alv ).
+    ENDIF.
+
+  ENDMETHOD. "on_click
+
+  METHOD on_hotspot_click.
+    DATA:
+    lx_selected_row TYPE lvc_s_row,
+    ls_data TYPE ty_data.
+    CLEAR lx_selected_row.
+    MOVE-CORRESPONDING e_row_id TO lx_selected_row.
+    READ TABLE gt_data INTO ls_data INDEX lx_selected_row-index.
+    SET PARAMETER ID 'RID' FIELD ls_data-name.
+    CALL TRANSACTION 'SE38' AND SKIP FIRST SCREEN.
+  ENDMETHOD. "on_hotspot_click
+ENDCLASS. "lcl_application IMPLEMENTATION
+
+
+FORM init_drawer.
+
+  repid = sy-repid.
+  dynnr = sy-dynnr.
+<span style="color: #fb2412;">* create container for drawer
+</span>  IF cc_drawer IS INITIAL.
+    CREATE OBJECT cc_drawer
+      EXPORTING
+        repid     = repid
+        dynnr     = dynnr
+        extension = 380.
+  ENDIF.
+<span style="color: #fb2412;">* create drawer
+</span>  IF c_drawer IS INITIAL.
+    l_caption-caption = 'Sales and Distribution Reports'(004). 
+    l_caption-icon = icon_wizard.
+    APPEND l_caption TO lt_captions.
+    l_caption-caption = 'Material Management Reports'(005). 
+    l_caption-icon = icon_date.
+    APPEND l_caption TO lt_captions.
+    l_caption-caption = 'Production Planning Reports'(006). 
+    l_caption-icon = icon_display_text.
+    APPEND l_caption TO lt_captions.
+    l_caption-caption = 'Finance and Controlling Reports'(007). 
+    l_caption-icon = icon_information.
+    APPEND l_caption TO lt_captions.
+    l_caption-caption = 'All custom Reports'(008).
+    l_caption-icon = icon_refresh.
+    APPEND l_caption TO lt_captions.
+
+<span style="color: #fb2412;">* Create cl_gui_container_bar
+</span>    CREATE OBJECT c_drawer
+      EXPORTING
+        parent                       = cc_drawer
+        captions                     = lt_captions
+      EXCEPTIONS
+        max_number_of_cells_exceeded = 1
+        OTHERS                       = 2.
+    IF sy-subrc &lt;&gt; 0.
+      SET SCREEN 0. LEAVE SCREEN.
+    ENDIF.
+<span style="color: #fb2412;">* Create cl_gui_container_bar
+</span>    IF c_application IS INITIAL.
+      CREATE OBJECT c_application.
+    ENDIF.
+    SET HANDLER c_application-&gt;on_click FOR c_drawer.
+    c_drawer-&gt;set_active( 1 ).
+  ENDIF.
+ENDFORM.                    "init_drawer
+
+INITIALIZATION.
+  PERFORM init_drawer.</pre>
+<p>Der Beitrag <a href="/blog/drawer/">Drawer</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/drawer/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Slider</title>
+		<link>/blog/slider/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Dec 2009 10:43:36 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=535</guid>
+
+					<description><![CDATA[<p>Etwas eigenwillig gel&#246;st ist das SliderControl. Deswegen wird es auch kaum jemand kennen. Das SliderControl wird nicht in einen CustomContainer gesetzt, sondern mittels Positionsangabe direkt auf das Dynpro geschrieben.</p>
+<p>Der Beitrag <a href="/blog/slider/">Slider</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Etwas eigenwillig gel&ouml;st ist das SliderControl. Deswegen wird es auch kaum jemand kennen. Das SliderControl wird nicht in einen CustomContainer gesetzt, sondern mittels Positionsangabe direkt auf das Dynpro geschrieben.<br /><P>Im folgenden implementieren wir das SliderControl direkt auf den Selektionsbildschirm. Er kann aber auch in jedes Dynpro eingebunden werden.</P><P class="head1">Screenshot</P><P><IMG src="/wp-content/uploads/tt_images/slider.jpg"></P><P class="head1">Coding</P><P class="sap1">REPORT zzslidercontrol.<BR>TYPE-POOLS cntl.</P><P class="sap1">DATA first_call&nbsp;&nbsp; &nbsp;TYPE c.<BR>DATA value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE i.<BR>DATA slider_handle TYPE cntl_handle.</P><P class="sap1">PARAMETERS p_value TYPE integer.</P><P class="sap1"><BR>INITIALIZATION.<BR><FONT color="#fb2412">*** Init slider</FONT><BR>&nbsp; PERFORM init_slider.</P><P class="sap1">AT SELECTION-SCREEN.<BR><FONT color="#fb2412">*** get slider value</FONT><BR>&nbsp; CALL FUNCTION &#8216;SLIDER_GET_VALUE&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; handle = slider_handle<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; value&nbsp; = p_value.</P><P class="sap1">START-OF-SELECTION.<BR><BR><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; init_slider<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM init_slider.</P><P class="sap1"><BR>&nbsp; DATA: is_parent&nbsp; TYPE i.</P><P class="sap1">&nbsp; CHECK first_call = space.<BR>&nbsp; first_call = &#8216;X&#8217;.<BR><BR><FONT color="#fb2412">*** get id of parent&nbsp;dynpro</FONT><BR>&nbsp; CALL FUNCTION &#8216;GUI_GET_PARENT_DYNPRO&#8217;<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parent = is_parent<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; error&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS = 2.<BR>&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp; MESSAGE i248(td) WITH &#8216;GUI_GET_PARENT_DYNPRO&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;#EC NOTEXT<BR>&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp; ENDIF.<BR><BR><FONT color="#fb2412">*** Create sliderControl</FONT><BR>&nbsp; CALL FUNCTION &#8216;SLIDER_CREATE&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; owner_repid&nbsp;&nbsp;&nbsp;&nbsp; = sy-cprog<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dynnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = sy-dynnr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; left&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2&nbsp; &#8221; Left position on Screen<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; top&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2&nbsp; &#8221; Top position on Screen<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; min&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1&nbsp; &#8221; Minimum value<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; max&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 20 &#8221; Maximum value<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; additional_text = &#8216; cm&#8217; &#8220;Metric<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tags&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;X&#8217; &#8220;Show&nbsp;min and max value<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tick_frequency&nbsp; = 1&nbsp;&nbsp;&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tick_small_step = &#8216;1&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parentid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = is_parent<BR>&nbsp;&nbsp;&nbsp; CHANGING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; handle&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = slider_handle<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.</P><P class="sap1"><FONT color="#fb2412">*** Set initial value</FONT><BR>&nbsp; CALL FUNCTION &#8216;SLIDER_SET_VALUE&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; handle&nbsp;&nbsp; = slider_handle<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; value&nbsp;&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_flush = &#8216; &#8216;.<BR><BR>ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;init_slider</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/slider/">Slider</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

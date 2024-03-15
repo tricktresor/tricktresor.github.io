@@ -1,0 +1,2268 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Dynamische Programmierung Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/programmierung/dynamic-programming/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 03 Mar 2023 16:52:17 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Dynamische Programmierung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Speicherung einer Splitterkonfiguration</title>
+		<link>/blog/speicherung-einer-splitterkonfiguration/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 27 Nov 2021 15:38:20 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[splitter]]></category>
+		<category><![CDATA[cl_gui_splitter_container]]></category>
+		<guid isPermaLink="false">/?p=1032639</guid>
+
+					<description><![CDATA[<p>Ich arbeite immer noch viel mit Dynpros. Für mich und die meisten meiner Kunden ist das nach wie vor das Frontend, mit dem gearbeitet wird. Bei der GUI-Programmierung habe ich mir angewöhnt, einzelne Teile in separaten Controls zu programmieren. Das hat den Vorteil, dass diese Module austauschbar und einzeln testbar sind. Um mehrere Module unterzubekommen, bieten sich Splittercontainer an. Diese haben jedoch den Nachteil, dass die Konfiguration (Größe, Breite, Höhe) feste definiert werden muss. Verwendet...</p>
+<p>Der Beitrag <a href="/blog/speicherung-einer-splitterkonfiguration/">Speicherung einer Splitterkonfiguration</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Ich arbeite immer noch viel mit Dynpros. Für mich und die meisten meiner Kunden ist das nach wie vor das Frontend, mit dem gearbeitet wird. Bei der GUI-Programmierung habe ich mir angewöhnt, einzelne Teile in separaten Controls zu programmieren. Das hat den Vorteil, dass diese Module austauschbar und einzeln testbar sind. Um mehrere Module unterzubekommen, bieten sich Splittercontainer an. Diese haben jedoch den Nachteil, dass die Konfiguration (Größe, Breite, Höhe) feste definiert werden muss. Verwendet man nur einen Splitter, dann kann man dessen Größe einfach auslesen, speichern und bei Bedarf wieder setzen. So kann sich der/die Anwender:in die Größe so einstellen, wie es für das aktuelle Setup aus Monitorauflösung, Skalierung und SAPGUI-Schriftgröße am besten passt.</p>
+
+
+
+<p>Verwendet man jedoch mehrere Splitter, dann und befindet sich zudem noch in der <em>Findungsphase</em> wo sich die Aufteilung der Container noch ändert, dann ist ein gezieltes Auslesen und Setzen der Größenparameter doch sehr aufwendig.</p>
+
+
+
+<h2 class="wp-block-heading" id="idee">Idee</h2>
+
+
+
+<p>Da ich nicht nur ein Freund von Controls bin, sondern auch von generischen Lösungen, war meine erste Idee, die aktuelle Konfiguration der Controls automatisch zu ermitteln. Die Routine dafür war auch schnell geschrieben:</p>
+
+
+
+<p><a href="https://github.com/tricktresor/splitter_configuration/blob/main/src/ztrcktrsr_splitter_config_01.prog.abap">https://github.com/tricktresor/splitter_configuration/blob/main/src/ztrcktrsr_splitter_config_01.prog.abap</a></p>
+
+
+
+<p>Das Programm erzeugt einen einigermaßen komplexen Bildschirmaufbau mit Splittern und liest diesen aus.</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="758" height="527" src="/wp-content/uploads/2021/11/image-2.png" alt="" class="wp-image-1032669" srcset="/wp-content/uploads/2021/11/image-2.png 758w, /wp-content/uploads/2021/11/image-2-300x209.png 300w, /wp-content/uploads/2021/11/image-2-200x140.png 200w" sizes="(max-width: 758px) 100vw, 758px" /><figcaption>Dynpro mit Splittercontainern</figcaption></figure>
+
+
+
+<p>Die Ausgabe der Konfiguration sieht wie folgt aus:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="470" height="193" src="/wp-content/uploads/2021/11/image-3.png" alt="" class="wp-image-1032670" srcset="/wp-content/uploads/2021/11/image-3.png 470w, /wp-content/uploads/2021/11/image-3-300x123.png 300w" sizes="(max-width: 470px) 100vw, 470px" /></figure>
+
+
+
+<p>Allerdings gibt es hier ein Problem: Ich habe keine Möglichkeit herauszufinden, wie die Container bzw. die Splitter inhaltlich einzuordnen sind. Wenn ich mich, wie beschrieben, noch in der Entwicklungsphase befinde, dann kommt eventuell mal ein Container dazu, ein Splitter verschwindet oder bekommt mehr oder weniger Controls. Dementsprechend würde sich das Wiederherstellen ungewollt ändern. </p>
+
+
+
+<p>Man kann zwar jedem Control einen Namen mitgeben, allerdings funktioniert dieses Feature nicht so, wie ich es mir vorgestellt habe. Wenn man die Namen, die übrigens nur aus Großbuchstaben und ohne Space bestehen müssen, vergibt, dann müssen <strong>alle</strong> Container und Controls einen Namen bekommen. Ansonsten gibt es einen Kurzdump.</p>
+
+
+
+<h2 class="wp-block-heading" id="vorgehen">Vorgehen</h2>
+
+
+
+<p>die Lösung hierfür besteht darin, eine Ableitung des Splittercontainers zu erstellen und diesen zu verwenden. In der Ableitung kann man den Parameter NAME des CONSTRUCTORs in einem eigenen Attribut speichern. Die Methode GET_NAME ist bereits vorhanden und ich redefiniere diese.</p>
+
+
+
+<pre class="wp-block-code"><code>CLASS zcl_gui_splitter DEFINITION INHERITING FROM cl_gui_splitter_container.
+  PUBLIC SECTION.
+    METHODS constructor
+      IMPORTING
+        link_dynnr              TYPE  sy-dynnr
+        link_repid              TYPE  sy-repid
+        shellstyle              TYPE  i
+        left                    TYPE  i
+        top                     TYPE  i
+        width                   TYPE  i
+        height                  TYPE  i
+        metric                  TYPE  cntl_metric
+        align                   TYPE  i
+        parent                  TYPE REF TO cl_gui_container
+        rows                    TYPE  i
+        columns                 TYPE  i
+        no_autodef_progid_dynnr TYPE  c
+        name                    TYPE  string.
+    METHODS get_name REDEFINITION.
+
+  PRIVATE SECTION.
+    DATA my_name TYPE string.
+
+ENDCLASS.
+
+CLASS zcl_gui_splitter IMPLEMENTATION.
+  METHOD constructor.
+    super->constructor(
+      link_dynnr              = link_dynnr
+      link_repid              = link_repid
+      shellstyle              = shellstyle
+      left                    = left
+      top                     = top
+      width                   = width
+      height                  = height
+      metric                  = metric
+      align                   = align
+      parent                  = parent
+      rows                    = rows
+      columns                 = columns
+      no_autodef_progid_dynnr = no_autodef_progid_dynnr ).
+
+    my_name = name.
+
+  ENDMETHOD.
+
+  METHOD get_name.
+    name = my_name.
+  ENDMETHOD.
+
+ENDCLASS.</code></pre>
+
+
+
+<p>Merkwürdigerweise funktioniert diese Variante nur, wenn man die Klasse global anlegt. mit einer lokalen Vererbung erhalte ich zwar keinen Fehler, aber leider auch keine Splittercontainer.</p>
+
+
+
+<h2 class="wp-block-heading" id="container-mit-namen">Container mit Namen</h2>
+
+
+
+<p>Dadurch, dass ich dem Splittercontainer nun einen Namen mitgeben kann, kann ich diesen auch wieder auslesen. Die Funktion ist genau so, wie bisher auch, nur dass ich nun eben auch den Namen ermitteln und speichern kann.</p>
+
+
+
+<p><a href="https://github.com/tricktresor/splitter_configuration/blob/main/src/ztrcktrsr_splitter_config_02.prog.abap">https://github.com/tricktresor/splitter_configuration/blob/main/src/ztrcktrsr_splitter_config_02.prog.abap</a></p>
+
+
+
+<p>Die Konfiguration enthält nun alle Splitter mit Namen und deren Containergrößen</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="483" height="240" src="/wp-content/uploads/2021/11/image-4.png" alt="" class="wp-image-1032677" srcset="/wp-content/uploads/2021/11/image-4.png 483w, /wp-content/uploads/2021/11/image-4-300x149.png 300w" sizes="(max-width: 483px) 100vw, 483px" /><figcaption>Splitter mit Namen</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading" id="losung-1">Lösung</h2>
+
+
+
+<p>Die aktuelle Konfiguration kann nun mit Namen ausgelesen werden. Dementsprechend kann ich die Konfiguration auch speichern. Ich habe es mir hier einfach gemacht und speichere sie per EXPORT TO DATABASE in INDX(Z2). </p>
+
+
+
+<p>Beim Auslesen muss ich zusätzlich die aktuelle Konfiguration ermitteln, um mithilfe der Namen den aktiven Splitter zuordnen zu können. Zu diesem setze ich dann mit SET_ROW_HEIGHT die Höhe und mit SET_COLUMN_WIDHT die Breite der Splittercontainer.</p>
+
+
+
+<p>Hier die endgültige Lösung:</p>
+
+
+
+<p><a href="https://github.com/tricktresor/splitter_configuration/blob/main/src/ztrcktrsr_splitter_config_03.prog.abap">https://github.com/tricktresor/splitter_configuration/blob/main/src/ztrcktrsr_splitter_config_03.prog.abap</a></p>
+<p>Der Beitrag <a href="/blog/speicherung-einer-splitterkonfiguration/">Speicherung einer Splitterkonfiguration</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Selektion zur Berechtigung</title>
+		<link>/blog/selektion-zur-berechtigung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 02 Jul 2019 12:33:05 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[SQL]]></category>
+		<category><![CDATA[authority-check]]></category>
+		<category><![CDATA[Berechtigungsprüfung]]></category>
+		<guid isPermaLink="false">/?p=1022316</guid>
+
+					<description><![CDATA[<p>Berechtigungsprüfungen sind mitunter sehr komplex und weisen einige Tücken auf. Mit dem hier vorgestellten Trick ist es schon mal eine Hürde weniger.</p>
+<p>Der Beitrag <a href="/blog/selektion-zur-berechtigung/">Selektion zur Berechtigung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Berechtigungen und die dazugehörigen Berechtigungsprüfungen sind eine mitunter eine knifflige Angelegenheit. Bei einzelnen Werten ist es einfach, diese mit der entsprechenden Berechtigung zu prüfen. Wenn es jedoch um Selektionen geht, bei denen der Anwender nur die Berechtigung über einen Teil der Daten hat, dann wird es schon schwieriger&#8230;</p>
+
+
+
+<h2 class="wp-block-heading">Problem &#8211; Selektionsoptionen</h2>
+
+
+
+<p>Bei dem hier beschriebenen Problem hat der Anwender bei einem Report die Möglichkeit, ein Objekt über Selektionsoptionen (SELECT-OPTIONS) einzugrenzen. Hierfür muss ich jedoch wissen, welches die zu Grunde liegende Prüftabelle mit allen existierenden Daten ist. </p>
+
+
+
+<h3 class="wp-block-heading">Beispiel Verkaufsorganisation</h3>
+
+
+
+<p>Der Anwender selektiert Verkaufsorganisationen A* und B*.  Der Anwender hat jedoch nur die Berechtigung für A200 und B330. </p>
+
+
+
+<p>In der Prüftabelle für die Verkaufsorganisationen (Tabelle TVAK) sind die folgenden Verkaufsorganisationen gepflegt:</p>
+
+
+
+<table class="wp-block-table"><tbody><tr><td><strong>Vkorg</strong></td><td><strong>Bezeichnung</strong></td></tr><tr><td>A100</td><td>Deutschland Gebiet Nord</td></tr><tr><td>A200</td><td>Deutschland Gebiet Süd </td></tr><tr><td>A300</td><td>Deutschland Gebiet West</td></tr><tr><td>A400</td><td>Deutschland Gebiet Ost</td></tr><tr><td>B330</td><td>Nord-Italien</td></tr><tr><td>B340</td><td>Süd-Italien</td></tr><tr><td>C500</td><td>Spanien</td></tr></tbody></table>
+
+
+
+<h2 class="wp-block-heading">Lösung A &#8211; Vorselektion</h2>
+
+
+
+<p>Bei dieser Lösungsvariante wird vorab geprüft, für welche Objekte der Anwender die Berechtigung hat. Man würde also die tatsächlich vorhandenen Einträge aus der Prüftabelle selektieren und für jeden Eintrag prüfen, ob der Anwender die entsprechende Berechtigung hat.</p>
+
+
+
+<p>Mit den verbleibenden Einträgen kann man entweder eine dynamische WHERE-Bedingung bauen oder baut aus diesen Einträgen eine genaue Ranges-Tabelle auf.</p>
+
+
+
+<h2 class="wp-block-heading">Lösung B &#8211; Einzelprüfung der Daten</h2>
+
+
+
+<p>Es gibt natürlich auch die relativ einfache Möglichkeit, alle Daten einzulesen und dann bei jedem einzelnen Datensatz zu prüfen, ob der Anwender berechtigt ist, ihn zu sehen. Das ist einfach zu programmieren, kann jedoch bei großen Datenmengen ein erhebliches Laufzeitproblem werden.</p>
+
+
+
+<h2 class="wp-block-heading">Unterstützung</h2>
+
+
+
+<p>Durch Zufall bin ich auf die Klasse <a href="https://help.sap.com/doc/abapdocu_751_index_htm/7.51/de-DE/abapauthority-check.htm">CL_AUTH_OBJECTS_TO_SQL</a> gestoßen. Mit Hilfe dieser Klasse wird der Lösungsweg A eingeschlagen. Allerdings ohne, dass ich als Programmierer wissen müsste, welches die Zugrunde liegende Prüftabelle ist und ohne, dass ich die WHERE-Bedingung selber erstellen müsste.</p>
+
+
+
+<p>Der Klasse müssen folgende Daten übergeben werden:</p>
+
+
+
+<ul><li>das zu prüfende Berechtigungsobjekt</li><li>die Aktivität (Anzeigen, Ändern, Löschen etc)</li><li>Ein Field Mapping (DDIC-Grundlage der Felder)</li><li>optional: Filter für die Einschränkung auf Objekte</li></ul>
+
+
+
+<p>Mit GET_SQL_CONDITION bekommt man dann die WHERE-Bedingung für die Felder zurück, für die der Anwender eine Berechtigung hat.</p>
+
+
+
+<p>Folgendes kleine Beispiel zeigt die Anwendung für die Klasse.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="554" height="280" src="/wp-content/uploads/2019/07/sql1.png" alt="" class="wp-image-1022317" srcset="/wp-content/uploads/2019/07/sql1.png 554w, /wp-content/uploads/2019/07/sql1-300x152.png 300w, /wp-content/uploads/2019/07/sql1-272x137.png 272w" sizes="(max-width: 554px) 100vw, 554px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="wp-block-code"><code>DATA h_vkorg TYPE vkorg.
+SELECT-OPTIONS s_vkorg FOR h_vkorg DEFAULT 'A100'.
+
+START-OF-SELECTION.
+
+  DATA(lo_converter_osql) = cl_auth_objects_to_sql=>create_for_open_sql( ).
+
+  lo_converter_osql->add_authorization_object( 
+    iv_authorization_object = 'V_VBAK_VKO'
+    it_activities = VALUE #(
+             ( auth_field = 'ACTVT' value = '03' ) )
+    it_field_mapping = VALUE #(
+             ( auth_field = 'VKORG'
+               view_field = VALUE #(
+                               table_ddic_name = 'VBAK'
+                               table_alias     = ''
+                               field_name      = 'VKORG' ) ) )
+    it_filter = VALUE #( FOR selopt IN s_vkorg&#91;]
+             ( auth_field = 'VKORG' low = selopt-low high = selopt-high ) ) ).
+  
+  TRY.
+      DATA(lv_where_clause) = lo_converter_osql->get_sql_condition( ).
+      IF lv_where_clause IS INITIAL.
+        MESSAGE 'Du hast die Berechtigung für alle ausgewählten Verkaufsorganisationen' TYPE 'I'.
+      ELSE.
+        cl_demo_output=>display_text( |Deine WHERE-Bedingung: { lv_where_clause }| ).
+      ENDIF.
+    CATCH cx_auth_not_authorized.
+      MESSAGE 'Keine Berechtigung für die ausgewählten Verkaufsorganisationen' TYPE 'I'.
+  ENDTRY.</code></pre>
+<p>Der Beitrag <a href="/blog/selektion-zur-berechtigung/">Selektion zur Berechtigung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Genereller Suchhilfe-Exit zur Anzeige von Icons</title>
+		<link>/blog/generelle-suchhilfe-exit-zur-anzeige-von-icons/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 15 Nov 2018 08:56:13 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Suchhilfen]]></category>
+		<category><![CDATA[icons]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019454</guid>
+
+					<description><![CDATA[<p>Suchhilfe-Exits sind eine recht komplexe Angelegenheit. In diesem Beitrag stelle ich dir einen Suchhilfe-Exit vor, den du generell zur Darstellung von Icons verwenden kannst. Er zeigt das Vorgehen, wie ein Suchhilfe-Exit auf Parameter der Suchhilfe zugreifen und nutzen kann.</p>
+<p>Der Beitrag <a href="/blog/generelle-suchhilfe-exit-zur-anzeige-von-icons/">Genereller Suchhilfe-Exit zur Anzeige von Icons</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Verwendung von grafischen Elementen im SAP-System ist doch arg eingeschränkt. Icons sind im Grunde die einzige Möglichkeit, etwas Farbe und Abwechslung in eine ALV-Liste zu bekommen. Schön ist es, wenn der Anwender selber einstellen kann, welche Icons zu welchen Informationen angezeigt werden sollen. Eine Status bietet sich perfekt an, um diesen durch ein geeignetes Icon visuell darzustellen.</p>
+<p>Für die Definition des zu verwendenden Icons sollte jedoch der Name des Icons verwendet werden (ICON_OKAY, ICON_MESSAGE_INFORMATION etc) anstelle der entsprechenden Icon-ID (@0V@, @19@ usw). Der Vorteil der Icon-ID ist zwar, dass dann das Icon direkt angezeigt wird, wenn das Feld nicht Eingabe bereit ist, allerdings ist die ID überhaupt nicht sprechend und die Pflege wird zum Glücksspiel.</p>
+<p>Wenn allerdings der Name des Icons verwendet wird, dann sieht man eben nur den Namen, aber nicht das zugehörige Icon.</p>
+<h2>Beispiel</h2>
+<p>Um zu verdeutlichen, wie ich die Icons einsetze, habe ich eine kleine Statustabelle definiert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat01.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019461" src="https://tricktresor.com/wp-content/uploads/2018/11/stat01.png" alt="" width="315" height="77" srcset="/wp-content/uploads/2018/11/stat01.png 315w, /wp-content/uploads/2018/11/stat01-300x73.png 300w" sizes="(max-width: 315px) 100vw, 315px" /></a></p>
+<blockquote><p>Der Text sollte natürlich besser in eine separat definierte Texttabelle ausgelagert werden, aber in diesem Fall soll es nur als Beispiel dienen.</p></blockquote>
+<p>Ich habe also eine Tabelle mit verschiedenen Status. Irgendein Eintrag/ Objekt kann einen dieser Status haben. In der Listausgabe wird zu einem Status der Name des zugeordneten Icons ermittelt und als Icon ausgegeben.</p>
+<h2>Darstellung eines Icons</h2>
+<p>Ein Icon besteht immer mindestens aus dem Icon selbst. Ein Icon muss immer Anfang eines Feldes stehen! Ich kann in jedem Anzeigefeld ein Icon ausgeben, indem ich die Icon-ID der Icons von zwei Klammeraffen umgeben eintrage: @1A@.</p>
+<p>Ein Icon kann aber auch noch einen Text besitzen, der mit angezeigt wird. Ebenso kann ein Icon eine 40 Zeichen lange Quickinfo enthalten, die bei MouseOver angezeigt wird.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat05.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019462" src="https://tricktresor.com/wp-content/uploads/2018/11/stat05.png" alt="" width="135" height="81" /></a></p>
+<h2>Erzeugen eines Icons</h2>
+<p>Der richtige Weg, um Icons für die Ausgabe in einem Feld vorzubereiten ist die Verwendung des Funktionsbausteins ICON_CREATE:</p>
+<pre>    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name            = 'ICON_DELETE'
+        text            = 'Löschen'
+        info            = 'Markiertes Objekt löschen'
+        add_stdinf      = ' '
+      IMPORTING
+        result          = lv_icon
+      EXCEPTIONS
+        OTHERS          = 3.</pre>
+<p>Dem Funktionsbaustein ist es egal, ob der Name oder die ID des Icons verwendet wird. Es kann also der Text &#8220;ICON_DELETE&#8221; übergeben werden oder die Konstante ICON_DELETE. Die Icon-Konstanten sind im Type-Pool ICON definiert und in jedem ABAP-Programm vorhanden.</p>
+<p><span style="text-decoration: underline;"><strong>Tipp:</strong></span></p>
+<p>Erstelle eine globale Klasse mit einer Methode, die dir das fertige Icon direkt zurück gibt. Die Erzeugung von Icons ist dann sehr einfach:</p>
+<pre>DATA(lv_icon) = zcl_icon=&gt;create( icon_okay ).</pre>
+<h2>Suchhilfe</h2>
+<p>Zurück zum Thema. Ich wollte ja eigentlich was ganz anderes&#8230;</p>
+<p>Eine Suchhilfe zum Status wäre sehr sinnvoll:</p>
+<ol>
+<li>Der Anwender kann in einer ALV-Gridliste durch betätigen der F4-Hilfe auf dem Statusfeld alle möglichen Status sehen (Legende)</li>
+<li>Bei der Auswahl eines Status ist eine Suchhilfe sowieso sinnvoll.</li>
+</ol>
+<p>Leider wird in diesem Fall ja nur der Name des Icons angezeigt und nicht das Icon selber. Das möchte ich ändern. Allerdings möchte ich nicht für genau diese eine Tabelle einen Suchhilfe-Exit basteln, der genau für diese Tabelle das Statusicon anzeigt. Ich möchte eine Suchhilfe erstellen, die für alle ähnlichen Tabellen ebenfalls verwendet werden kann.</p>
+<h3>Suchhilfe-Parameter</h3>
+<p>Zu diesem Zweck verwende ich die wenig bekannte Möglichkeit, in der Suchhilfe einen <em>Parameter</em> zu definieren. ein Parameter ist kein Feld der zugrunde liegenden Tabelle, sondern ein separat definierter Eintrag. Ein Parameter wird nicht in der Suchhilfe ausgegeben sondern dient der Übergabe an den Funktionsbausteins eines Suchhilfe-Exits.</p>
+<h3>Suchhilfe-Exit Funktionsbaustein</h3>
+<p>Ein Suchhilfe-Exit ist ein Funktionsbaustein mit einer definierten Schnittstelle. Zur Erstellung eines Suchhilfe-Exits wird am besten der Funktionsbaustein F4IF_SHLP_EXIT_EXAMPLE kopiert, der auch in der Hilfe zum Dynprofeld &#8220;Suchhilfe-Exit&#8221; erwähnt wird.</p>
+<p>In diesem Funktionsbaustein kann die Suchhilfe zu verschiedenen Zeitpunkten manipuliert werden (Datenselektion, Darstellung etc).</p>
+<p>Mit Hilfe des Funktionsbausteins F4UT_PARAMETER_VALUE_GET kann der Wert zu einem Parameter aus der Suchhilfe ermittelt werden.</p>
+<h2>Vorgehen</h2>
+<p>Ich möchte einen Suchhilfe-Exit erstellen, der aus der Suchhilfe ermittelt, in welchem Feld der Name des Icons steht und in welchem Feld das Icon selbst angezeigt werden soll.</p>
+<p>Das Ergebnis sieht so aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat04.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019458" src="https://tricktresor.com/wp-content/uploads/2018/11/stat04.png" alt="" width="349" height="200" srcset="/wp-content/uploads/2018/11/stat04.png 349w, /wp-content/uploads/2018/11/stat04-300x172.png 300w, /wp-content/uploads/2018/11/stat04-265x153.png 265w, /wp-content/uploads/2018/11/stat04-148x85.png 148w, /wp-content/uploads/2018/11/stat04-193x112.png 193w, /wp-content/uploads/2018/11/stat04-71x40.png 71w" sizes="(max-width: 349px) 100vw, 349px" /></a></p>
+<h2>Lösung</h2>
+<h3>Suchhilfe definieren</h3>
+<p>Als erstes muss ich in der Transaktion SE11 eine Suchhilfe anlegen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat06.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019463" src="https://tricktresor.com/wp-content/uploads/2018/11/stat06.png" alt="" width="719" height="394" srcset="/wp-content/uploads/2018/11/stat06.png 719w, /wp-content/uploads/2018/11/stat06-300x164.png 300w, /wp-content/uploads/2018/11/stat06-71x40.png 71w" sizes="(max-width: 719px) 100vw, 719px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat03.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1019459" src="https://tricktresor.com/wp-content/uploads/2018/11/stat03.png" alt="" width="640" height="260" srcset="/wp-content/uploads/2018/11/stat03.png 861w, /wp-content/uploads/2018/11/stat03-300x122.png 300w, /wp-content/uploads/2018/11/stat03-768x312.png 768w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h3>Suchhilfe-Exit anlegen</h3>
+<p>Den Suchhilfe-Exit kopiere ich vom Funktionsbaustein F4IF_SHLP_EXIT_EXAMPLE.</p>
+<p>&nbsp;</p>
+<p>Das Coding sieht folgendermaßen aus:</p>
+<pre>FUNCTION z_f4if_shlp_exit_icon.
+*"----------------------------------------------------------------------
+*"*"Lokale Schnittstelle:
+*"  TABLES
+*"      SHLP_TAB TYPE  SHLP_DESCT
+*"      RECORD_TAB STRUCTURE  SEAHLPRES
+*"  CHANGING
+*"     VALUE(SHLP) TYPE  SHLP_DESCR
+*"     VALUE(CALLCONTROL) LIKE  DDSHF4CTRL STRUCTURE  DDSHF4CTRL
+*"----------------------------------------------------------------------
+
+  DEFINE get_param.
+    CALL FUNCTION 'F4UT_PARAMETER_VALUE_GET'
+      EXPORTING
+        parameter         = &amp;1
+        fieldname         = '*'
+      IMPORTING
+        value             = lv_parameter_value
+      TABLES
+        shlp_tab          = shlp_tab
+        record_tab        = record_tab
+      CHANGING
+        shlp              = shlp
+        callcontrol       = callcontrol
+      EXCEPTIONS
+        parameter_unknown = 1.
+    IF sy-subrc = 0.
+      &amp;2 = lv_parameter_value.
+    ENDIF.
+  END-OF-DEFINITION.
+
+  DEFINE icon_create.
+    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name            = &amp;1
+        info            = &amp;2
+        add_stdinf      = ''
+      IMPORTING
+        result          = &amp;3
+      EXCEPTIONS
+        OTHERS          = 3.
+
+  END-OF-DEFINITION.
+
+*== Info:
+* Dieser Baustein kann in Suchhilfen als Suchhilfe-Exit verwendet werden
+*== Zweck:
+* Anzeige des Icons zu einem Icon-Namen, der in der Tabelle vorhanden ist
+*== Voraussetzung:
+* Spalte mit dem Namen eines Icons
+*
+
+  "Tabelle für den Iconnamen, der aus der RESULTTAB ermittelt wird
+  DATA lt_col_iconname TYPE STANDARD TABLE OF icon_name.
+  "Tabelle für den Inhalt der Info zum Icon
+  DATA lt_col_iconinfo TYPE STANDARD TABLE OF icon_text.
+  "Tabelle für das Aufbereitete Icon, das an die RESULTTAB übergeben wird
+  DATA lt_col_icontext TYPE STANDARD TABLE OF icon_text.
+  DATA lv_icontext TYPE icon_text.
+
+  "Generischer Parameter
+  DATA lv_parameter_value       TYPE  ddshvalue.
+  "Name der Spalte, die den Iconnamen enthält
+  DATA lv_column_with_icon_name TYPE  shlpfield.
+  "Name der Spalte, die den Icontext enthält
+  DATA lv_column_with_icon_info TYPE  shlpfield.
+  "Name der Spalte, in der das aufbereitete Icon dargestellt werden soll
+  DATA lv_column_for_display    TYPE  shlpfield.
+
+
+* EXIT immediately, if you do not want to handle this step
+  IF callcontrol-step &lt;&gt; 'SELONE' AND
+     callcontrol-step &lt;&gt; 'SELECT' AND
+     callcontrol-step &lt;&gt; 'SELONE' AND
+     callcontrol-step &lt;&gt; 'PRESEL' AND
+     callcontrol-step &lt;&gt; 'SELECT' AND
+     callcontrol-step &lt;&gt; 'DISP'.
+    EXIT.
+  ENDIF.
+
+*"----------------------------------------------------------------------
+* STEP DISP     (Display values)
+*"----------------------------------------------------------------------
+  IF callcontrol-step = 'DISP'.
+
+    get_param 'COLUMN_WITH_ICON_NAME'    lv_column_with_icon_name.
+    get_param 'COLUMN_WITH_ICON_INFO'    lv_column_with_icon_info.
+    get_param 'COLUMN_FOR_ICON_DISPLAY'  lv_column_for_display.
+
+
+    "Ermitteln aller ICON_NAMEN der einzelnen Einträge
+    CALL FUNCTION 'F4UT_PARAMETER_VALUE_GET'
+      EXPORTING
+        parameter         = lv_column_with_icon_name
+        fieldname         = '*'
+      TABLES
+        shlp_tab          = shlp_tab
+        record_tab        = record_tab
+        results_tab       = lt_col_iconname
+      CHANGING
+        shlp              = shlp
+        callcontrol       = callcontrol
+      EXCEPTIONS
+        parameter_unknown = 1
+        OTHERS            = 2.
+    IF sy-subrc = 0.
+      "Wenn alles geklappt hat, dann sind in Tabelle LT_COL_ICONNAME die Namen
+      "der Icons aus dem Parameter COLUMN_WITH_ICON_NAME
+
+      "Nun noch die die Texte für die Quickinfo ermitteln
+      CALL FUNCTION 'F4UT_PARAMETER_VALUE_GET'
+        EXPORTING
+          parameter         = lv_column_with_icon_info
+          fieldname         = '*'
+        TABLES
+          shlp_tab          = shlp_tab
+          record_tab        = record_tab
+          results_tab       = lt_col_iconinfo
+        CHANGING
+          shlp              = shlp
+          callcontrol       = callcontrol
+        EXCEPTIONS
+          parameter_unknown = 1
+          OTHERS            = 2.
+      if sy-subrc &gt; 0.
+        "Macht nichts: Es ist kein Feld definiert/ vorhanden, das zum Icon angezeigt werden soll
+        "Die Tabelle LT_COL_ICONINFO ist dann halt leer
+      endif.
+
+
+      LOOP AT lt_col_iconname INTO DATA(lv_iconname).
+        "Info zum Icon lesen:
+        READ TABLE lt_col_iconinfo INTO DATA(lv_iconinfo) INDEX sy-tabix.
+        "Aufbereitung des Icons zur Darstellung
+        icon_create lv_iconname lv_iconinfo lv_icontext.
+        APPEND lv_icontext TO lt_col_icontext.
+      ENDLOOP.
+    ENDIF.
+
+    "Alle aufbereiteten Icons an RESULTTAB übergeben
+    CALL FUNCTION 'F4UT_PARAMETER_RESULTS_PUT'
+      EXPORTING
+        parameter         = lv_column_for_display
+      TABLES
+        shlp_tab          = shlp_tab
+        record_tab        = record_tab
+        source_tab        = lt_col_icontext
+      CHANGING
+        shlp              = shlp
+        callcontrol       = callcontrol
+      EXCEPTIONS
+        parameter_unknown = 1
+        OTHERS            = 2.
+    IF sy-subrc &lt;&gt; 0.
+      EXIT.
+    ENDIF.
+    EXIT.
+  ENDIF.
+
+ENDFUNCTION.</pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/generelle-suchhilfe-exit-zur-anzeige-von-icons/">Genereller Suchhilfe-Exit zur Anzeige von Icons</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>GUI-Designer &#8220;guidrasil&#8221;</title>
+		<link>/blog/gui-designer-guidrasil/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 17 Oct 2018 17:19:56 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_picture]]></category>
+		<category><![CDATA[guidrasil]]></category>
+		<category><![CDATA[GUI-Designer]]></category>
+		<category><![CDATA[rtti]]></category>
+		<category><![CDATA[cl_gui_textedit]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019340</guid>
+
+					<description><![CDATA[<p>Vor langer Zeit habe ich mich mit der automatischen und generischen Erzeugung und Verwaltung von SAPGUI-Controls beschäftigt. Aus dieser Beschäftigung heraus ist der GUI-Designer entstanden, den ich guidrasil getauft habe. Folge mir in die Welt der Controls und Container...</p>
+<p>Der Beitrag <a href="/blog/gui-designer-guidrasil/">GUI-Designer &#8220;guidrasil&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Vor langer Zeit habe ich mich mit der automatischen und generischen Erzeugung und Verwaltung von <em>SAPGUI-Controls</em> beschäftigt.</p>
+<h2>Was sind Controls?</h2>
+<p>Controls sind ActiveX-Komponenten (auch OCX-Komponenten genannt), die im SAPGUI verwendet werden können und mit diesem ausgeliefert werden. Diese Windows-Komponenten werden über entsprechende Klassen im SAP angesprochen und erzeugt. Die Erzeugung erfolgt in der Regel ähnlich:</p>
+<ol>
+<li>CREATE OBJECT &lt;object reference&gt;</li>
+<li>&lt;object reference&gt;-SET_&#8230;.</li>
+<li>Manche Controls benötigen noch ein explizites DISPLAY.</li>
+</ol>
+<p>Die typischen GUI-Controls sind:</p>
+<ul>
+<li>CL_GUI_ALV_GRID</li>
+<li>CL_GUI_TEXTEDIT</li>
+<li>CL_GUI_PICTURE</li>
+<li>CL_GUI_CALENDAR</li>
+<li>CL_GUI_HTML_VIEWER</li>
+<li>CL_GUI_SIMPLE_TREE</li>
+<li>CL_GUI_COLUMN_TREE</li>
+<li>CL_GUI_LIST_TREE</li>
+</ul>
+<p>Controls benötigen einen Container, in dem sie platziert werden können. Lustiger Weise erben die Container-Klassen von der gleichen Klasse wie die Controls selber: CL_GUI_CONTROL. Die Container erben dann alle von CL_GUI_CONTAINER:</p>
+<ul>
+<li>CL_GUI_DOCKING_CONTAINER</li>
+<li>CL_GUI_CUSTOM_CONTAINER</li>
+<li>CL_GUI_DIALOGBOX_CONTAINER</li>
+</ul>
+<p>Eine Sonderstellung nehmen die Splitter-Controls ein, denn sie stellen ebenfalls wieder Container zur Verfügung:</p>
+<ul>
+<li>CL_GUI_SPLITTER_CONTAINER</li>
+<li>CL_GUI_EASY_SPLITTER_CONTAINER</li>
+</ul>
+<h3>Programmierung von Controls</h3>
+<p>Eine typische Programmierung sieht wie folgt aus:</p>
+<ul>
+<li>Erzeuge einen Container</li>
+<li>Erzeuge das Control in diesem Container</li>
+<li>Setze Eigenschaften des Controls</li>
+</ul>
+<p>In diesem <a href="https://tricktresor.com/blog/dockingcontainer/">Demoprogramm</a> zeige ich kurz, wie ein Textedit-Control in einem Docking-Container aufgebaut wird.</p>
+<h3>Setzen von Eigenschaften</h3>
+<p>Die Ansteuerung der Controls ist natürlich immer unterschiedlich, da sich die Control unterscheiden. Ein Picture-Control ist nun mal immer read-only, Ein Textedit-Control nicht. Das ist auch genau das Problem: Wenn ich ein Control häufig verwende, dann kenne ich die Eigenschaften und notwendigen Attribute. Wenn nicht, dann muss ich suchen. Zudem ist die Aktivierung von Attributen manchmal per BOOLEAN notwendig (X und space) und manchmal verlangt das Control &#8220;1&#8221; und &#8220;0&#8221;.</p>
+<h2>Idee eines GUI-Designers</h2>
+<p>Da die Controls alle von der Klasse CL_GUI_CONTROL abstammen, ist es möglich jedes Control über eine generelle Methodenschnittstelle zu erzeugen. Ich kann also einer Methode irgend einen Container übergeben (egal, ob Docking-Container, Custom-Container oder Dialogbox) und das Control wieder zurück bekommen. Oder ich kann ein Control erzeugen und es in einer Tabelle speichern.</p>
+<p>Das folgende Beispielprogramm macht genau das: Durch die Einstellungen auf dem Selektionsbildschirm wird definiert, welche Art von Control auf welcher Seite angedockt werden soll. Mit &lt;ENTER&gt; werden der Container sowie das Control erzeugt und in einer internen Tabelle abgelegt:</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1019345" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil-demo01-1024x773.png" alt="" width="640" height="483" srcset="/wp-content/uploads/2018/10/guidrasil-demo01-1024x773.png 1024w, /wp-content/uploads/2018/10/guidrasil-demo01-300x226.png 300w, /wp-content/uploads/2018/10/guidrasil-demo01-768x580.png 768w, /wp-content/uploads/2018/10/guidrasil-demo01.png 1378w" sizes="(max-width: 640px) 100vw, 640px" /></p>
+<h3>Demoprogramm</h3>
+<pre>REPORT zguidrsail_demo_generic_ctrl.
+
+SELECTION-SCREEN BEGIN OF BLOCK ctrl WITH FRAME TITLE TEXT-ctl.
+PARAMETERS p_text RADIOBUTTON GROUP ctrl DEFAULT 'X'.
+PARAMETERS p_icon RADIOBUTTON GROUP ctrl.
+SELECTION-SCREEN END OF BLOCK ctrl.
+
+SELECTION-SCREEN BEGIN OF BLOCK side WITH FRAME TITLE TEXT-sid.
+PARAMETERS p_left RADIOBUTTON GROUP side DEFAULT 'X'.
+PARAMETERS p_rigt RADIOBUTTON GROUP side.
+PARAMETERS p_botm RADIOBUTTON GROUP side.
+SELECTION-SCREEN END OF BLOCK side.
+
+CLASS ctrl_demo DEFINITION.
+  PUBLIC SECTION.
+    METHODS add_text
+      IMPORTING
+        side TYPE i.
+    METHODS add_icon
+      IMPORTING
+        side TYPE i.
+  PROTECTED SECTION.
+    TYPES: BEGIN OF ts_object,
+             container TYPE REF TO cl_gui_container,
+             control   TYPE REF TO cl_gui_control,
+           END OF ts_object.
+
+    DATA objects TYPE STANDARD TABLE OF ts_object.
+    METHODS append_control
+      IMPORTING
+        container TYPE REF TO cl_gui_container
+        control   TYPE REF TO cl_gui_control.
+
+ENDCLASS.
+
+CLASS ctrl_demo IMPLEMENTATION.
+  METHOD add_text.
+    DATA(parent) = NEW cl_gui_docking_container( side = side ratio = 20 ).
+    DATA(textedit) = NEW cl_gui_textedit( parent = parent ).
+    textedit-&gt;set_text_as_stream( VALUE texttab( ( tdline = `This is a demonstration` ) ) ).
+    append_control( container = parent control = textedit ).
+  ENDMETHOD.
+  METHOD add_icon.
+    DATA(parent) = NEW cl_gui_docking_container( side = side ratio = 20 ).
+    DATA(icon) = NEW cl_gui_picture( parent = parent ).
+    icon-&gt;load_picture_from_sap_icons( icon_message_question ).
+    icon-&gt;set_display_mode( cl_gui_picture=&gt;display_mode_fit_center ).
+    append_control( container = parent control = icon ).
+  ENDMETHOD.
+  METHOD append_control.
+    APPEND VALUE #( container = container control = control ) TO objects.
+  ENDMETHOD.
+ENDCLASS.
+
+INITIALIZATION.
+  DATA(demo) = NEW ctrl_demo( ).
+
+AT SELECTION-SCREEN.
+
+  CASE 'X'.
+    WHEN p_left.
+      DATA(side) = cl_gui_docking_container=&gt;dock_at_left.
+    WHEN p_rigt.
+      side = cl_gui_docking_container=&gt;dock_at_right.
+    WHEN p_botm.
+      side = cl_gui_docking_container=&gt;dock_at_bottom.
+  ENDCASE.
+
+  CASE 'X'.
+    WHEN p_text.
+      demo-&gt;add_text( side = side ).
+    WHEN p_icon.
+      demo-&gt;add_icon( side = side ).
+  ENDCASE.</pre>
+<h3>Dynamische Verwaltung</h3>
+<p>Da ich nun alle erzeugten Container und Controls in einer Tabelle habe, kann ich auch auf die Objekte und deren Eigenschaften zugreifen. Ich könnte zum Beispiel die Tabelle durchgehen und fragen: Ist im Feld CONTAINER ein Objekt der Klasse CL_GUI_DOCKING_CONTAINER? Wenn ja, frage ich das Control nach seinen wichtigen Eigenschaften: RATIO und SIDE:</p>
+<pre>IF itab-container IS INSTANCE OF cl_gui_docking_container.
+  DATA dock TYPE REF TO cl_gui_docking_container.
+  dock ?= itab-container.
+  DATA(side) = dock-&gt;get_docking_side( ).
+  dock-&gt;get_ratio( ratio = DATA(ratio) ).
+ENDIF.</pre>
+<p>Auf diese Weise könnte ich mir alle wichtigen Eigenschaften eines Controls beschaffen und speichern.</p>
+<h3>Dynamische Erzeugung</h3>
+<p>Mit Hilfe von RTTI (Run Time Type Information) in Form der Klasse CL_ABAP_TYPEDESCR kann ich sogar den Klassennamen des Objektes ermitteln:</p>
+<p>DATA(clsnam) = cl_abap_typedescr=&gt;describe_by_object_ref( itab-container )-&gt;get_relative_name( ).<br />
+Wenn ich diesen habe, dann ich das Objekt auch dynamisch erzeugen:</p>
+<pre>DATA: container TYPE REF TO cl_gui_container, 
+      exc_ref TYPE REF TO cx_root.
+
+DATA: ptab TYPE abap_parmbind_tab.
+
+ptab = VALUE #( 
+                ( name  = 'SIDE' 
+                  kind  = cl_abap_objectdescr=&gt;exporting 
+                  value = REF #( side ) ) 
+                ( name  = 'RATIO' 
+                  kind  = cl_abap_objectdescr=&gt;exporting 
+                  value = REF #( ratio ) ) ).
+
+TRY. 
+    CREATE OBJECT container TYPE (clsnam) 
+      PARAMETER-TABLE ptab. 
+  CATCH cx_sy_create_object_error INTO exc_ref. 
+    MESSAGE exc_ref-&gt;get_text( ) TYPE 'I'. 
+ENDTRY.</pre>
+<p>Eine dynamische Erzeugung ist jedoch gar nicht notwendig, denn ich kenne ja den Klassennamen und kann die Erzeugung wiederum an eine Erbauer-Klasse auslagern.</p>
+<h2>guidrasil</h2>
+<p>Nach dem oben beschriebenen Prinzip funktioniert der GUI-Designer ungefähr. Eine wichtige Eigenschaft ist jedoch, dass man erst auswählen muss, auf welcher Seite man einen Docking-Container erstellen möchte. In diesem Docking-Container wird dann ein Splitter erzeugt, der oben eine Toolbar integriert und unten erneut einen leeren Container anzeigt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_02.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019347" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_02.png" alt="" width="663" height="392" srcset="/wp-content/uploads/2018/10/guidrasil_02.png 663w, /wp-content/uploads/2018/10/guidrasil_02-300x177.png 300w" sizes="(max-width: 663px) 100vw, 663px" /></a></p>
+<p>&nbsp;</p>
+<p>In der Toolbar kann man dann die gewünschten Controls oder Splitter-Container auswählen. Der GUI-Designer merkt sich, welche Objekte an welcher Stelle erzeugt werden. Das Erzeugen der einzelnen Controls sowie das Speichern der unterstützten Eigenschaften übernimmt die Erbauer-Klasse, die es für jedes Control gibt.</p>
+<p>Zusätzlich stellt die Erbauer-Klasse auch noch einen Dialog zur Verfügung, in dem die Eigenschaften des Control eingestellt werden können.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019346" src="https://tricktresor.com/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png" alt="" width="340" height="200" srcset="/wp-content/uploads/2018/10/guidrasil_ctrl_function_icon.png 340w, /wp-content/uploads/2018/10/guidrasil_ctrl_function_icon-300x176.png 300w" sizes="(max-width: 340px) 100vw, 340px" /></a></p>
+<h2>I&#8217;d rather write code that writes code than write code</h2>
+<p>Eine weitere Eigenschaft der Erbauer-Klasse ist, dass jede Erbauer-Klasse ja genau weiß, wie das eigene Control erzeugt werden muss. Das heißt, es kann auch Code zur Verfügung stellen, der für die Erzeugung des Controls notwendig ist.</p>
+<p>Der GUI-Designer weiß genau, welche Controls in welcher Reihenfolge erzeugt werden müssen. Der Designer muss also nur noch jedes Control nach dem Erzeugungscode fragen&#8230;</p>
+<h2>abapGit</h2>
+<p>Der GUI-Designer guidrasil ist verfügbar per <a href="https://github.com/larshp/abapGit">abapGit</a> auf <a href="https://github.com/tricktresor">Github</a>:</p>
+<p><a href="https://github.com/tricktresor/guidrasil">https://github.com/tricktresor/guidrasil</a></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/gui-designer-guidrasil/">GUI-Designer &#8220;guidrasil&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Pflegeview mit Datennavigation</title>
+		<link>/blog/pflegeview-mit-datennavigation/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 23 Apr 2018 19:08:50 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018434</guid>
+
+					<description><![CDATA[<p>Pflegeviews kennt jeder. Sie werden zu einer Tabelle oder einem View generiert und erlauben eine mehr oder weniger komfortable Dateneingabe. Mit Pflegeviews sind die meisten Customizingfunktionen realisiert worden. Da der Tabellenpflegedialog generiert wird und von SAP seit Jahren nicht weiterentwickelt wird &#8211; ich hätte eine Menge einfacher Verbesserungsvorschläge &#8211; muss man mit dem Leben, was vorhanden ist. Die Eingabe oder die Funktionen können durch Zeitpunkte angepasst werden. Ab einer bestimmten Größe, also wenn ziemlich viele...</p>
+<p>Der Beitrag <a href="/blog/pflegeview-mit-datennavigation/">Pflegeview mit Datennavigation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Pflegeviews kennt jeder. Sie werden zu einer Tabelle oder einem View generiert und erlauben eine mehr oder weniger komfortable Dateneingabe. Mit Pflegeviews sind die meisten Customizingfunktionen realisiert worden.</p>
+<p>Da der Tabellenpflegedialog generiert wird und von SAP seit Jahren nicht weiterentwickelt wird &#8211; ich hätte eine Menge einfacher Verbesserungsvorschläge &#8211; muss man mit dem Leben, was vorhanden ist. Die Eingabe oder die Funktionen können durch <a href="https://tricktresor.com/blog/zeitpunkte/">Zeitpunkte </a>angepasst werden.</p>
+<p>Ab einer bestimmten Größe, also wenn ziemlich viele Schlüsselfelder vorhanden sind, wird die Eingabe und die Kontrolle der vorhandenen Daten sehr mühselig.</p>
+<h2>Datennavigation</h2>
+<p>Um die Daten besser sichten zu können und sozusagen durch die Daten surfen zu können, hatte ich die Idee, einen ganz bestimmten Tree-Control anzubinden, der die Daten hierarchisch darstellt. Die Darstellung der Daten funktioniert natürlich mit allen Tree-Arten, aber es gibt eine Klasse, die eine ganz besondere <em>Fähigkeit</em> hat: Bei der Klasse CL_GUI_ALV_TREE_SIMPLE kann die Hierarchie zur Laufzeit geändert werden.</p>
+<p>Der Anwender kann sich so also eine ganz eigene Sicht auf die Tabelle zusammenklicken. Ein Klick auf den entsprechenden Knoten soll dann die SM30 aufrufen. Die Anzeige wird auf die Daten eingeschränkt, die durch die Hierarchie gegeben sind.</p>
+<p>Um das Ganze zu verdeutlichen, habe ich eine Demotabelle mit vielen Schlüsselfeldern gebaut und ein paar fiktive Daten eingefügt. Die Tabelle stellt eine typische Customizingtabelle dar, wo zu einer bestimmten Kombination von organisatorischen Werten Optionen aktiv sind oder nicht:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-06.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018440" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-06.png" alt="" width="453" height="277" srcset="/wp-content/uploads/2018/04/sm30-06.png 453w, /wp-content/uploads/2018/04/sm30-06-300x183.png 300w" sizes="(max-width: 453px) 100vw, 453px" /></a></p>
+<p>Wenn man sich hier mit ein paar tausend Einträgen, die durchaus realistisch sind, zurecht finden möchte, dann braucht man schon etwas Geduld und Wissen, wie man die einzelnen Einträge Filtern kann.</p>
+<h2>Vorbereitung</h2>
+<p>Um die Daten zu lesen und anzeigen zu können, musste ich zwei grundsätzliche Dinge tun, die, wenn man weiß wie, nicht schwer sind:</p>
+<ul>
+<li>Erzeugen einer Tabelle mit genau der Struktur der vorgegebenen Tabelle</li>
+<li>Daten zu einer beliebigen Tabelle/ View lesen</li>
+</ul>
+<h3>Dynamisch Tabelle erzeugen</h3>
+<p>Das Erzeugen der Tabelle geht extrem einfach:</p>
+<pre class="lang:abap decode:true ">DATA mr_data TYPE REF TO data.
+FIELD-SYMBOLS &lt;lt_data&gt; TYPE STANDARD TABLE.
+CREATE DATA mr_data TYPE STANDARD TABLE OF (tabellenname).
+ASSIGN mr_data-&gt;* TO &lt;lt_data&gt;.</pre>
+<p>In TABELLENNAME steht der Name des Views. Im Feldsymbol &lt;LT_DATA&gt; steht nun die Tabelle zur Verfügung, die genau die gleichen Eigenschaften hat, als hätte ich sie direkt im Programm angegeben:</p>
+<pre class="lang:abap decode:true ">DATA lt_data TYPE STANDARD TABLE OF tabellenname.</pre>
+<h3>Viewdaten lesen</h3>
+<p>Wenn es sich um eine Tabelle handelt, dann kann ich die Daten einfach mit SELECT ermitteln. Bei einem Tabellenpflegeview geht das nicht. Dieser ist nur für die Verwendung in der SM30 gedacht, nicht für die Datenselektion.</p>
+<p>Aber das Problem hatte wohl vor mir auch schon jemand und hat den Funktionsbaustein VIEW_GET_DATA geschrieben.</p>
+<pre class="lang:abap decode:true ">    CALL FUNCTION 'VIEW_GET_DATA'
+      EXPORTING
+        view_name = tabellenname
+      TABLES
+        data      = &lt;lt_data&gt;
+      EXCEPTIONS
+        OTHERS    = 6.</pre>
+<p>Die Selektion der Daten ist also auch kein Problem.</p>
+<h2>Klasse CL_GUI_ALV_TREE_SIMPLE</h2>
+<p>Kommen wir nun zu dem spannenden Teil und meiner eigentlichen Idee zur Navigation in den Daten. Die Darstellung der Daten aus dem Tabellenpflegeview möchte ich hierarchisch darstellen. Die Klasse CL_GUI_ALV_SIMPLE_TREE erstellt die Hierarchie fast automatisch.</p>
+<p>Die Klasse benötigt eine Tabelle und eine Information, nach welchen Tabellenfeldern der Aufriss erfolgen soll. Wie bereits erwähnt, hat die Klasse CL_GUI_ALV_TREE_SIMPLE die besondere Eigenschaft, dass der Aufriss zur Laufzeit geändert werden kann:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-05.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018435" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-05.png" alt="" width="315" height="144" srcset="/wp-content/uploads/2018/04/sm30-05.png 315w, /wp-content/uploads/2018/04/sm30-05-300x137.png 300w" sizes="(max-width: 315px) 100vw, 315px" /></a></p>
+<p>Wie bei einem normalen ALV üblich, kann das Layout auch gespeichert werden, so dass man sich häufig genutzte Hierarchien speichern und wieder laden kann.</p>
+<h2>Navigation</h2>
+<p>Nun ist die bloße Anzeige der Daten nicht sonderlich hilfreich. Deswegen habe ich einen Doppelklick auf die Knoten und Items des Baumes programmiert. Mit einem Doppelklick sollen die Daten bis zu dieser Hierarchiestufe angezeigt werden. Wenn ich also einen Doppelklick auf die oberste Ebene, die Verkaufsorganisation 1000 mache, dann sollen im View nur die Daten mit Verkaufsorganisation 1000 angezeigt werden. Wenn ich einen Doppelklick auf den untergeordneten Vertriebsweg 10 mache, sollen nur die Daten von VkOrg 1000 und Vertriebsweg 10 angezeigt werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-03.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018437" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-03.png" alt="" width="640" height="278" srcset="/wp-content/uploads/2018/04/sm30-03.png 982w, /wp-content/uploads/2018/04/sm30-03-300x130.png 300w, /wp-content/uploads/2018/04/sm30-03-768x334.png 768w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p>Das funktioniert auch ganz gut, denn den Tabellenpflegedialog kann man nicht nur über die Transaktion SM30 aufrufen, sondern auch über den Funktionsbaustein VIEW_MAINTENANCE_CALL. Diesem Funktionsbaustein gibt man grob die folgenden Daten mit:</p>
+<ul>
+<li>Tabellenname</li>
+<li>Aktion (Anzeige oder Ändern)</li>
+<li>Selektionstabelle</li>
+</ul>
+<p>Der Clou hierbei ist die Selektionstabelle, in der ich anhand der jeweiligen Doppelklick-Position im Baum genau die zugrunde liegenden Daten übergebe. Beim Doppelklick werden folgende beiden Werte geliefert:</p>
+<ul>
+<li>Die Hierarchiestufe</li>
+<li>Der Tabellenindex der zugrunde liegenden Datentabelle</li>
+</ul>
+<p>Ich ermittele dafür beim Doppelklick die aktuelle Hierarchiedefinition, lese den zugrunde liegenden Tabelleneintrag und nehme dann die Werte aus der aktuellen Hierarchiestufe in die Selektionstabelle auf.</p>
+<h3>Beispiel</h3>
+<p>Obige Hierarchie zeigt</p>
+<ul>
+<li>Verkaufsorganisation
+<ul>
+<li>Vertriebsweg
+<ul>
+<li>Sparte</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Ich mache einen Doppelklick auf den Eintrag Vertriebsweg 10 der VkOrg 1000. Das Doppelklickereignis des Trees sagt mir als Hierarchiestufe VTWEG und Tabellenzeile 2.</p>
+<p>Ich mache einen Loop über die aktuelle Hierarchie und weise per ASSIGN COMPONENT dieses Feld der Tabellenzeile einem weiteren Feldsymbol zu. Den Feldnamen und den Wert dieses Feldes wird an die Selektionstabelle angehängt. So lange, bis ich die aktuelle Hierarchiestufe erreicht habe.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-01.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018439" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-01.png" alt="" width="981" height="575" srcset="/wp-content/uploads/2018/04/sm30-01.png 981w, /wp-content/uploads/2018/04/sm30-01-300x176.png 300w, /wp-content/uploads/2018/04/sm30-01-768x450.png 768w, /wp-content/uploads/2018/04/sm30-01-193x112.png 193w" sizes="(max-width: 981px) 100vw, 981px" /></a></p>
+<h2>Hierarchie ändern</h2>
+<p>Wenn ich nun nicht über die Verkaufsorganisation an die Daten ran möchte, sondern zum Beispiel über das Material, dann kann ich einfach die Hierarchie ändern:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-02.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018438" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-02.png" alt="" width="640" height="379" srcset="/wp-content/uploads/2018/04/sm30-02.png 648w, /wp-content/uploads/2018/04/sm30-02-300x178.png 300w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p>Die Darstellung im Baum ist entsprechend und ich kann mit einem Doppelklick auf ein Material schnell alle Einträge auswählen, die dieses Material enthalten:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-07.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018441" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-07.png" alt="" width="800" height="293" srcset="/wp-content/uploads/2018/04/sm30-07.png 800w, /wp-content/uploads/2018/04/sm30-07-300x110.png 300w, /wp-content/uploads/2018/04/sm30-07-768x281.png 768w" sizes="(max-width: 800px) 100vw, 800px" /></a></p>
+<h2>Wo bin ich</h2>
+<p>Eine Schwäche der Baumdarstellung ist, dass ich nicht genau, bzw. nicht gut erkennen kann, wo ich mich gerade befinde. Leider sind die Methoden, die den Aufbau der Hierarchie steuern als PRIVATE Methoden angelegt. Es ist also nicht möglich, die Klasse zu beerben und entsprechend anzupassen.</p>
+<p>Ich fände es sinnvoll, wenn ich diesem Falle der Eintrag nicht 1000, 2000 usw. heißen würde, sondern &#8220;Verkaufsorganisation 1000&#8221; usw. Das würde deutlich machen, welche Hierarchiestufe es ist.</p>
+<p>Eine einfache Möglichkeit habe ich jedoch gefunden, um die Darstellung anzupassen. Es kann ein Gruppenstufen-Layout definiert werden. Hier ist es möglich, für jede Stufe der Hierarchie ein Icon zu definieren. Da man im Icon auch eine Quickinfo mitgeben kann, lässt sich folgende Ausgabe erzeugen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-04.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018436" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-04.png" alt="" width="205" height="125" /></a></p>
+<p>Wenn man im Layout des SAPGUI einstellt, dass die Quickinfo sofort angezeigt wird, ist das eine akzeptable Lösung.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/04/sm30-08.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018442" src="https://tricktresor.com/wp-content/uploads/2018/04/sm30-08.png" alt="" width="795" height="257" srcset="/wp-content/uploads/2018/04/sm30-08.png 795w, /wp-content/uploads/2018/04/sm30-08-300x97.png 300w, /wp-content/uploads/2018/04/sm30-08-768x248.png 768w" sizes="(max-width: 795px) 100vw, 795px" /></a></p>
+<h2>Doppelklick</h2>
+<p>Um die Navigation so einfach und intuitiv wie möglich zu machen, habe ich nicht nur NODE_DOUBLE_CLICK ausprogrammiert, sondern auch ITEM_DOUBLE_CLICK. Ich finde es immer nervig, wenn man irgendwo draufklickt und nichts passiert. Oder wenn man nur ein Element angeklickt hat und dann die Meldung kommt: &#8220;Bitte markieren Sie einen Knoten&#8221;.</p>
+<h2>Call Screen</h2>
+<p>Leider hat die Lösung eine große Macke: Da mit jedem Doppelklick der Tabellenpflegedialog erneut aufgerufen wird, wird mit jedem Aufruf ein CALL SCREEN ausgeführt. Das ist jedoch nur etwa 50 mal möglich.</p>
+<p>Ein LEAVE TO SCREEN 0 sorgt zwar dafür, dass die Aufrufhierarchie wieder abgebaut wird, allerdings gibt es bei der Verwendung von LEAVE TO SCREEN 0 in der Doppelklick-Eventhandlermethode merkwürdige Seiteneffekte beim Blättern im Pflegedialog.</p>
+<p>Ich habe leider keine Möglichkeit gefunden, um die Daten direkt im View zu aktualisieren, ohne den VIEW_MAINTENANCE_CALL erneut auszuführen.</p>
+<h2>Weitere Infos</h2>
+<p>Um möglichst viele Informationen über den Tabellenpflegedialog zu bekommen &#8211; und auch um zu wissen, ob überhaupt ein Pflegedialog existiert <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" /> &#8211; rufe ich den Baustein VIEW_GET_DDIC_INFO auf. In der Tabelle TVDIR, die der Baustein unter anderem liest, steht zum Beispiel, in welcher Funktionsgruppe der Pflegedialog erstellt wurde. Das ist wichtig für externe Perform-aufrufe, mit denen man evtl. Daten manipulieren möchte. Es gibt zum Beispiel die Routine VIM_SET_GLOBAL_FIELD_VALUE, mit der globale Felder geändert werden können:</p>
+<pre class="lang:abap decode:true">DATA(prog) = |SAPL{ ms_tvdir-area }|.
+DATA(rc) TYPE i.
+PERFORM vim_set_global_field_value 
+     IN PROGRAM (prog) 
+  USING 'VIM_NEXT_SCREEN' 
+        'N' 
+        '0' 
+         rc.</pre>
+<p>Das funktioniert aber nur, wenn auch der Aufruf &#8220;extern&#8221; erfolgt. Für einen externen Aufruf müssen ein paar sehr intime Infos übergeben werden, die aber fast alle vom VIEW_GET_DDIC_INFO ermittelt werden.</p>
+<p>Mit der Routine TABLE_CALL_INFO und der Funktion &#8220;READ&#8221; werden die Daten gelesen und mit der Funktion &#8220;EDIT&#8221; werden die Daten im Änderungsmodus dargestellt.</p>
+<pre class="lang:abap decode:true">    DATA(prog) = |SAPL{ ms_tvdir-area }|.
+    PERFORM table_call_function IN PROGRAM (prog)
+     TABLES lt_dba_sellist
+            lt_dpl_sellist
+            mt_x_header
+            mt_x_namtab
+            lt_excl_func
+      USING 'READ'
+            'VERY_SHORT'
+            lv_updflag.
+
+    PERFORM table_call_function IN PROGRAM (prog)
+     TABLES lt_dba_sellist
+            lt_dpl_sellist
+            mt_x_header
+            mt_x_namtab
+            lt_excl_func
+      USING 'EDIT'
+            'VERY_SHORT'
+            lv_updflag.</pre>
+<p>Ich habe es, wie gesagt, leider nicht geschafft, die Daten nur zu aktualisieren, nachdem der View einmal dargestellt wurde.</p>
+<h2>Filterung</h2>
+<p>Normalerweise kann man in einem ALV Daten filtern. Der CL_GUI_ALV_SIMPLE_TREE basiert auf einem ALV aber leider kann hier nicht gefiltert werden. Die Funktion müsste aber leicht nachgestellt werden können. Eventuell kümmere ich mich da später noch mal drum.</p>
+<h2>Select-Options</h2>
+<p>Sinnvoll wäre es natürlich auch, ein Selektionsbild für den View anzubieten, so dass der Anwender eine Vorauswahl treffen kann.</p>
+<p>Dies müsste mit den freien Selektionsbedingungen abbildbar sein, aber da hatte ich bisher noch keine Lust zu. In diesem Beitrag steht jedoch, wie diese zu verwenden sind: <a href="https://tricktresor.com/blog/dynamisches-selektionsbild/">Dynamisches Selektionsbild</a></p>
+<p>Mit dem Funktionsbaustein VIEW_RANGETAB_TO_SELLIST können die Selektionsoptionen einfach in die für den Pflegedialog notwendige Selektionstabelle überführt werden.</p>
+<h2>AbapGit</h2>
+<p>Der gesamte Code inklusive Tabellendefinition und Tabellenpflegedialog steht bei <a href="https://github.com/tricktresor">github.com</a>:</p>
+<p><a href="https://github.com/tricktresor/blog">https://github.com/tricktresor/blog</a></p>
+<h2>Coding</h2>
+<pre class="lang:abap decode:true ">REPORT ztrcktrsr_sm30_navigation.
+
+PARAMETERS p_table TYPE tabname DEFAULT 'ZTT_DEMO1'.
+
+CLASS lcl_tree DEFINITION.
+  PUBLIC SECTION.
+    TYPES tt_sellist           TYPE STANDARD TABLE OF vimsellist.
+
+    DATA mo_tree               TYPE REF TO cl_gui_alv_tree_simple.
+    DATA mt_sort               TYPE lvc_t_sort. "Sortiertabelle
+    DATA mr_data               TYPE REF TO data.
+    DATA ms_tvdir              TYPE tvdir.
+    DATA mv_callstack_counter  TYPE i.
+
+    DATA mt_sellist            TYPE STANDARD TABLE OF vimsellist.
+    DATA mt_x_header           TYPE STANDARD TABLE OF vimdesc.
+    DATA mt_x_namtab           TYPE STANDARD TABLE OF vimnamtab.
+
+    METHODS handle_node_double_click
+                  FOR EVENT node_double_click OF cl_gui_alv_tree_simple
+      IMPORTING grouplevel index_outtab.
+    METHODS handle_item_double_click
+                  FOR EVENT item_double_click OF cl_gui_alv_tree_simple
+      IMPORTING grouplevel index_outtab fieldname.
+    METHODS build_sort_table.
+    METHODS register_events.
+    METHODS set_view IMPORTING viewname TYPE clike RAISING cx_axt.
+    METHODS get_view_data.
+    METHODS init_tree.
+    METHODS constructor.
+    METHODS view_maintenance_call IMPORTING it_sellist TYPE tt_sellist.
+
+ENDCLASS.
+
+DATA main TYPE REF TO lcl_tree.
+
+CLASS lcl_tree IMPLEMENTATION.
+  METHOD constructor.
+  ENDMETHOD.
+
+  METHOD set_view.
+    SELECT SINGLE * FROM tvdir INTO ms_tvdir WHERE tabname = viewname.
+    IF sy-subrc &gt; 0.
+      RAISE EXCEPTION TYPE cx_axt.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD handle_item_double_click.
+    "Pass click on item to handle_node_double_click
+    handle_node_double_click(
+      grouplevel   = grouplevel
+      index_outtab = index_outtab ).
+
+  ENDMETHOD.
+
+  METHOD handle_node_double_click.
+
+    FIELD-SYMBOLS &lt;lt_data&gt;            TYPE STANDARD TABLE.
+    ASSIGN mr_data-&gt;* TO &lt;lt_data&gt;.
+    DATA lt_dba_sellist                TYPE STANDARD TABLE OF vimsellist.
+    DATA ls_dbasellist                 TYPE  vimsellist.
+
+    "Get current hierarchy
+    mo_tree-&gt;get_hierarchy( IMPORTING et_sort = DATA(lt_sort) ).
+
+    IF grouplevel = space.
+      "clicked on entry
+      ASSIGN &lt;lt_data&gt;[ index_outtab ] TO FIELD-SYMBOL(&lt;ls_data&gt;).
+      CHECK sy-subrc = 0.
+
+      LOOP AT lt_sort INTO DATA(ls_sort).
+        ASSIGN COMPONENT ls_sort-fieldname OF STRUCTURE &lt;ls_data&gt; TO FIELD-SYMBOL(&lt;lv_value&gt;).
+        IF sy-subrc &lt;&gt; 0.
+          EXIT.
+        ENDIF.
+        APPEND INITIAL LINE TO lt_dba_sellist ASSIGNING FIELD-SYMBOL(&lt;ls_sellist&gt;).
+        &lt;ls_sellist&gt;-viewfield = ls_sort-fieldname.
+        &lt;ls_sellist&gt;-operator  = 'EQ'.
+        &lt;ls_sellist&gt;-value     = &lt;lv_value&gt;.
+        &lt;ls_sellist&gt;-and_or    = 'AND'.
+        READ TABLE mt_x_namtab TRANSPORTING NO FIELDS WITH KEY viewfield = ls_sort-fieldname.
+        &lt;ls_sellist&gt;-tabix     = sy-tabix.
+      ENDLOOP.
+
+    ELSE.
+      "Clicked on hierarchy node
+      ASSIGN &lt;lt_data&gt;[ index_outtab ] TO &lt;ls_data&gt;.
+      IF sy-subrc = 0.
+        LOOP AT lt_sort INTO ls_sort.
+          "Fill up all field from start of hierarchy to clicked node
+          ASSIGN COMPONENT ls_sort-fieldname OF STRUCTURE &lt;ls_data&gt; TO &lt;lv_value&gt;.
+          IF sy-subrc &lt;&gt; 0.
+            EXIT.
+          ENDIF.
+          APPEND INITIAL LINE TO lt_dba_sellist ASSIGNING &lt;ls_sellist&gt;.
+          &lt;ls_sellist&gt;-viewfield = ls_sort-fieldname.
+          &lt;ls_sellist&gt;-operator  = 'EQ'.
+          &lt;ls_sellist&gt;-value     = &lt;lv_value&gt;.
+          &lt;ls_sellist&gt;-and_or    = 'AND'.
+          READ TABLE mt_x_namtab TRANSPORTING NO FIELDS WITH KEY viewfield = ls_sort-fieldname.
+          &lt;ls_sellist&gt;-tabix     = sy-tabix.
+          IF ls_sort-fieldname = grouplevel.
+            EXIT.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+
+    CHECK &lt;ls_data&gt; IS ASSIGNED.
+
+    IF mv_callstack_counter &gt; 50.
+      MESSAGE 'Navigation not possible anymore. Sorry' TYPE 'I'.
+      RETURN. "handle_double_click
+    ENDIF.
+
+    ADD 1 TO mv_callstack_counter.
+
+    view_maintenance_call( lt_dba_sellist ).
+
+  ENDMETHOD.
+
+
+  METHOD get_view_data.
+
+    FIELD-SYMBOLS &lt;lt_data&gt; TYPE STANDARD TABLE.
+    CREATE DATA mr_data TYPE STANDARD TABLE OF (ms_tvdir-tabname).
+    ASSIGN mr_data-&gt;* TO &lt;lt_data&gt;.
+
+
+    "Get info about table/ view
+    CALL FUNCTION 'VIEW_GET_DDIC_INFO'
+      EXPORTING
+        viewname        = ms_tvdir-tabname
+      TABLES
+        sellist         = mt_sellist
+        x_header        = mt_x_header
+        x_namtab        = mt_x_namtab
+      EXCEPTIONS
+        no_tvdir_entry  = 1
+        table_not_found = 2
+        OTHERS          = 3.
+    IF sy-subrc = 0.
+      "Get data of view
+      CALL FUNCTION 'VIEW_GET_DATA'
+        EXPORTING
+          view_name = ms_tvdir-tabname
+        TABLES
+          data      = &lt;lt_data&gt;
+        EXCEPTIONS
+          OTHERS    = 6.
+    ENDIF.
+
+  ENDMETHOD.                               " BUILD_OUTTAB
+
+  METHOD build_sort_table.
+
+    DATA ls_sort TYPE lvc_s_sort.
+    DATA lv_idx  TYPE i.
+
+    LOOP AT mt_x_namtab INTO DATA(ls_namtab)
+    WHERE keyflag   = abap_true
+      AND datatype &lt;&gt; 'CLNT'.
+      ADD 1 TO lv_idx.
+      ls_sort-fieldname = ls_namtab-viewfield.
+      ls_sort-seltext   = ls_namtab-scrtext_l.
+      ls_sort-spos      = lv_idx.
+      ls_sort-up        = abap_true.
+      APPEND ls_sort TO mt_sort.
+    ENDLOOP.
+
+  ENDMETHOD.                               " BUILD_SORT_TABLE
+
+
+  METHOD register_events.
+
+    mo_tree-&gt;set_registered_events( VALUE #(
+          "Used here for applying current data selection
+          ( eventid = cl_gui_column_tree=&gt;eventid_node_double_click )
+          ( eventid = cl_gui_column_tree=&gt;eventid_item_double_click )
+          "Important! If not registered nodes will not expand -&gt;No data
+          ( eventid = cl_gui_column_tree=&gt;eventid_expand_no_children ) ) ).
+
+    SET HANDLER handle_node_double_click FOR mo_tree.
+    SET HANDLER handle_item_double_click FOR mo_tree.
+
+  ENDMETHOD.                               " register_events
+
+
+  METHOD init_tree.
+
+    get_view_data( ).
+    build_sort_table( ).
+
+    DATA(docker) = NEW cl_gui_docking_container(
+                            ratio = 25
+                            side  = cl_gui_docking_container=&gt;dock_at_left
+                            dynnr = CONV #( ms_tvdir-liste )
+                            repid = |SAPL{ ms_tvdir-area }| "'SAPLSVIM'
+                            no_autodef_progid_dynnr = abap_false ).
+
+* create tree control
+    mo_tree = NEW #( i_parent              = docker
+                     i_node_selection_mode = cl_gui_column_tree=&gt;node_sel_mode_multiple
+                     i_item_selection      = 'X'
+                     i_no_html_header      = ''
+                     i_no_toolbar          = '' ).
+
+
+
+* register events
+    register_events( ).
+
+
+    FIELD-SYMBOLS &lt;lt_data&gt; TYPE STANDARD TABLE.
+    ASSIGN mr_data-&gt;* TO &lt;lt_data&gt;.
+
+    DATA lt_grouplevel        TYPE lvc_t_fimg.
+    DATA ls_grouplevel        TYPE lvc_s_fimg.
+    DATA lv_field_description TYPE text50.
+    DATA lt_dba_sellist       TYPE STANDARD TABLE OF vimsellist.
+
+    LOOP AT mt_sort INTO DATA(ls_sort).
+      ls_grouplevel-grouplevel = ls_sort-fieldname.
+      lv_field_description = mt_x_namtab[ viewfield = ls_sort-fieldname ]-scrtext_l.
+      CALL FUNCTION 'ICON_CREATE'
+        EXPORTING
+          name       = 'ICON_OPEN_FOLDER'
+          text       = ls_sort-fieldname
+          info       = lv_field_description
+          add_stdinf = ' '
+        IMPORTING
+          result     = ls_grouplevel-exp_image.
+      CALL FUNCTION 'ICON_CREATE'
+        EXPORTING
+          name       = 'ICON_CLOSED_FOLDER'
+          text       = ls_sort-fieldname
+          info       = lv_field_description
+          add_stdinf = ' '
+        IMPORTING
+          result     = ls_grouplevel-n_image.
+      APPEND ls_grouplevel TO lt_grouplevel.
+    ENDLOOP.
+
+* create hierarchy
+    CALL METHOD mo_tree-&gt;set_table_for_first_display
+      EXPORTING
+        i_save               = 'A'
+        is_variant           = value #( report = sy-repid username = sy-uname )
+        i_structure_name     = ms_tvdir-tabname
+        it_grouplevel_layout = lt_grouplevel
+      CHANGING
+        it_sort              = mt_sort
+        it_outtab            = &lt;lt_data&gt;.
+
+    "expand first level
+    mo_tree-&gt;expand_tree( 1 ).
+
+    " optimize column-width
+    CALL METHOD mo_tree-&gt;column_optimize
+      EXPORTING
+        i_start_column = mt_sort[ 1 ]-fieldname
+        i_end_column   = mt_sort[ lines( mt_sort ) ]-fieldname.
+
+    view_maintenance_call( lt_dba_sellist ).
+
+  ENDMETHOD.
+
+  METHOD view_maintenance_call.
+
+    CALL FUNCTION 'VIEW_MAINTENANCE_CALL'
+      EXPORTING
+        action      = 'S'
+        view_name   = ms_tvdir-tabname
+      TABLES
+        dba_sellist = it_sellist
+      EXCEPTIONS
+        OTHERS      = 15.
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+START-OF-SELECTION.
+  CHECK main IS INITIAL.
+  main = NEW #( ).
+  TRY.
+      main-&gt;set_view( viewname = p_table ).
+      main-&gt;init_tree( ).
+    CATCH cx_axt.
+  ENDTRY.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/pflegeview-mit-datennavigation/">Pflegeview mit Datennavigation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Auf ECATT Datencontainer zugreifen</title>
+		<link>/blog/auf-ecatt-datencontainer-zugreifen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 27 Oct 2017 13:08:21 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[testdaten]]></category>
+		<category><![CDATA[ECATT]]></category>
+		<category><![CDATA[Datencontainer]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018179</guid>
+
+					<description><![CDATA[<p>ECATT-Testdatencontainer sind eine schicke Sache. In diesem Artikel zeige ich dir, wie du auf diese Daten zugreifen kannst. Der Zugriff erfolgt über die Klasse CL_APL_ECATT_TDC_API und bietet vielfältige Möglichkeiten</p>
+<p>Der Beitrag <a href="/blog/auf-ecatt-datencontainer-zugreifen/">Auf ECATT Datencontainer zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In dem letzten Artikel &#8211; <a href="https://tricktresor.com/blog/ecatt-datencontainer-nutzen/">ECATT Datencontainer nutzen</a> &#8211; habe ich dir gezeigt, was ein Testdatencontainer ist. Den Artikel brauchte ich als Vorbereitung für diesen, viel interessanteren Artikel: Der Zugriff auf die Daten des Testdatencontainers.</p>
+<p>Ein Testdatencontainer kann wunderbar für eigene Zwecke &#8220;missbraucht&#8221; werden um mehrere verschiedenartige Daten an einer Stelle zu verwalten.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/ecatt6.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018178" src="https://tricktresor.com/wp-content/uploads/2017/10/ecatt6.png" alt="" width="743" height="656" srcset="/wp-content/uploads/2017/10/ecatt6.png 743w, /wp-content/uploads/2017/10/ecatt6-300x265.png 300w" sizes="(max-width: 743px) 100vw, 743px" /></a></p>
+<h2>Zugriff!</h2>
+<p>Der Zugriff auf den Datencontainer des ECATT ist durch die zur Verfügung gestellte API sehr simpel:</p>
+<pre class="lang:abap decode:true ">"Objekte für Zugriff auf Testdatencontainer
+DATA tdc_ref TYPE REF TO cl_apl_ecatt_tdc_api.
+DATA par_ref TYPE REF TO etpar_gui.
+
+"Datenstrukturen
+DATA ls_mara TYPE mara.
+DATA demo    TYPE zecatt_heads.
+
+"Objekt für Testdatencontainer erzeugen
+tdc_ref = cl_apl_ecatt_tdc_api=&gt;get_instance( 'Z1' ).
+
+"Datenselektion MARA-MATNR für Default-Variante
+tdc_ref-&gt;get_value( EXPORTING i_param_name   = 'MARA'
+                              i_path         = 'MATNR'
+                              i_variant_name = 'ECATTDEFAULT'
+                    CHANGING  e_param_value  = ls_mara-matnr ).
+
+"Datenselektion gesamte Struktur MARA für Variante A1
+tdc_ref-&gt;get_value( EXPORTING i_param_name   = 'MARA'
+                              i_variant_name = 'A1'
+                    CHANGING  e_param_value  = ls_mara ).
+
+"Datenermittlung des komplexen DEMO-Objektes aus der Default-Variante
+tdc_ref-&gt;get_value( EXPORTING i_param_name   = 'DEMO'
+                              i_variant_name = 'ECATTDEFAULT'
+                    CHANGING  e_param_value  = demo ).</pre>
+<p>Über die Klasse CL_APL_ECATT_TDC_API kann der gesamte Datencontainer per Programm verwaltet werden. Es können eigene Container erstellt werden, Attribute ausgelesen und geändert werden und die Daten können ebenfalls gelesen und manipuliert werden.</p>
+<p>Im Gegensatz zu meinem <a href="https://tricktresor.com/blog/daten-dynamisch-verwalten/">Tipp, komplexe Daten in einer INDEX-Tabelle per XML zu speichern</a>, haben die Testdatencontainer den großen Vorteil, dass die Daten strukturiert angezeigt und manipuliert werden können.</p>
+<p>Der Beitrag <a href="/blog/auf-ecatt-datencontainer-zugreifen/">Auf ECATT Datencontainer zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid um Sortierfunktion erweitern (Vererbung)</title>
+		<link>/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Oct 2017 18:28:09 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Sortierung]]></category>
+		<category><![CDATA[Erweiterung]]></category>
+		<category><![CDATA[Geschützte Methoden]]></category>
+		<category><![CDATA[Redefinition]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[vererbung]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018153</guid>
+
+					<description><![CDATA[<p>Objektorientierte Programmierung ist häufig immer noch ein rotes Tuch für viele. Man weiß zwar, wie Methoden aufgerufen werden und dass ein Objekt mit CREATE OBJECT oder NEW erzeugt werden muss aber die Designprinzipien sind irgendwie unklar. Und SAP-Klassen sind eh unantastbar. In diesem Artikel möchte ich dir eine Möglichkeit vorstellen, wie du den SAP-Standard mit Standardmitteln, nämlich mit Hilfe der Vererbung, erweitern kannst. Ich erweitere Beispielhaft die Funktionalität des ALV-Grid.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/">ALV-Grid um Sortierfunktion erweitern (Vererbung)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Objektorientierte Programmierung ist häufig immer noch ein rotes Tuch für viele. Man weiß zwar, wie Methoden aufgerufen werden und dass ein Objekt mit CREATE OBJECT oder NEW erzeugt werden muss aber die Designprinzipien sind irgendwie unklar. Und SAP-Klassen sind eh <em>unantastbar</em>.</p>
+<p>In diesem Artikel möchte ich dir eine Möglichkeit vorstellen, wie du den SAP-Standard mit Standardmitteln, nämlich mit Hilfe der Vererbung, erweitern kannst.</p>
+<h2>Enjoy und Bedienung</h2>
+<p>Trotz der GUI-Elemente, die unter dem Schlagwort <a href="https://www.computerwoche.de/a/ein-freundlicheres-gesicht-fuer-r-3-sap-enjoy,506853"><em>ENJOY</em> </a>eingeführt wurden, sind viele Elemente immer noch nicht wirklich benutzerfreundlich. Einiges kann man ändern, anderes nicht. Eine Möglichkeit um mit Hilfe der SAP-Standardcontrols ein neues Look &amp; Feel zu erzeugen, habe ich in diesem Beitrag gezeigt: Moderne UI mit altem SAPGUI und ALV-Grid</p>
+<p>Hier habe ich das Standard-ALV-Grid verwendet, um eine neue Funktionalität zu erzeugen. Dies ist allerdings ein eigenständiges Objekt und erweitert nicht die Standardfunktionalität des ALV-Grids.</p>
+<p>Wie das Überschreiben von geschützten Methoden generell funktioniert, habe ich hier beschrieben: <a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">Geschützte Methoden nutzen</a></p>
+<p>Dieser Artikel soll zeigen, dass es sich eventuell lohnt, auch über andere Erweiterungen von SAP-Standardfunktionalitäten nachzudenken. Es gibt Funktionalitäten, die eventuell in <strong>jedem</strong> ALV-Grid hilfreich wären. Zum Beispiel das einfache Umsortieren von Einträgen.</p>
+<h3>Umsortierung mittels Drag &amp; Drop</h3>
+<p>Eine Möglichkeit ist die Sortierung mittels Drag&amp;Drop im ALV-Feldkatalog:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/alv-grid-sort.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018154" src="https://tricktresor.com/wp-content/uploads/2017/10/alv-grid-sort.png" alt="" width="595" height="450" srcset="/wp-content/uploads/2017/10/alv-grid-sort.png 595w, /wp-content/uploads/2017/10/alv-grid-sort-300x227.png 300w" sizes="(max-width: 595px) 100vw, 595px" /></a></p>
+<p>Die Bedienung ist hier zwar auch gewöhnungsbedürftig, denn ein Eintrag, der umsortiert werden soll, muss erst mit einem Klick markiert und kann dann erst mittels Drag &amp; Drop an eine andere Stelle verschoben werden, aber immerhin.</p>
+<h3>Umsortierung mit Funktionstasten</h3>
+<p>Eine andere Möglichkeit wäre das Verschieben von Einträgen mit Funktionstasten. Folgender Screenshot ist aus dem unten stehenden Demo-Programm. Das ALV-Grid wurde um die Funktionstasten &#8220;Sort Up&#8221; und &#8220;Sort Down&#8221; erweitert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/alv2.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018155" src="https://tricktresor.com/wp-content/uploads/2017/10/alv2.png" alt="" width="801" height="296" srcset="/wp-content/uploads/2017/10/alv2.png 801w, /wp-content/uploads/2017/10/alv2-300x111.png 300w, /wp-content/uploads/2017/10/alv2-768x284.png 768w, /wp-content/uploads/2017/10/alv2-800x296.png 800w" sizes="(max-width: 801px) 100vw, 801px" /></a></p>
+<p>Wie das im Einzelnen geht, erkläre ich gleich.</p>
+<h2>Redefinition</h2>
+<p>eine wirklich starke Waffe des objektorientierten Sprachumfangs ist die Vererbung. Sofern die anzupassende Klasse nicht als &#8220;Final&#8221; definiert wurde, können <em>geschützte</em> und <em>öffentliche</em> Methoden redefiniert werden. Leider wird bei Anlage einer Klasse das Kennzeichen &#8220;Final&#8221; vorbelegt, so dass der Programmierer dieses aktiv entfernen muss. Ist dieses Kennzeichen gesetzt, funktioniert die Ableitung bzw. Vererbung nicht.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/klasse_final.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018156" src="https://tricktresor.com/wp-content/uploads/2017/10/klasse_final.png" alt="" width="504" height="340" srcset="/wp-content/uploads/2017/10/klasse_final.png 504w, /wp-content/uploads/2017/10/klasse_final-300x202.png 300w" sizes="(max-width: 504px) 100vw, 504px" /></a></p>
+<p>Die Klasse CL_GUI_ALV_GRID allerdings darf vererbt werden, denn sie ist nicht als final gekennzeichnet. Nichts desto Trotz muss bei Klassen sehr genau definiert werden, welche Methoden vererbt werden dürfen und welche nicht.</p>
+<h2>Funktion &#8220;Umsortieren&#8221;</h2>
+<p>Die neue Funktion nenne ich &#8220;Umsortieren&#8221;, denn es ist keine Sortieren-Funktion, die man aus dem Standard kennt. Um Einträge umsortieren zu können, wird in der Regel im SAP mit einem Sortierfeld gearbeitet, das der Anwender manuell pflegen muss. Dazu wird häufig in Zehnerschritten gearbeitet, um später Einträge einfügen zu können. Einträge in dieser Form in eine andere Reihenfolge zu bringen ist in der Regel sehr mühselig.</p>
+<p>Die Idee ist, dass der Anwender einen Eintrag markieren kann und diesem mit den Funktionstasten &#8220;Sort Up&#8221; und Sort Down&#8221; in der Liste hoch und runter verschieben kann. Ein Feld, in der die aktuelle Reihenfolge festgehalten wird, brauchen wir natürlich trotzdem.</p>
+<h2>Vererbung</h2>
+<p>Ich möchte die Klasse CL_GUI_ALV_GRID also für meine Zwecke missbrauchen und muss sie deswegen ableiten bzw. vererben. Dazu lege ich in der Transaktion SE80 oder SE24 eine neue Klasse an: ZCL_GUI_ALV_GRID_SORT und gebe als Oberklasse zu zu beerbende Klasse CL_GUI_ALV_GRID an:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018157" src="https://tricktresor.com/wp-content/uploads/2017/10/class1.png" alt="" width="661" height="229" srcset="/wp-content/uploads/2017/10/class1.png 661w, /wp-content/uploads/2017/10/class1-300x104.png 300w, /wp-content/uploads/2017/10/class1-660x229.png 660w" sizes="(max-width: 661px) 100vw, 661px" /></a></p>
+<h2>Sortierfeld</h2>
+<p>Der Programmierer muss angeben können, welches Feld für die Sortierung der Einträge verwendet werden soll. In diesem Feld wird dann die automatische Nummerierung anhand der Reihenfolge gesetzt. Ich lege dafür die Methode SET_SORT_FIELD an mit dem Übergabeparameter FIELDNAME.</p>
+<p>Diese Methode muss vor SET_TABLE_FOR_FIRST_DISPLAY aufgerufen werden, damit die Umsortierfunktionalität von Anfang an zur Verfügung steht.</p>
+<p>Das Sortierfeld merke ich mir im Attribut MV_SORT_FIELD.</p>
+<h2>Ereignis TOOLBAR</h2>
+<p>Da ich das Ereignis TOOLBAR nutzen möchte, um die neuen Funktionstasten einzubauen, muss ich es für meine abgeleitete Klasse registrieren:</p>
+<pre class="lang:abap decode:true">SET HANDLER on_toolbar FOR me.</pre>
+<p>Zusätzlich benötige ich eine Methode, die beim Auslösen des Ereignisses angesprungen wird: ON_TOOLBAR. Diese Methode muss als Ereignisbehandler für das Ereignis TOOLBAR definiert werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class2.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018158" src="https://tricktresor.com/wp-content/uploads/2017/10/class2.png" alt="" width="420" height="383" srcset="/wp-content/uploads/2017/10/class2.png 420w, /wp-content/uploads/2017/10/class2-300x274.png 300w" sizes="(max-width: 420px) 100vw, 420px" /></a></p>
+<p>Der Methode stehen nun theoretisch alle Parameter des Ereignisses zur Verfügung. Allerdings müssen diese manuell übernommen werden. Die Drucktaste &#8220;Ereignisparameter&#8221; in der Sicht &#8220;Parameter&#8221; erledigt das für mich:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class3.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018159" src="https://tricktresor.com/wp-content/uploads/2017/10/class3.png" alt="" width="830" height="256" srcset="/wp-content/uploads/2017/10/class3.png 830w, /wp-content/uploads/2017/10/class3-300x93.png 300w, /wp-content/uploads/2017/10/class3-768x237.png 768w" sizes="(max-width: 830px) 100vw, 830px" /></a></p>
+<p>In der Methode füge ich die Drucktasten SORT_UP und SORT_DOWN der Toolbar hinzu.</p>
+<pre class="lang:abap decode:true">  METHOD on_toolbar.
+
+    check mv_sort_field is NOT INITIAL.
+
+    APPEND VALUE #(   function  = 'Sort_down'
+                      icon      = icon_next_page
+                      quickinfo = space
+                      butn_type = if_sat_ui_button_types=&gt;normal
+                      disabled  = space
+                      text      = 'Sort down'
+                      checked   = space ) TO e_object-&gt;mt_toolbar.
+    APPEND VALUE #(   function  = 'Sort_up'
+                      icon      = icon_previous_page
+                      quickinfo = space
+                      butn_type = if_sat_ui_button_types=&gt;normal
+                      disabled  = space
+                      text      = 'Sort up'
+                      checked   = space ) TO e_object-&gt;mt_toolbar.
+
+  ENDMETHOD.</pre>
+<h2>Redefinition DISPATCH</h2>
+<p>Um intern auf die Drucktasten reagieren zu können, muss ich die Methode DISPATCH redefinieren und meine Drucktasten SORT_UP und SORT_DOWN für das Ereignis TOOLBAR_BUTTON_CLICK abfangen.</p>
+<p>In allen anderen Fällen muss die Methode DISPATCH der abgeleiteten Klasse aufgerufen werden (SUPER-&gt;DISPATCH).</p>
+<p>Im Falle des Ereignisses TOOLBAR_BUTTON_CLICK muss ich mir noch die Ereignisparameter besorgen in denen der Funktionscode der Drucktaste steht (Methode GET_EVENT_PARAMETER).</p>
+<p>Nun gilt es noch, folgendes zu tun:</p>
+<ul>
+<li>Abfrage auf die Funktionscodes SORT_UP und SORT_DOWN</li>
+<li>Zugriff auf die Datentabelle erhalten</li>
+<li>Ermitteln der aktuellen Cursorposition</li>
+<li>Umsortieren des Eintrags</li>
+<li>Neunummerierung</li>
+<li>Cursor auf die umsortierte Zeile setzen</li>
+<li>Anzeige aktualisieren</li>
+</ul>
+<pre class="lang:abap decode:true">  METHOD dispatch.
+
+    DATA action TYPE string.
+    CASE eventid.
+      WHEN evt_toolbar_button_click.
+        CALL METHOD get_event_parameter
+          EXPORTING
+            parameter_id = 0
+            queue_only   = space
+          IMPORTING
+            parameter    = action.
+        CALL METHOD cl_gui_cfw=&gt;flush.
+        CASE action.
+          WHEN 'Sort_up'.
+            CALL METHOD get_current_cell
+              IMPORTING
+                es_row_id = DATA(ls_row)
+                es_row_no = DATA(ls_row_no).
+            FIELD-SYMBOLS &lt;outtab&gt; TYPE table.
+            ASSIGN mt_outtab-&gt;* TO &lt;outtab&gt;.
+            IF ls_row-index &gt; 1.
+              READ TABLE &lt;outtab&gt; ASSIGNING FIELD-SYMBOL(&lt;outline&gt;) INDEX ls_row-index.
+              DATA(indx) = ls_row-index - 1.
+              ASSIGN COMPONENT 2 OF STRUCTURE &lt;outline&gt; TO FIELD-SYMBOL(&lt;value&gt;).
+              IF sy-subrc = 0.
+                INSERT &lt;outline&gt; INTO &lt;outtab&gt; INDEX indx.
+                indx = indx + 2.
+                DELETE &lt;outtab&gt; INDEX indx.
+                indx = indx - 2.
+
+                LOOP AT &lt;outtab&gt; ASSIGNING &lt;outline&gt;.
+                  ASSIGN COMPONENT mv_sort_field OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+                  &lt;value&gt; = sy-tabix.
+                ENDLOOP.
+                refresh_table_display( is_stable = VALUE #( col = abap_true row = abap_true ) i_soft_refresh = abap_true ).
+                set_selected_rows( it_row_no = VALUE #( ( row_id = indx ) ) ).
+              ENDIF.
+            ENDIF.
+            EXIT.
+          WHEN 'Sort_down'.
+            CALL METHOD get_current_cell
+              IMPORTING
+                es_row_id = ls_row
+                es_row_no = ls_row_no.
+            ASSIGN mt_outtab-&gt;* TO &lt;outtab&gt;.
+            IF ls_row-index &lt; lines( &lt;outtab&gt; ).
+              READ TABLE &lt;outtab&gt; ASSIGNING &lt;outline&gt; INDEX ls_row-index.
+              indx = ls_row-index + 2.
+              ASSIGN COMPONENT 2 OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+              IF sy-subrc = 0.
+                INSERT &lt;outline&gt; INTO &lt;outtab&gt; INDEX indx.
+                indx = indx - 2.
+                DELETE &lt;outtab&gt; INDEX indx.
+                indx = indx + 1.
+                LOOP AT &lt;outtab&gt; ASSIGNING &lt;outline&gt;.
+                  ASSIGN COMPONENT mv_sort_field OF STRUCTURE &lt;outline&gt; TO &lt;value&gt;.
+                  &lt;value&gt; = sy-tabix.
+                ENDLOOP.
+
+                refresh_table_display( is_stable = VALUE #( col = abap_true row = abap_true ) i_soft_refresh = abap_true ).
+                set_selected_rows( it_row_no = VALUE #( ( row_id = indx ) ) ).
+              ENDIF.
+            ENDIF.
+            EXIT.
+        ENDCASE.
+    ENDCASE.
+
+
+    super-&gt;dispatch(
+      EXPORTING
+        cargo             = cargo
+        eventid           = eventid
+        is_shellevent     = is_shellevent
+        is_systemdispatch = is_systemdispatch
+      EXCEPTIONS
+        cntl_error        = 1
+        OTHERS            = 2 ).
+
+  ENDMETHOD.</pre>
+<h2>Testprogramm</h2>
+<p>In folgendem Testprogramm kannst du die Verwendung des neuen Standards sehen. Du siehst, dass trotz meines Eingriffs in die Toolbar weiterhin Drucktasten hinzugefügt werden können:</p>
+<pre class="lang:abap decode:true">REPORT zz_alv_grid_sort.
+
+DATA gs_data TYPE vbak.
+
+SELECT-OPTIONS s_vbeln FOR gs_data-vbeln.
+
+
+CLASS main DEFINITION.
+  PUBLIC SECTION.
+    TYPES ty_data       TYPE vbak.
+
+    TYPES ty_data_t     TYPE STANDARD TABLE OF ty_data
+                             WITH DEFAULT KEY.
+
+    DATA ms_data        TYPE ty_data.
+    DATA mt_data        TYPE ty_data_t.
+
+    DATA mr_grid        TYPE REF TO zcl_gui_alv_grid_sort.
+    METHODS start.
+  PROTECTED SECTION.
+    METHODS selection.
+    METHODS display.
+    METHODS handle_toolbar      FOR EVENT toolbar
+                  OF cl_gui_alv_grid
+      IMPORTING e_object.
+    METHODS handle_user_command FOR EVENT user_command
+                  OF cl_gui_alv_grid
+      IMPORTING e_ucomm sender.
+
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+
+  METHOD handle_user_command.
+
+    DATA lt_rows TYPE lvc_t_row.
+    DATA ls_row   TYPE lvc_s_row.
+    DATA ls_data  TYPE ty_data.
+
+    CASE e_ucomm.
+      WHEN 'USER01'.
+        sender-&gt;get_selected_rows( IMPORTING et_index_rows = lt_rows ).
+        LOOP AT lt_rows INTO ls_row.
+          READ TABLE mt_data INTO ls_data INDEX ls_row-index.
+          IF sy-subrc = 0.
+            MESSAGE i000(oo) WITH 'Usercommand 01: Beleg' ls_data-vbeln.
+          ENDIF.
+        ENDLOOP.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD handle_toolbar.
+
+    DATA: ls_toolbar  TYPE stb_button.
+
+*** Trenner
+    CLEAR ls_toolbar.
+    MOVE 3 TO ls_toolbar-butn_type.
+    APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+*** Icon “Test”
+    CLEAR ls_toolbar.
+    MOVE icon_generate              TO ls_toolbar-icon.
+    MOVE 'USER01'                   TO ls_toolbar-function.
+    MOVE 'User 01'                  TO ls_toolbar-quickinfo.
+    MOVE 'Userbutton 01'            TO ls_toolbar-text.
+    APPEND ls_toolbar TO e_object-&gt;mt_toolbar.
+
+  ENDMETHOD.
+
+
+  METHOD start.
+    selection( ).
+    display( ).
+  ENDMETHOD.
+
+  METHOD selection.
+    SELECT * FROM vbak INTO TABLE mt_data UP TO 10 ROWS.
+  ENDMETHOD.
+
+  METHOD display.
+
+    WRITE 'DUMMY'.
+
+    CREATE OBJECT mr_grid
+      EXPORTING
+        i_parent      = cl_gui_container=&gt;screen0
+        i_appl_events = space.
+
+    mr_grid-&gt;set_sort_field( 'ERNAM' ).
+
+    SET HANDLER handle_toolbar      FOR mr_grid.
+    SET HANDLER handle_user_command FOR mr_grid.
+
+
+    DATA lv_structure_name    TYPE dd02l-tabname VALUE 'VBAK'.
+    DATA ls_variant           TYPE disvariant.
+    DATA lv_save              TYPE char01 VALUE 'U'.
+    DATA lv_default           TYPE char01 VALUE abap_true.
+    DATA ls_layout            TYPE lvc_s_layo.
+
+    ls_layout-sel_mode       = 'A'.
+    ls_layout-grid_title     = 'Titel'.
+
+    mr_grid-&gt;set_table_for_first_display(
+      EXPORTING
+        i_structure_name              = lv_structure_name
+        is_variant                    = ls_variant
+        i_save                        = lv_save
+        i_default                     = lv_default
+        is_layout                     = ls_layout
+      CHANGING
+        it_outtab                     = mt_data ).
+
+  ENDMETHOD.
+ENDCLASS.
+
+
+START-OF-SELECTION.
+  NEW main( )-&gt;start( ).</pre>
+<p>&nbsp;</p>
+<h2>Ergebnis</h2>
+<p>Du kannst nun den Cursor auf einen Eintrag stellen und durch Klicken auf &#8220;Sort Up&#8221; oder &#8220;Sort Down&#8221; den Eintrag umsortieren. Die Sortierung wird in dem Feld &#8220;ERNAM &#8211; Angelegt von&#8221; vorgehalten.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/class4.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018161" src="https://tricktresor.com/wp-content/uploads/2017/10/class4.png" alt="" width="753" height="335" srcset="/wp-content/uploads/2017/10/class4.png 753w, /wp-content/uploads/2017/10/class4-300x133.png 300w" sizes="(max-width: 753px) 100vw, 753px" /></a></p>
+<h2>Fazit</h2>
+<p>Die Änderung von SAP-Standardfunktionen ist möglich. Allerdings ist das erstens nicht immer so einfach, wie in diesem Artikel beschrieben. In der Regel muss man genau und langwierig debuggen und prüfen, wo welche Methoden verwendet werden können. Zudem müssen die Funktionen natürlich ausgiebig getestet werden. Immerhin sollen sie genau wie die Standardfunktionalität zuverlässig funktionieren.</p>
+<p>Des Weiteren sollten Funktionen, die wirklich in einer Vielzahl von eigenen Programmierungen eingesetzt werden sauber ausprogrammiert werden. In dem hier vorgestellten Beispiel sollte zum Beispiel sichergestellt werden, dass das Feld mit der Sortierung auch wirklich im Feldkatalog vorhanden ist. Die Benutzereigene Sortierung muss irgendwie berücksichtigt werden.</p>
+<p>Zudem sollte es natürlich möglich sein, auch mehrere Zeilen zu markieren und diese en bloc zu verschieben. Das hängt aber wiederum von der Programmierung ab, ob wirklich mehrere Zeilen markiert werden dürfen oder nicht.</p>
+<p>Ebenso wäre die Eingangs erwähnte Sortierung mittels Drag &amp; Drop sinnvoll. Diese könnte dann allerdings einer anderen vom Programmierer erstellten Drag &amp; Drop Funktionalität in die Quere kommen.</p>
+<p>Allerdings lohnt es sich, hier Aufwand zu investieren, denn die erweiterte Funktionalität kann eventuell viele separate Programmierungen überflüssig machen oder vorhandene Programmierungen auf einfache Weise benutzerfreundlicher machen.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-um-sortierfunktion-erweitern-vererbung/">ALV-Grid um Sortierfunktion erweitern (Vererbung)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Global. Lokal. Egal.</title>
+		<link>/blog/global-lokal-egal/</link>
+					<comments>/blog/global-lokal-egal/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Dec 2016 21:13:54 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Objekt]]></category>
+		<category><![CDATA[Global]]></category>
+		<category><![CDATA[Lokal]]></category>
+		<category><![CDATA[klasse]]></category>
+		<category><![CDATA[Instanz]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=961091</guid>
+
+					<description><![CDATA[<p>Im Rahmen eines Projektes haben wir uns mit der dynamischen Erzeugung von Klassen beschäftigt und Stefan hat dabei einen netten Trick herausgefunden.</p>
+<p>Der Beitrag <a href="/blog/global-lokal-egal/">Global. Lokal. Egal.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im Rahmen eines Projektes haben wir uns mit der dynamischen Erzeugung von Klassen beschäftigt und Stefan hat dabei einen netten Trick herausgefunden.</p>
+<h2>Globale Klasse</h2>
+<p>Normalerweise gibt es in einem Report nur die folgenden zwei Möglichkeiten um eine Klasse zu instantiieren:</p>
+<ol>
+<li>Ein Objekt mit Referenz zu einer <strong>global</strong> definierten Klasse (SE24)</li>
+<li>Ein Objekt mit Referenz zu einer im selben Programm definierten <strong>lokalen</strong> Klasse</li>
+</ol>
+<p>Stefan hat nun eine Möglichkeit gefunden, wie man lokale Klassen, die in beliebigen Programmen definiert sind, erzeugen kann. Und das geht so:</p>
+<h2>Lokale Klasse</h2>
+<p>Wir brauchen ein Programm mit einer lokal definierten Klasse. In dem folgenden Programm werden zwei lokale Klassen definiert. Beide haben die Methode INFO.</p>
+<pre>REPORT zttloc01.
+
+CLASS lcl_local_01 DEFINITION.
+ PUBLIC SECTION.
+ METHODS info RETURNING VALUE(text) TYPE string.
+ENDCLASS.
+
+CLASS lcl_local_01 IMPLEMENTATION.
+
+METHOD info.
+ text = 'Ich bin Klasse 01'.
+ ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_local_02 DEFINITION.
+ PUBLIC SECTION.
+ METHODS info RETURNING VALUE(text) TYPE string.
+ENDCLASS.
+
+CLASS lcl_local_02 IMPLEMENTATION.
+
+METHOD info.
+ text = 'Ich bin Klasse 02'.
+ ENDMETHOD.
+ENDCLASS.</pre>
+<h2>Dynamische Erzeugung von Klasseninstanzen</h2>
+<p>Wenn man den Namen einer Klasse erst zur Laufzeit ermitteln kann, dann kann man ein Objekt dieser Klasse dynamisch wie folgt erzeugen:</p>
+<pre>DATA classname TYPE string.
+DATA object    TYPE REF TO object.
+classname = 'ZCL_CLASS_XYZ'.
+CREATE OBJECT object TYPE (classname).</pre>
+<p>Sinnvoller Weise verwendet man hierfür ein Interface, dass alle in Frage kommenden Klassen implementiert haben.</p>
+<h2>Ihr Auftritt Herr Kollege</h2>
+<p>Unser Trick besteht nun darin, dass wir den Klassennamen genauer spezifizieren. Wir geben dem Klassennamen die Information mit, in welchem Programm die Klasse vorhanden ist. Der Klassenname sieht dann zum Beispiel wie folgt aus:</p>
+<pre>\PROGRAM=ZTTLOC01\CLASS=LCL_LOCAL01</pre>
+<p>Wir müssen also nur noch die intern verwendete Struktur zusammenbasteln. Das folgende Programm erzeugt je nach Auswahl ein Objekt der im Programm ZTTLOC01 lokale definierten Klasse LCL_LOCAL_01 oder LCL_LOCAL_02.</p>
+<pre class="">REPORT zttlocaccess.
+
+PARAMETERS p_01 RADIOBUTTON GROUP cls DEFAULT 'X'.
+PARAMETERS p_02 RADIOBUTTON GROUP cls.
+PARAMETERS p_repid TYPE syrepid DEFAULT 'ZTTLOC01'.
+
+START-OF-SELECTION.
+
+ DATA classname TYPE string.
+ DATA r_object TYPE REF TO object.
+ DATA text TYPE string.
+
+CASE 'X'.
+ WHEN p_01.
+   classname = 'LCL_LOCAL_01'.
+ WHEN p_02.
+   classname = 'LCL_LOCAL_02'.
+ ENDCASE.
+
+ CONCATENATE '\PROGRAM=' p_repid '\CLASS=' classname INTO classname.
+
+ CREATE OBJECT r_object TYPE (classname).
+
+ CALL METHOD r_object-&gt;('INFO') RECEIVING text = text.
+ MESSAGE text TYPE 'I'.</pre>
+<h3>Screenshot</h3>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-07_22-04-54.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-961158 alignnone" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-07_22-04-54.jpg" alt="" width="696" height="430" srcset="/wp-content/uploads/2016/12/2016-12-07_22-04-54.jpg 696w, /wp-content/uploads/2016/12/2016-12-07_22-04-54-300x185.jpg 300w" sizes="(max-width: 696px) 100vw, 696px" /></a></p>
+<p>Das rufende Programm muss natürlich genau wissen, was es tut. Je nachdem wie dynamisch der Aufruf einzelner Methoden sein soll, können ebenfalls dynamisch ermittelte Parameter über die <a href="https://help.sap.com/saphelp_nw70/helpdata/de/08/d27c03b81011d194f60000e8353423/content.htm">Parameterliste</a> übergeben werden.</p>
+<p>Verwendet man ein Interface, dass die zu verwendenden Klassen implementieren, dann kann man verwendete Interface-Methoden direkt aufrufen.</p>
+<p>Der Beitrag <a href="/blog/global-lokal-egal/">Global. Lokal. Egal.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/global-lokal-egal/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Autosumme in ALV-Grid &#8211; Version 2</title>
+		<link>/blog/autosumme-in-alv-grid-version-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2016 18:16:47 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[interface]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Autosumme]]></category>
+		<category><![CDATA[Friend]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=861505</guid>
+
+					<description><![CDATA[<p>Im vorherigen Artikel&#160;Autosumme in ALV-Grid (Version 1)&#160;habe ich euch gezeigt, wie man das Ereignis&#160;set_delay_change_selection nutzen kann, um die Summe von markierten Zellen eines ALV-Grids herausfinden kann. Diese Methode hat leider zwei Nachteile: Wie kann man nun dieser Herausforderung begegnen? Es gibt zwei Varianten. Die erste Variante habe ich hier bereits beschrieben. Die Lösung ist in diesem Fall, dass man eine eigene Klasse von CL_GUI_ALV_GRID ableitet (erben lässt) und dann eine neue Methode erstellt, die diese...</p>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-2/">Autosumme in ALV-Grid &#8211; Version 2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Im vorherigen Artikel&nbsp;<a href="https://tricktresor.com/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid (Version 1)</a>&nbsp;habe ich euch gezeigt, wie man das Ereignis&nbsp;set_delay_change_selection nutzen kann, um die Summe von markierten Zellen eines ALV-Grids herausfinden kann. Diese Methode hat leider zwei Nachteile:</p>
+
+
+
+<ol>
+<li>Die Reaktionszeit&nbsp;des Ereignisses <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/ee/c8e068d52611d2b468006094192fe3/content.htm">Delayed_Changed_Sel_Callback</a>&nbsp;ist auf 1,5 Sekunden voreingestellt. Das ist viel zu lange, um schnell mal eben einige Werte zu prüfen</li>
+
+
+
+<li>Es funktioniert nur, wenn die Datentabelle bekannt ist, denn die Datentabelle des ALV-Grid MT_OUTTAB ist geschützt. Auf sie kann also nicht zugegriffen werden. Es ist demnach nicht möglich, eine Methode zu schreiben, die die Grid-Instanz einfach entgegen nimmt und darauf die Funktion Autosumme anwendet.</li>
+</ol>
+
+
+
+<p>Wie kann man nun dieser Herausforderung begegnen? Es gibt zwei Varianten. Die erste Variante habe ich <a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">hier</a> bereits beschrieben. Die Lösung ist in diesem Fall, dass man eine eigene Klasse von CL_GUI_ALV_GRID ableitet (erben lässt) und dann eine neue Methode erstellt, die diese geschützte Methode aufruft.</p>
+
+
+
+<p>Die andere Variante ist hier von Lukasz Pegiel beschrieben:&nbsp;http://abapblog.com/articles/tricks/105-how-to-access-private-or-protected-data-and-methods-of-cl-gui-alv-grid</p>
+
+
+
+<p>In dieser Variante wird einfach das Interface&nbsp;if_alv_rm_grid_friend eingebunden. Hierdurch wird die eigene Klasse als &#8220;Freund des ALV-Grid&#8221; bekannt gemacht. Und als Freund ist es möglich, auf die geschützten Attribute und Methoden zuzugreifen!</p>
+
+
+<p>[notice type=&#8217;info&#8217;]Vielen Dank an dieser Stelle an Lukasz, der mir sehr geholfen hat, diesen Trick Wirklichkeit werden zu lassen! Ich kann jedem nur empfehlen einen oder besser: mehrere Blicke auf seinen <a href="http://abapblog.com/">ABAPBlog</a> zu werfen.  Besonders hervorzuheben ist seine Entwicklung <a href="http://abapblog.com/falv">Fast ALV-Grid</a>. [/notice]</p>
+
+
+
+<figure class="wp-block-image"><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg"><img loading="lazy" decoding="async" width="856" height="274" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg" alt="2016-10-07_19-06-25" class="wp-image-861506" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg 856w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-300x96.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-768x246.jpg 768w" sizes="(max-width: 856px) 100vw, 856px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">1. Verbesserung:&nbsp;Änderung der Reaktionszeit</h2>
+
+
+
+<p>Um das Event zu behandeln und die markierten Zellen auszulesen, bedarf es keiner großen Tricks. Allerdings ist die Reaktionszeit Das ist deutlich zu lange. Mit Hilfe der Methode&nbsp;set_delay_change_selection kann die Reaktionszeit geändert werden. Diese Methode ist allerdings PROTECTED, also geschützt.</p>
+
+
+
+<p>Wir müssen also das oben genannte Interface einbinden und haben so Zugriff auf die Methode&nbsp;set_delay_change_selection mit der man die Reaktionszeit in Millisekunden einstellen kann.</p>
+
+
+
+<h2 class="wp-block-heading">2. Verbesserung: Zugriff auf die Datentabelle des ALV-Grid</h2>
+
+
+
+<p>Zusätzlich wollte ich an das geschützte Attribute MT_OUTTAB heran, um die aktuellen Daten auszulesen. Auf diese Weise ist es möglich, ein universelles Tool zu schreiben, dass mit jedem ALV-Grid zusammen arbeitet und nicht nur lokal.</p>
+
+
+
+<h2 class="wp-block-heading">Wie sieht&#8217;s aus?</h2>
+
+
+
+<p>Beide Verbesserungen sind in dieser Version 2 des Codes enthalten. Das Programm besteht nun aus zwei Klassen:</p>
+
+
+
+<ol>
+<li>Die Klasse, LCL_MAIN, die den Grid verwendet und darstellt.</li>
+
+
+
+<li>Die Klasse LCL_AUTOSUMME, die die eigentliche Funktionalität zur Verfügung stellt.</li>
+</ol>
+
+
+
+<p>LCL_AUTOSUMME kann nun also als globale Klasse universell eingesetzt werden. Jedes Grid, dass die Autosummenfunktion verwenden möchte, muss sich in der Klasse mit der Methode REGISTER registrieren. Und dann kann&#8217;s los gehen&#8230;!</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT.
+
+PARAMETERS p_total TYPE p DECIMALS 2.
+
+CLASS lcl_autosumme DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES if_alv_rm_grid_friend .
+    CLASS-METHODS register IMPORTING ir_grid TYPE REF TO cl_gui_alv_grid.
+  PROTECTED SECTION.
+    CLASS-METHODS handle_delayed_selection
+      FOR EVENT delayed_changed_sel_callback
+                  OF cl_gui_alv_grid
+      IMPORTING sender.
+ENDCLASS.
+
+CLASS lcl_autosumme IMPLEMENTATION.
+  METHOD register.
+    "Set handler
+    SET HANDLER handle_delayed_selection FOR ir_grid.
+    "set delayed selection time
+    ir_grid->set_delay_change_selection( time = 100 ).   " Time in Milliseconds
+    "register event for delayed selection
+    ir_grid->register_delayed_event( ir_grid->mc_evt_delayed_change_select ).
+
+  ENDMETHOD.
+
+  METHOD handle_delayed_selection.
+
+    "Local data
+    DATA lt_cells            TYPE lvc_t_cell.
+    DATA ls_cell             LIKE LINE OF lt_cells.
+    DATA lv_total            TYPE p DECIMALS 2.
+    DATA lv_val_type         TYPE c.
+    DATA lv_index            TYPE n LENGTH 2.
+    DATA lv_tablename        TYPE string.
+    DATA lt_grouplevels      TYPE lvc_t_grpl.
+    DATA ls_grouplevel       LIKE LINE OF lt_grouplevels.
+
+    FIELD-SYMBOLS &lt;ref_data> TYPE REF TO data.
+    FIELD-SYMBOLS &lt;table>    TYPE table.
+    FIELD-SYMBOLS &lt;warea>    TYPE any.
+    FIELD-SYMBOLS &lt;val>      TYPE any.
+
+    "data references to sub totals tables
+    DATA ld_ct01             TYPE REF TO data.
+    DATA ld_ct02             TYPE REF TO data.
+    DATA ld_ct03             TYPE REF TO data.
+    DATA ld_ct04             TYPE REF TO data.
+    DATA ld_ct05             TYPE REF TO data.
+    DATA ld_ct06             TYPE REF TO data.
+    DATA ld_ct07             TYPE REF TO data.
+    DATA ld_ct08             TYPE REF TO data.
+    DATA ld_ct09             TYPE REF TO data.
+
+    "get selected cells (selection via CTRL + Y)
+    sender->get_selected_cells( IMPORTING et_cell = lt_cells ).
+
+    "If there is only one cell selected, we do not need to sum that...
+    CHECK lines( lt_cells ) > 1.
+
+    "Read all cell values
+    LOOP AT lt_cells INTO ls_cell.
+
+      "in case of rowtype (normal cell, total or subtotal) assign correct data table
+      CASE ls_cell-row_id-rowtype(1).
+          "Total sum of all
+        WHEN 'T'.
+          ASSIGN sender->mt_ct00 TO &lt;ref_data>.
+          ls_cell-row_id-index = 1.
+          "subtotals
+        WHEN 'S'.
+          sender->get_subtotals( IMPORTING
+                                  ep_collect01 = ld_ct01
+                                  ep_collect02 = ld_ct02
+                                  ep_collect03 = ld_ct03
+                                  ep_collect04 = ld_ct04
+                                  ep_collect05 = ld_ct05
+                                  ep_collect06 = ld_ct06
+                                  ep_collect07 = ld_ct07
+                                  ep_collect08 = ld_ct08
+                                  ep_collect09 = ld_ct09
+                                  et_grouplevels = lt_grouplevels ).
+
+          lv_index = ls_cell-row_id-rowtype+4(2).
+          lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+          ASSIGN (lv_tablename) TO &lt;ref_data>.
+
+          READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+          IF sy-subrc = 0.
+            ls_cell-row_id-index = ls_grouplevel-cindx_from.
+          ENDIF.
+          "Normal cell value
+        WHEN space.
+          ASSIGN sender->mt_outtab TO &lt;ref_data>.
+      ENDCASE.
+
+      "assign specified data table
+      ASSIGN &lt;ref_data>->* TO &lt;table>.
+
+      "Only read table line when index changes
+      AT NEW row_id.
+        READ TABLE &lt;table> ASSIGNING &lt;warea> INDEX ls_cell-row_id-index.
+      ENDAT.
+      "Assign selected fieldname of workarea
+      ASSIGN COMPONENT ls_cell-col_id OF STRUCTURE &lt;warea> TO &lt;val>.
+      IF sy-subrc = 0.
+        "check correct type of field: Only numeric fields will be taken
+        DESCRIBE FIELD &lt;val> TYPE lv_val_type.
+        CASE lv_val_type.
+          WHEN 'P'  "Packed
+            OR 'N'  "Numchar
+            OR 'b'  "Integer
+            OR 'a'  "decfloat
+            OR 'e'  "decfloat
+            OR 'F'. "Float?
+            "add cell value to total
+            ADD &lt;val> TO lv_total.
+        ENDCASE.
+      ENDIF.
+    ENDLOOP.
+
+    IF lv_total IS NOT INITIAL.
+      "There were numeric fields selected and therefor we have a total to show:
+      MESSAGE s000(oo) WITH 'TOTAL:' space lv_total.
+      p_total = lv_total.
+    ENDIF.
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_main DEFINITION.
+
+  PUBLIC SECTION.
+*    INTERFACES if_alv_rm_grid_friend .
+    METHODS start.
+  PROTECTED SECTION.
+    DATA mr_grid TYPE REF TO cl_gui_alv_grid.
+    DATA mt_data TYPE STANDARD TABLE OF spfli.
+    DATA mv_data_table TYPE tabname VALUE 'SPFLI'.
+    DATA mr_dock TYPE REF TO cl_gui_docking_container.
+    METHODS create_docker.
+    METHODS create_grid.
+    METHODS select_data.
+    METHODS register_autosumme.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+  METHOD start.
+    select_data( ).
+    create_docker( ).
+    create_grid( ).
+    register_autosumme( ).
+  ENDMETHOD.
+
+  METHOD create_docker.
+    "Create Docking container at bottom
+    CREATE OBJECT mr_dock
+      EXPORTING
+        side                    = cl_gui_docking_container=>dock_at_bottom
+        ratio                   = 90
+        no_autodef_progid_dynnr = abap_false.
+
+  ENDMETHOD.
+
+  METHOD create_grid.
+    "Create ALV-Grid
+    CREATE OBJECT mr_grid
+      EXPORTING
+        i_appl_events = abap_true
+        i_parent      = mr_dock.
+
+    "and display data
+    mr_grid->set_table_for_first_display(
+      EXPORTING
+        i_structure_name = mv_data_table
+      CHANGING
+        it_outtab        = mt_data ).
+
+    "Set focus on grid so user can directly scroll and select cells via CTRL+Y
+    cl_gui_container=>set_focus( mr_grid ).
+
+  ENDMETHOD.
+
+  METHOD select_data.
+    "Select data
+    SELECT * FROM (mv_data_table) INTO TABLE mt_data UP TO 100 ROWS.
+  ENDMETHOD.
+
+  METHOD register_autosumme.
+    lcl_autosumme=>register( mr_grid ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+  DATA(gr_main) = NEW lcl_main( ).
+  gr_main->start( ).</pre>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-2/">Autosumme in ALV-Grid &#8211; Version 2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Autosumme in ALV-Grid &#8211; Version 1</title>
+		<link>/blog/autosumme-in-alv-grid-version-1/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2016 17:50:59 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=861138</guid>
+
+					<description><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&#038;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen...!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&amp;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen&#8230;!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Ich erinnerte mich an das Event delayed_changed_sel_callback, mit dem man eine Selektion im Grid verzögert auswerten konnte. Mit Hilfe der Tastenkombination STRG+Y kann man einzelne Zellen markieren. Diese Funktionen wollte ich nutzen, um die markierten Zellenwerte auszulesen und zu summieren.</p>
+<p>Herausgekommen ist das unten stehende Programm. Der eigentliche Teil, die Summierung der Zellen, steht komplett in der Methode HANDLE_DELAYED_SELECTION.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861506" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg" alt="2016-10-07_19-06-25" width="856" height="274" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg 856w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-300x96.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-768x246.jpg 768w" sizes="(max-width: 856px) 100vw, 856px" /></a></p>
+<h2>Vorgehen</h2>
+<p>Event delayed_changed_sel_callback registrieren und einen Eventhandler in der Klasse zuordnen (Handle_Delayed_Selection).</p>
+<p>Wie kommt man an die markierten Zellen heran? Dafür gibt es die Methode Get_Selected_Cells. Sie liefert eine Tabelle zurück, in der die markierten Feldnamen und der Zeilenindex stehen. Mittels READ TABLE und ASSIGN COMPONENT kann man also auf einen Zellwert zugreifen.</p>
+<p>Nun muss noch mittels DESCRIBE FIELD geprüft werden, ob es sich um ein Feld mit einem numerischen Wert handelt. Wenn das der Fall ist, kann der Wert der Zelle aufsummiert werden.</p>
+<p>&nbsp;</p>
+<h2>Normale Zellen vs. Summenzeilen</h2>
+<p>Das Vorgehen bei einem ALV-Grid, in dem keine Summen oder Zwischensummen gebildet wurden, ist einfach und erfolgt nach dem oben genannten Schema. Eine Herausforderung sind jedoch die (Zwischen-) Summenstufen gewesen. Diese werden im ALV-Grid in eigenen &#8211; geschützten &#8211; Tabellen verwaltet:</p>
+<table>
+<tbody>
+<tr>
+<td>Tabelle</td>
+<td>Bedeutung</td>
+<td>Bemerkung</td>
+</tr>
+<tr>
+<td>MT_CT00</td>
+<td>Summetabelle</td>
+<td>Sie enthält in der Regel nur einen Eintrag. Ausnahme: Es sind in der Summierung der Feldwerte unterschiedliche Einheiten vorhanden.</td>
+</tr>
+<tr>
+<td>MT_CT01</td>
+<td>Zwischensummentabelle 1</td>
+<td>Erste Zwischensummenstufe</td>
+</tr>
+<tr>
+<td>MT_CTnn</td>
+<td>Zwischensummentabelle n</td>
+<td>Tabellen für Zwischensummenstufe nn</td>
+</tr>
+<tr>
+<td>MT_CT09</td>
+<td>Zwischensummentabelle 9</td>
+<td>9 ist die höchste Stufe. Mehr Zwischensummen können nicht erstellt werden.</td>
+</tr>
+</tbody>
+</table>
+<p>Immerhin gibt es in diesem Fall eine Methode, mit der man sich die Zwischensummentabellen &#8211; bzw. eine Referenz auf diese &#8211; besorgen kann: <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/9e/2c7b38180fee45e10000009b38f8cf/content.htm">Get_Subtotals</a>. Im Feld ROW_ID-ROWTYPE der Zellen-Tabelle steht, ob es sich um die Totals-Tabelle handelt (1. Zeichen = T) oder eine Zwischensumme (1. Zeichen = S). Nicht gruppierte Zellen haben den Eintrag SPACE.</p>
+<p>Eine Selektion auf ein Summenfeld liefert zum Beispiel diesen ROWTYPE: S 0101X0000000001. Der Vierstellige Code nach dem S sagt aus, um welche Hierarchiestufe es sich handelt (Stellen 1 und 2 des Codes). Die Stellen 3 und 4 des Codes sagen aus, in welcher Tabelle das markierte Feld steht. In diesem Fall ist es Level 1 der Hierarchie und Tabelle MT_CT01.</p>
+<p>Anhand dieses Code kann man also herausfinden, in welcher Zwischensummentabelle nachgeschaut werden muss. Dies tue ich hier:</p>
+<pre>lv_index = ls_cell-row_id-rowtype+4(2).
+lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ASSIGN (lv_tablename) TO &lt;ref_data&gt;.</pre>
+<p>Nachdem wir nun wissen, in welcher Tabelle wir nachsehen müssen um den markierten Zellwert zu finden, müssen wir nun noch den richtigen Index ermitteln. Dieser wird leider nicht mitgegeben, sondern muss aus der Tabelle GROUPLEVELS, die über Get_Subtotals geliefert wird, ermittelt werden:</p>
+<pre>READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+IF sy-subrc = 0.
+  ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ENDIF.</pre>
+<h2></h2>
+<p><strong>Achtung!</strong> Das Programm funktioniert nur, wenn es sich um <em>reine</em> (Zwischen-) Summen handelt! Zwischensummen, die aus mehreren Zeilen bestehen weil sich die zugehörige Einheit unterscheidet, können (noch) nicht erkannt werden. Hier muss ich noch etwas forschen&#8230;</p>
+<h2>Zwischensummen bilden</h2>
+<p>Ein kurzer Hinweis, wie man im ALV-Grid Zwischensummen bildet:</p>
+<p>Wähle als erstes mindestens eine Spalte über die du dann mit Hilfe des Summenicons <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861510" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg" alt="2016-10-07_19-48-00" width="34" height="20" /></a> eine Summe bildest. Danach kannst du weitere Spalten markieren und mit dem Zwischensummenicon <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861511" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg" alt="2016-10-07_19-49-31" width="34" height="20" /></a> die Spalten definieren, über die zusätzlich eine Zwischensumme erstellt werden soll.</p>
+<h2>Aufrisssummenstufe</h2>
+<p>Über die Aufrisssummenstufe kannst du einfach festlegen, dass nur Zwischensummenzeilen einer bestimmten Hierarchie angezeigt werden sollen:</p>
+<p>Auswahl im Menü:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861508" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg" alt="2016-10-07_19-41-49" width="336" height="137" srcset="/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg 336w, /wp-content/uploads/2016/10/2016-10-07_19-41-49-300x122.jpg 300w" sizes="(max-width: 336px) 100vw, 336px" /></a></p>
+<p>Auswahl der Hierarchieebene:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861509" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg" alt="2016-10-07_19-06-45" width="364" height="208" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg 364w, /wp-content/uploads/2016/10/2016-10-07_19-06-45-300x171.jpg 300w" sizes="(max-width: 364px) 100vw, 364px" /></a></p>
+<p>Anzeige der gewählten Zwischensummen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861507" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg" alt="2016-10-07_19-22-39" width="847" height="139" srcset="/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg 847w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-300x49.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-768x126.jpg 768w" sizes="(max-width: 847px) 100vw, 847px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zz_alv_autosumme.
+
+PARAMETERS p_total TYPE p DECIMALS 2.
+
+CLASS lcl_main DEFINITION.
+
+ PUBLIC SECTION.
+ METHODS start.
+ PROTECTED SECTION.
+ DATA mr_grid TYPE REF TO cl_gui_alv_grid.
+ DATA mt_data TYPE STANDARD TABLE OF spfli.
+ DATA mv_data_table TYPE tabname VALUE 'SPFLI'.
+ DATA mr_dock TYPE REF TO cl_gui_docking_container.
+ METHODS create_docker.
+ METHODS create_grid.
+ METHODS handle_delayed_selection
+ FOR EVENT delayed_changed_sel_callback
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ METHODS register_events.
+ METHODS select_data.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+ METHOD start.
+ select_data( ).
+ create_docker( ).
+ create_grid( ).
+ register_events( ).
+ ENDMETHOD.
+
+ METHOD create_docker.
+ "Create Docking container at bottom
+ CREATE OBJECT mr_dock
+ EXPORTING
+ side = cl_gui_docking_container=&gt;dock_at_bottom
+ ratio = 90
+ no_autodef_progid_dynnr = abap_false.
+
+ ENDMETHOD.
+
+ METHOD create_grid.
+ "Create ALV-Grid
+ CREATE OBJECT mr_grid
+ EXPORTING
+ i_appl_events = abap_true
+ i_parent = mr_dock.
+
+ "and display data
+ mr_grid-&gt;set_table_for_first_display(
+ EXPORTING
+ i_structure_name = mv_data_table
+ CHANGING
+ it_outtab = mt_data ).
+
+ "Set focus on grid so user can directly scroll and select cells via CTRL+Y
+ cl_gui_container=&gt;set_focus( mr_grid ).
+
+ ENDMETHOD.
+ METHOD handle_delayed_selection.
+
+ "Local data
+ DATA lt_cells TYPE lvc_t_cell.
+ DATA ls_cell LIKE LINE OF lt_cells.
+ DATA lv_total TYPE p DECIMALS 2.
+ DATA lv_val_type TYPE c.
+ DATA lv_index TYPE n LENGTH 2.
+ DATA lv_tablename TYPE string.
+ DATA lt_grouplevels TYPE lvc_t_grpl.
+ DATA ls_grouplevel LIKE LINE OF lt_grouplevels.
+
+ FIELD-SYMBOLS &lt;ref_data&gt; TYPE REF TO data.
+ FIELD-SYMBOLS &lt;table&gt; TYPE table.
+ FIELD-SYMBOLS &lt;warea&gt; TYPE any.
+ FIELD-SYMBOLS &lt;val&gt; TYPE any.
+
+ "data references to sub totals tables
+ DATA ld_ct00 TYPE REF TO data.
+ DATA ld_ct01 TYPE REF TO data.
+ DATA ld_ct02 TYPE REF TO data.
+ DATA ld_ct03 TYPE REF TO data.
+ DATA ld_ct04 TYPE REF TO data.
+ DATA ld_ct05 TYPE REF TO data.
+ DATA ld_ct06 TYPE REF TO data.
+ DATA ld_ct07 TYPE REF TO data.
+ DATA ld_ct08 TYPE REF TO data.
+ DATA ld_ct09 TYPE REF TO data.
+
+ "get selected cells (selection via CTRL + Y)
+ sender-&gt;get_selected_cells( IMPORTING et_cell = lt_cells ).
+
+ "If there is only one cell selected, we do not need to sum that...
+ CHECK lines( lt_cells ) &gt; 1.
+
+ "Read all cell values
+ LOOP AT lt_cells INTO ls_cell.
+
+ "in case of rowtype (normal cell, total or subtotal) assign correct data table
+ CASE ls_cell-row_id-rowtype(1).
+ "Total sum of all
+ WHEN 'T'.
+ sender-&gt;get_subtotals( IMPORTING ep_collect00 = ld_ct00 ).
+
+ ASSIGN ld_ct00 TO &lt;ref_data&gt;.
+ ls_cell-row_id-index = 1.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "subtotals
+ WHEN 'S'.
+ sender-&gt;get_subtotals( IMPORTING
+ ep_collect01 = ld_ct01
+ ep_collect02 = ld_ct02
+ ep_collect03 = ld_ct03
+ ep_collect04 = ld_ct04
+ ep_collect05 = ld_ct05
+ ep_collect06 = ld_ct06
+ ep_collect07 = ld_ct07
+ ep_collect08 = ld_ct08
+ ep_collect09 = ld_ct09
+ et_grouplevels = lt_grouplevels ).
+
+ lv_index = ls_cell-row_id-rowtype+4(2).
+ lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ ASSIGN (lv_tablename) TO &lt;ref_data&gt;.
+
+ READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+ IF sy-subrc = 0.
+ ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ ENDIF.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "Normal cell value
+ WHEN space.
+ ASSIGN mt_data TO &lt;table&gt;.
+ ENDCASE.
+
+
+ "Only read table line when index changes
+ AT NEW row_id.
+ READ TABLE &lt;table&gt; ASSIGNING &lt;warea&gt; INDEX ls_cell-row_id-index.
+ ENDAT.
+ "Assign selected fieldname of workarea
+ ASSIGN COMPONENT ls_cell-col_id OF STRUCTURE &lt;warea&gt; TO &lt;val&gt;.
+ IF sy-subrc = 0.
+ "check correct type of field: Only numeric fields will be taken
+ DESCRIBE FIELD &lt;val&gt; TYPE lv_val_type.
+ CASE lv_val_type.
+ WHEN 'P' "Packed
+ OR 'N' "Numchar
+ OR 'b' "Integer
+ OR 'a' "decfloat
+ OR 'e' "decfloat
+ OR 'F'. "Float?
+ "add cell value to total
+ ADD &lt;val&gt; TO lv_total.
+ ENDCASE.
+ ENDIF.
+ ENDLOOP.
+
+ IF lv_total IS NOT INITIAL.
+ "There were numeric fields selected and therefor we have a total to show:
+ MESSAGE s000(oo) WITH 'TOTAL:' space lv_total.
+ "Parameterfeld ebenfalls füllen
+ p_total = lv_total.
+ ENDIF.
+ ENDMETHOD.
+
+ METHOD register_events.
+ "Set handler
+ SET HANDLER handle_delayed_selection FOR mr_grid.
+ "register event for delayed selection
+ mr_grid-&gt;register_delayed_event( mr_grid-&gt;mc_evt_delayed_change_select ).
+ ENDMETHOD.
+
+ METHOD select_data.
+ "Select data
+ SELECT * FROM (mv_data_table) INTO TABLE mt_data UP TO 100 ROWS.
+ ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+ DATA(gr_main) = NEW lcl_main( ).
+ gr_main-&gt;start( ).</pre>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

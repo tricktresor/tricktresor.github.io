@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>simdia Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/simdia/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 06 May 2021 16:25:10 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>simdia Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</title>
+		<link>/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 24 Apr 2021 21:35:23 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Aufzeichnung]]></category>
+		<category><![CDATA[Geschäftspartner]]></category>
+		<guid isPermaLink="false">/?p=1027590</guid>
+
+					<description><![CDATA[<p>Seit einiger Zeit beschäftige ich mich mit den Geschäftspartnern in S/4HANA und deren programmatischer Anlage, Änderung sowie der Erweiterung der einzelnen Sichten. In meinem aktuellen Projekt führt kein Weg an der Anlage der Business Partner per Programm vorbei, da die Daten über eine Schnittstelle kommen und verarbeitet werden müssen. Wie sieht es aber aus, wenn Geschäftspartner zwar massenhaft aber nicht automatisch geändert werden müssen, zum Beispiel durch den Fachbereich? In der aktuellen Situation, in der...</p>
+<p>Der Beitrag <a href="/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/">Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Seit einiger Zeit beschäftige ich mich mit den Geschäftspartnern in S/4HANA und deren programmatischer Anlage, Änderung sowie der Erweiterung der einzelnen Sichten. In meinem aktuellen Projekt führt kein Weg an der Anlage der Business Partner per Programm vorbei, da die Daten über eine Schnittstelle kommen und verarbeitet werden müssen. </p>
+
+
+
+<p>Wie sieht es aber aus, wenn Geschäftspartner zwar massenhaft aber nicht automatisch geändert werden müssen, zum Beispiel durch den Fachbereich? In der aktuellen Situation, in der wir uns befinden, müssen Stammdatenänderungen mitunter schnell erfolgen können. Die IT kann dies oftmals nicht leisten, denn der Aufwand ist erheblich und die Vorlaufzeit mitunter katastrophal. Und wenn dann noch regelmäßige, weit auseinander liegende Releasezyklen dazu kommen (also Produktivsetzung nur alle drei Monate), dann kann locker ein dreiviertel Jahr ins Land gehen, bis der Anwender sein Programm hat.</p>
+
+
+
+<p>Mit der Software <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> können viele Aufgaben vom Anwender selbst erledigt werden. Die Einarbeitungszeit für <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist gering, die Möglichkeiten sind vielfältig.</p>
+
+
+
+<p>Ich möchte heute einmal vergleichen, wie sich meine Programmierung und Simdia² im Vergleich schlagen. </p>
+
+
+
+<h2 class="wp-block-heading">Disziplin: Geschäftszeiten ändern</h2>
+
+
+
+<p>Die Änderung von Geschäftspartnern in S/4HANA ist eine sehr anspruchsvolle Aufgabe. Das Objekt &#8220;Business Partner&#8221; ist komplex und sehr variabel. Es gibt für einzelne Funktionen entsprechende Funktionsbausteine (die man jedoch erst einmal finden muss) oder die zentrale Funktion CL_MD_BP_MAINTAIN=&gt;MAINTAIN, die mit einem komplexen Datentypen <em>gefüttert </em>werden muss. </p>
+
+
+
+<p>Aktuell und wohl auch noch viele Monate später sind die genauen Öffnungszeiten von Partnern wichtig. Kunden haben eventuell eingeschränkte und häufig wechselnde Warenannahmezeiten und auch Lieferanten sind nicht ständig zu den <em>normalen</em> Geschäftszeiten erreichbar.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="604" height="893" src="/wp-content/uploads/2021/04/SNAG-01504.png" alt="" class="wp-image-1027604" srcset="/wp-content/uploads/2021/04/SNAG-01504.png 604w, /wp-content/uploads/2021/04/SNAG-01504-203x300.png 203w" sizes="(max-width: 604px) 100vw, 604px" /><figcaption>Geschäftszeiten eines Geschäftspartners</figcaption></figure>
+
+
+
+<p>Aus diesem Grund denke ich, dass die Funktion der Geschäftszeiten eine sehr wichtige Rolle spielt oder spielen kann. Der Fachbereich erfragt die Geschäftszeiten seiner Partner jedoch in der Regel nicht einzeln um sie dann in den Geschäftspartner einzutragen, sondern erfragt diese eventuell über ein Online-Formular. Oder die Daten werden von Kollegen und Kolleginnen gesammelt, die diese dann in eine Excel-Tabelle eintragen. Am Ende wäre es also für den Fachbereich sehr hilfreich, wenn er ein Programm hätte, mit dem die aktuellen Geschäftszeiten automatisiert in die betroffenen Partner eingetragen werden könnte.</p>
+
+
+
+<h2 class="wp-block-heading">Ablauf in der IT</h2>
+
+
+
+<p>Auch wenn inzwischen viel über Continuous Integration und Continuous Delivery geredet wird, sieht der Alltag in der SAP-IT immer noch anders aus. Natürlich muss der Fachbereich eine Anforderung stellen. Alleine das ist häufig nicht ganz einfach. Die Anforderung muss geprüft und die technische Umsetzung geplant werden. Wenn dann irgendwann ein Programmierer für die Entwicklung eingeplant wurde, müssen weitere Hürden genommen werden:</p>
+
+
+
+<ul><li>Es müssen die richtigen Bausteine für die Aufgabe gefunden werden</li><li>Selbst wenn die programmierende Person sich mit der Programmierung der Geschäftspartner auskennt, muss eventuell erst einmal recherchiert werden</li><li>Dann muss die Excel-Datei eingelesen werden<ul><li>entweder wird tatsächlich eine recht aufwendige Programmierung zum Einlesen der Excel-Datei entwickelt</li><li>oder man macht es sich leicht und liest eine CSV-Datei ein. Dann muss der Fachbereich die Datei erst als CSV speichern, bevor die Datei verarbeitet werden kann</li></ul></li><li>Es müssen eventuell Berechtigungen für die neue Transaktion beantragt und zugeordnet werden</li></ul>
+
+
+
+<p>Sobald das Programm fertiggestellt wurde, muss der Fachbereich testen. Meiner Erfahrung nach funktioniert ein Programm selten nach dem ersten <em>Wurf</em>.</p>
+
+
+
+<p>Häufig kommen noch Urlaub oder Krankheit entweder aus dem Fachbereich oder in der IT hinzu, was die Fertigstellung des Programms verzögert&#8230;</p>
+
+
+
+<p>Und wenn dann noch lange Releasezyklen dazu kommen, dann ist in manchen Firmen die Pandemie bereits vorbei, bevor der Fachbereich das Programm zur Arbeitserleichterung erhalten hat.</p>
+
+
+
+<h2 class="wp-block-heading">Änderung der Geschäftszeiten in S4/HANA mit der Business-Partner-API</h2>
+
+
+
+<p>Da ich mich in letzter Zeit öfters mit der API zu den Geschäftspartnern beschäftigt habe (Klasse CL_MD_BP_MAINTAIN), wollte ich wissen, wie lange ich alleine für die Programmierung zur Änderung der Geschäftszeiten benötige.</p>
+
+
+
+<p>Etwa vier Stunden waren alleine schon nötig, nur um herauszufinden, welche Parameter bei den Geschäftszeiten überhaupt benötigt werden. Viele Parameter gingen häufig nicht aus den definierten Datenelementen hervor und auch nicht aus der Anwendung selbst.</p>
+
+
+
+<p>Beispielsweise ist der Typ (Feldname TYPE), der definiert, welche Regel für die Geschäftszeiten gilt (Täglich, Wöchentlich, Monatlich) vom Typ CHAR2. Ich musste also erst herausfinden, was mit TYPE eigentlich gemeint ist. Welche Id für die Art der Geschäftszeiten (Anrufzeiten, Warenannahmezeiten, Besuchszeiten) verwendet werden muss, habe ich eher durch Zufall herausgefunden. Der SCHEDULE_TYPE hat zwar ein eigenes Datenelement, das jedoch weder Festwerte hat noch auf eine Prüftabelle verweist.</p>
+
+
+
+<p>Durch meine Arbeit mit den Geschäftspartnern, beziehungsweise mit der Klasse CL_MD_BP_MAINTAIN, hatte ich bereits eine passende Fehlerbehandlung. </p>
+
+
+
+<h3 class="wp-block-heading">Coding</h3>
+
+
+
+<p>Der folgende Quelltext legt zu einem Business Partner die Warenannahmezeiten für Montag bis Freitag mit den jeweils übergebenen Von- und Bis-Zeiten an. </p>
+
+
+
+<pre class="wp-block-code"><code>    SELECT SINGLE partner_guid FROM but000 INTO @DATA(guid) WHERE partner = @partner.
+
+    CHECK sy-subrc = 0.
+
+    "fill data structure with relevant customer data
+    DATA(bp_data) = VALUE cvis_ei_extern(
+      partner-header-object_task     = 'M'
+      partner-header-object          = 'BUS1006' "Business Partner
+      partner-header-object_instance = VALUE #(
+      bpartner = partner
+        bpartnerguid           = guid )
+        partner-central_data-business_hour = VALUE #( current_state = ' '
+          business_hours = VALUE #(
+            task = 'M'
+            data_key-schedule_type = 'B' "Warenannahme TAB TB049
+            data-weekly = VALUE #(
+              ( weeks      = 1
+                fcalid     = '01' "Deutschland
+                conflicts  = '0' "Keine Ausnahmen
+                type       = 'W'
+                start_date = sy-datum
+                end_date   = sy-datum + 365
+                monday     = 'X' monda_from = time_from  monday_to  = time_to    mond_tzone = 'CET'
+                tuesday    = 'X' tuesd_from = time_from  tuesday_to = time_to    tues_tzone = 'CET'
+                wednesday  = 'X' wedne_from = time_from  wednesd_to = time_to    wedn_tzone = 'CET'
+                thursday   = 'X' thurs_from = time_from  thursda_to = time_to    thur_tzone = 'CET'
+                friday     = 'X' frida_from = time_from  friday_to  = time_to    frid_tzone = 'CET'
+                saturday   = ' ' satur_from = VALUE #( ) saturda_to = VALUE #( ) satu_tzone = ''
+                sunday     = ' ' sunda_from = VALUE #( ) sunday_to  = VALUE #( ) sund_tzone = '' )
+                )
+                 ( ) ) ) ) .
+
+    TRY.
+
+        SET UPDATE TASK LOCAL.
+        cl_md_bp_maintain=&gt;maintain(
+          EXPORTING
+            i_data     = VALUE #( ( bp_data ) )
+          IMPORTING
+            e_return   = DATA(lt_return)   ).
+
+        IF lt_return IS INITIAL.
+          sy-subrc = 1.
+        ELSE.
+          READ TABLE lt_return&#091; 1 ]-object_msg INTO ls_return WITH KEY type = 'A'.
+          IF sy-subrc &gt; 0.
+            READ TABLE lt_return&#091; 1 ]-object_msg INTO ls_return WITH KEY type = 'E'.
+          ENDIF.
+        ENDIF.
+
+        IF sy-subrc &lt;&gt; 0.
+          CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+        ENDIF.
+      CATCH zcx_bc_bp.
+        RETURN.
+    ENDTRY.</code></pre>
+
+
+
+<p>In meinem Beispiel habe ich noch nicht das Einlesen und Prüfen der Excel-Tabelle programmiert, keine Darstellung der eingelesenen Daten und keine Fehlerbehandlung für den Anwender. </p>
+
+
+
+<p>Deswegen würde ich schätzen, dass die Entwicklung eines ordentlichen Programms, das die Geschäftszeiten anlegt und entsprechend Anwenderfreundlich ist, <strong>mindestens eine Woche Entwicklungszeit </strong>benötigt.</p>
+
+
+
+<h2 class="wp-block-heading">Und was ist jetzt mit SimDia²?</h2>
+
+
+
+<p>Das Tool <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> von Ersasoft, das als Windowsprogramm auf dem PC des Anwenders vorhanden sein muss, wird vom SAP-Anwender bedient. Im Grunde führt der Anwender dabei die gleichen Schritte aus, wie bei einer normalen manuellen Eingabe in der Transaktion, die er gerade benötigt. In unserem Fall ist es die Transaktion &#8220;BP &#8211; Geschäftspartner&#8221;. Diese Arbeitsschritte werden aufgezeichnet und können beliebig oft wiederholt werden.</p>
+
+
+
+<p>Der Anwender legt eine Excel-Datei mit den Daten an, die für die Transaktion benötigt werden. Dabei ist es wichtig, dass die Feldnamen eindeutig sind, damit <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> die Felder eindeutig zuordnen kann. Die Erstellung der Excel-Datei kann ebenfalls durch <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> mit Hilfe des integrierten Vorlagen-Generators erfolgen.</p>
+
+
+
+<h3 class="wp-block-heading">Eingabedatei</h3>
+
+
+
+<p>In unserem Fall benötigen wir eine Datei mit Spalten für die Felder Geschäftspartnernummer und jeweils drei Felder für jeden Tag:</p>
+
+
+
+<ul><li>Tag auswählen (X/space)</li><li>Uhrzeit von</li><li>Uhrzeit bis</li></ul>
+
+
+
+<p>Nach einer kurzen Einführung in die Funktionen und die Arbeitsweise von <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist der Anwender in der Lage, die Transaktion mit den Daten aus der Excel-Datei zu befüllen. Der große Vorteil ist, dass der Anwender seine Transaktion genau kennt und genau weiß, welche Daten benötigt werden.</p>
+
+
+
+<p>Bei der Aufzeichnung muss man sich nach den Besonderheiten der Transaktion richten. Bei der Transaktion BP ist zum Beispiel eine Besonderheit, dass die jeweils letzte Sicht des Geschäftspartners bei Auswahl eines anderen Geschäftspartners erneut präsentiert wird. </p>
+
+
+
+<h3 class="wp-block-heading">Aufzeichnung</h3>
+
+
+
+<p>Die Aufzeichnung ist sehr einfach und intuitiv. <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> und die gewünschte Transaktion müssen gestartet werden. Danach muss die Excel-Datei mit den Daten ausgewählt werden. Mit dem Aufzeichungsassistenten von <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> wird die Aufzeichnung gestartet. Alle Felder der Excel-Tabelle werden im <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a>-Fenster als Drucktaste dargestellt. Der Anwender muss dann nur noch die einzelnen Sichten auswählen, die zu belegenden Felder anklicken und mit einem Klick auf die dazugehörige Drucktaste im <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a>-Fenster die Daten übertragen. Die Aufzeichnung kann natürlich gespeichert und jederzeit wiederverwendet werden.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="530" height="725" src="/wp-content/uploads/2021/04/SNAG-01507.png" alt="" class="wp-image-1027611" srcset="/wp-content/uploads/2021/04/SNAG-01507.png 530w, /wp-content/uploads/2021/04/SNAG-01507-219x300.png 219w" sizes="(max-width: 530px) 100vw, 530px" /><figcaption>Felder aus der Excel-Tabelle</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Daten importieren</h3>
+
+
+
+<p>Zum Import der Daten aus einer Excel-Tabelle müssen die Excel-Datei und die passende Aufzeichnung geladen werden. Die passende Transaktion startet <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> selbstständig und schon können die Daten importiert werden. Am Anfang kann man den Import Schritt für Schritt überwachen um sicher zu gehen, dass die Aufzeichnung wirklich korrekt ist.</p>
+
+
+
+<p>Wenn alles passt, dann kann der Turbo eingeschaltet werden und die Daten werden in Windeseile importiert.  </p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="/wp-content/uploads/2021/04/SNAG-01506-1024x616.png" alt="" class="wp-image-1027610" width="NaN" height="NaN" srcset="/wp-content/uploads/2021/04/SNAG-01506-1024x616.png 1024w, /wp-content/uploads/2021/04/SNAG-01506-300x181.png 300w, /wp-content/uploads/2021/04/SNAG-01506-768x462.png 768w, /wp-content/uploads/2021/04/SNAG-01506.png 1268w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Simdia² integriert in den SAPGUI</figcaption></figure>
+
+
+
+<p>Die importierten Daten werden protokolliert. Kann ein Datensatz nicht gespeichert werden, dann wird dies im Protokoll festgehalten.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="163" src="/wp-content/uploads/2021/04/SNAG-01505-1024x163.png" alt="" class="wp-image-1027609" srcset="/wp-content/uploads/2021/04/SNAG-01505-1024x163.png 1024w, /wp-content/uploads/2021/04/SNAG-01505-300x48.png 300w, /wp-content/uploads/2021/04/SNAG-01505-768x123.png 768w, /wp-content/uploads/2021/04/SNAG-01505.png 1109w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Excel-Datei mit Geschäftszeiten und Protokoll aus Simdia²</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Bei der ABAP-Programmierung habe ich dir eine ungefähre Zeitangabe gegeben, wie lange die Vorarbeit für ein <em>richtiges </em>Programm gedauert hat (Zur Erinnerung: ca. eine Woche). Jetzt bist du sicherlich gespannt, wie lange die Aufzeichnung mit Simdia² gedauert hat? Nun, während ich diesen Artikel schreibe, habe ich die Aufzeichnung erstellt und ein paar Datensätze importiert und ein paar Screenshots gemacht. Ich musste die Aufzeichnung mehrere Male machen, weil ich erst später darüber gestolpert bin, dass ich für das Aktivieren der einzelnen Tage ein separates Feld benötige. Das alles hat insgesamt circa <strong>zwei Stunden </strong>gedauert. Mit etwas Übung ist man mit <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> innerhalb von <strong>10 Minuten</strong> mit einer Aufzeichnung fertig.</p>
+
+
+
+<p><a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist also auf jeden Fall eine Alternative zur ABAP-Programmierung. Besonders dann, wenn die IT überlastet ist und der Fachbereich dringend eine Lösung für zeitraubende, wiederkehrende Arbeiten benötigt.</p>
+
+
+
+<h2 class="wp-block-heading">Sicherheit</h2>
+
+
+
+<p>Sicherheit und Sicherheitslücken sind ein wichtiges Thema in der IT. <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> hat diesbezüglich einen enormen Vorteil: Der Anwender kann nur die Daten ändern, für die er auch die Berechtigung hat. Das ist bei SAP-Programmen nicht immer der Fall und wird gerne übersehen.</p>
+
+
+
+<h2 class="wp-block-heading">Weitere Artikel zu SimDia²</h2>
+
+
+            <div id="post-grid-lazy-1028358" class="post-grid-lazy"><img decoding="async" alt="" src="" /></div>
+        <script>
+            jQuery('#post-grid-lazy-1028358').ready(function($) {
+                $('#post-grid-lazy-1028358').fadeOut();
+                $('#post-grid-1028358   ').fadeIn();
+            })
+        </script>
+        <style type="text/css">
+            #post-grid-1028358 {
+                display: none;
+            }
+
+            .post-grid-lazy {
+                text-align: center;
+            }
+        </style>
+        <div data-options='{&quot;page_type&quot;:&quot;taxonomy&quot;,&quot;page_taxonomy&quot;:&quot;post_tag&quot;,&quot;page_tax_term&quot;:1208,&quot;id&quot;:&quot;1028358&quot;,&quot;lazy_load&quot;:&quot;yes&quot;,&quot;masonry_enable&quot;:&quot;no&quot;,&quot;view_type&quot;:&quot;grid&quot;}' id="post-grid-1028358" class="post-grid grid">
+                <div class="grid-items">
+            <div class="item item-1043503 skin flat even 0 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/abap-und-stellenanzeigen/"><img loading="lazy" decoding="async" width="500" height="500" src="/wp-content/uploads/2020/09/abap-magician-turnbeutel.jpg" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2020/09/abap-magician-turnbeutel.jpg 500w, /wp-content/uploads/2020/09/abap-magician-turnbeutel-300x300.jpg 300w, /wp-content/uploads/2020/09/abap-magician-turnbeutel-150x150.jpg 150w, /wp-content/uploads/2020/09/abap-magician-turnbeutel-83x83.jpg 83w" sizes="(max-width: 500px) 100vw, 500px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/abap-und-stellenanzeigen/">ABAP und Stellenanzeigen</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Den Tricktresor gibt es nun seit über zwanzig Jahren. Am 17.4.2003 habe ich meinen ersten Beitrag verfasst: Drucktaste neben AUSFÜHREN-Button.                    <a target="_self" href="/blog/abap-und-stellenanzeigen/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div><div class="item item-1045109 skin flat odd 1 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/img-struktur-anzeigen/"><img loading="lazy" decoding="async" width="640" height="228" src="/wp-content/uploads/2024/03/image-9.png" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2024/03/image-9.png 739w, /wp-content/uploads/2024/03/image-9-300x107.png 300w" sizes="(max-width: 640px) 100vw, 640px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/img-struktur-anzeigen/">IMG-Struktur anzeigen</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Für den ein oder anderen Fall kann es sinnvoll sein, eine Unternehmensstruktur (IMG) direkt anzeigen oder sogar editieren zu können.                    <a target="_self" href="/blog/img-struktur-anzeigen/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div><div class="item item-1045045 skin flat even 2 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/alv-grid-und-dropdown/"><img loading="lazy" decoding="async" width="332" height="364" src="/wp-content/uploads/2024/03/image-8.png" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2024/03/image-8.png 332w, /wp-content/uploads/2024/03/image-8-274x300.png 274w" sizes="(max-width: 332px) 100vw, 332px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/alv-grid-und-dropdown/">ALV-Grid und Dropdown</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Es gibt einige Verhaltensweise in SAP-Objekten, bei denen ich einfach nicht verstehe, warum diese nicht schon seit langer Zeit behoben                    <a target="_self" href="/blog/alv-grid-und-dropdown/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div><div class="item item-1044885 skin flat odd 3 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/finden-%e2%94%80-nicht-suchen/"><img loading="lazy" decoding="async" width="533" height="179" src="/wp-content/uploads/2024/02/SNAG-0290.jpg" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2024/02/SNAG-0290.jpg 533w, /wp-content/uploads/2024/02/SNAG-0290-300x101.jpg 300w" sizes="(max-width: 533px) 100vw, 533px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/finden-%e2%94%80-nicht-suchen/">Finden ─ nicht suchen</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Ich denke, nach beinahe 30 Jahren Erfahrung mit SAP-Systemen kann ich mich als alten Fuchs bezeichnen und es gibt wenig                    <a target="_self" href="/blog/finden-%e2%94%80-nicht-suchen/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div>        </div>
+            <style type="text/css">
+            .layout-1028386 .element_1587187627902 {
+                            }
+
+                    </style>
+        <style type="text/css">
+        .layout-1028386 .element_1587190790308 {
+            overflow: hidden;
+                    }
+
+        .layout-1028386 .element_1587190790308 img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        @media only screen and (min-width: 1024px) {
+            .layout-1028386 .element_1587190790308 {
+                height: auto;
+                            }
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 1023px) {
+            .layout-1028386 .element_1587190790308 {
+                height: auto;
+                            }
+        }
+
+        @media only screen and (min-width: 0px) and (max-width: 767px) {
+            .layout-1028386 .element_1587190790308 {
+                height: auto;
+                            }
+        }
+    </style>
+        <style type="text/css">
+            .layout-1028386 .element_1587187714568 {
+                margin: 10px;
+                            }
+
+                    </style>
+        <style type="text/css">
+        .layout-1028386 .element_1587187895341 {
+            font-size: 18px;
+            margin: 5px 0px;
+            text-align: left;
+                    }
+
+        .layout-1028386 .element_1587187895341 a {
+            font-size: 18px;
+            margin: 5px 0px;
+            text-align: left;
+                    }
+    </style>
+    <style type="text/css">
+        .layout-1028386 .element_1587187729822 {
+            font-size: 13px;
+            margin: 0px 0px;
+            text-align: left;
+                    }
+
+        .layout-1028386 .element_1587187729822 a {
+            font-size: 13px;
+                    }
+    </style>
+
+
+    
+
+            <style type="text/css">
+            .layout-1028386 a{text-decoration:none}.layout-1028386{vertical-align:top}.layout-1028386 .layer-content{padding:10px}        </style>
+        <script>
+                    </script>
+        <style type="text/css">
+        #post-grid-1028358 {
+            padding: 10px;
+                    }
+
+        #post-grid-1028358 .item {
+            padding: 0px;
+            background: #fff;
+                    }
+
+        #post-grid-1028358 .item .layer-media {
+            height:auto;        }
+
+        @media only screen and (min-width: 0px) and (max-width: 767px) {
+            #post-grid-1028358 .grid-items {
+                text-align: center;
+                            }
+
+            #post-grid-1028358 .item {
+                width: 90%;
+                margin: 10px;
+                display: inline-block;
+                vertical-align: top;
+                height:auto;            }
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 1023px) {
+            #post-grid-1028358 .grid-items {
+                text-align: center;
+                            }
+
+            #post-grid-1028358 .item {
+                width: 250px;
+                margin: 10px;
+                display: inline-block;
+                vertical-align: top;
+                max-height:auto;            }
+        }
+
+        @media only screen and (min-width: 1024px) {
+            #post-grid-1028358 .grid-items {
+                text-align: center;
+                            }
+
+            #post-grid-1028358 .item {
+                width: 250px;
+                display: inline-block;
+                margin: 10px;
+                vertical-align: top;
+                height:auto;            }
+        }
+
+            </style>
+    </div>
+
+<p>Der Beitrag <a href="/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/">Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SimDia² als Alternative zur Programmierung?</title>
+		<link>/blog/simdia%c2%b2-als-alternative-zur-programmierung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 15 Jan 2018 16:44:36 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Module]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[LSMW]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[migration]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018330</guid>
+
+					<description><![CDATA[<p>Für Datenimporte muss man programmieren oder sich mit der LSMW auskennen. Beides Tools, die dem Anwender in der Regel nicht zur Verfügung stehen. Hier ist SimDia² das ideale Tool. Allerdings nicht nur für Fachanwender und Key-User...</p>
+<p>Der Beitrag <a href="/blog/simdia%c2%b2-als-alternative-zur-programmierung/">SimDia² als Alternative zur Programmierung?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Über mein Lieblings-AddOn <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> habe ich ja bereits mehrmals geschrieben (<a href="https://tricktresor.com/blog/simdia2-sap-datenimport-einfach/">SAP Datenimport einfach?</a>, <a href="https://tricktresor.com/blog/simdia2-neue-version-des-besten-sap-import-tools/">Neue Version SimDia²</a> und <a href="https://tricktresor.com/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten</a>). Grund dafür waren die große Funktionalität und die extrem einfache Handhabung. Beides ermöglicht es auch Endanwendern und Nicht-Informatikern, sehr schnell &#8211; also in wenigen Minuten &#8211; einen Datenaustausch zwischen Excel und SAP zu definieren und automatisch ausführen zu lassen.</p>
+<p>Mein Problem als leidenschaftlicher Programmierer und „Datenmalträtierer“ war aber bisher immer, dass mir ein bisschen die „Anwender-Brille“ fehlte und damit entsprechende Anwendungsfälle. In meinem Arbeitsalltag habe ich nämlich mit Datenimport-Anfragen nicht wirklich zu tun (worüber ich aber ehrlicherweise gar nicht traurig bin). Und wenn doch, dann habe ich ja dieses Tool zum <em>Extreme Customizing</em>: ABAP. Daher ging ich bis vor kurzem davon aus, dass SimDia² vor allem ein Tool für Fachabteilungen und Endanwender zur Lösung kleinerer und einfacher Datenimport-Aufgaben ist.</p>
+<p>Das Problem eines Entwicklers in meiner Xing-Gruppe <a href="https://www.xing.com/communities/groups/tricktresor-f8f4-1000599">Tricktresor</a>  zum Thema <a href="https://www.xing.com/communities/posts/aufzeichnung-in-lsmw-sekundaerressourcen-pflegen-1014264586">Aufzeichnung in LSMW (Sekundärressourcen pflegen)</a> brachte mich jedoch zu der Frage, ob und wie sich der dort geschilderte und recht komplexe Vorgang statt mit LSMW auch mit SimDia² lösen ließe. Kurz und gut: mit ein wenig Auffrischung im Umgang mit SimDia² (was mir bis dahin aus oben erwähnten Gründen etwas gefehlt hatte) ließ sich die gesamte Aufgabe schlussendlich in nur 2-3 Minuten lösen.</p>
+<h2>Aufzeichnung mit SimDia²</h2>
+<p>Im Grunde reicht es, wenn man die betreffende SAP-Transaktion gut kennt (in diesem Fall die mir bis dahin unbekannte C202) und ein wenig weiß, wie SAP tickt. Da die gesamte SimDia²-Aufzeichnung im normalen SAP GUI-Dialog stattfindet, verschwinden auch keine Registerkarten (wie teilweise beim Batchinput) und nach dem Text <em>Planungs-Vorgang</em> lässt sich sehr einfach in der Tabelle suchen. Der einzige Trick besteht dann noch darin, den gefundenen Vorgang zu markieren. Aber auch das verrät SAP einem nach beherztem Druck auf die rechte Maustaste:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/sd01.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018332" src="https://tricktresor.com/wp-content/uploads/2018/01/sd01.png" alt="" width="313" height="61" srcset="/wp-content/uploads/2018/01/sd01.png 313w, /wp-content/uploads/2018/01/sd01-300x58.png 300w" sizes="(max-width: 313px) 100vw, 313px" /></a></p>
+<p>Anschließend lassen sich die Sekundärressourcen ganz einfach ebenfalls über das Kontext-Menü  aufrufen und versorgen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/sd02.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018331" src="https://tricktresor.com/wp-content/uploads/2018/01/sd02.png" alt="" width="314" height="64" srcset="/wp-content/uploads/2018/01/sd02.png 314w, /wp-content/uploads/2018/01/sd02-300x61.png 300w" sizes="(max-width: 314px) 100vw, 314px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/sd03.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018333" src="https://tricktresor.com/wp-content/uploads/2018/01/sd03-1024x590.png" alt="" width="640" height="369" srcset="/wp-content/uploads/2018/01/sd03-1024x590.png 1024w, /wp-content/uploads/2018/01/sd03-300x173.png 300w, /wp-content/uploads/2018/01/sd03-768x442.png 768w, /wp-content/uploads/2018/01/sd03-265x153.png 265w, /wp-content/uploads/2018/01/sd03-148x85.png 148w, /wp-content/uploads/2018/01/sd03-193x112.png 193w, /wp-content/uploads/2018/01/sd03-71x40.png 71w, /wp-content/uploads/2018/01/sd03.png 1502w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Nur für Fachabteilungen?</h2>
+<p>Ist SimDia² also „nur“ ein Tool für Fachabteilungen und Endanwender zur Lösung kleinerer Datenimport-Aufgaben? Mitnichten.</p>
+<p>Nachdem bei mir der Knoten geplatzt war &#8211; spätestens, als ich gesehen hatte, wie einfach auch die <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial6">Verarbeitung von Kopf- und Detaildaten</a> damit ist &#8211; wurde mir klar, dass mit SimDia² eben auch komplexe Fälle abgebildet werden können. Auch solche, für die in der LSMW geballtes Entwickler-Gehirnschmalz und manchmal sogar ABAP nötig sind.</p>
+<p>Denn auf diese Weise können &#8211; und da müssen wir Entwickler jetzt ganz stark sein<img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /> &#8211; auch ganz „normale“ SAP-Anwender komplexe Datenimporte durchführen. Wenn man mal kurz darüber nachdenkt, ist das doch aber gar nicht so verkehrt. Warum? Weil dadurch die Aufgaben von denjenigen erledigt werden können, die sich mit den Daten ohnehin am besten auskennen. Und wir Entwickler können uns auf das konzentrieren, wofür wir eigentlich ausgebildet wurden und bezahlt werden: komplexe Software-Lösungen entwickeln und unsere Unternehmen fit zu machen für die Zukunft. Außerdem sagt ja keiner, dass wir SimDia² nicht auch für unsere Zwecke einsetzen können, falls z. B. die Datenimporte weiterhin von der IT durchgeführt werden sollen. Wenn wir Aufgaben in ein paar Minuten erledigen können, für die vorher einige Stunden nötig waren, dann beschwert sich darüber sicher auch niemand.</p>
+<h2>SimDia²</h2>
+<p>Mehr Informationen zu SimDia² findest du auf der Homepage: <a href="https://ersasoft.de/de/simdia/?s=tt">https://ersasoft.de/</a></p>
+<h2>Erfahrungsberichte</h2>
+<p>Da ich selbst SimDia² in der Praxis noch nicht eingesetzt habe (ich darf zum Glück tun, wofür ich ausgebildet wurde und bezahlt werde<img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" />), interessieren mich natürlich einschlägige Erfahrungen. Falls ihr also weitere Beispiele für mich habt, in denen ihr komplexe Datentransfers mit SimDia² erledigt habt, für die vorher eine aufwendige LSMW-Programmierung notwendig war, dann gerne immer her damit!</p>
+<p><br />
+[accordian]</p>
+<h2>Tricktresor- Bonus</h2>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p><em>Da SimDia² eine professionelle Software für SAP-Nutzer ist, benutze bitte deine Firmen-Mailadresse. SAP-Berater können einen entsprechenden Hinweis in die Nachricht schreiben.</em></p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>[contact-form-7]</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p></p>
+<p>Der Beitrag <a href="/blog/simdia%c2%b2-als-alternative-zur-programmierung/">SimDia² als Alternative zur Programmierung?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</title>
+		<link>/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 08 Nov 2017 22:20:13 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[Logik]]></category>
+		<category><![CDATA[Kunde]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Datenstruktur]]></category>
+		<category><![CDATA[Entwickler]]></category>
+		<category><![CDATA[Datenübernahme]]></category>
+		<category><![CDATA[Programmierer]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<category><![CDATA[Anwender]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018010</guid>
+
+					<description><![CDATA[<p>Ein paar mehr oder weniger philosophische Gedanken, die ich mir gemacht habe. Manches fließt einfach und will heraus. Ansonsten kann ich nicht schlafen, weil mir diese Gedanken immer und immer wieder im Kopf herum spuken. Um so schöner, wenn dabei der Bogen zu meinem Lieblings-AddOn "SimDia²" geschlagen werden kann. Den Kampf zwischen Anwender und Entwickler, Logik und Daten werden hoffentlich viele kennen. </p>
+<p>Der Beitrag <a href="/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich bin Programmierer aus Leidenschaft. Ich liebe es, Daten so zu malträtieren, umzuformen und anzureichern, dass eine für den Menschen sinnvolle Darstellung dabei herauskommt. Ebenso liebe ich es, Anforderungen so umzusetzen, dass am Ende ein paar zufriedene Anwender vor dem PC und wohlgeformte Daten auf der Datenbank sind. Zudem bin ich bestrebt, die Programmierungen so universell und wiederverwendbar wie möglich zu gestalten.</p>
+<p>Voraussetzung dafür ist, dass der Anwender oder Kunde sich exzellent ausdrücken kann und sehr genau weiß, was er möchte und seine Prozesse und Daten selbst gut kennt. Dabei ist nicht nur der aktuelle Zustand wichtig, sondern auch, wie es mit den Daten weiter gehen soll. Wie müssen sie weiter verarbeitet werden? Inwieweit müssen sie wie lange änderbar sein? Häufig müssen im Nachhinein wilde Verrenkungen gemacht werden, um Dinge zu prüfen oder sicherzustellen, die bei sorgfältiger Planung &#8211; ich glaube so etwas nennt man 360°-Sicht &#8211; nicht nötig gewesen wäre.</p>
+<p>Zugegebener Maßen ist das nicht immer möglich, denn sehr oft entwickeln sich Dinge einfach. Aus einem ehemals kleinen Auswertungsreport entsteht nach und nach die Schaltzentrale für eine ganze Abteilung.</p>
+<h2>Daten</h2>
+<p>Die Daten sind tatsächlich der wichtigste Bestandteil bei der Programmierung in einem ERP-System. Dadurch, dass die Daten in Strukturen abgelegt und organisiert werden, ist es recht einfach, zusammengehörende Daten zu ermitteln. Es ist allerdings sehr schwer, diese Strukturen erst einmal zu erkennen und dann zu erzeugen. Zudem ist es schwer, wenn nicht gar unmöglich, anhand der Daten die Zugehörigkeit zu Prozessen zu ermitteln. Um die zu einem Prozess notwendigen Daten zu wissen, müsste ein detailliertes Datenflussdiagramm erstellt werden. Das wird jedoch kaum gemacht, denn es ist unendlich viel Arbeit und starken Änderungen unterworfen.</p>
+<h2>Logik</h2>
+<p>Für einen Programmierer ist es sehr wichtig zu wissen, wo welche Daten stehen und wie sie verarbeitet werden müssen. Der Programmierer muss die Daten so verarbeiten, dass am Ende das gewünschte Ergebnis heraus kommt. Dafür ist es notwendig, dass er bestimmte Logiken anwendet. Einige Logiken ergeben sich aus den Einstellungen im Customizing, andere Logiken müssen vom Fachbereich bzw. dem Kunden vorgegeben werden. Sofern es genug &#8220;Beweismaterial&#8221; gibt, können aus speziellen Anforderungen allgemein gültige Logiken abgeleitet werden. Diese wiederum können im Kundeneigenen Customizing abgebildet werden. Dies hat den Vorteil, dass die Lösung flexibel und vom Kunden steuerbar ist.</p>
+<h2>Programmierer</h2>
+<p>Ja, es mag ein Klischee sein, aber Programmierer sind ein wundersames Völkchen. Ich spreche aus eigener Erfahrung&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" />  Programmierer sind in der Regel sehr Technik-affin und sind mehr daran interessiert, eine möglichst <em>figgelinsche</em> Lösung zu präsentieren oder eine besonders komplexe Aufgabenstellung zu meistern. In der Regel haben Programmierer wenig Sinn für Design und Layout. Ja, es gibt Ausnahmen&#8230;! Aber meistens bilden Programmierer genau das ab, was in der Vorgabe steht &#8211; egal wie es aussieht und ob es den SAP-Design-Vorgaben gleich in mehreren Ebenen widerspricht. Der einfachste Weg, einen Programmierer zur Arbeit zu bewegen ist, ihm zu sagen: &#8220;Das geht nicht. Haben schon andere versucht&#8221;.</p>
+<h2>Anwender</h2>
+<p>Auch Anwender sind häufig <em>speziell</em>. Sie müssen mit ihrer Arbeit fertig werden und sie wollen ihre Arbeit in der Regel gut machen. Anwender verstehen ihre Daten und ihre Prozesse. Aber sie können häufig nicht einschätzen welche Auswirkungen Änderungen in ihrem Bereich auf andere Teile der Firma haben. Zudem schätzen sie häufig die Komplexität von Programmieraufgaben falsch ein. Dinge, die einfach zu programmieren sind, weil bereits ähnliche Programmierungen vorhanden sind oder es eine SAP-Funktion dafür gibt, werden eventuell als zu komplex abgetan. Andererseits werden Dinge, die sich verbal einfach ausdrücken lassen und <em>offensichtlich</em> sind, als einfach eingeschätzt. Dabei sind gerade diese Dinge schwer und aufwändig zu programmieren.</p>
+<h2>Programmierer vs. Anwender</h2>
+<p>Im allgemeinen mehr oder weniger chaotischen Durcheinander, was in einigen Firmen <em>Alltag</em> genannt wird, müssen Programmierer und Anwender (Fachbereiche) miteinander auskommen und sich gegenseitig soweit verstehen, dass eindeutige Ergebnisse erzielt werden. Ein guter Programmierer wird versuchen, ein Schema, eine Logik, eine allgemein gültige Regel zu finden oder scheinbar allgemein gültige Regeln zu hinterfragen. Ein guter Anwender kennt seine Daten und Prozesse und erkennt Daten, die &#8220;nicht passen&#8221; oder &#8220;unsinnig&#8221; sind. Dahingehend unterscheiden sich in der Regel Programmierer und Anwender. Denn genau das, was der eine kann, kann der andere mit ziemlicher Sicherheit nicht. Ein Programmierer kann nicht erkennen, ob Daten unsinnig sind und ein Anwender erkennt selten die technische Logik hinter bestimmten Prozessen oder Funktionen.</p>
+<h2>Logik vs. Daten</h2>
+<p>Für einen Anwender ist es eventuell einfacher &#8220;seine&#8221; Daten so zu ordnen, wie sie für ihn aktuell sinnvoll und wichtig sind. Um Daten aus einem Fremdsystem oder manuell erarbeiteten Prozessen in ein SAP-System zu übernehmen gibt es im Grunde zwei maschinelle Möglichkeiten</p>
+<ol>
+<li>Anwender und Programmierer setzen sich zusammen und definieren eine Datenstruktur. Sie besprechen, welche Daten wann unter welchen Bedingungen wo hin müssen. Der Programmierer arbeitet in der Regel mit <strong>einer</strong> (je nach Anforderung natürlich auch mit mehreren) allgemeinen Datenstruktur. Felder, die für einen Datensatz nicht relevant sind, bleiben leer. Der Programmierer erstellt dann ein Programm mit den entsprechenden Regeln, um die Daten ins SAP-System zu schreiben.</li>
+<li>Der Anwender baut sich seine Daten in Gruppen so zusammen, wie sie für ihn logisch sind. Dabei ist es egal, dass er 12 Excel-Blätter hat, die alle zu 90% die gleiche Struktur haben. Für ihn ist wichtig, dass er die komplexen Daten möglichst einfach gruppieren und verwalten kann. Der Anwender kann dann einen einfachen Prozess starten, um die Daten zu übernehmen (zum Beispiel mit SimDia²).</li>
+</ol>
+<p>Die erste Lösung würde ich als Programmierer natürlich immer bevorzugen. Immerhin verdiene ich damit mein Geld. Es ist jedoch nicht von der Hand zu weisen, dass eine Programmierung fast immer recht kompliziert ist. Es sind Absprachen mit dem Auftraggeber notwendig, es muss getestet werden, es müssen Programme transportiert werden usw. Zudem erfordert die Arbeit in der Ausführung häufig zwei Leute: Einen aus der IT (Programmierer), der Daten in ein Verzeichnis schiebt, Daten hochlädt, Daten konvertiert und so weiter. Der Anwender ist hilflos, wenn etwas nicht so funktioniert, wie er es erwartet.</p>
+<p>Die zweite Lösung mag auf den ersten Blick nicht professionell erscheinen. Im Hinblick darauf, dass Daten meistens regelmäßig und von beliebigen Personen übernommen werden sollen, wird eine &#8220;Frickellösung&#8221; häufig nicht in Betracht gezogen.</p>
+<p>Dass der Anwender meistens gar nichts machen kann, liegt häufig an diesen zwei Umständen:</p>
+<ol>
+<li>Es gibt häufig keine guten Möglichkeiten für einen Anwender, Daten massenhaft in ein SAP-System zu importieren.</li>
+<li>Die IT-Abteilung hat für kleinere Aufgaben häufig keine Zeit und keine Kapazitäten.</li>
+</ol>
+<p>Die cleverste Möglichkeit, von der ich gehört habe ist die folgende: Ein Poweruser (also ein Benutzer mit hinreichend guten Berechtigungen zum Ausführen von Programmen) hat sich die Batchinputstruktur zu einem SAP-Standard-Übernahmeprogramm genommen, diese in Word bearbeitet und mit Hilfe der Serienbrieffunktion eine Batchinputdatei für seine Daten generiert. Die so erzeugten Batchinputmappen hat der Anwender dann eingespielt. Ich weiß leider nicht mehr genau, um welche Daten es sich handelte.</p>
+<p>Diese Lösung erfordert jedoch umfangreiche Berechtigungen, sehr gutes Word- und Excelwissen sowie natürlich ein vorhandenes SAP-Übernahmeprogramm.</p>
+<h2>Alternative SimDia²</h2>
+<p>Das Addon <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> von <a href="https://ersasoft.de/de/?s=tt">Ersasoft</a> ist eine &#8211; gemessen am Nutzen &#8211; kostengünstige Alternative für den Fachbereich um alltäglich wiederkehrende Datenübernahmen einfach und effizient zu erledigen. Der Anwender hat zumeist hinreichende Excel-Kenntnisse und er kennt seine SAP-Anwendungen. Die Bedienung von SimDia² ist sehr leicht und darauf ausgelegt, wiederkehrende Datenimporte von Excel nach SAP auszuführen.</p>
+<p><a href="https://ersasoft.de/de/simdia/?s=tt"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018210" src="https://tricktresor.com/wp-content/uploads/2017/11/starten-sie-mit-ihren-daten-durch2.png" alt="" width="760" height="323" srcset="/wp-content/uploads/2017/11/starten-sie-mit-ihren-daten-durch2.png 760w, /wp-content/uploads/2017/11/starten-sie-mit-ihren-daten-durch2-300x128.png 300w" sizes="(max-width: 760px) 100vw, 760px" /></a></p>
+<p>Beispiele für die Anwendung sind:</p>
+<ol>
+<li>Übernahme von Vertriebsstücklisten</li>
+<li>Ausführung von Buchungen</li>
+<li>Anlage von Fertigungsaufträgen</li>
+<li>Gezieltes Ändern von Materialstämmen</li>
+</ol>
+<p>SimDia² kann sogar dazu genutzt werden, um Daten aus einem SAP-System für Auswertungszwecke zu sammeln, da SimDia² Felder einer SAP-Transaktion auslesen kann. Ein Anwender kann sich so also gezielt selber Listen erstellen, ohne dass er die entsprechenden SAP-Tabellen kennen muss. Besonders gut funktioniert das bei Daten, die für einen Programmierer nur sehr umständlich zu ermitteln sind, da die Daten auf viele untereinander verknüpfte Tabellen verteilt sind.</p>
+<p>Der Beitrag <a href="/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SimDia² &#8211; Neue Version des besten SAP-Import-Tools</title>
+		<link>/blog/simdia2-neue-version-des-besten-sap-import-tools/</link>
+					<comments>/blog/simdia2-neue-version-des-besten-sap-import-tools/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 22 Jul 2015 04:00:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[datenerfassung]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Datenimport]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Import]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[TableControl]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=163546</guid>
+
+					<description><![CDATA[<p>Über ein Jahr sind seit der Veröffentlichung meines Test-Berichts zu SimDia² vergangen. Dort habe ich die Version 2.5 getestet. Seitdem wurden vom Hersteller ERSAsoft bereits zwei neue Versionen veröffentlicht. Höchste Zeit also für ein Update. Die aktuelle Version ist 2.7.</p>
+<p>Der Beitrag <a href="/blog/simdia2-neue-version-des-besten-sap-import-tools/">SimDia² &#8211; Neue Version des besten SAP-Import-Tools</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Über ein Jahr sind seit der Veröffentlichung meines <a href="https://ersasoft.de/de/simdia/?s=tt">Test-Berichts zu SimDia²</a> vergangen. Dort habe ich die Version 2.5 getestet. Seitdem wurden vom Hersteller <a href="https://ersasoft.de/de/?s=tt">ERSAsoft</a> bereits zwei neue Versionen veröffentlicht. Höchste Zeit also für ein Update. Die aktuelle <a href="https://ersasoft.de/de/simdia/?s=tt">Version ist 2.7</a>.</p>
+<h2><strong>Update</strong></h2>
+<p>Neben vielen Kleinigkeiten wurden zwei recht große Funktionen implementiert. Zunächst zu den &#8220;Kleinigkeiten&#8221;, die jedoch das Leben noch einfacher machen:</p>
+<ul>
+<li>Pause-Button: Die aktuelle Aufzeichnung kann unterbrochen werden, um zum Beispiel nachschauen zu können, ob bereits bestimmte Daten vorhanden sind.</li>
+<li>Gesteigerte Performance, insbesondere bei großen Datenmengen</li>
+<li>Benutzung der F4-Hilfe während der Aufzeichnung</li>
+<li>Mehrsprachigkeit</li>
+<li>Verbesserte Unterstützung von eingabebereiten ALV-Grid</li>
+</ul>
+<p>Die zwei großen Änderungen sind:</p>
+<ul>
+<li>Dynamische Maßnahmen</li>
+<li>Berechtigungsverwaltung</li>
+</ul>
+<p>Mit den<em> dynamischen Maßnahmen</em> ist es nun möglich, SAP-Aktionen dynamisch (sprich: für jeden Datensatz der Excel-Datei unterschiedlich) in Abhängigkeit der Datenkonstellation in SAP und/oder Excel auszuführen &#8211; oder dies eben nicht zu tun.</p>
+<p>Zusammen mit der verbesserten Auswahlmöglichkeit bzw. Positionierbarkeit auf einem TableControl (s.u.) lassen sich z.B. Materialstämme sehr einfach anpassen.</p>
+<p>Bereits mit der vorigen Version wurde SimDia² ein recht weit reichendes Verwaltungstool spendiert, um die Berechtigungen für das Programm sehr differenziert festzulegen. Dies dürfte vor allem in größeren Organisationen nicht ganz unwichtig sein.</p>
+<p>Die Berechtigungsverwaltung erlaubt es einem Administrator, festzulegen, welcher Windows-Benutzer Skripte erstellen oder lediglich ausführen darf.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/07/2015-07-21_22-47-39.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-166925" src="https://tricktresor.com/wp-content/uploads/2015/07/2015-07-21_22-47-39-300x255.jpg" alt="Simdia² - Admin" width="300" height="255" srcset="/wp-content/uploads/2015/07/2015-07-21_22-47-39-300x255.jpg 300w, /wp-content/uploads/2015/07/2015-07-21_22-47-39.jpg 760w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Eine Übersicht über alle Verbesserungen findest du im <a href="https://ersasoft.de/de/ressourcen/newsletter-archiv/?s=tt">Newsletter-Archiv von SimDia²</a>.</p>
+<h2><strong>Technik</strong></h2>
+<p>SimDia² ist zwar nach wie vor ein reines Windows-Programm. Das Programm-Fenster legt sich mittlerweile aber nicht mehr nur einfach <span style="text-decoration: underline;">über</span> den SAP GUI sondern wird fest ans SAP GUI „angetackert“. Für mich ein kleiner, für die einfache Bedienung aber nicht unwichtiger Punkt.</p>
+<h2><strong>Anwendung &#8211; Funktionalität </strong></h2>
+<p>In TableControls ist die Suche nach dem Identifikations-Merkmal jetzt nicht mehr auf die erste Spalte eingeschränkt. Vielmehr kann jetzt in einer beliebigen Spalte nach einer zu ändernden Tabellenzeile gesucht werden. Darüber hinaus kann jetzt auch z.B. in SUB-Fenstern, wie z.B. der Sichtenauswahl der Transaktion MM01/MM02&#8230;) gezielt nach der auszuwählenden Sicht gesucht werden, auch wenn sich diese je nach Material an unterschiedlichsten Positionen befindet.</p>
+<h2><strong>Pro und Contra</strong></h2>
+<p>Zwar können mit SimDia² immer noch keine Abfragen oder Verzweigungen programmiert werden (was ja eigentlich auch der Programm-Philosophie „Daten importieren ohne programmieren“ widersprechen würde). Aber immerhin lassen sich jetzt auch auf einfache Weise Buttons (und auch Tabs) abhängig von den Excel-Daten betätigen. Und damit sind wir dann doch schon (fast) bei der Möglichkeit, Abfragen oder Verzweigungen zu erstellen (das Wort „Programmieren“ vermeide ich bewusst, denn da gehört doch noch ein wenig mehr dazu.).</p>
+<p>Anhand eines <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial7">Videos</a> auf der SimDia²-Homepage wird z.B. gezeigt, wie aufgrund der Excel-Daten ein Button betätigt werden kann, um fallweise in einem dadurch ausgelösten Popup zusätzliche Daten zu erfassen.</p>
+<h2>Fazit</h2>
+<p>Nach wie vor ist <a href="https://ersasoft.de/de/simdia/?s=tt">Simdia²</a> ein einfach gehaltenes Tool, das jedoch sehr mächtig ist. Als Programmierer möchte ich natürlich für jede wiederkehrende Aufgabe ein ABAP-Programm schreiben. Solange es jedoch lediglich darum geht, aus einer Excel-Tabelle einfache Daten in ein SAP-System zu bekommen, ist Simdia² fast jeder Programmierung überlegen.</p>
+<p>Schon wenn nur ein paar wenige (einfache) Datenübernahmeprogramme geschrieben werden müssen, komme ich wahrscheinlich bereits in Erklärungsnot, warum ich denn dafür nicht eine Simdia-Lizenz gekauft hätte.</p>
+<p>Alleine dadurch, dass der Fachbereich selbst schnell und einfach definieren kann, welche Daten wo abgelegt werden sollen, können zwei Fliege mit einer (Simdia²-) Klappe geschlagen werden:</p>
+<ol>
+<li>Die IT wird entlastet. Es muss keine Anforderung definiert werden, die dann geprüft und umgesetzt werden muss.</li>
+<li>Der Fachbereich kann sich selbst helfen und ist nicht auf freie Kapazitäten der IT angewiesen</li>
+</ol>
+<p>Häufig werden Anforderungen gar nicht an die IT herangetragen, weil von vornherein feststeht, dass für solche kleinen Aufgaben kaum Zeit übrig ist.</p>
+<p>Ich habe von Fachabteilungen gehört, die sich mit einer geeigneten Batchinput-Datei und der Word-Serienbrief-Funktion geholfen haben, um Daten in ihr SAP-System zu bekommen. Im Gegensatz dazu ist Simdia² wirklich ein Kinderspiel!</p>
+<p></p>
+<h2>Tricktresor- Bonus</h2>
+<p>Nach wie vor bietet ERSAsoft allen Tricktresor-Lesern einen Nachlass von 5% an. Fülle einfach das unten stehende Formular aus und du bekommst den erwähnten Nachlass gewährt.</p>
+<p><strong>Du wirst dich wundern, was mit Simdia in deinem Unternehmen möglich ist!</strong></p>
+<p><span style="line-height: 1.5em;">[accordian]</span></p>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>[contact-form-7]</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p></p>
+<p>Der Beitrag <a href="/blog/simdia2-neue-version-des-besten-sap-import-tools/">SimDia² &#8211; Neue Version des besten SAP-Import-Tools</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/simdia2-neue-version-des-besten-sap-import-tools/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>SimDia² &#8211; SAP-Datenimport einfach?</title>
+		<link>/blog/simdia2-sap-datenimport-einfach/</link>
+					<comments>/blog/simdia2-sap-datenimport-einfach/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 14 Apr 2014 15:24:30 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Batch Input]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[Viewcluster]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[Scripting]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[LSMW]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Popups]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4659</guid>
+
+					<description><![CDATA[<p>Für die Datenmigration von Fremdsystemen oder Excel stehen in SAP viele Möglichkeiten offen. In diesem Artikel stelle ich euch SimDia² vor mit dem die Datenübernahme aus Exceldateien ein Kinderspiel wird. Die Übernahme der Felder wird durch einfaches Anklicken im SAPGUI definiert. Es können "Kopfdaten" und "Positionsdaten" übernommen werden. </p>
+<p>Der Beitrag <a href="/blog/simdia2-sap-datenimport-einfach/">SimDia² &#8211; SAP-Datenimport einfach?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><span style="line-height: 1.5em;">[pullquote float=&#8217;left&#8217; color=&#8217;#000000&#8242; bgcolor=&#8217;#ffffff&#8217;]Wir schärfen Ihre Axt, während Sie den Baum fällen.[/pullquote] So lautet das Motto von </span><a style="line-height: 1.5em;" title="ERSAsoft | Homepage" href="https://ersasoft.de/de?s=tt">ERSAsoft</a><span style="line-height: 1.5em;">.&nbsp;</span>Der Slogan ist eine Anspielung auf das Zitat „Ich hab keine Zeit meine Axt zu schärfen. Ich muss einen Baum fällen.“ aus der Erzählung „Komm, ich erzähl dir eine Geschichte“ von <a title="Jorge Bucay | Wikipedia" href="http://de.wikipedia.org/wiki/Jorge_Bucay">Jorge Bucay</a>.</p>
+<p>Er soll den Anspruch von ERSAsoft verdeutlichen, Tools zu entwickeln, die „den Umgang mit SAP so einfach und komfortabel wie möglich gestalten“. Ob das Datenimport-Tool SimDia²&nbsp; diesem Anspruch wirklich gerecht wird, wollte ich prüfen.</p>
+<h2>Was ist SimDia²?</h2>
+<p><a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist ein ein Tool, um Daten aus Excel nach SAP zu importieren. Dabei arbeitet das Programm direkt im SAPGUI-Dialog. Damit wird auch schnell klar, welche Zielrichtung SimDia² verfolgt: den Import kleinster bis mittlerer Datenmengen (von zwei bis &gt;10.000 Datensätzen). Für wirklich große Datenmigrationen mit mehreren 100.000 oder gar Millionen Datensätzen ist es nicht gedacht.</p>
+<p>Aufgaben, bei denen Daten von Excel in eine SAP-Transaktion übertragen werden, sollen mit SimDia² einfacher werden. Auf der&nbsp;<a title="Demo-Videos | SimDia²" href="https://ersasoft.de/de/videos/?s=tt">Video-Seite&nbsp;</a>werden deswegen auch typische Beispiele aus der täglichen Arbeit eines SAP-Fachanwenders vorgestellt: Personaldaten erfassen, Rechnungen buchen oder Materialstücklisten einpflegen.</p>
+<p>Diese Videos habe ich mir natürlich angesehen und war begeistert. Das Versprechen „Dateneingabe so einfach und komfortabel wie möglich“ war offensichtlich kein leeres. Und dass man damit wohl auch mehr machen kann, als Stamm- und Bewegungsdaten zu importieren, war mir schnell klar. Aber dazu später mehr.</p>
+<h2>Technik</h2>
+<p><span style="line-height: 1.5em;"><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_05_56.jpg"><img loading="lazy" decoding="async" class="alignright size-medium wp-image-4662" src="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_05_56-300x255.jpg" alt="simdia und se11" width="300" height="255" srcset="/wp-content/uploads/2014/03/03_21_17_05_56-300x255.jpg 300w, /wp-content/uploads/2014/03/03_21_17_05_56-624x531.jpg 624w, /wp-content/uploads/2014/03/03_21_17_05_56.jpg 861w" sizes="(max-width: 300px) 100vw, 300px" /></a>Nachdem ich mich in meinem SAP-Leben bereits häufiger mit den verschiedensten Tools zur Datenübernahme beschäftigt habe, war ich gespannt, was SimDia² zu bieten hat. Bei meinem ersten Kontakt mit dem Tool fand ich es spontan sehr innovativ und hilfreich, dass sich das SimDia²-Fenster in den SAP GUI integriert. Technisch stimmt das zwar nicht, denn SimDia²&nbsp; ist ein reines Windows-Programm mit einem eigenen Fenster, das sich über den SAP GUI legt, aber es sieht zuerst einmal so aus, als wäre das Tool nahtlos in SAP integriert.</span></p>
+<p>Das Programm verwendet die SAP GUI Scripting API, um Daten mit SAP GUI auszutauschen sowie VBA als Schnittstelle zu Excel. Ein gravierender Vorteil der Realisierung als Windows-Programm: außer einem aktivierten GUI-Scripting sind keinerlei Eingriffe in SAP erforderlich.</p>
+<p>Darüber hinaus ist SimDia² praktisch „out-of-the-box“ ablauffähig. Ausgeliefert wird es als ZIP-Archiv: nach dem Entpacken ist es <a href="https://ersasoft.de/de/videos/?s=tt#Video1">sofort startklar</a>.</p>
+<h2>Anwendung</h2>
+<p>Wie erwähnt, ist SimDia² als Datenimport-Tool konzipiert. Diese Aufgabe bewältigte es in den (wenigen) von mir durchgeführten Tests problemlos. Da ich aber aus der Entwicklung komme und eher selten (eigentlich: nie) typische Daten-Imports durchführen muss, habe ich überlegt, mit welcher Anwendung ich SimDia² noch testen könnte.</p>
+<p>Dabei stieß ich auf eine Tätigkeit, die mich jedes Mal schrecklich nervt: das Anlegen von Datenelementen und den dazugehörigen Domänen in ABAP. Da meine Entwicklungen in der Regel eher übersichtlich sind, kommt das massenweise Anlegen von Datenelementen und Domänen bei mir nicht häufig vor. Ich kann mir jedoch gut vorstellen, dass SimDia² bei größeren Projekten, in denen zuvor ein umfangreiches Datenmodell erstellt wird, gut zum Einsatz kommen kann.</p>
+<p>Hierfür könnten die Attribute von allen Datenelementen und Domänen in einer Excel-Datei einfach erfasst, diskutiert und gegebenenfalls noch geändert werden. Sobald die Entwicklung in SAP beginnt, lässt man die Repository Objekte durch SimDia²&nbsp;anlegen.</p>
+<p>Um zu prüfen, wie SimDia² mit Popups, Radiobuttons und Ankreuzfeldern klar kommt, wollte ich Datenelement und Domäne in einem Rutsch anlegen. Alle notwendigen Attribute hatte ich in einer Excel-Datei gespeichert und die Aufzeichnung gestartet.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/04_14_16_53_40.jpg"><img loading="lazy" decoding="async" class="size-medium wp-image-4707 alignleft" src="https://tricktresor.com/wp-content/uploads/2014/03/04_14_16_53_40-300x158.jpg" alt="simdia Excel" width="300" height="158" srcset="/wp-content/uploads/2014/03/04_14_16_53_40-300x158.jpg 300w, /wp-content/uploads/2014/03/04_14_16_53_40-624x330.jpg 624w, /wp-content/uploads/2014/03/04_14_16_53_40.jpg 724w" sizes="(max-width: 300px) 100vw, 300px" /></a><span style="line-height: 1.5em;">Für die Aufzeichnung werden im SimDia²-Fenster die Daten aus der ersten Tabellenzeile als Druckknöpfe angezeigt.</span></p>
+<p>Zur programm-internen <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial1">Verknüpfung der Excel-Daten mit den jeweiligen SAP-Feldern</a> positioniert man einfach den Cursor im gewünschten SAP-Feld und klickt im SimDia²-Fenster auf den entsprechenden Button. Der Wert wird daraufhin übernommen und die Aktion aufgezeichnet. So verfährt man, bis alle erforderlichen Felder und Aktionen in SAP erfolgt und aufgezeichnet sind.&nbsp;Und das geht nun wirklich schnell, einfach und intuitiv.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_07_33.jpg"><img loading="lazy" decoding="async" class="alignright size-medium wp-image-4664" src="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_07_33-236x300.jpg" alt="simdia_buttons" width="236" height="300" srcset="/wp-content/uploads/2014/03/03_21_17_07_33-236x300.jpg 236w, /wp-content/uploads/2014/03/03_21_17_07_33.jpg 415w" sizes="(max-width: 236px) 100vw, 236px" /></a></p>
+<p><b>Funktionalität</b></p>
+<p>SimDia² kann grundsätzlich mit allen SAP-Dynpros und Transaktionen arbeiten (einige Transaktionen sind allerdings zur Automatisierung nicht besonders gut geeignet; s.u.). Dabei ist es egal, ob es sich um Standard-, modifizierte oder kundeneigene Transaktionen handelt. Auch nachträgliche Dynpro-Änderungen sind unproblematisch &#8211; solange keine in der Aufzeichnung benutzte Datenfelder entfernt werden.</p>
+<p>Während des Imports werden alle SAP-Meldungen direkt in der Excel-Datei protokolliert, sodass alle innerhalb von SAP durchgeführten Verarbeitungsschritte nachvollzogen werden können.</p>
+<p>Darüber hinaus enthält SimDia² einige Funktionen, die ich in anderen Import-Tools noch nie gesehen habe. Hier nur zwei Beispiele:</p>
+<ul>
+<li>In Table Controls lassen sich nicht nur neue Sätze <span style="text-decoration: underline;">anlegen</span>. Auch bereits existierende Sätze können zielsicher identifiziert und <span style="text-decoration: underline;">geändert</span> werden.</li>
+<li>SimDia² kann nicht nur Daten aus Excel nach SAP übertragen, sondern auch umgekehrt. Aber nicht nur das. Die exportierten Daten können z.B. mit Excel-internen Funktionen beliebig modifiziert und sofort nach SAP zurück übertragen werden.</li>
+</ul>
+<p>Wie weiter oben bereits angedeutet, kann SimDia² aber auch noch mehr, als Daten zu importieren. Da das Programm alle in SAP vorgenommenen Aktionen aufzeichnen und später beliebig wiederholen kann, eignet es sich auch super als Automatisierungstool für SAP. Da ist es egal, ob man schnell mal ein paar hundert Datensätze in einem Testsystem löschen muss, ViewCluster in der Transaktion SM34 anlegen will oder regelmäßig ein paar dutzend Reports ausführen soll.</p>
+<h2>Pro und Contra</h2>
+<p>SimDia² ist darauf spezialisiert, <em>flache Daten</em> und dazugehörige <em>Positionsdaten</em> zu übernehmen. Es können keine Abfragen oder Verzweigungen programmiert werden. Das macht das Tool einerseits sehr interessant für Key- oder Poweruser, die „ihre“ Imports jetzt selbst vorbereiten und durchführen können.</p>
+<p>Gleichzeitig zeigen sich aber auch die Grenzen zur klassischen Programmierung. Sobald eine SAP-Anwendung auf einen Eingabewert mit unterschiedlichen Dynpros &#8220;antwortet&#8221;, muss der Anwender für jeden Eingabewert eine eigene Aufzeichnung erstellen.</p>
+<p>Dem steht jedoch der benötigte Zeitaufwand gegenüber: mit etwas Erfahrung (s.u.) braucht man für eine Aufzeichnung mit SimDia² nicht länger als 1-2 Minuten. Bei einem Import mit der LSMW sind dies wohl eher 1-2 Stunden. Und ganz zu schweigen natürlich von einer klassisch programmierten Lösung.</p>
+<p>Der Support von <a href="https://ersasoft.de/de/?s=tt">ERSAsoft</a> ist super. Probleme oder Fragen sind schnell per Mail, Telefon oder Teamviewer geklärt. Rüdiger Specht, Gründer und Inhaber, ist dabei stets ruhig, freundlich, geduldig und kompetent. Bei Problemen oder Schwierigkeiten redet er nicht um den heißen Brei herum, sondern sagt klar und deutlich, was Sache ist.</p>
+<h2>Fazit</h2>
+<p>Obwohl SimDia² sehr einfach zu bedienen ist, hatte ich die ersten Male das Gefühl, dass es &#8220;rum zickt&#8221;. Ich habe jedoch schnell gemerkt, dass die Zickerei an den unterschiedlich programmierten SAP-Programmen liegt. Bei der Aufzeichnung muss man sich an die Gegebenheiten der SAP-Transaktionen richten. Auch wenn SimDia² einfach zu bedienen und schnell zu erlernen ist, heißt es auch hier: Übung macht den Meister und SAP-Knowhow sollte vorhanden sein.</p>
+<p>Insgesamt ist SimDia² sehr innovativ, wirklich einfach zu bedienen und schnell zu erlernen. Das ist das riesengroße Plus. Das, was ich bei SimDia² vermisst habe, als negativ zu bewerten, wäre falsch, denn einem Porsche kreide ich auch nicht an, dass er zwar 260 km/h fährt, ich aber nicht gleichzeitig ein Klavier damit transportieren kann. SimDia² ist dafür konzipiert, bestimmte Aufgaben im Zusammenspiel mit Excel schnell und intuitiv zu lösen. Und das tut es.</p>
+<p>Damit ist das Programm SAP-internen Tools wie LSMW oder Batch Input haushoch überlegen.</p>
+<p>Ist eine Aufzeichnung erst einmal &#8220;im Kasten&#8221;, dann ist der Aufruf schnell möglich und die neuen Daten sind ratzfatz im SAP. Anwendern, die regelmäßig Daten von Excel nach SAP überführen müssen, kann ich SimDia² wirklich nur ans Herz legen.</p>
+<h2>Update</h2>
+<p>In diesem Artikel beschreibe ich die neue Version von SimDia²:</p>
+<p>https://tricktresor.com/blog/simdia2-neue-version-des-besten-sap-import-tools/</p>
+<p><br />
+[accordian]</p>
+<p>Und jetzt kommt das Beste: ERSAsoft bietet allen Tricktresor-Fans einen Nachlass von 5% an. Füllt einfach das unten stehende Formular aus und ihr bekommt den erwähnten Nachlass gewährt. So. Noch leichter kann ich euch den SAP-Datenimport wirklich nicht machen&#8230;!</p>
+<h2>Tricktresor- Bonus</h2>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>https://tricktresor.com/blog/simdia%C2%B2-als-alternative-zur-programmierung/</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p></p>
+<p>Der Beitrag <a href="/blog/simdia2-sap-datenimport-einfach/">SimDia² &#8211; SAP-Datenimport einfach?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/simdia2-sap-datenimport-einfach/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

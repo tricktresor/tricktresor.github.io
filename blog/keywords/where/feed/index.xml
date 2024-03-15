@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>WHERE Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/where/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 23 Sep 2020 11:28:00 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>WHERE Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Loop At ITAB Group By</title>
+		<link>/blog/loop-at-itab-group-by/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 09 Sep 2020 18:28:58 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Gruppe]]></category>
+		<category><![CDATA[GROUP BY]]></category>
+		<category><![CDATA[WHERE]]></category>
+		<category><![CDATA[LOOP]]></category>
+		<guid isPermaLink="false">/?p=1024249</guid>
+
+					<description><![CDATA[<p>Mühsam ernährt sich das Eichhörnchen. Die heutige Nuss galt dem Befehlszusatz GROUP BY für den LOOP über eine interne Tabelle. Es gibt dankenswerter Weise in der SAP-Doku inzwischen viele Beispiele. Diese sind jedoch sehr abstrakt. Sie zeigen die Syntax, verdeutlichen aber nicht unbedingt, was damit möglich ist. Ich präsentiere euch heute ein paar Möglichkeiten der Gruppierung, die hoffentlich die Funktionsweise deutlich machen. Beispieldaten im Folgenden verwende ich diese Struktur für meine Beispiele: Die Tabelle soll...</p>
+<p>Der Beitrag <a href="/blog/loop-at-itab-group-by/">Loop At ITAB Group By</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Mühsam ernährt sich das Eichhörnchen. Die heutige Nuss galt dem Befehlszusatz GROUP BY für den LOOP über eine interne Tabelle. Es gibt dankenswerter Weise in der SAP-Doku inzwischen viele Beispiele. Diese sind jedoch sehr abstrakt. Sie zeigen die Syntax, verdeutlichen aber nicht unbedingt, was damit möglich ist. </p>
+
+
+
+<p>Ich präsentiere euch heute ein paar Möglichkeiten der Gruppierung, die hoffentlich die Funktionsweise deutlich machen. </p>
+
+
+
+<h2 class="wp-block-heading">Beispieldaten</h2>
+
+
+
+<p>im Folgenden verwende ich diese Struktur für meine Beispiele:</p>
+
+
+
+<pre class="wp-block-code"><code>TYPES: BEGIN OF _doc,
+         docnr TYPE n length 10,
+         itmno TYPE n length 6,
+         category type c length 2,
+         del_flag type abap_bool,
+       END OF _doc,
+       _docs TYPE SORTED TABLE OF _doc WITH UNIQUE KEY docnr itmno.
+
+DATA(documents) = VALUE _docs(
+  ( docnr = 12001 itmno = 10 category = 'A1' del_flag = 'X' )
+  ( docnr = 12001 itmno = 20 category = 'A1' del_flag = ' ' )
+  ( docnr = 12002 itmno = 10 category = 'A2' del_flag = 'X' )
+  ( docnr = 12003 itmno = 10 category = 'B3' del_flag = ' ' )
+  ( docnr = 12003 itmno = 20 category = 'B1' del_flag = ' ' )  ).</code></pre>
+
+
+
+<p>Die Tabelle soll generelle Belege mit Positionsnummer, einem Positionstypen und einem Löschkennzeichen simulieren.</p>
+
+
+
+<h2 class="wp-block-heading">Generelle Funktionsweise</h2>
+
+
+
+<p>Der Befehlszusatz GROUP BY zum LOOP bietet die Möglichkeit der Gruppierung, ähnlich wie die Sprachelemente AT NEW oder AT CHANGE OF innerhalb eines LOOP. Allerdings bietet der GROUP BY Befehl noch einige weitere Möglichkeiten.</p>
+
+
+
+<p>In der einfachen Variante kannst du ein Feld der internen Tabelle angeben, nach dem gruppiert werden soll. </p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents INTO DATA(document)
+  GROUP BY document-docnr INTO DATA(docgrp).
+  WRITE: / docgrp.
+ENDLOOP.</code></pre>
+
+
+
+<p>Das Ergebnis ist eine Liste aller eindeutigen Belegnummern:</p>
+
+
+
+<pre class="wp-block-code"><code>0000012001
+0000012002
+0000012003</code></pre>
+
+
+
+<h2 class="wp-block-heading">Gruppenelemente</h2>
+
+
+
+<p>Es ist nun eine Gruppe DOCGRP vorhanden. Auf die Zeilen dieser Gruppe kann mit Hilfe des Befehls LOOP AT GROUP zugegriffen werden:</p>
+
+
+
+<pre class="wp-block-code"><code>  LOOP AT GROUP docgrp INTO DATA(docline).
+    WRITE: / doc1line-docnr, docline-itmno.
+  ENDLOOP.
+</code></pre>
+
+
+
+<h2 class="wp-block-heading">So weit so gut&#8230;</h2>
+
+
+
+<p>Es gibt zwei Interessante Zusätze in einer Gruppe:</p>
+
+
+
+<ul><li>GROUP INDEX</li><li>GROUP SIZE</li></ul>
+
+
+
+<p>Diese können zusätzlich definiert werden. Im LOOP kann darauf zugegriffen werden.</p>
+
+
+
+<h3 class="wp-block-heading">GROUP INDEX</h3>
+
+
+
+<p>Der Zusatz GRIOUP INDEX liefert den aktuellen Index der (unsortierten) Gruppe. </p>
+
+
+
+<h3 class="wp-block-heading">GROUP SIZE</h3>
+
+
+
+<p>Der Zusatz GROUP SIZE liefert Informationen über die Anzahl der enthaltenen Gruppenelemente.</p>
+
+
+
+<h3 class="wp-block-heading">Beispiel</h3>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents INTO DATA(document)
+  GROUP BY
+  ( doc   = document-docnr
+    size  = GROUP SIZE
+    index = GROUP INDEX )
+  INTO DATA(docgrp).
+  WRITE: / |elements in group { 
+    docgrp-index align = left } "{ 
+    docgrp-doc }": { 
+    docgrp-size ALIGN = left } entries|.
+
+  LOOP AT GROUP docgrp INTO DATA(doc).
+    WRITE: / doc-docnr, doc-itmno.
+  ENDLOOP.
+ENDLOOP.
+</code></pre>
+
+
+
+<p>Ergebnis:</p>
+
+
+
+<pre class="wp-block-code"><code>number of elements in group 1: 2 entries
+0000012001 000010
+elements in group 1 "0000012001": 2 entries
+0000012001 000010
+0000012001 000020
+elements in group 2 "0000012002": 1 entries
+0000012002 000010
+elements in group 3 "0000012003": 2 entries
+0000012003 000010
+0000012003 000020</code></pre>
+
+
+
+<p>In diesem Fall müssen die Gruppenfelder, die nun in Klammern eingefasst werden müssen, selbst definiert werden. </p>
+
+
+
+<h2 class="wp-block-heading">Dynamische Gruppen</h2>
+
+
+
+<p>Jetzt kommt der spannende Teil, der einen großen Vorteil gegenüber der alten AT NEW Gruppenstufenverarbeitung hat. Die Gruppen können dynamisch anhand der Feldwerte definiert werden. Im Folgenden Beispiel fasse ich alle Einträge mit einem Löschkennzeichen in der Gruppe &#8220;deleted&#8221; zusammen. Alle anderen Einträge kommen in die Gruppe &#8220;valid&#8221;.</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents
+INTO DATA(doc)
+GROUP BY (
+    del_group = COND string( WHEN doc-del_flag = space THEN 'valid' ELSE 'deleted' )
+    size  = GROUP SIZE
+    index = GROUP INDEX  )
+  INTO DATA(docgrp).
+  WRITE: / 'number of', docgrp-del_group, 'entries:', docgrp-size.
+ENDLOOP.</code></pre>
+
+
+
+<p>Ergebnis:</p>
+
+
+
+<pre class="wp-block-code"><code>number of deleted entries:          2
+number of valid entries:          3</code></pre>
+
+
+
+<p>Ich füge also je nachdem, ob das Löschhkennzeichen gesetzt ist oder nicht, eine andere Gruppenbezeichnung ein. Das ist besonders dann interessant, wenn man mehrere unterschiedliche Elemente gruppieren möchte. Beispielsweise alle Positionstypen, die mit A oder B beginnen:</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents
+INTO DATA(doc)
+GROUP BY (
+    cat   = doc-category(1)
+    size  = GROUP SIZE
+    index = GROUP INDEX  )
+  INTO DATA(docgrp).
+
+  WRITE: / 'number of items in category', 
+    docgrp-cat LEFT-JUSTIFIED NO-GAP, 
+    docgrp-size.
+
+ENDLOOP.</code></pre>
+
+
+
+<p>Ergebnis:</p>
+
+
+
+<pre class="wp-block-code"><code>number of items in category A         3
+number of items in category B         2</code></pre>
+
+
+
+<p>Ebenso könnte man nach Bestellungen gruppieren, die einen &#8220;geringen&#8221; oder einen &#8220;höheren&#8221; Bestellwert haben. Oder ich kann Aufträge direkt nach Aufträgen mit A-, B- oder C-Kunden gruppieren, indem ich für die Ermittlung der Kundenklassifizierung eine Methode in der GROUP BY Klausel verwende.</p>
+
+
+
+<h2 class="wp-block-heading">Gruppen gruppieren</h2>
+
+
+
+<p>Die definierten Gruppen können ebenfalls weiter gruppiert werden. Im folgenden Beispiel gruppiere ich erst nach der <em>Positionstypengruppe</em> (A oder B) aus dem obigen Beispiel. In dieser Gruppe gruppiere ich dann noch einmal nach dem eigentlichem Positionstyp (A1, A2, &#8230;). zudem berücksichtige ich in der WHERE-Bedingung nur die Positionen ohne Löschkennzeichen. Für dieses Beispiel habe ich die Datenbasis etwas erweitert&#8230;</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT documents
+INTO DATA(doc2)
+GROUP BY (
+    cat   = doc2-category(1)
+    size  = GROUP SIZE
+    index = GROUP INDEX  )
+  INTO DATA(docgrp2).
+
+  WRITE: /1 'number of items in category',
+    docgrp2-cat LEFT-JUSTIFIED NO-GAP,
+    docgrp2-size.
+
+  LOOP AT GROUP docgrp2 INTO DATA(docline2)
+  WHERE del_flag = space GROUP BY ( category = docline2-category ) INTO DATA(grpcat).
+    write: /5 'category', grpcat-category.
+    LOOP AT GROUP grpcat INTO DATA(cat).
+      WRITE: /9 cat-docnr, cat-itmno, cat-category.
+    ENDLOOP.
+  ENDLOOP.
+
+ENDLOOP.</code></pre>
+
+
+
+<p>Ergebnis:</p>
+
+
+
+<pre class="wp-block-code"><code>number of items in category A         5
+    category A1
+        0000012001 000020 A1
+        0000012003 000030 A1
+    category A2
+        0000012004 000010 A2
+number of items in category B         5
+    category B3
+        0000012003 000010 B3
+        0000012003 000020 B3
+        0000012005 000010 B3
+        0000012005 000020 B3
+    category B1
+        0000012006 000010 B1</code></pre>
+
+
+
+<h2 class="wp-block-heading">Einschränkungen</h2>
+
+
+
+<p>Bei meinem heutigen Ausflug in die Gruppenstufen bin ich über folgende Einschränkungen gestolpert:</p>
+
+
+
+<ol><li>Sortierung nur nach Gruppenstufenfeldern möglich, aber nicht nach GROUP SIZE</li><li>Kein WHERE über Gruppenstufen möglich</li></ol>
+
+
+
+<h3 class="wp-block-heading">Sortierung</h3>
+
+
+
+<p>Ich wollte gerne die Gruppen nach der Anzahl der Elemente sortieren. Das ist leider nicht möglich.</p>
+
+
+
+<h3 class="wp-block-heading">WHERE über Gruppenstufen</h3>
+
+
+
+<p>Es ist anscheinend nicht möglich, die erzeugten Gruppen direkt über eine WHERE-Bedingung einzuschränken. In den meisten Fällen kann man es sicherlich über eine geschickte WHERE-Bedingung über die Tabelle abbilden (zum Beispiel WHERE category(1) = &#8216;A&#8217;). Allerdings wäre eine Einschränkung über die Gruppen selbst eventuell auch hilfreich. Zum Beispiel könnte die Bedingung für die Gruppe DEL_GROUP, die ich mit <em>valid </em>und <em>deleted </em>definiert hatte, etwas komplizierter und aufgrund einen Methodenaufrufes nicht ersichtlich sein. Ich würde dann trotzdem nur über die Einträge mit <em>valid </em>verarbeiten wollen. Das geht natürlich mit CHECK innerhalb des LOOP, eine WHERE-Bedingung wäre jedoch eleganter.</p>
+<p>Der Beitrag <a href="/blog/loop-at-itab-group-by/">Loop At ITAB Group By</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ABAP 740-Features unter der Lupe</title>
+		<link>/blog/abap-740-features-unter-der-lupe/</link>
+					<comments>/blog/abap-740-features-unter-der-lupe/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 Apr 2017 15:12:16 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<category><![CDATA[standard table]]></category>
+		<category><![CDATA[sorted table]]></category>
+		<category><![CDATA[GROUP BY]]></category>
+		<category><![CDATA[WHERE]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017998</guid>
+
+					<description><![CDATA[<p>Aus einer einfachen Anfängerfrage im abapforum.com hat sich eine recht spannende Antwortserie entwickelt, die auf die neuen Sprachfeatures von ABAP740 eingeht. Ich habe diese einmal zusammen gefasst und auch Laufzeitmessungen durchgeführt. Die Frage Die Frage von debianfan lautete: Wie ermittele ich die Anzahl von Datensätzen bestimmter Ausprägung in einer internen Tabelle? Die interne Tabelle NAMES besteht nur aus den Feldern NAME (string) TF (boolean) Die folgenden Lösungen sind teilweise vereinfacht und ohne DATA-Definitionen. Die einzelnen...</p>
+<p>Der Beitrag <a href="/blog/abap-740-features-unter-der-lupe/">ABAP 740-Features unter der Lupe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Aus einer einfachen Anfängerfrage im <a href="http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21900&amp;p=82019">abapforum.com</a> hat sich eine recht spannende Antwortserie entwickelt, die auf die neuen Sprachfeatures von ABAP740 eingeht. Ich habe diese einmal zusammen gefasst und auch Laufzeitmessungen durchgeführt.</p>
+<h2>Die Frage</h2>
+<p>Die Frage von debianfan lautete: Wie ermittele ich die Anzahl von Datensätzen bestimmter Ausprägung in einer internen Tabelle?</p>
+<p>Die interne Tabelle NAMES besteht nur aus den Feldern</p>
+<ul>
+<li>NAME (string)</li>
+<li>TF (boolean)</li>
+</ul>
+<p>Die folgenden Lösungen sind teilweise vereinfacht und ohne DATA-Definitionen. Die einzelnen lauffähigen Lösungen sind unten im Beispielprogramm ersichtlich.</p>
+<h2>Lösung 1 &#8211; 2xLOOP+WHERE(DATA)</h2>
+<p>Die einfachste und auf der Hand liegende Antwort von Tron war:</p>
+<pre class="">LOOP AT names INTO name WHERE tf = abap_true.
+  ADD 1 TO zaehler_true.
+ENDLOOP.
+
+LOOP AT names INTO name WHERE tf = abap_false.
+  ADD 1 TO zaehler_false.
+ENDLOOP.
+</pre>
+<p>Die Lösung ist einfach und verständlich.</p>
+<p>Der Einwand von Ralf war, dass bei WHERE die gesamte Tabelle durchlaufen werden muss, wenn kein Index verwendet wird. Das kann sich bei großen Tabellen negativ auf die Laufzeit auswirken.</p>
+<p>Mein Gedanke war, dass ich zwei LOOPs nicht schön finde und außerdem ein LOOP mit einer Case-Anweisung noch einen Tacken einfacher und deutlich sein müsste. Dazu später mehr.</p>
+<h2>Lösung 2 &#8211; FILTER</h2>
+<p>Haubi hat dann den Vorschlag gemacht, die einzelnen Einträge mittels FILTER zu zählen:</p>
+<pre class=""> DATA(lv_true)  = lines( FILTER #( names WHERE tf = abap_true ) ).
+ DATA(lv_false) = lines( FILTER #( names WHERE tf = abap_false ) ).</pre>
+<p>Diese Lösung finde ich sehr schlank und gut lesbar. Was mich hier stört, ist, dass durch FILTER alle verarbeiteten Tabelleneinträge kopiert werden. Es werden alle Datensätze die der WHERE-Anweisung entsprechen in eine neue Tabelle kopiert. Die Tabelle ist zwar temporär und wird nur für die Zeit der Verarbeitung des FILTER-Befehls verwendet, aber bei großen Tabellen kann sich die zusätzliche Speicherlast negativ auswirken.</p>
+<h2>Lösung 3 &#8211; REDUCE</h2>
+<p>Ich wollte dann unbedingt noch eins drauf setzen und eine Lösung haben, die auch bei vielen Ausprägungen von TF funktioniert und die Werte von TF nicht bekannt sind. Zudem wollte ich komplett die neuen Sprachfeatures verwenden.</p>
+<p>Bei beiden vorhergehenden Lösungen fand ich es nicht gut, dass gezielt im Programm auf ABAP_TRUE und ABAP_FALSE abgefragt wurde. In diesem Beispiel ist es in Ordnung, weil das die Vorgabe war. Der häufigere Fall ist jedoch, dass eine Gruppe viele und gegebenenfalls nicht bekannte Ausprägungen hat (Verkaufsorganisation, Datum, Materialnummer, etc.).</p>
+<p>Meine Lösung bestand dann aus einer Kombination aus VALUE und REDUCE:</p>
+<pre class=""> DATA(sum) = VALUE ttf( FOR GROUPS grp OF &lt;name&gt; IN names
+                        WHERE ( name IS NOT INITIAL )
+                        GROUP BY ( tf = &lt;name&gt;-tf )
+                          ( tf    = grp
+                            count = REDUCE #( INIT i = 0
+                                       FOR name IN names
+                                       WHERE ( tf = grp )
+                                       NEXT i = i + 1 ) ) ).</pre>
+<p>Diese Lösung baut eine Tabelle auf aus TF und COUNT, so dass alle Gruppenwerte mit der entsprechenden Anzahl Einträge in der Tabelle SUM landen.</p>
+<p>Eigentlich müsste diese Lösung die langsamste sein, denn es werden zuerst die Gruppen gebildet. Dafür muss die gesamte Tabelle durchlaufen werden. Dann werden zu jedem Gruppeneintrag erneut die zugehörigen Einträge gelesen und gezählt. Deswegen wollte ich zuerst gar keine Laufzeitmessung machen. Die Herausforderung für mich war in erster Linie, die Problemstellung mit den neuen Sprachfeatures abzubilden, da ich mich mit der Syntax eher schwer tue.</p>
+<h2>Lösung 4 &#8211; 1xLOOP+WHERE(DATA)</h2>
+<p>Ich habe mit den vorhandenen drei Lösungen ein Testprogramm geschrieben um die Laufzeit mit der Transaktion SAT analysieren zu können.</p>
+<p>Allerdings habe ich gemerkt, dass ich die Lösung von Tron falsch übernommen hatte, nämlich folgendermaßen:</p>
+<pre class="">LOOP AT names INTO name.
+  CASE name-tf.
+    WHEN abap_true.
+      ADD 1 TO zaehler_true.
+    WHEN abap_false.
+      ADD 1 TO zaehler_false.
+  ENDCASE.
+ENDLOOP.</pre>
+<p>Anstatt zweier LOOPs hatte ich nur einen LOOP und eine CASE-Abfrage.</p>
+<p>Da ich die schon dabei war zu testen, wollte ich Trons Code genau so übernehmen, da ich davon ausging, dass meine Variante mit CASE schneller sein würde. Allerdings war dem nicht so&#8230;</p>
+<h2>Update</h2>
+<p>Zusätzlich zu den LOOP-Lösungen, die mit dem Zusatz INTO workarea arbeiten, habe ich noch die Varianten mit ASSIGNING (Feldsymbol) und TRANSPORTING NO FIELDS aufgenommen.</p>
+<h2>Lösung 5 &#8211; 1xLOOP+CASE(Fieldsymbol)</h2>
+<p>Die Lösung mit einem LOOP und CASE-Anweisung jedoch mit LOOP-ASSIGNING.</p>
+<h2>Lösung 6 &#8211; 2xLOOP+WHERE(Fieldsymbol)</h2>
+<p>Die Lösung mit zwei LOOPs und entsprechender WHERE-Bedingung jedoch mit LOOP-ASSIGNING.</p>
+<h2>Lösung 7 &#8211; 2xLOOP+WHERE(ohne Feldtransport)</h2>
+<p>Die Lösung mit zwei LOOPs und entsprechender WHERE-Bedingung jedoch mit dem Zusatz TRANSPORTING NO FIELDS.</p>
+<h2>Laufzeitanalyse</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018001" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg" alt="" width="748" height="269" srcset="/wp-content/uploads/2017/04/2017-04-26_17-13-33.jpg 748w, /wp-content/uploads/2017/04/2017-04-26_17-13-33-300x108.jpg 300w" sizes="(max-width: 748px) 100vw, 748px" /></a></p>
+<p>&nbsp;</p>
+<p>Der Vollständigkeit halber habe ich die Messung auch noch einmal mit der Variante &#8220;SORTED TABLE&#8221; durchgeführt. Und wieder war ich überrascht: Die Variante mit Sorted Table ist deutlich langsamer als die Variante mit Standard Table&#8230;</p>
+<p>Hier das Ergebnis der Laufzeitmessungen mit 100.000 Datensätzen und STANDARD TABLE:</p>
+<pre class="">Variante          Laufzeit
+P01_REDUCE         76.602
+P02_FILTER         36.755
+P03_LOOP_CASE      33.891
+P04_LOOP_WHERE     27.282
+P05_LOOP_CASE_FS   25.097
+P06_LOOP_WHERE_FS  18.805
+P07_LOOP_WHERE_NO  17.774
+</pre>
+<h2>abapgit</h2>
+<p>Eine aktuelle Version der Lösungen (inzwischen erweitert auf den Vergleich mit SORTED TABLE) findest du im github <a href="https://github.com/tricktresor/">Tricktresor-Repository</a>:</p>
+<p><a href="https://github.com/tricktresor/loop_performance_comparison">https://github.com/tricktresor/loop_performance_comparison</a></p>
+<h2>Code</h2>
+<p>Methode rnd_name baut aus zufälligen Buchstaben Fantasienamen auf.</p>
+<p>Methode rnd_bool liefert per Zufall den Wert TRUE oder FALSE zurück.</p>
+<p>Die Methoden p01 &#8211; p07 enthalten die jeweils erwähnten Lösungsvarianten.</p>
+<pre class="">REPORT.
+" http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21900&amp;p=82017#p82017
+
+PARAMETERS p TYPE i DEFAULT 100000.
+
+CLASS help DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS rnd_name RETURNING VALUE(name) TYPE string.
+ CLASS-METHODS rnd_bool RETURNING VALUE(tf) TYPE boolean.
+ CLASS-METHODS class_constructor.
+ CLASS-METHODS p01_reduce.
+ CLASS-METHODS p02_filter.
+ CLASS-METHODS p03_loop_case.
+ CLASS-METHODS p04_loop_where.
+ CLASS-METHODS p05_loop_case_fs.
+ CLASS-METHODS p06_loop_where_fs.
+ CLASS-METHODS p07_loop_where_no.
+ PROTECTED SECTION.
+ CLASS-DATA rnd TYPE REF TO cl_abap_random.
+ TYPES:
+ BEGIN OF lst_names,
+ name TYPE string,
+ tf TYPE abap_bool,
+ END OF lst_names,
+ ltt_names TYPE STANDARD TABLE OF lst_names
+ WITH NON-UNIQUE KEY name
+ WITH NON-UNIQUE SORTED KEY key_tf COMPONENTS tf.
+
+* ltt_names TYPE SORTED TABLE OF lst_names
+* WITH NON-UNIQUE KEY name
+* WITH NON-UNIQUE SORTED KEY key_tf COMPONENTS tf.
+ CLASS-DATA names TYPE ltt_names.
+ENDCLASS.
+
+CLASS help IMPLEMENTATION.
+ METHOD class_constructor.
+ rnd = cl_abap_random=&gt;create( ).
+ names = VALUE ltt_names( FOR i = 1 THEN i + 1 WHILE i &lt;= p
+ ( name = help=&gt;rnd_name( ) tf = help=&gt;rnd_bool( ) ) ).
+
+ ENDMETHOD.
+
+ METHOD rnd_name.
+ DATA(len) = rnd-&gt;intinrange( low = 5 high = 40 ).
+ DO len TIMES.
+ DATA(pos) = rnd-&gt;intinrange( low = 0 high = 25 ).
+ name = name &amp;&amp; sy-abcde+pos(1).
+ ENDDO.
+ ENDMETHOD.
+
+ METHOD rnd_bool.
+ CASE rnd-&gt;intinrange( low = 0 high = 1 ).
+ WHEN 0.
+ tf = abap_false.
+ WHEN 1.
+ tf = abap_true.
+ ENDCASE.
+ ENDMETHOD.
+
+ METHOD p01_reduce.
+ TYPES:
+ BEGIN OF stf,
+ tf TYPE abap_bool,
+ count TYPE i,
+ END OF stf,
+ ttf TYPE SORTED TABLE OF stf WITH UNIQUE KEY tf.
+
+ DATA(sum) = VALUE ttf( FOR GROUPS grp OF &lt;name&gt; IN names
+ WHERE ( name IS NOT INITIAL )
+ GROUP BY ( tf = &lt;name&gt;-tf )
+ ( tf = grp
+ count = REDUCE #( INIT i = 0
+ FOR name IN names
+ WHERE ( tf = grp )
+ NEXT i = i + 1 ) ) ).
+* cl_demo_output=&gt;display_data( sum ).
+ ENDMETHOD.
+
+ METHOD p02_filter.
+ DATA(lv_true) = lines( FILTER #( names USING KEY key_tf WHERE tf = abap_true ) ).
+ DATA(lv_false) = lines( FILTER #( names USING KEY key_tf WHERE tf = abap_false ) ).
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p03_loop_case.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names INTO DATA(name).
+ CASE name-tf.
+ WHEN abap_true. ADD 1 TO lv_true.
+ WHEN abap_false. ADD 1 TO lv_false.
+ ENDCASE.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p04_loop_where.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names INTO DATA(name) WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names INTO name WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p05_loop_case_fs.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names ASSIGNING FIELD-SYMBOL(&lt;name&gt;).
+ CASE &lt;name&gt;-tf.
+ WHEN abap_true. ADD 1 TO lv_true.
+ WHEN abap_false. ADD 1 TO lv_false.
+ ENDCASE.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p06_loop_where_fs.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names ASSIGNING FIELD-SYMBOL(&lt;name&gt;) WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names ASSIGNING &lt;name&gt; WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD p07_loop_where_no.
+
+ DATA lv_true TYPE i.
+ DATA lv_false TYPE i.
+
+ LOOP AT names TRANSPORTING NO FIELDS WHERE tf = abap_true.
+ ADD 1 TO lv_true.
+ ENDLOOP.
+ LOOP AT names TRANSPORTING NO FIELDS WHERE tf = abap_false.
+ ADD 1 TO lv_false.
+ ENDLOOP.
+
+* DATA(out) = cl_demo_output=&gt;new( ).
+* out-&gt;write( lv_true )-&gt;write( lv_false )-&gt;display( ).
+ ENDMETHOD.
+
+
+ENDCLASS.
+
+START-OF-SELECTION.
+
+
+ help=&gt;p01_reduce( ).
+ help=&gt;p02_filter( ).
+ help=&gt;p03_loop_case( ).
+ help=&gt;p04_loop_where( ).
+ help=&gt;p05_loop_case_fs( ).
+ help=&gt;p06_loop_where_fs( ).
+ help=&gt;p07_loop_where_no( ).</pre>
+<p>Der Beitrag <a href="/blog/abap-740-features-unter-der-lupe/">ABAP 740-Features unter der Lupe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/abap-740-features-unter-der-lupe/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

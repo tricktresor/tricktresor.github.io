@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Instandhaltung Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/module/instandhaltung/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 11 May 2017 09:24:10 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Instandhaltung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Grundsätzliches</title>
+		<link>/blog/grundsaetzliches-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Aug 2010 15:31:03 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Instandhaltung]]></category>
+		<category><![CDATA[Equipments]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[EQUI]]></category>
+		<category><![CDATA[IH]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=556</guid>
+
+					<description><![CDATA[<p>Grunds&#228;tzliches zu Equipments: Funktionsbausteine, Tabellen, Suchhilfen etc.</p>
+<p>Der Beitrag <a href="/blog/grundsaetzliches-2/">Grundsätzliches</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Grundsätzliches zu Equipments: Funktionsbausteine, Tabellen, Suchhilfen etc.</p>
+<h2 class="head1">Funktionsbausteine</h2>
+<h3 class="head2">EQUIPMENT_READ_VIEW</h3>
+<p class="text1">Lesen eines Equipments. Das Equi kann beim Lesen bereits gesperrt werden.</p>
+<h3 class="head2">EQUIPMENT_MODIFY</h3>
+<p class="text1">Ändern eines Equipments. Am besten vorher mit EQUIPMENT_READ_VIEW lesen.</p>
+<h3 class="head2">EQUIPMENT_LOCK / EQUIPMENT_UNLOCK</h3>
+<p class="text1">Sperren und Entsperren eines Equipments</p>
+<h3 class="head2">EQUIPMENT_TRANSMIT_DATA</h3>
+<p>Datenweitergabe an untergeordnete Equipments</p>
+<h2 class="head1">BAPIS</h2>
+<h3 class="head2">BAPI_EQUI_CHANGE</h3>
+<p class="text1">Equipment ändern.</p>
+<h3 class="head2">BAPI_EQUI_CREATE</h3>
+<p class="text1">Equipment anlegen.</p>
+<h3 class="head2">BAPI_EQUI_INSTALL</h3>
+<p class="text1">Equipment einem anderen Equipment unterordnen/ einbauen.</p>
+<h3 class="head2">BAPI_EQUI_DISMANTLE</h3>
+<p class="text1">Equipment ausbauen</p>
+<h3 class="head2">BAPI_OBJCL_GETCLASSES</h3>
+<p>Prüfen, ob ein Equipment klassifiziert ist</p>
+<pre class="lang:abap decode:true ">*** check if equipment is classified
+    CALL FUNCTION 'BAPI_OBJCL_GETCLASSES'
+      EXPORTING
+        objectkey_imp   = lv_objkey
+        objecttable_imp = 'EQUI'
+        classtype_imp   = '002'
+      TABLES
+        alloclist       = lt_alloc
+        return          = lt_return.</pre>
+<h3>EQUIPMENT_CLASS_ALLOCATE</h3>
+<p>Equipment klassifizieren</p>
+<pre class="lang:abap decode:true ">*** classify equipment
+      CALL FUNCTION 'EQUIPMENT_CLASS_ALLOCATE'
+        EXPORTING
+          read_sequi         = ' '
+          eq_class           = 'OBJECTINFO'
+          eq_class_type      = '002'
+          update_new         = 'X'
+          commit_new         = 'S'
+        CHANGING
+          s_equi             = v_equi
+        EXCEPTIONS
+          err_class_allocate = 1
+          OTHERS             = 2.</pre>
+<h2>Tabellen und Views</h2>
+<h3 class="head2">EQUI</h3>
+<p>Haupttabelle für die Equipments</p>
+<h3 class="head2">EQKT</h3>
+<p>Texttabelle</p>
+<h3 class="head2">EQUZ</h3>
+<p>Zeitabhängige Zusatzdaten</p>
+<h3 class="head2">ILOA</h3>
+<p>Standortdaten. Verknüpfung über EQUZ-ILOAN</p>
+<h3 class="head2">EQUI_ADDR</h3>
+<p>Adreßview für Sammelsuchhilfe EQUI über ADRC &#8211; ILOA &#8211; EQUZ &#8211; EQKT</p>
+<h3 class="head2">V_EQUI</h3>
+<p>Technische Objekte PM; View über EQUI &#8211; EQUZ &#8211; EQKT &#8211; ILOA</p>
+<h3 class="head2">EQST</h3>
+<p>Verbindungstabelle Equipment &#8211; Stückliste</p>
+<h3 class="head2">EQBS</h3>
+<p class="text1">Bestandssegment</p>
+<p>Der Beitrag <a href="/blog/grundsaetzliches-2/">Grundsätzliches</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Equipmentstückliste löschen</title>
+		<link>/blog/equipmentstueckliste-loeschen/</link>
+					<comments>/blog/equipmentstueckliste-loeschen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 09 Jul 2009 13:57:15 +0000</pubDate>
+				<category><![CDATA[Instandhaltung]]></category>
+		<category><![CDATA[IH]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=523</guid>
+
+					<description><![CDATA[<p>Das L&#246;schen einer Equipmentst&#252;ckliste erfolgt ebenfalls &#252;ber Standardbausteine. Der Trick hierbei ist, das die St&#252;ckliste zuerst gelesen werden muss, bevor die L&#246;schung vorgenommen werden kann.</p>
+<p>Der Beitrag <a href="/blog/equipmentstueckliste-loeschen/">Equipmentstückliste löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das L&ouml;schen einer Equipmentst&uuml;ckliste erfolgt ebenfalls &uuml;ber Standardbausteine. Der Trick hierbei ist, das die St&uuml;ckliste zuerst gelesen werden muss, bevor die L&ouml;schung vorgenommen werden kann.<br /><P class="sap1">DATA ls_bom_head&nbsp; TYPE bicsk.<BR>DATA ls_bom_zub&nbsp;&nbsp; TYPE stzub.<BR>DATA lt_bom_items TYPE STANDARD TABLE OF bicsp.<BR>DATA lv_flag&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE c.<BR><BR>PARAMETERS p_equnr TYPE equnr.<BR>PARAMETERS p_del AS CHECKBOX.<BR><BR>START-OF-SELECTION.<BR><BR><FONT color="#fb2412">*** Zuerst: Lesen der St&uuml;ckliste</FONT><BR>&nbsp; CALL FUNCTION &#8216;CS_CI_BOM_READ&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; estlan&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;4&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ewerks&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; estlty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;E&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; eequnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = p_equnr<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; abicsk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_bom_head<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; astzub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_bom_zub<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bom_items&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_bom_items<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alt_invalid&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alt_not_exist&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bom_invalid&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bom_not_exist&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; foreign_lock&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_auth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; system_failure = 7<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 8.<BR>&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp; MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.<BR>&nbsp; ELSE.<BR>&nbsp;&nbsp;&nbsp; IF p_del &lt;&gt; space.<BR><FONT color="#fb2412">*** L&ouml;schen der St&uuml;ckliste</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;CS_BT_BOM_DELETE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_stzub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_bom_zub<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flg_complete&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lv_flag.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF lv_flag IS NOT INITIAL.<BR><FONT color="#fb2412">*** Verbuchen<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;CS_DI_BOM_VB&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flg_commit_and_wait = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flg_no_commit_work&nbsp; = space.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp; ENDIF.<BR></P></p>
+<p>Der Beitrag <a href="/blog/equipmentstueckliste-loeschen/">Equipmentstückliste löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/equipmentstueckliste-loeschen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Equipmentstückliste lesen</title>
+		<link>/blog/equipmentstueckliste-lesen/</link>
+					<comments>/blog/equipmentstueckliste-lesen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 09 Jul 2009 13:38:13 +0000</pubDate>
+				<category><![CDATA[Instandhaltung]]></category>
+		<category><![CDATA[IH]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=522</guid>
+
+					<description><![CDATA[<p>Lesen einer Equipmentst&#252;ckliste mithilfe der SAP-Standardbausteine</p>
+<p>Der Beitrag <a href="/blog/equipmentstueckliste-lesen/">Equipmentstückliste lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Lesen einer Equipmentst&uuml;ckliste mithilfe der SAP-Standardbausteine<br /><P class="head1">Alternative 1</P><P class="sap1">DATA ls_bom_head&nbsp; TYPE bicsk.<BR>DATA ls_bom_zub&nbsp;&nbsp; TYPE stzub.<BR>DATA lt_bom_items TYPE STANDARD TABLE OF bicsp.<BR><BR>PARAMETERS p_equnr TYPE equnr.<BR><BR>START-OF-SELECTION.<BR><BR>*** Lesen der St&uuml;ckliste<BR>&nbsp; CALL FUNCTION &#8216;CS_CI_BOM_READ&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; estlan&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;4&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ewerks&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; estlty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;E&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; eequnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = p_equnr<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; abicsk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_bom_head<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; astzub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_bom_zub<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bom_items&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_bom_items<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alt_invalid&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alt_not_exist&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bom_invalid&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bom_not_exist&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; foreign_lock&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_auth&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; system_failure = 7<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 8.<BR>&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp; MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.<BR>&nbsp; ENDIF.<BR></P><P class="head1">Alternative 2</P><P class="sap1">&nbsp; DATA lt_stb TYPE STANDARD TABLE OF stpox.<BR>&nbsp; DATA lt_cat TYPE STANDARD TABLE OF cscmat.<BR><BR>&nbsp; CALL FUNCTION &#8216;CS_BOM_EXPL_EQU_V2&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; capid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = space<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; datuv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = sy-datum<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; eqnrv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = p_equnr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stlan&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;4&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; werks&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = space<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_stb<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; matcat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_cat<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alt_not_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_invalid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; equipment_not_found&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; missing_authorization = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_bom_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_plant_data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_suitable_bom_found = 7<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 8.<BR></P><P class="head1">Anmerkungen</P><P>Wenn es sich um <STRONG>keine </STRONG>Konzernst&uuml;ckliste handelt, muss nat&uuml;rlich das Werk angegeben werden.</P></p>
+<p>Der Beitrag <a href="/blog/equipmentstueckliste-lesen/">Equipmentstückliste lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/equipmentstueckliste-lesen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

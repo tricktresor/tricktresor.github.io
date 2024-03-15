@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>types Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/types/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 04 Dec 2018 13:01:08 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>types Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Fehlermeldung &#8220;Innerhalb von Strukturen sind keine generischen Typdefinitionen erlaubt&#8221;</title>
+		<link>/blog/fehlermeldung-innerhalb-von-strukturen-sind-keine-generischen-typdefinitionen-erlaubt/</link>
+					<comments>/blog/fehlermeldung-innerhalb-von-strukturen-sind-keine-generischen-typdefinitionen-erlaubt/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 24 Jun 2010 08:46:37 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[types]]></category>
+		<category><![CDATA[table]]></category>
+		<category><![CDATA[Syntaxfehler]]></category>
+		<category><![CDATA[Stolperfallen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=552</guid>
+
+					<description><![CDATA[<p>Folgende Fehlermeldung erscheint eventuell bei Typdeklarationen: Innerhalb von Strukturen sind keine generischen Typdefinitionen erlaubt.</p>
+<p>Der Beitrag <a href="/blog/fehlermeldung-innerhalb-von-strukturen-sind-keine-generischen-typdefinitionen-erlaubt/">Fehlermeldung &#8220;Innerhalb von Strukturen sind keine generischen Typdefinitionen erlaubt&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Folgende Fehlermeldung erscheint eventuell bei Typdeklarationen:</p>
+<blockquote><p>Innerhalb von Strukturen sind keine generischen Typdefinitionen erlaubt.</p></blockquote>
+<p>Folgende Typdeklaration ruft diesen Fehler hervor:</p>
+<pre class="sap1">TYPES: BEGIN OF ts_daten,
+         vbeln  TYPE vbeln,
+         auart  TYPE auart,
+<span>         t_vbap TYPE STANDARD TABLE OF vbap,
+</span>       END OF ts_daten.</pre>
+<h2>Häh? und nun?</h2>
+<p>Die Aussage ist klar: Die Deklaration TYPE STANDARD TABLE OF ist anscheinend eine <em>generische Datendeklaration</em>. Aber wie macht man daraus eine <em>spezielle</em>??</p>
+<p>In der <a href="https://help.sap.com/http.svc/rc/abapdocu_751_index_htm/7.51/de-DE/abenbuilt_in_types_generic.htm">Dokumentation</a> ist der folgende Satz zu finden:</p>
+<blockquote><p>Ein mit TYPES &#8211; TABLE OF oder im ABAP Dictionary definierter Tabellentyp ist generisch, wenn der primäre Tabellenschlüssel nicht oder unvollständig angegeben ist oder wenn der Tabellentyp generisch bezüglich sekundären Tabellenschlüssel ist.</p></blockquote>
+<h2>Lösung</h2>
+<p>Das bedeutet, dass der Schlüssel für die Tabelle durch den Zusatz WITH { DEFAULT | NON-UNIQUE | UNIQUE } KEY spezifiziert werden muss:</p>
+<pre class="sap1">t_vbap TYPE STANDARD TABLE OF vbap <strong>WITH DEFAULT KEY</strong>,</pre>
+<h2>Übrigens</h2>
+<p>Die Fehlermeldung erscheint nur bei der Typdefinition. Eine Datendeklaration kann exakt so, wie oben beschrieben, vorgenommen werden:</p>
+<pre>DATA: BEGIN OF ls_daten,
+         vbeln TYPE vbeln,
+         auart TYPE auart,
+         t_vbap TYPE STANDARD TABLE OF vbap,
+      END OF ls_daten.</pre>
+<p>Der Beitrag <a href="/blog/fehlermeldung-innerhalb-von-strukturen-sind-keine-generischen-typdefinitionen-erlaubt/">Fehlermeldung &#8220;Innerhalb von Strukturen sind keine generischen Typdefinitionen erlaubt&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/fehlermeldung-innerhalb-von-strukturen-sind-keine-generischen-typdefinitionen-erlaubt/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

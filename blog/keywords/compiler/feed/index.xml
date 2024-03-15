@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>compiler Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/compiler/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:50 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>compiler Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ABAP System Deep Dive</title>
+		<link>/blog/abap-system-deep-dive/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 26 Sep 2016 12:48:49 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[compiler]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=842809</guid>
+
+					<description><![CDATA[<p>Das SAP-System ist uralt und steckt voller Geheimnisse. Einige alte Artefakte sind immer noch vorhanden. Außerdem gibt es einige versteckte Kommandos. In diesem Artikel möchte ich dir einiges von dem geheimen Wissen vorstellen.</p>
+<p>Der Beitrag <a href="/blog/abap-system-deep-dive/">ABAP System Deep Dive</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das SAP-System ist uralt und steckt voller Geheimnisse. Einige alte Artefakte sind immer noch vorhanden. Außerdem gibt es einige versteckte Kommandos. In diesem Artikel möchte ich dir einiges von dem <em>geheimen Wissen</em> vorstellen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_12-39-10.jpg"><img fetchpriority="high" decoding="async" class="alignright wp-image-842812 size-full" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_12-39-10.jpg" alt="2016-09-26_12-39-10" width="414" height="203" srcset="/wp-content/uploads/2016/09/2016-09-26_12-39-10.jpg 414w, /wp-content/uploads/2016/09/2016-09-26_12-39-10-300x147.jpg 300w" sizes="(max-width: 414px) 100vw, 414px" /></a></p>
+<h2>1. R/2, R/3-Präprozessor</h2>
+<p>Es besteht die Möglichkeit, bestimmte Anweisungen nur auf R/2- bzw. R/3-Systemen auszuführen. Dies geht mithilfe des Präprozessor-Befehls #rx, wobei x für das entsprechende System steht.</p>
+<p>R/2-Systeme interpretieren die Zeichenfolge #r3 am Anfang der Zeile als Kommentar, während R/3-Systeme die Zeilen ignorieren, die mit #r2 anfangen. Dies wird z.B. im Pretty-Printer ausgenutzt.</p>
+<p>#r2 WRITE &#8216;Ich bin ein R/2-System&#8217;.<br />
+#r3 WRITE &#8216;Ich bin ein R/3-System&#8217;.</p>
+<h2>2. Operator IS %_SWITCHED_ON</h2>
+<p>Mit diesem versteckten Schlüsselwort kann man prüfen, ob ein bestimmter Switch im Switch Framework gesetzt ist. So kann man etwa ein Verhalten implementieren, das sich zwischen Industrie- und Retail-Systemen unterscheidet. Man kann den Operator u.A. in den Anweisungen CHECK oder IF verwenden.</p>
+<h2>3. Laufzeitmessung mit +REP/+ENDREP</h2>
+<p>Es besteht die Möglichkeit, eine Laufzeitmessung in ABAP durchzuführen. Dies funktioniert mit einer speziellen Schleife, der +REP/+ENDREP-Schleife. Die Anweisung hat noch einige Zusatzparameter, z.B. dass man nur zu einem bestimmten Befehl messen oder weitere interne Statisiken mit auslesen möchte. Das möchte ich hier nicht im einzelnen wiedergeben. Falls Sie Fragen hierzu haben, kann ich hierzu weitere Informationen liefern.</p>
+<pre>DATA ls_rep_results TYPE rep_s_results.
+
++REP 100 times.
+ "hier das Statement einfügen (z. B. Methodenaufruf)
+ +ENDREP RESULTS ls_rep_results.
+
+WRITE: (30) 'Brutto-Laufzeit', ls_rep_results-rtime,
+ /(30) 'Datenbankzeit', ls_rep_results-dbtime,
+ /(30) 'Anzahl der Datenbankaufrufe', ls_rep_results-dbcount,
+ /(30) 'Netzwerkzeit', ls_rep_results-ictime,
+ /(30) 'Anzahl der Netzwerkzugriffe', ls_rep_results-iccount.
+
+CLEAR ls_rep_results. "Clear nicht vergessen!!!</pre>
+<p>Scheinbar gibt es noch die Möglichkeit, die Performance von einzelnen ABAP-Opcodes (zu sehen im Debugger mit Rechtsklick ABAP-Bytecode) zu messen. Die Syntax ist:</p>
+<pre>  DATA lv_opcode TYPE char4.
+  DATA lv_flags  TYPE x.
+
+  lv_opcode = 'WRIB'.
+  lv_flags  = '01'.
+  BREAK-POINT.
+  +REP 1 TIMES UP TO lv_opcode lv_flags.
+  WRITE 'foo'.
+  +ENDREP RESULTS gs_rep_results.
+
+  lv_opcode = 'TIME'.
+  lv_flags  = '00'.
+  +REP 100 TIMES REPEATING lv_opcode lv_flags.
+  WRITE 'bar'.
+  GET TIME.
+  WRITE 'baz'.
+  +ENDREP RESULTS gs_rep_results.</pre>
+<p>Allerdings ist dies sehr technisch und vor allen Dingen undokumentiert und führt zu Fehlern wie CX_SY_REP_PARAMETER_ERROR und CX_SY_REP_INTERNAL_ERROR.</p>
+<p>Man kann außerdem</p>
+<pre>+REP 100 TIMES WITH KERNELINFO.</pre>
+<p>benutzen, dann stehen in den Feldern gs_rep_results-bboxinfo, gs_rep_results-kinfo und gs_rep_results-inlayinfo zudem weitere Infos.</p>
+<p>Es handelt sich offenbar um Informationen zu Kernel-Funktionen wie vMemcpyR (Kopieren von Speicherbereichen).</p>
+<h2>4. Globale Variable in Form-Routine oder Methode einer lokalen Klasse definieren</h2>
+<p>Es ist möglich, eine lokale Variable innerhalb einer Form-Routinen oder in der Methode einer lokalen Klasse als global zu definieren. Fragt nicht, wozu das sinnvoll ist, aber die Anweisungen DATA unterstützt den Zusatz %_NON-LOCAL, der die Variable global deklariert.</p>
+<h2>5. Internen Modus bei SUBMIT explizit angeben.</h2>
+<p>Man kann mit dem Zusatz %_INTERNAL_%_SUBMODE_% bei der Anweisung SUBMIT explizit angeben, in welchem internen Modus ein Programm ausgeführt werden soll. Hiermit kann Interprozesskommunikation implementieren. Die Anweisung wird z.B. im Systemprogramm RDSBRUNT (dient der Steuerung von Reports) verwendet.</p>
+<h2>6. ABAP-Assembler<a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_14-36-30.jpg"><img decoding="async" class="alignright wp-image-842998 size-full" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_14-36-30.jpg" alt="2016-09-26_14-36-30" width="486" height="486" srcset="/wp-content/uploads/2016/09/2016-09-26_14-36-30.jpg 486w, /wp-content/uploads/2016/09/2016-09-26_14-36-30-150x150.jpg 150w, /wp-content/uploads/2016/09/2016-09-26_14-36-30-300x300.jpg 300w" sizes="(max-width: 486px) 100vw, 486px" /></a></h2>
+<p>Sicherlich bist du schon einmal im Debugger oder in der ST22 über den ABAP-Bytecode gestolpert. Es besteht die Möglichkeit, Bytecodebefehle direkt in ABAP einzugeben. Die interne Anweisung RSYN ermöglicht es mit dem Zusatz &gt;SCONT beliebige Bytecode-Befehle auszuführen. Das erste Argument entspricht dem Namen des Bytecodebefehls, das zweite Argument ist der erste Parameter (binär) und das zweite Argument der zweite Parameter (dezimal).</p>
+<pre>RSYN &gt;SCONT time 0 0.</pre>
+<p>ist gleichbedeutend mit dem ABAP-Statement</p>
+<pre>GET TIME.</pre>
+<p>RSYN &gt;SCONT wird im Standard in der Komponente zum Aufruf von RFC-Calls verwendet, um Spezialformen der Anweisung SYSTEM-CALL FREE MODE aufzurufen. Welche weiteren Funktionalitäten das Schlüsselwort RSYN bietet, konnte ich noch nicht herausfinden.</p>
+<h2>7. zusätzliche Vergleichsoperatoren</h2>
+<p>Aufgrund eines Fehlers im Compiler wurden vor ABAP 7.40 beliebige Zeichen als Vergleichsoperatoren erkannt. Dies ist mittlerweile gefixt, aber aus Kompatibilitätsgründen wird der Operator I (der gleichbedeutend mit EQ ist) weiterhin unterstützt.</p>
+<p>Folgende Anweisung ist für den ABAP-Compiler eine gültige Syntax:</p>
+<pre>CHECK 1 i 1.</pre>
+<h2>8. Vorsicht!</h2>
+<p>All die hier erwähnten Befehle oder Zusätze sollten nie in einem produktiven SAP-System eingesetzt werden. Die Behandlung dieser Befehle dient nur dem besseren Verständnis des SAP-Systems und um beim nächsten SAP-Stammtisch ein bisschen angeben zu können.</p>
+<p>Keiner der hier vorgestellten Befehle ist dem Code Inspector auch nur ein Hinweis wert. Die Befehle könnten also weitestgehend unbemerkt eingesetzt werden.</p>
+<p>Der Befehl CHECK 1 i 1 bringt die erweiterte Programmprüfung &#8211; die auch im Code Inspector aufgerufen wird &#8211; dazu, mit einem Kurzdump abzustürzen.</p>
+<h2>9. Beispielcode</h2>
+<p>Ein paar der oben genannten Beispiele sind in folgendem Listing untergebracht:</p>
+<pre>REPORT.
+
+IF ea-glt IS %_SWITCHED_ON.
+ RSYN &gt;SCONT time 0 0. "GET TIME
+ WRITE: / 'Global Trade Management aktiv'.
+ENDIF.
+
+IF 1 I 1. "=&gt; Makes Code Inspector dump
+#r3 PERFORM run.
+ PERFORM out.
+ENDIF.
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form run!
+*&amp;---------------------------------------------------------------------*
+FORM run.
+
+DATA ls_rep_results TYPE rep_s_results %_NON-LOCAL. "=&gt;GLOBALISIEREN
+
+ +REP 10 TIMES.
+ WRITE: / sy-uzeit.
+ SELECT COUNT( * ) FROM t001.
+ +ENDREP RESULTS ls_rep_results.
+
+ENDFORM. "run!
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form out
+*&amp;---------------------------------------------------------------------*
+FORM out.
+
+  WRITE: (30) 'Brutto-Laufzeit', ls_rep_results-rtime EXPONENT 0 DECIMALS 0,
+        /(30) 'Datenbankzeit', ls_rep_results-dbtime EXPONENT 0 DECIMALS 0,
+        /(30) 'Anzahl der Datenbankaufrufe', ls_rep_results-dbcount EXPONENT 0 DECIMALS 0,
+        /(30) 'Netzwerkzeit', ls_rep_results-ictime EXPONENT 0 DECIMALS 0,
+        /(30) 'Anzahl der Netzwerkzugriffe', ls_rep_results-iccount EXPONENT 0 DECIMALS 0.
+
+ENDFORM. "out</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/abap-system-deep-dive/">ABAP System Deep Dive</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

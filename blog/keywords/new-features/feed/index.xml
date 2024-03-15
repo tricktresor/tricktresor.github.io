@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>new features Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/new-features/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:48 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>new features Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>REDUCE ABAP750 FOR x = u IN n = 1 THEN brainf*ck</title>
+		<link>/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/</link>
+					<comments>/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 28 Feb 2017 16:18:53 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[abap740]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[new features]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017909</guid>
+
+					<description><![CDATA[<p>Hoijoijoi. Ich gebe zu, ich tue mich echt schwer mit den neuen Befehlen im ABAP-Sprachschatz. Besonders die ganz neuen Features im ABAP Release 7.50 (oder 7.40 &#8211; ich blick da nicht mehr durch) fordern mich ziemlich (REDUCE, COND, FILTER etc). Angeregt durch den Artikel von Jerry Wang im neuen SCN über REDUCE habe ich mich mit dem Befehl-REDUCE näher beschäftigt. Über die ABAP-Doku bin ich dann auf die Demoprogramme DEMO_REDUCE* gestolpert und beim DEMO_REDUCE_SIMPLE hängen geblieben....</p>
+<p>Der Beitrag <a href="/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/">REDUCE ABAP750 FOR x = u IN n = 1 THEN brainf*ck</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hoijoijoi. Ich gebe zu, ich tue mich echt schwer mit den neuen Befehlen im ABAP-Sprachschatz. Besonders die ganz neuen Features im ABAP Release 7.50 (oder 7.40 &#8211; ich blick da nicht mehr durch) fordern mich ziemlich (REDUCE, COND, FILTER etc).</p>
+<p>Angeregt durch den Artikel von <a href="https://blogs.sap.com/2017/02/27/functional-programming-try-reduce-in-javascript-and-in-abap/comment-page-1/#comment-365125">Jerry Wang im neuen SCN über REDUCE</a> habe ich mich mit dem Befehl-REDUCE näher beschäftigt. Über die ABAP-Doku bin ich dann auf die Demoprogramme DEMO_REDUCE* gestolpert und beim DEMO_REDUCE_SIMPLE hängen geblieben.</p>
+<p>Das Programm ermittelt mit Hilfe des REDUCE-Befehls die Summe von Werten in einer Tabelle. Das Programm DEMO_REDUCE_COND_ITERATION erzeugt mit Hilfe einer FOR-Schleife zusammengesetzte Texte (1 2 3 4 usw).</p>
+<p>Ich wollte dann ein bisserl mit den Features herumspielen und hatte die Idee, einen HTML-Text zusammen zusetzen.</p>
+<p>Aus der Tabelle</p>
+<p>&lt;HTML&gt;<br />
+&lt;BODY&gt;<br />
+&lt;P&gt;</p>
+<p>wollte ich die einzelnen Elemente plus einem separaten Text zu einem String zusammenfügen. Das funktionierte auch noch sehr einfach:</p>
+<pre>DATA(text) = REDUCE string(
+               INIT html = ``
+                FOR command IN html_commands 
+                NEXT html = |{ html }{ command }| ) 
+            &amp;&amp; 'Hallo Welt'.</span></pre>
+<p>Eigentlich nur zum Spaß habe ich versucht, ob ich mit einem erneuten &amp;&amp; auch ein erneutes REDUCE benutzen kann. Obwohl ich einigermaßen überrascht war, dass es anstandslos funktionierte, wäre ich auch maßlos enttäuscht gewesen, wenn es nicht geklappt hätte&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Der nächste Schritt war dann etwas komplizierter: Ich wollte die einzelnen Tags auch wieder schließen. Natürlich in umgekehrter Reihenfolge. Und mit dem SLASH, der ein Ende-Tag anzeigt. Hier brauchte es dann etliche Versuche und verwirrte Blicke in die Doku um zu dem folgenden Ergebnis zu gelangen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-28_16-53-39.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017910 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/02/2017-02-28_16-53-39.jpg" alt="" width="450" height="185" srcset="/wp-content/uploads/2017/02/2017-02-28_16-53-39.jpg 450w, /wp-content/uploads/2017/02/2017-02-28_16-53-39-300x123.jpg 300w" sizes="(max-width: 450px) 100vw, 450px" /></a></p>
+<p>Und hier der Quelltext dazu:</p>
+<pre class="">REPORT zdemo_reduce_simple.
+
+CLASS demo DEFINITION.
+  PUBLIC SECTION.
+  CLASS-METHODS main.
+ENDCLASS.
+
+CLASS demo IMPLEMENTATION.
+  METHOD main.
+
+  DATA(html_commands) = VALUE string_table(
+                              ( `&lt;html&gt;` )
+                              ( `&lt;body&gt;` )
+                              ( `&lt;p&gt;` ) ).
+  cl_demo_output=&gt;write( html_commands ).
+
+
+  DATA(text) = REDUCE string(
+                INIT html = ``
+                 FOR command IN html_commands NEXT html = |{ html }{ command }| )
+             &amp;&amp; 'Hallo Welt'
+             &amp;&amp; REDUCE string( INIT html = ``
+                FOR n = lines( html_commands )
+                THEN n - 1
+                WHILE n &gt; 0
+                 NEXT html = html &amp;&amp; COND #( LET command = html_commands[ n ]
+                                              IN WHEN command IS NOT INITIAL
+                                                 THEN command(1) &amp;&amp; '/' &amp;&amp; command+1 ) ).
+
+   cl_demo_output=&gt;write( text ).
+   cl_demo_output=&gt;display( ).
+ ENDMETHOD.
+
+ENDCLASS.
+
+START-OF-SELECTION.
+ demo=&gt;main( ).</pre>
+<p>Ich lasse es einfach so unkommentiert stehen. Wenn man weiß, was der Ausdruck macht, ist es einigermaßen klar.</p>
+<p>Hier der Beitrag von Horst Keller zum Thema ABAP-740 Features: <a href="https://blogs.sap.com/2014/09/30/abap-news-for-740-sp08-iteration-expressions/">https://blogs.sap.com/2014/09/30/abap-news-for-740-sp08-iteration-expressions/</a></p>
+<h2>Table Expressions</h2>
+<p>Sehr gewöhnungsbedürftig für mich ist der Zusatz um die einzelne Tabellenzeile (die Tabelle hat ja keine Struktur) anzusprechen:</p>
+<pre class="">COND #( LET command = html_commands[ n ]
+         IN WHEN command IS NOT INITIAL
+            THEN command(1) &amp;&amp; '/' &amp;&amp; command+1 )</pre>
+<p>Mein erster Ansatz war Folgendes (was aber nicht funktionierte):</p>
+<pre class="">html_commands[ n ]-TABLE_LINE</pre>
+<p>Also bin ich zum COND-Ausdruck gekommen. Hier finde ich verwirrend, dass anscheinend zwingend eine WHEN-Klausel angegeben werden muss. Vielleicht gibt es auch eine einfachere Alternative?! Bestimmt. Lasst es mich gerne wissen.</p>
+<p>Link zur Horst Kellers Blog: <a href="https://blogs.sap.com/2013/05/29/abap-news-for-release-740-table-expressions/">https://blogs.sap.com/2013/05/29/abap-news-for-release-740-table-expressions/</a></p>
+<p>&nbsp;</p>
+<p>Ein komisches Gefühl, auf ein mal wieder Anfänger zu sein&#8230;</p>
+<p>Der guten alten Zeiten Willen noch mal das Coding mit ABAPvor740. Viel Länger ist es auch nicht. Und ob die Programmierung mit ABAP740 eleganter oder besser ist, wage ich zu bezweifeln.</p>
+<pre class="">DATA text TYPE string.
+LOOP AT html_commands INTO DATA(command).
+  text = text &amp;&amp; command.
+ENDLOOP.
+text = text &amp;&amp; 'Hallo Welt'.
+
+DATA line TYPE i.
+line = lines( html_commands ).
+DO lines( html_commands ) TIMES.
+  DATA(cmd) = html_commands[ line ].
+  text = text &amp;&amp; cmd(1) &amp;&amp; '/' &amp;&amp; cmd+1.
+  SUBTRACT 1 FROM line.
+ENDDO.</pre>
+<p>Der Beitrag <a href="/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/">REDUCE ABAP750 FOR x = u IN n = 1 THEN brainf*ck</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/reduce-abap750-for-x-u-in-n-1-then-brainfck/feed/</wfw:commentRss>
+			<slash:comments>5</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

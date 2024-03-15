@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Berechtigungsobjekt Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/berechtigungsobjekt/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:56 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Berechtigungsobjekt Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Berechtigungen inklusive erlaubter Aktivitäten</title>
+		<link>/blog/berichtigungen-inklusive-erlaubter-aktivitaeten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 13 Aug 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Berechtigungsobjekt]]></category>
+		<category><![CDATA[Aktivität]]></category>
+		<category><![CDATA[ACTVT]]></category>
+		<category><![CDATA[Berechtigung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=192400</guid>
+
+					<description><![CDATA[<p>Ich habe keinen Report gefunden, der mir zu den Berechtigungsobjekten anzeigt, welche Aktivitäten erlaubt sind. Kurzerhand habe ich diesen natürlich schnell selbst geschrieben. Der Report kann zur Dokumentation eigener Objekte oder als Information zu Standardobjekten dienen.</p>
+<p>Der Beitrag <a href="/blog/berichtigungen-inklusive-erlaubter-aktivitaeten/">Berechtigungen inklusive erlaubter Aktivitäten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich habe keinen Report gefunden, der mir zu den Berechtigungsobjekten anzeigt, welche Aktivitäten erlaubt sind. Kurzerhand habe ich diesen natürlich schnell selbst geschrieben.</p>
+<p>Der Report kann zur Dokumentation eigener Objekte oder als Information zu Standardobjekten dienen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-11_17-02-48.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-192469" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-11_17-02-48.jpg" alt="2015-08-11_17-02-48" width="516" height="384" srcset="/wp-content/uploads/2015/08/2015-08-11_17-02-48.jpg 516w, /wp-content/uploads/2015/08/2015-08-11_17-02-48-300x223.jpg 300w" sizes="(max-width: 516px) 100vw, 516px" /></a></p>
+<p>Viel Spaß. Soweit das mit Berechtigungen möglich ist&#8230;</p>
+<h2>Code</h2>
+<pre>REPORT z_disp_auth_activity.
+*== Daten
+DATA gt_tobj  TYPE STANDARD TABLE OF tobj.
+DATA gs_tobj  TYPE tobj.
+
+DATA gt_actz  TYPE STANDARD TABLE OF tactz.
+DATA gs_actz  TYPE tactz.
+
+DATA gv_ltext TYPE text30.
+DATA gv_ttext TYPE xutext.
+DATA gv_stext TYPE scrtext_l.
+
+FIELD-SYMBOLS &lt;feld&gt; TYPE any.
+
+*== Selektionsbild
+PARAMETERS p_oclss TYPE xuobjclass DEFAULT 'MDG'.
+
+START-OF-SELECTION.
+
+*== Berechtigungsobjekte lesen
+ SELECT * FROM tobj INTO TABLE gt_tobj WHERE oclss = p_oclss.
+ CHECK sy-subrc = 0.
+
+*== Aktivitäten zu den Berechtigungsobjekten
+ SELECT * FROM tactz INTO TABLE gt_actz FOR ALL ENTRIES IN gt_tobj WHERE brobj = gt_tobj-objct.
+
+ LOOP AT gt_tobj INTO gs_tobj.
+*== Berechtigungsobjekt + Text
+   FORMAT COLOR COL_GROUP.
+   WRITE: / gs_tobj-objct.
+   SELECT SINGLE ttext FROM tobjt INTO gv_ttext WHERE langu = sy-langu AND object = gs_tobj-objct.
+   IF sy-subrc = 0.
+     WRITE gv_ttext.
+   ENDIF.
+   WRITE AT sy-linsz space.
+   FORMAT COLOR OFF.
+
+ DO.
+*== Berechtigungsfelder
+   ASSIGN gs_tobj-objct INCREMENT sy-index TO &lt;feld&gt; RANGE gs_tobj.
+   IF sy-subrc &gt; 0 OR &lt;feld&gt; IS INITIAL.
+     EXIT.
+   ELSE.
+     WRITE: /3 &lt;feld&gt;.
+*== Text zum Berechtigungsfeld
+     SELECT SINGLE dd04t~scrtext_l
+       FROM dd04t
+      INNER JOIN authx ON authx~rollname = dd04t~rollname
+       INTO gv_stext
+      WHERE dd04t~ddlanguage = sy-langu
+        AND authx~fieldname = &lt;feld&gt;
+        AND dd04t~as4local = 'A'
+        AND as4vers = space.
+     IF sy-subrc = 0.
+       WRITE gv_stext.
+     ENDIF.
+   ENDIF.
+ ENDDO.
+
+*== Aktivitäten zum Berechtigungsobjekt
+   LOOP AT gt_actz INTO gs_actz WHERE brobj = gs_tobj-objct.
+     WRITE: /6 gs_actz-actvt.
+     SELECT SINGLE ltext FROM tactt INTO gv_ltext WHERE spras = sy-langu AND actvt = gs_actz-actvt.
+     IF sy-subrc = 0.
+       WRITE gv_ltext.
+     ENDIF.
+   ENDLOOP.
+   SKIP 1.
+ ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/berichtigungen-inklusive-erlaubter-aktivitaeten/">Berechtigungen inklusive erlaubter Aktivitäten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,766 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Word &amp; Excel Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/word-excel/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 21 Jan 2019 15:31:41 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Word &amp; Excel Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>TXT-öffnen und als XLSX speichern</title>
+		<link>/blog/txt-oeffnen-und-als-xlsx-speichern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 08 Jul 2011 14:26:00 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=602</guid>
+
+					<description><![CDATA[<p>Hauptbestandteil dieses Demoprogramms ist die Methode "OpenText" mit der Text-Dateien eingelesen werden k&#246;nnen, deren Felder durch Trennzeichen voneinader getrennt sind.</p>
+<p>Der Beitrag <a href="/blog/txt-oeffnen-und-als-xlsx-speichern/">TXT-öffnen und als XLSX speichern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hauptbestandteil dieses Demoprogramms ist die Methode &#8220;OpenText&#8221; mit der Text-Dateien eingelesen werden können, deren Felder durch Trennzeichen voneinader getrennt sind.</p>
+<p>Dieser Report öffnet die Textdatei und speichert sie als XLSX-Datei wieder ab.</p>
+<p>Es werden folgende Trennzeichen berücksichtigt:</p>
+<ul>
+<li>Tabulator</li>
+<li>Semikolon</li>
+<li>Komma</li>
+<li>Doppelpunkt</li>
+</ul>
+<p>Sollte die zu erzeugende Datei bereits vorhanden sein, so wird sie ohne Nachfrage überschrieben. Soll der Anwender gefragt werden, ob die Datei überschrieben werden soll oder nicht, so muss</p>
+<p class="sap1">SET PROPERTY OF excel &#8216;DisplayAlerts&#8217; = 1</p>
+<p>gesetzt oder ganz weg gelassen werden (DisplayAlerts = 1 ist der Default).</p>
+<h2 class="head1">Code</h2>
+<pre>REPORT zz_open_text_and_save_xlsx.
+TYPE-POOLS ole2.
+*== screen
+PARAMETERS p_file TYPE string DEFAULT 'D:text.txt'.
+PARAMETERS p_saveas TYPE string DEFAULT 'D:text2'.
+START-OF-SELECTION.
+*== data
+ DATA: excel TYPE ole2_object,
+       workbook TYPE ole2_object,
+       active_window TYPE ole2_object,
+       sheet TYPE ole2_object.
+*== create excel application
+ CREATE OBJECT excel 'EXCEL.APPLICATION'.
+*== do not display excel
+ SET PROPERTY OF excel 'Visible' = 0.
+*== get workbook
+ CALL METHOD OF excel 'Workbooks' = workbook.
+*== open file as text to convert
+ CALL METHOD OF workbook 'OPENTEXT'
+      EXPORTING
+         #1 = p_file "file to open
+         #2 = 2 "origin
+         #3 = 2 "start row
+         #4 = 1 "data
+         #5 = 1 "text qualifier
+         #6 = 0 "consecutive delimiter
+         #7 = 1 "Separator: tab
+         #8 = 1 "Separator: semicolon
+         #9 = 1 "Separator: comma
+         #10 = 0 "Separator: space
+         #11 = 1 "Separator: other
+         #12 = ':'. "Separator: specify other char
+*== get active sheet.
+ GET PROPERTY OF excel 'ActiveSheet' = sheet.
+
+*== overwrite existing file w/o prompting
+ SET PROPERTY OF excel 'DisplayAlerts' = 0.
+
+*== save as XLSX
+ CALL METHOD OF sheet 'SAVEAS'
+      EXPORTING
+         #1 = p_saveas
+         #2 = 51.
+
+*== get active window
+ CALL METHOD OF excel 'ACTIVEWINDOW' = active_window.
+*== set active_window visible
+ SET PROPERTY OF active_window 'VISIBLE' = 1.
+*== close active_window without saving
+ CALL METHOD OF active_window 'CLOSE'
+      EXPORTING #1 = 0.
+*== close workbook
+ CALL METHOD OF workbook 'CLOSE'.
+*== close excel application
+ CALL METHOD OF excel 'QUIT'.
+*== free all used objects
+ FREE OBJECT sheet.
+ FREE OBJECT workbook.
+ FREE OBJECT excel.
+ FREE OBJECT active_window.</pre>
+<p>Der Beitrag <a href="/blog/txt-oeffnen-und-als-xlsx-speichern/">TXT-öffnen und als XLSX speichern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Kleinigkeiten</title>
+		<link>/blog/kleinigkeiten-6/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 26 Jul 2010 10:54:27 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=554</guid>
+
+					<description><![CDATA[<p>Hier sammeln wir kleine Infos, Hinweise auf Dokumentationen oder einzelen Programme oder Funktionsbausteine.</p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-6/">Kleinigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier sammeln wir kleine Infos, Hinweise auf Dokumentationen oder einzelnen Programme oder Funktionsbausteine.</p>
+<h1 class="head1">Funktionsbausteine</h1>
+<h2 class="head1">MS_WORD_OLE_FORMLETTER</h2>
+<p>Mit diesem Funktionsbaustein ist es möglich Serienbriefe zu erstellen. Der Baustein ist gut dokumentiert.</p>
+<h2 class="head1">TEXT_CONVERT_XLS_TO_SAP</h2>
+<p>Liefert die Zellen einer Excel-Tabelle zurück. Hier ein kleines Demo-Programm:</p>
+<p><a href="http://www.sapdev.co.uk/file/file_upexcel.htm" target="_blank">http://www.sapdev.co.uk/file/file_upexcel.htm</a></p>
+<p>Der Beitrag <a href="/blog/kleinigkeiten-6/">Kleinigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Werte per RFC importieren</title>
+		<link>/blog/werte-per-rfc-importieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 17 Aug 2009 14:26:15 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=526</guid>
+
+					<description><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie mithilfe eines Excel-Makros auf ein R/3-System zugreifen und das Ergebnis in Excel speichern k&#246;nnen. Der Zugriff erfolgt durch einen "Remote Function Call". Verwendete Funktionsbausteine m&#252;ssen RFC-f&#228;hig sein.</p>
+<p>Der Beitrag <a href="/blog/werte-per-rfc-importieren/">Werte per RFC importieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie mithilfe eines Excel-Makros auf ein R/3-System zugreifen und das Ergebnis in Excel speichern k&ouml;nnen. Der Zugriff erfolgt durch einen &#8220;Remote Function Call&#8221;. Verwendete Funktionsbausteine m&uuml;ssen RFC-f&auml;hig sein.<br /><P>Legen Sie folgende Makros an und f&uuml;hren Sie das Makro &#8220;Start&#8221; aus. Die Tabelle T001 &#8220;Buchungskreise&#8221; wird dann aus dem angegebenen System gelesen und in Excel ausgegeben.</P><P>In diesem Fall wird der Funktionsbaustein RFC_READ_TABLE verwendet, um eine Datenbanktabelle auszulesen.</P><P>In den Kommentaren stehen noch hilfreiche Hinweise.</P><P><A href="/wp-content/downloads/OCX/OCXHE03E.PDF" target="_blank" Target="_blank">SAP-Doku &#8220;Using OCX Controls &#8211; Chapter 2&#8221;</A></P><P><A href="/wp-content/downloads/OCX/EXCEL_RFC.zip" target="_blank" Target="_blank">Hier gibt es die Excel-Datei (Format &#8220;XLSM&#8221;).</A></P><P><STRONG>Danke an tron! <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></STRONG></P><P class="sap1"><FONT color="#fb2412">&#8216;***********************************<BR>&#8216; Allgemeine SAP Objekte<BR>&#8216;***********************************<BR></FONT>Public oConSMD As Object<BR>Public FuncSMD As Object<BR>Public oLogSMD As Object<BR>Public SMDFunctions As Object<BR><FONT color="#fb2412">&#8216;***********************************<BR>&#8216; Objekte f&uuml;r RFC_READ_TABLE<BR>&#8216;***********************************<BR></FONT>Public SMDFunc As Object<BR>Public SMDTabObj As Object<BR>Public LOGSSMD As Integer<BR>Public SMDdata() As String</P><P class="sap1">Public Sub Logon()<BR><BR><FONT color="#fb2412">Rem *** Create the Logon Control<BR></FONT>Set oLogSMD = CreateObject(&#8220;SAP.Logoncontrol.1&#8221;)<BR><FONT color="#fb2412">Rem *** Get a connection object</FONT><BR>Set oConSMD = oLogSMD.NewConnection<BR><FONT color="#fb2412">Rem *** Either all parameters are set by the design environment <BR>Rem *** (except the password) or they are hardcoded,as in the following <BR>Rem *** lines. The following lines depend on your R/3 environment<BR>Rem *** These are the system parameters</FONT><BR>oConSMD.System = &#8220;DEV&#8221; &#8216;Name of your R/3 System<BR>oConSMD.ApplicationServer = &#8220;sldevt10&#8221; &#8216;ApplicationServer of your R/3 System<BR>oConSMD.SystemNumber = 0 &#8216;SystemNumber of your R/3 System<BR><FONT color="#fb2412">Rem ***User specific data<BR></FONT>oConSMD.User = &#8220;TRICKTRESOR&#8221;<BR>oConSMD.Password = &#8220;Trick17&#8221;<BR>oConSMD.Client = &#8220;100&#8221;<BR>oConSMD.Language = &#8220;DE&#8221;<BR><FONT color="#fb2412"><BR>Rem ***Try to connect to the R/3 System<BR></FONT>If oConSMD.Logon(0, True) = False Then<BR>&nbsp;&nbsp;&nbsp; MsgBox &#8220;R/3 connection failed&#8221;<BR>&nbsp;LOGSSMD = 0<BR>Exit Sub<BR>End If<BR><BR>LOGSSMD = 1<BR>Set SMDFunctions = CreateObject(&#8220;SAP.Functions&#8221;)<BR><FONT color="#fb2412">&#8216;Log on to the R/3 System.<BR></FONT>Set SMDFunctions.Connection = oConSMD<BR>Set SMDFunc = SMDFunctions.Add(&#8220;RFC_READ_TABLE&#8221;)<BR><BR>End Sub</P><P class="sap1">Public Sub LogoffSMD()<BR><BR>&nbsp; If LOGSSMD = 1 Then oConSMD. Logoff<BR><BR>End Sub</P><P class="sap1"><BR>Sub SMDRead_Table(Table As String)<BR><BR>Dim T() As String<BR>Dim i As Long<BR>Dim k As Long<BR><BR>SMDFunc.Exports(&#8220;DELIMITER&#8221;) = vbTab<BR><FONT color="#fb2412">&#8216;SMDFunc.Exports(&#8220;NO_DATA&#8221;) = &#8220;X&#8221;<BR></FONT>SMDFunc.Exports(&#8220;QUERY_TABLE&#8221;) = Table<BR><FONT color="#fb2412">&#8216;SMDFunc.Exports(&#8220;ROWCOUNT&#8221;) = &#8220;500&#8221;</FONT><BR><FONT color="#fb2412"><BR>&#8216;******** Create Table Object ************<BR></FONT>Set SMDTabObj = SMDFunc.Tables(&#8220;FIELDS&#8221;)<BR>SMDTabObj.freetable<BR><FONT color="#fb2412"><BR>&#8216;SMDTabObj.appendrow<BR>&#8216;SMDTabObj.appendrow<BR>&#8216;SMDTabObj.cell(1, 1) = &#8220;CHECKTABLE&#8221;<BR>&#8216;SMDTabObj.cell(2, 1) = &#8220;KEYFLAG&#8221;<BR><BR></FONT><FONT color="#fb2412">&#8216;******** Create Table Object ************<BR></FONT>Set SMDTabObj = SMDFunc.Tables(&#8220;OPTIONS&#8221;)<BR>SMDTabObj.freetable<BR><FONT color="#fb2412">&#8216;SMDTabObj.appendrow<BR>&#8216;SMDTabObj.cell(1, 1) = &#8220;TABNAME EQ &#8216;&#8221; &amp; Tab_Nam &amp; &#8220;&#8216; AND LENG NE 0&#8221;<BR></FONT><FONT color="#fb2412"><BR>&#8216;******** Create Table Object ************<BR></FONT>Set SMDTabObj = SMDFunc.Tables(&#8220;DATA&#8221;)<BR><FONT color="#fb2412"><BR>&#8216;******** CLear Table ************<BR></FONT>SMDTabObj.freetable<BR><BR>If SMDFunc.Call = True Then<BR><FONT color="#fb2412">&#8216;******** Read Result ************<BR></FONT>T = Split(SMDTabObj.cell(1, 1), vbTab)<BR><BR>ReDim SMDdata(SMDTabObj.Rows.Count, UBound(T))<BR><BR>k = 0<BR>For Each element In SMDTabObj.Rows<BR>&nbsp;&nbsp;&nbsp; T = Split(element(&#8220;WA&#8221;), vbTab)<BR>&nbsp;&nbsp;&nbsp; For i = 0 To UBound(T)<BR>&nbsp;&nbsp;&nbsp;&nbsp; SMDdata(k, UBound(T) &#8211; i) = T(i)<BR>&nbsp;&nbsp;&nbsp; Next i<BR>&nbsp;&nbsp;&nbsp; k = k + 1<BR>Next element<BR><BR>Else<BR>&nbsp;&nbsp;&nbsp; MsgBox SMDFunc.Exception<BR>End If<BR><BR><FONT color="#fb2412">&#8216;*** ohne Mandant<BR></FONT>ReDim Preserve SMDdata(SMDTabObj.Rows.Count, UBound(T) &#8211; 1)<BR><BR>End Sub</P><P class="sap1">Sub Start()<BR><BR>Dim i As Long<BR>Dim k As Long<BR><BR>Sheets(1).Select<BR><BR>Logon<BR><BR>SMDRead_Table (&#8220;T001&#8221;)<BR><BR>For i = 0 To UBound(SMDdata, 1)<BR>&nbsp;&nbsp;&nbsp; For k = 0 To UBound(SMDdata, 2)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cells(i + 1, UBound(SMDdata, 2) &#8211; k + 1).Value = SMDdata(i, k)<BR>Next k, i<BR><BR>LogoffSMD<BR><BR>End Sub</P><P class="head1">Verbesserungsvorschl&auml;ge</P><P>1.)&nbsp; Die Methoden Logon und LogoffSMD auf von &#8220;Public&#8221; auf &#8220;Private&#8221; setzen &#8211; dann tauchen Sie nicht in der Makroliste auf <BR>&nbsp;<BR>2.)&nbsp; Die Kennworteingabe ist ja immer problematisch.&nbsp; Ersetzen Sie die die folgende Zeile</P><P>If oConSMD.Logon(0, <FONT color="#fb2412">True</FONT>) = False Then</P><P>durch</P><P>If oConSMD.Logon(0, <FONT color="#fb2412">False</FONT>) = False Then</P><P>Dann kommt ein Popup angeh&uuml;pft, in welchem man die Logondaten&nbsp; (User, Kennwort, System, Mandant, &#8230; &#8211; alles vorbelegbar aus dem VBA heraus) eingeben kann. <BR>&nbsp;<BR>3.)&nbsp; Wenn der Logon fehlschl&auml;gt wird zwar eine MsgBox gesendet &#8211; aber es wird trotzdem versucht die Daten zu lesen und dabei kommte es dann zu einem Dump.&nbsp; Es sollte noch getestet werden ob das Objekt &uuml;berhaupt angelegt werden konnte.</P></p>
+<p>Der Beitrag <a href="/blog/werte-per-rfc-importieren/">Werte per RFC importieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Werte per Excel eingeben</title>
+		<link>/blog/werte-per-excel-eingeben/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 25 May 2005 11:41:29 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=332</guid>
+
+					<description><![CDATA[<p>Das hier vorgestellte Programm startet Excel und &#252;bergibt Werte. Diese Werte k&#246;nnen in Excel bearbeitet werden. Danach werden die Daten ausgelesen und Excel wird &#252;ber eine Funktion im R/3 beendet.</p>
+<p>Der Beitrag <a href="/blog/werte-per-excel-eingeben/">Werte per Excel eingeben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das hier vorgestellte Programm startet Excel und &uuml;bergibt Werte. Diese Werte k&ouml;nnen in Excel bearbeitet werden. Danach werden die Daten ausgelesen und Excel wird &uuml;ber eine Funktion im R/3 beendet.<br /><P>Mit dem folgenden Programm ist es m&ouml;glich, Excel zu starten, Daten zu &uuml;bergeben und zu &auml;ndern.</P><P>Das Arbeitsblatt wird gesch&uuml;tzt, so dass nur die zu &auml;ndernden Daten ge&auml;ndert werden k&ouml;nnen. </P><P>Diese Daten werden dann durch das Programm wieder eingelesen und Excel wird beendet.</P><P class="head1">Quelltext</P><P class="sap1">REPORT ZZ_EXCEL_DEMO.</P><P class="sap1"><FONT color="#fb2412">*******************************************************************<BR>***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<BR>***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;</FONT><FONT color="#fb2412">https://tricktresor.com/</FONT><FONT color="#fb2412">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<BR>***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<BR>*******************************************************************</FONT></P><P class="sap1"><FONT color="#fb2412">*** OLE-Definitionen</FONT><BR>INCLUDE OLE2INCL.</P><P class="sap1"><FONT color="#fb2412">*** Variablen</FONT><BR>DATA: O_EXCEL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE OLE2_OBJECT,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; Excel.Application<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O_MAPL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE OLE2_OBJECT,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; list of workbooks<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O_WORKBOOK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE OLE2_OBJECT,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; Workbook<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O_MAP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE OLE2_OBJECT,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; Mappe</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O_ACTIVE_WINDOW TYPE OLE2_OBJECT,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; Active Window<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O_ACTIVE_SHEET&nbsp; TYPE OLE2_OBJECT,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; Active Sheet<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O_CELL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE OLE2_OBJECT,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; Cell<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V_ZAHL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE P DECIMALS 2,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; Number<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V_VALUE(30)&nbsp;&nbsp;&nbsp;&nbsp; TYPE C.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; Cell Value</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*** Objekt &#8220;Excel&#8221; erzeugen</FONT><BR>&nbsp; CREATE OBJECT O_EXCEL &#8216;EXCEL.APPLICATION&#8217;.<BR>&nbsp; IF sy-subrc NE 0.<BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Fehler Excel Create!&#8217;.<BR>&nbsp;&nbsp;&nbsp; STOP.<BR>&nbsp; ELSE.</P><P class="sap1"><FONT color="#fb2412">*** Information</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;|&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;|&#8217;.<BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;| FERTIG: Werte einlesen |&#8217; HOTSPOT ON.<BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;|&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;|&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Sichtbarkeit setzen</FONT><BR>&nbsp;&nbsp;&nbsp; SET PROPERTY OF O_EXCEL&nbsp;&nbsp; &#8216;Visible&#8217;&nbsp;&nbsp; = 1.</P><P class="sap1"><FONT color="#fb2412">*** Excel-Objekt &#8220;Arbeitsblatt&#8221; erzeugen</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD OF O_EXCEL&nbsp;&nbsp;&nbsp; &#8216;Workbooks&#8217; = O_WORKBOOK.</P><P class="sap1">*** Excel-Objekt &#8220;Mappe&#8221; erzeugen<BR>&nbsp;&nbsp;&nbsp; CALL METHOD OF O_WORKBOOK &#8216;Add&#8217;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = O_MAP.<BR>&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*** Werte einf&uuml;gen</FONT><BR>&nbsp; PERFORM FILL_CELL<BR>&nbsp;&nbsp;&nbsp; USING: 1 1 1 &#8216;Bitte Werte eingeben.&#8217; &amp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;Zum Beenden &#8220;FERTIG&#8221; im SAPGUI anklicken!&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 1 1 &#8216;L&auml;nge:&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3 1 1 &#8216;Breite:&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4 1 1 &#8216;H&ouml;he:&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 2 0 &#8217;10&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3 2 0 &#8217;20&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4 2 0 &#8217;30&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Aktives Arbeitsblatt ermitteln</FONT><BR>&nbsp; CALL METHOD OF O_EXCEL &#8216;ActiveSheet&#8217; = O_ACTIVE_SHEET.</P><P class="sap1"><FONT color="#fb2412">*** Blattschutz setzen</FONT><BR>&nbsp; CALL METHOD OF O_ACTIVE_SHEET &#8216;Protect&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = SPACE<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Drawing Objects<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #3 = 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Contents<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #4 = 1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Scenarios</P><P class="sap1">AT LINE-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*** Listindex zur&uuml;cksetzen, damit nach Anzeige der Werte nicht<BR>*** wieder der FERTIG-Button angezeigt wird.<BR></FONT>&nbsp; SY-LSIND = 0.</P><P class="sap1"><FONT color="#fb2412">*** Wert &#8220;L&auml;nge&#8221; auslesen</FONT><BR>&nbsp; PERFORM GET_CELLVALUE USING 2 2 V_VALUE.<BR>&nbsp; WRITE: / &#8216;L&auml;nge: &#8216;, V_VALUE.</P><P class="sap1"><FONT color="#fb2412">*** Wert &#8220;Breite&#8221; auslesen</FONT><BR>&nbsp; PERFORM GET_CELLVALUE USING 3 2 V_VALUE.<BR>&nbsp; WRITE: / &#8216;Breite:&#8217;, V_VALUE.</P><P class="sap1"><FONT color="#fb2412">*** Wert &#8220;H&ouml;he&#8221; auslesen</FONT><BR>&nbsp; PERFORM GET_CELLVALUE USING 4 2 V_VALUE.<BR>&nbsp; WRITE: / &#8216;H&ouml;he:&nbsp; &#8216;, V_VALUE.</P><P class="sap1"><BR><FONT color="#fb2412">* Excel beenden<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>* see </FONT><A href="http://support.microsoft.com/default.aspx?scid=kb;de;503541" target="_blank" Target="_blank"><FONT color="#fb2412">http://support.microsoft.com/default.aspx?scid=kb;de;503541</FONT></A><BR><FONT color="#fb2412">* Close without saving</FONT></P><P class="sap1"><FONT color="#fb2412">* get active window<BR></FONT>&nbsp; CALL METHOD OF O_EXCEL &#8216;ACTIVEWINDOW&#8217; = O_ACTIVE_WINDOW.</P><P class="sap1"><FONT color="#fb2412">* close active_window without saving<BR></FONT>&nbsp; CALL METHOD OF O_ACTIVE_WINDOW &#8216;CLOSE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = 0.</P><P class="sap1"><FONT color="#fb2412">* close Excel</FONT><BR>&nbsp; CALL METHOD OF O_EXCEL &#8216;QUIT&#8217;.</P><P class="sap1"><FONT color="#fb2412">* Free Objects</FONT><BR>&nbsp; FREE OBJECT O_WORKBOOK.<BR>&nbsp; FREE OBJECT O_EXCEL.<BR>&nbsp; FREE OBJECT O_MAPL.<BR>&nbsp; FREE OBJECT O_MAP.<BR>&nbsp; FREE OBJECT O_ACTIVE_WINDOW.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM FILL_CELL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM FILL_CELL USING I J LOCK VAL.</P><P class="sap1"><FONT color="#fb2412">*** Zelle ansprechen</FONT><BR>&nbsp; CALL METHOD OF O_EXCEL &#8216;Cells&#8217;&nbsp;&nbsp;&nbsp;&nbsp; = O_CELL<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #1 = I&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Zeile<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = J.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Spalte</P><P class="sap1"><FONT color="#fb2412">*** Zellwert setzen</FONT><BR>&nbsp; SET PROPERTY OF O_CELL &#8216;Value&#8217;&nbsp;&nbsp;&nbsp;&nbsp; = VAL.<BR>&nbsp; SET PROPERTY OF O_CELL &#8216;Locked&#8217;&nbsp;&nbsp;&nbsp; = LOCK.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM GET_CELLVALUE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM GET_CELLVALUE USING I J VAL.</P><P class="sap1"><FONT color="#fb2412">* Zelle, aus der Ergebnis gelesen wird</FONT><BR>&nbsp; CALL METHOD OF O_EXCEL &#8216;Cells&#8217; = O_CELL<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #1 = I&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Zeile<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = J.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Spalte</P><P class="sap1"><FONT color="#fb2412">* Zellinhalt lesen</FONT><BR>&nbsp; GET PROPERTY OF O_CELL &#8216;Value&#8217; = V_VALUE.</P><P class="sap1">&nbsp; IF V_VALUE CO &#8216;0123456789. &#8216;.<BR>&nbsp;&nbsp;&nbsp; V_ZAHL = V_VALUE.<BR>&nbsp;&nbsp;&nbsp; VAL = V_ZAHL.<BR>&nbsp; ELSE.<BR>&nbsp;&nbsp;&nbsp; VAL = V_VALUE.<BR>&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">* Objekt freigeben</FONT><BR>&nbsp; FREE OBJECT O_CELL.</P><P class="sap1">ENDFORM.</P></p>
+<p>Der Beitrag <a href="/blog/werte-per-excel-eingeben/">Werte per Excel eingeben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Felder formatieren</title>
+		<link>/blog/felder-formatieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 19 Apr 2005 11:01:54 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=325</guid>
+
+					<description><![CDATA[<p>F&#252;r das Formatieren der Excel-Zellen muss man die entsprechenden Eigenschaften kennen. Wir zeigen Ihnen hier einige.</p>
+<p>Der Beitrag <a href="/blog/felder-formatieren/">Felder formatieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>F&uuml;r das Formatieren der Excel-Zellen muss man die entsprechenden Eigenschaften kennen. Wir zeigen Ihnen hier einige.<br /><P>Teilweise k&ouml;nnen die Eigenschaften abgeleitet werden, wenn Sie in Excel die Feldformatierung als Makro ausfzeichnen und sich den Quelltext anschauen.</P><P><STRONG><U>Tipp 1: <BR></U></STRONG>Den Wert von verwendeten&nbsp;Konstanten, wie z.B. xlGeneral, xlEdgeLeft, xlNone&nbsp;oder xlAutomatic, k&ouml;nnen Sie ermitteln, indem Sie mit die Konstante mit&nbsp;rechten Maustaste anklicken und im Men&uuml; den Eintrag &#8220;Quickinfo&#8221; ausw&auml;hlen.</P><P><STRONG><U>Tipp 2:</U></STRONG><BR>Alle Objekte und deren Methoden k&ouml;nnen eingesehen werden, indem man in den VisualBasic-Editor wechselt (Men&uuml;: <EM>Extras &#8211; Makro &#8211; VisualBasic &#8211; Editor</EM> (ALT+F11)) und <STRONG><FONT color="#fb2412">[F2]</FONT> </STRONG>dr&uuml;ckt. </P><P>Das Objekt &#8220;o_zelle&#8221; ist das Objekt der Zelle. Die Definition muss wie folgt lauten:</P><P class="sap1">DATA:&nbsp;&nbsp;o_zelle TYPE ole2_object.</P><P class="head1">Meldungen unterdr&uuml;cken</P><P class="text1">Meldungen k&ouml;nnen mit dem folgenden Befehl unterdr&uuml;ckt werden:</P><P class="sap1">SET PROPERTY OF h_excel&nbsp;&#8216;DisplayAlerts&#8217; = 0.</P><P class="head1">Kommentar hinzuf&uuml;gen</P><P class="sap1">CALL METHOD OF o_zelle &#8216;AddComment&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216;Das ist ein Kommentar&#8217;.</P><P class="head1">Zellenformat &auml;ndern</P><P class="text1">Diese Funktionen ben&ouml;tigt man z.B. dann, wenn Excel Zahlen nicht korrekt anzeigt, sondern im Exponentialformat (1,001E+12).</P><P class="head2">Zelle in als Zahl ohne Nachkommastellen formaitieren</P><P class="sap1">SET PROPERTY OF o_zelle &#8216;NumberFormat&#8217; = &#8216;0&#8217;.</P><P class="head2">Zelle mit zwei Nachkommastellen formatieren</P><P class="sap1">SET PROPERTY OF h_zl &#8216;NumberFormat&#8217; = &#8216;0.00&#8217;.</P><P class="head1">Zellenhintergrund einf&auml;rben</P><P class="sap1">DATA&nbsp;o_int TYPE ole2_object.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; Interior</P><P class="sap1">GET PROPERTY OF o_zelle &#8216;Interior&#8217;&nbsp; &nbsp;= o_int<BR>SET PROPERTY OF o_int&nbsp;&nbsp;&nbsp;&#8216;ColorIndex&#8217; = &#8216;4&#8217;.&nbsp;&nbsp; &#8220;Gr&uuml;n</P><P class="text1"><STRONG>Farben:</STRONG></P><UL><LI><DIV class="text1">1=Schwarz</DIV><LI><DIV class="text1">2=weiss</DIV><LI><DIV class="text1">3=rot</DIV><LI><DIV class="text1">4=gr&uuml;n</DIV><LI><DIV class="text1">5=blau</DIV><LI><DIV class="text1">6=gelb </DIV></LI></UL><P class="head1">Ausrichtung und Drehen der Schrift</P><P class="text1">Zum Setzen der folgenden Attribute muss auf eine Zelle positioniert werden:</P><P class="sap1">&nbsp;<FONT color="#fb2412">*** Zelle ansprechen<BR></FONT>&nbsp;&nbsp; CALL METHOD OF o_excel &#8216;Cells&#8217;&nbsp;&nbsp;&nbsp;&nbsp; = o_cell&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #1 =&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8220;Zeile&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = 1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Spalte </P><P class="head2">Schrift drehen</P><P class="text1">Setzt die Drehung der Schrift in der Zelle. In diesem Fall wird die Schrift um 90° nach links gedreht.</P><P class="sap1">SET PROPERTY OF o_zelle &#8216;Orientation&#8217;&nbsp; = 90.</P><P class="head2">Ausrichtung</P><P class="text1">So wird der Text in einer Zelle ausgerichtet:</P><P class="sap1">SET PROPERTY OF o_cell &#8216;HorizontalAlignment&#8217;&nbsp;&nbsp;&nbsp; = xlAlign.</P><P class="text1">xlAlign kann folgende Werte haben:</P><UL><LI><DIV class="sap1">xlcenter = -4108 (Zentriert)</DIV></LI><LI><DIV class="sap1">xlright&nbsp; = -4102 (Rechtsb&uuml;ndig)</DIV></LI><LI><DIV class="sap1">xlleft&nbsp;&nbsp; = -4131 (Linksb&uuml;ndig)<BR></DIV></LI></UL><P class="head1">Spaltenbreite optimieren</P><P class="sap1">DATA:<BR>&nbsp; o_cells&nbsp;&nbsp;&nbsp;&nbsp; TYPE ole2_object,<BR>&nbsp; o_sheet&nbsp;&nbsp;&nbsp;&nbsp; TYPE ole2_object,<BR>&nbsp; o_start&nbsp;&nbsp;&nbsp;&nbsp; TYPE ole2_object,<BR>&nbsp; o_end&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE ole2_object,<BR>&nbsp; o_column&nbsp;&nbsp;&nbsp; TYPE ole2_object,<BR>&nbsp; o_selection TYPE ole2_object,<BR>&nbsp; o_range&nbsp;&nbsp;&nbsp;&nbsp; TYPE ole2_object.</P><P class="sap1">CALL METHOD OF o_excel &#8216;Cells&#8217; = o_cells.<BR>CALL METHOD OF o_cells &#8216;Select&#8217;.</P><P class="sap1">CALL METHOD OF o_excel &#8216;ActiveSheet&#8217; = o_sheet.</P><P class="sap1"><FONT color="#fb2412">*** Range definieren: Start</FONT><BR>CALL METHOD OF o_sheet &#8216;Cells&#8217; = o_start<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; #1 = 1<BR>&nbsp;&nbsp;&nbsp; #2 = 1.</P><P class="sap1"><FONT color="#fb2412">*** Range definieren: Ende<BR></FONT>CALL METHOD OF o_sheet &#8216;Cells&#8217; = o_end<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; #1 = 20&nbsp;<BR>&nbsp;&nbsp;&nbsp; #2 = 10.</P><P class="sap1"><FONT color="#fb2412">*** Range aktivieren</FONT><BR>CALL METHOD OF o_sheet &#8216;range&#8217; = o_range&nbsp;&nbsp;&nbsp;<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; #1 = o_start<BR>&nbsp;&nbsp;&nbsp; #2 = o_end.</P><P class="sap1"><FONT color="#fb2412">*** Range selektieren</FONT><BR>CALL METHOD OF o_range &#8216;Select&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Aktuelle selektion zuweisen</FONT><BR>CALL METHOD OF o_excel &#8216;Selection&#8217; = o_selection. <BR>GET PROPERTY OF o_range &#8216;Columns&#8217; = o_column. </P><P class="sap1"><FONT color="#fb2412">*** Optimale Breite<BR></FONT>CALL METHOD OF o_column &#8216;Autofit&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </P><P class="sap1"><FONT color="#fb2412">*** Oder feste Breite: 40</FONT><BR>SET PROPERTY OF o_column &#8216;ColumnWidth&#8217; = &#8217;40&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Rahmen um die Selektion</FONT><BR>CALL METHOD OF o_range &#8216;BorderAround&#8217; EXPORTING #1 = 1. <BR></P><P class="sap1">FREE OBJECT: o_cells,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o_sheet,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o_start,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o_end,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o_column,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o_selection,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; o_range.<BR></P></p>
+<p>Der Beitrag <a href="/blog/felder-formatieren/">Felder formatieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Demo zu &#8220;Desktop Office Integration&#8221;</title>
+		<link>/blog/demo-zu-desktop-office-integration/</link>
+					<comments>/blog/demo-zu-desktop-office-integration/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 02 Oct 2004 21:31:16 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=287</guid>
+
+					<description><![CDATA[<p>Demoprogramm zur Desktop Office Integration.</p>
+<p>Der Beitrag <a href="/blog/demo-zu-desktop-office-integration/">Demo zu &#8220;Desktop Office Integration&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<h2 class="wp-block-heading">Demoprogramme SAP</h2>
+
+
+
+<p>Entwicklungsklasse: <strong>SOFFICEINTEGRATION</strong></p>
+
+
+
+<ul><li>SAPRDEMO_PIVOTINTERFACE</li><li>SAPRDEMO_SPREADSHEET_INTERFACE</li><li>SAPRDEMO_TABLES_IN_EXCEL</li><li>SAPRDEMOEXCELINTEGRATION2</li></ul>
+
+
+
+<h2 class="wp-block-heading">DOI-Demo von Black_Adept</h2>
+
+
+
+<h2 class="wp-block-heading">Screenshot</h2>
+
+
+
+<figure><img decoding="async" src="/wp-content/uploads/tt_images/DOI/doi_demo.jpg">
+
+
+
+<p></p>
+
+
+
+<p class="sap1"><span style="color: #fb2412;">* Darstellung Inplace auf Dynpro 9000 in einem Containercontrol namens<br>* &#8220;CONTAINER_9000&#8221;</span></p>
+
+
+
+<p class="sap1"><span style="color: #fb2412;">* Minimale Fehlerbehandlung</span></p>
+
+
+
+<pre class="wp-block-code"><code>REPORT zzdoidemo.
+TYPE-POOLS: soi.
+
+CONSTANTS: c_containername TYPE text20 VALUE 'CONTAINER_9000'.
+
+* Definition der benötigten Controls
+DATA: cl_container   TYPE REF TO cl_gui_custom_container,   " Container
+cl_control     TYPE REF TO i_oi_container_control,"OIContainerCtrl
+cl_document    TYPE REF TO i_oi_document_proxy,   "Office Dokument
+cl_spreadsheet TYPE REF TO i_oi_spreadsheet.       " Spreadsheet
+
+DATA: t_ranges       TYPE soi_range_list,
+t_contents     TYPE soi_generic_table.
+
+DATA: t_daten        TYPE STANDARD TABLE OF d010sinf    " Demodaten
+WITH NON-UNIQUE DEFAULT KEY INITIAL SIZE 100,
+ok_code        TYPE syucomm.  " Für Dynpro 9000
+
+START-OF-SELECTION.
+*** Demodaten selektieren
+SELECT * UP TO 100 ROWS
+INTO TABLE t_daten
+FROM d010sinf
+WHERE prog  LIKE 'Z%'.
+
+END-OF-SELECTION.
+
+* 1. Aufbau des Spreadsheet-Interfaces
+* Version:
+*  Leeres Blatt - alternativ kann man auch einen bestehenden
+*  File vom Frontend oder aus dem BOR öffnen.
+*  Kommentar an der relevanten Stelle in der folgenden Routine
+  PERFORM build_spreadsheet_interface.
+
+* Die Tabellenkalkulationsschnittstelle arbeitet mit benannten Bereichen
+* Zur Demo werde ich einen n Zeilen, 5 Spalten großen Bereich
+* definieren, in den ich nachher dann Daten einfülle
+  PERFORM build_named_areas.
+
+* Daten zur Verfügung stellen
+  PERFORM set_data_into_sheet.
+
+  CALL SCREEN 9000.
+
+* Freigabe der Objekte
+  FREE cl_spreadsheet.
+CLEAR: cl_spreadsheet.
+
+  IF NOT cl_document IS INITIAL.
+CALL METHOD cl_document->release_document.
+ENDIF.
+
+  FREE:  cl_document,
+cl_control,
+cl_container.
+
+  CLEAR: cl_document,
+cl_control,
+cl_container.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  build_spreadsheet_interface
+*&amp;---------------------------------------------------------------------*
+FORM build_spreadsheet_interface.
+
+  TYPES: tyt_errors    TYPE STANDARD TABLE OF REF TO i_oi_error
+WITH NON-UNIQUE DEFAULT KEY.
+
+  DATA:  error         TYPE REF TO i_oi_error,
+t_errors      TYPE tyt_errors,
+
+         repid TYPE syrepid,
+dynnr TYPE sydynnr.
+
+* Container erzeugen
+repid = sy-repid.
+dynnr = '9000'.
+CREATE OBJECT cl_container
+EXPORTING
+container_name              = c_containername
+repid                       = repid
+dynnr                       = dynnr
+EXCEPTIONS
+cntl_error                  = 1
+cntl_system_error           = 2
+create_error                = 3
+lifetime_error              = 4
+lifetime_dynpro_dynpro_link = 5
+others                      = 6.
+IF sy-subrc &lt;> 0.
+BREAK-POINT.STOP.
+ENDIF.
+
+************************************************************************
+**  Hier geht die DOI-Erzeugung los
+************************************************************************
+
+* Instanz des OI-controls erzeugen
+CALL METHOD c_oi_container_control_creator=>get_container_control
+IMPORTING
+control = cl_control
+error   = error.
+APPEND error TO t_errors.
+
+* control aufbauen
+CALL METHOD cl_control->init_control
+EXPORTING
+inplace_enabled          = 'X'
+no_flush                 = 'X'
+*          INPLACE_SHOW_TOOLBARS    = ' '
+r3_application_name      = 'Demo Document Container'
+parent                   = cl_container
+IMPORTING
+error                    = error
+EXCEPTIONS
+*          javabeannotsupported     = 1  " ex. nicht im Minisap
+OTHERS                   = 2.
+IF sy-subrc &lt;> 0.
+BREAK-POINT.
+STOP.
+ENDIF.
+APPEND error TO t_errors.
+
+* Documentproxy holen
+CALL METHOD cl_control->get_document_proxy
+EXPORTING
+document_type      = 'Excel.Sheet'                " EXCEL
+*          document_type      = 'Word.Document'              " WORD
+no_flush           = 'X'
+IMPORTING
+document_proxy     = cl_document
+error              = error.
+APPEND error TO t_errors.
+
+* Leeres Dokument erzeugen,
+CALL METHOD cl_document->create_document
+EXPORTING
+document_title   = 'Demo für Enno' " sichtbar wenn nicht inplace
+no_flush         = 'X'
+open_inplace     = 'X'
+*    OPEN_READONLY    = ' '
+IMPORTING
+error            = error.
+APPEND error TO t_errors.
+
+* Alternativ: vorhandenes Dokument öffnen:
+* Mit der Methode cl_document->open_document kann man ein schon
+* vorhandenes Dokument ( etwa eine Vorlage öffnen ).
+* Falls du eine lokale Datei öffnen willst: URL muss mit "'file://'"
+* beginnen - dahinter dann gleich der Filename.  Beliebt ist auch
+* eine URL aus dem BOR
+
+* Und Spreadsheetinterface drüberlegen
+CALL METHOD cl_document->get_spreadsheet_interface
+EXPORTING
+no_flush        = ' '
+IMPORTING
+error           =  error
+sheet_interface = cl_spreadsheet.
+APPEND error TO t_errors.
+sy-subrc = 0.
+
+  LOOP AT t_errors INTO error.
+CALL METHOD error->raise_message
+EXPORTING  type     = 'E'
+EXCEPTIONS message_raised = 1
+flush_failed   = 2.
+ENDLOOP.
+
+ENDFORM.                    " build_spreadsheet_interface
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  build_named_areas
+*&amp;---------------------------------------------------------------------*
+FORM build_named_areas.
+
+  DATA: error    TYPE REF TO i_oi_error,
+rows     TYPE i,
+columns  TYPE i.
+
+  columns = 5.
+DESCRIBE TABLE t_daten LINES rows.
+* Datenbereich benennen
+  CALL METHOD cl_spreadsheet->insert_range_dim
+EXPORTING
+no_flush  = 'X'  " Reicht bei nächstem Aufruf
+name      = 'ALL'
+left      = 2
+top       = 8
+rows      = rows
+columns   = columns
+IMPORTING
+error     = error.
+
+* Faul sein - und Rangestabelle zurückgeben lassen
+CALL METHOD cl_spreadsheet->get_ranges_names
+IMPORTING
+error    = error
+ranges   = t_ranges.
+
+ENDFORM.                    " build_named_areas
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  set_data_into_sheet
+*&amp;---------------------------------------------------------------------*
+FORM set_data_into_sheet.
+
+  DATA: error      TYPE REF TO i_oi_error,
+wa_range   LIKE LINE OF t_ranges,
+wa_daten   LIKE LINE OF t_daten,
+wa_content LIKE LINE OF t_contents.
+
+* ACHTUNG - es müssen ALLE einträge in der Rangelist versorg werden
+* und dort müssen auch ALLE Zellen ( auch wenn sie leer sind ) einmal
+* auftauchen
+  DELETE t_ranges WHERE NOT name = 'ALL'.
+CLEAR t_contents.
+LOOP AT t_ranges INTO wa_range.
+CASE wa_range-name.
+WHEN 'ALL'.
+LOOP AT t_daten INTO wa_daten.
+CLEAR wa_content.
+* Row und Column beziehen sich auf die linke obere Ecke des Bereichs
+wa_content-row = sy-tabix.
+wa_content-column = 1.
+
+          wa_content-value = wa_daten-prog.
+APPEND wa_content TO t_contents. ADD 1 TO wa_content-column.
+
+          wa_content-value = wa_daten-cnam.
+APPEND wa_content TO t_contents. ADD 1 TO wa_content-column.
+
+          WRITE wa_daten-cdat TO wa_content-value.
+APPEND wa_content TO t_contents. ADD 1 TO wa_content-column.
+
+          WRITE wa_daten-udat TO wa_content-value.
+APPEND wa_content TO t_contents. ADD 1 TO wa_content-column.
+
+          WRITE wa_daten-utime TO wa_content-value.
+APPEND wa_content TO t_contents. ADD 1 TO wa_content-column.
+ENDLOOP.
+
+      WHEN OTHERS.
+BREAK-POINT.STOP.  " sollte nicht vorkommen, wenn korrekt
+ENDCASE.
+ENDLOOP.
+
+* ACHTUNG!  Formatierung VOR dem Setzen der Daten.  Sonst kommt es bei
+* z.B. Datumsfeldern zu seltsamen Effekten.  Zum Testen die
+* Formatierungsroutine mal HINTER die Datensetzenroutine setzen
+* und staunen.
+  DATA t_cells TYPE soi_cell_table.
+DATA wa_cell LIKE LINE OF t_cells.
+
+  wa_cell-top     = 10.
+wa_cell-left    = 3.
+wa_cell-rows    = 5.
+wa_cell-columns = 2.
+wa_cell-front   = 5. " Blau - siehe Doku in SAP-Bibliothek
+wa_cell-back    = 27.
+wa_cell-bold    = 1.
+wa_cell-number  = 0.
+wa_cell-font    = 'Courier New'.
+wa_cell-size    = -1.  " Default
+APPEND wa_cell TO t_cells.
+
+* Und ein paar Zellen formatieren - Bereiche lassen sich mit einer
+* anderen Methode schnell komplett formatieren.
+CALL METHOD cl_spreadsheet->cell_format
+EXPORTING
+no_flush = 'X'
+cells    = t_cells
+IMPORTING
+error    = error.
+
+* Und jetzt die Daten in Spreadsheet schießen
+CALL METHOD cl_spreadsheet->set_ranges_data
+EXPORTING ranges    = t_ranges
+contents  = t_contents
+updating  = -1
+no_flush  = 'X'
+IMPORTING error     = error.
+
+* Spaltenbreiten Optimieren
+CALL METHOD cl_spreadsheet->fit_widest
+EXPORTING
+no_flush = ' '
+name     = 'ALL'
+IMPORTING
+error    = error.
+
+ENDFORM.                    " set_data_into_sheet
+
+*&amp;---------------------------------------------------------------------*
+*&amp; Form free_objects
+*&amp;---------------------------------------------------------------------*
+FORM free_objects.
+
+*** Freigabe der Objekte
+  IF NOT cl_document IS INITIAL.
+CALL METHOD cl_document->release_document.
+CALL METHOD cl_document->close_document.
+FREE cl_document.
+ENDIF.
+
+  IF NOT cl_control IS INITIAL.
+CALL METHOD cl_control->destroy_control.
+FREE cl_control.
+ENDIF.
+
+  FREE:  cl_spreadsheet.
+CLEAR: cl_spreadsheet.
+FREE:  cl_container.
+CLEAR: cl_container.
+
+ENDFORM.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  STATUS_9000  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE status_9000 OUTPUT.
+
+  SET PF-STATUS '9000'.
+SET TITLEBAR '9000'.
+
+ENDMODULE.                 " STATUS_9000  OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  USER_COMMAND_9000  INPUT
+*&amp;---------------------------------------------------------------------*
+MODULE user_command_9000 INPUT.
+
+  CASE ok_code.
+WHEN 'BACK'.
+PERFORM free_objects.
+SET SCREEN 0. LEAVE SCREEN.
+ENDCASE.
+
+ENDMODULE.                 " USER_COMMAND_9000  INPUT
+
+Ablauflogik Dynpro 9000
+
+PROCESS BEFORE OUTPUT.
+MODULE STATUS_9000.
+*
+PROCESS AFTER INPUT.
+MODULE USER_COMMAND_9000.</code></pre>
+
+
+
+<h3 class="wp-block-heading">Status &#8216;9000&#8217;</h3>
+
+
+
+<table class="wp-block-table tblimg"><tbody><tr><td><figure><img decoding="async" src="/wp-content/uploads/tt_images/DOI/doi_9000_status.jpg"></figure><br>Der PF-Status vom Dynpro 9000</td></tr></tbody></table>
+<p>Der Beitrag <a href="/blog/demo-zu-desktop-office-integration/">Demo zu &#8220;Desktop Office Integration&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/demo-zu-desktop-office-integration/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Desktop Office Integration (DOI)</title>
+		<link>/blog/desktop-office-integration-doi/</link>
+					<comments>/blog/desktop-office-integration-doi/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 02 Oct 2004 20:58:20 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=286</guid>
+
+					<description><![CDATA[<p>Mit den Tools zur "Destop Office Integration" bietet SAP eine Schnittstelle zur Arbeit mit Word und Excel.</p>
+<p>Der Beitrag <a href="/blog/desktop-office-integration-doi/">Desktop Office Integration (DOI)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit den Tools zur &#8220;Destop Office Integration&#8221; bietet SAP eine Schnittstelle zur Arbeit mit Word und Excel.<br /><P class="text1">Das Demoprogramm <STRONG><FONT>SAPRDEMO_FORM_INTERFACE</FONT></STRONG> demonstriert das Setzen von Daten aus R/3 oder auch das Holen der Daten aus der jeweiligen Anwendung (Excel oder Word).</P><P class="text1">Hier gelangen Sie zur SAP-Online-Hilfe zur DOI: <BR><A href="http://help.sap.com/saphelp_46c/helpdata/de/e9/0bee9f408e11d1893b0000e8323c4f/frameset.htm" target="_blank" Target="_blank">http://help.sap.com/saphelp_46c/helpdata/de/e9/<BR>0bee9f408e11d1893b0000e8323c4f/frameset.htm</A></P><P class="text1">Und hier eine PDF-Dokumentation:<BR><A href="http://help.sap.com/printdocu/core/Print46c/de/data/pdf/BCCIOFFI/BCCIOFFI.pdf" Target="_blank">http://help.sap.com/printdocu/core/Print46c/de/data/pdf/BCCIOFFI/BCCIOFFI.pdf</A></P><P class="text1">Die Anwendung kann im separaten Fenster oder &#8220;inplace&#8221; gestartet werden.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/word/doi_word.jpg"><BR>Ein Word-Formular, auf das aus R/3 zugegriffen wird</P></TD></TR></TBODY></TABLE></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/desktop-office-integration-doi/">Desktop Office Integration (DOI)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/desktop-office-integration-doi/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Methoden (WORD)</title>
+		<link>/blog/methoden-word/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 02 Oct 2004 18:10:51 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=285</guid>
+
+					<description><![CDATA[<p>In diesem Artikel geben wir Ihnen Informationen zu den Methoden, die Sie zur Ansteuerung eines Word-Dokuments verwenden k&#246;nnen, bzw. wo Sie die unterst&#252;tzten Methoden finden.</p>
+<p>Der Beitrag <a href="/blog/methoden-word/">Methoden (WORD)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Artikel geben wir Ihnen Informationen zu den Methoden, die Sie zur Ansteuerung eines Word-Dokuments verwenden können, bzw. wo Sie die unterstützten Methoden finden.</p>
+<p class="head1">Word.Basic</p>
+<p>In dem Artikel &#8220;Erzeugung eines Dokuments&#8221; werden bereits einige Methoden behandelt mit denen Sie ein Word-Dokument füllen und formatieren können.</p>
+<p>Das Demoprogramm verwendet veraltete Aufrufe von Word.Basic-Methoden. Diese Methoden wurden in neueren Word-Programmen von VisualBasic abgelöst.</p>
+<p>Ich bin nicht sicher, in wie weit VisualBasic-Methoden unterstützt werden, bzw. wie man dann damit ein Word-Dokument ansteuern kann. Für Informationen oder Beispielprogramme bin ich sehr dankbar.</p>
+<p>Der Aufruf der Word.Basic-Methoden jedoch funktioniert. Sie können alle Methoden verwenden, die von Word.Basic unterstützt werden.</p>
+<h2 class="head2">Tabelle OLELOAD</h2>
+<p>Sie haben einmal die Möglichkeit, in der SAP-Tabelle <strong>OLELOAD</strong> zu suchen (Sprache = &#8216;EN&#8217;, Typeinfo-Key = &#8216;WORD.BASIC&#8217;). Hier stehen alle Methoden mit den einzelnen Parametern. Leider haben die Parameter, obwohl die Möglichkeit vorgesehen ist, keine Bezeichnung. Dies macht die Verwendung natürlich schwer.</p>
+<p>Immerhin steht in dem Feld PARAMTYPE um was für einen Parametertyp es sich handelt:<br />
+5 = Integer<br />
+8 = String</p>
+<p class="text1"><strong>Eine hilfreiche Datei hat Christian Maier bei Microsoft gefunden:<br />
+</strong><a href="https://tricktresor.com/wp-content/downloads/doi_position.zip" target="_blank"><strong>POSITION.HLP</strong></a><strong>.</strong></p>
+<p>Die Datei enthält alle Befehle und auch die Parameter dazu. Daraus ist dann auch die Positionsnummer für den Aufruf aus SAP ersichtlich.</p>
+<p>Hier der komplette Link zu Microsoft:<br />
+<a href="http://support.microsoft.com/default.aspx?scid=http://support.microsoft.com:80/support/kb/articles/Q112/7/33.asp&amp;NoWebContent=1#appliesto" target="_blank"><u><span style="color: #0000ff; font-size: small;">http://support.microsoft.com/default.aspx?scid=http://support.microsoft.com:80/support/kb/<br />
+articles/Q112/7/33.asp&amp;NoWebContent=1#appliesto</span></u></a></p>
+<h2 class="head1">Methoden finden</h2>
+<p>Sie sollten deswegen den Weg über die &#8220;<strong>Visual Basic-Entsprechungen zu WordBasic-Befehlen</strong>&#8221; gehen:</p>
+<p>Starten Sie hierzu Word und wechseln Sie zum Makroeditor (Menü: <em>Extras &#8211; Makro &#8211; Visual Basic Editor</em>).</p>
+<p>Klicken Sie dann im Menü auf das &#8220;?&#8221; und &#8220;Microsoft Visual Basic-Hilfe&#8221; oder drücken Sie die F1-Taste. Es erscheint das Hilfe-Fenster in dem Sie bitte auf den Reiter [Index] wechseln. Dort geben Sie &#8220;WordBasic&#8221; ein und klicken auf [Suchen].</p>
+<p><img decoding="async" class="alignnone" src="/wp-content/uploads/tt_images/word/wordhilfe.jpg" /></p>
+<p><em>Die Ergebnisliste zu WordBasic</em></p>
+<p>Es erscheint im unteren Fenster der Eintrag &#8220;<strong>Basic-Entsprechungen zu WordBasic-Befehlen</strong>&#8220;. Diesen klicken Sie bitte an.</p>
+<p>Im rechten Fenster erscheinen Druckknöpfe mit dem Alphabet. Suchen Sie sich dort die Methoden, die Sie benötigen.</p>
+<h2 class="head1">Beispiel</h2>
+<p>Wenn Sie unter dem Eintrag &#8220;T&#8221; schauen, dann entdecken Sie den Word.Basic-Befehl</p>
+<p><strong>TableColumnWidth <em>ColumnWidth, RulerStyle</em> </strong></p>
+<p>Die Parameter, die Sie zu dieser Methode verwenden können/ müssen stehen in kursiver Schrift hinter der Methode.</p>
+<p>Der Aufruf in ABAP sähe dann wie folgt aus:</p>
+<p class="sap1">CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<br />
+EXPORTING #1 = &#8216;9 cm&#8217;.</p>
+<p class="text1">Leider gibt es einige Ungereimtheiten, zu denen ich keine Erklärung habe:</p>
+<ul>
+<li>
+<div class="text1">Die Methode <strong>TableInsertTable</strong> z.B. hat eigentlich laut Doku nur zwei Parameter (Anzahl Spalten und Anzahl Zeilen). Trotzdem müssen vier Parameter übergeben werden (Siehe Demoprogramm).</div>
+</li>
+<li>
+<div class="text1">Die o. g. Methode <strong>TableColumnWidth</strong> hat laut Doku zwei Parameter (Width und RulerStyle), wobei <em>RulerStyle</em> ein Muß ist. Die Methode funktioniert, obwohl nur der Parameter <em>Width </em>übergeben wird.</div>
+</li>
+</ul>
+<p class="text1">Falls jemand hierfür eine Erklärung hat, oder weiß, worauf man achten muss, nehme ich Infos gerne entgegen.</p>
+<p class="text1">
+<p>Der Beitrag <a href="/blog/methoden-word/">Methoden (WORD)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Erzeugung eines Dokuments</title>
+		<link>/blog/erzeugung-eines-dokuments/</link>
+					<comments>/blog/erzeugung-eines-dokuments/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 02 Oct 2004 17:20:35 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=284</guid>
+
+					<description><![CDATA[<p>Hier stellen wir Ihnen ein ABAP-Programm vor, mit dem ein Word-Dokument erzeugt und mit Daten "gef&#252;ttert" wird. </p>
+<p>Der Beitrag <a href="/blog/erzeugung-eines-dokuments/">Erzeugung eines Dokuments</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier stellen wir Ihnen ein ABAP-Programm vor, mit dem ein Word-Dokument erzeugt und mit Daten &#8220;gef&uuml;ttert&#8221; wird. <br /><P>Mit diesem Programm stellen wir Ihnen eine M&ouml;glichkeit vor, wie Sie aus SAP heraus ein Word-Dokument erzeugen und mit Daten f&uuml;llen k&ouml;nnen.</P><P>Es werden sowohl Tabellen erzeugt und bef&uuml;llt als auch Formatierungen vorgenommen. </P><P>Das Beispiel erzeugt ein Dokument mit Kopfzeile und Tabellen. Es sieht nicht sehr sch&ouml;n aus, aber es zeigt die Anwendung der wichtigsten Methoden.</P><P>So sieht&#8217;s aus:</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/word/word.jpg"><BR>Ein Ausschnitt des erzeugten Dokuments</P></TD></TR></TBODY></TABLE></P><P class="head1">Das Coding</P><P class="sap1">REPORT zz_word .<BR><FONT color="#fb2412">**********************************************************************<BR>***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<BR>***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </FONT><A href="https://tricktresor.com/" target="_blank" Target="_blank"><FONT color="#fb2412">https://tricktresor.com/</FONT></A><FONT color="#fb2412">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<BR>***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<BR>**********************************************************************</FONT></P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;*<BR>*<BR>* Starten von Word und &Uuml;bergabe von Daten, Erzeugung von Tabellen,<BR>* Positionieren innerhalb der Tabellen und Formatierung von Text bzw.<BR>* Abs&auml;tzen<BR>*<BR><STRONG>* ACHTUNG: </STRONG><BR>* Ab der Version 4.7 muss die Schriftgr&ouml;&szlig;e als Integer<BR>* &uuml;bergeben werden!</FONT><FONT color="#fb2412"><BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;*</FONT></P><P class="sap1"><BR><FONT color="#fb2412">*** Ben&ouml;tigte Typinformationen f&uuml;r OLE<BR></FONT>INCLUDE ole2incl.<BR>INCLUDE docsincl.</P><P class="sap1"><FONT color="#fb2412">*** Programmvariablen</FONT><BR>DATA:<BR>&nbsp; BEGIN OF t_item OCCURS 0,<BR>&nbsp;&nbsp;&nbsp; posnr&nbsp;&nbsp;&nbsp; &nbsp;TYPE posnr,<BR>&nbsp;&nbsp;&nbsp; matnr&nbsp;&nbsp;&nbsp;&nbsp; TYPE matnr,<BR>&nbsp;&nbsp;&nbsp; mtext(40) TYPE c,<BR>&nbsp;&nbsp;&nbsp; menge(6) &nbsp;TYPE p,<BR>&nbsp;&nbsp;&nbsp; meins&nbsp;&nbsp;&nbsp; &nbsp;TYPE meins,<BR>&nbsp;&nbsp;&nbsp; netpr(6)&nbsp; TYPE p DECIMALS 2,<BR>&nbsp;&nbsp;&nbsp; waers&nbsp;&nbsp;&nbsp;&nbsp; TYPE waers,<BR>&nbsp; END OF t_item,</P><P class="sap1">&nbsp; l_menge(20),<BR>&nbsp; l_preis(20),<BR>&nbsp; l_text(80),</P><P class="sap1">&nbsp; h_word TYPE ole2_object.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1">&nbsp; PERFORM word_starten.</P><P class="sap1"><BR><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* FORM WORD_STARTEN<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM word_starten.</P><P class="sap1">&nbsp; IF h_word-header = space OR h_word-handle EQ -1.</P><P class="sap1"><FONT color="#fb2412">*** Word starten</FONT><BR>&nbsp;&nbsp;&nbsp; CREATE OBJECT h_word &#8216;Word.Basic&#8217;.<BR>&nbsp;&nbsp;&nbsp; CALL METHOD OF h_word &#8216;FileNew&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216;normal.dot&#8217;.<BR>&nbsp;&nbsp;&nbsp; CALL METHOD OF h_word &#8216;AppShow&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Kopfzeile erzeugen</FONT><BR>&nbsp;&nbsp;&nbsp; PERFORM kopfzeile.</P><P class="sap1"><FONT color="#fb2412">*** Infotext <BR></FONT>&nbsp;&nbsp;&nbsp; PERFORM infotext.</P><P class="sap1"><FONT color="#fb2412">*** Testdaten f&uuml;r die Positionstabelle&nbsp;generieren</FONT><BR>&nbsp;&nbsp;&nbsp; PERFORM testdaten.</P><P class="sap1">&nbsp;&nbsp;&nbsp; IF NOT t_item[] IS INITIAL.<BR><FONT color="#fb2412">*** &Uuml;berschirften und Tabelle</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM item_title.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><BR>&nbsp;&nbsp;&nbsp; LOOP AT t_item.<BR><FONT color="#fb2412">*** Ausgabe der Positionen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM ausgabe_position.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.</P><P class="sap1"><FONT color="#fb2412">*** Ausgabe der restlichen Informationen</FONT><BR>&nbsp;&nbsp;&nbsp; PERFORM ende.</P><P class="sap1">&nbsp; ENDIF.</P><P class="sap1">&nbsp; IF sy-subrc NE 0.<BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Error when opening word.application&#8217;, sy-msgli.<BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; FREE OBJECT h_word.<BR>&nbsp; h_word-handle = -1.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* FORM WRITE_TEXT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* &#8211;&gt; TEXT<BR>* &#8211;&gt; FONT<BR>* &#8211;&gt; SIZE<BR>* &#8211;&gt; LOOK<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM write_text USING text font size look.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;Font&#8217; EXPORTING #01 = font.<BR>&nbsp; CALL METHOD OF h_word &#8216;FontSize&#8217; EXPORTING #1 = size.</P><P class="sap1">&nbsp; IF look NE &#8221;.<BR>&nbsp;&nbsp;&nbsp; CALL METHOD OF h_word look.<BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;Insert&#8217; EXPORTING #1 = text.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM item_title&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* Aufbau und F&uuml;llen der Positionstabelle<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM item_title.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableInsertTable&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = &#8216;2&#8217;&nbsp; &#8220;Spalten<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #3 = &#8216;8&#8217;&nbsp; &#8220;Zeilen<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #4 = &#8216;Auto&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;9,0 cm&#8217;. &#8220;Breite der 1. Spalte</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Adresse:&#8217; &#8216;TimesNewRoman&#8217; &#8217;14&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Informationen:&#8217; &#8216;TimesNewRoman&#8217; &#8217;14&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Tricktresor&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Information 1&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Im Banksafe 2&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Information 2&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Information 3&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;12345 Klein-Schl&uuml;ssel&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Information 4&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;EndOfDocument&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;EndOfLine&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableInsertTable&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = &#8216;6&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #3 = &#8216;1&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #4 = &#8216;Auto&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;2,0 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Material number&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;4,0 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Material description&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;TimesNewRoman&#8217; &#8217;12&#8217;&nbsp; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;2,1 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Quantity&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;1,6 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216; Unit&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;3,0 cm&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;RightPara&#8217; EXPORTING #01 = &#8216;AlignRight&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Price / Unit&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;3,2 cm&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;RightPara&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;AlignRight&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Net value&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; kopfzeile<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM kopfzeile.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;ViewHeader&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Anzeige Tabellengitter (0=aus)</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;TableGridLines&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216;1&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableInsertTable&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = &#8216;2&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #3 = &#8216;1&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #4 = &#8216;Auto&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Kopftext links schreiben</FONT><BR>&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;TRICKTRESOR&#8217; &#8216;TimesNewRoman&#8217; &#8217;24&#8217; &#8216;Bold&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Kopftext links mit Absatzformat &#8220;&Uuml;berschrift 1&#8221; formatieren</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;FormatStyle&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216;&Uuml;berschrift 1&#8217;.</P><P class="sap1"><FONT color="#fb2412">***&nbsp;Breite der Tabellenspalte &auml;ndern</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;9,0 cm&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Logo einbinden<BR></FONT>&nbsp; CALL METHOD OF h_word &#8216;InsertPicture&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216;C:/temp/logo.bmp&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;DEMO&#8217; &#8216;TimesNewRoman&#8217; &#8217;24&#8217; &#8216;Bold&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Kopffenster wieder schlie&szlig;en</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;CloseViewHeaderFooter&#8217;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; kopfzeile</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; infotext<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM infotext.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableInsertTable&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = &#8216;2&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #3 = &#8216;1&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #4 = &#8216;Auto&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;9,0 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Dieses Dokument wurde aus R/3 erzeugt&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;TimesNewRoman &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8217;12&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221;.</P><P class="sap1"><FONT color="#fb2412">*** Absatz linksb&uuml;ndig</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;LeftPara&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Datum &uuml;bergeben</FONT><BR>&nbsp; write sy-datum to l_text.<BR>&nbsp;&nbsp;PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING l_text &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8216;Italic&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Datum rechtsb&uuml;ndig</FONT><BR>&nbsp;&nbsp;CALL METHOD OF h_word &#8216;RightPara&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;EndOfDocument&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;EndOfLine&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; infotext</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; testdaten<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM testdaten.</P><P class="sap1">&nbsp; CLEAR t_item.<BR>&nbsp; t_item-posnr = 1.<BR>&nbsp; t_item-matnr = &#8216;ABCD&#8217;.<BR>&nbsp; t_item-mtext = &#8216;Testartikel ABCD gro&szlig;&#8217;.<BR>&nbsp; t_item-menge = &#8217;10&#8217;.<BR>&nbsp; t_item-meins = &#8216;ST&#8217;.<BR>&nbsp; t_item-netpr = &#8216;21.45&#8217;.<BR>&nbsp; t_item-waers = &#8216;EUR&#8217;.<BR>&nbsp; APPEND t_item.<BR>&nbsp; t_item-posnr = 2.<BR>&nbsp; t_item-matnr = &#8216;TEST123&#8217;.<BR>&nbsp; t_item-mtext = &#8216;Testartikel 123 klein&#8217;.<BR>&nbsp; t_item-menge = &#8216;2000&#8217;.<BR>&nbsp; t_item-meins = &#8216;ST&#8217;.<BR>&nbsp; t_item-netpr = &#8216;11.45&#8217;.<BR>&nbsp; t_item-waers = &#8216;EUR&#8217;.<BR>&nbsp; APPEND t_item.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; testdaten</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; ausgabe_position<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM ausgabe_position.</P><P class="sap1">&nbsp; PERFORM write_text USING t_item-matnr &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1"><BR>&nbsp; PERFORM write_text USING t_item-mtext &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1"><BR>&nbsp; WRITE t_item-menge TO l_menge UNIT t_item-meins.<BR>&nbsp; PERFORM write_text USING l_menge &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text USING t_item-meins &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;RightPara&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;AlignRight&#8217;.<BR>&nbsp; WRITE t_item-netpr TO l_preis CURRENCY t_item-waers.<BR>&nbsp; PERFORM write_text USING l_preis &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;RightPara&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;AlignRight&#8217;.<BR>&nbsp; l_text = t_item-menge * t_item-netpr.<BR>&nbsp; WRITE l_text TO l_text CURRENCY t_item-waers.<BR>&nbsp; PERFORM write_text USING l_text &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ausgabe_position</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; ende<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM ende.</P><P class="sap1"><FONT color="#fb2412">*** Ans Ende vom Dokument springen<BR></FONT>&nbsp; CALL METHOD OF h_word &#8216;EndOfDocument&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Dieses Programm&#8217; &#8216;TimesNewRoman&#8217; &#8217;14&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;wurde Ihnen pr&auml;sentiert&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;vom Tricktresor&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp;CALL METHOD OF h_word &#8216;InsertPara&#8217;.<BR>&nbsp;CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;https://tricktresor.com&/#8217; &#8216;Courier&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ende&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/erzeugung-eines-dokuments/">Erzeugung eines Dokuments</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/erzeugung-eines-dokuments/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Berechnung in Excel durchführen</title>
+		<link>/blog/berechnung-in-excel-durchfuehren/</link>
+					<comments>/blog/berechnung-in-excel-durchfuehren/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 11 Mar 2004 20:58:24 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=210</guid>
+
+					<description><![CDATA[<p>Dieses Programm startet Excel im Hintergrund mit einer Datei, in der eine Formel hinterlegt ist. Per OLE werden zwei Werte nach Excel &#252;bergeben und das Ergebnis der Berechnung aus diesen zwei Werten wird an R/3 zur&#252;ckgeliefert.</p>
+<p>Der Beitrag <a href="/blog/berechnung-in-excel-durchfuehren/">Berechnung in Excel durchführen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Dieses Programm startet Excel im Hintergrund mit einer Datei, in der eine Formel hinterlegt ist. Per OLE werden zwei Werte nach Excel &uuml;bergeben und das Ergebnis der Berechnung aus diesen zwei Werten wird an R/3 zur&uuml;ckgeliefert.<br /><P>Das Programm kann gut dazu verwendet werden, um komplexe bereits bestehende Berechnungen weiterhin in Excel ausf&uuml;hren zu lassen.&nbsp;</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/excel1.gif"><BR>Die Eingabe der Formel in C1</P></TD></TR></TBODY></TABLE></P><P class="sap1">REPORT ztestole NO STANDARD PAGE HEADING.<BR><FONT color="#fb2412">*====================================================================*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </FONT><A href="https://tricktresor.com/" target="_blank" Target="_blank"><FONT color="#fb2412">https://tricktresor.com/</FONT></A><FONT color="#fb2412">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*====================================================================*<BR>*<BR>* Durchf&uuml;hren einer Berechnung in einem Excel-Arbeitsblatt.<BR>*<BR>* Erstellen Sie eine Excel-Datei, in der in Zelle<BR>* C1 die Formel &#8220;=A1+B1&#8221; steht.<BR>* Die Zellen A1 und B1 werden durch das Programm &uuml;bergeben.<BR>* Die Zelle C1, in der dann das Ergebnis steht, wird wieder ausgelesen<BR>* und ausgegeben.<BR>*<BR>* Mit freundlicher Unterst&uuml;tzung von OliverS<BR>*====================================================================*</FONT></P><P class="sap1"><BR><FONT color="#fb2412">* Excel-Sheet</FONT><BR>PARAMETERS: var_file(30) DEFAULT &#8216;C:/temp/testole.xls&#8217; LOWER CASE.</P><P class="sap1"><FONT color="#fb2412">* Ergebnis</FONT><BR>DATA: result(50).</P><P class="sap1">TYPE-POOLS ole2 .</P><P class="sap1"><FONT color="#fb2412">* Handles f&uuml;r OLE Objekte</FONT><BR>DATA:<BR>&nbsp; h_excel&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE ole2_object, &#8221; Excel object<BR>&nbsp; h_book&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;TYPE ole2_object, &#8221; list of workbooks<BR>&nbsp; h_active_window TYPE ole2_object,<BR>&nbsp; cell_out&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;TYPE ole2_object,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT color="#fb2412">&#8221; cell</FONT><BR>&nbsp; cell_in&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE ole2_object.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT color="#fb2412">&#8221; cell</FONT></P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-<BR></FONT>START-OF-SELECTION.<BR><FONT color="#fb2412">* start Excel<BR></FONT>&nbsp; CREATE OBJECT h_excel &#8216;EXCEL.APPLICATION&#8217;.</P><P class="sap1"><FONT color="#fb2412">* Excel nicht sichtbar ausf&uuml;hren</FONT><BR>&nbsp; SET PROPERTY OF h_excel &#8216;Visible&#8217; = 0.</P><P class="sap1"><FONT color="#fb2412">* Arbeitsblatt ausw&auml;hlen<BR></FONT>&nbsp; CALL METHOD OF h_excel &#8216;Workbooks&#8217; = h_book.</P><P class="sap1"><FONT color="#fb2412">* bestehendes File &ouml;ffnen</FONT><BR>&nbsp; CALL METHOD OF h_book &#8216;OPEN&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #1 = var_file.</P><P class="sap1"><BR><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>* 1. Zelle, an die Wert &uuml;bergeben wird (A1)<BR></FONT>&nbsp; CALL METHOD OF h_excel &#8216;Cells&#8217; = cell_out<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #1 = 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="#fb2412">&#8220;Zeile</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = 1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="#fb2412">&#8220;Spalte</FONT></P><P class="sap1"><FONT color="#fb2412">* Zellinhalt A1 setzen</FONT><BR>&nbsp; SET PROPERTY OF cell_out &#8216;Value&#8217; = &#8216;200&#8217;.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>* 2. Zelle, an die Wert &uuml;bergeben wird (B2)<BR></FONT>&nbsp; CALL METHOD OF h_excel &#8216;Cells&#8217; = cell_out<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #1 = 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="#fb2412">&#8220;Zeile</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = 2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="#fb2412">&#8220;Spalte</FONT></P><P class="sap1"><FONT color="#fb2412">* Zellinhalt B1 setzen</FONT><BR>&nbsp; SET PROPERTY OF cell_out &#8216;Value&#8217; = &#8216;500&#8217;.</P><P class="sap1"><FONT color="#fb2412">* Object freigeben</FONT><BR>&nbsp; FREE OBJECT cell_out.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>* Zelle, aus der Ergebnis gelesen wird (C1)<BR></FONT>&nbsp; CALL METHOD OF h_excel &#8216;Cells&#8217; = cell_in<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #1 = 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="#fb2412">&#8220;Zeile</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = 3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <FONT color="#fb2412">&#8220;Spalte</FONT></P><P class="sap1"><FONT color="#fb2412">* Zellinhalt lesen</FONT><BR>&nbsp; GET PROPERTY OF cell_in &#8216;Value&#8217; = result.</P><P class="sap1"><FONT color="#fb2412">* Objekt freigeben</FONT><BR>&nbsp; FREE OBJECT cell_in.</P><P class="sap1"><FONT color="#fb2412">* Excel beenden</FONT><BR><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>* see <A href="http://support.microsoft.com/default.aspx?scid=kb;de;503541" target="_blank" Target="_blank">http://support.microsoft.com/default.aspx?scid=kb;de;503541</A><BR>* Close without saving</FONT></P><P class="sap1"><FONT color="#fb2412">* get active window<BR></FONT>&nbsp; CALL METHOD OF h_excel &#8216;ACTIVEWINDOW&#8217; = h_active_window.<BR><FONT color="#fb2412">* set active_window visible<BR>&nbsp;</FONT> SET PROPERTY OF h_active_window &#8216;VISIBLE&#8217; = 1.<BR><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;</FONT></P><P class="sap1"><FONT color="#fb2412">* close active_window without saving<BR>&nbsp; </FONT>CALL METHOD OF h_active_window &#8216;CLOSE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = 0.</P><P class="sap1"><FONT color="#fb2412">* close Excel<BR>&nbsp; </FONT>CALL METHOD OF h_excel &#8216;QUIT&#8217;.<FONT color="#fb2412"><BR>&nbsp;</FONT> FREE OBJECT: h_excel, h_active_window.<BR><BR>&nbsp; WRITE: / &#8216;Ergebnis der Berechnung in Excel:&#8217;, result.</P></p>
+<p>Der Beitrag <a href="/blog/berechnung-in-excel-durchfuehren/">Berechnung in Excel durchführen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/berechnung-in-excel-durchfuehren/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

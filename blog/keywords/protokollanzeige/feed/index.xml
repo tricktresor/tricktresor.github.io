@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Protokollanzeige Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/protokollanzeige/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 29 Nov 2013 17:00:31 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Protokollanzeige Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Callback beim Löschen eines Logs</title>
+		<link>/blog/callback-beim-loeschen-eines-logs/</link>
+					<comments>/blog/callback-beim-loeschen-eines-logs/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Oct 2009 17:22:21 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Application-Log SBAL]]></category>
+		<category><![CDATA[Protokollanzeige]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=532</guid>
+
+					<description><![CDATA[<p>Protokolle sind dazu da, um Informationen zu zeigen und vorzuhalten. In Protokollen kann man alles m&#246;gliche ablegen. Was macht man aber, wenn das Protokoll selbst gel&#246;scht wird? Es gibt keine &#196;nderungbelege daf&#252;r...</p>
+<p>Der Beitrag <a href="/blog/callback-beim-loeschen-eines-logs/">Callback beim Löschen eines Logs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Protokolle sind dazu da, um Informationen zu zeigen und vorzuhalten. In Protokollen kann man alles m&ouml;gliche ablegen. Was macht man aber, wenn das Protokoll selbst gel&ouml;scht wird? Es gibt keine &Auml;nderungbelege daf&uuml;r&#8230;<br /><P class="head1">Funktionsbaustein</P><P>Gl&uuml;cklicherweise hat die SAP hier Vorarbeit geleistet: Es wird bei jedem L&ouml;schen ein Funktionsbaustein aufgerufen mit der Namenskonvention</P><P>&#8220;BAL_DBDEL_&#8221; + Protokoll-Objekt</P><P>Merkw&uuml;rdigerweise gibt es hier keinen Beispielbaustein, den man kopieren kann. Es gibt aber andere Bausteine im System, die als Vorlage dienlich sind.</P><P>Wenn Sie also ein Protokollobjekt &#8220;ZDATEN&#8221; haben, dann k&ouml;nnen Sie den Funktionsbaustein BAL_DBDEL_EACC kopieren auf BAL_DBDEL_ZDATEN. </P><P>Sobald der Baustein aktiv ist, wird bei Aufruf des Bausteins BAL_DB_DELETE, der auch in der Transaktion SLG2 verwendet wird, Ihr Baustein aufgerufen.</P><P>Hier k&ouml;nnen Sie dann weitere Daten l&ouml;schen oder &#8211; wie im folgenden Beispiel &#8211; einen Eintrag ins Syslog vornehmen.</P><P class="head1">Callback-Funktion sinnvoll nutzen</P><P class="sap1">function bal_dbdel_zdaten.<BR><FONT color="#fb2412">*&#8221;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR>*&#8221;*&#8221;Lokale Schnittstelle:<BR>*&#8221;&nbsp; IMPORTING<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; REFERENCE(I_T_LOGS_TO_DELETE) TYPE&nbsp; BALHDR_T<BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; REFERENCE(I_IN_UPDATE_TASK) TYPE&nbsp; BOOLEAN<BR>*&#8221;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<BR><BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>* THIS is THE CALLBACK Function Module for the Application Log<BR>* -&gt; HERE we can delete our own DB tables<BR>*&nbsp;&nbsp;&nbsp; which we use for additional data storage for the our action log<BR>*<BR>* &#8211; the function module had to follow the naming convention<BR>*&nbsp;&nbsp;&nbsp; BAL_DBDEL_&#8230; to get called !!!<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR><BR>* work areas<BR></FONT>&nbsp; data: ls_log type balhdr.<BR><BR>&nbsp; loop at i_t_logs_to_delete into ls_log.<BR><BR>&nbsp;&nbsp;&nbsp; call function &#8216;RSLG_WRITE_SYSLOG_ENTRY&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exporting<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; data_word1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_log-extnumber<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; data_word2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = sy-tcode<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; data_word3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; data_word4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; data_word5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sl_message_area&nbsp; = &#8216;ZZ&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sl_message_subid = &#8216;1&#8217;&nbsp; &#8220;Protokoll &amp;A gel&ouml;scht, Transaktion &amp;B&#8221;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exceptions<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; others&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 5.<BR>&nbsp; endloop.<BR><BR>endfunction.</P><P class="head1">L&ouml;schen verhindern?</P><P>Leider hat die SAP beim Vordenken vers&auml;umt, dass man evtl. auch das L&ouml;schen von bestimmten Protokollen verhindern m&ouml;chte&#8230; Leider l&auml;sst sich das hier nur durch einen harten Abbruch mit z.B. MESSAGE X bewerkstelligen.</P></p>
+<p>Der Beitrag <a href="/blog/callback-beim-loeschen-eines-logs/">Callback beim Löschen eines Logs</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/callback-beim-loeschen-eines-logs/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Kurzübersicht</title>
+		<link>/blog/kurzuebersicht/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 30 Oct 2008 19:59:28 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Application-Log SBAL]]></category>
+		<category><![CDATA[Protokollanzeige]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=512</guid>
+
+					<description><![CDATA[<p>Hier erhalten Sie eine kurze &#220;bersicht &#252;ber wichtige Programme und Transaktionen.</p>
+<p>Der Beitrag <a href="/blog/kurzuebersicht/">Kurzübersicht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier erhalten Sie eine kurze &Uuml;bersicht &uuml;ber wichtige Programme und Transaktionen.<br /><P class="head1">Objekte und Unterobjekte pflegen</P><P>Mit der Transaktion <STRONG>SLG0 </STRONG>k&ouml;nnen Sie eigene Objekte definieren. Dies ist sinnvoll, wenn Sie Protokolle nicht nur anzeigen sondern auch speichern m&ouml;chten.</P><P>Bei komplexen Anwendungen k&ouml;nnen auch Unterobjekte angelegt werden um die einzelnen Protokolle zu differenzieren.</P><P class="head1">Protokolle anzeigen</P><P>Die Transaktion <STRONG>SLG1</STRONG> ist die Standard-Anzeigetransaktion f&uuml;r Protokolle. W&auml;hlen Sie Objekt (Unterobjekt) und den Bezeichner oder w&auml;hlen Sie die Protokolle nach Benutzer/ Datum aus.</P><P class="head1">Protokolle l&ouml;schen</P><P>Das L&ouml;schen von veralteten Protokollen ist mit der Transaktion <STRONG>SLG2</STRONG> m&ouml;glich.</P><P class="head1">Nummernkreise</P><P>Den zu verwendenden Nummernkreis f&uuml;r die Ojekte k&ouml;nnen Sie mit der Transaktion <STRONG>SLGN </STRONG>einstellen</P><P><U><STRONG>HINWEIS:</STRONG></U><BR>Eine ausf&uuml;hrliche Dokumentation mit Verweis auf alle Demo-Programme kann mit dem Programm <STRONG>SBAL_DOCUMENTATION</STRONG> angesehen werden!</P><P>Die <STRONG>HTML-Hilfe </STRONG>wird mit Programm <STRONG>SBAL_DOCU_DISPLAY </STRONG>aufgerufen!</P></p>
+<p>Der Beitrag <a href="/blog/kurzuebersicht/">Kurzübersicht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Grundsätzliches</title>
+		<link>/blog/grundsaetzliches/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Feb 2005 10:23:52 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Protokollanzeige]]></category>
+		<category><![CDATA[Application-Log SBAL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=312</guid>
+
+					<description><![CDATA[<p>Einige Transaktionen, die f&#252;r den Umgang mit der Protokollanzeige wichtig sind. Einstellen der Objekte und Anzeige der Protokolle mit Standardtransaktionen</p>
+<p>Der Beitrag <a href="/blog/grundsaetzliches/">Grundsätzliches</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Einige Transaktionen, die f&uuml;r den Umgang mit der Protokollanzeige wichtig sind. Einstellen der Objekte und Anzeige der Protokolle mit Standardtransaktionen<br /><P class="text1">Die SBAL-Protokolle sind vielseitig und universal einsetzbar. Wenn Sie noch keine Erfahrung mit diesen Protokollen haben, sollten Sie sich mal die Demoprogramme SBAL_DEMO* anschauen! Sie werden vielf&auml;ltige M&ouml;glichkeiten entdecken&#8230;</P><P class="head2">Prinzip</P><P class="text1">Im Gro&szlig;en und Ganzen bereiten Sie als erstes die Verwendung des Protokolls vor. Danach k&ouml;nnen Sie einzelne Meldungen (MESSAGE) an das Protokoll anh&auml;ngen. Sie haben dabei die M&ouml;glichkeit eine Problemklasse mitzugeben (Kritisch &#8211; Wichtig &#8211; Info &#8211; Warnung etc) oder auch zus&auml;tzliche Informationen, die Sie selbst zu Ihrem Protokollobjekt definieren k&ouml;nnen. Am Ende k&ouml;nnen Sie das Protokoll in vielf&auml;ltiger Weise ausgeben und auch speichern. </P><P class="text1">Im Folgenden ein paar Vorteile, die dieses figgelinsche Tool bietet:</P><P class="head2">Zus&auml;tzliche Felder</P><P class="text1">So k&ouml;nnen zu jedem Protokollierungsobjekt zus&auml;tzliche Felder definiert werden, die zus&auml;tzlich zur Meldung angezeigt werden. </P><P class="head2">Hierarchiedarstellung</P><P class="text1">Sie k&ouml;nnen das Protokoll leicht so aufbauen, dass der Anwender Meldungen zu bestimmten Objekten in einer Baumstruktur sehen kann. Das macht das Ganze sehr &uuml;bersichtlich. Sie k&ouml;nnen auch nach &#8220;Problemklassen&#8221; strukturieren. Dann sieht der Anwender mit einem Blick, welche Meldungen wichtig sind und welche &#8220;nur&#8221; Information sind.</P><P class="head2">Interaktivit&auml;t</P><P class="text1">Sie k&ouml;nnen in die Protokolle Call-Back-Routinen implementieren. So k&ouml;nnen nachtr&auml;glich Texte oder andere Informationen nachgelesen werden oder Sie k&ouml;nnen dem Anwender weitere Informationen zu einer Meldung bieten.</P><P class="head2">Speicherung</P><P class="text1">Protkolle k&ouml;nnen gespeichert werden und mit der Standardtransaktion SLG1 aufgerufen werden. Protokollen k&ouml;nnen Sie ein Verfallsdatum mitgeben. Mit einem periodischen Job k&ouml;nnen Sie dann automatisiert veraltete Protokolle l&ouml;schen.</P><P class="head2">Integration</P><P class="text1">Bauen Sie die Protokollanzeige in Ihre Programme ein: Als Subscreen, als Control oder rufen Sie die Anzeige als Popup auf.</P><P class="head2">Modul&uuml;bergreifend</P><P class="text1">Die Protokolle werden im Hauptspeicher gehalten. Sie k&ouml;nnen dadurch in verschachtelten Aufrufen in der letzten Ebene eine Meldung absetzen und im Hauptprogramm dann alle aufgelaufenen Meldungen einsammeln.</P><P class="head1">SAP-Doku</P><P class="text1"><A href="http://help.sap.com/saphelp_erp2005/helpdata/DE/d6/5d7f38f52f923ae10000009b38f8cf/frameset.htm" Target="_blank">http://help.sap.com/saphelp_erp2005/helpdata/DE/<BR>d6/5d7f38f52f923ae10000009b38f8cf/frameset.htm</A></P></p>
+<p>Der Beitrag <a href="/blog/grundsaetzliches/">Grundsätzliches</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Komplexe Meldungsanzeige</title>
+		<link>/blog/komplexe-meldungsanzeige/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 11 Jan 2005 13:01:25 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Application-Log SBAL]]></category>
+		<category><![CDATA[Protokollanzeige]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=303</guid>
+
+					<description><![CDATA[<p>Meldungen k&#246;nnen gruppiert dargestellt werden. So ist es f&#252;r den Anwender besonders &#252;bersichtlich, da er sich die Meldungen zu bestimmten Objekten anzeigen lassen kann. Der Control mit den Gruppierungen kann entweder ob oder links dargestellt werden.</p>
+<p>Der Beitrag <a href="/blog/komplexe-meldungsanzeige/">Komplexe Meldungsanzeige</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Meldungen k&ouml;nnen gruppiert dargestellt werden. So ist es f&uuml;r den Anwender besonders &uuml;bersichtlich, da er sich die Meldungen zu bestimmten Objekten anzeigen lassen kann. Der Control mit den Gruppierungen kann entweder ob oder links dargestellt werden.<br /><P class="head1">Anzeige eines Protokolls mit eigendefinierten Gruppen:</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/sbal/sbal_eigen.gif"><BR>Programm SBAL_DEMO_04_SELF</P></TD></TR></TBODY></TABLE></P><P class="head1">Einfachst-Aufruf einer Meldungsliste:</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/sbal/sbal_einfachst.gif"><BR>Programm SBAL_DEMO_01</P></TD></TR></TBODY></TABLE></P><P class="head1">Demonstration der Call-Back-Routinen in der Meldungsliste:</P><P>Beim Start des Programms kann bei den&nbsp;einzelnen Call-Back-Ereignissen ein Break-Point gesetzt werden, so dass man einfach nachvollziehen kann, was im einzelnen passiert.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/sbal/sbal_callback.gif"><BR>Programm SBAL_CALLBACK</P></TD></TR></TBODY></TABLE></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/komplexe-meldungsanzeige/">Komplexe Meldungsanzeige</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Einfaches Protokoll</title>
+		<link>/blog/einfaches-protokoll/</link>
+					<comments>/blog/einfaches-protokoll/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 11 Jan 2005 12:24:44 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Application-Log SBAL]]></category>
+		<category><![CDATA[Protokollanzeige]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=302</guid>
+
+					<description><![CDATA[<p>Beispiele, um Meldungen als einfache Liste anzuzeigen. Standardm&#228;&#223;ig k&#246;nnen Meldungen einer Meldungsklasse immer aus- oder eingeblendet werden. </p>
+<p>Der Beitrag <a href="/blog/einfaches-protokoll/">Einfaches Protokoll</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Beispiele, um Meldungen als einfache Liste anzuzeigen. Standardm&auml;&szlig;ig k&ouml;nnen Meldungen einer Meldungsklasse immer aus- oder eingeblendet werden. <br /><P class="head1">Anzeige&nbsp;in einem amodalen Fenster</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/sbal/sbal_popup1.gif"><BR>Programm SBAL_DEMO_04_CONTROL</P></TD></TR></TBODY></TABLE></P><P class="head1">Anzeige als (ALV-) Grid im Popup</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/sbal/sbal_popup.gif"><BR>Programm SBAL_DEMO_04_POPUP</P></TD></TR></TBODY></TABLE></P><P class="head1">Anzeige in einem Subscreen</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/sbal/sbal_subscreen.gif"><BR>Programm SBAL_DEMO_04_SUBSCREEN</P></TD></TR></TBODY></TABLE></P><P class="head1">Anzeige eines einfachen Protokolls</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/sbal/sbal_prot.gif"><BR>Programm SBAL_DEMO_04_NO_TREE</P></TD></TR></TBODY></TABLE></P></p>
+<p>Der Beitrag <a href="/blog/einfaches-protokoll/">Einfaches Protokoll</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/einfaches-protokoll/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

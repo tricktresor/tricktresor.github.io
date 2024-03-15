@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Datentypen Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/datentypen/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:56 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Datentypen Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Manchmal, aber nur manchmal&#8230; ♫</title>
+		<link>/blog/manchmal-aber-nur-manchmal-%e2%99%ab/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 11 Aug 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[dec]]></category>
+		<category><![CDATA[Datentypen]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=190554</guid>
+
+					<description><![CDATA[<p>hält SAP Überraschungen bereit, das glaubt man kaum... In einem Projekt haben wir uns gewundert, warum es in einer dynamisch generierten internen Tabelle einen CONVERSION OVERFLOW gab, obwohl das Feld vom Typ DEC ausreichend groß dimensioniert war. Die Lösung war offensichtlich. Hinterher...</p>
+<p>Der Beitrag <a href="/blog/manchmal-aber-nur-manchmal-%e2%99%ab/">Manchmal, aber nur manchmal&#8230; ♫</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>hält SAP Überraschungen bereit, das glaubt man kaum&#8230;</p>
+<p>Aber von vorne.</p>
+<p>In einem Projekt haben wir uns gewundert, warum es in einer dynamisch generierten internen Tabelle einen CONVERSION OVERFLOW gab, obwohl das Feld vom Typ DEC ausreichend groß dimensioniert war. Die Lösung war offensichtlich. Hinterher&#8230;</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-31-23.jpg"><img decoding="async" class="alignnone size-full wp-image-190690" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-31-23.jpg" alt="2015-08-10_15-31-23" width="891" height="55" srcset="/wp-content/uploads/2015/08/2015-08-10_15-31-23.jpg 891w, /wp-content/uploads/2015/08/2015-08-10_15-31-23-300x19.jpg 300w" sizes="(max-width: 891px) 100vw, 891px" /></a></p>
+<h2>Erzeugung</h2>
+<p>Wir sind bei der Erzeugung der internen Tabelle wie folgt vorgegangen:</p>
+<ul>
+<li>Definition des Feldkataloges</li>
+<li>Erzeugung der internen Tabelle mit Hilfe von cl_alv_table_create=&gt;create_dynamic_table</li>
+</ul>
+<p>Beispielhaft kann die Erzeugung folgendermaßen veranschaulicht werden:</p>
+<pre>  FIELD-SYMBOLS &lt;fcat&gt;  TYPE lvc_s_fcat.
+  DATA gt_table         TYPE lvc_t_fcat.
+
+  APPEND INITIAL LINE TO gt_fcat ASSIGNING .
+  &lt;fcat&gt;-fieldname = 'FELD1'.
+  &lt;fcat&gt;-scrtext_l = 'Feld 1: CHAR'.
+  &lt;fcat&gt;-inttype   = 'C'.
+  &lt;fcat&gt;-intlen    = 20.
+  &lt;fcat&gt;-datatype  = 'CHAR'.
+
+  APPEND INITIAL LINE TO gt_fcat ASSIGNING .
+  &lt;fcat&gt;-fieldname = 'FELD2'.
+  &lt;fcat&gt;-scrtext_l = 'Feld 2: DEC'.
+  &lt;fcat&gt;-inttype   = 'P'.
+  &lt;fcat&gt;-intlen    = 16.
+  &lt;fcat&gt;-datatype  = 'DEC'.
+  &lt;fcat&gt;-decimals  = 2.
+
+  CALL METHOD cl_alv_table_create=&gt;create_dynamic_table
+    EXPORTING
+      it_fieldcatalog           = gt_fcat
+      i_length_in_byte          = abap_true
+    IMPORTING
+      ep_table                  = gd_table
+    EXCEPTIONS
+      generate_subpool_dir_full = 9.</pre>
+<h2>Das macht SAP</h2>
+<p>Im Debugger sieht man die erzeugte Datenstruktur im Detail.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-40-25.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-190691" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-40-25.jpg" alt="2015-08-10_15-40-25" width="768" height="128" srcset="/wp-content/uploads/2015/08/2015-08-10_15-40-25.jpg 768w, /wp-content/uploads/2015/08/2015-08-10_15-40-25-300x50.jpg 300w" sizes="(max-width: 768px) 100vw, 768px" /></a></p>
+<p>Hier ist auch erkennbar, dass die gepackte Zahl im internen Format nicht 16 Bytes groß ist, sondern nur 8. Dadurch passt nur eine vierzehnstellige Zahl (plus Vorzeichen) in das Feld. Im Coding wurde jedoch die maximale Größe von intern 16 Bytes verwendet.</p>
+<h2>Versteckte Parameter</h2>
+<p>Ich habe mir die Erzeugung der internen Tabelle durch cl_alv_table_create=&gt;create_dynamic_table genauer angesehen und bin dann recht schnell auf den Parameter I_LENGTH_IN_BYTE gestoßen. Dieser Parameter ist in der Schnittstelle &#8211; wie so oft &#8211; sehr anschaulich und gut dokumentiert:</p>
+<p><em>boolsche Variable (X=true, space=false)</em></p>
+<p>Der Parameter ist optional und hat als Vorgabewert ABAP_FALSE.</p>
+<p>Um es vorweg zu nehmen: Nachdem wir den Parameter auf ABAP_TRUE gesetzt haben, funktionierte alles, wie erwartet.</p>
+<p>Beim Debuggen bin ich irgendwann auf folgende Stelle gestossen:</p>
+<pre>if ls_fieldcat-inttype eq 'P'.
+  if r_length_in_byte eq abap_true.
+    l_leng = ls_fieldcat-intlen.
+  else.
+    l_leng =  ( ls_fieldcat-intlen + 1 ) / 2.
+  endif.
+endif.
+</pre>
+<p>Meiner Meinung nach ist das Coding hier verkehrt, da gepackte Zahlen immer aus Halbbytes bestehen. An dieser Stelle darf nicht einfach die Länge halbiert werden. Warum genau diese &#8220;Halbierung&#8221; statt findet, habe ich auch nicht verstanden. Es hat wahrscheinlich mit Unicode zu tun.</p>
+<h2>Fazit</h2>
+<p>Die Erzeugung von internen Tabellen sollte meiner Meinung nach eh nicht mehr mit dem erwähnten Funktion erzeugt werden, da hier im Hintergrund Subroutine-Pools generiert werden. Die Verwendung ist nur eingeschränkt möglich (maximale Anzahl Aufrufe: 36). Inzwischen sind die Möglichkeiten mit <a href="https://tricktresor.com/blog/interne-tabelle-mit-components/">CREATE DATA &amp; RTTC</a> deutlich eleganter und zukunftssicherer. Allerdings habe ich die Verwendung von <a href="https://tricktresor.com/blog/interne-tabelle-zur-laufzeit-generieren/">CREATE_DYNMIC_TABLE </a>auch schon mal als elegant bezeichnet&#8230;</p>
+<p>Die Methode mit CREATE_DYNAMIC_TABLE hat auch einen großen Vorteil: Bei dem Aufbau der internen Tabelle kann ich gleich semantische Informationen mitgeben/ anreichern (Titel, Texte, Suchhilfen etc.), die nicht automatisch übernommen werden. Ich dann diesen Feldkatalog nicht nur zur Erzeugung der internen Tabelle verwenden, sondern auch für die Anzeige.</p>
+<p>Bei der Variante über CREATE DATA und RTTC werden fast ausschließlich die technischen Informationen ausgewertet. Wenn ein verwendetes Datenelement korrekte Überschriften hat, ist es okay, aber wenn ich eigene Felder mit einem generischen Datenelement aufbaue (FELD1, FELD2) und diese im gleichen Zug benennen will, dann muss ich dies separat tun.</p>
+<p>Der Beitrag <a href="/blog/manchmal-aber-nur-manchmal-%e2%99%ab/">Manchmal, aber nur manchmal&#8230; ♫</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

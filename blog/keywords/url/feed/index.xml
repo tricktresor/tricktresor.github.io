@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>url Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/url/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 02 Jan 2018 08:55:46 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>url Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Daten einer Website per HTTP ermitteln</title>
+		<link>/blog/daten-einer-website/</link>
+					<comments>/blog/daten-einer-website/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Jul 2012 20:02:59 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[cl_http_client]]></category>
+		<category><![CDATA[url]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Regex]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[color]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=649</guid>
+
+					<description><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Mithilfe der Klasse CL_HTTP_CLIENT besorgen wir uns den Quelltext einer Internetseite. Die URL muss dabei komplett angegeben werden, also inklusive http://</p>
+<h2 class="head1">Coding</h2>
+<p class="sap1">
+<pre class="lang:abap decode:true ">*:: Selection screen
+PARAMETERS p_url TYPE string LOWER CASE
+DEFAULT '/wp-content/index.php?aID=0'.
+
+START-OF-SELECTION.
+
+  PERFORM get_urls USING p_url.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_URLS
+*&amp;---------------------------------------------------------------------*
+FORM get_urls  USING  iv_url TYPE clike.
+
+*:: local data
+  DATA lv_http_url     TYPE string.
+  DATA lr_http_client  TYPE REF TO if_http_client.
+  DATA lv_html_code    TYPE string.
+
+  DATA lt_urls         TYPE STANDARD TABLE OF string
+WITH NON-UNIQUE DEFAULT KEY.
+  DATA lt_new          LIKE lt_urls.
+  DATA lv_regex        TYPE string.
+
+  DATA lv_url          TYPE string.
+  DATA lv_dummy1       TYPE string.
+  DATA lv_dummy2       TYPE string.
+
+  STATICS lt_list      TYPE HASHED TABLE OF string
+WITH UNIQUE KEY table_line.
+
+*:: create url
+  CALL METHOD cl_http_client=&gt;create_by_url
+    EXPORTING
+      url                = iv_url
+    IMPORTING
+      client             = lr_http_client
+    EXCEPTIONS
+      argument_not_found = 1
+      plugin_not_active  = 2
+      internal_error     = 3
+      OTHERS             = 4.
+  IF sy-subrc &gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to create url, Sy-Subrc;', sy-subrc.
+    STOP.
+  ENDIF.
+
+*:: Send out request
+  lr_http_client-&gt;send( ).
+
+*:: Receive result as stream
+  CALL METHOD lr_http_client-&gt;receive
+    EXCEPTIONS
+      http_communication_failure = 1
+      http_invalid_state         = 2
+      http_processing_failed     = 3
+      OTHERS                     = 4.
+
+  IF sy-subrc &lt;&gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to read data, Sy-Subrc;', sy-subrc.
+  ELSE.
+*:: Get sourcecode
+    lv_html_code = lr_http_client-&gt;response-&gt;get_cdata( ).
+    WRITE:/ iv_url COLOR 5.
+
+*:: simple method - Find urls
+    SPLIT lv_html_code AT 'href=' INTO TABLE lt_urls.
+    LOOP AT lt_urls INTO lv_url.
+      FORMAT COLOR OFF.
+      CHECK lv_url IS NOT INITIAL.
+      CHECK lv_url(1) = `"`
+      OR lv_url(1) = `'`.
+      FIND lv_url(1) IN lv_url+1 MATCH OFFSET sy-fdpos.
+      CHECK sy-subrc = 0.
+      lv_url = lv_url+1(sy-fdpos).
+
+      IF lv_url IS INITIAL.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '#'.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '/'.  "Root
+        FORMAT COLOR COL_GROUP.
+
+      ELSEIF lv_url(1) = '?'.
+        SPLIT iv_url AT '?' INTO lv_dummy1 lv_dummy2.
+        IF sy-subrc = 0.
+          CONCATENATE lv_dummy1 lv_url INTO lv_url.
+        ELSE.
+        ENDIF.
+      ELSEIF lv_url(5) = 'https' OR lv_url(5) = 'HTTPS'.
+        FORMAT COLOR COL_POSITIVE.
+      ELSEIF lv_url(4) = 'http' OR lv_url(4) = 'HTTP'.
+        FORMAT COLOR COL_NORMAL.
+      ENDIF.
+
+*:: try to find main URL in link
+      CONCATENATE '^' iv_url INTO lv_regex.
+      FIND REGEX lv_regex IN lv_url.
+      IF sy-subrc = 0.
+        FORMAT INTENSIFIED ON.
+      ELSE.
+        FORMAT INTENSIFIED OFF.
+      ENDIF.
+      WRITE: /10 lv_url.
+
+    ENDLOOP.
+    ULINE.
+
+  ENDIF.
+
+ENDFORM.                    " GET_URLS</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/daten-einer-website/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Internetadressen einbinden</title>
+		<link>/blog/internetadressen-einbinden/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 12 Jan 2006 11:03:04 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[SAPScript]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[url]]></category>
+		<category><![CDATA[SE61]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=363</guid>
+
+					<description><![CDATA[<p>Das Einbinden von Internetadressen ist bis Release 6.20 noch nicht vorgesehen, jedoch bereits implementiert. Hier zeigen wir Ihnen, was Sie unternehmen m&#252;ssen, um die Funktion zu aktivieren.</p>
+<p>Der Beitrag <a href="/blog/internetadressen-einbinden/">Internetadressen einbinden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Einbinden von Internetadressen ist bis Release 6.20 noch nicht vorgesehen, jedoch bereits implementiert. Hier zeige ich dir, was du unternehmen musst, um die Funktion zu aktivieren.</p>
+<p>Welche anderen Verweisobjekte es gibt, beschreibe ich hier: <a href="https://tricktresor.com/blog/verweisobjekte/">Verweisobjekte</a></p>
+<h2 class="head1">URL einbinden</h2>
+<p>Um eine URL einbinden zu können, hat die SAP bereits alles vorbereitet. Lediglich ein Tabelleneintrag fehlt, um die Funktion nutzen zu können.</p>
+<p>Füge mit der Transaktion SE16 oder SE16n in die Tabelle TDCLD einen neuen Eintrag hinzu. Fülle die Felder wie folgt:</p>
+<pre class="">DOKCLASS      URLA
+DOKEDICL      URLA
+DOKLENGTH1    60 (nicht länger, sonst kann es zu einem shortdump  kommen!)
+DOKU LINK     X (Damit Das Objekt im Menu "Einbinden - Verweis" angezeigt wird)
+DOKTITEL      URL (Internetadresse)
+DOKDESCR1     URL
+DOKDESCR2     URL</pre>
+<p>Nachdem du den Eintrag gesichert hast, kannst du deine URL wie folgt einbinden:</p>
+<p>Link: &lt;DS:URLA.http://www.google.de&gt;Google&lt;/&gt;<br />
+File: &lt;DS:URLA.file://o:/Projekte/SAP/Inhalt.doc&gt;SAP Doku (Word)&lt;/&gt;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/internetadressen-einbinden/">Internetadressen einbinden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

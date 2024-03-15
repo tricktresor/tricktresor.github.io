@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>github Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/github/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 20 Oct 2020 17:01:01 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>github Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Automatische Aufgabengenerierung [abapGit]</title>
+		<link>/blog/automatische-aufgabengenerierung-abapgit/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 20 Oct 2020 17:00:59 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abapGit]]></category>
+		<category><![CDATA[github]]></category>
+		<category><![CDATA[issue]]></category>
+		<guid isPermaLink="false">/?p=1024465</guid>
+
+					<description><![CDATA[<p>Dank des devtoberfestes habe ich diese Woche einiges über github gelernt. Ein cooles Feature möchte ich gerne mit euch teilen: Github actions Github actions können verwendet werden, um auf github Ereignisse reagieren zu können. Ein wichtiges Ereignis ist der Commit einer Datei (push). TODO to Issue Action Mit einer YAML-Definition kann man mit einer Action auf die Ereignisse reagieren. Ich habe im github Marketplace die Action TODO to issue action gefunden und einmal ausprobiert. Mit...</p>
+<p>Der Beitrag <a href="/blog/automatische-aufgabengenerierung-abapgit/">Automatische Aufgabengenerierung [abapGit]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Dank des <a href="https://github.com/SAP-samples/sap-devtoberfest-2020/blob/master/topics/github/readme.md">devtoberfestes</a> habe ich diese Woche einiges über github gelernt. Ein cooles Feature möchte ich gerne mit euch teilen:</p>
+
+
+
+<h2 class="wp-block-heading">Github actions</h2>
+
+
+
+<p><a class="keychainify-checked" href="https://github.com/features/actions">Github actions</a> können verwendet werden, um auf github Ereignisse reagieren zu können. Ein wichtiges Ereignis ist der Commit einer Datei (push). </p>
+
+
+
+<h2 class="wp-block-heading">TODO to Issue Action</h2>
+
+
+
+<p>Mit einer YAML-Definition kann man mit einer <em>Action</em> auf die Ereignisse reagieren. Ich habe im github Marketplace die Action<a href="https://github.com/marketplace/actions/todo-to-issue"> TODO to issue action </a>gefunden und einmal ausprobiert.</p>
+
+
+
+<p>Mit dieser Action ist es möglich auf einen bestimmten <em>Marker</em> zu reagieren, der im Quelltext vorkommt. Sinnvoll ist im ABAP-Umfeld das Doppelte Anführungszeichen, dass einen Kommentar einleitet, gefolgt von dem Wort &#8220;TODO&#8221;. Findet der Workflow beim Einchecken (push) eines Sourcecodes diesen Marker, dann erstellt die Action automatisch ein Issue im github Repository.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="500" height="616" src="/wp-content/uploads/2020/10/issue05.jpg" alt="" class="wp-image-1024467" srcset="/wp-content/uploads/2020/10/issue05.jpg 500w, /wp-content/uploads/2020/10/issue05-244x300.jpg 244w" sizes="(max-width: 500px) 100vw, 500px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Test Repository</h2>
+
+
+
+<p>Um das Ganze auszuprobieren, habe ich ein Testrepository im github angelegt: <a class="keychainify-checked" href="https://github.com/tricktresor/todo_action_test">TODO to Issue</a>.</p>
+
+
+
+<h2 class="wp-block-heading">Vorbereitungen</h2>
+
+
+
+<p>Um TODO to Action Issues in deinem Repository zu aktivieren, musst du zwei Dinge tun:</p>
+
+
+
+<ul><li>Erstellen der Workflowdatei</li><li>Anlegen des TODO Labeles</li></ul>
+
+
+
+<h3 class="wp-block-heading">YAML-Workflowdatei</h3>
+
+
+
+<p>Um den Workflow einzurichten, brauchst du nur eine YML-Datei in dem Ordner .github/workflows erstellen. Wahrscheinlich existiert der Ordner noch nicht. Dann lege ihn einfach an.</p>
+
+
+
+<p>Die Datei kann zum Beispiel wie folgt aussehen:</p>
+
+
+
+<pre class="wp-block-preformatted">name: todo2issue
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: TODO to Issue
+        uses: alstr/todo-to-issue-action@v2.0
+        with:
+          REPO: ${{ github.repository }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL: "\"TODO"
+          COMMENT_MARKER: "\""
+          CLOSE_ISSUES: true
+        id: "todo"</pre>
+
+
+
+<p>Die wichtige Anpassung für ABAP-Programme ist die Definition des COMMENT_MARKERs mit &#8220;. Da das doppelte Anführungszeichen ein Sonderzeichen ist, muss es mit dem Escape-Zeichen &#8216;\&#8217; erstellt werden.</p>
+
+
+
+<p>Die Definition des * als Kommentarmarker hat bei mir zu einem Syntaxfehler im YAML-File geführt. Das doppelte Anführungszeichen finde ich aber eh sinnvoller.</p>
+
+
+
+<h3 class="wp-block-heading">Label TODO</h3>
+
+
+
+<p>Wechsele in deinem Repository zu der Registerkarte <em>Issues</em> und lege ein Issue an. Auf der rechten Seite kannst du aus den verfügbaren Labels auswählen. TODO existiert noch nicht und du musst es anlegen.</p>
+
+
+
+<h2 class="wp-block-heading">Anwendung</h2>
+
+
+
+<p>Um die Anlage eines Issues zu prüfen, habe ich ein einfaches Programm erstellt und einen TODO-Kommentar eingefügt:</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT langs INTO DATA(lang). "TODO use ALV grid for display<br>  WRITE: / lang-sptxt.<br>ENDLOOP.</code></pre>
+
+
+
+<p>Beim Einchecken mit abapGit wird auf das Ereignis <em>push</em> reagiert und der Workflow startet:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="339" src="/wp-content/uploads/2020/10/SNAG-00796-1024x339.png" alt="" class="wp-image-1024470" srcset="/wp-content/uploads/2020/10/SNAG-00796-1024x339.png 1024w, /wp-content/uploads/2020/10/SNAG-00796-300x99.png 300w, /wp-content/uploads/2020/10/SNAG-00796-768x254.png 768w, /wp-content/uploads/2020/10/SNAG-00796-1536x509.png 1536w, /wp-content/uploads/2020/10/SNAG-00796.png 1543w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Registerkarte &#8220;Actions&#8221; direkt nach dem push</figcaption></figure>
+
+
+
+<p>Die Verarbeitung dauert etwa eine Minute. Danach ist das Issue in der Registerkarte <em>Issues </em>vorhanden:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="199" src="/wp-content/uploads/2020/10/SNAG-00799-1024x199.png" alt="" class="wp-image-1024469" srcset="/wp-content/uploads/2020/10/SNAG-00799-1024x199.png 1024w, /wp-content/uploads/2020/10/SNAG-00799-300x58.png 300w, /wp-content/uploads/2020/10/SNAG-00799-768x149.png 768w, /wp-content/uploads/2020/10/SNAG-00799.png 1216w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Die automatisch generierten Aufgaben in der Registerkarte &#8220;Issues&#8221;</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Features</h2>
+
+
+
+<p>In der Action <em>TODO to Issue Action </em>gibt es noch ein paar zusätzliche Features, die sehr interessant sind:</p>
+
+
+
+<h3 class="wp-block-heading">Closing issues</h3>
+
+
+
+<p>Wenn das Label CLOSE_ISSUES auf TRUE gesetzt wird, dann erkennt die Action, wenn ein TODO aus dem Quelltext entfernt wurde. Was will man mehr? </p>
+
+
+
+<h3 class="wp-block-heading">Multiline Todos</h3>
+
+
+
+<p>Mit mehrzeiligen Kommentaren kann ein Issue mit einer Beschreibung angelegt werden:</p>
+
+
+
+<pre class="wp-block-preformatted">"TODO Come up with a more imaginative greeting
+"Everyone uses hello world and it's boring.</pre>
+
+
+
+<h3 class="wp-block-heading">Dynamic Labels</h3>
+
+
+
+<p>Fügt man dem TODO-Kommentar das Schlüsselwort <em>labels:</em> voran, dann kann man zusätzliche Tags (Labels) mitgeben:</p>
+
+
+
+<pre class="wp-block-preformatted">labels: enhancement, help wanted</pre>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Ich finde, dass das Feature <em>TODO to Action Issue</em> extrem hilfreich ist. Die Verwaltung funktioniert nach ersten Tests sehr gut. Im Issue selbst ist gut erkenntlich, in welchem Zusammenhang das todo steht. Ein direkter Link zum Sourcecode ist ebenfalls vorhanden. Auch das Löschen von Todos funktioniert gut. Änderungen im Quelltext erzeugen keine doppelten Issues. Wenn ein Issue geschlossen wurde, wird es erneut angelegt, sobald ein Issue mit dem gleichen Text wieder auftaucht.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="500" height="649" src="/wp-content/uploads/2020/10/issues3.jpg" alt="" class="wp-image-1024468" srcset="/wp-content/uploads/2020/10/issues3.jpg 500w, /wp-content/uploads/2020/10/issues3-231x300.jpg 231w" sizes="(max-width: 500px) 100vw, 500px" /></figure>
+
+
+
+<p>Viel Spaß beim Verwaltungen deiner Projekte mit Issues!</p>
+<p>Der Beitrag <a href="/blog/automatische-aufgabengenerierung-abapgit/">Automatische Aufgabengenerierung [abapGit]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>abapGit</title>
+		<link>/blog/abapgit/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 10 Jan 2018 23:52:18 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Community]]></category>
+		<category><![CDATA[abapGit]]></category>
+		<category><![CDATA[github]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018300</guid>
+
+					<description><![CDATA[<p>abapGit revolutioniert gerade die Art, wie die SAP-Community zusammen arbeiten kann. Das Addon, das Lars Hvam im Alleingang entwickelt hat, hat SAPLink inzwischen fast vollständig abgelöst und begeistert jeden, der damit einmal zu tun hatte. In diesem Artikel erfährst du, was abapGit ist, wie es funktioniert und welche Vorteile es gibt.</p>
+<p>Der Beitrag <a href="/blog/abapgit/">abapGit</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>abapGit revolutioniert gerade die Art, wie die SAP-Community zusammen arbeiten kann. Das Addon, das Lars Hvam im Alleingang entwickelt hat, hat SAPLink inzwischen fast vollständig abgelöst und begeistert jeden, der damit einmal zu tun hatte. In diesem Artikel erfährst du, was abapGit ist, wie es funktioniert und welche Vorteile es gibt.</p>
+<h2>Github</h2>
+<p>Die Grundlage von abapGit ist die Open Source Plattform <a href="https://github.com/">Github</a>. Auf dieser Plattform kann Quellcode verwaltet werden. Andere Anwender können sich die Quelltexte auf ihren Computer laden, verwenden, verbessern und die verbesserte Version wieder publizieren. Zusammenarbeit wird durch diese Plattform enorm erleichtert. Es gibt auch andere Plattformen, die nach einem ähnlichen Prinzip arbeiten: Gitlab, BitBucket und so weiter. Hier gibt es eine Liste der Alternativen: <a href="https://trusted.de/github-alternativen">https://trusted.de/github-alternativen</a>.</p>
+<p>Github zum Beispiel erlaubt in der kostenlosen Variante nur öffentliche Projekte. Die Plattform <a href="https://about.gitlab.com/products/feature-comparison/">GitLab</a> ermöglicht auch private Projekte, die nicht öffentlich sichtbar sind.</p>
+<h2>Der Nutzen im SAP-Umfeld</h2>
+<p>Im Gegensatz zu den meisten anderen Programmiersprachen, benötigt man einen kompletten <em>SAP-Server</em>, um ABAP-Programme ausführen zu können. Dieser Server steht jedoch zentral in einem Unternehmen. Damit hat man auch ein zentrales Repository und benötigt Github nicht. In diesem Fall haben alle, die SAP programmieren auch Zugriff auf den unternehmenseigenen Server. Was also bringt die Installation und die Verwendung von abapGit?</p>
+<p>Wenn jemand im Unternehmen das Tool abapGit auf dem SAP-Entwicklungssystem installiert und den Zugang zum öffentlichen github-Repository freischalten lässt, dann können Mitarbeiter an öffentlichen ABAP-Open-Source-Projekten teilhaben. Ein Klick und die entsprechende Anwendung kann aus dem Github-Repository auf dem SAP-Server installiert werden. Es gibt mehrere Gründe, warum das jemand tun könnte:</p>
+<ul>
+<li>Viele der Github-Projekte sind Demoprogramme oder Lernprojekte zu einem Thema. So kann man sich also schnell und einfach zu vielen Themen weiterbilden ohne dass man Tabellen, Programme, Klasse, Datenelemente etc. manuell im SAP-System anlegen muss.
+<ul>
+<li><a href="https://github.com/pixelbaker/ABAP-RayTracer">ABAP-RayTracer</a></li>
+<li><a href="https://github.com/christianguenter2/ABAP_conways_game_of_life">Conways Game Of Life</a></li>
+</ul>
+</li>
+<li>Es werden immer mehr wertvolle Tools von SAP-begeisterten Programmierern entwickelt. Diese Tools darf ein Unternehmen kostenlos nutzen. Durch abapGit können diese einfach und gefahrlos installiert werden
+<ul>
+<li><a href="https://github.com/ivanfemia/abap2xlsx">ABAP2XLSX</a></li>
+<li><a href="https://github.com/larshp/abapOpenChecks">abapOpenChecks</a></li>
+</ul>
+</li>
+</ul>
+<p>Wenn ein Unternehmen kostenlose, von vielen erfahrenen Menschen programmierte Software nutzt, dann ist es nur recht und billig, dass ein Unternehmen durch die Beteiligung der eigenen Mitarbeiter auch etwas an die Gemeinschaft zurück gibt. abapGit macht es einfach möglich.</p>
+<p>Lars Hvam hat berichtet in seinen Blogs auf <a href="https://blogs.sap.com/author/lars.hvam/">blogs.sap.com</a> über abapGit als auch über seine Open-Source-Projekte und andere Programmierthemen. Zusätzlich hat er eine Seite erstellt, auf denen ABAP-Projekte gelistet werden: <a href="http://dotabap.org/">http://dotabap.org/</a></p>
+<h2>Weitere Berichte über abapGit</h2>
+<p>https://blogs.sap.com/2017/06/21/abapgit-so-easy/</p>
+<p>https://blogs.sap.com/2017/11/19/getting-started-open-sourcing-abap-code/</p>
+<h2>Zukunft</h2>
+<p>Die Problemlose Zusammenarbeit im ABAP-Umfeld ist immer noch Neuland. Dementsprechend sind auch die genannten Plattformen zur Speicherung von Quelltext und zur Zusammenarbeit für die meisten ABAP-Programmierer ungewohnt. Das genial andere Programm ZABAPGIT von Lars Hvam ermöglicht jedoch viele neue Möglichkeiten. Im Gegensatz zu SAPLink, das irgendwann in der Entwicklung stoppte und oftmals fehlerhaft und umständlich zu bedienen war, arbeitet abapGit sensationell einfach und sicher.</p>
+<p>Jeder, der eine kleine Programmierung, ein Mini-Addon oder ein Lernprojekt auf dem SAP-Server erstellt hat, kann es einfach mit anderen teilen und von der Gemeinschaft verbessern lassen.</p>
+<h2>Tricktresor auf Github</h2>
+<p>Angefangen hat es gestern mit einem kleinen Blogeintrag &#8220;<a href="https://blogs.sap.com/2018/01/09/variations-of-selecting-multiple-options-from-a-list/">Varianten einer Mehrfachselektion</a>&#8220;, den ich auf blogs.sap.com veröffentlicht habe, habe ich angefangen, den Quellcode, der im Tricktresor ja eh bereits öffentlich ist, auch auf Github zu publizieren. Alle Github-Projekte könnt ihr unter der folgenden Adresse sehen:</p>
+<p><a href="https://github.com/tricktresor?tab=repositories">https://github.com/tricktresor?tab=repositories</a></p>
+<p>Hier werde ich neue und auch alte Programmierungen veröffentlichen. Einerseits tue ich das, um euch den Quellcode einfacher zur Verfügung zu stellen. Andererseits sammle ich damit ebenfalls Erfahrungen um damit meine eigene Arbeit besser machen zu können als auch meine Kunden beraten zu können.</p>
+<p>Zudem hoffe ich auch, dass vielleicht das eine oder andere kleine Programm Stück für Stück verbessert wird, auf ein neues ABAP-Release gehoben wird oder auch eine Toolsammlung entsteht, die uns allen das Leben leichter macht.</p>
+<h2>Eigene Projekte</h2>
+<p>Wenn du ein eigenes Projekt auf Github veröffentlichen möchtest, dann ist es ziemlich leicht.</p>
+<h3>abapGit installieren</h3>
+<p>Als erstes musst du abapGit auf dem SAP-Server installieren, sofern dies noch niemand vor dir getan hat. Dafür musst du abapGit herunterladen und installieren: <a href="http://abapgit.org/">abapgit.org</a> Wie genau, das steht dort beschrieben.</p>
+<p>Solltest du keine Verbindung zu github.com bekommen, so muss die HTTP-Verbindung freigeschaltet werden (SAP-Server, Router, Antivirenprogramme prüfen).</p>
+<h3>Github-Account</h3>
+<p>Sofern du noch keinen Github-Account hast, musst du einen auf <a href="https://github.com/">https://github.com/</a> anlegen.</p>
+<p>Danach kannst du direkt auf der Startseite oder über das Menü PLUS ein neues Projekt anlegen .</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/github1-1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018308" src="https://tricktresor.com/wp-content/uploads/2018/01/github1-1.png" alt="" width="1045" height="304" srcset="/wp-content/uploads/2018/01/github1-1.png 1045w, /wp-content/uploads/2018/01/github1-1-300x87.png 300w, /wp-content/uploads/2018/01/github1-1-768x223.png 768w, /wp-content/uploads/2018/01/github1-1-1024x298.png 1024w" sizes="(max-width: 1045px) 100vw, 1045px" /></a></p>
+<p>Hier gibst du einen Namen sowie die Beschreibung ein. In der kostenlosen Variante kannst du nur öffentliche Projekte erstellen.</p>
+<p>Wichtig ist, dass du den Haken &#8220;Initialize this repository with a README&#8221; setzt. Eine Lizenz solltest du auch direkt auswählen. Am meisten verwendet wird die MIT-License.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/github2-1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018309" src="https://tricktresor.com/wp-content/uploads/2018/01/github2-1.png" alt="" width="768" height="609" srcset="/wp-content/uploads/2018/01/github2-1.png 768w, /wp-content/uploads/2018/01/github2-1-300x238.png 300w" sizes="(max-width: 768px) 100vw, 768px" /></a></p>
+<p>Ein Klick auf <em>Create repository</em> erzeugt das Projekt. Herzlichen Glückwunsch!</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit5.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018320 size-full" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit5.png" alt="" width="996" height="680" srcset="/wp-content/uploads/2018/01/abapgit5.png 996w, /wp-content/uploads/2018/01/abapgit5-300x205.png 300w, /wp-content/uploads/2018/01/abapgit5-768x524.png 768w" sizes="(max-width: 996px) 100vw, 996px" /></a></p>
+<h3>abapGit</h3>
+<p>Theoretisch kannst du nun eine neue Datei anlegen und ABAP-Quellcode in diese Datei kopieren. Praktisch funktioniert das jedoch nicht, da abapGit noch Meta-Daten zu dem jeweiligen Objekt speichert. Diese werden nur geschrieben und später wieder erkannt, wenn du die SAP-Objekte über das Programm ZABAPGIT hinzufügst. Starte dafür die Transaktion SE38 und führe das Programm ZABAPGIT aus.</p>
+<p>Die Startseite ist dann wahrscheinlich leer, aber in etwa wird dich folgendes Bild begrüßen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit2.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018312 size-large" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit2-1024x434.png" alt="" width="640" height="271" srcset="/wp-content/uploads/2018/01/abapgit2-1024x434.png 1024w, /wp-content/uploads/2018/01/abapgit2-300x127.png 300w, /wp-content/uploads/2018/01/abapgit2-768x325.png 768w, /wp-content/uploads/2018/01/abapgit2.png 1086w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h3>Repository füllen</h3>
+<p>Wie bekommst du nun Programme und andere Objekte nach Github? Zuerst klonst du das gewünschte Projekt über den Link &#8220;Clone&#8221; im abapGit-Menu. Es erscheint dann folgendes Popup:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit3.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018311" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit3.png" alt="" width="904" height="164" srcset="/wp-content/uploads/2018/01/abapgit3.png 904w, /wp-content/uploads/2018/01/abapgit3-300x54.png 300w, /wp-content/uploads/2018/01/abapgit3-768x139.png 768w" sizes="(max-width: 904px) 100vw, 904px" /></a></p>
+<p>Hier trägst du dir github-URL ein sowie ein Paket. Du kannst ein lokales Paket definieren, das nicht transportiert wird (du benötigst also keinen Transportauftrag) oder du nimmst ein Z- oder Y-Paket, das einen Transport in die nachfolgenden SAP-Systeme erlaubt.</p>
+<p>Wenn das Paket noch nicht existiert, kannst du es über die Schaltfläche &#8220;Create Package&#8221; anlegen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit4.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018310" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit4.png" alt="" width="760" height="252" srcset="/wp-content/uploads/2018/01/abapgit4.png 760w, /wp-content/uploads/2018/01/abapgit4-300x99.png 300w" sizes="(max-width: 760px) 100vw, 760px" /></a></p>
+<p>du kannst für die Github-Projekte auch ein Hauptpaket definieren und dann für jedes Projekt ein eigenes Unterpaket erstellen.</p>
+<p>Als Ergebnis erhältst du wiederum eine sehr übersichtliche Seite:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit6.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018321 size-full" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit6.png" alt="" width="1073" height="311" srcset="/wp-content/uploads/2018/01/abapgit6.png 1073w, /wp-content/uploads/2018/01/abapgit6-300x87.png 300w, /wp-content/uploads/2018/01/abapgit6-768x223.png 768w, /wp-content/uploads/2018/01/abapgit6-1024x297.png 1024w" sizes="(max-width: 1073px) 100vw, 1073px" /></a></p>
+<p>Wenn du nun ein Programm in diesem Paket anlegst, dann kannst du über <em>Refresh</em> prüfen, ob du das Programm auch wirklich in dem Paket angelegt hast. Es erscheint dann in der Liste.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit7.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018322 size-full" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit7.png" alt="" width="1035" height="122" srcset="/wp-content/uploads/2018/01/abapgit7.png 1035w, /wp-content/uploads/2018/01/abapgit7-300x35.png 300w, /wp-content/uploads/2018/01/abapgit7-768x91.png 768w, /wp-content/uploads/2018/01/abapgit7-1024x121.png 1024w" sizes="(max-width: 1035px) 100vw, 1035px" /></a></p>
+<p>Über den Link <em>Stage</em> kannst du die Daten ins Github hochladen. In der Übersicht siehst du die Objekte, die übertragen werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit8.png"><img loading="lazy" decoding="async" class="alignnone wp-image-1018323 size-full" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit8.png" alt="" width="1068" height="189" srcset="/wp-content/uploads/2018/01/abapgit8.png 1068w, /wp-content/uploads/2018/01/abapgit8-300x53.png 300w, /wp-content/uploads/2018/01/abapgit8-768x136.png 768w, /wp-content/uploads/2018/01/abapgit8-1024x181.png 1024w" sizes="(max-width: 1068px) 100vw, 1068px" /></a></p>
+<p>Mit <em>Add all and commit</em> gelangst du zum nächsten Schritt. Hier musst du deine Anmeldedaten von Github eintragen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit9-1.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018325" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit9-1.png" alt="" width="582" height="461" srcset="/wp-content/uploads/2018/01/abapgit9-1.png 582w, /wp-content/uploads/2018/01/abapgit9-1-300x238.png 300w" sizes="(max-width: 582px) 100vw, 582px" /></a></p>
+<p>Danach noch dein Kennwort eingeben und es wird die Übertragung zu Github gestartet.</p>
+<p>Ob es geklappt hat, kannst du direkt auf Github prüfen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/abapgit10.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018326" src="https://tricktresor.com/wp-content/uploads/2018/01/abapgit10.png" alt="" width="990" height="488" srcset="/wp-content/uploads/2018/01/abapgit10.png 990w, /wp-content/uploads/2018/01/abapgit10-300x148.png 300w, /wp-content/uploads/2018/01/abapgit10-768x379.png 768w" sizes="(max-width: 990px) 100vw, 990px" /></a></p>
+<p>&nbsp;</p>
+<h3>Weg frei zur Zusammenarbeit</h3>
+<p>Damit ist der Weg frei zur Zusammenarbeit mit anderen SAP-Entwicklern. Wenn dein Projekt spannend ist oder gerade diese Funktion von anderen Programmierern benötigt wird, wird sich jemand finden, der hier mitarbeitet. Du kannst deine Programme natürlich auch einfach so auf Github speichern und hauptsächlich für dich dein persönliches Lernprogramm oder Code-Fundgrube verwalten.</p>
+<p>Happy Coding!</p>
+<p>Der Beitrag <a href="/blog/abapgit/">abapGit</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

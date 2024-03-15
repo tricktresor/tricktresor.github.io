@@ -1,0 +1,1101 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Partner Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/tricktresor/partner/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 06 May 2021 16:25:10 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Partner Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</title>
+		<link>/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 24 Apr 2021 21:35:23 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Aufzeichnung]]></category>
+		<category><![CDATA[Geschäftspartner]]></category>
+		<guid isPermaLink="false">/?p=1027590</guid>
+
+					<description><![CDATA[<p>Seit einiger Zeit beschäftige ich mich mit den Geschäftspartnern in S/4HANA und deren programmatischer Anlage, Änderung sowie der Erweiterung der einzelnen Sichten. In meinem aktuellen Projekt führt kein Weg an der Anlage der Business Partner per Programm vorbei, da die Daten über eine Schnittstelle kommen und verarbeitet werden müssen. Wie sieht es aber aus, wenn Geschäftspartner zwar massenhaft aber nicht automatisch geändert werden müssen, zum Beispiel durch den Fachbereich? In der aktuellen Situation, in der...</p>
+<p>Der Beitrag <a href="/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/">Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Seit einiger Zeit beschäftige ich mich mit den Geschäftspartnern in S/4HANA und deren programmatischer Anlage, Änderung sowie der Erweiterung der einzelnen Sichten. In meinem aktuellen Projekt führt kein Weg an der Anlage der Business Partner per Programm vorbei, da die Daten über eine Schnittstelle kommen und verarbeitet werden müssen. </p>
+
+
+
+<p>Wie sieht es aber aus, wenn Geschäftspartner zwar massenhaft aber nicht automatisch geändert werden müssen, zum Beispiel durch den Fachbereich? In der aktuellen Situation, in der wir uns befinden, müssen Stammdatenänderungen mitunter schnell erfolgen können. Die IT kann dies oftmals nicht leisten, denn der Aufwand ist erheblich und die Vorlaufzeit mitunter katastrophal. Und wenn dann noch regelmäßige, weit auseinander liegende Releasezyklen dazu kommen (also Produktivsetzung nur alle drei Monate), dann kann locker ein dreiviertel Jahr ins Land gehen, bis der Anwender sein Programm hat.</p>
+
+
+
+<p>Mit der Software <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> können viele Aufgaben vom Anwender selbst erledigt werden. Die Einarbeitungszeit für <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist gering, die Möglichkeiten sind vielfältig.</p>
+
+
+
+<p>Ich möchte heute einmal vergleichen, wie sich meine Programmierung und Simdia² im Vergleich schlagen. </p>
+
+
+
+<h2 class="wp-block-heading">Disziplin: Geschäftszeiten ändern</h2>
+
+
+
+<p>Die Änderung von Geschäftspartnern in S/4HANA ist eine sehr anspruchsvolle Aufgabe. Das Objekt &#8220;Business Partner&#8221; ist komplex und sehr variabel. Es gibt für einzelne Funktionen entsprechende Funktionsbausteine (die man jedoch erst einmal finden muss) oder die zentrale Funktion CL_MD_BP_MAINTAIN=&gt;MAINTAIN, die mit einem komplexen Datentypen <em>gefüttert </em>werden muss. </p>
+
+
+
+<p>Aktuell und wohl auch noch viele Monate später sind die genauen Öffnungszeiten von Partnern wichtig. Kunden haben eventuell eingeschränkte und häufig wechselnde Warenannahmezeiten und auch Lieferanten sind nicht ständig zu den <em>normalen</em> Geschäftszeiten erreichbar.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="604" height="893" src="/wp-content/uploads/2021/04/SNAG-01504.png" alt="" class="wp-image-1027604" srcset="/wp-content/uploads/2021/04/SNAG-01504.png 604w, /wp-content/uploads/2021/04/SNAG-01504-203x300.png 203w" sizes="(max-width: 604px) 100vw, 604px" /><figcaption>Geschäftszeiten eines Geschäftspartners</figcaption></figure>
+
+
+
+<p>Aus diesem Grund denke ich, dass die Funktion der Geschäftszeiten eine sehr wichtige Rolle spielt oder spielen kann. Der Fachbereich erfragt die Geschäftszeiten seiner Partner jedoch in der Regel nicht einzeln um sie dann in den Geschäftspartner einzutragen, sondern erfragt diese eventuell über ein Online-Formular. Oder die Daten werden von Kollegen und Kolleginnen gesammelt, die diese dann in eine Excel-Tabelle eintragen. Am Ende wäre es also für den Fachbereich sehr hilfreich, wenn er ein Programm hätte, mit dem die aktuellen Geschäftszeiten automatisiert in die betroffenen Partner eingetragen werden könnte.</p>
+
+
+
+<h2 class="wp-block-heading">Ablauf in der IT</h2>
+
+
+
+<p>Auch wenn inzwischen viel über Continuous Integration und Continuous Delivery geredet wird, sieht der Alltag in der SAP-IT immer noch anders aus. Natürlich muss der Fachbereich eine Anforderung stellen. Alleine das ist häufig nicht ganz einfach. Die Anforderung muss geprüft und die technische Umsetzung geplant werden. Wenn dann irgendwann ein Programmierer für die Entwicklung eingeplant wurde, müssen weitere Hürden genommen werden:</p>
+
+
+
+<ul><li>Es müssen die richtigen Bausteine für die Aufgabe gefunden werden</li><li>Selbst wenn die programmierende Person sich mit der Programmierung der Geschäftspartner auskennt, muss eventuell erst einmal recherchiert werden</li><li>Dann muss die Excel-Datei eingelesen werden<ul><li>entweder wird tatsächlich eine recht aufwendige Programmierung zum Einlesen der Excel-Datei entwickelt</li><li>oder man macht es sich leicht und liest eine CSV-Datei ein. Dann muss der Fachbereich die Datei erst als CSV speichern, bevor die Datei verarbeitet werden kann</li></ul></li><li>Es müssen eventuell Berechtigungen für die neue Transaktion beantragt und zugeordnet werden</li></ul>
+
+
+
+<p>Sobald das Programm fertiggestellt wurde, muss der Fachbereich testen. Meiner Erfahrung nach funktioniert ein Programm selten nach dem ersten <em>Wurf</em>.</p>
+
+
+
+<p>Häufig kommen noch Urlaub oder Krankheit entweder aus dem Fachbereich oder in der IT hinzu, was die Fertigstellung des Programms verzögert&#8230;</p>
+
+
+
+<p>Und wenn dann noch lange Releasezyklen dazu kommen, dann ist in manchen Firmen die Pandemie bereits vorbei, bevor der Fachbereich das Programm zur Arbeitserleichterung erhalten hat.</p>
+
+
+
+<h2 class="wp-block-heading">Änderung der Geschäftszeiten in S4/HANA mit der Business-Partner-API</h2>
+
+
+
+<p>Da ich mich in letzter Zeit öfters mit der API zu den Geschäftspartnern beschäftigt habe (Klasse CL_MD_BP_MAINTAIN), wollte ich wissen, wie lange ich alleine für die Programmierung zur Änderung der Geschäftszeiten benötige.</p>
+
+
+
+<p>Etwa vier Stunden waren alleine schon nötig, nur um herauszufinden, welche Parameter bei den Geschäftszeiten überhaupt benötigt werden. Viele Parameter gingen häufig nicht aus den definierten Datenelementen hervor und auch nicht aus der Anwendung selbst.</p>
+
+
+
+<p>Beispielsweise ist der Typ (Feldname TYPE), der definiert, welche Regel für die Geschäftszeiten gilt (Täglich, Wöchentlich, Monatlich) vom Typ CHAR2. Ich musste also erst herausfinden, was mit TYPE eigentlich gemeint ist. Welche Id für die Art der Geschäftszeiten (Anrufzeiten, Warenannahmezeiten, Besuchszeiten) verwendet werden muss, habe ich eher durch Zufall herausgefunden. Der SCHEDULE_TYPE hat zwar ein eigenes Datenelement, das jedoch weder Festwerte hat noch auf eine Prüftabelle verweist.</p>
+
+
+
+<p>Durch meine Arbeit mit den Geschäftspartnern, beziehungsweise mit der Klasse CL_MD_BP_MAINTAIN, hatte ich bereits eine passende Fehlerbehandlung. </p>
+
+
+
+<h3 class="wp-block-heading">Coding</h3>
+
+
+
+<p>Der folgende Quelltext legt zu einem Business Partner die Warenannahmezeiten für Montag bis Freitag mit den jeweils übergebenen Von- und Bis-Zeiten an. </p>
+
+
+
+<pre class="wp-block-code"><code>    SELECT SINGLE partner_guid FROM but000 INTO @DATA(guid) WHERE partner = @partner.
+
+    CHECK sy-subrc = 0.
+
+    "fill data structure with relevant customer data
+    DATA(bp_data) = VALUE cvis_ei_extern(
+      partner-header-object_task     = 'M'
+      partner-header-object          = 'BUS1006' "Business Partner
+      partner-header-object_instance = VALUE #(
+      bpartner = partner
+        bpartnerguid           = guid )
+        partner-central_data-business_hour = VALUE #( current_state = ' '
+          business_hours = VALUE #(
+            task = 'M'
+            data_key-schedule_type = 'B' "Warenannahme TAB TB049
+            data-weekly = VALUE #(
+              ( weeks      = 1
+                fcalid     = '01' "Deutschland
+                conflicts  = '0' "Keine Ausnahmen
+                type       = 'W'
+                start_date = sy-datum
+                end_date   = sy-datum + 365
+                monday     = 'X' monda_from = time_from  monday_to  = time_to    mond_tzone = 'CET'
+                tuesday    = 'X' tuesd_from = time_from  tuesday_to = time_to    tues_tzone = 'CET'
+                wednesday  = 'X' wedne_from = time_from  wednesd_to = time_to    wedn_tzone = 'CET'
+                thursday   = 'X' thurs_from = time_from  thursda_to = time_to    thur_tzone = 'CET'
+                friday     = 'X' frida_from = time_from  friday_to  = time_to    frid_tzone = 'CET'
+                saturday   = ' ' satur_from = VALUE #( ) saturda_to = VALUE #( ) satu_tzone = ''
+                sunday     = ' ' sunda_from = VALUE #( ) sunday_to  = VALUE #( ) sund_tzone = '' )
+                )
+                 ( ) ) ) ) .
+
+    TRY.
+
+        SET UPDATE TASK LOCAL.
+        cl_md_bp_maintain=&gt;maintain(
+          EXPORTING
+            i_data     = VALUE #( ( bp_data ) )
+          IMPORTING
+            e_return   = DATA(lt_return)   ).
+
+        IF lt_return IS INITIAL.
+          sy-subrc = 1.
+        ELSE.
+          READ TABLE lt_return&#091; 1 ]-object_msg INTO ls_return WITH KEY type = 'A'.
+          IF sy-subrc &gt; 0.
+            READ TABLE lt_return&#091; 1 ]-object_msg INTO ls_return WITH KEY type = 'E'.
+          ENDIF.
+        ENDIF.
+
+        IF sy-subrc &lt;&gt; 0.
+          CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+        ENDIF.
+      CATCH zcx_bc_bp.
+        RETURN.
+    ENDTRY.</code></pre>
+
+
+
+<p>In meinem Beispiel habe ich noch nicht das Einlesen und Prüfen der Excel-Tabelle programmiert, keine Darstellung der eingelesenen Daten und keine Fehlerbehandlung für den Anwender. </p>
+
+
+
+<p>Deswegen würde ich schätzen, dass die Entwicklung eines ordentlichen Programms, das die Geschäftszeiten anlegt und entsprechend Anwenderfreundlich ist, <strong>mindestens eine Woche Entwicklungszeit </strong>benötigt.</p>
+
+
+
+<h2 class="wp-block-heading">Und was ist jetzt mit SimDia²?</h2>
+
+
+
+<p>Das Tool <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> von Ersasoft, das als Windowsprogramm auf dem PC des Anwenders vorhanden sein muss, wird vom SAP-Anwender bedient. Im Grunde führt der Anwender dabei die gleichen Schritte aus, wie bei einer normalen manuellen Eingabe in der Transaktion, die er gerade benötigt. In unserem Fall ist es die Transaktion &#8220;BP &#8211; Geschäftspartner&#8221;. Diese Arbeitsschritte werden aufgezeichnet und können beliebig oft wiederholt werden.</p>
+
+
+
+<p>Der Anwender legt eine Excel-Datei mit den Daten an, die für die Transaktion benötigt werden. Dabei ist es wichtig, dass die Feldnamen eindeutig sind, damit <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> die Felder eindeutig zuordnen kann. Die Erstellung der Excel-Datei kann ebenfalls durch <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> mit Hilfe des integrierten Vorlagen-Generators erfolgen.</p>
+
+
+
+<h3 class="wp-block-heading">Eingabedatei</h3>
+
+
+
+<p>In unserem Fall benötigen wir eine Datei mit Spalten für die Felder Geschäftspartnernummer und jeweils drei Felder für jeden Tag:</p>
+
+
+
+<ul><li>Tag auswählen (X/space)</li><li>Uhrzeit von</li><li>Uhrzeit bis</li></ul>
+
+
+
+<p>Nach einer kurzen Einführung in die Funktionen und die Arbeitsweise von <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist der Anwender in der Lage, die Transaktion mit den Daten aus der Excel-Datei zu befüllen. Der große Vorteil ist, dass der Anwender seine Transaktion genau kennt und genau weiß, welche Daten benötigt werden.</p>
+
+
+
+<p>Bei der Aufzeichnung muss man sich nach den Besonderheiten der Transaktion richten. Bei der Transaktion BP ist zum Beispiel eine Besonderheit, dass die jeweils letzte Sicht des Geschäftspartners bei Auswahl eines anderen Geschäftspartners erneut präsentiert wird. </p>
+
+
+
+<h3 class="wp-block-heading">Aufzeichnung</h3>
+
+
+
+<p>Die Aufzeichnung ist sehr einfach und intuitiv. <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> und die gewünschte Transaktion müssen gestartet werden. Danach muss die Excel-Datei mit den Daten ausgewählt werden. Mit dem Aufzeichungsassistenten von <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> wird die Aufzeichnung gestartet. Alle Felder der Excel-Tabelle werden im <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a>-Fenster als Drucktaste dargestellt. Der Anwender muss dann nur noch die einzelnen Sichten auswählen, die zu belegenden Felder anklicken und mit einem Klick auf die dazugehörige Drucktaste im <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a>-Fenster die Daten übertragen. Die Aufzeichnung kann natürlich gespeichert und jederzeit wiederverwendet werden.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="530" height="725" src="/wp-content/uploads/2021/04/SNAG-01507.png" alt="" class="wp-image-1027611" srcset="/wp-content/uploads/2021/04/SNAG-01507.png 530w, /wp-content/uploads/2021/04/SNAG-01507-219x300.png 219w" sizes="(max-width: 530px) 100vw, 530px" /><figcaption>Felder aus der Excel-Tabelle</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Daten importieren</h3>
+
+
+
+<p>Zum Import der Daten aus einer Excel-Tabelle müssen die Excel-Datei und die passende Aufzeichnung geladen werden. Die passende Transaktion startet <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> selbstständig und schon können die Daten importiert werden. Am Anfang kann man den Import Schritt für Schritt überwachen um sicher zu gehen, dass die Aufzeichnung wirklich korrekt ist.</p>
+
+
+
+<p>Wenn alles passt, dann kann der Turbo eingeschaltet werden und die Daten werden in Windeseile importiert.  </p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" src="/wp-content/uploads/2021/04/SNAG-01506-1024x616.png" alt="" class="wp-image-1027610" width="NaN" height="NaN" srcset="/wp-content/uploads/2021/04/SNAG-01506-1024x616.png 1024w, /wp-content/uploads/2021/04/SNAG-01506-300x181.png 300w, /wp-content/uploads/2021/04/SNAG-01506-768x462.png 768w, /wp-content/uploads/2021/04/SNAG-01506.png 1268w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Simdia² integriert in den SAPGUI</figcaption></figure>
+
+
+
+<p>Die importierten Daten werden protokolliert. Kann ein Datensatz nicht gespeichert werden, dann wird dies im Protokoll festgehalten.</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="1024" height="163" src="/wp-content/uploads/2021/04/SNAG-01505-1024x163.png" alt="" class="wp-image-1027609" srcset="/wp-content/uploads/2021/04/SNAG-01505-1024x163.png 1024w, /wp-content/uploads/2021/04/SNAG-01505-300x48.png 300w, /wp-content/uploads/2021/04/SNAG-01505-768x123.png 768w, /wp-content/uploads/2021/04/SNAG-01505.png 1109w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Excel-Datei mit Geschäftszeiten und Protokoll aus Simdia²</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Bei der ABAP-Programmierung habe ich dir eine ungefähre Zeitangabe gegeben, wie lange die Vorarbeit für ein <em>richtiges </em>Programm gedauert hat (Zur Erinnerung: ca. eine Woche). Jetzt bist du sicherlich gespannt, wie lange die Aufzeichnung mit Simdia² gedauert hat? Nun, während ich diesen Artikel schreibe, habe ich die Aufzeichnung erstellt und ein paar Datensätze importiert und ein paar Screenshots gemacht. Ich musste die Aufzeichnung mehrere Male machen, weil ich erst später darüber gestolpert bin, dass ich für das Aktivieren der einzelnen Tage ein separates Feld benötige. Das alles hat insgesamt circa <strong>zwei Stunden </strong>gedauert. Mit etwas Übung ist man mit <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> innerhalb von <strong>10 Minuten</strong> mit einer Aufzeichnung fertig.</p>
+
+
+
+<p><a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist also auf jeden Fall eine Alternative zur ABAP-Programmierung. Besonders dann, wenn die IT überlastet ist und der Fachbereich dringend eine Lösung für zeitraubende, wiederkehrende Arbeiten benötigt.</p>
+
+
+
+<h2 class="wp-block-heading">Sicherheit</h2>
+
+
+
+<p>Sicherheit und Sicherheitslücken sind ein wichtiges Thema in der IT. <a class="keychainify-checked" href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> hat diesbezüglich einen enormen Vorteil: Der Anwender kann nur die Daten ändern, für die er auch die Berechtigung hat. Das ist bei SAP-Programmen nicht immer der Fall und wird gerne übersehen.</p>
+
+
+
+<h2 class="wp-block-heading">Weitere Artikel zu SimDia²</h2>
+
+
+            <div id="post-grid-lazy-1028358" class="post-grid-lazy"><img decoding="async" alt="" src="" /></div>
+        <script>
+            jQuery('#post-grid-lazy-1028358').ready(function($) {
+                $('#post-grid-lazy-1028358').fadeOut();
+                $('#post-grid-1028358   ').fadeIn();
+            })
+        </script>
+        <style type="text/css">
+            #post-grid-1028358 {
+                display: none;
+            }
+
+            .post-grid-lazy {
+                text-align: center;
+            }
+        </style>
+        <div data-options='{&quot;page_type&quot;:&quot;taxonomy&quot;,&quot;page_taxonomy&quot;:&quot;category&quot;,&quot;page_tax_term&quot;:1068,&quot;id&quot;:&quot;1028358&quot;,&quot;lazy_load&quot;:&quot;yes&quot;,&quot;masonry_enable&quot;:&quot;no&quot;,&quot;view_type&quot;:&quot;grid&quot;}' id="post-grid-1028358" class="post-grid grid">
+                <div class="grid-items">
+            <div class="item item-1043503 skin flat even 0 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/abap-und-stellenanzeigen/"><img loading="lazy" decoding="async" width="500" height="500" src="/wp-content/uploads/2020/09/abap-magician-turnbeutel.jpg" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2020/09/abap-magician-turnbeutel.jpg 500w, /wp-content/uploads/2020/09/abap-magician-turnbeutel-300x300.jpg 300w, /wp-content/uploads/2020/09/abap-magician-turnbeutel-150x150.jpg 150w, /wp-content/uploads/2020/09/abap-magician-turnbeutel-83x83.jpg 83w" sizes="(max-width: 500px) 100vw, 500px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/abap-und-stellenanzeigen/">ABAP und Stellenanzeigen</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Den Tricktresor gibt es nun seit über zwanzig Jahren. Am 17.4.2003 habe ich meinen ersten Beitrag verfasst: Drucktaste neben AUSFÜHREN-Button.                    <a target="_self" href="/blog/abap-und-stellenanzeigen/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div><div class="item item-1045109 skin flat odd 1 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/img-struktur-anzeigen/"><img loading="lazy" decoding="async" width="640" height="228" src="/wp-content/uploads/2024/03/image-9.png" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2024/03/image-9.png 739w, /wp-content/uploads/2024/03/image-9-300x107.png 300w" sizes="(max-width: 640px) 100vw, 640px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/img-struktur-anzeigen/">IMG-Struktur anzeigen</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Für den ein oder anderen Fall kann es sinnvoll sein, eine Unternehmensstruktur (IMG) direkt anzeigen oder sogar editieren zu können.                    <a target="_self" href="/blog/img-struktur-anzeigen/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div><div class="item item-1045045 skin flat even 2 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/alv-grid-und-dropdown/"><img loading="lazy" decoding="async" width="332" height="364" src="/wp-content/uploads/2024/03/image-8.png" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2024/03/image-8.png 332w, /wp-content/uploads/2024/03/image-8-274x300.png 274w" sizes="(max-width: 332px) 100vw, 332px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/alv-grid-und-dropdown/">ALV-Grid und Dropdown</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Es gibt einige Verhaltensweise in SAP-Objekten, bei denen ich einfach nicht verstehe, warum diese nicht schon seit langer Zeit behoben                    <a target="_self" href="/blog/alv-grid-und-dropdown/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div><div class="item item-1044885 skin flat odd 3 ">
+                <div class="layer-wrapper layout-1028386">
+                <div class="layer-media element_1587187627902" id="">
+        <div class="element element_1587190790308  element-media ">
+        <a target="_self" href="/blog/finden-%e2%94%80-nicht-suchen/"><img loading="lazy" decoding="async" width="533" height="179" src="/wp-content/uploads/2024/02/SNAG-0290.jpg" class="attachment-large size-large wp-post-image" alt="" srcset="/wp-content/uploads/2024/02/SNAG-0290.jpg 533w, /wp-content/uploads/2024/02/SNAG-0290-300x101.jpg 300w" sizes="(max-width: 533px) 100vw, 533px" /></a>
+
+    </div>
+    </div>
+    <div class="layer-content element_1587187714568" id="">
+        <div class="element element_1587187895341  title ">
+                    <a target="_blank" href="/blog/finden-%e2%94%80-nicht-suchen/">Finden ─ nicht suchen</a>
+
+        
+
+    </div>
+    <div class="element element_1587187729822  excerpt ">
+        Ich denke, nach beinahe 30 Jahren Erfahrung mit SAP-Systemen kann ich mich als alten Fuchs bezeichnen und es gibt wenig                    <a target="_self" href="/blog/finden-%e2%94%80-nicht-suchen/">Read more</a>
+            </div>
+    </div>
+        </div>
+    </div>        </div>
+            <style type="text/css">
+            .layout-1028386 .element_1587187627902 {
+                            }
+
+                    </style>
+        <style type="text/css">
+        .layout-1028386 .element_1587190790308 {
+            overflow: hidden;
+                    }
+
+        .layout-1028386 .element_1587190790308 img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        @media only screen and (min-width: 1024px) {
+            .layout-1028386 .element_1587190790308 {
+                height: auto;
+                            }
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 1023px) {
+            .layout-1028386 .element_1587190790308 {
+                height: auto;
+                            }
+        }
+
+        @media only screen and (min-width: 0px) and (max-width: 767px) {
+            .layout-1028386 .element_1587190790308 {
+                height: auto;
+                            }
+        }
+    </style>
+        <style type="text/css">
+            .layout-1028386 .element_1587187714568 {
+                margin: 10px;
+                            }
+
+                    </style>
+        <style type="text/css">
+        .layout-1028386 .element_1587187895341 {
+            font-size: 18px;
+            margin: 5px 0px;
+            text-align: left;
+                    }
+
+        .layout-1028386 .element_1587187895341 a {
+            font-size: 18px;
+            margin: 5px 0px;
+            text-align: left;
+                    }
+    </style>
+    <style type="text/css">
+        .layout-1028386 .element_1587187729822 {
+            font-size: 13px;
+            margin: 0px 0px;
+            text-align: left;
+                    }
+
+        .layout-1028386 .element_1587187729822 a {
+            font-size: 13px;
+                    }
+    </style>
+
+
+    
+
+            <style type="text/css">
+            .layout-1028386 a{text-decoration:none}.layout-1028386{vertical-align:top}.layout-1028386 .layer-content{padding:10px}        </style>
+        <script>
+                    </script>
+        <style type="text/css">
+        #post-grid-1028358 {
+            padding: 10px;
+                    }
+
+        #post-grid-1028358 .item {
+            padding: 0px;
+            background: #fff;
+                    }
+
+        #post-grid-1028358 .item .layer-media {
+            height:auto;        }
+
+        @media only screen and (min-width: 0px) and (max-width: 767px) {
+            #post-grid-1028358 .grid-items {
+                text-align: center;
+                            }
+
+            #post-grid-1028358 .item {
+                width: 90%;
+                margin: 10px;
+                display: inline-block;
+                vertical-align: top;
+                height:auto;            }
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 1023px) {
+            #post-grid-1028358 .grid-items {
+                text-align: center;
+                            }
+
+            #post-grid-1028358 .item {
+                width: 250px;
+                margin: 10px;
+                display: inline-block;
+                vertical-align: top;
+                max-height:auto;            }
+        }
+
+        @media only screen and (min-width: 1024px) {
+            #post-grid-1028358 .grid-items {
+                text-align: center;
+                            }
+
+            #post-grid-1028358 .item {
+                width: 250px;
+                display: inline-block;
+                margin: 10px;
+                vertical-align: top;
+                height:auto;            }
+        }
+
+            </style>
+    </div>
+
+<p>Der Beitrag <a href="/blog/geschaeftszeiten-cl_md_bp_maintain-vs-simdia%c2%b2/">Geschäftszeiten in S/4HANA: ABAP vs. SimDia²</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>GROSSER MATJES-PREIS 2020</title>
+		<link>/blog/grosser-matjes-preis-2020/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 26 Jun 2020 11:17:07 +0000</pubDate>
+				<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Lustiges]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Excel]]></category>
+		<category><![CDATA[GaloppSim]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<guid isPermaLink="false">/?p=1023787</guid>
+
+					<description><![CDATA[<p>Zum dritten Mal findet das Rennen um den großen Matjes-Preis statt. Durch die Erfahrungen aus dem Corona-Cup Ende März, in dem die armen Pixelponys mit Mund-Nasenschutz rennen mussten, kann der große Matjes-Preis durch gelockerte Maßnahmen nun weitestgehend uneingeschränkt durchgeführt werden. Alle wichtigen Informationen rund um das Rennen erfährst du auf der Website https://galoppsim.racing/grosser-matjes-preis/ Renninformation Startmodus Taktik und Training vieles mehr Galoppsimulation Das Rennen wird komplett virtuell in the cloud ausgeführt (cloud = someone elses computer)...</p>
+<p>Der Beitrag <a href="/blog/grosser-matjes-preis-2020/">GROSSER MATJES-PREIS 2020</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Zum dritten Mal findet das Rennen um den<a aria-label="undefined (opens in a new tab)" href="https://galoppsim.racing/grosser-matjes-preis/" target="_blank" rel="noreferrer noopener"> großen Matjes-Preis</a> statt. Durch die Erfahrungen aus dem <a aria-label="undefined (opens in a new tab)" href="https://galoppsim.racing/corona-cup-2020/" target="_blank" rel="noreferrer noopener">Corona-Cup</a> Ende März, in dem die armen Pixelponys mit Mund-Nasenschutz rennen mussten,  kann der große Matjes-Preis durch gelockerte Maßnahmen nun weitestgehend uneingeschränkt durchgeführt werden.  </p>
+
+
+
+<p>Alle wichtigen Informationen rund um das Rennen erfährst du auf der Website <a href="https://galoppsim.racing/grosser-matjes-preis/">https://galoppsim.racing/grosser-matjes-preis/</a></p>
+
+
+
+<ul><li>Renninformation</li><li>Startmodus</li><li>Taktik und Training</li><li>vieles mehr</li></ul>
+
+
+
+<h2 class="wp-block-heading">Galoppsimulation</h2>
+
+
+
+<p>Das Rennen wird komplett virtuell <em>in the cloud </em>ausgeführt (cloud = someone elses computer) ausgeführt. Die Grundlagen für das Rennen hat der Gründer des <a aria-label="undefined (opens in a new tab)" href="http://matjes-institut.de/" target="_blank" rel="noreferrer noopener">Matjes-Institutes</a> in Hamburg, Marco Matjes, gelegt, als er sich das Programmieren mit Excel (VBA) beibringen wollte. </p>
+
+
+
+<p>Mit dem <a href="https://galoppsim.racing/download/1743/">Galoppsim Trainingsversion</a> kannst du deine eigenen Rennen planen und ausführen:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="641" src="/wp-content/uploads/2020/06/gmp2020_trainingsedition-1024x641.png" alt="" class="wp-image-1023791" srcset="/wp-content/uploads/2020/06/gmp2020_trainingsedition-1024x641.png 1024w, /wp-content/uploads/2020/06/gmp2020_trainingsedition-300x188.png 300w, /wp-content/uploads/2020/06/gmp2020_trainingsedition-768x480.png 768w, /wp-content/uploads/2020/06/gmp2020_trainingsedition-487x304.png 487w, /wp-content/uploads/2020/06/gmp2020_trainingsedition-563x353.png 563w, /wp-content/uploads/2020/06/gmp2020_trainingsedition.png 1154w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption>Galoppsim Trainingsversion</figcaption></figure>
+
+
+
+<p>Jedes Rennen wird auf <a href="https://www.twitch.tv/galoppsim" target="_blank" aria-label="undefined (opens in a new tab)" rel="noreferrer noopener">Twitch </a>live übertragen und begeistert kommentiert.</p>
+
+
+
+<h2 class="wp-block-heading">Aba isch &#8216;abe doch ga kein Pfärrd&#8230;!</h2>
+
+
+
+<p>Das kannst du ändern. Und zwar ganz einfach mit dem <a href="https://galoppsim.racing/download/1639/">Pixelpferdeditor</a> vom <a aria-label="undefined (opens in a new tab)" href="http://matjes-institut.de/" target="_blank" rel="noreferrer noopener">Matjes-Institut für Galoppsimulation</a>.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="773" height="366" src="/wp-content/uploads/2020/06/SNAG-00504.png" alt="" class="wp-image-1023790" srcset="/wp-content/uploads/2020/06/SNAG-00504.png 773w, /wp-content/uploads/2020/06/SNAG-00504-300x142.png 300w, /wp-content/uploads/2020/06/SNAG-00504-768x364.png 768w" sizes="(max-width: 773px) 100vw, 773px" /><figcaption>Pferdeeditor</figcaption></figure>
+
+
+
+<p>Die Daten werden per Mail dem Rennveranstalter übermittelt. Danach fehlt eigentlich nur noch die Zahlung des</p>
+
+
+
+<div class="wp-block-image"><figure class="alignright size-large is-resized"><img loading="lazy" decoding="async" src="/wp-content/uploads/2020/06/image.png" alt="" class="wp-image-1023789" width="186" height="94"/><figcaption>Startgeld</figcaption></figure></div>
+
+
+
+<h2 class="wp-block-heading">Startgeld</h2>
+
+
+
+<p>Mit einem lächerlich günstigen, an Übervorteilung grenzenden Betrag von EUR 5,- kannst du deinen Pixelpanther an den Start schicken. Alle Einnahmen werden zu gleichen Teilen an folgende soziale Einrichtungen oder Projekte für Kinder gespendet:</p>
+
+
+
+<ul><li><a rel="noreferrer noopener" href="https://www.grosse-hilfe.de/" target="_blank">Große Hilfe für kleine Helden</a>&nbsp;(Heilbronn)</li><li><a rel="noreferrer noopener" href="https://sternenbruecke.de/home" target="_blank">Kinder-Hospiz Sternenbrücke</a>&nbsp;(Hamburg)</li></ul>
+
+
+
+<h2 class="wp-block-heading">Anmeldung</h2>
+
+
+
+<p>Hier geht es zur <a aria-label="undefined (opens in a new tab)" href="https://galoppsim.racing/grosser-matjes-preis/#anker20anmeldung" target="_blank" rel="noreferrer noopener">Anmeldung zum Großen Matjes-Preis 2020</a> sowie allen wichtigen Informationen rund um Rennsimulation, Rennen, Taktiken, Spenden, Editoren, Ergebnisse und vieles mehr.</p>
+
+
+
+<p>Die ersten Qualifikationsläufe haben bereits statt gefunden:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="846" height="302" src="/wp-content/uploads/2020/06/image-1.png" alt="" class="wp-image-1023792" srcset="/wp-content/uploads/2020/06/image-1.png 846w, /wp-content/uploads/2020/06/image-1-300x107.png 300w, /wp-content/uploads/2020/06/image-1-768x274.png 768w" sizes="(max-width: 846px) 100vw, 846px" /><figcaption>Qualifikationslauf Großer Matjes-Preis 2020</figcaption></figure>
+<p>Der Beitrag <a href="/blog/grosser-matjes-preis-2020/">GROSSER MATJES-PREIS 2020</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Sprachtransporte</title>
+		<link>/blog/sprachtransporte/</link>
+		
+		<dc:creator><![CDATA[Martin Lüdecke]]></dc:creator>
+		<pubDate>Mon, 25 May 2020 11:57:29 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Partner]]></category>
+		<guid isPermaLink="false">/?p=1023615</guid>
+
+					<description><![CDATA[<p>Wenn man ein paar eigenentwickelte Transaktionen oder Reports im SAP-System in eine andere Sprache übersetzt hat, dann stellt als Nächstes sich häufig die Frage, wie diese Texte jetzt in weitere Systeme gelangen sollen. Die offensichtliche Antwort wäre, einfach noch einmal alle Objekte zu transportieren, die zu den übersetzten Transaktionen gehören. Und je nach Einstellung des Transportsystems klappt das auch ganz gut. Aber es ist schon etwas unschön, den ganzen Code noch einmal zu transportieren, wenn...</p>
+<p>Der Beitrag <a href="/blog/sprachtransporte/">Sprachtransporte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Wenn man ein paar eigenentwickelte Transaktionen oder Reports im SAP-System in eine andere Sprache übersetzt hat, dann stellt als Nächstes sich häufig die Frage, wie diese Texte jetzt in weitere Systeme gelangen sollen. Die offensichtliche Antwort wäre, einfach noch einmal alle Objekte zu transportieren, die zu den übersetzten Transaktionen gehören. Und je nach Einstellung des Transportsystems klappt das auch ganz gut. Aber es ist schon etwas unschön, den ganzen Code noch einmal zu transportieren, wenn sich eigentlich nur die Texte auf der Benutzeroberfläche geändert haben. Vor allem dann, wenn der eigene Arbeitgeber für jeden Transport, den man weiterschiebt, umfassende Qualitätsprüfungen vorschreibt. Solche Qualitätsmaßnahmen mögen zwar sinnvoll sein für Transporte, die tatsächlich die Funktionsweise einer Transaktion u. Ä. ändern – aber Übersetzungen tun dies per Definition nicht.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="490" src="/wp-content/uploads/2020/05/LU1_Report-1024x490.jpg" alt="" class="wp-image-1023619" srcset="/wp-content/uploads/2020/05/LU1_Report-1024x490.jpg 1024w, /wp-content/uploads/2020/05/LU1_Report-300x143.jpg 300w, /wp-content/uploads/2020/05/LU1_Report-768x367.jpg 768w, /wp-content/uploads/2020/05/LU1_Report.jpg 1054w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption><em>Unser Beispielreport, auf Deutsch und auf Französisch!</em></figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Was sind Sprachtransporte?</h2>
+
+
+
+<p>Zu diesem Zweck gibt es Sprachtransporte, einen Typ von Transporten, der aus meiner Sicht viel zu selten eingesetzt wird. In Sprachtransporten werden nur die Übersetzungen transportiert, nicht die eigentlichen Entwicklungsobjekte. Das hat immense Vorteile und ist ganz einfach viel sauberer, denn man transportiert so wirklich nur dass, was transportiert werden soll. Sprachtransporte sind kein eigene Art von Transportaufträgen, sondern man verwendet einfach einen Workbenchauftrag oder einen Transport von Kopien. Zunächst zeige ich einmal kurz, wie das Ganze funktioniert, wenn man so einen Transport von Hand zusammenbaut.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="972" height="850" src="/wp-content/uploads/2020/05/LU1_SE63.jpg" alt="" class="wp-image-1023620" srcset="/wp-content/uploads/2020/05/LU1_SE63.jpg 972w, /wp-content/uploads/2020/05/LU1_SE63-300x262.jpg 300w, /wp-content/uploads/2020/05/LU1_SE63-768x672.jpg 768w, /wp-content/uploads/2020/05/LU1_SE63-400x350.jpg 400w" sizes="(max-width: 972px) 100vw, 972px" /><figcaption><em>Hier wurde der Report in SE63 übersetzt. Für die Qualität der französischen Übersetzung übernehme ich keine Garantie!</em></figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Beispiel</h2>
+
+
+
+<p>In unserem Beispiel haben wir die Textelemente des Reports <em>/LUDECKE/TESTREPORT</em> und des Datenelements <em>/LUDECKE/TESTFELD</em> aus dem Deutschen ins Französische übersetzt, einfach durch Abspringen nach SE63 aus dem jeweiligen Objekt. Dann legen wir zunächst einmal einen neuen Transportauftrag vom Typ <em>Workbenchauftrag</em> oder <em>Transport von Kopien</em> an. In die Objektliste des Transportauftrags oder der Aufgabe tragen wir nun von Hand wie unten abgebildet einige Objekt ein, in diesem Fall einen Report und ein Datenelement. Doch anstatt <em>R3TR</em> geben wir als Programm-ID hier <em>LANG</em> ein. Sobald wir die Eingabe abschließen, fragt uns das System nach einer Sprache. Hier geben wir <em>FR</em> ein.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="438" src="/wp-content/uploads/2020/05/LU1_Manueller_Transport-1024x438.jpg" alt="" class="wp-image-1023617" srcset="/wp-content/uploads/2020/05/LU1_Manueller_Transport-1024x438.jpg 1024w, /wp-content/uploads/2020/05/LU1_Manueller_Transport-300x128.jpg 300w, /wp-content/uploads/2020/05/LU1_Manueller_Transport-768x328.jpg 768w, /wp-content/uploads/2020/05/LU1_Manueller_Transport.jpg 1324w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption><em>In diesen Transport haben wir die Objekte, deren französische Texte transportiert werden sollen, manuell eingegeben.</em></figcaption></figure>
+
+
+
+<p>Für alle weiteren Objekte vom Typ <em>LANG</em>, die wir eingeben, wird jetzt automatisch <em>FR</em> eingetragen. Wir können das jedoch manuell ändern und z. B. dasselbe Objekt mehrfach eintragen, mit unterschiedlichen Sprachen. </p>
+
+
+
+<h2 class="wp-block-heading">Freigabe des Sprachtransports</h2>
+
+
+
+<p>Wenn wir jetzt diesen Transportauftrag freigeben und ins nächste System importieren, wird exakt gar nichts an den eigentlichen Objekten geändert, sondern es werden nur die Übersetzungen importiert. Wenn ein Objekt im Zielsystem nicht existiert, gibt es einen RC-8. Wenn in einem Objekt im Zielsystem die Feldlänge kürzer ist als im Quellsystem, erhält man einen RC-4. In beiden Fällen werden die betreffenden Übersetzungen beim Import übersprungen, aber alle Übersetzungen, für die keine Fehler auftraten, werden erfolgreich importiert. In unserem Beispiel wurde das Datenelement <em>/LUDECKE/TESTFELD</em> nie ins Testsystem transportiert, daher schlägt hier der Import fehl. Die Textelemente des Reports <em>/LUDECKE/TESTREPORT</em> wurden aber trotz dieses Fehlers importiert.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="118" src="/wp-content/uploads/2020/05/LU1_RC8-1024x118.jpg" alt="" class="wp-image-1023618" srcset="/wp-content/uploads/2020/05/LU1_RC8-1024x118.jpg 1024w, /wp-content/uploads/2020/05/LU1_RC8-300x35.jpg 300w, /wp-content/uploads/2020/05/LU1_RC8-768x89.jpg 768w, /wp-content/uploads/2020/05/LU1_RC8-1536x177.jpg 1536w, /wp-content/uploads/2020/05/LU1_RC8.jpg 1682w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption><em>So sieht der Fehler im Transportprotokoll aus, wenn ein Objekt, für das Übersetzungen importiert werden sollen, im Zielsystem nicht existiert.</em></figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Transaktion SLXT</h2>
+
+
+
+<p>Natürlich möchte niemand ständig einzelne Objekte in Transportaufträgen erfassen. Um also massenweise Übersetzungen in Transportaufträge zu schreiben, nutzt man die Transaktion SLXT. Diese Transaktion liest das Übersetzungsprotokoll aus, das beim Übersetzen geschrieben wird. Jedes Objekt, das man in Transaktion SE63 sichert, wird in dieses Protokoll geschrieben. Alle guten SAP-Übersetzungstools (natürlich auch die <a href="https://www.ludecke.net/de/translation-tools/overview/">Übersetzungstools von LUDECKE</a>) unterstützen dieses Übersetzungsprotokoll, und daher können mit der Transaktion SLXT auch Übersetzungen in Transportaufträge verfrachtet werden, die mit Drittanbietertools oder per Export übersetzt wurden.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="672" src="/wp-content/uploads/2020/05/LU1_SLXT-1024x672.jpg" alt="" class="wp-image-1023616" srcset="/wp-content/uploads/2020/05/LU1_SLXT-1024x672.jpg 1024w, /wp-content/uploads/2020/05/LU1_SLXT-300x197.jpg 300w, /wp-content/uploads/2020/05/LU1_SLXT-768x504.jpg 768w, /wp-content/uploads/2020/05/LU1_SLXT-1536x1007.jpg 1536w, /wp-content/uploads/2020/05/LU1_SLXT-818x537.jpg 818w, /wp-content/uploads/2020/05/LU1_SLXT-95x62.jpg 95w, /wp-content/uploads/2020/05/LU1_SLXT.jpg 1598w" sizes="(max-width: 1024px) 100vw, 1024px" /><figcaption><em>In SLXT reicht es, Sprache, Transport und Zeitraum einzugeben, und schon wird ein Sprachtransport erzeugt.</em></figcaption></figure>
+
+
+
+<p>In SLXT wählt man eine oder mehrere Sprachen sowie einen Transportauftrag aus, oder man gibt, wie im Beispiel, eine Beschreibung für einen neuen Transportauftrag an. Außerdem kann man auf diverse Weise die Objekte auswählen, für die Übersetzungen transportiert werden sollen. Am einfachsten finde ich die Auswahl nach Übersetzungsdatum, denn so erwischt man meistens genau die Objekte, die man benötigt. Nach dem Ausführen des Reports wird die Nummer des Sprachtransports ausgegeben, in den die Objekte geschrieben wurden. Ein Aufgabe wird hierbei nicht angelegt – die Transportobjekte landen direkt im Transportauftrag. Diesen kann man dann analog zum manuell angelegten Auftrag transportieren.</p>
+<p>Der Beitrag <a href="/blog/sprachtransporte/">Sprachtransporte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Exploration der Pferderennphysik für den Einsatz in IT-gestützten Rennsimulatoren</title>
+		<link>/blog/exploration-der-pferderennphysik-fuer-den-einsatz-in-it-gestuetzten-rennsimulatoren/</link>
+		
+		<dc:creator><![CDATA[Marco Matjes]]></dc:creator>
+		<pubDate>Sun, 25 Nov 2018 18:34:51 +0000</pubDate>
+				<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Excel]]></category>
+		<category><![CDATA[GaloppSim]]></category>
+		<category><![CDATA[Rennsimulation]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019519</guid>
+
+					<description><![CDATA[<p>Matjes-Institut für Galoppsimulation Das Hamburger Matjes-Institut für Galoppsimulation (MIG) beschäftigt sich mit der Erforschung und Entwicklung von Algorithmen für Pferderennsimulatoren. Die Erkenntnisse werden in unregelmäßigen Abständen in wissenschaftlichen Artikeln auf der Website des Instituts veröffentlicht und als beispielhafte Implementierungen im Excel-Lehrsimulator GaloppSim rennpraktisch dargestellt. Galoppsimulationsforschung Grundannahme der Simulationspraxis ist, dass beim Galopp als schneller Dreitaktgangart eine ausgeprägte Schwebephase stattfindet, bei der zwischen Absprung und Landung sämtliche Hufe in der Luft stehen und der Raumgewinn zwischen...</p>
+<p>Der Beitrag <a href="/blog/exploration-der-pferderennphysik-fuer-den-einsatz-in-it-gestuetzten-rennsimulatoren/">Exploration der Pferderennphysik für den Einsatz in IT-gestützten Rennsimulatoren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2>Matjes-Institut für Galoppsimulation</h2>
+<p>Das Hamburger Matjes-Institut für Galoppsimulation (MIG) beschäftigt sich mit der Erforschung und Entwicklung von Algorithmen für Pferderennsimulatoren. Die Erkenntnisse werden in unregelmäßigen Abständen in wissenschaftlichen Artikeln auf der <a href="http://matjes-institut.de/" target="_blank" rel="noopener">Website des Instituts</a> veröffentlicht und als beispielhafte Implementierungen im <a href="https://galoppsim.racing/" target="_blank" rel="noopener">Excel-Lehrsimulator GaloppSim</a> rennpraktisch dargestellt.</p>
+<h2>Galoppsimulationsforschung</h2>
+<p>Grundannahme der Simulationspraxis ist, dass beim Galopp als schneller Dreitaktgangart eine ausgeprägte Schwebephase stattfindet, bei der zwischen Absprung und Landung sämtliche Hufe in der Luft stehen und der Raumgewinn zwischen den einzelnen Sprungfolgen entsteht.</p>
+<p>Nach heutigem Stand der Galoppsimulationsforschung wird der Gesamtrennalgorithmus (GRalg) für eine möglichst realitätsnahe Darstellung aus den Einzelalgorithmen Tagesform-, Schleifendurchlauf- und Windschattenalgorithmus unter Einbeziehung eines pferdespezifischen Grundmaximalgeschwindigkeitsfestwerts sowie eines eventuellen Taktikfaktors durch integrierte Algorithmuskombination beschrieben und als Meter in der Schwebephase ausgegeben.</p>
+<p>Im Falle einer spaltenorientierten Anwendung wie Microsoft Excel muss der GRalg eine Ganzzahl als Meter in der Schwebephase berechnen, wobei im einfachsten Fall jede Spalte einen laufenden Rennmeter repräsentiert und damit ein Rennen über beispielsweise 2400 Meter durch 2400 Excel-Spalten dargestellt wird.</p>
+<h2>GaloppSim-Implementierung</h2>
+<p>GaloppSim verwendet in der Grundimplementierung für Pferde eine simple Ein-oder-zwei-Spalten- Phasenschwebung, bei der ein Pferd pro Spielschleifendurchlauf entweder einen oder zwei Meter (also Spalten) vorrrückt (anders als bei den bereits konzipierten, noch unveröffentlichten Esel- oder Ziegensimulationsrennen, bei denen auch Nullschwebungen (Esel, bockt) oder Dreispalten- bzw. Negativspaltenschwebungen (Ziegen, unkontrollierbar) möglich sind).</p>
+<p>Die Referenzimplementierung (GaloppSim bis Version 149.10) besteht aus den Teilen</p>
+<p>&#8211; Grundgeschwindigkeit pro Pferd in einer Spanne von 1,49988 bis 1,50010<br />
+&#8211; Tagesform für jedes Pferd zwischen 1,49990 und 1,50010<br />
+&#8211; Kurzfristiger Schleifendurchlauffaktor zwischen 1,49700 und 1,50300<br />
+&#8211; (Optionaler) Taktikfaktor je nach Rennphase von 1,49950, 1,50000 bzw. 1,50050<br />
+&#8211; Windschattenadditionswert 0,0005 bei einfachem bzw. 0,0010 bei doppeltem Windschatteneffekt</p>
+<h2>Gesamtrennalgorithmus</h2>
+<p>Der Gesamtrennalgorithmus mit dem Rückgabewert Meter in der Schwebephase ist damit</p>
+<blockquote><p><em>GRalg(m/SPh) = Ganzzahl gerundet aus ((((Grundgeschwindigkeitsfixwert zwischen 1,49988 und 1,50010) + (((Tagesformzufallszahl zwischen 49990 und 50010) + 100000) / 100000) + (((Schleifendurchlaufzufallszahl zwischen 49700 und 50300) + 100000) / 100000)) [+ ggf. Taktikfaktor 1,49950, 1,50000 bzw. 1,50050] / 3 [bzw. /4 im Falle eines Taktikfaktors]) + Windschattenfaktor 0,0005 bzw. 0,001)</em></p></blockquote>
+<p>Der Gleitkommawert der einzelnen Innenalgorithmen beträgt jeweils ca. 1,50000 (meist knapp darunter oder darüber) und wird dann im Außenalgorithmus (GRalg) auf eine ganze Zahl (1 oder 2) gerundet.</p>
+<p>Der Beitrag <a href="/blog/exploration-der-pferderennphysik-fuer-den-einsatz-in-it-gestuetzten-rennsimulatoren/">Exploration der Pferderennphysik für den Einsatz in IT-gestützten Rennsimulatoren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SimDia² als Alternative zur Programmierung?</title>
+		<link>/blog/simdia%c2%b2-als-alternative-zur-programmierung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 15 Jan 2018 16:44:36 +0000</pubDate>
+				<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Module]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[LSMW]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[migration]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018330</guid>
+
+					<description><![CDATA[<p>Für Datenimporte muss man programmieren oder sich mit der LSMW auskennen. Beides Tools, die dem Anwender in der Regel nicht zur Verfügung stehen. Hier ist SimDia² das ideale Tool. Allerdings nicht nur für Fachanwender und Key-User...</p>
+<p>Der Beitrag <a href="/blog/simdia%c2%b2-als-alternative-zur-programmierung/">SimDia² als Alternative zur Programmierung?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Über mein Lieblings-AddOn <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> habe ich ja bereits mehrmals geschrieben (<a href="https://tricktresor.com/blog/simdia2-sap-datenimport-einfach/">SAP Datenimport einfach?</a>, <a href="https://tricktresor.com/blog/simdia2-neue-version-des-besten-sap-import-tools/">Neue Version SimDia²</a> und <a href="https://tricktresor.com/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten</a>). Grund dafür waren die große Funktionalität und die extrem einfache Handhabung. Beides ermöglicht es auch Endanwendern und Nicht-Informatikern, sehr schnell &#8211; also in wenigen Minuten &#8211; einen Datenaustausch zwischen Excel und SAP zu definieren und automatisch ausführen zu lassen.</p>
+<p>Mein Problem als leidenschaftlicher Programmierer und „Datenmalträtierer“ war aber bisher immer, dass mir ein bisschen die „Anwender-Brille“ fehlte und damit entsprechende Anwendungsfälle. In meinem Arbeitsalltag habe ich nämlich mit Datenimport-Anfragen nicht wirklich zu tun (worüber ich aber ehrlicherweise gar nicht traurig bin). Und wenn doch, dann habe ich ja dieses Tool zum <em>Extreme Customizing</em>: ABAP. Daher ging ich bis vor kurzem davon aus, dass SimDia² vor allem ein Tool für Fachabteilungen und Endanwender zur Lösung kleinerer und einfacher Datenimport-Aufgaben ist.</p>
+<p>Das Problem eines Entwicklers in meiner Xing-Gruppe <a href="https://www.xing.com/communities/groups/tricktresor-f8f4-1000599">Tricktresor</a>  zum Thema <a href="https://www.xing.com/communities/posts/aufzeichnung-in-lsmw-sekundaerressourcen-pflegen-1014264586">Aufzeichnung in LSMW (Sekundärressourcen pflegen)</a> brachte mich jedoch zu der Frage, ob und wie sich der dort geschilderte und recht komplexe Vorgang statt mit LSMW auch mit SimDia² lösen ließe. Kurz und gut: mit ein wenig Auffrischung im Umgang mit SimDia² (was mir bis dahin aus oben erwähnten Gründen etwas gefehlt hatte) ließ sich die gesamte Aufgabe schlussendlich in nur 2-3 Minuten lösen.</p>
+<h2>Aufzeichnung mit SimDia²</h2>
+<p>Im Grunde reicht es, wenn man die betreffende SAP-Transaktion gut kennt (in diesem Fall die mir bis dahin unbekannte C202) und ein wenig weiß, wie SAP tickt. Da die gesamte SimDia²-Aufzeichnung im normalen SAP GUI-Dialog stattfindet, verschwinden auch keine Registerkarten (wie teilweise beim Batchinput) und nach dem Text <em>Planungs-Vorgang</em> lässt sich sehr einfach in der Tabelle suchen. Der einzige Trick besteht dann noch darin, den gefundenen Vorgang zu markieren. Aber auch das verrät SAP einem nach beherztem Druck auf die rechte Maustaste:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/sd01.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018332" src="https://tricktresor.com/wp-content/uploads/2018/01/sd01.png" alt="" width="313" height="61" srcset="/wp-content/uploads/2018/01/sd01.png 313w, /wp-content/uploads/2018/01/sd01-300x58.png 300w" sizes="(max-width: 313px) 100vw, 313px" /></a></p>
+<p>Anschließend lassen sich die Sekundärressourcen ganz einfach ebenfalls über das Kontext-Menü  aufrufen und versorgen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/sd02.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018331" src="https://tricktresor.com/wp-content/uploads/2018/01/sd02.png" alt="" width="314" height="64" srcset="/wp-content/uploads/2018/01/sd02.png 314w, /wp-content/uploads/2018/01/sd02-300x61.png 300w" sizes="(max-width: 314px) 100vw, 314px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/01/sd03.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018333" src="https://tricktresor.com/wp-content/uploads/2018/01/sd03-1024x590.png" alt="" width="640" height="369" srcset="/wp-content/uploads/2018/01/sd03-1024x590.png 1024w, /wp-content/uploads/2018/01/sd03-300x173.png 300w, /wp-content/uploads/2018/01/sd03-768x442.png 768w, /wp-content/uploads/2018/01/sd03-265x153.png 265w, /wp-content/uploads/2018/01/sd03-148x85.png 148w, /wp-content/uploads/2018/01/sd03-193x112.png 193w, /wp-content/uploads/2018/01/sd03-71x40.png 71w, /wp-content/uploads/2018/01/sd03.png 1502w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Nur für Fachabteilungen?</h2>
+<p>Ist SimDia² also „nur“ ein Tool für Fachabteilungen und Endanwender zur Lösung kleinerer Datenimport-Aufgaben? Mitnichten.</p>
+<p>Nachdem bei mir der Knoten geplatzt war &#8211; spätestens, als ich gesehen hatte, wie einfach auch die <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial6">Verarbeitung von Kopf- und Detaildaten</a> damit ist &#8211; wurde mir klar, dass mit SimDia² eben auch komplexe Fälle abgebildet werden können. Auch solche, für die in der LSMW geballtes Entwickler-Gehirnschmalz und manchmal sogar ABAP nötig sind.</p>
+<p>Denn auf diese Weise können &#8211; und da müssen wir Entwickler jetzt ganz stark sein<img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /> &#8211; auch ganz „normale“ SAP-Anwender komplexe Datenimporte durchführen. Wenn man mal kurz darüber nachdenkt, ist das doch aber gar nicht so verkehrt. Warum? Weil dadurch die Aufgaben von denjenigen erledigt werden können, die sich mit den Daten ohnehin am besten auskennen. Und wir Entwickler können uns auf das konzentrieren, wofür wir eigentlich ausgebildet wurden und bezahlt werden: komplexe Software-Lösungen entwickeln und unsere Unternehmen fit zu machen für die Zukunft. Außerdem sagt ja keiner, dass wir SimDia² nicht auch für unsere Zwecke einsetzen können, falls z. B. die Datenimporte weiterhin von der IT durchgeführt werden sollen. Wenn wir Aufgaben in ein paar Minuten erledigen können, für die vorher einige Stunden nötig waren, dann beschwert sich darüber sicher auch niemand.</p>
+<h2>SimDia²</h2>
+<p>Mehr Informationen zu SimDia² findest du auf der Homepage: <a href="https://ersasoft.de/de/simdia/?s=tt">https://ersasoft.de/</a></p>
+<h2>Erfahrungsberichte</h2>
+<p>Da ich selbst SimDia² in der Praxis noch nicht eingesetzt habe (ich darf zum Glück tun, wofür ich ausgebildet wurde und bezahlt werde<img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" />), interessieren mich natürlich einschlägige Erfahrungen. Falls ihr also weitere Beispiele für mich habt, in denen ihr komplexe Datentransfers mit SimDia² erledigt habt, für die vorher eine aufwendige LSMW-Programmierung notwendig war, dann gerne immer her damit!</p>
+<p><br />
+[accordian]</p>
+<h2>Tricktresor- Bonus</h2>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p><em>Da SimDia² eine professionelle Software für SAP-Nutzer ist, benutze bitte deine Firmen-Mailadresse. SAP-Berater können einen entsprechenden Hinweis in die Nachricht schreiben.</em></p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>[contact-form-7]</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p></p>
+<p>Der Beitrag <a href="/blog/simdia%c2%b2-als-alternative-zur-programmierung/">SimDia² als Alternative zur Programmierung?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</title>
+		<link>/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 08 Nov 2017 22:20:13 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Datenstruktur]]></category>
+		<category><![CDATA[Entwickler]]></category>
+		<category><![CDATA[Datenübernahme]]></category>
+		<category><![CDATA[Programmierer]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<category><![CDATA[Anwender]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[Logik]]></category>
+		<category><![CDATA[Kunde]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018010</guid>
+
+					<description><![CDATA[<p>Ein paar mehr oder weniger philosophische Gedanken, die ich mir gemacht habe. Manches fließt einfach und will heraus. Ansonsten kann ich nicht schlafen, weil mir diese Gedanken immer und immer wieder im Kopf herum spuken. Um so schöner, wenn dabei der Bogen zu meinem Lieblings-AddOn "SimDia²" geschlagen werden kann. Den Kampf zwischen Anwender und Entwickler, Logik und Daten werden hoffentlich viele kennen. </p>
+<p>Der Beitrag <a href="/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich bin Programmierer aus Leidenschaft. Ich liebe es, Daten so zu malträtieren, umzuformen und anzureichern, dass eine für den Menschen sinnvolle Darstellung dabei herauskommt. Ebenso liebe ich es, Anforderungen so umzusetzen, dass am Ende ein paar zufriedene Anwender vor dem PC und wohlgeformte Daten auf der Datenbank sind. Zudem bin ich bestrebt, die Programmierungen so universell und wiederverwendbar wie möglich zu gestalten.</p>
+<p>Voraussetzung dafür ist, dass der Anwender oder Kunde sich exzellent ausdrücken kann und sehr genau weiß, was er möchte und seine Prozesse und Daten selbst gut kennt. Dabei ist nicht nur der aktuelle Zustand wichtig, sondern auch, wie es mit den Daten weiter gehen soll. Wie müssen sie weiter verarbeitet werden? Inwieweit müssen sie wie lange änderbar sein? Häufig müssen im Nachhinein wilde Verrenkungen gemacht werden, um Dinge zu prüfen oder sicherzustellen, die bei sorgfältiger Planung &#8211; ich glaube so etwas nennt man 360°-Sicht &#8211; nicht nötig gewesen wäre.</p>
+<p>Zugegebener Maßen ist das nicht immer möglich, denn sehr oft entwickeln sich Dinge einfach. Aus einem ehemals kleinen Auswertungsreport entsteht nach und nach die Schaltzentrale für eine ganze Abteilung.</p>
+<h2>Daten</h2>
+<p>Die Daten sind tatsächlich der wichtigste Bestandteil bei der Programmierung in einem ERP-System. Dadurch, dass die Daten in Strukturen abgelegt und organisiert werden, ist es recht einfach, zusammengehörende Daten zu ermitteln. Es ist allerdings sehr schwer, diese Strukturen erst einmal zu erkennen und dann zu erzeugen. Zudem ist es schwer, wenn nicht gar unmöglich, anhand der Daten die Zugehörigkeit zu Prozessen zu ermitteln. Um die zu einem Prozess notwendigen Daten zu wissen, müsste ein detailliertes Datenflussdiagramm erstellt werden. Das wird jedoch kaum gemacht, denn es ist unendlich viel Arbeit und starken Änderungen unterworfen.</p>
+<h2>Logik</h2>
+<p>Für einen Programmierer ist es sehr wichtig zu wissen, wo welche Daten stehen und wie sie verarbeitet werden müssen. Der Programmierer muss die Daten so verarbeiten, dass am Ende das gewünschte Ergebnis heraus kommt. Dafür ist es notwendig, dass er bestimmte Logiken anwendet. Einige Logiken ergeben sich aus den Einstellungen im Customizing, andere Logiken müssen vom Fachbereich bzw. dem Kunden vorgegeben werden. Sofern es genug &#8220;Beweismaterial&#8221; gibt, können aus speziellen Anforderungen allgemein gültige Logiken abgeleitet werden. Diese wiederum können im Kundeneigenen Customizing abgebildet werden. Dies hat den Vorteil, dass die Lösung flexibel und vom Kunden steuerbar ist.</p>
+<h2>Programmierer</h2>
+<p>Ja, es mag ein Klischee sein, aber Programmierer sind ein wundersames Völkchen. Ich spreche aus eigener Erfahrung&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" />  Programmierer sind in der Regel sehr Technik-affin und sind mehr daran interessiert, eine möglichst <em>figgelinsche</em> Lösung zu präsentieren oder eine besonders komplexe Aufgabenstellung zu meistern. In der Regel haben Programmierer wenig Sinn für Design und Layout. Ja, es gibt Ausnahmen&#8230;! Aber meistens bilden Programmierer genau das ab, was in der Vorgabe steht &#8211; egal wie es aussieht und ob es den SAP-Design-Vorgaben gleich in mehreren Ebenen widerspricht. Der einfachste Weg, einen Programmierer zur Arbeit zu bewegen ist, ihm zu sagen: &#8220;Das geht nicht. Haben schon andere versucht&#8221;.</p>
+<h2>Anwender</h2>
+<p>Auch Anwender sind häufig <em>speziell</em>. Sie müssen mit ihrer Arbeit fertig werden und sie wollen ihre Arbeit in der Regel gut machen. Anwender verstehen ihre Daten und ihre Prozesse. Aber sie können häufig nicht einschätzen welche Auswirkungen Änderungen in ihrem Bereich auf andere Teile der Firma haben. Zudem schätzen sie häufig die Komplexität von Programmieraufgaben falsch ein. Dinge, die einfach zu programmieren sind, weil bereits ähnliche Programmierungen vorhanden sind oder es eine SAP-Funktion dafür gibt, werden eventuell als zu komplex abgetan. Andererseits werden Dinge, die sich verbal einfach ausdrücken lassen und <em>offensichtlich</em> sind, als einfach eingeschätzt. Dabei sind gerade diese Dinge schwer und aufwändig zu programmieren.</p>
+<h2>Programmierer vs. Anwender</h2>
+<p>Im allgemeinen mehr oder weniger chaotischen Durcheinander, was in einigen Firmen <em>Alltag</em> genannt wird, müssen Programmierer und Anwender (Fachbereiche) miteinander auskommen und sich gegenseitig soweit verstehen, dass eindeutige Ergebnisse erzielt werden. Ein guter Programmierer wird versuchen, ein Schema, eine Logik, eine allgemein gültige Regel zu finden oder scheinbar allgemein gültige Regeln zu hinterfragen. Ein guter Anwender kennt seine Daten und Prozesse und erkennt Daten, die &#8220;nicht passen&#8221; oder &#8220;unsinnig&#8221; sind. Dahingehend unterscheiden sich in der Regel Programmierer und Anwender. Denn genau das, was der eine kann, kann der andere mit ziemlicher Sicherheit nicht. Ein Programmierer kann nicht erkennen, ob Daten unsinnig sind und ein Anwender erkennt selten die technische Logik hinter bestimmten Prozessen oder Funktionen.</p>
+<h2>Logik vs. Daten</h2>
+<p>Für einen Anwender ist es eventuell einfacher &#8220;seine&#8221; Daten so zu ordnen, wie sie für ihn aktuell sinnvoll und wichtig sind. Um Daten aus einem Fremdsystem oder manuell erarbeiteten Prozessen in ein SAP-System zu übernehmen gibt es im Grunde zwei maschinelle Möglichkeiten</p>
+<ol>
+<li>Anwender und Programmierer setzen sich zusammen und definieren eine Datenstruktur. Sie besprechen, welche Daten wann unter welchen Bedingungen wo hin müssen. Der Programmierer arbeitet in der Regel mit <strong>einer</strong> (je nach Anforderung natürlich auch mit mehreren) allgemeinen Datenstruktur. Felder, die für einen Datensatz nicht relevant sind, bleiben leer. Der Programmierer erstellt dann ein Programm mit den entsprechenden Regeln, um die Daten ins SAP-System zu schreiben.</li>
+<li>Der Anwender baut sich seine Daten in Gruppen so zusammen, wie sie für ihn logisch sind. Dabei ist es egal, dass er 12 Excel-Blätter hat, die alle zu 90% die gleiche Struktur haben. Für ihn ist wichtig, dass er die komplexen Daten möglichst einfach gruppieren und verwalten kann. Der Anwender kann dann einen einfachen Prozess starten, um die Daten zu übernehmen (zum Beispiel mit SimDia²).</li>
+</ol>
+<p>Die erste Lösung würde ich als Programmierer natürlich immer bevorzugen. Immerhin verdiene ich damit mein Geld. Es ist jedoch nicht von der Hand zu weisen, dass eine Programmierung fast immer recht kompliziert ist. Es sind Absprachen mit dem Auftraggeber notwendig, es muss getestet werden, es müssen Programme transportiert werden usw. Zudem erfordert die Arbeit in der Ausführung häufig zwei Leute: Einen aus der IT (Programmierer), der Daten in ein Verzeichnis schiebt, Daten hochlädt, Daten konvertiert und so weiter. Der Anwender ist hilflos, wenn etwas nicht so funktioniert, wie er es erwartet.</p>
+<p>Die zweite Lösung mag auf den ersten Blick nicht professionell erscheinen. Im Hinblick darauf, dass Daten meistens regelmäßig und von beliebigen Personen übernommen werden sollen, wird eine &#8220;Frickellösung&#8221; häufig nicht in Betracht gezogen.</p>
+<p>Dass der Anwender meistens gar nichts machen kann, liegt häufig an diesen zwei Umständen:</p>
+<ol>
+<li>Es gibt häufig keine guten Möglichkeiten für einen Anwender, Daten massenhaft in ein SAP-System zu importieren.</li>
+<li>Die IT-Abteilung hat für kleinere Aufgaben häufig keine Zeit und keine Kapazitäten.</li>
+</ol>
+<p>Die cleverste Möglichkeit, von der ich gehört habe ist die folgende: Ein Poweruser (also ein Benutzer mit hinreichend guten Berechtigungen zum Ausführen von Programmen) hat sich die Batchinputstruktur zu einem SAP-Standard-Übernahmeprogramm genommen, diese in Word bearbeitet und mit Hilfe der Serienbrieffunktion eine Batchinputdatei für seine Daten generiert. Die so erzeugten Batchinputmappen hat der Anwender dann eingespielt. Ich weiß leider nicht mehr genau, um welche Daten es sich handelte.</p>
+<p>Diese Lösung erfordert jedoch umfangreiche Berechtigungen, sehr gutes Word- und Excelwissen sowie natürlich ein vorhandenes SAP-Übernahmeprogramm.</p>
+<h2>Alternative SimDia²</h2>
+<p>Das Addon <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> von <a href="https://ersasoft.de/de/?s=tt">Ersasoft</a> ist eine &#8211; gemessen am Nutzen &#8211; kostengünstige Alternative für den Fachbereich um alltäglich wiederkehrende Datenübernahmen einfach und effizient zu erledigen. Der Anwender hat zumeist hinreichende Excel-Kenntnisse und er kennt seine SAP-Anwendungen. Die Bedienung von SimDia² ist sehr leicht und darauf ausgelegt, wiederkehrende Datenimporte von Excel nach SAP auszuführen.</p>
+<p><a href="https://ersasoft.de/de/simdia/?s=tt"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018210" src="https://tricktresor.com/wp-content/uploads/2017/11/starten-sie-mit-ihren-daten-durch2.png" alt="" width="760" height="323" srcset="/wp-content/uploads/2017/11/starten-sie-mit-ihren-daten-durch2.png 760w, /wp-content/uploads/2017/11/starten-sie-mit-ihren-daten-durch2-300x128.png 300w" sizes="(max-width: 760px) 100vw, 760px" /></a></p>
+<p>Beispiele für die Anwendung sind:</p>
+<ol>
+<li>Übernahme von Vertriebsstücklisten</li>
+<li>Ausführung von Buchungen</li>
+<li>Anlage von Fertigungsaufträgen</li>
+<li>Gezieltes Ändern von Materialstämmen</li>
+</ol>
+<p>SimDia² kann sogar dazu genutzt werden, um Daten aus einem SAP-System für Auswertungszwecke zu sammeln, da SimDia² Felder einer SAP-Transaktion auslesen kann. Ein Anwender kann sich so also gezielt selber Listen erstellen, ohne dass er die entsprechenden SAP-Tabellen kennen muss. Besonders gut funktioniert das bei Daten, die für einen Programmierer nur sehr umständlich zu ermitteln sind, da die Daten auf viele untereinander verknüpfte Tabellen verteilt sind.</p>
+<p>Der Beitrag <a href="/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Automatisierte Qualitätsprüfung mit SAP Code Inspector und ABAP Test Cockpit</title>
+		<link>/blog/automatisierte-qualitaetspruefung-mit-sap-code-inspector-und-abap-test-cockpit/</link>
+		
+		<dc:creator><![CDATA[dzens]]></dc:creator>
+		<pubDate>Wed, 13 Sep 2017 17:34:23 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[ABAP Test Cockpit]]></category>
+		<category><![CDATA[Gastbeitrag]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018107</guid>
+
+					<description><![CDATA[<p>Das manuelle Überprüfen von eigenen Entwicklungen kann im Eifer des Gefechts schnell vergessen werden oder in den Hintergrund geraten. Doch genau diese regelmäßigen Qualitätschecks können die letzten Prozente deiner Entwicklung herauskitzeln. Du möchtest deine ABAP Entwicklungen automatisiert einer Qualitätsprüfung unterziehen? Der Code Inspector in Kombination mit dem ABAP Test Cockpit sind in diesem Fall die Werkzeuge der Wahl.</p>
+<p>Der Beitrag <a href="/blog/automatisierte-qualitaetspruefung-mit-sap-code-inspector-und-abap-test-cockpit/">Automatisierte Qualitätsprüfung mit SAP Code Inspector und ABAP Test Cockpit</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das manuelle, also händische Überprüfen von eigenen Entwicklungen kann im Eifer des Gefechts schnell vergessen werden oder in den Hintergrund geraten. Doch genau diese regelmäßigen Qualitätschecks können die letzten Prozente deiner Entwicklung herauskitzeln.</p>
+<p>Du möchtest deine ABAP Entwicklungen automatisiert einer Qualitätsprüfung unterziehen? Der Code Inspector in Kombination mit dem ABAP Test Cockpit sind in diesem Fall die Werkzeuge der Wahl.</p>
+<p>Neben der manuellen Prüfung durch den Code Inspector und dem Ausführen von statischen Prüfvarianten ist es möglich, die Qualitätsprüfung automatisiert durch eine Transportauftragsfreigabe zu realisieren. Durch ein paar Einstellungen im System lässt sich die Überprüfung gebunden an entsprechende Benutzer definieren.</p>
+<h2>Definieren einer Prüfvariante</h2>
+<p>Beginnen wir als Erstes mit dem Code Inspector und dem Definieren einer Prüfvariante.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/09/t1.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018108" src="https://tricktresor.com/wp-content/uploads/2017/09/t1-1024x538.png" alt="" width="640" height="336" srcset="/wp-content/uploads/2017/09/t1-1024x538.png 1024w, /wp-content/uploads/2017/09/t1-300x158.png 300w, /wp-content/uploads/2017/09/t1-768x403.png 768w, /wp-content/uploads/2017/09/t1.png 1308w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p>Abbildung 1: Definieren einer Prüfvariante im Code Inspector</p>
+<p>Wie in Abbildung 1 zu sehen ist, sind die Einstellungsmöglichkeiten vielfältig. Angefangen von simpler Prüfung von Namenskonvention bis hin zu HANA Readiness Checks ist beinahe alles möglich.</p>
+<h2>Objektprüfung bei Auftragsfreigabe</h2>
+<p>Als Nächstes stellen wir im Transport Organizer (SE03) die „Objektprüfung bei Auftragsfreigabe“ auf „vom Benutzer einstellbar“. Das bedeutet nichts anderes, als jeder User mit den entsprechenden Rechten in den persönlichen Einstellungen festlegen kann, ob eine automatisierte Prüfung durchgeführt werden soll.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/09/t2.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018109" src="https://tricktresor.com/wp-content/uploads/2017/09/t2.png" alt="" width="476" height="144" srcset="/wp-content/uploads/2017/09/t2.png 476w, /wp-content/uploads/2017/09/t2-300x91.png 300w" sizes="(max-width: 476px) 100vw, 476px" /></a></p>
+<p>Abbildung 2: Objektprüfung bei Auftragsfreigabe</p>
+<p>Die persönlichen Einstellungen können auf mehrere Wege erreicht werden. Beispielsweise über die ABAP Workbench -&gt; Object Navigator (SE80) und über die Menüoptionen &#8211; <em>Hilfsmittel -&gt; Einstellungen -&gt; Transport Organizer</em> können unter der Option „Individuelle Einstellungen“ die notwendigen Änderungen vorgenommen werden.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/09/t3.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018110" src="https://tricktresor.com/wp-content/uploads/2017/09/t3.png" alt="" width="640" height="111" srcset="/wp-content/uploads/2017/09/t3.png 799w, /wp-content/uploads/2017/09/t3-300x52.png 300w, /wp-content/uploads/2017/09/t3-768x134.png 768w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p>Abbildung 3: Freigabe der Objektprüfung in den individuellen Einstellungen</p>
+<p>Durch Setzen des Hakens, wie in Abbildung 3 dargestellt, wird eine Code Überprüfung ausschließlich für diesen User festgelegt.</p>
+<h2>ABAP Test Cockpit</h2>
+<p>Als Letztes kommt das ABAP Test Cockpit ins Spiel. Hier findet die Verheiratung zwischen der definierten Prüfvariante im Code Inspector und dem Transportsystem statt. Zunächst wird die festgelegte Prüfvariante ausgewählt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/09/t4.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018111" src="https://tricktresor.com/wp-content/uploads/2017/09/t4.png" alt="" width="640" height="75" srcset="/wp-content/uploads/2017/09/t4.png 722w, /wp-content/uploads/2017/09/t4-300x35.png 300w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p>Abbildung 4: Festlegung einer globalen Prüfvariante</p>
+<p>Anschließend wird das Verhalten bei gefundenen Meldungen in der Anwendung konfiguriert. Die SAP schlägt dabei vor, den Code Inspector als Testtreiber zu deaktivieren und das Verhalten bei der Freigabe durch das ABAP Test Cockpit zu regeln.</p>
+<h2><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018112" style="font-size: 16px;" src="https://tricktresor.com/wp-content/uploads/2017/09/t5.png" alt="" width="640" height="180" srcset="/wp-content/uploads/2017/09/t5.png 848w, /wp-content/uploads/2017/09/t5-300x85.png 300w, /wp-content/uploads/2017/09/t5-768x216.png 768w" sizes="(max-width: 640px) 100vw, 640px" /></h2>
+<p>Abbildung 5: Konfiguration des Verhaltens bei gefundenen Meldungen im ABAP Test Cockpit</p>
+<p>Es gibt insgesamt drei Abstufungen von Meldungen die geworfen werden können:</p>
+<ol>
+<li>Über Fehler informieren (Priorität 1 und 2)</li>
+<li>Block auf jedem Fehler (Priorität 1 und 2)</li>
+<li>Keine ATC Prüfung</li>
+</ol>
+<p>Variante 1 zeigt die gefunden Meldungen an. Der Entwickler kann die Meldungen beheben. Jedoch wird die Freigabe des Transports nicht verhindert. Es ist trotz gefundener Fehler möglich, eine Freigabe durchzuführen.</p>
+<p>Die Variante 2 zwingt den Entwickler, alle Fehler und Meldungen zu beheben, bevor eine Auftragsfreigabe erfolgen darf</p>
+<p>Die Variante 3 schaltet die Überprüfung durch das ABAP Test Cockpit aus.</p>
+<h2>Fazit</h2>
+<p>Durch Aktivieren der automatisierten Prüfung wird verhindert, dass die Qualitätsprüfung einmal vergessen oder weggelassen wird. Mit wenigen Klicks ist es möglich Quellcode zu überprüfen, der sich an den definierten Unternehmensstandards orientiert.</p>
+<p><a href="https://erlebe-software.de/"><img loading="lazy" decoding="async" class="aligncenter size-full wp-image-1018117" src="https://tricktresor.com/wp-content/uploads/2017/09/erlebe-software.png" alt="" width="196" height="87" srcset="/wp-content/uploads/2017/09/erlebe-software.png 196w, /wp-content/uploads/2017/09/erlebe-software-193x87.png 193w" sizes="(max-width: 196px) 100vw, 196px" /></a></p>
+<p>Der Beitrag <a href="/blog/automatisierte-qualitaetspruefung-mit-sap-code-inspector-und-abap-test-cockpit/">Automatisierte Qualitätsprüfung mit SAP Code Inspector und ABAP Test Cockpit</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>IF cl_qualification=&gt;i_speak( &#8216;ABAP&#8217; ) = abap_true. me-&gt;apply( ). ENDIF.</title>
+		<link>/blog/inwerken_jobs/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 20 Jun 2017 11:36:03 +0000</pubDate>
+				<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[job]]></category>
+		<category><![CDATA[inwerken]]></category>
+		<category><![CDATA[firma]]></category>
+		<category><![CDATA[stellenangebot]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018048</guid>
+
+					<description><![CDATA[<p>Ich suche neue Kolleginnen und Kollegen! Du möchtest in einem starken Team arbeiten, neue Technologien kennen lernen und suchst eine neue Herausforderung? Dann bewirb dich bei uns!</p>
+<p>Der Beitrag <a href="/blog/inwerken_jobs/">IF cl_qualification=&gt;i_speak( &#8216;ABAP&#8217; ) = abap_true. me-&gt;apply( ). ENDIF.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<h2>Kurz und knapp</h2>
+<p>Ich suche neue Kolleginnen und Kollegen!</p>
+<p>Du kannst ABAP oder suchst als SAP-Berater eine neue Herausforderung?</p>
+<p>Dann bewirb dich bei uns: <a href="mailto:bewerbung@inwerken.de">bewerbung@inwerken.de</a>.</p>
+<h2>Die etwas längere Version</h2>
+<p>Der ein oder andere kennt mich als &#8220;Mr. Tricktresor&#8221; oder als <a href="http://www.abapforum.com/forum/search.php?author_id=202&amp;sr=posts">ewx im ABAPforum.com</a>. Allerdings wissen, glaube ich, nur wenige, dass ich bei der Firma INWERKEN AG angestellt bin. Dort programmiere und berate ich in Kundenprojekten als auch bei internen Projekten. Ich habe bei Inwerken angefangen, weil ich begeistert von den Kollegen war und ich meine eigenen Ziele verfolgen konnte. Heute, ziemlich genau neun Jahre später, bin ich immer noch überzeugt von dem technischen Knowhow  meiner Kollegen und dem Zusammenhalt in der Firma. Das <a href="http://amzn.to/2tjl20B">ABAP-Kochbuch </a>wäre ohne meine Kollegen nie zustande gekommen.</p>
+<p>Wer mich kennt, der weiß, dass ich ein ehrlicher Mensch bin. Deswegen muss ich auch klar sagen: Es ist nicht alles perfekt. Natürlich gibt es bei Inwerken Probleme und Dinge, die nicht optimal funktionieren. Aber wir können immer über alles sprechen und meistens finden wir eine zufriedenstellende Lösung. Ich möchte nun nicht die ganzen Buzzwords von wegen flache Strukturen, Teamgeist und so weiter aufzählen, das kann nur in die Hose gehen. Am besten machst du dir selbst ein Bild.</p>
+<h2>Das Team Inwerken</h2>
+<p>Da wir ein SAP-Beratungshaus sind, ist der Großteil natürlich in der SAP-Beratung und ABAP-Programmierung tätig. Wir beschäftigen uns dabei mit der ganzen breiten Palette von SAP-Produkten. Wir machen komplette SAP-Einführungen als auch Add-On-Programmierungen und Anpassungen an bestehenden Systemen. Wir optimieren Prozesse und Programme. In der Regel verstehen wir das große Ganze und verlieren trotzdem die Details nicht aus dem Blick.</p>
+<p>Wir haben ein hervorragendes Backoffice bestehend aus fünf Kolleginnen, die sich um alles kümmern, was nicht mit SAP zu tun hat.</p>
+<p>Die interne vierköpfige IT und Basisadministration betreut unsere Software und Notebooks sowie unsere Inwerken-eigenen SAP-Systeme. Ganz neu im Fuhrpark sind gerade vier HANA und S/4HANA Systeme!</p>
+<p>Im Beratungsbereich haben wir für fast jedes Modul fähige Mitarbeiter und Mitarbeiterinnen. Egal ob Preisfindung im SD, Chargenfindung in der Lieferung, Arbeitsplanerstellung bei Fertigungsaufträgen oder Infocubes im Business Warehouse: Fast immer gibt es jemanden, der sich auskennt.</p>
+<p>ABAP-Programmierung besteht nicht nur aus IF-ELSE-ENDIF oder SELECT, sondern aus einer Vielzahl von Komponenten und modulspezifischen Funktionen Und auch hier sind zu vielen Spezialthemen Leute unterwegs, die genau wissen, was sie tun. Dabei ist es egal ob es sich um BAPIs, Programmierkonzepte oder die Analyse von schwer nachzustellenden Fehlern geht, bei Inwerken ist meistens jemand, der sich schon einmal mit dem Thema auseinandergesetzt hat oder schlichtweg hilft, wenn ein Programm nicht so funktioniert, wie es soll. Auf jeden Fall kann man sich immer zusammensetzen und Lösungen diskutieren oder Ideen sammeln.</p>
+<h2>Die Firma</h2>
+<p>Die Inwerken AG ist aus der 1999 gegründeten COMbridge AG hervorgegangen. Bereits zu COMbridge-Zeiten hatte die Firma den Ruf, Probleme anzupacken und lösen. Mit Inwerken ist daraus eine Firma entwachsen, die ich durchaus einen sehr attraktiven Arbeitgeber nennen würde. Inwerken besteht aktuell aus 57 Mitarbeitern, davon acht Auszubildende.</p>
+<p>Wir organisieren regelmäßig <a href="https://www.inwerken.de/karriere/inside-inwerken-newsblog-intern/">Team-Events und Feste</a>, bei denen der Spaß und Teamgeist nicht zu kurz kommen. Neben dem Spaßfaktor bietet Inwerken jedoch auch flexible Arbeitszeitmodelle, Homeoffice, ergonomische Arbeitsplätze, vielfältige soziale Leistungen, Kaffee und Mineralwasser, Firmenwagenregelung und interne Weiterbildungsmöglichkeiten (Englishkurs, Code-Dojo, Workshops).</p>
+<p><a href="https://www.inwerken.de/"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018049" src="https://tricktresor.com/wp-content/uploads/2017/06/IMG_0117.jpg" alt="" width="640" height="480" srcset="/wp-content/uploads/2017/06/IMG_0117.jpg 640w, /wp-content/uploads/2017/06/IMG_0117-300x225.jpg 300w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Community</h2>
+<p>Wir engagieren uns stark in der SAP-Community. Regelmäßig richten wir die SAP CodeJam zu verschiedenen Themen aus. Die CodeJam ist ein beliebtes Event bei dem man unkompliziert mit neuen Techniken (SAPUI5, HANA, Gateway etc.) in Kontakt treten kann. Ein erfahrener SAP-Mitarbeiter führt durch den Tag und steht Fragen Rede und Antwort.</p>
+<p>Im Februar 2017 haben wir unseren ersten SAP Inside Track veranstaltet, der ein großer Erfolg war. Bei einem SAP Inside Track halten SAP-Profis aus der SAP-Community Vorträge über verschiedenste Themen. Die Themen sind meistens technisch und in der Regel mit irgend einem SAP-Bezug. Es wurden jedoch auch schon ein Vortrag über Rum mit anschließender Verköstigung gehalten. Die Inside Tracks sind eine gute Gelegenheit um viele verschiedene Eindrücke zu meistens sehr aktuellen Themen zu bekommen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/06/sithvr.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1018051" src="https://tricktresor.com/wp-content/uploads/2017/06/sithvr-1024x679.png" alt="" width="640" height="424" srcset="/wp-content/uploads/2017/06/sithvr-1024x679.png 1024w, /wp-content/uploads/2017/06/sithvr-300x199.png 300w, /wp-content/uploads/2017/06/sithvr-768x509.png 768w, /wp-content/uploads/2017/06/sithvr-95x62.png 95w, /wp-content/uploads/2017/06/sithvr.png 1299w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h2>Bewerbung &#8211; Wir suchen dich!</h2>
+<p>Inwerken ist klar auf Wachstumskurs. Aus diesem Grund suchen wir neue Mitarbeiter: Berater und Entwickler aus (fast) allen SAP-Teilbereichen. Wenn du gerne in einem modernen Arbeitsumfeld in einem leistungsstarken Team an anspruchsvollen Projekten mitarbeiten möchtest, dann bewirb dich und schicke uns eine Mail: <a href="mailto:bewerbung@inwerken.de">bewerbung@inwerken.de</a>.</p>
+<p>Schaue dich gerne bei unseren <a href="https://www.inwerken.de/karriere/offene-stellen/">offenen Stellen</a> um. Es ist nichts für dich dabei? Wenn du das Gefühl hast, dass Inwerken die richtige Firma ist, dann sprich uns trotzdem an! Gute Leute können wir immer gebrauchen.</p>
+<p>Ich bin gespannt auf deine Bewerbung!!</p>
+<p>Der Beitrag <a href="/blog/inwerken_jobs/">IF cl_qualification=&gt;i_speak( &#8216;ABAP&#8217; ) = abap_true. me-&gt;apply( ). ENDIF.</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Espresso-Tutorials</title>
+		<link>/blog/espresso-tutorials/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 04 Sep 2015 10:58:04 +0000</pubDate>
+				<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Wissen]]></category>
+		<category><![CDATA[ebook]]></category>
+		<category><![CDATA[Tutorials]]></category>
+		<category><![CDATA[Flatrate]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=201619</guid>
+
+					<description><![CDATA[<p>SAP-Wissen zum Mitnehmen: Espresso-Tutorials. Klein. Stark. SAP. Umfassende und doch auf das Wesentliche beschränkte Lektüre zu SAP-Themen.</p>
+<p>Der Beitrag <a href="/blog/espresso-tutorials/">Espresso-Tutorials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>SAP-Wissen zum Mitnehmen: Espresso-Tutorials. Klein. Stark. SAP. Umfassende und doch auf das Wesentliche beschränkte Lektüre zu verschiedenen SAP-Themen.</p>
+<p><a class="keychainify-checked" href="https://www.espresso-tutorials.de/shop/?ref=4"><img loading="lazy" decoding="async" class="aligncenter wp-image-230059 size-full" src="https://tricktresor.com/wp-content/uploads/2015/09/2015-09-04_11-01-06.jpg" alt="Espresso-Tutorials" width="475" height="162" srcset="/wp-content/uploads/2015/09/2015-09-04_11-01-06.jpg 475w, /wp-content/uploads/2015/09/2015-09-04_11-01-06-300x102.jpg 300w" sizes="(max-width: 475px) 100vw, 475px" /></a></p>
+<p>Espresso-Tutorials konzentrieren sich auf ein Thema. Kurz und knackig. Die Bücher liegen in der Regel in einem digitalen Format vor, so dass sie bequem am Tablet oder PC gelesen werden können.</p>
+<h2>Flatrate-Wissen</h2>
+<p>Die große Besonderheit bei Espresso-Tutorials: <a class="keychainify-checked" href="https://www.espresso-tutorials.de/sap-e-book-flatrate/?ref=4">Die eBook-Flatrate</a> für EUR 149,00 pro Jahr.</p>
+<p>In dieser Flatrate sind alle Bücher aus der Espresso-Bibliothek enthalten. Zudem auch alle, die noch erscheinen. Für Firmen gibt es spezielle Angebote, um den Mitarbeitern das gesamte Wissen der Espresso-Fachbücher online zur Verfügung stellen zu können.<br />
+<iframe loading="lazy" src="https://www.youtube.com/embed/CQYeorl6pYk" width="560" height="315" frameborder="0" allowfullscreen="allowfullscreen"></iframe></p>
+<h2>Eingebettete Videos</h2>
+<p>Zu vielen Büchern gibt es erklärende Videos, die direkt aus dem eBook heraus angesehen werden können. Eine wertvolle Hilfe zum Verständnis!</p>
+<h2>Stöbern</h2>
+<p><a class="keychainify-checked" href="https://www.espresso-tutorials.de/shop/?ref=4&amp;_kategorie=programmierung">Die Espresso-Bibliothek</a></p>
+<h2>Vorteil</h2>
+<p>Mit dem Gutscheincode &#8220;<strong>915-885-313</strong>&#8221; sparst du 10 Euro Gebühr im ersten Jahr!</p>
+<p>Der Beitrag <a href="/blog/espresso-tutorials/">Espresso-Tutorials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SimDia² &#8211; Neue Version des besten SAP-Import-Tools</title>
+		<link>/blog/simdia2-neue-version-des-besten-sap-import-tools/</link>
+					<comments>/blog/simdia2-neue-version-des-besten-sap-import-tools/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 22 Jul 2015 04:00:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Featured]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[TableControl]]></category>
+		<category><![CDATA[datenerfassung]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Datenimport]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Import]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=163546</guid>
+
+					<description><![CDATA[<p>Über ein Jahr sind seit der Veröffentlichung meines Test-Berichts zu SimDia² vergangen. Dort habe ich die Version 2.5 getestet. Seitdem wurden vom Hersteller ERSAsoft bereits zwei neue Versionen veröffentlicht. Höchste Zeit also für ein Update. Die aktuelle Version ist 2.7.</p>
+<p>Der Beitrag <a href="/blog/simdia2-neue-version-des-besten-sap-import-tools/">SimDia² &#8211; Neue Version des besten SAP-Import-Tools</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Über ein Jahr sind seit der Veröffentlichung meines <a href="https://ersasoft.de/de/simdia/?s=tt">Test-Berichts zu SimDia²</a> vergangen. Dort habe ich die Version 2.5 getestet. Seitdem wurden vom Hersteller <a href="https://ersasoft.de/de/?s=tt">ERSAsoft</a> bereits zwei neue Versionen veröffentlicht. Höchste Zeit also für ein Update. Die aktuelle <a href="https://ersasoft.de/de/simdia/?s=tt">Version ist 2.7</a>.</p>
+<h2><strong>Update</strong></h2>
+<p>Neben vielen Kleinigkeiten wurden zwei recht große Funktionen implementiert. Zunächst zu den &#8220;Kleinigkeiten&#8221;, die jedoch das Leben noch einfacher machen:</p>
+<ul>
+<li>Pause-Button: Die aktuelle Aufzeichnung kann unterbrochen werden, um zum Beispiel nachschauen zu können, ob bereits bestimmte Daten vorhanden sind.</li>
+<li>Gesteigerte Performance, insbesondere bei großen Datenmengen</li>
+<li>Benutzung der F4-Hilfe während der Aufzeichnung</li>
+<li>Mehrsprachigkeit</li>
+<li>Verbesserte Unterstützung von eingabebereiten ALV-Grid</li>
+</ul>
+<p>Die zwei großen Änderungen sind:</p>
+<ul>
+<li>Dynamische Maßnahmen</li>
+<li>Berechtigungsverwaltung</li>
+</ul>
+<p>Mit den<em> dynamischen Maßnahmen</em> ist es nun möglich, SAP-Aktionen dynamisch (sprich: für jeden Datensatz der Excel-Datei unterschiedlich) in Abhängigkeit der Datenkonstellation in SAP und/oder Excel auszuführen &#8211; oder dies eben nicht zu tun.</p>
+<p>Zusammen mit der verbesserten Auswahlmöglichkeit bzw. Positionierbarkeit auf einem TableControl (s.u.) lassen sich z.B. Materialstämme sehr einfach anpassen.</p>
+<p>Bereits mit der vorigen Version wurde SimDia² ein recht weit reichendes Verwaltungstool spendiert, um die Berechtigungen für das Programm sehr differenziert festzulegen. Dies dürfte vor allem in größeren Organisationen nicht ganz unwichtig sein.</p>
+<p>Die Berechtigungsverwaltung erlaubt es einem Administrator, festzulegen, welcher Windows-Benutzer Skripte erstellen oder lediglich ausführen darf.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/07/2015-07-21_22-47-39.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-166925" src="https://tricktresor.com/wp-content/uploads/2015/07/2015-07-21_22-47-39-300x255.jpg" alt="Simdia² - Admin" width="300" height="255" srcset="/wp-content/uploads/2015/07/2015-07-21_22-47-39-300x255.jpg 300w, /wp-content/uploads/2015/07/2015-07-21_22-47-39.jpg 760w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Eine Übersicht über alle Verbesserungen findest du im <a href="https://ersasoft.de/de/ressourcen/newsletter-archiv/?s=tt">Newsletter-Archiv von SimDia²</a>.</p>
+<h2><strong>Technik</strong></h2>
+<p>SimDia² ist zwar nach wie vor ein reines Windows-Programm. Das Programm-Fenster legt sich mittlerweile aber nicht mehr nur einfach <span style="text-decoration: underline;">über</span> den SAP GUI sondern wird fest ans SAP GUI „angetackert“. Für mich ein kleiner, für die einfache Bedienung aber nicht unwichtiger Punkt.</p>
+<h2><strong>Anwendung &#8211; Funktionalität </strong></h2>
+<p>In TableControls ist die Suche nach dem Identifikations-Merkmal jetzt nicht mehr auf die erste Spalte eingeschränkt. Vielmehr kann jetzt in einer beliebigen Spalte nach einer zu ändernden Tabellenzeile gesucht werden. Darüber hinaus kann jetzt auch z.B. in SUB-Fenstern, wie z.B. der Sichtenauswahl der Transaktion MM01/MM02&#8230;) gezielt nach der auszuwählenden Sicht gesucht werden, auch wenn sich diese je nach Material an unterschiedlichsten Positionen befindet.</p>
+<h2><strong>Pro und Contra</strong></h2>
+<p>Zwar können mit SimDia² immer noch keine Abfragen oder Verzweigungen programmiert werden (was ja eigentlich auch der Programm-Philosophie „Daten importieren ohne programmieren“ widersprechen würde). Aber immerhin lassen sich jetzt auch auf einfache Weise Buttons (und auch Tabs) abhängig von den Excel-Daten betätigen. Und damit sind wir dann doch schon (fast) bei der Möglichkeit, Abfragen oder Verzweigungen zu erstellen (das Wort „Programmieren“ vermeide ich bewusst, denn da gehört doch noch ein wenig mehr dazu.).</p>
+<p>Anhand eines <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial7">Videos</a> auf der SimDia²-Homepage wird z.B. gezeigt, wie aufgrund der Excel-Daten ein Button betätigt werden kann, um fallweise in einem dadurch ausgelösten Popup zusätzliche Daten zu erfassen.</p>
+<h2>Fazit</h2>
+<p>Nach wie vor ist <a href="https://ersasoft.de/de/simdia/?s=tt">Simdia²</a> ein einfach gehaltenes Tool, das jedoch sehr mächtig ist. Als Programmierer möchte ich natürlich für jede wiederkehrende Aufgabe ein ABAP-Programm schreiben. Solange es jedoch lediglich darum geht, aus einer Excel-Tabelle einfache Daten in ein SAP-System zu bekommen, ist Simdia² fast jeder Programmierung überlegen.</p>
+<p>Schon wenn nur ein paar wenige (einfache) Datenübernahmeprogramme geschrieben werden müssen, komme ich wahrscheinlich bereits in Erklärungsnot, warum ich denn dafür nicht eine Simdia-Lizenz gekauft hätte.</p>
+<p>Alleine dadurch, dass der Fachbereich selbst schnell und einfach definieren kann, welche Daten wo abgelegt werden sollen, können zwei Fliege mit einer (Simdia²-) Klappe geschlagen werden:</p>
+<ol>
+<li>Die IT wird entlastet. Es muss keine Anforderung definiert werden, die dann geprüft und umgesetzt werden muss.</li>
+<li>Der Fachbereich kann sich selbst helfen und ist nicht auf freie Kapazitäten der IT angewiesen</li>
+</ol>
+<p>Häufig werden Anforderungen gar nicht an die IT herangetragen, weil von vornherein feststeht, dass für solche kleinen Aufgaben kaum Zeit übrig ist.</p>
+<p>Ich habe von Fachabteilungen gehört, die sich mit einer geeigneten Batchinput-Datei und der Word-Serienbrief-Funktion geholfen haben, um Daten in ihr SAP-System zu bekommen. Im Gegensatz dazu ist Simdia² wirklich ein Kinderspiel!</p>
+<p></p>
+<h2>Tricktresor- Bonus</h2>
+<p>Nach wie vor bietet ERSAsoft allen Tricktresor-Lesern einen Nachlass von 5% an. Fülle einfach das unten stehende Formular aus und du bekommst den erwähnten Nachlass gewährt.</p>
+<p><strong>Du wirst dich wundern, was mit Simdia in deinem Unternehmen möglich ist!</strong></p>
+<p><span style="line-height: 1.5em;">[accordian]</span></p>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>[contact-form-7]</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p></p>
+<p>Der Beitrag <a href="/blog/simdia2-neue-version-des-besten-sap-import-tools/">SimDia² &#8211; Neue Version des besten SAP-Import-Tools</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/simdia2-neue-version-des-besten-sap-import-tools/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

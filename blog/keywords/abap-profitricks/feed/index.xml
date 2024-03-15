@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ABAP Profitricks Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/abap-profitricks/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 21 Nov 2017 12:12:16 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ABAP Profitricks Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Verbuchung abwarten</title>
+		<link>/blog/verbuchung-abwarten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 18 Nov 2009 19:01:43 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<category><![CDATA[ABAP Profitricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=533</guid>
+
+					<description><![CDATA[<p>In Kundenprogrammen werden h&#228;ufig SAP-Funktionen aufgerufen, die eine Verbuchung starten. Meistens ist das aber gar nicht gew&#252;nscht, denn manchmal m&#246;chte man vielleicht die verbuchten Daten nachlesen oder - was wahrscheinlich h&#228;ufiger der Fall sein wird - die verbuchten Daten werden f&#252;r den n&#228;chsten Prozess ben&#246;tigt.</p>
+<p>Der Beitrag <a href="/blog/verbuchung-abwarten/">Verbuchung abwarten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In Kundenprogrammen werden h&auml;ufig SAP-Funktionen aufgerufen, die eine Verbuchung starten. Meistens ist das aber gar nicht gew&uuml;nscht, denn manchmal m&ouml;chte man vielleicht die verbuchten Daten nachlesen oder &#8211; was wahrscheinlich h&auml;ufiger der Fall sein wird &#8211; die verbuchten Daten werden f&uuml;r den n&auml;chsten Prozess ben&ouml;tigt.<br /><P class="head1">Problem</P><P class="text1">Sie m&ouml;chten einen &#8220;Workflow&#8221; programmieren, der zum Beispiel einen Auftrag anlegt und danach ein Equipment zuordnet. Sie Starten den BAPI zur Auftragsanlage und ordnen dann &#8211; ebenfalls mit einem SAP-Standard-Baustein &#8211; das Equipment zu. Das Programm l&auml;uft in der Regel gut. Aber hin und wieder bekommen Sie die R&uuml;ckmeldung, dass die Zuordnung des Equipments nicht funktioniert hat. Sie machen sich also daran, das Programm zu analysieren und zu debuggen, finden aber keinen Fehler. </P><P class="text1">Dann kommt irgendwann der Hinweis, dass der Fehler meistens dann aufrtitt, wenn das System sehr langsam ist und langsam keimt bei Ihnen der leise Verdacht, dass es mit der Verbuchung zusammen h&auml;ngen k&ouml;nnte&#8230;</P><P>In der Regel findet man dann in den Programmen Anweisungen wie &#8220;WAIT UP TO 10 SECONDS&#8221; oder ein St&uuml;ck Coding, das so lange auf der Datenbank liest, bis der Beleg endlich da ist. Das ist aber unn&ouml;tig, wenn man weiss, wie man sicherstellen kann, dass die Verbuchung auch wirklich mit dem n&auml;chsten Verarbeitungsschritt abgeschlossen wurde.</P><P class="head1">L&ouml;sung</P><P>Die L&ouml;sung ist sehr einfach:</P><P class="sap1">SET UPDATE TASK LOCAL.</P><P>Mit diesem Befehl wird der Verbucher im aktuellen Modus abgearbeitet, es wird also gar nicht verbucht. Nach diesem Befehl kann dann zum Beispiel ein BAPI aufgerufen werden. Nach COMMIT WORK kann man sicher sein, dass die Daten auch &#8220;verbucht&#8221; wurden.</P><P><U><STRONG>HINWEIS:</STRONG></U><BR>Nach jedem COMMIT WORK muss der Befehl erneut abgesetzt werden!</P><P class="head1">Einschr&auml;nkungen</P><P>Bei CALL TRANSACTION funktioniert diese Anweisung leider nicht!</P><P>Im Modul &#8220;Warehouse Management&#8221; (WM) werden einige Daten per <STRONG>asynchronem RFC </STRONG>&#8220;verbucht&#8221;. Hier hat man leider auch keine andere Chance, als gegenbenenfalls die Daten zu lesen, bis sie wirklich auf der Datenbank sind.</P></p>
+<p>Der Beitrag <a href="/blog/verbuchung-abwarten/">Verbuchung abwarten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Mussfelder</title>
+		<link>/blog/mussfelder/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Mar 2009 17:17:09 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<category><![CDATA[Transport]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[ABAP Profitricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=517</guid>
+
+					<description><![CDATA[<p>Ein h&#228;ufiger Wunsch ist die dynamische Aktivierung von Musseingabefeldern. Hierbei gibt es jedoch das Problem, dass die Mussfelder nicht beliebig hin- und hergeschaltet werden k&#246;nnen. Denn: Ist ein Mussfeld einmal aktiv, muss es auch gef&#252;llt werden. Andere Aktionen werden mit "Bitte erst alle Mussfelder ausf&#252;llen" quittiert.</p>
+<p>Der Beitrag <a href="/blog/mussfelder/">Mussfelder</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein häufiger Wunsch ist die dynamische Aktivierung von Musseingabefeldern. Hierbei gibt es jedoch das Problem, dass die Mussfelder nicht beliebig hin- und hergeschaltet werden können. Denn: Ist ein Mussfeld einmal aktiv, muss es auch gefüllt werden. Andere Aktionen werden mit &#8220;Bitte erst alle Mussfelder ausfüllen&#8221; quittiert.</p>
+<p>Um dieses &#8211; ansich ja gewollte Verhalten &#8211; zu umgehen, müssen wir uns einiger Tricks bedienen&#8230;</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/abap/Radiobutton/Radio_muss.gif" alt="" /></p>
+<p>Im folgenden wollen wir an einem Beispiel zeigen, wie die Mussfeldeigenschaft von Feldern geändert werden kann, sobald ein anderer Radiobutton aktiv ist.</p>
+<h2 class="head1">Trick 1</h2>
+<p>Wir hinterlegen beim Radiobutton einen Funktionscode und versehen ihn mit dem Funktionstyp &#8220;E&#8221; (Exit-Kommando).</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/abap/Radiobutton/eck_063.jpg" alt="" /></p>
+<p>Damit können wir im PAI des Dynpros das aktivieren der Radiobuttons mittels des folgenden Befehls abfangen:</p>
+<p>MODULE MyExitModule AT EXIT-COMMAND</p>
+<p>Nun brauchen wir in MyExitModule nur noch auf &#8220;RB&#8221; abzufragen, machen dann nix und&#8230; Wir kriegen die Meldung &#8220;Bitte alle Mussfelder ausfüllen&#8221;.</p>
+<p>Wir könnten nun zwar noch ein &#8220;LEAVE SCREEN&#8221; hinten dran hängen, aber dann erfolgt kein Transport der Feldwerte in die ABAP-Variablen, also wird auch unser Radiobutton auf dem alten Wert belassen.</p>
+<h2 class="head1">Trick 2</h2>
+<p>Wir simulieren den Feldtransport mit dem Funktionsbaustein &#8220;DYNP_VALUES_READ&#8221; und verlassen danach die Verarbeitung. Effekt: Die Radiobuttons werden korrekt gesetzt und auch alle bereits eingegebenen Werte bleiben erhalten.</p>
+<pre class="lang:abap decode:true ">CALL FUNCTION 'DYNP_VALUES_READ'
+  EXPORTING
+    dyname                   = repid
+    dynumb                   = dynnr
+    request                  = 'A'
+    perform_conversion_exits = 'X'
+    perform_input_conversion = ' '
+  TABLES
+    dynpfields               = t_fields
+  EXCEPTIONS
+    OTHERS                   = 11.</pre>
+<p>Normalerweise muss man dem Baustein alle zu lesenden Feldnamen übergeben. Wenn wir den Parameter REQUEST aber mit &#8220;A&#8221; füllen, dann liefert der Baustein alle auf dem Dynpro vorhandenen Felder zurück&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f600.png" alt="😀" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Wir müssen jetzt noch die Feldinhalte in die entsprechenden Felder stellen:</p>
+<pre class="lang:abap decode:true ">LOOP AT t_fields INTO wa_field.
+  ASSIGN (wa_field-fieldname) TO &lt;field&gt;.
+  CHECK sy-subrc = 0.
+  &lt;field&gt; = wa_field-fieldvalue.
+ENDLOOP.</pre>
+<p>Jetzt können wir schon mit den Radiobuttons hin- und herschalten und je nach Radiobutton ein anderes Feld zum Mussfeld machen.</p>
+<p>Wenn jedoch Datumsfelder, Uhrzeiten oder Dezimalzahlen auf dem Dynpro auftauchen, müssen wir diese auch selbst ins interne Format umwandeln.</p>
+<p>Deswegen:</p>
+<h2 class="head1">Trick 3</h2>
+<pre class="lang:abap decode:true">DESCRIBE FIELD &lt;field&gt; TYPE lv_field_type.
+CASE lv_field_type.
+  WHEN 'P'.
+*** Packed
+    CALL FUNCTION 'RS_CONV_EX_2_IN_DTEL'
+      EXPORTING
+        input_external  = wa_field-fieldvalue
+        dtel            = 'NETWR'
+      IMPORTING
+        output_internal = &lt;field&gt;
+      EXCEPTIONS
+        OTHERS          = 21.
+
+  WHEN 'T'.
+*** Time
+    CALL FUNCTION 'CONVERSION_EXIT_TIMLO_INPUT'
+      EXPORTING
+        input       = wa_field-fieldvalue
+      IMPORTING
+        output      = &lt;field&gt;
+      EXCEPTIONS
+        wrong_input = 1
+      OTHERS      = 2.
+
+  WHEN 'D'.
+*** Date
+    CALL FUNCTION 'CONVERSION_EXIT_SDATE_INPUT'
+      EXPORTING
+        input  = wa_field-fieldvalue
+      IMPORTING
+        output = &lt;field&gt;.
+
+  WHEN OTHERS.
+*** other fields
+    &lt;field&gt; = wa_field-fieldvalue.
+ENDCASE.</pre>
+<h2 class="head1">Beispielprogramm</h2>
+<p>Hier gibt es nochmal das ganze <a title="Mussfelder" href="https://tricktresor.com/wp-content/downloads/radiobuttons.txt" target="_blank" rel="noopener">Coding</a>.</p>
+<p>Hier die Ablauflogik vom Dynpro:</p>
+<pre class="lang:abap decode:true ">PROCESS BEFORE OUTPUT.
+MODULE status_0100.
+*
+PROCESS AFTER INPUT.
+MODULE exit_command_0100 AT EXIT-COMMAND.
+MODULE user_command_0100.</pre>
+<p>Der GUI-Status &#8216;100&#8217; muss natürlich noch angelegt werden. Es müssen nur die Tasten F3, SHIFT-F3 und F12 mit &#8220;EXIT&#8221; belegt werden (Exit-Code &#8220;E&#8221; nicht vergsessen!!).</p>
+<p>Der Beitrag <a href="/blog/mussfelder/">Mussfelder</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Fortschrittsbalken</title>
+		<link>/blog/fortschrittsbalken/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 20 Jun 2008 15:17:21 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Sonstiges]]></category>
+		<category><![CDATA[ABAP Profitricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=490</guid>
+
+					<description><![CDATA[<p>Hier demonstrieren wir Ihnen einen Fortschrittsbalken, der ausnahmsweise nicht mittels SAPGUI_PROGRESS_INDICATOR dargestellt wird, sondern mit einem Tool aus dem SAP-Grafik-Bereich. </p>
+<p>Der Beitrag <a href="/blog/fortschrittsbalken/">Fortschrittsbalken</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier demonstrieren wir Ihnen einen Fortschrittsbalken, der ausnahmsweise nicht mittels SAPGUI_PROGRESS_INDICATOR dargestellt wird, sondern mit einem Tool aus dem SAP-Grafik-Bereich. <br /><P><IMG src="https://tricktresor.com/wp-content/uploads/tt_images/abap/eck_014.jpg"></P><P class="head1">Coding</P><P class="sap1">REPORT zz_fortschrittsanzeige.<BR><FONT color="#fb2412">******************************************************<BR>* Fortschrittsanzeige&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>******************************************************</FONT></P><P class="sap1">DATA: BEGIN OF status,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; btn_txt(75),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; curval(6) TYPE n,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; maxval(6) TYPE n,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stat,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text_1(75),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text_2(6),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text_3(75),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; title(75),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; winid(4),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m_typ,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; popup_event(10),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rwnid(4).<BR>DATA: END OF status.<BR>DATA: popup_event_cancel(6) VALUE &#8216;CANCEL&#8217;.<BR>DATA: stat_4 VALUE &#8216;3&#8217;.<BR>DATA: lv_wert(15) TYPE c.</P><P class="sap1"><BR>PARAMETERS: p_max&nbsp;&nbsp; TYPE i DEFAULT 1000<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , p_step&nbsp; TYPE i DEFAULT 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .</P><P class="sap1">&nbsp;</P><P class="sap1">CLEAR status.</P><P class="sap1">status-curval&nbsp; = &#8216;1&#8217;.<BR>status-maxval&nbsp; = p_max.<BR>status-text_1 = &#8216;Hier kann ein (variabler) Text stehen&#8217;.<BR>status-text_2 = &#8216; &#8216;.<BR>status-title&nbsp; = &#8216;Fortschrittsanzeige ( by johu )&#8217;.</P><P class="sap1">WHILE status-curval &lt; p_max.</P><P class="sap1">&nbsp; ADD p_step&nbsp; TO status-curval.</P><P class="sap1">&nbsp; WRITE: sy-index TO lv_wert.<BR>&nbsp; CONCATENATE lv_wert &#8216; und hier auch&#8230;&#8217;</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INTO status-text_3.<BR>&nbsp; CONDENSE status-text_3.</P><P class="sap1">&nbsp; CALL FUNCTION &#8216;PROGRESS_POPUP&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; btn_txt&nbsp;&nbsp;&nbsp;&nbsp; = status-btn_txt<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; curval&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-curval<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; maxval&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-maxval<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-stat<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text_1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-text_1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text_2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-text_2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; text_3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-text_3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; title&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-title<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; winid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-winid<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m_typ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-m_typ<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; popup_event = status-popup_event<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rwnid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = status-rwnid.</P><P class="sap1">&nbsp; IF status-popup_event =&nbsp;&nbsp; popup_event_cancel.</P><P class="sap1">&nbsp;&nbsp;&nbsp; PERFORM status_end USING status.<BR>&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; status-stat =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stat_4.</P><P class="sap1">ENDWHILE.</P><P class="sap1">PERFORM status_end USING status.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM STATUS_END&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM status_end USING s STRUCTURE status.</P><P class="sap1">&nbsp; CALL FUNCTION &#8216;GRAPH_DIALOG&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; close = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kwdid = s-winid.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;status_end</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/fortschrittsbalken/">Fortschrittsbalken</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Versteckte Kundennamensräume</title>
+		<link>/blog/versteckte-kundennamensraeume/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Dec 2007 19:19:38 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP Profitricks]]></category>
+		<category><![CDATA[Profitricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=449</guid>
+
+					<description><![CDATA[<p>Der Kundennamensraum f&#252;r Programme beschr&#228;nkt sich eigentlich auf Z*, Y*, SAPMZ*, SAPMY*, MZ* und MY*. Es gibt aber noch ein paar L&#252;cken im SAP-Namensraum, in denen man unbehelligt Programme anlegen kann.... Zum Beispiel aus der Zeit der Dialogbausteine mit DZ*...</p>
+<p>Der Beitrag <a href="/blog/versteckte-kundennamensraeume/">Versteckte Kundennamensräume</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der Kundennamensraum f&uuml;r Programme beschr&auml;nkt sich eigentlich auf Z*, Y*, SAPMZ*, SAPMY*, MZ* und MY*. Es gibt aber noch ein paar L&uuml;cken im SAP-Namensraum, in denen man unbehelligt Programme anlegen kann&#8230;. Zum Beispiel aus der Zeit der Dialogbausteine mit DZ*&#8230;<br /><P>&#8230;das sollte nat&uuml;rlich niemand tun, denn jeder schaut erstmal nach &#8220;Z-oder Y-Programmen&#8221;. Es ist aber gut zu wissen, dass es diese L&uuml;cken gibt.</P><P>Folgende Namensr&auml;ume k&ouml;nnen ebenfalls verwendet werden:</P><UL><LI>MP9* <LI>DZ*, DY* <LI>MSTP9* <LI>MSTT9* <LI>MSTPB9* </LI></UL><P>Es gibt noch ein paar andere MST-Namensr&auml;ume&#8230;</P><P>Alle Kombinationen jeglicher Objekttypen k&ouml;nnen in dem Funktionsbaustein <STRONG>TRINT_GET_NAMESPACE</STRONG> eingesehen werden.</P><P class="head1">&nbsp;&#8230;und f&uuml;r Tabellen</P><UL><LI>T9* f&uuml;r eigenes Customizing (stammt noch aus der Zeit der R/2 nach R/3 Migrationen [Transaktion DMIG]).</LI></UL><P>Weiterf&uuml;hrende Infos zu Namensr&auml;umen und Besonderheiten zum Namensraum gibt es hier:</P><P><A href="http://help.sap.com/saphelp_nw73ehp1/helpdata/de/2a/6b0b1f547a11d189600000e829fbbd/content.htm" Target="_blank">http://help.sap.com/saphelp_nw73ehp1/helpdata/de/<BR>2a/6b0b1f547a11d189600000e829fbbd/content.htm</A></P></p>
+<p>Der Beitrag <a href="/blog/versteckte-kundennamensraeume/">Versteckte Kundennamensräume</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Interprozesskommunikation</title>
+		<link>/blog/interprozesskommunikation/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Aug 2007 18:30:39 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP Profitricks]]></category>
+		<category><![CDATA[Profitricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=427</guid>
+
+					<description><![CDATA[<p>In diesem Beispiel wird gezeigt, wie man zwischen verschiedenen SAPGUI-Modi interagieren kann. Aus dem zu startenden Programm werden eine bestimmte Anzahl neuer Modi ge&#246;ffnet und aus dem Start-Dynpro gesteuert. </p>
+<p>Der Beitrag <a href="/blog/interprozesskommunikation/">Interprozesskommunikation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beispiel wird gezeigt, wie man zwischen verschiedenen SAPGUI-Modi interagieren kann. Aus dem zu startenden Programm werden eine bestimmte Anzahl neuer Modi ge&ouml;ffnet und aus dem Start-Dynpro gesteuert. <br /><P>Das ist wirklich was f&uuml;r Profis:</P><P>Mit dem Report <STRONG><FONT>RSIMC003</FONT> </STRONG>werden andere SAPGUI-Modi ge&ouml;ffnet und gesteuert. In diesem Beispiel kann folgendes Mit den &#8220;Kinder-Modi&#8221; passieren:</P><UL><LI>Aktivieren des SAPGUI-Fensters (Also in den Vordergrund bringen) <LI>Schliessen/ Beenden des Fensters <LI>Senden eines Befehls</LI></UL><P>Der &#8220;Vater-Modus&#8221; erkennt sofort, wenn ein Modus beendet wird.</P><P>Im unteren Screenshot wurden drei zus&auml;tzliche Fenster ge&ouml;ffnet. Durch anlicken eines Modus kann man mit ihn mit den Befehlen unter &#8220;ACTION&#8221; steuern.</P><P><IMG src="https://tricktresor.com/wp-content/uploads/tt_images/abap/imc.jpg"></P><P>Ein praktischer Nutzen f&uuml;r diese Intermoduskommunikation muss allerdings noch gefunden werden&#8230;</P><P class="head1">Ebenfalls interessant</P><P>Programm <STRONG>RSIMCTST</STRONG>: Hier k&ouml;nne die einzelnen Funktionen&nbsp;direkt angesteuert werden und auch OK-Codes zu den einzelnen Modi gesendet werden.&nbsp; Wenn es dann noch gel&auml;nge, die Fenstergr&ouml;&szlig;e- und position zu beeinflussen, k&auml;men wir einem praktischen Nutzen schon viel n&auml;her&#8230;</P></p>
+<p>Der Beitrag <a href="/blog/interprozesskommunikation/">Interprozesskommunikation</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

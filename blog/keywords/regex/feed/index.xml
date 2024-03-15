@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Regex Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/regex/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 05 May 2017 12:23:16 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Regex Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Daten einer Website per HTTP ermitteln</title>
+		<link>/blog/daten-einer-website/</link>
+					<comments>/blog/daten-einer-website/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Jul 2012 20:02:59 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[url]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<category><![CDATA[Regex]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[cl_http_client]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=649</guid>
+
+					<description><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Mithilfe der Klasse CL_HTTP_CLIENT besorgen wir uns den Quelltext einer Internetseite. Die URL muss dabei komplett angegeben werden, also inklusive http://</p>
+<h2 class="head1">Coding</h2>
+<p class="sap1">
+<pre class="lang:abap decode:true ">*:: Selection screen
+PARAMETERS p_url TYPE string LOWER CASE
+DEFAULT '/wp-content/index.php?aID=0'.
+
+START-OF-SELECTION.
+
+  PERFORM get_urls USING p_url.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_URLS
+*&amp;---------------------------------------------------------------------*
+FORM get_urls  USING  iv_url TYPE clike.
+
+*:: local data
+  DATA lv_http_url     TYPE string.
+  DATA lr_http_client  TYPE REF TO if_http_client.
+  DATA lv_html_code    TYPE string.
+
+  DATA lt_urls         TYPE STANDARD TABLE OF string
+WITH NON-UNIQUE DEFAULT KEY.
+  DATA lt_new          LIKE lt_urls.
+  DATA lv_regex        TYPE string.
+
+  DATA lv_url          TYPE string.
+  DATA lv_dummy1       TYPE string.
+  DATA lv_dummy2       TYPE string.
+
+  STATICS lt_list      TYPE HASHED TABLE OF string
+WITH UNIQUE KEY table_line.
+
+*:: create url
+  CALL METHOD cl_http_client=&gt;create_by_url
+    EXPORTING
+      url                = iv_url
+    IMPORTING
+      client             = lr_http_client
+    EXCEPTIONS
+      argument_not_found = 1
+      plugin_not_active  = 2
+      internal_error     = 3
+      OTHERS             = 4.
+  IF sy-subrc &gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to create url, Sy-Subrc;', sy-subrc.
+    STOP.
+  ENDIF.
+
+*:: Send out request
+  lr_http_client-&gt;send( ).
+
+*:: Receive result as stream
+  CALL METHOD lr_http_client-&gt;receive
+    EXCEPTIONS
+      http_communication_failure = 1
+      http_invalid_state         = 2
+      http_processing_failed     = 3
+      OTHERS                     = 4.
+
+  IF sy-subrc &lt;&gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to read data, Sy-Subrc;', sy-subrc.
+  ELSE.
+*:: Get sourcecode
+    lv_html_code = lr_http_client-&gt;response-&gt;get_cdata( ).
+    WRITE:/ iv_url COLOR 5.
+
+*:: simple method - Find urls
+    SPLIT lv_html_code AT 'href=' INTO TABLE lt_urls.
+    LOOP AT lt_urls INTO lv_url.
+      FORMAT COLOR OFF.
+      CHECK lv_url IS NOT INITIAL.
+      CHECK lv_url(1) = `"`
+      OR lv_url(1) = `'`.
+      FIND lv_url(1) IN lv_url+1 MATCH OFFSET sy-fdpos.
+      CHECK sy-subrc = 0.
+      lv_url = lv_url+1(sy-fdpos).
+
+      IF lv_url IS INITIAL.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '#'.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '/'.  "Root
+        FORMAT COLOR COL_GROUP.
+
+      ELSEIF lv_url(1) = '?'.
+        SPLIT iv_url AT '?' INTO lv_dummy1 lv_dummy2.
+        IF sy-subrc = 0.
+          CONCATENATE lv_dummy1 lv_url INTO lv_url.
+        ELSE.
+        ENDIF.
+      ELSEIF lv_url(5) = 'https' OR lv_url(5) = 'HTTPS'.
+        FORMAT COLOR COL_POSITIVE.
+      ELSEIF lv_url(4) = 'http' OR lv_url(4) = 'HTTP'.
+        FORMAT COLOR COL_NORMAL.
+      ENDIF.
+
+*:: try to find main URL in link
+      CONCATENATE '^' iv_url INTO lv_regex.
+      FIND REGEX lv_regex IN lv_url.
+      IF sy-subrc = 0.
+        FORMAT INTENSIFIED ON.
+      ELSE.
+        FORMAT INTENSIFIED OFF.
+      ENDIF.
+      WRITE: /10 lv_url.
+
+    ENDLOOP.
+    ULINE.
+
+  ENDIF.
+
+ENDFORM.                    " GET_URLS</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/daten-einer-website/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Replace REGEX</title>
+		<link>/blog/replace-regex/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 15 May 2008 13:29:11 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Regex]]></category>
+		<category><![CDATA[Reguläre Ausdrücke]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=477</guid>
+
+					<description><![CDATA[<p>Ein paar Anwendungsbeispiele zu REPLACE ALL OCCURRENCES OF REGEX. Zum Beispiel "Kindergeheimsprache"</p>
+<p>Der Beitrag <a href="/blog/replace-regex/">Replace REGEX</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein paar Anwendungsbeispiele zu REPLACE ALL OCCURRENCES OF REGEX. Zum Beispiel &#8220;Kindergeheimsprache&#8221;<br /><P class="head1">Kindergeheimsprache</P><P>Mancher kennt aus Kindertagen noch die &#8220;Geheimsprache&#8221;, in der nach jedem Vokal ein &#8220;B&#8221; sowie der vorherige Vokal gesprochen wird (Pompolusisch).</P><P>Aus &#8220;Guten Tag&#8221; wird dann &#8220;Gubuteben Tabag&#8221;.</P><P>Was zum Sprechen schon eine ganz sch&ouml;ne Herausforderung ist, kann auch mit Regex gel&ouml;st werden:</P><P class="sap1">REPLACE ALL&nbsp; OCCURRENCES <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;OF REGEX &#8216;(EI)|(EU)|(IE)|(AU)|(&Auml;U)|(AA)|(OO)|A|I|O|U|E|&Auml;|&Uuml;|&Ouml;&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;IN p_text WITH &#8216;$0B$0&#8217;.<BR></P><P>Es werden die Gruppen EI, EU, IE, AU, AA und OO sowie die Vokale gesucht und dann ersetzt durch &#8220;gefundener String + B + gefundener String&#8221;.</P><P>Ein &#8220;normales&#8221; Ersetzen w&uuml;rde hier kl&auml;glich scheitern, denn es m&uuml;sste immer mehrstufig gesucht und ersetzt werden und die gruppierten Silben w&uuml;rden so zwangsl&auml;ufig zerst&uuml;ckelt werden.</P><P>Der besondere Clou bei diesem Trick ist, dass der Suchstring erneut eingesetzt wird: $0</P><P>$` bezeichnet den Text VOR der Fundstelle.<BR>$&#8217; ist der Text NACH der Fundstelle.</P><P><STRONG>IBIM TRIBICKTREBESOBOR BEBEFIBINDEBEN SIBICH DIEBIE BEBESTEBEN TRIBICKS!</STRONG></P><img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Der Beitrag <a href="/blog/replace-regex/">Replace REGEX</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

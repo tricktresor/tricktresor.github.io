@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Code-Inspector Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/code-inspector-2/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 29 Feb 2024 12:32:55 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Code-Inspector Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Übersicht Code-Inspector-Prüfungen</title>
+		<link>/blog/uebersicht-code-inspector-pruefungen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 16 Feb 2024 09:40:06 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code-Inspector]]></category>
+		<guid isPermaLink="false">/?p=1044656</guid>
+
+					<description><![CDATA[<p>Code-Inspector Prüfungen werden zu Varianten mit Hilfe der Transaktion SCI ein- und ausgeschaltet. Wenn du wissen möchtest, welche technische Klasse hinter der jeweiligen Prüfung steht, dann kannst du im Menü Check Variant • Display • Technical names aufrufen, aber dann siehst du alle nicht markierten Prüfungen ebenfalls. Aus diesem Grund existiert das folgende Programm. Es listet die technischen Namen der aktiven Prüfungen einer Variante auf. Default-Varianten Es gibt in der Regel zwei Default-Varianten: Die Variante...</p>
+<p>Der Beitrag <a href="/blog/uebersicht-code-inspector-pruefungen/">Übersicht Code-Inspector-Prüfungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Code-Inspector Prüfungen werden zu Varianten mit Hilfe der <em>Transaktion SCI</em> ein- und ausgeschaltet. Wenn du wissen möchtest, welche technische Klasse hinter der jeweiligen Prüfung steht, dann kannst du im Menü <em>Check Variant  • Display • Technical names</em> aufrufen, aber dann siehst du alle nicht markierten Prüfungen ebenfalls. Aus diesem Grund existiert das folgende Programm. Es listet die technischen Namen der aktiven Prüfungen einer Variante auf.</p>
+
+
+
+<h2 class="wp-block-heading">Default-Varianten</h2>
+
+
+
+<p>Es gibt in der Regel zwei Default-Varianten:</p>
+
+
+
+<ul>
+<li>DEFAULT</li>
+
+
+
+<li>TRANSPORT</li>
+</ul>
+
+
+
+<p>Die Variante DEFAULT wird verwendet, wenn die Code-Inspector-Prüfung aus dem Sourcecode heraus aufgerufen wird. Die Variante TRANSPORT wird bei Freigabe eines Transportauftrags verwendet.</p>
+
+
+
+<p>Du kannst die eingestellte DEFAULT-Variante aus Tabelle SCICHKV_ALTER lesen oder die folgende Methode verwenden:</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">cl_ci_checkvariant=>get_chkv_alter(  
+  EXPORTING
+    p_checkvname_default = 'DEFAULT'
+  IMPORTING
+    p_checkvname_new     = DATA(default_config) ).</pre>
+
+
+
+<p>Meines Wissens gibt es keine Möglichkeit, die DEFAULT-Variante im Standard zu setzen. Du musst also einen Pflegedialog für die Tabelle SCICHKV_ALTER generieren oder den Eintrag mittels SE16N in die Tabelle schreiben.</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="363" height="444" src="/wp-content/uploads/2024/02/image.png" alt="" class="wp-image-1044663" srcset="/wp-content/uploads/2024/02/image.png 363w, /wp-content/uploads/2024/02/image-245x300.png 245w" sizes="(max-width: 363px) 100vw, 363px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">PARAMETERS name  TYPE scichkv_hd-checkvname DEFAULT 'DEFAULT'.
+PARAMETERS owner TYPE scichkv_hd-ciuser     DEFAULT space.
+
+START-OF-SELECTION.
+
+  SELECT SINGLE * FROM scichkv_hd
+      WHERE checkvname = @name     ##WARN_OK
+        AND ciuser     = @owner    "#EC CI_NOORDER
+       INTO @DATA(variant_header).
+
+  DATA(main) =  cl_ci_checkvariant=>get_ref(
+       p_user                   = owner
+       p_name                   = name ).
+  CHECK main IS BOUND.
+
+  main->get_info(
+    EXCEPTIONS
+      could_not_read_variant = 1
+      OTHERS                 = 2 ).
+
+  IF sy-subrc = 0.
+    cl_demo_output=>display_data(
+      VALUE string_table(
+        FOR variant IN main->variant (
+          CONV #( variant-testname ) ) ) ).
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/uebersicht-code-inspector-pruefungen/">Übersicht Code-Inspector-Prüfungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

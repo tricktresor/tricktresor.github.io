@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ABAP 752 Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/programmierung/abap-752/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 27 Sep 2021 11:57:49 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ABAP 752 Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>oSQL Test Environment</title>
+		<link>/blog/osql-test-environment/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Sep 2021 16:53:22 +0000</pubDate>
+				<category><![CDATA[ABAP 752]]></category>
+		<category><![CDATA[osql]]></category>
+		<category><![CDATA[if_osql_test_environment]]></category>
+		<category><![CDATA[unit tests]]></category>
+		<guid isPermaLink="false">/?p=1031450</guid>
+
+					<description><![CDATA[<p>Mit dem ab ABAP Release 7.52 verfügbaren Open SQL Test Framework ist es nun einfacher, Daten für Unit Tests zu manipulieren. Wie das geht, zeige ich dir in diesem Beitrag.</p>
+<p>Der Beitrag <a href="/blog/osql-test-environment/">oSQL Test Environment</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Unit Tests werden immer wichtiger. Je mehr ich sie selber verwende, desto mehr merke ich aber auch, wie schwierig es teilweise ist, vernünftige Unit Tests aufzubauen und sinnvoll zu testen. Seit ABAP Release 7.52 gibt es eine neue Möglichkeit, Daten für nit Tests zu &#8220;fälschen&#8221;: Das <a href="https://help.sap.com/viewer/c238d694b825421f940829321ffa326a/1809.000/en-US/1432ca1fc7b547d493f691cdd09245ae.html" target="_blank" rel="noreferrer noopener">Open SQL Test Environment</a>.</p>
+
+
+
+<p>Mit diesem Framework ist es sehr einfach, der Datenbank manipulierte Daten unterzuschieben. Wie das im Detail geht, zeige ich dir hier.</p>
+
+
+
+<h2 class="wp-block-heading">Ausgangslage</h2>
+
+
+
+<p>Stellen wir uns vor, wir haben eine Anwendung, die zu einem Material die Materialart ermitteln soll und anhand der Materialart prüfen soll, ob eine bestimmte Aktion erlaubt ist oder nicht.</p>
+
+
+
+<p>Die Klasse zur Ermittlung der Materialstammdaten könnte folgendermaßen aussehen:</p>
+
+
+
+<pre class="wp-block-code"><code>CLASS mat DEFINITION.
+  PUBLIC SECTION.
+    METHODS check_usage
+      IMPORTING
+        matnr TYPE matnr
+      RETURNING
+        VALUE(result) TYPE abap_bool.
+      
+  PRIVATE SECTION.
+    METHODS get_type
+      IMPORTING
+        matnr TYPE matnr
+      RETURNING
+        VALUE(mtart) TYPE mtart.
+ENDCLASS.
+CLASS mat IMPLEMENTATION.
+  METHOD check_usage.
+    IF get_type( matnr ) = 'FERT'.
+      result = abap_true.
+    ENDIF. 
+  ENDMETHOD.
+
+  METHOD get_type.
+    SELECT SINGLE mtart FROM mara INTO mtart WHERE matnr = matnr.
+  ENDMETHOD.
+ENDCLASS.</code></pre>
+
+
+
+<p>Mit der Methode CHECK_USAGE kann ich ermitteln, ob ein gegebenes Material für irgendeine hier nicht näher definierte Verwendung erlaubt ist oder nicht.</p>
+
+
+
+<h2 class="wp-block-heading">Unit Tests</h2>
+
+
+
+<p>Wenn ich im Test System zwei Materialien habe, mit denen ich das testen kann, dann könnten die Unit Tests folgendermaßen aussehen:</p>
+
+
+
+<pre class="wp-block-code"><code>CLASS test DEFINITION FOR TESTING
+  DURATION SHORT
+  RISK LEVEL HARMLESS.
+  PRIVATE SECTION.
+
+    DATA f_cut TYPE REF TO mat.
+    METHODS: setup.
+    METHODS: check_allowed FOR TESTING.
+    METHODS: check_forbidden FOR TESTING.
+ENDCLASS. 
+
+CLASS test IMPLEMENTATION.
+
+  METHOD setup.
+    f_cut = NEW #( ).
+  ENDMETHOD.
+
+  METHOD check_allowed.
+    cl_abap_unit_assert=&gt;assert_equals(
+      act   = f_cut-&gt;check_usage( 'MAT-2277' )
+      exp   = abap_true ).
+  ENDMETHOD.
+
+  METHOD check_forbidden.
+    cl_abap_unit_assert=&gt;assert_equals(
+      act   = f_cut-&gt;check_usage( 'MAT-565' )
+      exp   = abap_false ).
+  ENDMETHOD.
+
+ENDCLASS.</code></pre>
+
+
+
+<p>Demzufolge ist das auf der Datenbank vorhandene Material MAT-2277 ein Material vom Typ &#8220;FERT&#8221; und das Material MAT-565 hat einen anderen Typ.</p>
+
+
+
+<h2 class="wp-block-heading">Problem Stammdaten</h2>
+
+
+
+<p>Auf Stammdaten darf man sich allerdings nicht verlassen. Diese werden &#8211; gerade in einem Entwicklungssystem &#8211; gerne mal geändert oder gelöscht. Bei einem Unit Test muss ich mich jedoch auf die Daten verlassen können. Das kann ich nur, wenn ich diese fest mitgebe.</p>
+
+
+
+<h2 class="wp-block-heading">oSQL Test Framework</h2>
+
+
+
+<p>Mit dem oSQL Test Environment kann ich das sehr komfortabel tun. Und zwar folgendermaßen:</p>
+
+
+
+<p>Es muss mit der Methode CL_OSQL_TEST_ENVIRONMENT=&gt;CREATE eine Instanz erstellt werden. Dieser Instanz gebe ich die Tabellennamen mit, die ich beeinflussen möchte. Zusätzlich gebe ich genau die Daten mit, die der Datenbank vorgegaukelt werden sollen. In diesem Beispiel verwende ich das Material FAKEMAT1 als Testmaterial für FERT und FAKEMAT2 als Testmaterial für ein Material ungleich FERT.</p>
+
+
+
+<pre class="wp-block-code"><code>CLASS test DEFINITION FOR TESTING
+  DURATION SHORT
+  RISK LEVEL HARMLESS.
+  PRIVATE SECTION.
+    CLASS-DATA: osql TYPE REF TO if_osql_test_environment.
+    CLASS-METHODS: class_setup.
+    CLASS-METHODS: class_teardown.
+    DATA f_cut TYPE REF TO mat.
+    METHODS: setup.
+    METHODS: check_allowed FOR TESTING.
+    METHODS: check_forbidden FOR TESTING.
+ENDCLASS.     
+
+CLASS test IMPLEMENTATION.
+
+  METHOD class_setup.
+    osql = cl_osql_test_environment=>create( VALUE #( ( 'MARA' ) ) ).
+    DATA(materials) = VALUE mara_tab( 
+      ( mandt = '100' matnr = 'FAKEMAT1' mtart = 'FERT' )
+      ( mandt = '100' matnr = 'FAKEMAT2' mtart = 'HALB' ) ).
+    osql->insert_test_data( materials ).
+  ENDMETHOD.
+
+  METHOD class_teardown.
+    osql->destroy( ).
+  ENDMETHOD.
+
+  METHOD setup.
+    f_cut = NEW #( ).
+  ENDMETHOD.
+
+  METHOD check_allowed.
+    cl_abap_unit_assert=>assert_equals(
+      act   = f_cut->check_usage( 'FAKEMAT1' )
+      exp   = abap_true ).
+  ENDMETHOD.
+
+  METHOD check_forbidden.
+    cl_abap_unit_assert=>assert_equals(
+      act   = f_cut->check_usage( 'FAKEMAT2' )
+      exp   = abap_false ).
+  ENDMETHOD.
+
+ENDCLASS.</code></pre>
+
+
+
+<h2 class="wp-block-heading">Verwendung</h2>
+
+
+
+<p>Die Anwendung ist wirklich denkbar einfach. Keine Ahnung, was da im Hintergrund passiert, aber das ist mir (zur Zeit) auch egal. Hauptsache, es funktioniert.</p>
+
+
+
+<p>Das Gute ist, dass es auch mit Funktionsbausteinen funktioniert, die innerhalb der Testumgebung aufgerufen werden.</p>
+
+
+
+<p>Wenn du ermitteln möchtest, welche Tabellen angesprochen werden, dann kannst du dies einigermaßen bequem mit der Transaktion SAT machen. Dort werden alle Datenbankzugriffe aufgeführt.</p>
+<p>Der Beitrag <a href="/blog/osql-test-environment/">oSQL Test Environment</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

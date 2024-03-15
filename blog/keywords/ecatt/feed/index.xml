@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ECATT Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/ecatt/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 27 Oct 2017 13:12:26 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ECATT Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Auf ECATT Datencontainer zugreifen</title>
+		<link>/blog/auf-ecatt-datencontainer-zugreifen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 27 Oct 2017 13:08:21 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ECATT]]></category>
+		<category><![CDATA[Datencontainer]]></category>
+		<category><![CDATA[testdaten]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018179</guid>
+
+					<description><![CDATA[<p>ECATT-Testdatencontainer sind eine schicke Sache. In diesem Artikel zeige ich dir, wie du auf diese Daten zugreifen kannst. Der Zugriff erfolgt über die Klasse CL_APL_ECATT_TDC_API und bietet vielfältige Möglichkeiten</p>
+<p>Der Beitrag <a href="/blog/auf-ecatt-datencontainer-zugreifen/">Auf ECATT Datencontainer zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In dem letzten Artikel &#8211; <a href="https://tricktresor.com/blog/ecatt-datencontainer-nutzen/">ECATT Datencontainer nutzen</a> &#8211; habe ich dir gezeigt, was ein Testdatencontainer ist. Den Artikel brauchte ich als Vorbereitung für diesen, viel interessanteren Artikel: Der Zugriff auf die Daten des Testdatencontainers.</p>
+<p>Ein Testdatencontainer kann wunderbar für eigene Zwecke &#8220;missbraucht&#8221; werden um mehrere verschiedenartige Daten an einer Stelle zu verwalten.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/ecatt6.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018178" src="https://tricktresor.com/wp-content/uploads/2017/10/ecatt6.png" alt="" width="743" height="656" srcset="/wp-content/uploads/2017/10/ecatt6.png 743w, /wp-content/uploads/2017/10/ecatt6-300x265.png 300w" sizes="(max-width: 743px) 100vw, 743px" /></a></p>
+<h2>Zugriff!</h2>
+<p>Der Zugriff auf den Datencontainer des ECATT ist durch die zur Verfügung gestellte API sehr simpel:</p>
+<pre class="lang:abap decode:true ">"Objekte für Zugriff auf Testdatencontainer
+DATA tdc_ref TYPE REF TO cl_apl_ecatt_tdc_api.
+DATA par_ref TYPE REF TO etpar_gui.
+
+"Datenstrukturen
+DATA ls_mara TYPE mara.
+DATA demo    TYPE zecatt_heads.
+
+"Objekt für Testdatencontainer erzeugen
+tdc_ref = cl_apl_ecatt_tdc_api=&gt;get_instance( 'Z1' ).
+
+"Datenselektion MARA-MATNR für Default-Variante
+tdc_ref-&gt;get_value( EXPORTING i_param_name   = 'MARA'
+                              i_path         = 'MATNR'
+                              i_variant_name = 'ECATTDEFAULT'
+                    CHANGING  e_param_value  = ls_mara-matnr ).
+
+"Datenselektion gesamte Struktur MARA für Variante A1
+tdc_ref-&gt;get_value( EXPORTING i_param_name   = 'MARA'
+                              i_variant_name = 'A1'
+                    CHANGING  e_param_value  = ls_mara ).
+
+"Datenermittlung des komplexen DEMO-Objektes aus der Default-Variante
+tdc_ref-&gt;get_value( EXPORTING i_param_name   = 'DEMO'
+                              i_variant_name = 'ECATTDEFAULT'
+                    CHANGING  e_param_value  = demo ).</pre>
+<p>Über die Klasse CL_APL_ECATT_TDC_API kann der gesamte Datencontainer per Programm verwaltet werden. Es können eigene Container erstellt werden, Attribute ausgelesen und geändert werden und die Daten können ebenfalls gelesen und manipuliert werden.</p>
+<p>Im Gegensatz zu meinem <a href="https://tricktresor.com/blog/daten-dynamisch-verwalten/">Tipp, komplexe Daten in einer INDEX-Tabelle per XML zu speichern</a>, haben die Testdatencontainer den großen Vorteil, dass die Daten strukturiert angezeigt und manipuliert werden können.</p>
+<p>Der Beitrag <a href="/blog/auf-ecatt-datencontainer-zugreifen/">Auf ECATT Datencontainer zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ECATT Datencontainer nutzen</title>
+		<link>/blog/ecatt-datencontainer-nutzen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 27 Oct 2017 12:51:23 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[testdaten]]></category>
+		<category><![CDATA[ECATT]]></category>
+		<category><![CDATA[Datencontainer]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018172</guid>
+
+					<description><![CDATA[<p>Das Extended Computer Aided Test Tool der SAP (ECATT) ist eine umfangreiche Applikation zur Erstellung und Verwaltung von Testdaten und Abläufen. In diesem Artikel zeige ich dir, was ein Testdatencontainer ist.</p>
+<p>Der Beitrag <a href="/blog/ecatt-datencontainer-nutzen/">ECATT Datencontainer nutzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>ECATT (Extended Computer Aided Test Tool) ist ein mächtiges Tool zur Testautomatisierung und Testverwaltung. In der Transaktion SECATT können Skripte aufgezeichnet und abgespielt werden. Es können auch Testdaten verwaltet werden. Um diese Testdaten möchte ich mich in diesem Artikel einmal kümmern.</p>
+<h2>Testdatencontainer</h2>
+<p>In einem Testdatencontainer werden Testdaten vorgehalten. Die Datentypen können beinahe beliebig komplex sein. Nur Objektreferenzen können nicht verwaltet werden. Ansonsten kannst du folgende Datentypen einfach im Container erfassen und ändern:</p>
+<ul>
+<li>Felder</li>
+<li>Strukturen</li>
+<li>Tabellen</li>
+<li>komplexe Datenobjekte: Struktur mit Tabelle etc.</li>
+</ul>
+<h2>Testdatencontainer anlegen</h2>
+<p>Mit Transaktion SECATT kannst du einen Container anlegen. Ich lege einen Container mit Namen &#8220;Z1&#8221; an:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/ecatt1.png"><img decoding="async" class="alignnone size-full wp-image-1018173" src="https://tricktresor.com/wp-content/uploads/2017/10/ecatt1.png" alt="" width="455" height="526" srcset="/wp-content/uploads/2017/10/ecatt1.png 455w, /wp-content/uploads/2017/10/ecatt1-260x300.png 260w" sizes="(max-width: 455px) 100vw, 455px" /></a></p>
+<p>Als erstes musst du die Attribute pflegen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/ecatt2.png"><img decoding="async" class="alignnone size-full wp-image-1018174" src="https://tricktresor.com/wp-content/uploads/2017/10/ecatt2.png" alt="" width="560" height="330" srcset="/wp-content/uploads/2017/10/ecatt2.png 560w, /wp-content/uploads/2017/10/ecatt2-300x177.png 300w" sizes="(max-width: 560px) 100vw, 560px" /></a></p>
+<h2>Parameter</h2>
+<p>Jetzt kommt der interessante Teil: Die Definition der Parameter. Hier kannst du (fast) beliebige Strukturen definieren und mit Daten füllen. Ich habe einmal ein paar Parameter definiert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/ecatt3.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018175" src="https://tricktresor.com/wp-content/uploads/2017/10/ecatt3.png" alt="" width="728" height="302" srcset="/wp-content/uploads/2017/10/ecatt3.png 728w, /wp-content/uploads/2017/10/ecatt3-300x124.png 300w" sizes="(max-width: 728px) 100vw, 728px" /></a></p>
+<p>Einfache Variablen wie im obigen Beispiel &#8220;ID&#8221;, werden direkt in dem ALV-Grid gepflegt.</p>
+<p>Alles andere wird in einem separaten  Container gepflegt. Durch einen Doppelklick auf die entsprechende Zelle in der Spalte &#8220;Parameterwert&#8221; öffnet sich dieser:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/ecatt4.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018176" src="https://tricktresor.com/wp-content/uploads/2017/10/ecatt4.png" alt="" width="943" height="293" srcset="/wp-content/uploads/2017/10/ecatt4.png 943w, /wp-content/uploads/2017/10/ecatt4-300x93.png 300w, /wp-content/uploads/2017/10/ecatt4-768x239.png 768w" sizes="(max-width: 943px) 100vw, 943px" /></a></p>
+<p>Bei einer komplexeren Struktur muss man sich durch die einzelnen Objekte durch hangeln, kann aber alles pflegen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/ecatt5.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018177" src="https://tricktresor.com/wp-content/uploads/2017/10/ecatt5.png" alt="" width="792" height="310" srcset="/wp-content/uploads/2017/10/ecatt5.png 792w, /wp-content/uploads/2017/10/ecatt5-300x117.png 300w, /wp-content/uploads/2017/10/ecatt5-768x301.png 768w" sizes="(max-width: 792px) 100vw, 792px" /></a></p>
+<h2>Varianten</h2>
+<p>Ein Testdatencontainer kann mehrere Varianten verwalten. Für jeden definierten Parameter gibt es nun eine Spalte in der Variantentabelle. Auch hier kann mit einem Doppelklick auf die entsprechende Zelle der Pflegedialog für diesen Parameter geöffnet werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/ecatt6.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018178" src="https://tricktresor.com/wp-content/uploads/2017/10/ecatt6.png" alt="" width="743" height="656" srcset="/wp-content/uploads/2017/10/ecatt6.png 743w, /wp-content/uploads/2017/10/ecatt6-300x265.png 300w" sizes="(max-width: 743px) 100vw, 743px" /></a></p>
+<h2>Ausblick</h2>
+<p>So. Das war nur ein kleiner Ausflug damit du weißt, was ein Datencontainer ist. Wie du ihn als Datenspeicher nutzen kannst, erfährst du in diesem Artikel.</p>
+<p>Der Beitrag <a href="/blog/ecatt-datencontainer-nutzen/">ECATT Datencontainer nutzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>interface Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/interface/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 03 Mar 2023 17:41:08 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>interface Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ALV-Grid Tabelle direkt ändern</title>
+		<link>/blog/alv-grid-tabelle-direkt-aendern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 03 Mar 2023 17:26:06 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[interface]]></category>
+		<category><![CDATA[Friends]]></category>
+		<category><![CDATA[Navigationsprofil]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">/?p=1041994</guid>
+
+					<description><![CDATA[<p>Bei einem ALV-Grid wird die anzuzeigende Datentabelle der Methode SET_TABLE_FOR_FIRST_DISPLAY mitgegeben. Eine Änderung kann eigentlich nur aus der aufrufenden Klasse oder im Ereignis DATA_CHANGED erfolgen. Wird die Datentabelle im Programm geändert, so muss die Methode REFRESH_TABLE_DISPLAY aufgerufen werden, damit die Änderungen auch im Frontend angezeigt werden. In einigen Fällen kann es jedoch erforderlich sein, die Daten von außen zu ändern. Dies ist jedoch nicht möglich, da das Attribut MT_OUTTAB, das die Datenreferenz zur Datentabelle hält,...</p>
+<p>Der Beitrag <a href="/blog/alv-grid-tabelle-direkt-aendern/">ALV-Grid Tabelle direkt ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Bei einem ALV-Grid wird die anzuzeigende Datentabelle der Methode SET_TABLE_FOR_FIRST_DISPLAY mitgegeben. Eine Änderung kann eigentlich nur aus der aufrufenden Klasse oder im Ereignis DATA_CHANGED erfolgen. Wird die Datentabelle im Programm geändert, so muss die Methode REFRESH_TABLE_DISPLAY aufgerufen werden, damit die Änderungen auch im Frontend angezeigt werden. </p>
+
+
+
+<p>In einigen Fällen kann es jedoch erforderlich sein, die Daten <em>von außen </em>zu ändern. Dies ist jedoch nicht möglich, da das Attribut MT_OUTTAB, das die Datenreferenz zur Datentabelle hält, geschützt (protected) ist. Zudem werden die folgenden beiden öffentlichen Methoden, die es ermöglichen könnten, die Daten zu ändern, nicht unterstützt:</p>
+
+
+
+<ul>
+<li>SET_DATA_CELLS</li>
+
+
+
+<li>CHANGE_DATA_FROM_INSIDE</li>
+</ul>
+
+
+
+<p>Wenn ich diese verwende, erhalte ich den Shortdump ASSERTION_FAILED in Klasse CL_DATAPTABLECACHE.</p>
+
+
+
+<p>Glücklicherweise gibt es das <a href="/blog/if-you-wanna-be-my-lover-das-friends-konzept/">If you wanna be my lover – Das FRIENDS-Konzept</a>. Das können wir uns zunutze machen, indem wir die ALV-Grid-Instanz an eine Klasse übergeben, die mit CL_GUI_ALV_GRID befreundet ist und uns die Datenreferenz von MT_OUTTAB zurückgeben lassen. </p>
+
+
+
+<h2 class="wp-block-heading">Friends-Klasse</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">CLASS alv_data DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES if_alv_rm_grid_friend .
+    CLASS-METHODS get_outtab
+      IMPORTING
+        ir_grid          TYPE REF TO cl_gui_alv_grid
+      RETURNING
+        VALUE(ro_outtab) TYPE REF TO data.
+
+ENDCLASS.
+
+CLASS alv_data IMPLEMENTATION.
+  METHOD get_outtab.
+    ro_outtab = ir_grid->mt_outtab.
+  ENDMETHOD.
+ENDCLASS.</pre>
+
+
+
+<h2 class="wp-block-heading">Nutzung</h2>
+
+
+
+<p>Wenn wir also die Instanz eines ALV-Grids haben, dann können wir dieses an die Klasse ALV_DATA=&gt;GET_OUTTAB übergeben und erhalten eine nutzbare Datenreferenz. Diese Datenreferenz können wir zu einem Feldsymbol zuweisen:</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">DATA(my_outtab) = alv_data=>get_outtab( my_grid ).
+FIELD-SYMBOLS &lt;outtab> TYPE TABLE.
+ASSIGN my_outtab->* TO &lt;outtab>.</pre>
+
+
+
+<h2 class="wp-block-heading">Anwendungsbeispiel &#8220;Navigationsprofil&#8221;</h2>
+
+
+
+<p>Wenn du dich bisher gefragt hast, wo zum Geier man sowas machen wollen würde, dann schau dir dieses Beispiel an. Es gibt die Funktionalität <a href="https://erp-up.de/navigationsprofil-im-alv-grid-control/">Navigationsprofil</a>. Mit dieser Funktionalität kannst du ein ALV-Grid erweitern und modifikationsfrei Funktionalitäten hinzufügen. Das kann zum Beispiel durch eine Klasse erfolgen, die das Interface IF_NAVIGATION_PROFILE implementiert. In der Methode USER_COMMAND werden eine Referenz auf die Daten und die Instanz des ALV-Grid übergeben. mit GET_SELECTED_ROWS ist es dann möglich, ausgewählte Zeilen zu ermitteln und aufgrund dieser eine andere Funktionalität aufzurufen.</p>
+
+
+
+<p>Allerdings ist es nicht möglich, die Daten selbst zu ändern. Es sei denn, du verwendest den oben genannten Trick. </p>
+
+
+
+<p>Wie das Beispiel im Detail funktioniert, kannst du mit dem Demoprogramm NAVP_DEMO_TABLE nachvollziehen. Hierzu musst du das Navigationsprofil ändern und einen Button hinzufügen. Wie genau das geht, kannst du <a href="https://blogs.sap.com/2013/04/23/how-to-use-navigation-profiles-with-classes/">hier</a> erfahren.</p>
+
+
+
+<p>Zuerst benötigst du jedoch eine Klasse, die die Datenänderungen vornimmt.</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">CLASS zcl_navigation_profile_enno DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_navigation_profile .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS ZCL_NAVIGATION_PROFILE_ENNO IMPLEMENTATION.
+
+
+* &lt;SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_NAVIGATION_PROFILE_ENNO->IF_NAVIGATION_PROFILE~USER_COMMAND
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IO_ALV                         TYPE REF TO OBJECT
+* | [--->] ID_TABLE                       TYPE REF TO DATA
+* | [--->] IS_PROFILE_KEY                 TYPE        NAVP_S_PROFILE_KEY
+* | [--->] IV_PARAMETER                   TYPE        NAVP_FUNCTION_PARAMETER
+* +--------------------------------------------------------------------------------------&lt;/SIGNATURE>
+  METHOD if_navigation_profile~user_command.
+    DATA outtab TYPE REF TO data.
+    FIELD-SYMBOLS &lt;table> TYPE table.
+
+    DATA(alv) = CAST cl_gui_alv_grid( io_alv ).
+    outtab = lcl_data=>get_outtab( alv ).
+    ASSIGN outtab->* TO &lt;table>.
+
+    DATA lt_delta TYPE lvc_t_modi.
+
+    alv->get_selected_rows( IMPORTING et_row_no = DATA(lt_row_no) ).
+
+    LOOP AT lt_row_no INTO DATA(ls_row).
+      ASSIGN &lt;table>[ ls_row-row_id ] TO FIELD-SYMBOL(&lt;line>).
+      ASSIGN COMPONENT 'FLDATE' OF STRUCTURE &lt;line> TO FIELD-SYMBOL(&lt;fldate>).
+      &lt;fldate> = sy-datum.
+    ENDLOOP.
+
+    FIELD-SYMBOLS &lt;outtab> TYPE table.
+
+    alv->refresh_table_display(
+      i_soft_refresh = abap_true
+      is_stable      = VALUE #( row = abap_true col = abap_true ) ).
+
+    alv->set_selected_rows( it_row_no = lt_row_no ).
+
+  ENDMETHOD.
+ENDCLASS.</pre>
+
+
+
+<p>Danach kannst du die neue Drucktaste anlegen:</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="1024" height="494" src="/wp-content/uploads/2023/03/image-1024x494.png" alt="" class="wp-image-1041995" srcset="/wp-content/uploads/2023/03/image-1024x494.png 1024w, /wp-content/uploads/2023/03/image-300x145.png 300w, /wp-content/uploads/2023/03/image-768x371.png 768w, /wp-content/uploads/2023/03/image.png 1096w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<p>Drucktaste &#8220;Set Date&#8221;</p>
+
+
+
+<p>Die Drucktaste wird nun &#8211; modifikationsfrei &#8211; in der Toolbar angezeigt:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="849" height="203" src="/wp-content/uploads/2023/03/image-2.png" alt="" class="wp-image-1041997" srcset="/wp-content/uploads/2023/03/image-2.png 849w, /wp-content/uploads/2023/03/image-2-300x72.png 300w, /wp-content/uploads/2023/03/image-2-768x184.png 768w" sizes="(max-width: 849px) 100vw, 849px" /></figure>
+
+
+
+<p>Wenn du Einträge markierst und die Drucktaste drückst, dann wird das Flugdatum der markierten Einträge auf das Tagesdatum gesetzt.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-tabelle-direkt-aendern/">ALV-Grid Tabelle direkt ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Autosumme in ALV-Grid &#8211; Version 2</title>
+		<link>/blog/autosumme-in-alv-grid-version-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2016 18:16:47 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[interface]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Autosumme]]></category>
+		<category><![CDATA[Friend]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=861505</guid>
+
+					<description><![CDATA[<p>Im vorherigen Artikel&#160;Autosumme in ALV-Grid (Version 1)&#160;habe ich euch gezeigt, wie man das Ereignis&#160;set_delay_change_selection nutzen kann, um die Summe von markierten Zellen eines ALV-Grids herausfinden kann. Diese Methode hat leider zwei Nachteile: Wie kann man nun dieser Herausforderung begegnen? Es gibt zwei Varianten. Die erste Variante habe ich hier bereits beschrieben. Die Lösung ist in diesem Fall, dass man eine eigene Klasse von CL_GUI_ALV_GRID ableitet (erben lässt) und dann eine neue Methode erstellt, die diese...</p>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-2/">Autosumme in ALV-Grid &#8211; Version 2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Im vorherigen Artikel&nbsp;<a href="https://tricktresor.com/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid (Version 1)</a>&nbsp;habe ich euch gezeigt, wie man das Ereignis&nbsp;set_delay_change_selection nutzen kann, um die Summe von markierten Zellen eines ALV-Grids herausfinden kann. Diese Methode hat leider zwei Nachteile:</p>
+
+
+
+<ol>
+<li>Die Reaktionszeit&nbsp;des Ereignisses <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/ee/c8e068d52611d2b468006094192fe3/content.htm">Delayed_Changed_Sel_Callback</a>&nbsp;ist auf 1,5 Sekunden voreingestellt. Das ist viel zu lange, um schnell mal eben einige Werte zu prüfen</li>
+
+
+
+<li>Es funktioniert nur, wenn die Datentabelle bekannt ist, denn die Datentabelle des ALV-Grid MT_OUTTAB ist geschützt. Auf sie kann also nicht zugegriffen werden. Es ist demnach nicht möglich, eine Methode zu schreiben, die die Grid-Instanz einfach entgegen nimmt und darauf die Funktion Autosumme anwendet.</li>
+</ol>
+
+
+
+<p>Wie kann man nun dieser Herausforderung begegnen? Es gibt zwei Varianten. Die erste Variante habe ich <a href="https://tricktresor.com/blog/geschuetzte-methoden-nutzen/">hier</a> bereits beschrieben. Die Lösung ist in diesem Fall, dass man eine eigene Klasse von CL_GUI_ALV_GRID ableitet (erben lässt) und dann eine neue Methode erstellt, die diese geschützte Methode aufruft.</p>
+
+
+
+<p>Die andere Variante ist hier von Lukasz Pegiel beschrieben:&nbsp;http://abapblog.com/articles/tricks/105-how-to-access-private-or-protected-data-and-methods-of-cl-gui-alv-grid</p>
+
+
+
+<p>In dieser Variante wird einfach das Interface&nbsp;if_alv_rm_grid_friend eingebunden. Hierdurch wird die eigene Klasse als &#8220;Freund des ALV-Grid&#8221; bekannt gemacht. Und als Freund ist es möglich, auf die geschützten Attribute und Methoden zuzugreifen!</p>
+
+
+<p>[notice type=&#8217;info&#8217;]Vielen Dank an dieser Stelle an Lukasz, der mir sehr geholfen hat, diesen Trick Wirklichkeit werden zu lassen! Ich kann jedem nur empfehlen einen oder besser: mehrere Blicke auf seinen <a href="http://abapblog.com/">ABAPBlog</a> zu werfen.  Besonders hervorzuheben ist seine Entwicklung <a href="http://abapblog.com/falv">Fast ALV-Grid</a>. [/notice]</p>
+
+
+
+<figure class="wp-block-image"><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg"><img decoding="async" width="856" height="274" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg" alt="2016-10-07_19-06-25" class="wp-image-861506" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg 856w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-300x96.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-768x246.jpg 768w" sizes="(max-width: 856px) 100vw, 856px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">1. Verbesserung:&nbsp;Änderung der Reaktionszeit</h2>
+
+
+
+<p>Um das Event zu behandeln und die markierten Zellen auszulesen, bedarf es keiner großen Tricks. Allerdings ist die Reaktionszeit Das ist deutlich zu lange. Mit Hilfe der Methode&nbsp;set_delay_change_selection kann die Reaktionszeit geändert werden. Diese Methode ist allerdings PROTECTED, also geschützt.</p>
+
+
+
+<p>Wir müssen also das oben genannte Interface einbinden und haben so Zugriff auf die Methode&nbsp;set_delay_change_selection mit der man die Reaktionszeit in Millisekunden einstellen kann.</p>
+
+
+
+<h2 class="wp-block-heading">2. Verbesserung: Zugriff auf die Datentabelle des ALV-Grid</h2>
+
+
+
+<p>Zusätzlich wollte ich an das geschützte Attribute MT_OUTTAB heran, um die aktuellen Daten auszulesen. Auf diese Weise ist es möglich, ein universelles Tool zu schreiben, dass mit jedem ALV-Grid zusammen arbeitet und nicht nur lokal.</p>
+
+
+
+<h2 class="wp-block-heading">Wie sieht&#8217;s aus?</h2>
+
+
+
+<p>Beide Verbesserungen sind in dieser Version 2 des Codes enthalten. Das Programm besteht nun aus zwei Klassen:</p>
+
+
+
+<ol>
+<li>Die Klasse, LCL_MAIN, die den Grid verwendet und darstellt.</li>
+
+
+
+<li>Die Klasse LCL_AUTOSUMME, die die eigentliche Funktionalität zur Verfügung stellt.</li>
+</ol>
+
+
+
+<p>LCL_AUTOSUMME kann nun also als globale Klasse universell eingesetzt werden. Jedes Grid, dass die Autosummenfunktion verwenden möchte, muss sich in der Klasse mit der Methode REGISTER registrieren. Und dann kann&#8217;s los gehen&#8230;!</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT.
+
+PARAMETERS p_total TYPE p DECIMALS 2.
+
+CLASS lcl_autosumme DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES if_alv_rm_grid_friend .
+    CLASS-METHODS register IMPORTING ir_grid TYPE REF TO cl_gui_alv_grid.
+  PROTECTED SECTION.
+    CLASS-METHODS handle_delayed_selection
+      FOR EVENT delayed_changed_sel_callback
+                  OF cl_gui_alv_grid
+      IMPORTING sender.
+ENDCLASS.
+
+CLASS lcl_autosumme IMPLEMENTATION.
+  METHOD register.
+    "Set handler
+    SET HANDLER handle_delayed_selection FOR ir_grid.
+    "set delayed selection time
+    ir_grid->set_delay_change_selection( time = 100 ).   " Time in Milliseconds
+    "register event for delayed selection
+    ir_grid->register_delayed_event( ir_grid->mc_evt_delayed_change_select ).
+
+  ENDMETHOD.
+
+  METHOD handle_delayed_selection.
+
+    "Local data
+    DATA lt_cells            TYPE lvc_t_cell.
+    DATA ls_cell             LIKE LINE OF lt_cells.
+    DATA lv_total            TYPE p DECIMALS 2.
+    DATA lv_val_type         TYPE c.
+    DATA lv_index            TYPE n LENGTH 2.
+    DATA lv_tablename        TYPE string.
+    DATA lt_grouplevels      TYPE lvc_t_grpl.
+    DATA ls_grouplevel       LIKE LINE OF lt_grouplevels.
+
+    FIELD-SYMBOLS &lt;ref_data> TYPE REF TO data.
+    FIELD-SYMBOLS &lt;table>    TYPE table.
+    FIELD-SYMBOLS &lt;warea>    TYPE any.
+    FIELD-SYMBOLS &lt;val>      TYPE any.
+
+    "data references to sub totals tables
+    DATA ld_ct01             TYPE REF TO data.
+    DATA ld_ct02             TYPE REF TO data.
+    DATA ld_ct03             TYPE REF TO data.
+    DATA ld_ct04             TYPE REF TO data.
+    DATA ld_ct05             TYPE REF TO data.
+    DATA ld_ct06             TYPE REF TO data.
+    DATA ld_ct07             TYPE REF TO data.
+    DATA ld_ct08             TYPE REF TO data.
+    DATA ld_ct09             TYPE REF TO data.
+
+    "get selected cells (selection via CTRL + Y)
+    sender->get_selected_cells( IMPORTING et_cell = lt_cells ).
+
+    "If there is only one cell selected, we do not need to sum that...
+    CHECK lines( lt_cells ) > 1.
+
+    "Read all cell values
+    LOOP AT lt_cells INTO ls_cell.
+
+      "in case of rowtype (normal cell, total or subtotal) assign correct data table
+      CASE ls_cell-row_id-rowtype(1).
+          "Total sum of all
+        WHEN 'T'.
+          ASSIGN sender->mt_ct00 TO &lt;ref_data>.
+          ls_cell-row_id-index = 1.
+          "subtotals
+        WHEN 'S'.
+          sender->get_subtotals( IMPORTING
+                                  ep_collect01 = ld_ct01
+                                  ep_collect02 = ld_ct02
+                                  ep_collect03 = ld_ct03
+                                  ep_collect04 = ld_ct04
+                                  ep_collect05 = ld_ct05
+                                  ep_collect06 = ld_ct06
+                                  ep_collect07 = ld_ct07
+                                  ep_collect08 = ld_ct08
+                                  ep_collect09 = ld_ct09
+                                  et_grouplevels = lt_grouplevels ).
+
+          lv_index = ls_cell-row_id-rowtype+4(2).
+          lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+          ASSIGN (lv_tablename) TO &lt;ref_data>.
+
+          READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+          IF sy-subrc = 0.
+            ls_cell-row_id-index = ls_grouplevel-cindx_from.
+          ENDIF.
+          "Normal cell value
+        WHEN space.
+          ASSIGN sender->mt_outtab TO &lt;ref_data>.
+      ENDCASE.
+
+      "assign specified data table
+      ASSIGN &lt;ref_data>->* TO &lt;table>.
+
+      "Only read table line when index changes
+      AT NEW row_id.
+        READ TABLE &lt;table> ASSIGNING &lt;warea> INDEX ls_cell-row_id-index.
+      ENDAT.
+      "Assign selected fieldname of workarea
+      ASSIGN COMPONENT ls_cell-col_id OF STRUCTURE &lt;warea> TO &lt;val>.
+      IF sy-subrc = 0.
+        "check correct type of field: Only numeric fields will be taken
+        DESCRIBE FIELD &lt;val> TYPE lv_val_type.
+        CASE lv_val_type.
+          WHEN 'P'  "Packed
+            OR 'N'  "Numchar
+            OR 'b'  "Integer
+            OR 'a'  "decfloat
+            OR 'e'  "decfloat
+            OR 'F'. "Float?
+            "add cell value to total
+            ADD &lt;val> TO lv_total.
+        ENDCASE.
+      ENDIF.
+    ENDLOOP.
+
+    IF lv_total IS NOT INITIAL.
+      "There were numeric fields selected and therefor we have a total to show:
+      MESSAGE s000(oo) WITH 'TOTAL:' space lv_total.
+      p_total = lv_total.
+    ENDIF.
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_main DEFINITION.
+
+  PUBLIC SECTION.
+*    INTERFACES if_alv_rm_grid_friend .
+    METHODS start.
+  PROTECTED SECTION.
+    DATA mr_grid TYPE REF TO cl_gui_alv_grid.
+    DATA mt_data TYPE STANDARD TABLE OF spfli.
+    DATA mv_data_table TYPE tabname VALUE 'SPFLI'.
+    DATA mr_dock TYPE REF TO cl_gui_docking_container.
+    METHODS create_docker.
+    METHODS create_grid.
+    METHODS select_data.
+    METHODS register_autosumme.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+  METHOD start.
+    select_data( ).
+    create_docker( ).
+    create_grid( ).
+    register_autosumme( ).
+  ENDMETHOD.
+
+  METHOD create_docker.
+    "Create Docking container at bottom
+    CREATE OBJECT mr_dock
+      EXPORTING
+        side                    = cl_gui_docking_container=>dock_at_bottom
+        ratio                   = 90
+        no_autodef_progid_dynnr = abap_false.
+
+  ENDMETHOD.
+
+  METHOD create_grid.
+    "Create ALV-Grid
+    CREATE OBJECT mr_grid
+      EXPORTING
+        i_appl_events = abap_true
+        i_parent      = mr_dock.
+
+    "and display data
+    mr_grid->set_table_for_first_display(
+      EXPORTING
+        i_structure_name = mv_data_table
+      CHANGING
+        it_outtab        = mt_data ).
+
+    "Set focus on grid so user can directly scroll and select cells via CTRL+Y
+    cl_gui_container=>set_focus( mr_grid ).
+
+  ENDMETHOD.
+
+  METHOD select_data.
+    "Select data
+    SELECT * FROM (mv_data_table) INTO TABLE mt_data UP TO 100 ROWS.
+  ENDMETHOD.
+
+  METHOD register_autosumme.
+    lcl_autosumme=>register( mr_grid ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+  DATA(gr_main) = NEW lcl_main( ).
+  gr_main->start( ).</pre>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-2/">Autosumme in ALV-Grid &#8211; Version 2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Serialize me</title>
+		<link>/blog/serialize-me/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 Dec 2015 17:42:33 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[call transformation]]></category>
+		<category><![CDATA[interface]]></category>
+		<category><![CDATA[ZIP]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=368973</guid>
+
+					<description><![CDATA[<p>Serialisierung von Objekten. Was ist das? Wozu braucht man das? Wie kann man es sinnvoll nutzen? </p>
+<p>Der Beitrag <a href="/blog/serialize-me/">Serialize me</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Interface IF_SERIALIZABLE_OBJECT läuft einem hin und wieder in SAP-Standardklassen über den Weg.</p>
+<h2>Was ist Serialisierung?</h2>
+<p>Wikipedia sagt über <a href="https://de.wikipedia.org/wiki/Serialisierung">Serialisierung</a>:</p>
+<blockquote><p>Die <b>Serialisierung</b> ist in der Informatik eine Abbildung von strukturierten Daten auf eine sequenzielle Darstellungsform.</p></blockquote>
+<p>Eine der bekanntesten Anwendungen für die Serialisierung ist das JSON-Format, in dem komplexe Daten in einer lesbaren Form dargestellt werden können.</p>
+<p>Eine andere Form der Serialisierung lässt sich mit XML bewerkstelligen.</p>
+<h2>Interface IF_SERIALIZABLE_OBJECT</h2>
+<p>Damit ein Objekt (Klasse) serialisierbar ist, muss es das Interface IF_SERIALIZABLE_OBJECT implementieren:</p>
+<pre>CLASS lcl_serialize_me DEFINITION.
+ PUBLIC SECTION.
+ INTERFACES if_serializable_object.
+
+ DATA mt_t005  TYPE STANDARD TABLE OF t005.
+ DATA mt_t005t TYPE STANDARD TABLE OF t005t.
+
+ENDCLASS.</pre>
+<p>Zur Demonstration habe ich die zwei öffentlichen Attribute MT_T005 und MT_T005T hinzugefügt.</p>
+<p>Um die Klasse nutzen zu können, muss sie instantiiert werden:</p>
+<pre>DATA ref TYPE REF TO lcl_serialize_me.
+CREATE OBJECT ref.</pre>
+<p>In die Tabellen laden wir nun alle EG-Länder inklusive Texte:</p>
+<pre> SELECT * FROM t005 INTO TABLE ref-&gt;mt_t005 WHERE xegld = abap_true.
+ IF sy-subrc = 0.
+   SELECT * FROM t005t INTO TABLE ref-&gt;mt_t005t
+      FOR ALL ENTRIES IN ref-&gt;mt_t005
+    WHERE land1 = ref-&gt;mt_t005-land1
+      AND spras = sy-langu.
+ ENDIF.
+</pre>
+<p>Somit haben wir eine Objektreferenz erzeugt, die ein paar Daten enthält.</p>
+<p>Diese Daten sind auch serialisierbar. Andere Daten, wie zum Beispiel Attribute mit Referenzen zu anderen Klassen, sind nicht serialisierbar.</p>
+<p>Deswegen darf das Interface IF_SERIALIZABLE_OBJECT nur dann implementiert werden, wenn alle Attribute der Klasse für die Serialisierung geeignet sind.</p>
+<h2>Serialisierung</h2>
+<p>Nun soll das Objekt mittels XML serialisiert werden. Das geht schnell und einfach:</p>
+<pre>DATA ser TYPE string.</pre>
+<pre>CALL TRANSFORMATION id
+     SOURCE model = ref
+     RESULT XML ser.</pre>
+<p>Das Ergebnis ist ein lesbarer XML-String (Ausschnitt):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-20-37.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-368974" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-20-37-300x168.png" alt="2015-12-02_18-20-37" width="300" height="168" srcset="/wp-content/uploads/2015/12/2015-12-02_18-20-37-300x168.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-20-37-1024x572.png 1024w, /wp-content/uploads/2015/12/2015-12-02_18-20-37.png 1145w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Tipp: Im Debugger ist es möglich, einen XML-String komplett darstellen zu lassen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-21-08.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-368975" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-21-08-300x101.png" alt="2015-12-02_18-21-08" width="300" height="101" srcset="/wp-content/uploads/2015/12/2015-12-02_18-21-08-300x101.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-21-08.png 960w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Speicherplatz sparen</h2>
+<p>Da die Tabellen gefüllt sind, ist das Objekt recht groß geworden. Mit GZIP schrumpfen wir es auf eine kleinere Größe:</p>
+<pre>DATA zip TYPE xstring.
+cl_abap_gzip=&gt;compress_text(
+     EXPORTING text_in  = ser
+     IMPORTING gzip_out = zip ).</pre>
+<p>Dies aber nur nebenbei&#8230;</p>
+<h2>Deserialisierung</h2>
+<p>Nun möchten wir das serialisierte Objekt natürlich irgendwo speichern, ablegen oder verschicken.</p>
+<p>Das ist jedoch nur sinnvoll, wenn wir es auch wieder deserialisieren können&#8230;</p>
+<p>Die Objektreferenz ist in dem Fall natürlich leer:</p>
+<pre>CLEAR ref.
+</pre>
+<p>Die Deserialisierung funktioniert ebenfalls mittel CALL TRANSFORMATION in der Standardvariante:</p>
+<pre>CALL TRANSFORMATION id
+     SOURCE XML ser
+     RESULT model = ref.</pre>
+<p>Im Debugger kannst du überprüfen, dass die komplette Referenz wiederhergestellt wurde. Das ist fast schon Zauberei&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Vielen Dank an Haubi für diese Idee!</p>
+<h2>Nutzen</h2>
+<p>Wozu die Serialisierung und Deserialisierung tatsächlich nützlich ist, wird man wahrscheinlich erst wissen, wenn man es braucht. Daher ist es in jedem Fall gut zu wissen, dass es funktioniert.</p>
+<h2>DEMO</h2>
+<p>Ein einfaches Demoprogramm ist DEMO_SERIALIZABLE_OBJECT. Hier wird ebenfalls die Serialisierung demonstriert.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-41-07.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-368977" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-41-07-300x269.png" alt="2015-12-02_18-41-07" width="300" height="269" srcset="/wp-content/uploads/2015/12/2015-12-02_18-41-07-300x269.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-41-07-1024x917.png 1024w, /wp-content/uploads/2015/12/2015-12-02_18-41-07.png 1116w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Wer ein komplexes Demoprogramm zur Konvertierung von (Daten-) Typen sehen möchte, sollte sich das Programm STRANSDEMO_FLIGHTS anschauen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-37-23.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-368976" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-02_18-37-23-300x237.png" alt="2015-12-02_18-37-23" width="300" height="237" srcset="/wp-content/uploads/2015/12/2015-12-02_18-37-23-300x237.png 300w, /wp-content/uploads/2015/12/2015-12-02_18-37-23-1024x810.png 1024w, /wp-content/uploads/2015/12/2015-12-02_18-37-23.png 1466w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Viel Spaß damit; mir ist es zu kompliziert!</p>
+<p>Der Beitrag <a href="/blog/serialize-me/">Serialize me</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Klasse in ein Interface kopieren</title>
+		<link>/blog/klasse-in-ein-interface-kopieren/</link>
+					<comments>/blog/klasse-in-ein-interface-kopieren/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Feb 2014 12:12:52 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[saplink]]></category>
+		<category><![CDATA[refactoring]]></category>
+		<category><![CDATA[interface]]></category>
+		<category><![CDATA[nugget]]></category>
+		<category><![CDATA[Editor]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4465</guid>
+
+					<description><![CDATA[<p>Im Zuge einer Refactoring-Maßnahme kann es nötig sein, Methoden in ein Interface auszulagern. Hierbei gibt es jedoch leider keinerlei Unterstützung durch die Workbench. Helfen tut hier das kostenlose Tool SAPlink.</p>
+<p>Der Beitrag <a href="/blog/klasse-in-ein-interface-kopieren/">Klasse in ein Interface kopieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Aufgabe: Im Zuge einer Refactoring-Maßnahme sollen Methoden einer Klasse in ein Interface überführt werden. Im Class-browser gibt es dafür leider keine Unterstützung. Es ist also nicht möglich, eine Klasse auf ein Interface zu kopieren, oder den Typ der Klasse zu ändern.</p>
+<p>Eine einfache Möglichkeit bietet das kostenlos Tool <a title="SAPlink | code.google.com" href="https://code.google.com/p/saplink/" target="_blank">SAPlink</a>. Mit diesem Tool ist es möglich, viele Repository-Objekte (Datenelemente, Tabellen, Klassen, Programme etc.) in ein <em>nugget</em> zu exportieren. Das nugget ist eine XML-Datei, die alle notwendigen Attribute eines SAP-Entwicklungsobjekets enthält und in einem anderen SAP-System wieder eingespielt werden kann.</p>
+<h2>Nugget bearbeiten</h2>
+<p>SAPlink können wir für diese Aufgabe nutzen. Nach dem Erzeugen des nuggets muss dieses mit einem normalen Editor bearbeitet werden.</p>
+<ol>
+<li>CLAS durch INTF ersetzen<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_00_14.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4469" style="line-height: 1.5em;" alt="nugget_text1" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_00_14-201x300.jpg" width="201" height="300" srcset="/wp-content/uploads/2014/02/02_20_13_00_14-201x300.jpg 201w, /wp-content/uploads/2014/02/02_20_13_00_14.jpg 443w" sizes="(max-width: 201px) 100vw, 201px" /></a></li>
+<li>Klassenname durch Interfacenamen ersetzen:<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_01_43.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4470" alt="nugget_text2" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_01_43-300x155.jpg" width="300" height="155" srcset="/wp-content/uploads/2014/02/02_20_13_01_43-300x155.jpg 300w, /wp-content/uploads/2014/02/02_20_13_01_43-624x323.jpg 624w, /wp-content/uploads/2014/02/02_20_13_01_43.jpg 870w" sizes="(max-width: 300px) 100vw, 300px" /></a></li>
+</ol>
+<h2>Vorgehen</h2>
+<ol>
+<li>SAPlink starten (in der Regel Programm ZSAPLINK)</li>
+<li>Nugget erzeugen (XML-Datei wird auf dem PC angelegt)<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_12_58_47.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4466" alt="saplink1" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_12_58_47-300x205.jpg" width="300" height="205" srcset="/wp-content/uploads/2014/02/02_20_12_58_47-300x205.jpg 300w, /wp-content/uploads/2014/02/02_20_12_58_47.jpg 583w" sizes="(max-width: 300px) 100vw, 300px" /></a></li>
+<li>gewünschte Klasse ins nugget exportieren<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_12_59_30.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4467" alt="saplink2" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_12_59_30-300x211.jpg" width="300" height="211" srcset="/wp-content/uploads/2014/02/02_20_12_59_30-300x211.jpg 300w, /wp-content/uploads/2014/02/02_20_12_59_30-624x440.jpg 624w, /wp-content/uploads/2014/02/02_20_12_59_30.jpg 627w" sizes="(max-width: 300px) 100vw, 300px" /></a></li>
+<li>nugget bearbeiten (siehe oben)</li>
+<li>nugget importieren<br />
+<a href="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_02_26.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4468" alt="nugget3" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_13_02_26.jpg" width="300" height="133" /></a></li>
+</ol>
+<h2>Hinweise</h2>
+<p>Interfaces haben keinen Quelltext. Der Quelltext der exportierten Klasse wird beim Import in das Interface ignoriert. Der Quelltext muss also nicht extra aus dem nugget gelöscht werden.</p>
+<p>Interfaces haben keinen CONSTRUCTOR. Dieser kann entweder aus dem nugget gelöscht werden oder später im importierten Interface.</p>
+<p>Eventuell muss für SAPlink das Objekt für Interfaces INTF separat installiert werden.</p>
+<p>Weitere Infos zu SAPlink gibt es hier:</p>
+<p><a title="SAPlink Homepage | assembla" href="https://www.assembla.com/spaces/saplink/wiki">Assembla &#8211; SAPlink project homepage</a></p>
+<p><a title="SAPlink | Berater-Wiki" href="http://www.berater-wiki.de/index.php?title=SAPlink">Berater-Wiki</a></p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/klasse-in-ein-interface-kopieren/">Klasse in ein Interface kopieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/klasse-in-ein-interface-kopieren/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

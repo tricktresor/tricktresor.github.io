@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Nützliche Standardprogramme Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/nuetzliche-standardprogramme/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 19 Apr 2021 10:42:46 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Nützliche Standardprogramme Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Editor-Aufruf</title>
+		<link>/blog/editor-aufruf/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 21 Aug 2013 14:07:11 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[ABAP Tools]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=677</guid>
+
+					<description><![CDATA[<p>M&#246;glichkeiten, den ABAP-Editor aufzurufen gibt es viele. Hier zeigen wir Ihnen einige davon...</p>
+<p>Der Beitrag <a href="/blog/editor-aufruf/">Editor-Aufruf</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Möglichkeiten, den ABAP-Editor aufzurufen gibt es viele. Hier zeigen wir Ihnen einige davon&#8230;</p>
+<p><img decoding="async" class="alignnone size-medium wp-image-4055" alt="ABAP Editor" src="https://tricktresor.com/wp-content/uploads/2013/08/12_10_21_56_58-300x162.jpg" width="300" height="162" srcset="/wp-content/uploads/2013/08/12_10_21_56_58-300x162.jpg 300w, /wp-content/uploads/2013/08/12_10_21_56_58-624x338.jpg 624w, /wp-content/uploads/2013/08/12_10_21_56_58.jpg 629w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<h1 class="head1">EDITOR-CALL</h1>
+<p>Der einfachste Aufruf:</p>
+<pre>DATA lv_progname TYPE syrepid.
+lv_progname = 'ZZMEINPROGRAMM'.
+EDITOR-CALL FOR REPORT lv_progname.</pre>
+<h1 class="head1">RS_TOOL_ACCESS</h1>
+<pre>  CALL FUNCTION 'RS_TOOL_ACCESS'
+     EXPORTING
+       operation           = 'DOCS'
+       object_name         = 'ZZPROGNAME'
+       object_type         = 'PROG'
+     EXCEPTIONS
+       not_executed        = 1
+       invalid_object_type = 2
+       OTHERS              = 3.</pre>
+<h1 class="head1">Programm TPDA_EDITOR_START</h1>
+<pre>DATA prg_info  TYPE tpda_prg_info.
+DATA dynp_info TYPE tpda_dynp_info.
+
+authority-check object 'S_DEVELOP'
+  id 'DEVCLASS' field '*'
+  id 'OBJTYPE' field '*'
+  id 'OBJNAME' field '*'
+  id 'P_GROUP' field '*'
+  id 'ACTVT' field '3'.
+
+IF dynp IS NOT INITIAL.
+  dynp_info-program  = prgm.
+  dynp_info-dynpnr   = dynp.
+  dynp_info-dynpline = line.
+ELSE.
+  prg_info-program  = prgm.
+  prg_info-include  = incl.
+  prg_info-line     = line.
+ENDIF.
+
+CALL METHOD cl_tpda_services_tools=&gt;navigate_to_source
+  EXPORTING
+    p_prg_info  = prg_info
+    p_dynp_info = dynp_info.</pre>
+<h1 class="head1">Funktionsbaustein EDITOR_PROGRAM</h1>
+<pre>CALL FUNCTION 'EDITOR_PROGRAM'
+  EXPORTING
+    display = 'X'
+    program = 'ZZTESTPROG'
+  EXCEPTIONS
+    OTHERS  = 2.</pre>
+<p>Der Beitrag <a href="/blog/editor-aufruf/">Editor-Aufruf</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Texte kopieren</title>
+		<link>/blog/texte-kopieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 24 Feb 2012 14:22:10 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[Texte SAP]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=636</guid>
+
+					<description><![CDATA[<p>Mit der Transaktion TXBA k&#246;nnen Standardtexte selektiert und kopiert werden. Zudem k&#246;nnen diese auch in einen Transportauftrag &#252;bernommen und transportiert werden.</p>
+<p>Der Beitrag <a href="/blog/texte-kopieren/">Texte kopieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit der Transaktion TXBA können Standardtexte selektiert und kopiert werden. Zudem können diese auch in einen Transportauftrag übernommen und transportiert werden.</p>
+<p>Zum Kopieren (z.B. auf anderen Sprachen) und Transportieren von Standardtexten können Sie die Transaktion <strong>TXBA</strong> verwenden.</p>
+<p>Sie können <strong>mehrere</strong> Texte markieren und Kopieren (wobei man beim Kopieren aufpassen muss, da als Zielsprachkürzel das einstellige Sprachkürzel verwendet wird. z.B. kopiert SAP hier von PL [Polnisch] nach P [Portugisisch]).</p>
+<p>Aus der Transaktion heraus können die Texte dann noch bearbeitet werden UND direkt in einen <strong>Transportauftrag</strong> aufgenommen werden.</p>
+<p>Der Beitrag <a href="/blog/texte-kopieren/">Texte kopieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Änderungsbelege</title>
+		<link>/blog/aenderungsbelege/</link>
+					<comments>/blog/aenderungsbelege/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 30 Sep 2008 11:35:39 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<category><![CDATA[Änderungsbelegobjekt]]></category>
+		<category><![CDATA[CDHDR]]></category>
+		<category><![CDATA[CDPOS]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=509</guid>
+
+					<description><![CDATA[<p>Komfortable Anzeige und Auswertung von &#196;nderungsbelegen zu einem Objekt.</p>
+<p>Der Beitrag <a href="/blog/aenderungsbelege/">Änderungsbelege</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<h2 class="wp-block-heading">Komfortable Anzeige und Auswertung von Änderungsbelegen zu einem Objekt.</h2>
+
+
+
+<p>Report RSSCD200 dient Ihnen als komfortable Möglichkeit zur Auswertung von Änderungen (Auslesen der Tabellen CDHDR und CDPOS)</p>
+
+
+
+<p>Mit diesem Report ist es möglich, eine sehr übersichtliche Auswertung über die Änderungen eines Objekts zu erstellen. Beispiel:</p>
+
+
+
+<p>Objektklasse: MATERIAL<br>Objekt-Id.: (materialnummer)<br>ab Datum: (blank)<br>bis Datum: (heute)</p>
+
+
+
+<p>Durch diese Selektion werden *alle* änderungen des selektierten Materials aufgerufen.</p>
+
+
+
+<h2 class="wp-block-heading">Änderungsbelegobjekt anlegen</h2>
+
+
+
+<p>Änderungsbelegobjekte legt man mit der Transaktion SCDO an. Hierbei muss angegeben werden, welche Tabellen von Änderungen betroffen sein sollen und ob es sich um eine Kopftabelle handelt oder um Daten, die in einer internen Tabelle übergeben werden müssen.</p>
+
+
+
+<h2 class="wp-block-heading">Tabellen zu Änderungsbelegen</h2>
+
+
+
+<p>Es gibt meines Wissens nach keinen Verwendungsnachweis von Tabellen zu Änderungsbelegobjekten. Wenn du also wissen möchtest, ob eine Tabellen in einem Änderungsbelegobjekt verwendet wird, kannst du in die Tabelle TCDOB schauen. </p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="572" height="329" src="/wp-content/uploads/2021/04/SNAG-01470.png" alt="" class="wp-image-1027441" srcset="/wp-content/uploads/2021/04/SNAG-01470.png 572w, /wp-content/uploads/2021/04/SNAG-01470-300x173.png 300w, /wp-content/uploads/2021/04/SNAG-01470-265x153.png 265w, /wp-content/uploads/2021/04/SNAG-01470-148x85.png 148w, /wp-content/uploads/2021/04/SNAG-01470-193x112.png 193w, /wp-content/uploads/2021/04/SNAG-01470-71x40.png 71w" sizes="(max-width: 572px) 100vw, 572px" /><figcaption>Tabellen des Änderungsbelegobjektes EQUI</figcaption></figure>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="323" height="269" src="/wp-content/uploads/2021/04/SNAG-01471.png" alt="" class="wp-image-1027442" srcset="/wp-content/uploads/2021/04/SNAG-01471.png 323w, /wp-content/uploads/2021/04/SNAG-01471-300x250.png 300w" sizes="(max-width: 323px) 100vw, 323px" /><figcaption>Tabelleneinträge TCDOB zum Änderungsbelegobjekt EQUI</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Lesen von Änderungsbelegen</h2>
+
+
+
+<p>Änderungsbelege zu einem Änderungsbelegobjekt liest du mit den folgenden Funktionsbausteinen:</p>
+
+
+
+<ul><li>CHANGEDOCUMENT_READ_HEADERS</li><li>CHANGEDOCUMENT_READ_POSITIONS</li><li>CHANGEDOCUMENT_READ_ALL</li></ul>
+<p>Der Beitrag <a href="/blog/aenderungsbelege/">Änderungsbelege</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/aenderungsbelege/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Download</title>
+		<link>/blog/download/</link>
+					<comments>/blog/download/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 26 Sep 2006 13:42:00 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=383</guid>
+
+					<description><![CDATA[<p>Programme um verschiedene Dinge auf den PC zu exportieren (Quelltexte, Tabellen, etc.)</p>
+<p>Der Beitrag <a href="/blog/download/">Download</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Programme um verschiedene Dinge auf den PC zu exportieren (Quelltexte, Tabellen, etc.)<br /><P class="head1">Report RPUDPSM0</P><P>Dieser Report dient zum Herunterladen von Programmen. Selektiert werden kann nach Entwicklungsklasse und Reportnamen. Die Quelltexte werden in einer Datei gespeichert.</P><P class="head1">Report RPUDFSM0</P><P>Dieser Report l&auml;dt den Quelltext von Funktionsgruppen auf den PC. Auch hier werden alle Quelltexte in einer Datei gespeichert.</P><P class="head1">Report RPUDTEM0</P><P>Download von Tabelleneintr&auml;gen aus zu spezifizierenden Tabellen. Der Parameter MOLGA&nbsp;sollte mit&nbsp;01 f&uuml;r Deutschland angegeben werden, ist aber f&uuml;r nicht-HR-Tabellen irrelevant.</P><P class="head1">Report RPUDTSM0</P><P>Hiermit kann die Struktur von Tabellen exportiert werden. Der Parameter MOLGA&nbsp;sollte mit&nbsp;01 f&uuml;r Deutschland angegeben werden, ist aber f&uuml;r nicht-HR-Tabellen irrelevant.</P><P class="head1">Kennwort</P><P class="text1">Das Kennwort f&uuml;r diese Programme lautet &#8220;HR&#8221;&#8230;</P></p>
+<p>Der Beitrag <a href="/blog/download/">Download</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/download/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Tabellenmodifikationen im Programm suchen</title>
+		<link>/blog/tabellenmodifikationen-im-programm-suchen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 12 May 2005 12:18:59 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=328</guid>
+
+					<description><![CDATA[<p>Sie k&#246;nnen sich mit der richtigen Transaktion Tabellenmodifkationen und Tabellenzugriffe in einem Programme anzeigen lassen. Geben Sie einfach die Transaktion, das Programm oder die Funktionsgruppe an und Sie erhalten eine &#220;bersicht &#252;ber alle Tabellenzugriffe. </p>
+<p>Der Beitrag <a href="/blog/tabellenmodifikationen-im-programm-suchen/">Tabellenmodifikationen im Programm suchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Sie k&ouml;nnen sich mit der richtigen Transaktion Tabellenmodifkationen und Tabellenzugriffe in einem Programme anzeigen lassen. Geben Sie einfach die Transaktion, das Programm oder die Funktionsgruppe an und Sie erhalten eine &Uuml;bersicht &uuml;ber alle Tabellenzugriffe. <br /><P>Die Wundertransaktion heisst <STRONG><FONT color="#fb2412">SE49</FONT></STRONG>.</P><P>Geben Sie im Einstiegsbild den Namen des entsprechenden Objektes ein und klicken sie auf [Anzeigen].</P><P>Sie erhalten dann eine Liste untergliedert nach den&nbsp;Tabellenzugriffen</P><UL><LI>Lesen <LI>L&ouml;schen <LI>&Auml;ndern</LI></UL><P>Dynamische Tabellenzugriffe werden <STRONG><FONT color="#fb2412">rot</FONT></STRONG> hervorgehoben.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/ze49.jpg"><BR>Ausschnitt der Programmanalyse f&uuml;r Transaktion VA01</P></TD></TR></TBODY></TABLE></P><P>In einem 4.5er Release ist zwar das Programm, nicht jedoch die Transaktion vorhanden. Legen Sie dazu einfach die Dialog-Transaktion ZE49 an:</P><P class="sap1">Transaktionstext:&nbsp; Prog.analyse: Tabellenmanipulation<BR>Programm:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT color="#fb2412">SAPMSEUZ</FONT><BR>Dynpronummer:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT color="#fb2412">200</FONT></P><P class="text1">Gleiches gilt anscheinend f&uuml;r Releases ab ECC 6.0: Das Programm ist noch vorhanden, jedoch die Transaktion nicht mehr. Die Programmanalyse funktioniert auch nur noch mit Einschr&auml;nkungen: Der Absprung ins Coding wird leider teilweise mit dem Shortdump &#8220;READ_REPORT_LINE_TOO_LONG&#8221; quittiert&#8230;</P></p>
+<p>Der Beitrag <a href="/blog/tabellenmodifikationen-im-programm-suchen/">Tabellenmodifikationen im Programm suchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Sourcecode durchsuchen</title>
+		<link>/blog/sourcecode-durchsuchen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 30 Sep 2004 16:44:22 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SAP-Standardprogramme]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=282</guid>
+
+					<description><![CDATA[<p>Hier sind Standardfunktionen aufgelistet, mit denen Sie den Quellcode von Programmen komfortabel durchsuchen k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/sourcecode-durchsuchen/">Sourcecode durchsuchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Hier sind Standardfunktionen aufgelistet, mit denen du den Quellcode von Programmen komfortabel durchsuchen kannst.</p>
+
+
+
+<p>Mit den Programmen <strong>RPR_ABAP_SOURCE_SCAN</strong> oder <strong>RS_ABAP_SOURCE_SCAN</strong> kannst du den Quelltext von mehreren Programmen durchsuchen.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="836" height="791" src="/wp-content/uploads/2020/08/SNAG-00619.png" alt="" class="wp-image-1024053" srcset="/wp-content/uploads/2020/08/SNAG-00619.png 836w, /wp-content/uploads/2020/08/SNAG-00619-300x284.png 300w, /wp-content/uploads/2020/08/SNAG-00619-768x727.png 768w" sizes="(max-width: 836px) 100vw, 836px" /><figcaption>RS_ABAP_SOURCE_SCAN</figcaption></figure>
+
+
+
+<p>Kurz und Schmerzlos ist die Transaktion <strong>EWK1</strong>.</p>
+
+
+
+<p>Ebenfalls sehr sinnvoll ist das Programm&nbsp;<strong>RPINCL10</strong>, mit dem Programme sehr gezielt mit zwei Suchstrings durchsucht werden können.</p>
+
+
+
+<p>Auch das Programm <strong>RSRSCAN1</strong> leistet gute Dienste.</p>
+
+
+
+<p>Und auch die Transaktion <strong>CODE_SCANNER </strong>hilft, Source Code zu durchsuchen.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="837" height="592" src="/wp-content/uploads/2020/08/SNAG-00618.png" alt="" class="wp-image-1024054" srcset="/wp-content/uploads/2020/08/SNAG-00618.png 837w, /wp-content/uploads/2020/08/SNAG-00618-300x212.png 300w, /wp-content/uploads/2020/08/SNAG-00618-768x543.png 768w, /wp-content/uploads/2020/08/SNAG-00618-200x140.png 200w" sizes="(max-width: 837px) 100vw, 837px" /><figcaption>x CODE_SCANNER</figcaption></figure>
+<p>Der Beitrag <a href="/blog/sourcecode-durchsuchen/">Sourcecode durchsuchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Analysieren von Dynpro-Generierungsfehlern</title>
+		<link>/blog/analysieren-von-dynpro-generierungsfehlern/</link>
+					<comments>/blog/analysieren-von-dynpro-generierungsfehlern/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 22 Jul 2003 20:41:53 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=100</guid>
+
+					<description><![CDATA[<p>Beim Aufw&#228;ndigen Gestalten der Selektionsbildes von Reports kann es vorkommen, dass das Dynpro aufgrund von &#220;berschneidungen nicht generiert werden kann. Der Editor meldet dann allerdings nur "Fehler beim Generieren des Selektionsbilds "1000" des Reports "xyz". Mit dem folgenden Programm k&#246;nnen Sie den Fehler genau analysieren.</p>
+<p>Der Beitrag <a href="/blog/analysieren-von-dynpro-generierungsfehlern/">Analysieren von Dynpro-Generierungsfehlern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Beim Aufw&auml;ndigen Gestalten der Selektionsbildes von Reports kann es vorkommen, dass das Dynpro aufgrund von &Uuml;berschneidungen nicht generiert werden kann. Der Editor meldet dann allerdings nur &#8220;Fehler beim Generieren des Selektionsbilds &#8220;1000&#8221; des Reports &#8220;xyz&#8221;. Mit dem folgenden Programm k&ouml;nnen Sie den Fehler genau analysieren.<br /><P>Wenn Sie Selektionsbilder mit dem Befehl SELECTION-SCREEN komplexer gestalten, so kann es zu &Uuml;berschneidungen von Bildschirmelementen kommen.</P><P>Im folgenden Beispiel sollen mehrere Elemente in einer Zeile ausgegeben werden. Diese &uuml;berschneiden sich jedoch: </P><P class="sap1">selection-screen begin of line.<BR><FONT color="#fb2412">*** Dieses Element geht bis zur Position &#8220;30&#8221;<BR></FONT>selection-screen comment <FONT color="#f49047">1</FONT>(<FONT color="#f49047">30</FONT>) text-t01.<BR><FONT color="#fb2412">*** Dieses Element schliesst sich an und endet an Position &#8220;42&#8221;<BR></FONT>parameters: p_obj1(<FONT color="#f49047">12</FONT>).<BR><FONT color="#fb2412">*** An Position &#8220;40&#8221; soll aber schon das n&auml;chste Element folgen&#8230;</FONT><BR>selection-screen comment <FONT color="#f49047">40</FONT>(20) text-t02.<BR>selection-screen end of line.</P><P>Verwenden Sie das Prorgramm <FONT>RSDBGENA</FONT> um dem Fehler auf die Spur zu kommen. Die Analyse ist sehr detailliert und aufschlussreich:</P><P><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/rsdbgena.gif"><BR>Analyse von ZZENNO20</P></TD></TR></TBODY></TABLE></P></p>
+<p>Der Beitrag <a href="/blog/analysieren-von-dynpro-generierungsfehlern/">Analysieren von Dynpro-Generierungsfehlern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/analysieren-von-dynpro-generierungsfehlern/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Abhängigkeiten</title>
+		<link>/blog/abhaengigkeiten/</link>
+					<comments>/blog/abhaengigkeiten/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Jul 2003 10:47:00 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SAP-Standardprogramme]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=89</guid>
+
+					<description><![CDATA[<p>Mit diesem Programm k&#246;nnen die Abh&#228;ngigkeiten eines Programms angezeigt werden. Es ist hierdruch ersichtlich, welche anderen Programme, Tabellen und Strukturen in dem Programm verwendet werden. Es l&#228;&#223;t sich auch feststellen, wann abh&#228;ngige Sourcen generiert wurden. Wenn sich also bei einer Anwendung der ber&#252;hmte Chinese Com Pi Ling zu Wort meldet, kann hier ermittelt werden, aufgrund welcher Programm&#228;nderung das Kompilieren erfolgt.</p>
+<p>Der Beitrag <a href="/blog/abhaengigkeiten/">Abhängigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Programm k&ouml;nnen die Abh&auml;ngigkeiten eines Programms angezeigt werden. Es ist hierdruch ersichtlich, welche anderen Programme, Tabellen und Strukturen in dem Programm verwendet werden. Es l&auml;&szlig;t sich auch feststellen, wann abh&auml;ngige Sourcen generiert wurden. Wenn sich also bei einer Anwendung der ber&uuml;hmte Chinese Com Pi Ling zu Wort meldet, kann hier ermittelt werden, aufgrund welcher Programm&auml;nderung das Kompilieren erfolgt.<br /><P>Verwenden Sie die Transaktion&nbsp;<STRONG><FONT>RSDEPEND</FONT></STRONG> (gleichnamiges Programm <FONT><STRONG>RSDEPEND</STRONG></FONT>), um diese Abh&auml;ngigkeiten aufzulisten.</P><P><A href="https://tricktresor.com/wp-content/downloads/depend1.gif" target="_blank" Target="_blank"><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/depend1.gif" width="560" height="362"><BR>Abh&auml;ngigkeiten zum Programm</P></TD></TR></TBODY></TABLE></A></P><P>Bei Includes k&ouml;nnen Sie die eingebundenen Includes sehen, die im Hauptprogramm verwendet werden. Die beiden <FONT color="#008952">gr&uuml;nen</FONT> Zeilen zeigen an, dass diese Includes&nbsp;sp&auml;ter&nbsp;generiert wurden, als das Hauptprogramm selbst.</P><P>Unter der Rubrik &#8220;TABLE&#8221; sind verwendete Tabellendefinitionen als auch verwendete Datenelemente ersichtlich (DATA&nbsp;l_tabelle TYPE TABLENAME).</P><P>Sie k&ouml;nnen so einfach erkennen, welche Objekte zuletzt generiert wurden.</P></p>
+<p>Der Beitrag <a href="/blog/abhaengigkeiten/">Abhängigkeiten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/abhaengigkeiten/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Icons anzeigen</title>
+		<link>/blog/icons-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 03 Jul 2003 11:04:19 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=81</guid>
+
+					<description><![CDATA[<p>Es gibt verschiedene M&#246;glichkeiten, sich die Icons anzeigen zu lassen. Die einfachste ist die Transaktion "ICON". Hier sehen Sie allerdings nicht das f&#252;r Programmierer wichtige zwei-stellige K&#252;rzel f&#252;r das Icon. Ein Standardreport schafft auch hier Befriedigung.</p>
+<p>Der Beitrag <a href="/blog/icons-anzeigen/">Icons anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Es gibt verschiedene M&ouml;glichkeiten, sich die Icons anzeigen zu lassen. Die einfachste ist die Transaktion &#8220;ICON&#8221;. Hier sehen Sie allerdings nicht das f&uuml;r Programmierer wichtige zwei-stellige K&uuml;rzel f&uuml;r das Icon. Ein Standardreport schafft auch hier Befriedigung.<br /><P>Sie k&ouml;nnen in einem Report Icons ausgeben, indem Sie vorher den Typen-Pool &#8220;icon&#8221; einbinden und dann die Icons mit Namen ansprechen:</P><P class="sap1">WRITE: /&nbsp;icon_message_warning AS ICON.</P><P>Sie k&ouml;nnen Icons aber auch direkt ausgeben:</P><P class="sap1">WRITE: / &#8216;@1A@&#8217; AS ICON.</P><P>Hierf&uuml;r ben&ouml;tigen Sie dann das zweistellige K&uuml;rzel. Die Reports&nbsp;<FONT><STRONG>RSTXICON</STRONG></FONT>&nbsp;und <FONT><STRONG>SHOWICON</STRONG></FONT> zeigt diese K&uuml;rzel, sowie den Icon-Namen und das Icon selbst an.</P><P>So&nbsp;k&ouml;nnen Sie auch Texte auf dem Selektionsbild mit einem Icon beginnen lassen:</P><P class="sap1">SELECTION-SCREEN COMMENT /1(30) text-001.</P><P>Das Textliteral &#8220;001&#8221; kann dann so aussehen: </P><P class="sap1">@1A@Achtung!</P></p>
+<p>Der Beitrag <a href="/blog/icons-anzeigen/">Icons anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Texte transportieren</title>
+		<link>/blog/texte-transportieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 03 Jul 2003 10:58:37 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SAP-Standardprogramme]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=80</guid>
+
+					<description><![CDATA[<p>Texte sind Stammdaten. Deswegen werden sie auch nicht in einen Transportauftrag aufgenommen. Oft macht es aber Sinn, Texte zu transportieren, z. B. Logos oder allgemeing&#252;ltige Texte. Mit einem Programm kann das getan werden.</p>
+<p>Der Beitrag <a href="/blog/texte-transportieren/">Texte transportieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Texte sind Stammdaten. Deswegen werden sie auch nicht in einen Transportauftrag aufgenommen. Oft macht es aber Sinn, Texte zu transportieren, z. B. Logos oder allgemeing&uuml;ltige Texte. Mit einem Programm kann das getan werden.<br /><P>Verwenden Sie das SAP-Standardprogramm <FONT>RSTXTRAN</FONT>, um Texte zu transportieren. Geben Sie hierzu auf dem Selektionsbild den Textnamen (Wildcards sind erlaubt!), die Text-ID und die gew. Sprache an. Ausserdem ben&ouml;tigen Sie einen Transportauftrag, in dem die Texte gepeichert werden.</P><P>Nach Ausf&uuml;hren erhalten Sie eine Liste der selektierten Textbausteine. Sie k&ouml;nnen hier noch entscheiden, welche Texte transportiert werden sollen.</P><P>Alternativ kann auch die Transaktion <STRONG>TXBA</STRONG> &#8220;Verwendungsnachweis f&uuml;r Textbausteine&#8221; genommen werden.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/texte-transportieren/">Texte transportieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

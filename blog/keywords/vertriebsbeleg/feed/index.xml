@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Vertriebsbeleg Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/vertriebsbeleg/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:48 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Vertriebsbeleg Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Preisfindung im Kundenauftrag von außen anstossen</title>
+		<link>/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Mar 2017 20:25:15 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_SALESORDER_CHANGE]]></category>
+		<category><![CDATA[Vertriebsbeleg]]></category>
+		<category><![CDATA[Preisfindung]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017958</guid>
+
+					<description><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus: Userexit in SAPMV45A anpassen Parameter setzen BAPI aufrufen Parameter zurücknehmen Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:...</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus:</p>
+<ol>
+<li>Userexit in SAPMV45A anpassen</li>
+<li>Parameter setzen</li>
+<li>BAPI aufrufen</li>
+<li>Parameter zurücknehmen</li>
+</ol>
+<p>Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:</p>
+<ol>
+<li>EXPORT TO MEMORY und IMPORT FROM MEMORY</li>
+<li>Öffentliches Attribut der eigenen globalen Klasse</li>
+</ol>
+<h2>Anlage der globalen Klasse</h2>
+<p>Als erstes musst du eine Klasse anlegen mit der die neue Preisfindung durchgeführt werden soll. In meinem Beispiel heißt sie ZCL_SD_NP (New Pricing).</p>
+<p>Lege das öffentliche Klassenattribut KNPRS vom Typ KNPRS an (static). Das ist die Preisfindungsart, mit der die Art der neuen Preisfindung gesteuert werden kann.</p>
+<h2>Quelltext (relevanter Teil ) in MV45AFZB:</h2>
+<pre class="">FORM userexit_new_pricing_vbap CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL.  
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBAP</pre>
+<pre class="">FORM userexit_new_pricing_vbkd CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL. 
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBKD</pre>
+<h2>Quelltext Klasse</h2>
+<p>Nun brauchen wir noch die Methode TRIGGER_NEW_PRICING</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017959 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png" alt="" width="776" height="177" srcset="/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png 776w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-300x68.png 300w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-768x175.png 768w" sizes="(max-width: 776px) 100vw, 776px" /></a></p>
+<pre class="">DATA: 
+  ls_bapisdh1x  TYPE bapisdh1x,
+  lt_pos        TYPE STANDARD TABLE OF bapisditm WITH NON-UNIQUE DEFAULT KEY,
+  lt_posx       TYPE STANDARD TABLE OF bapisditmx WITH NON-UNIQUE DEFAULT KEY,
+  lt_return     TYPE bapiret2_t.
+FIELD-SYMBOLS: 
+  &lt;ls_pos&gt;      LIKE LINE OF lt_pos,
+  &lt;ls_posx&gt;     LIKE LINE OF lt_posx.
+
+
+CLEAR ct_bapiret2.
+knprs = iv_knprs.
+*--------------------------------------------------------------------*
+* Get all positions to be redermined
+*--------------------------------------------------------------------*
+SELECT posnr AS itm_number werks AS plant
+INTO CORRESPONDING FIELDS OF TABLE lt_pos
+FROM vbap
+WHERE vbeln = iv_vbeln_va.
+
+LOOP AT lt_pos ASSIGNING &lt;ls_pos&gt;.
+APPEND INITIAL LINE TO lt_posx ASSIGNING &lt;ls_posx&gt;.
+&lt;ls_posx&gt;-itm_number = &lt;ls_pos&gt;-itm_number.
+&lt;ls_posx&gt;-updateflag = 'U'.
+ENDLOOP.
+
+ls_bapisdh1x-updateflag = 'U'.
+CALL FUNCTION 'BAPI_SALESORDER_CHANGE'
+  EXPORTING
+    salesdocument    = iv_vbeln_va
+    order_header_inx = ls_bapisdh1x
+  TABLES
+    return           = ct_bapiret2
+    order_item_in    = lt_pos
+    order_item_inx   = lt_posx
+  EXCEPTIONS
+    ERROR_MESSAGE = 1.
+
+CLEAR knprs.  " Only once
+
+TRY.
+    DATA(ls_return) = ct_bapiret2[ type = 'E' ].
+    CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
+    RAISE EXCEPTION TYPE zcx_my_exception.
+  CATCH CX_SY_ITAB_LINE_NOT_FOUND.
+    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+ENDTRY.
+</pre>
+<p>Durch Aufruf der Methode ZCL_SD_NP=&gt;TRIGGER_NEW_PRICING( &#8230; ) kannst du nun einen Beleg dazu bewegen, eine neue Preisfindung durchzuführen.</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

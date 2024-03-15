@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Workshop: Performance Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/workshop-performance/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 22 May 2018 07:26:40 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Workshop: Performance Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Geschachtelte interne Tabellen</title>
+		<link>/blog/geschachtelte-interne-tabellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 21 Mar 2005 08:11:58 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<category><![CDATA[Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=324</guid>
+
+					<description><![CDATA[<p>Zwei oder mehrere geschachtelte Tabellen können ebenfalls mit einem einfachen Trick schneller abgearbeitet werden. In diesem Beispiel zeigen wir Ihnen wie das geht.</p>
+<p>Der Beitrag <a href="/blog/geschachtelte-interne-tabellen/">Geschachtelte interne Tabellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Zwei oder mehrere geschachtelte Tabellen k&ouml;nnen ebenfalls mit einem einfachen Trick schneller abgearbeitet werden. In diesem Beispiel zeigen wir Ihnen wie das geht.<br /><P>Geschachtelte Tabellen werden normalerweise in der folgenden Weise bearbeitet:</P><P class="sap1"><FONT color="#fb2412">*** Abarbeitung der &auml;u&szlig;eren Tabelle</FONT><BR>LOOP AT itab1 ASSIGNING &lt;itab1&gt;.<BR><FONT color="#fb2412">*** Abarbeitung der inneren Tabelle<BR></FONT>&nbsp; LOOP AT itab2&nbsp;ASSIGNING &lt;itab2&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHERE feld1 = &lt;itab1&gt;-feld1.<BR><BR>&nbsp; ENDLOOP.<BR><BR>ENDLOOP.</P><P class="text1">Besser ist allerdings die folgende Variante. Sie ist etwas umst&auml;ndlicher, jedoch trotz der Sortierung deutlich schneller.</P><P class="sap1">DATA l_index TYPE sytabix.<BR><BR>SORT: itab1, itab2.<BR><BR><FONT color="#f49047">*** Abarbeitung der &auml;u&szlig;eren Tabelle</FONT><BR>LOOP AT itab1 ASSIGNING &lt;itab1&gt;.<BR><BR><FONT color="#f49047">*** Ermittlung des ersten Eintrags der inneren Tabelle</FONT><BR>&nbsp; READ TABLE itab2 WITH KEY feld1 = &lt;itab1&gt;-feld1.<BR>&nbsp; CHECK sy-subrc = 0.<BR>&nbsp; l_index = sy-tabix.<BR><BR><FONT color="#f49047">*** Abarbeitung der&nbsp;inneren Tabelle ab ermitteltem Eintrag</FONT><BR>&nbsp; LOOP AT itab2 ASSIGNING &lt;itab2&gt; <FONT color="#fb2412">FROM l_index.</FONT><BR><BR>&nbsp;&nbsp;&nbsp; IF &lt;itab1&gt;-feld1 &lt;&gt; &lt;itab2&gt;-feld1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp;&nbsp;&nbsp; ELSE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8230;<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR><BR>&nbsp; ENDLOOP. &#8220;itab2.<BR><BR>ENDLOOP.&nbsp;&nbsp; &#8220;itab1.</P></p>
+<p>Der Beitrag <a href="/blog/geschachtelte-interne-tabellen/">Geschachtelte interne Tabellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+		<item>
+		<title>Bearbeitung von internen Tabellen</title>
+		<link>/blog/bearbeitung-von-internen-tabellen/</link>
+					<comments>/blog/bearbeitung-von-internen-tabellen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 21 Mar 2005 08:09:56 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<category><![CDATA[Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=323</guid>
+
+					<description><![CDATA[<p>Bei der Bearbeitung von internen Tabellen kann man mit einem einfachen Trick viel Zeit sparen. Hier zeigen wir Ihnen, was Sie beachten müssen.</p>
+<p>Der Beitrag <a href="/blog/bearbeitung-von-internen-tabellen/">Bearbeitung von internen Tabellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei der Bearbeitung von internen Tabellen kann man mit einem einfachen Trick viel Zeit sparen. Hier zeigen wir Ihnen, was Sie beachten m&uuml;ssen.<br /><P>Wenn Sie interne Tabellen mittels LOOP zeilenweise abarbeiten, dann sieht das Coding in etwa so aus:</P><P class="sap1">DATA: <BR>&nbsp; itab LIKE ddictab OCCURS 0 WITH HEADER LINE.<BR><BR>LOOP AT itab.<BR>&nbsp; itab-feld1 = &#8216;ABC&#8217;.<BR>&nbsp; MODIFY itab.<BR>ENDLOOP.</P><P align="left"><STRONG>Mit dieser Variante verschenken Sie jedoch viel Performance!</STRONG> </P><P>Besser da&nbsp;deutlich schneller ist die folgende Version:</P><P class="sap1">DATA:<BR>&nbsp; itab TYPE STANDARD TABLE OF TABLE ddictab.<BR><BR><FONT color="#fb2412">FIELD-SYMBOLS:<BR>&nbsp; &lt;itab&gt;&nbsp;STRUCTURE itab DEFAULT itab.</FONT><BR><BR>LOOP AT itab <FONT color="#fb2412">ASSIGNING &lt;itab&gt;</FONT>.<BR>&nbsp; <FONT color="#fb2412">&lt;itab&gt;</FONT>-feld1 = &#8216;ABC&#8217;.<BR><FONT color="#fb2412">*** Ein Modify ist nicht n&ouml;tig!!!</FONT><BR>ENDLOOP.</P><P class="head1">Warum ist das so?</P><P class="text1">Bei der herk&ouml;mmlichen LOOP-Variante mit Kopfzeile m&uuml;ssen zu jedem LOOP die Daten aus der Tabelle in die Kopfzeile kopiert werden. Das kostet Zeit.</P><P class="text1">Mithilfe des Feldsymbols wird direkt auf die Tabellenzeile zugegriffen, es wird also nichts kopiert. Das geht deutlich schneller.</P><P class="text1">Ein weiterer Vorteil ist, dass bei einem Modify die Daten aus der Kopfzeile nicht wieder in die Tabelle kopiert werden m&uuml;ssen, da der Wert direkt in der Tabellenzeile ge&auml;ndert wird.</P><P class="head1">L&ouml;schen von Eintr&auml;gen</P><P class="text1">Das L&ouml;schen von Eintr&auml;gen erfolgt mit:</P><P class="sap1">DELETE itab INDEX sy-tabix.</P></p>
+<p>Der Beitrag <a href="/blog/bearbeitung-von-internen-tabellen/">Bearbeitung von internen Tabellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bearbeitung-von-internen-tabellen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+		<item>
+		<title>Einige Tipps zum Abschluss</title>
+		<link>/blog/einige-tipps-zum-abschluss/</link>
+					<comments>/blog/einige-tipps-zum-abschluss/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Mar 2005 20:00:48 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Performance]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=321</guid>
+
+					<description><![CDATA[<p>Hier einige Tipps zum Abschluss des Workshops: Wie Sie am besten Testen und welche Tools Ihnen zur Verfügung stehen.</p>
+<p>Der Beitrag <a href="/blog/einige-tipps-zum-abschluss/">Einige Tipps zum Abschluss</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier einige Tipps zum Abschluss des Workshops: Wie Sie am besten Testen und welche Tools Ihnen zur Verf&uuml;gung stehen.<br /><P class="head1">Aufwand</P><P>Die Optimierung von Programmen ben&ouml;tigt einiges an Zeitaufwand: Es muss eine Analyse gemacht werden, es m&uuml;ssen Programme/ Funktionsbausteine ge&auml;ndert und optimiert werden. Falls gr&ouml;&szlig;ere &#8220;Umbauma&szlig;nahmen&#8221; erfolgen, muss auch noch ein Funktionstest gemacht werden.</P><P>Es schadet deswegen nichts, wenn Sie von Anfang an etwas mehr Entwicklungsaufwand in Ihre Programme stecken, so dass sp&auml;ter keine oder wenig Optimierungen notwendig sind.</P><P>Bei der Optimierung von vorhandenen Programmen sollten Sie sich grunds&auml;tzlich &uuml;berlegen, welche Programme in welchem Ma&szlig;e optimiert werden. Ein Programm, das einmal pro Woche nachts l&auml;uft und zwei Stunden ben&ouml;tigt ist sicherlich nicht so dringend wie eine Transaktion, die am Tag von mehreren hundert Anwendern benutzt wird.</P><P class="head1">Datenbeschaffung</P><P>Es lohnt sich in der Regel auch zweimal dar&uuml;ber nachzudenken, wie die Daten von der Datenbank gelesen werden sollen.</P><P>Unter Umst&auml;nden ist es einfacher, Daten aus anderen Tabellen vorzuselektieren, so dass entweder die Haupt-Selektion st&auml;rker eingeschr&auml;nkt werden kann oder der Zugriff auf andere Tabellen schneller geht.</P><P>Sie sollten sich in Ihrem Betrieb eine Liste der Tabellen machen, die f&uuml;r die Datenbeschaffung problematisch sind. Grunds&auml;tzlich sind dies Tabellen, die sehr viele Eintr&auml;ge haben (mehr als eine Million, z. B. MSEG, NAST&#8230;) und auf die mit Nicht-Schl&uuml;sselfeldern zugegriffen werden muss.</P><P>Hier sollten Sie Indizes anlegen, damit der Zugriff schneller erfolgt.</P><P class="head1">Hilfe zur Optimierung</P><P>Hilfe zur Optimierung Ihrer Programme finden Sie unter anderem hier:</P><P class="head2">Transaktion SE30 </P><P>Wenn Sie den Button [Tipps &amp; Tricks] anklicken (Report &#8220;RSHOWTIM&#8221;), dann erhalten Sie eine umfangreiche Gegen&uuml;berstellung diverser Befehle. Sie k&ouml;nnen den Laufzeitunterschied direkt pr&uuml;fen.&nbsp;</P><P class="head2">SAPFans</P><P>Im Internet gibt es die <FONT>SAP-Fans Knowledge Corner</FONT>. Hier finden Sie ebenfalls umfangreiche Abhandlungen zum Thema Performance. Leider nur in englischer Sprache:</P><P><A href="http://www.sapfans.com/forums/" Target="_blank">http://www.sapfans.com/forums/</A> </P><P class="head2">ABAP-Forum</P><P>Im deutschsprachigen ABAP-Forum k&ouml;nnen Sie gezielte Fragen stellen. Es finden sich immer kompetente Leute, die Ihnen gerne bei einem Problem helfen. Gerade Performance-Fragen werden hei&szlig; diskutiert&#8230;</P><P>Achten Sie bitte darauf, dass Sie h&ouml;flich sind, Ihr Problem deutlich erl&auml;utern und Ihre Anfrage so pr&auml;zise wie m&ouml;glich stellen!</P><P><A href="http://www.abapforum.com/" target="_blank" Target="_blank">http://www.abapforum.com/</A> </P></p>
+<p>Der Beitrag <a href="/blog/einige-tipps-zum-abschluss/">Einige Tipps zum Abschluss</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/einige-tipps-zum-abschluss/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+		<item>
+		<title>Sub-Queries</title>
+		<link>/blog/sub-queries/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Mar 2005 19:50:47 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<category><![CDATA[Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=319</guid>
+
+					<description><![CDATA[<p>Eine kurze Vorstellung von Sub-Queries und wie sie verwendet werden können.</p>
+<p>Der Beitrag <a href="/blog/sub-queries/">Sub-Queries</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine kurze Vorstellung von Sub-Queries und wie sie verwendet werden können.</p>
+<p>Sub-Queries kommen nicht sehr häufig zum Einsatz. Man sollte jedoch im Hinterkopf haben, dass es sie gibt, denn einige Aufgaben kann man recht elegant mit ihnen lösen.</p>
+<p>Im folgenden Beispiel soll nur dann ein Satz aus Tabelle <strong>ztab_b</strong> gelesen werden, wenn ein zugehöriger Satz in Tabelle <strong>knvv</strong> vorhanden ist.</p>
+<pre class="lang:abap decode:true ">    SELECT SINGLE * FROM knvv
+             WHERE kunnr EQ p_kunnr
+               AND vkorg EQ p_vkorg
+               AND vtweg EQ p_vtweg
+               AND spart EQ p_spart
+               AND loevm NE 'X'.
+    IF sy-subrc EQ 0.
+*** Zusatzdaten zum verkaufsbüro/verkäufergruppe   
+      SELECT SINGLE * FROM ztab_b
+              WHERE vkorg  = p_vkorg
+                AND vkbur  = p_vkbur
+                AND vkgrp  = p_vkgrp.
+      IF sy-subrc EQ 0.
+        ... 
+      ENDIF.
+    ENDIF.</pre>
+<p class="text1">Folgendes Coding ist mindestens doppelt so schnell:</p>
+<pre class="lang:abap decode:true ">*** Zusatzdaten zum verkaufsbüro/verkäufergruppe   
+    SELECT SINGLE * FROM ztab_b
+            WHERE vkorg  = p_vkorg
+              AND vkbur  = p_vkbur
+              AND vkgrp  = p_vkgrp
+              AND EXISTS ( SELECT * FROM knvv
+                            WHERE kunnr EQ p_kunnr
+                              AND vkorg EQ p_vkorg
+                              AND vtweg EQ p_vtweg
+                              AND spart EQ p_spart
+                              AND loevm NE 'X' ).</pre>
+<p class="text1">Wenn Sie sich innerhalb des Subqueries auf den aktuellen Tabelleneintrag beziehen möchten, dann sieht das Coding etwas anders aus:</p>
+<pre class="lang:abap decode:true ">*** Zusatzdaten zum verkaufsbüro/verkäufergruppe   
+    SELECT SINGLE * FROM ztab_b AS b
+            WHERE vkorg  = p_vkorg
+              AND vkbur  = p_vkbur
+              AND vkgrp  = p_vkgrp
+              AND EXISTS ( SELECT * FROM knvv
+                            WHERE kunnr EQ p_kunnr
+                              AND vkorg EQ b~vkorg
+                              AND vtweg EQ b~vtweg
+                              AND spart EQ b~spart
+                              AND loevm NE 'X' ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/sub-queries/">Sub-Queries</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+		<item>
+		<title>SELECT mit Feldleiste</title>
+		<link>/blog/select-mit-feldleiste/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Mar 2005 19:13:52 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<category><![CDATA[Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=318</guid>
+
+					<description><![CDATA[<p>Selektion nur benötigter Felder bringt einen kleinen Geschwindigkeitsvorteil. Im Zusammenhang mit internen Tabellen kann dies eine große Performancesteigerung bedeuten.</p>
+<p>Der Beitrag <a href="/blog/select-mit-feldleiste/">SELECT mit Feldleiste</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Selektion nur ben&ouml;tigter Felder bringt einen kleinen Geschwindigkeitsvorteil. Im Zusammenhang mit internen Tabellen kann dies eine gro&szlig;e Performancesteigerung bedeuten.<br /><P>Das Selektieren <STRONG>aller Felder einer Tabelle</STRONG> ist durchaus &uuml;blich und in der Regel auch in Ordnung. </P><P>Die folgende Anweisung ist sehr kurz und macht das Programm sehr einfach lesbar:</P><P class="sap1">SELECT * FROM kna1 INTO TABLE it_kna1 <BR>&nbsp;WHERE kunnr IN s_kunnr.</P><P>Wenn Sie jedoch eine Tabelle lesen, die sehr viele Felder hat und Sie viel auf die interne Tabelle zugreifen und sie vielleicht noch h&auml;ufig sortieren, dann sollten Sie sich auf die Felder beschr&auml;nken, die Sie wirklich ben&ouml;tigen.</P><P>Eine interne Tabelle ben&ouml;tigt Speicherplatz. Je breiter die Tabelle &#8211; also je mehr Felder sie hat &#8211; desto mehr Speicherplatz ben&ouml;tigt die interne Tabelle.</P><P>Bei einem Datenvolumen von einigen hundert Eintr&auml;gen ist es relativ irrelevant, ob die interne Tabelle nun ein oder zwei Megabyte Hauptspeicher beansprucht.</P><P>Bei mehreren tausend Eintr&auml;gen ist es aber schon sinnvoll, darauf zu achten, dass die Tabelle so klein wie m&ouml;glich ist. <STRONG>Das verringert nicht nur&nbsp;den Bedarf im Hauptspeicher, es werden auch weniger Daten von der Datenbank transferiert.</STRONG></P><P>Folgendes Coding zeigt die gezielte Selektion von einzelnen Feldern:</P><P class="sap1">DATA: <BR>&nbsp; BEGIN OF it_kna1 OCCURS 0,<BR>&nbsp;&nbsp;&nbsp; kunnr TYPE kunnr,<BR>&nbsp;&nbsp;&nbsp; land1 TYPE land1,<BR>&nbsp; END OF it_kna1.<BR><BR>SELECT <FONT color="#fb2412">kunnr land1</FONT> FROM kna1 <FONT color="#fb2412">INTO TABLE it_kna1</FONT><BR>&nbsp;WHERE kunnr IN s_kunnr.</P><P>Die Reihenfolge im SELECT muss dabei auch der Reihenfolge der Datendeklarierung entsprechen.</P><P>Vermeiden Sie m&ouml;glichst&nbsp;den folgenden Fall mit dem Zusatz &#8220;INTO CORRESPONDING FIELDS&#8221;:</P><P class="sap1">SELECT kunnr land1 FROM kna1 <BR>&nbsp; INTO CORRESPONDING FIELDS OF TABLE it_kna1<BR>&nbsp;WHERE kunnr IN s_kunnr.</P><P>Diese Version ist deutlich langsamer, da das System noch einen Abgleich zwischen den selektierten Feldern und den Feldern in der internen Tabelle machen muss!!!</P><P>Im gro&szlig;en und ganzen macht es Sinn, sich von Anfang an auf die Felder zu beschr&auml;nken, die auch ben&ouml;tigt werden. Das Programm ist dadurch leichter zu warten, da man schnell erkennen kann, welche Felder verwendet werden.</P><P>Beim Hinzuf&uuml;gen neuer Felder m&uuml;ssen Sie allerdings darauf achten, dass die Reihenfolge eingehalten wird:</P><P class="sap1">DATA: <BR>&nbsp; BEGIN OF it_kna1 OCCURS 0,<BR>&nbsp;&nbsp;&nbsp; kunnr TYPE kunnr,<BR><FONT color="#008952">&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#fb2412">name1 TYPE name1,<BR></FONT>&nbsp;&nbsp;&nbsp; land1 TYPE land1,<BR>&nbsp; END OF it_kna1.<BR><BR>SELECT kunnr <FONT color="#fb2412">name1 </FONT>land1 FROM kna1 INTO TABLE it_kna1<BR>&nbsp;WHERE kunnr IN s_kunnr.</P></p>
+<p>Der Beitrag <a href="/blog/select-mit-feldleiste/">SELECT mit Feldleiste</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+		<item>
+		<title>Geschachtelter SELECT</title>
+		<link>/blog/geschachtelter-select/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Mar 2005 18:21:50 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<category><![CDATA[Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=317</guid>
+
+					<description><![CDATA[<p>Hier erklären wir Ihnen, wie Sie am besten geschachtelte SELECTs verwenden oder wie Sie diese umgehen können.</p>
+<p>Der Beitrag <a href="/blog/geschachtelter-select/">Geschachtelter SELECT</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier erkl&auml;ren wir Ihnen, wie Sie am besten geschachtelte SELECTs verwenden oder wie Sie diese umgehen k&ouml;nnen.<br /><P>Geschachtelte SELECTs kommen sehr h&auml;ufig in Programmen vor, da die Kopfinformation eines Objekts meistens in einer Tabelle und die Positionsinformationen in einer zweiten Tabelle gespeichert werden. Oftmals kommen noch andere Tabellen hinzu:</P><UL><LI>Verkaufsbelege: VBAK -&gt; VBAP -&gt; VBEP <LI>Einkaufsbelege: EKKO -&gt; EKPO -&gt; EKBE <LI>Materialstamm: MARA -&gt; MARC -&gt; MARD</LI></UL><P class="head1">Der geschachtelte SELECT</P><P>Im folgenden Beispiel werden Verkaufsbelege mit den dazugeh&ouml;rigen Positionen gelesen.</P><P class="sap1"><FONT color="#fb2412">*** Lesen von Verkaufsbelegen</FONT><BR>SELECT * FROM VBAK INTO TABLE t_vbak WHERE &#8230;. <BR>LOOP AT t_vbak. <BR>&nbsp; SELECT * FROM vbap APPENDING TABLE t_vbap <BR>&nbsp;&nbsp; WHERE vbeln = t_vbak-vbeln. <BR>&nbsp;&nbsp; &#8230; <BR>ENDLOOP.</P><P class="text1">Schlecht an diesem Coding ist, dass f&uuml;r <STRONG>jeden</STRONG> Verkaufsbeleg <STRONG>ein SELECT</STRONG> gemacht wird, um die Positionsdaten nachzulesen.</P><P>Diesen geschachtelten SELECT kann man auf zwei Arten schneller und effizienter machen:</P><P class="head1">FOR ALL ENTRIES </P><P>Diese Variante ist besser, da der SELECT auf die VBAP nur einmal ausgef&uuml;hrt wird. Ausserdem spart man den LOOP &uuml;ber die Tabelle VBAP. </P><P>Noch mal zur Erinnerung: Die Verbindung mit der Datenbank sollte auf ein Minimum reduziert werden, da sie am meisten Zeit beansprucht. </P><P><STRONG>Stellen Sie bei dieser Variante unbedingt sicher, dass die Tabelle, die Sie unter &#8220;FOR ALL ENTRIES&#8221; angeben auch gef&uuml;llt ist!!<BR><BR></STRONG></P><P>Es werden sonst alle Daten aus der in der FROM-Klausel angegebenen Tabelle gelesen!!<STRONG></P></STRONG><P class="sap1">SELECT * FROM VBAK INTO TABLE t_vbak WHERE &#8230;. <BR><FONT color="#fb2412">IF sy-dbcnt &gt; 0.</FONT><BR>&nbsp; SELECT * FROM vbap INTO TABLE t_vbap <BR>&nbsp;&nbsp;&nbsp; &nbsp;<FONT color="#fb2412">FOR ALL ENTRIES&nbsp;IN t_vbak</FONT> <BR>&nbsp; &nbsp;WHERE vbeln = t_vbak-vbeln. <BR>ENDIF.</P><P class="head1">INNER JOIN </P><P>Wenn es sinnvoll ist, dass nur bestimmte Felder aus den Beleg-Tabellen VBAK und VBAP selektiert werden, dann kann ein <STRONG>Inner Join</STRONG> verwendet werden. Auch dieser ist in der Regel schneller, als zwei unabh&auml;ngige SELECTS, da schon auf Datenbankebene die meiste Arbeit gemacht wird. </P><P class="sap1">DATA: <BR>&nbsp; BEGIN OF t_vbakap OCCURS 0, <BR>&nbsp;&nbsp;&nbsp; vbeln TYPE vbeln, <BR>&nbsp;&nbsp;&nbsp; posnr TYPE posnr, <BR>&nbsp;&nbsp;&nbsp; matnr TYPE matnr, <BR>&nbsp;&nbsp;&nbsp; pstyv TYPE pstyv, <BR>&nbsp; END OF t_vbakap. <BR><BR><FONT color="#fb2412">*** Selektion der Felder aus VBAK und VBAP <BR></FONT>SELECT vbap~vbeln&nbsp; vbap~vbeln vbap~matnr vbap~pstyv <BR>&nbsp; FROM vbak <BR>&nbsp;<FONT color="#fb2412">INNER JOIN vbap ON vbap~vbeln = vbak~vbeln</FONT> <BR>&nbsp;WHERE vbak~vbeln IN s_vbeln <BR>&nbsp;&nbsp; AND vbak~auart IN s_auart <BR>&nbsp;&nbsp; AND vbap~matnr IN s_matnr. <BR></P></p>
+<p>Der Beitrag <a href="/blog/geschachtelter-select/">Geschachtelter SELECT</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+		<item>
+		<title>SELECT und ORDER BY</title>
+		<link>/blog/select-und-order-by/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Mar 2005 18:19:56 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<category><![CDATA[Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=316</guid>
+
+					<description><![CDATA[<p>Tücken der ORDER-BY-Klausel. Wann Sie darauf verzichten sollten und wann sie unabdingbar ist.</p>
+<p>Der Beitrag <a href="/blog/select-und-order-by/">SELECT und ORDER BY</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>T&uuml;cken der ORDER-BY-Klausel. Wann Sie darauf verzichten sollten und wann sie unabdingbar ist.<br /><P>Die ORDER-BY-Klausel wird verwendet, um eine sortierte Liste von der Datenbank zu erhalten.</P><P>Dies ist aber h&auml;ufig nicht sinnvoll!</P><P>Deutlich schneller geht es, wenn die Daten mittels SELECT INTO TABLE mit einem Mal in eine interne Tabelle gelesen werden und dann diese interne Tabelle mittels SORT sortiert wird.</P><P>Der Grund f&uuml;r die bessere Perfromance liegt in der SAP-Pufferung: Zwischen Datenbank und ABAP-Programm gibt es noch eine SAP-eigene Datenpufferung, die in der Regel sehr effizient arbeitet.</P><P>Bei der Verwendung von ORDER BY wird diese Pufferung umgangen.</P><P>Wenn Sie den gr&ouml;&szlig;ten Eintrag eines Feldes aus einer Tabelle ben&ouml;tigen, dann sollten Sie anstelle des folgenden Codings lieber eine Aggregatfunktion der Datenbank nutzen:</P><P class="sap1">SELECT zaehl FROM dbtab INTO lv_groesster_zaehler<BR>&nbsp;WHERE feld1 = lv_feld1<BR>&nbsp; ORDER BY zaehl DESCENDING.<BR>&nbsp; EXIT.<BR>ENDSELECT.</P><P>Verwendung der Aggregatfunktion &#8220;MAX&#8221;:</P><P class="sap1">SELECT max( zaehl ) FROM dbtab INTO lv_groesster_zaehler<BR>&nbsp;WHERE feld1 = lv_feld1.</P><P class="text1">Hierbei wird zwar ebenfalls die SAP-Pufferung umgangen, die Datenbank hat jedoch in der Regel eigene schnelle Routinen f&uuml;r die Ergebnisselektion.</P></p>
+<p>Der Beitrag <a href="/blog/select-und-order-by/">SELECT und ORDER BY</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+		<item>
+		<title>SELECT &#8211; ENDSELECT</title>
+		<link>/blog/select-endselect/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Mar 2005 18:18:30 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<category><![CDATA[Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=315</guid>
+
+					<description><![CDATA[<p>Eine der häufigsten Anweisungen: Das Lesen mehrerer Sätze von der Datenbank. Hier erfahren Sie, was dabei besonders zu beachten ist und was Sie vermeiden sollten.</p>
+<p>Der Beitrag <a href="/blog/select-endselect/">SELECT &#8211; ENDSELECT</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine der h&auml;ufigsten Anweisungen: Das Lesen mehrerer S&auml;tze von der Datenbank. Hier erfahren Sie, was dabei besonders zu beachten ist und was Sie vermeiden sollten.<br /><P class="text1">Einer der h&auml;ufigsten Fehler ist die Selektion von mehreren Datens&auml;tzen mittels einer <STRONG>SELECT-Schleife</STRONG>:</P><P class="sap1">SELECT * FROM tabelle WHERE feld1 = &#8230;<BR>&nbsp; &#8220;Anweisung 1<BR>&nbsp; &#8220;Anweisung 2<BR>ENDSELECT.</P><P class="text1">Der gro&szlig;e Fehler hierbei ist, dass die Verbindung zu der Datenbank w&auml;hrend der gesamten Verarbeitung aufrecht erhalten wird. </P><P class="text1">Stellen Sie sich vor, Sie sitzen in einem Autohaus und m&ouml;chten sich &uuml;ber das Modell &#8220;AB600&#8221; informieren. Sie bitten den hilfsbereiten Verk&auml;ufer: &#8220;Bringen Sie mir doch mal alles, was Sie &uuml;ber das Modell &#8220;AB600&#8243; an Informationen haben!&#8221;. </P><P class="text1">Der Verk&auml;ufer l&auml;uft also los und bringt den ersten Prospekt. Sie sehen sich den Prospekt durch w&auml;hrend der Verk&auml;ufer sich wieder anderen Aufgaben widmet. </P><P class="text1">Dann rufen Sie ihn wieder und bitten ihn um den n&auml;chsten Prospekt. Der Verk&auml;ufer l&auml;uft wieder zu dem St&auml;nder &#8211; w&auml;hrend Sie nun warten &#8211; und bringt die n&auml;chste Infobrosch&uuml;re. </P><P class="text1">Wenn es gerade sehr voll ist in dem Autohaus, kann es sogar sein, dass Sie warten m&uuml;ssen, bis der Verk&auml;ufer wieder Zeit f&uuml;r Sie hat.</P><P class="text1">Sehr zeitaufw&auml;ndig, oder?</P><P class="text1">Deswegen ist es immer schneller, alle ben&ouml;tigten Daten in einem Rutsch in eine interne Tabelle zu lesen. </P><P class="head2">Vorteile: </P><OL><LI><DIV class="text1">Die Datenbank muss nur einmal Daten sammeln und &uuml;bergeben</DIV><LI><DIV class="text1">Das Programm kann uneingeschr&auml;nkt mit diesen Daten arbeiten und ist nicht darauf angewiesen, dass die Datenbank den n&auml;chsten Satz bereitstellt. Der Verwaltungsaufwand ist also deutlich geringer.</DIV></LI></OL><P class="text1">So sieht dann das Coding daf&uuml;r aus:</P><P class="sap1">SELECT * FROM tabelle <FONT color="#fb2412">INTO TABLE itab </FONT>WHERE feld1 = &#8230;&nbsp;<FONT color="#fb2412">.</FONT></P><P class="text1">Die interne Tabelle muss dabei genau so definiert sein, wie die Datenbanktabelle.</P><P class="head1">Speicherverbrauch</P><P class="text1">Der Nachteil bei dieser Methode ist allerdings, dass mehr Hauptspeicher f&uuml;r die Speicherung in der internen Tabelle verwendet werden muss.</P><P class="text1">Deshalb sollte bei sehr gro&szlig;en Datenmengen die Anzahl der S&auml;tze begrenzt und in mehreren Bl&ouml;cken gelesen werden.</P><P class="head1">PACKAGE-SIZE</P><P class="text1">Der SELECT-Zusatz PACKAGE-SIZE ist sehr hilfreich und angeraten, wenn ungew&ouml;hnlich gro&szlig;e Datenmengen &#8211; je nach Tabellenbreite: ab 500.000 Datens&auml;tze &#8211; verarbeitet werden sollen.</P><P class="sap1">SELECT * FROM&nbsp;ddictab1 INTO TABLE gt_data1 PACKAGE SIZE 10000.<BR>&nbsp; SELECT * FROM ddictab2 INTO gt_data2<BR>&nbsp;&nbsp;&nbsp;&nbsp; FOR ALL ENTRIES OF&nbsp;gt_data1<BR>&nbsp;&nbsp;&nbsp;WHERE field1 = gt_data1-field1<BR><BR>&nbsp; LOOP AT gt_data ASSIGNING &lt;data&gt;.<BR>&nbsp;&nbsp; &#8220;data processing here<BR>&nbsp; ENDLOOP.<BR><BR>ENDSELECT.</P><P class="text1">Die Blockgr&ouml;&szlig;e muss angegeben werden. Ideale Werte variieren von System zu System. Hier hilft h&auml;ufig nur ausprobieren.</P></p>
+<p>Der Beitrag <a href="/blog/select-endselect/">SELECT &#8211; ENDSELECT</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+		<item>
+		<title>Einleitung</title>
+		<link>/blog/einleitung/</link>
+					<comments>/blog/einleitung/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 16 Mar 2005 17:35:11 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<category><![CDATA[Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=314</guid>
+
+					<description><![CDATA[<p>Einleitende Worte zum Performance-Workshop. Hier geben wir Ihnen allgemeine Hinweise zur performanten Programmierung. Wir behandeln Datenbankabfragen und die Bearbeitung von Tabellen. </p>
+<p>Der Beitrag <a href="/blog/einleitung/">Einleitung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Einleitende Worte zum Performance-Workshop. Hier geben wir Ihnen allgemeine Hinweise zur performanten Programmierung. Wir behandeln Datenbankabfragen und die Bearbeitung von Tabellen. <br /><P>In diesem Workshop m&ouml;chten wir Ihnen Tipps geben, wie Sie einerseits vorhandene Programme optimieren k&ouml;nnen aber auch neue Programme von Beginn an performant programmieren.</P><P class="head1"><STRONG>Die Datenbank</STRONG></P><P>In einem Entwicklungssystem sind in der Regel nur wenig Daten vorhanden. W&auml;hrend in einer Tabelle im Produktivsystem gut und gerne mal <STRONG>2.000.000 </STRONG>Datens&auml;tze vorhanden sind, sind es in dem Entwicklungssystem evtl. nur <STRONG>20.000</STRONG> S&auml;tze.</P><P>Das bedeutet aber nicht, dass ein Programm im Produktivsystem eben 100 mal langsamer l&auml;uft! Meistens <STRONG>potenziert </STRONG>sich die Laufzeit bei ung&uuml;nstiger Programmierung!</P><P>Mit einer Datenbank ist es fast wie im richtigen Leben: Wenn man genau definiert, was man haben m&ouml;chte, dann&nbsp;bekommt man die Sachen auch schnell. <BR>Deswegen zwei ganz wichtige Regeln: </P><OL><LI><FONT color="#fb2412">Selektieren Sie nur die Daten, die Sie auch wirklich ben&ouml;tigen!</FONT> <LI><FONT color="#fb2412">Selektieren Sie diese Daten m&ouml;glichst in einem Rutsch und bearbeiten Sie dann die Daten in einer internen Tabelle weiter.</FONT></LI></OL><P>Die Datenbank ist fast immer der Flaschenhals in einem SAP-System. Deswegen sollte man&nbsp;sie nicht unn&ouml;tig belasten.</P><P class="head1"><STRONG>Doppeltes Lesen</STRONG></P><P>Achten Sie darauf, dass Sie Daten nicht doppelt lesen. Diese Gefahr besteht h&auml;ufig, wenn vorhandene Programme erweitert werden.</P><P>Auch wenn mit Funktionsbausteinen gearbeitet wird, besteht die Gefahr, dass Daten doppelt und dreifach gelesen werden. Wenn Sie eigene Funktionsbausteine schreiben, schaffen Sie die M&ouml;glichkeit, dass der Aufrufer die zu lesenden Daten auch selbst &uuml;bergeben kann, damit diese nicht noch einmal gelesen werden.</P><P class="head1"><STRONG>H&auml;ufige Zugriffe</STRONG></P><P>Seien Sie besonders sensibel bei Programmteilen oder Funktionsbausteinen, die sehr h&auml;ufig aufgerufen werden. </P><P>Die Zugriffe sind zwar in der Regel sehr schnell, aber bei sehr h&auml;ufigen Aufrufen macht es sich schnell bemerkbar, ob eine Routine vier Sekunden ben&ouml;tigt oder nur 100 Millisekunden!!</P><P class="head1">Interne Tabellen</P><P>Die Bearbeitung von internen Tabellen ist ebenfalls ein wichtiges Thema. Hier kann man mit dem richtigen Wissen seine Programmen ebenfalls deutlich schneller machen. Mehr dazu erfahren Sie in den folgenden Artikeln.</P><P class="head1">An die Arbeit&#8230;</P><P>Wir w&uuml;nschen Ihnen nun viel Spa&szlig; und dass Sie viel lernen. Auch wenn Sie wenig lernen, ist das ja ein gutes Zeichen, denn dann wissen Sie bereits worauf es ankommt.</P><P>Sollten Sie Anmerkungen, Lob&nbsp;oder Kritik zu den Artikeln haben, dann freue ich mich &uuml;ber ein Feedback:</P><P><TABLE class="tblmodul" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top">kontakt</TD></TR></TBODY></TABLE></P><P>Ihr Enno Wulff.</P></p>
+<p>Der Beitrag <a href="/blog/einleitung/">Einleitung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/einleitung/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+		<item>
+		<title>Datenbank-Hints</title>
+		<link>/blog/datenbank-hints/</link>
+					<comments>/blog/datenbank-hints/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 30 Apr 2003 01:52:13 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Workshop: Performance]]></category>
+		<category><![CDATA[Performance]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=30</guid>
+
+					<description><![CDATA[<p>Datenbank-Hints sind datenbankspezifische Zusätze, mit denen Sie dem Datenbankoptimierer etwas auf die Sprünge helfen können. Wir zeigen Ihnen hier kurz, wie die Hints verwendet werden. Ausserdem sind OSS-Hinweise aufgelistet, die genauere Informationen liefern.</p>
+<p>Der Beitrag <a href="/blog/datenbank-hints/">Datenbank-Hints</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Datenbank-Hints sind datenbankspezifische Zus&auml;tze, mit denen Sie dem Datenbankoptimierer etwas auf die Spr&uuml;nge helfen k&ouml;nnen. Wir zeigen Ihnen hier kurz, wie die Hints verwendet werden. Ausserdem sind OSS-Hinweise aufgelistet, die genauere Informationen liefern.<br /><P>Die folgenden Hinweise sind <STRONG>datenbankspezifisch</STRONG>!!! Die Datenbank-Hints sollten Sie auch nur einsetzen, wenn Sie vorher genau analysiert haben, wo genau das Problem liegt.</P><P>Die Datenbank-Hints werden einfach am Ende an die SELECT-Anweisung geschrieben. </P><P>Sollte ein <FONT color="#fb2412">Join</FONT> oder anderer <FONT color="#fb2412">SELECT</FONT>-Befehl, der eigentlich einen <STRONG>INDEX</STRONG> verwenden sollte, einen Full Table Scan machen, dann kann versucht werden, ob der Zusatz </P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;%_HINTS ORACLE &#8216;RULE&#8217;</P><P>eine Besserung bringt.</P><P class="sap1">Oder:&nbsp;&nbsp;&nbsp;&nbsp;%_HINTS ORACLE &#8216;FIRST_ROWS&#8217;</P><P class="text1">Mit FIRST_ROWS wird der Datenbank-Optimizer angewiesen, m&ouml;glichst schnell, die ersten Ergbniss&auml;tze zu liefern. Genau dies ist aber zumeist nur mittels Indexzugriff zu erreichen. Bei der Verwendung des FIRST_ROWS Hints auf Queries mit Joins wird oft ein Nested-Loop-Join anstelle eines Hash-Joins verwendet.</P><P>Dieser Befehl veranlasst eine Oracle-Datenbank dazu, auf jeden Fall einen passenden Index auszuw&auml;hlen.</P><P>Bitte beachten Sie dazu auch die folgenden SAP-Hinweise: </P><P><STRONG><BR>129385 </STRONG>Datenbank-Hints in Open SQL <BR><BR></P><P class="text1"><STRONG><BR>130480 </STRONG>Datenbank-Hints in Open SQL f&uuml;r Oracle</P><P><STRONG>133381 </STRONG>Datenbank-Hints in Open SQL f&uuml;r MS SQL Server</P><P><STRONG>150037 </STRONG>Datenbank-Hints in Open SQL f&uuml;r DB6 (DB2 UDB)</P><P><STRONG>152913 </STRONG>Datenbank-Hints in Open SQL f&uuml;r Informix</P><P><STRONG>162034 </STRONG>DB2/390: Datenbank-Hints in Open SQL</P><P class="text1"><STRONG>485420 </STRONG>iSeries: Datenbank-Hints f&uuml;r Open SQL/Native SQL</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/datenbank-hints/">Datenbank-Hints</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/datenbank-hints/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+		
+		<series:name><![CDATA[Performance-Workshop]]></series:name>
+	</item>
+	</channel>
+</rss>

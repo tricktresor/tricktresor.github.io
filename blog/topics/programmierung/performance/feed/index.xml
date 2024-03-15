@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Performance Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/programmierung/performance/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 10 Oct 2017 11:47:50 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Performance Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Fibonacci</title>
+		<link>/blog/fibonacci/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 10 Oct 2017 10:58:46 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Performance]]></category>
+		<category><![CDATA[VERGLEICH]]></category>
+		<category><![CDATA[Fibonacci]]></category>
+		<category><![CDATA[Berechnung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018140</guid>
+
+					<description><![CDATA[<p>Ein kleiner Vergleich von verschiedenen Berechnungsarten für Fibonacci-Zahlen in ABAP. Die Unterschiede sind enorm...</p>
+<p>Der Beitrag <a href="/blog/fibonacci/">Fibonacci</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein kleines Beispielprogramm um die verschiedenen Arten der Berechnung von Fibonacci-Zahlen und deren Geschwindigkeit zu demonstrieren.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/fibonacci.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018141" src="https://tricktresor.com/wp-content/uploads/2017/10/fibonacci.png" alt="" width="586" height="248" srcset="/wp-content/uploads/2017/10/fibonacci.png 586w, /wp-content/uploads/2017/10/fibonacci-300x127.png 300w" sizes="(max-width: 586px) 100vw, 586px" /></a></p>
+<p>Ursprünglich habe ich das Programm auf Grund eines Beitrags im ABAP-Forum geschrieben (der aber leider gelöscht wurde) und um die verschiedenen Arten der Berechnung zu vergleichen. Hauptsächlich sollte es ein Vergleich sein zwischen der rekursiven und der iterativen Variante. Dazu gekommen ist dann noch eine Lösung, die mit einer internen Tabelle arbeitet. Ausschlaggebend für die Veröffentlichung war dann ein Beispiel von Lars Hvam dafür, wie man <strong>nicht</strong> programmieren sollte. Wie man an den Ergebnissen sieht, auch im Sinne der schlechten Performance&#8230;</p>
+<h2>Code</h2>
+<pre class="lang:abap decode:true" title="Berechnung Fibonacci-Zahlen">REPORT zz_fibonacci.
+
+DATA result_f TYPE f.
+DATA start    TYPE i.
+DATA stopp    TYPE i.
+DATA i        TYPE i.
+
+PARAMETERS p_n       TYPE i.
+PARAMETERS p_reku RADIOBUTTON GROUP b USER-COMMAND space.
+PARAMETERS p_iter RADIOBUTTON GROUP b.
+PARAMETERS p_tabl RADIOBUTTON GROUP b.
+PARAMETERS p_hvam RADIOBUTTON GROUP b.
+PARAMETERS p_res  TYPE text50 MODIF ID x.
+PARAMETERS p_time TYPE i      MODIF ID x.
+
+CLASS lcl_fibonacci DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS calc_rekursiv IMPORTING n TYPE i RETURNING VALUE(result) TYPE f.
+    CLASS-METHODS calc_iterativ IMPORTING n TYPE i RETURNING VALUE(result) TYPE f.
+    CLASS-METHODS calc_read_table IMPORTING x TYPE i RETURNING VALUE(result) TYPE f.
+    CLASS-METHODS calc_hvam IMPORTING n TYPE i RETURNING VALUE(r) TYPE f.
+  PRIVATE SECTION.
+    CLASS-METHODS f IMPORTING i TYPE f RETURNING VALUE(f) TYPE f.
+ENDCLASS.
+
+CLASS lcl_fibonacci IMPLEMENTATION.
+
+  METHOD calc_iterativ.
+
+    DATA f1 TYPE f VALUE 0.
+    DATA f2 TYPE f VALUE 1.
+    DATA x  TYPE f VALUE 0.
+
+    IF n &lt;= 0.
+      result = 0.
+    ELSEIF n = 1.
+      result = 1.
+    ELSE.
+      x = n - 1.
+      DO x TIMES.
+        result = f1 + f2.
+        f1 = f2.
+        f2 = result.
+
+      ENDDO.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD calc_rekursiv.
+    DATA f TYPE f.
+    f = n.
+    result = f( f ).
+  ENDMETHOD.
+
+  METHOD calc_read_table.
+    "http://www.abapforum.com/forum/viewtopic.php?f=1&amp;t=21045
+
+    TYPES BEGIN OF ts_fibonacci.        "Strukturtyp
+    TYPES n         TYPE i.             "Zählvariable    (Spalte)
+    TYPES fib_n     TYPE i.             "Fibonacci-Zahl  (Spalte)
+    TYPES rechnung  TYPE string.        "Rechenweg       (Spalte)
+    TYPES END OF ts_fibonacci.
+
+    DATA gf_zahl1 TYPE i.
+    DATA gf_zahl1_s TYPE string.
+    DATA gf_zahl2 TYPE i.
+    DATA gf_zahl2_s TYPE string.
+    DATA gt_fibzahl TYPE TABLE OF ts_fibonacci.     "Tabelle
+    DATA gs_fib TYPE ts_fibonacci.
+
+    DO x TIMES.
+
+      IF sy-index = 1 OR sy-index = 2.
+        gs_fib-n = sy-index.
+        gs_fib-fib_n = 1.
+        gs_fib-rechnung = '-'.
+
+      ELSE.
+        READ TABLE gt_fibzahl
+        INTO gs_fib
+        INDEX sy-index - 1.
+        gf_zahl1 = gs_fib-fib_n.
+
+        READ TABLE gt_fibzahl
+        INTO gs_fib
+        INDEX sy-index - 2.
+        gf_zahl2 = gs_fib-fib_n.
+
+        gs_fib-fib_n = gf_zahl1 + gf_zahl2.
+        gs_fib-n = sy-index.
+        gf_zahl1_s = gf_zahl1.
+        gf_zahl2_s = gf_zahl2.
+        CONCATENATE gf_zahl1_s '+' gf_zahl2_s INTO gs_fib-rechnung SEPARATED BY space.
+      ENDIF.
+
+      APPEND gs_fib TO gt_fibzahl.
+      CLEAR gs_fib.
+
+    ENDDO.
+
+    READ TABLE gt_fibzahl INDEX lines( gt_fibzahl ) INTO gs_fib.
+    result = gs_fib-fib_n.
+
+  ENDMETHOD.
+
+  METHOD f.
+    DATA x TYPE f.
+    DATA y TYPE f.
+
+    IF i &lt;= 0.
+      f = 0.
+    ELSEIF i = 1.
+      f = 1.
+    ELSE.
+      x = i - 2.
+      y = i - 1.
+      f = f( x ) + f( y ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD calc_hvam.
+
+    "negative example of Lars Hvam for how _NOT_ to code!
+    "https://gist.github.com/larshp/cc5326dec8fe413bdc29e4d6b8c64b4f
+    DATA n1 TYPE i.
+    DATA n2 TYPE i.
+    DATA r1 TYPE p.
+    DATA r2 TYPE f.
+
+    n2 = n - 1.
+    n1 = n2 - 1.
+    IF n = 1.
+      r = n.
+    ELSEIF n := 2.
+      r = n - 1.
+    ELSE.
+      r2 = calc_hvam( n1 ).
+      r1 = calc_hvam( n2 ).
+    ENDIF.
+    r = r + r1 + r2.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+
+AT SELECTION-SCREEN OUTPUT.
+  LOOP AT SCREEN.
+    IF screen-group1 = 'X'.
+      screen-input = '0'.
+      MODIFY SCREEN.
+    ENDIF.
+  ENDLOOP.
+
+  GET RUN TIME FIELD start.
+  CASE abap_true.
+    WHEN p_iter.
+      result_f = lcl_fibonacci=&gt;calc_iterativ( p_n ).
+    WHEN p_reku.
+      result_f = lcl_fibonacci=&gt;calc_rekursiv( p_n ).
+    WHEN p_tabl.
+      result_f = lcl_fibonacci=&gt;calc_read_table( p_n ).
+    WHEN p_hvam.
+      result_f = lcl_fibonacci=&gt;calc_hvam( p_n ).
+  ENDCASE.
+
+  WRITE result_f TO p_res EXPONENT 0 DECIMALS 0 LEFT-JUSTIFIED.
+  GET RUN TIME FIELD stopp.
+  p_time = stopp - start.
+
+
+START-OF-SELECTION.
+
+  DO p_n TIMES.
+    i = sy-index.
+
+    GET RUN TIME FIELD start.
+    CASE abap_true.
+      WHEN p_iter.
+        result_f = lcl_fibonacci=&gt;calc_iterativ( i ).
+      WHEN p_reku.
+        result_f = lcl_fibonacci=&gt;calc_rekursiv( i ).
+      WHEN p_tabl.
+        result_f = lcl_fibonacci=&gt;calc_read_table( i ).
+    ENDCASE.
+
+    WRITE result_f TO p_res EXPONENT 0 DECIMALS 0 LEFT-JUSTIFIED.
+    WRITE: / i, p_res.
+
+  ENDDO.
+
+  GET RUN TIME FIELD stopp.
+  p_time = stopp - start.
+
+  WRITE: / 'Time:', p_time.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/fibonacci/">Fibonacci</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Log-Points zur Performancemessung</title>
+		<link>/blog/log-points-zur-performancemessung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 19 Aug 2015 07:42:50 +0000</pubDate>
+				<category><![CDATA[Performance]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[saab]]></category>
+		<category><![CDATA[sat]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=204178</guid>
+
+					<description><![CDATA[<p>Performance ist früher oder später immer ein Thema. Es gibt zahlreiche Tools, die zur Performanceanalyse herangezogen werden können. Doch nicht immer sind diese hilfreich. So kann es notwendig sein, die Performance einzelner Programmabschnitte genauer und gezielt zu protokollieren. Ich zeige euch eine Möglichkeit, dies zu tun. Der Clou dabei: Ich benutze die Log-Points.</p>
+<p>Der Beitrag <a href="/blog/log-points-zur-performancemessung/">Log-Points zur Performancemessung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Performance ist ein komplexes Thema. Häufig ist es schwer überhaupt einen Ansatzpunkt zu finden, wo man mit der Performanceoptimierung beginnen soll. Ich habe ein einfaces Testprogramm geschrieben, um das Problem zu verdeutlichen. Es berechnet in einer Schleife ein Ergebnis mit unterschiedlichen Rechenoperationen.</p>
+<p>[notice type=&#8217;info&#8217;]Der folgende Tipp zeigt in erster Linie, wie man die Log-Points zur Protokollierung einsetzen kann. eine zuverlässige Laufzeitanalyse ist so nicht unbedingt möglich.</p>
+<p>Die Transaktion SAT bietet die Möglichkeit, eine definierte Laufzeitmessung durchzuführen. Mittels SET RUN TIME ANALYZER ON/ OFF können explizit Blöcke für die Messung definiert werden. In der Variante kannst du definieren, dass nur diese Blöcke analysiert werden sollen. Zudem kann die <em>Aggregation</em> ausgestellt werden.[/notice]</p>
+<h2>Testprogramm</h2>
+<p>Zuerst wird die Tabellen mit Testdaten gefüllt (TESTDATA). Diese Tabelle wird per LOOP durchlaufen und die Berechnung durchgeführt (CALCULATE). Bei Bedarf kann das Ergebnis ausgegeben werden (OUTPUT).</p>
+<pre class="">REPORT zzenno38.
+CLASS lcl_test DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS: main,
+                output.
+
+ PROTECTED SECTION.
+ TYPES: BEGIN OF ty_data,
+          type TYPE c LENGTH 1,
+          count TYPE i,
+          result TYPE f,
+          p1 TYPE f,
+          p2 TYPE f,
+        END OF ty_data.
+
+ CLASS-DATA gt_data TYPE STANDARD TABLE OF ty_data.
+
+ CLASS-METHODS:
+       testdata,
+       calculate IMPORTING type TYPE char1
+                           count TYPE i
+                           p1 TYPE f
+                           p2 TYPE f
+                 RETURNING VALUE(result) TYPE f .
+
+ENDCLASS.
+
+CLASS lcl_test IMPLEMENTATION.
+ METHOD testdata.
+ FIELD-SYMBOLS &lt;data&gt; TYPE ty_data.
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'A'.
+ &lt;data&gt;-count = 1000.
+ &lt;data&gt;-p1 = 123.
+ &lt;data&gt;-p2 = 456.
+
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'A'.
+ &lt;data&gt;-count = 10000.
+ &lt;data&gt;-p1 = 123.
+ &lt;data&gt;-p2 = 456.
+
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'A'.
+ &lt;data&gt;-count = 10000.
+ &lt;data&gt;-p1 = 123456.
+ &lt;data&gt;-p2 = 4567890.
+
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'B'.
+ &lt;data&gt;-count = 100000.
+ &lt;data&gt;-p1 = 123.
+ &lt;data&gt;-p2 = 456.
+
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'C'.
+ &lt;data&gt;-count = 10000.
+ &lt;data&gt;-p1 = 1234567.
+ &lt;data&gt;-p2 = 4.
+
+ ENDMETHOD.
+
+ METHOD main.
+   FIELD-SYMBOLS &lt;data&gt; TYPE ty_data.
+
+   testdata( ).
+
+   LOOP AT gt_data ASSIGNING &lt;data&gt;.
+     &lt;data&gt;-result = calculate( type = &lt;data&gt;-type
+                               count = &lt;data&gt;-count
+                                  p1 = &lt;data&gt;-p1
+                                  p2 = &lt;data&gt;-p2 ).
+   ENDLOOP.
+ ENDMETHOD.
+
+ METHOD output.
+   DATA lr_grid TYPE REF TO cl_salv_table.
+   cl_salv_table=&gt;factory( IMPORTING r_salv_table = lr_grid
+                           CHANGING t_table = gt_data ).
+   lr_grid-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD calculate.
+
+   DO count TIMES.
+     CASE type.
+       WHEN 'A'.
+         result = p1 * p2.
+       WHEN 'B'.
+         result = p1 / p2.
+       WHEN 'C'.
+         result = p1 ** p2.
+     ENDCASE.
+ ENDDO.
+
+ ENDMETHOD.
+
+ENDCLASS.
+
+PARAMETERS p_output AS CHECKBOX DEFAULT space.
+
+START-OF-SELECTION.
+
+ lcl_test=&gt;main( ).
+ IF p_output = abap_true.
+   lcl_test=&gt;output( ).
+ ENDIF.</pre>
+<h2>Auswertung</h2>
+<p>In der Transaktion SAT erhält man leider zu wenig aussagekräftige Informationen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-14-26.jpg"><img decoding="async" class="alignnone size-medium wp-image-204179" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-14-26-300x170.jpg" alt="2015-08-19_01-14-26" width="300" height="170" srcset="/wp-content/uploads/2015/08/2015-08-19_01-14-26-300x170.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_01-14-26-1024x580.jpg 1024w, /wp-content/uploads/2015/08/2015-08-19_01-14-26.jpg 1349w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-14-44.jpg"><img decoding="async" class="alignnone wp-image-204180 size-medium" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-14-44-300x64.jpg" alt="2015-08-19_01-14-44" width="300" height="64" srcset="/wp-content/uploads/2015/08/2015-08-19_01-14-44-300x64.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_01-14-44.jpg 967w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Wir brauchen also eine andere Möglichkeit, um die Performance weiter zu analysieren.</p>
+<h2>Eigene Performanceprotokollierung</h2>
+<p>Die Protokollierung der Performance ist mit GET RUN TIME möglich. Der Befehl muss jedoch zu Beginn des Tests aufgerufen werden und zum Ende der Messung. Die Zeitendifferenz &#8211; also die Laufzeit &#8211; muss noch berechnet werden. Das ist umständlich, wenn man mehrere Routinen protokollieren möchte.</p>
+<p>Es liegt also nah, diese Funktion auszulagern:</p>
+<pre>CLASS lcl_performance DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS:
+   start IMPORTING id TYPE any,
+   stopp IMPORTING id TYPE any.
+ PROTECTED SECTION.
+   TYPES: BEGIN OF ty_id_table,
+            id TYPE string,
+            count TYPE i,
+            runtime TYPE i,
+          END OF ty_id_table.
+  CLASS-DATA gt_id_table TYPE STANDARD TABLE OF ty_id_table.
+ENDCLASS.
+
+CLASS lcl_performance IMPLEMENTATION.
+  METHOD start.
+    FIELD-SYMBOLS &lt;id_table&gt; TYPE ty_id_table.
+    READ TABLE gt_id_table ASSIGNING &lt;id_table&gt; WITH KEY id = id.
+    IF sy-subrc &gt; 0.
+      APPEND INITIAL LINE TO gt_id_table ASSIGNING &lt;id_table&gt;.
+      &lt;id_table&gt;-id = id.
+    ENDIF.
+    ADD 1 TO &lt;id_table&gt;-count.
+    GET RUN TIME FIELD &lt;id_table&gt;-runtime.
+  ENDMETHOD.
+METHOD stopp.
+FIELD-SYMBOLS &lt;id_table&gt; TYPE ty_id_table.
+DATA lv_runtime TYPE i.
+DATA lv_subkey TYPE c LENGTH 200.
+READ TABLE gt_id_table ASSIGNING &lt;id_table&gt; WITH KEY id = id.
+CHECK sy-subrc = 0.
+GET RUN TIME FIELD lv_runtime.
+&lt;id_table&gt;-runtime = lv_runtime - &lt;id_table&gt;-runtime.
+lv_subkey = |{ id }, Run { &lt;id_table&gt;-count }: { &lt;id_table&gt;-runtime NUMBER = USER }ms|.
+LOG-POINT ID z_performance SUBKEY lv_subkey FIELDS &lt;id_table&gt;-runtime.
+ENDMETHOD.
+ENDCLASS.</pre>
+<h2>Aufruf der Protokollierung</h2>
+<p>Wir müssen die Methoden unserer Protokollklasse nun nur noch einbinden:</p>
+<pre>METHOD main.
+  FIELD-SYMBOLS &lt;data&gt; TYPE ty_data.
+  testdata( ).
+  LOOP AT gt_data ASSIGNING &lt;data&gt;.
+    lcl_performance=&gt;start( &lt;data&gt;-type ).
+    &lt;data&gt;-result = calculate( type = &lt;data&gt;-type
+                              count = &lt;data&gt;-count
+                                 p1 = &lt;data&gt;-p1
+                                 p2 = &lt;data&gt;-p2 ).
+    lcl_performance=&gt;stopp( &lt;data&gt;-type ).
+  ENDLOOP.
+ENDMETHOD.</pre>
+<h2>Log-Points</h2>
+<p>In dem Coding zur Performanceprotokollierung benutze ich bereits eines Log-Point. Diesen kannst du mit der Transaktion SAAB anlegen. Log-Points haben den Vorteil, dass man diese in jedem System bei Bedarf aktivieren kann. Du benötigst also keine separate Tabelle, um einstellen zu können, was wann protokolliert werden muss, sondern kannst du Standardfunktionalität nutzen.</p>
+<p>Mit der Transaktion SAAB musst du den Log-Point auch einschalten. Du kannst wählen, für welchen Zeitraum die Protokollierung aktiv sein soll:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_00-46-371.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-204252" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_00-46-371-300x128.jpg" alt="2015-08-19_00-46-37" width="300" height="128" srcset="/wp-content/uploads/2015/08/2015-08-19_00-46-371-300x128.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_00-46-371.jpg 524w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Normalerweise würde man den Log-Point in dieser Form verwenden:</p>
+<pre>LOG-POINT ID z_performance SUBKEY id FIELDS &lt;id_table&gt;-runtime.</pre>
+<p>Diese Protokollierung ist jedoch sehr umständlich auszuwerten: Man sieht erstens nur den letzten Aufruf des Log-Points und zweitens muss man die Hierarchie aufklappen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-50-34.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-204181" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-50-34-300x164.jpg" alt="2015-08-19_01-50-34" width="300" height="164" srcset="/wp-content/uploads/2015/08/2015-08-19_01-50-34-300x164.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_01-50-34-1024x559.jpg 1024w, /wp-content/uploads/2015/08/2015-08-19_01-50-34.jpg 1208w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Aber ich wollte die Auswertung ja einfacher machen. Also machen wir uns den Umstand zunutze, dass die Log-Point-ID bis zu 200 Zeichen lang sein darf und basteln uns für jeden Aufruf eine eigene ID. Das Ergebnis ist viel aussagekräftiger:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_00-50-19.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-204247" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_00-50-19-300x254.jpg" alt="2015-08-19_00-50-19" width="300" height="254" srcset="/wp-content/uploads/2015/08/2015-08-19_00-50-19-300x254.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_00-50-19.jpg 375w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Variante</h2>
+<p>Es ist auch möglich, einem Log-Point eine interne Tabelle zu übergeben! Da jeweils nur der letzte Log-Point gesichert wird, können wir uns diesen Umstand ebenfalls gut zunutze machen:</p>
+<p>Wir rufen den Log-Point einfach mit einem festen Wert auf und übergeben bei FIELDS die interne Tabelle:</p>
+<pre>LOG-POINT ID z_performance SUBKEY 'Default' FIELDS gt_id_table.</pre>
+<p>Das Ergebnis sieht folgendermaßen aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_02-01-472.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-204250" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_02-01-472-300x228.jpg" alt="2015-08-19_02-01-47" width="300" height="228" srcset="/wp-content/uploads/2015/08/2015-08-19_02-01-472-300x228.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_02-01-472.jpg 984w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Erweiterungsmöglichkeiten</h2>
+<p>Die Protokollierung ist natürlich auch noch sehr begrenzt. Du kannst die Methoden jedoch um Parameter erweitern, so dass bei jedem Aufruf zusätzliche Informationen übergeben werden können. Auch könnte die Protokollklasse sich selbst je Log-Id instanziieren, so dass je Log-Id nur die eigenen Aufrufe an den Log-Point übergeben werden. So würde die Messung von mehreren Abschnitten wahrscheinlich übersichtlicher werden.</p>
+<h2>Doku</h2>
+<p>Für die genauen Möglichkeiten der Log-Points solltest du dir die Hilfe durchlesen: <a href="http://help.sap.com/abapdocu_702/de/abaplog-point.htm">LOG-POINT.</a></p>
+<p>Der Beitrag <a href="/blog/log-points-zur-performancemessung/">Log-Points zur Performancemessung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Exporting vs. Returning. Gibt es da Unterschiede?</title>
+		<link>/blog/exporting-vs-returning-gibt-es-da-unterschiede/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 03 Apr 2014 15:15:43 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Performance]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Code Inspector]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4685</guid>
+
+					<description><![CDATA[<p>Es gibt Funktionalitäten und Prozesse, die man häufig einfach verwendet und nicht im Entferntesten auf die Idee kommt, dass hier Performance relevantes Potential schlummert. Bei der Parameterübergabe schlummert so einiges... </p>
+<p>Der Beitrag <a href="/blog/exporting-vs-returning-gibt-es-da-unterschiede/">Exporting vs. Returning. Gibt es da Unterschiede?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein Kollege ist kürzlich bei der Überarbeitung seines Programmes über eine Meldung aus dem Code Inspector gestolpert:</p>
+<p>[notice type=&#8217;alert&#8217;]==&gt; Der Typ des RETURNING-Parameters &#8220;RETURN_VALUE&#8221; enthält eine oder mehrere Strings (Siehe Test-Dokumentation).[/notice]</p>
+<p>Die Meldung hat verwundert, da die Übergabe eines Strings als RETURNING-Parameter eigentlich nichts &#8220;Böses&#8221; ist. Die Erklärung der Meldung ist jedoch einleuchtend:</p>
+<p>[boxes type=&#8217;light&#8217; title=&#8217;Inperformante Parameterübergabe&#8217;]Bei der Parameter-Übergabe in ABAP gibt es die Modi Referenz-Übergabe (keine oder Kennzeichnung reference(PARAM)) und Wert-Übergabe (Kennzeichnung value(PARAM) ). Es gilt allgemein die Regel, dass Wert-Übergabe immer langsamer als Referenz-Übergabe ist. Der Performance-Nachteil ist immer mindestens 40 % und kann abhängig vom Datentyp und Datenvolumen auf mehrere 1000 % Prozent steigen.</p>
+<p>STR: Der Typ des VALUE-Parameters enthält keine Tabellen aber Strings. In diesem Fall findet bei Parameter-Übergabe ein String-Sharing statt, was aber relativ aufwändig ist. Der Performance-Nachteil gegenüber Referenz-Übergabe beträgt hier bei ca. 700 %. Dieser Wert gilt nur für den Fall dass der Parameter nicht geändert wird. Erfolgt eine Änderung steigt dieser Wert noch weiter an.[/boxes]</p>
+<p>[boxes type=&#8217;light&#8217; title=&#8217;Rückgabe-Parameter (RETURNING)&#8217;]Da RETURNING-Parameter immer VALUE-Parameter sind, ist hier eine Performance-Verbesserung nur durch Änderung der Parameter-Art möglich. Der RETURNING-Value-Parameter muss in einen EXPORTING-Reference-Parameter umgewandelt werden.[/boxes]</p>
+<h2>String-Sharing</h2>
+<p>Die Erklärung des Code Inspectors scheint schlüssig. Mit einem Testprogramm wollte ich die Performance-Unterschiede testen. Das Programm verwendet zwei Methoden, die jeweils einen String zurück geben. Vor Ausführung kann festgelegt werden, wie groß der String werden soll (Parameter P_LENTH) und wie oft die Methoden ausgeführt werden sollen (Parameter P_TIMES).</p>
+<p>Es ist schnell ersichtlich, dass bei Zunahme der String-Größe die Ausführungszeit tatsächlich signifikant steigt. Bei kurzen Strings (~100 Bytes) ist die RETURNING-Variante etwa 25% langsamer.<br />
+[accordian]<br />
+[accordian_list title=&#8217;Testprogramm &lt;&lt;hier aufklappen&gt;&gt;&#8217;]</p>
+<pre>REPORT.
+
+PARAMETERS p_times  TYPE i DEFAULT 10000.
+PARAMETERS p_length TYPE i DEFAULT 10000.
+
+*----------------------------------------------------------------------*
+*       CLASS l DEFINITION
+*----------------------------------------------------------------------*
+CLASS l DEFINITION.
+  PUBLIC SECTION.
+    CLASS-DATA teststring TYPE string.
+    CLASS-METHODS ret RETURNING value(val) TYPE string.
+    CLASS-METHODS imp EXPORTING val TYPE string.
+    CLASS-METHODS testdata IMPORTING len TYPE i.
+ENDCLASS.                    "l DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS l IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS l IMPLEMENTATION.
+  METHOD testdata.
+    DO len TIMES.
+      CONCATENATE teststring 'A' INTO teststring.
+    ENDDO.
+  ENDMETHOD.                    "class_constructor
+
+  METHOD ret.
+    val = teststring.
+  ENDMETHOD.                    "ret
+
+  METHOD imp.
+    val = teststring.
+  ENDMETHOD.                    "imp
+ENDCLASS.                    "l IMPLEMENTATION
+
+*== data
+DATA start TYPE i.
+DATA stopp TYPE i.
+DATA result TYPE i.
+DATA string TYPE string.
+
+START-OF-SELECTION.
+
+  l=&gt;testdata( p_length ).
+*== test RETURNING
+  GET RUN TIME FIELD start.
+  DO p_times TIMES.
+    string = l=&gt;ret( ).
+  ENDDO.
+  GET RUN TIME FIELD stopp.
+
+  result = stopp - start.
+  WRITE: / 'Returning', result.
+
+*== Test EXPORTING
+  GET RUN TIME FIELD start.
+  DO p_times TIMES.
+    l=&gt;imp( IMPORTING val = string ).
+  ENDDO.
+  GET RUN TIME FIELD stopp.
+
+  result = stopp - start.
+  WRITE: / 'Exporting', result.</pre>
+<p>[/accordian_list]<br />
+[/accordian]</p>
+<h2>Fazit</h2>
+<p>Im Normalfall würde ich bei Rückgabe eines String-Feldes immer die RETURNING-Variante wählen, da sie &#8220;schöner&#8221; ist. Die direkte Wertübergabe, die RETURNING möglich macht, macht das Coding eleganter und verständlicher. Wenn mit großen Strings gearbeitet wird und diese Verarbeitung zudem sehr oft durchgeführt wird, solltest du dich jedoch an diesen Artikel erinnern&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Der Beitrag <a href="/blog/exporting-vs-returning-gibt-es-da-unterschiede/">Exporting vs. Returning. Gibt es da Unterschiede?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

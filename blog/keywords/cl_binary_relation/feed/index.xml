@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_binary_relation Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_binary_relation/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 15 May 2017 15:16:51 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_binary_relation Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Generic Object Services</title>
+		<link>/blog/generic-object-services/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 17 Aug 2006 16:55:27 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Delta]]></category>
+		<category><![CDATA[GOS]]></category>
+		<category><![CDATA[Generic Object Services]]></category>
+		<category><![CDATA[Anhänge]]></category>
+		<category><![CDATA[attachments]]></category>
+		<category><![CDATA[cl_binary_relation]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=374</guid>
+
+					<description><![CDATA[<p>Das Ablegen von Anh&#228;ngen an SAP-Standardtransaktionen hat sich zu Release 4.70 komplett ge&#228;ndert. Konnte man vorher die Anh&#228;nge mit dem Funktionsbaustein SREL_GET_NEXT_RELATIONS lesen, ist zu 4.70 eine andere Vorgensweise vonn&#246;ten.</p>
+<p>Der Beitrag <a href="/blog/generic-object-services/">Generic Object Services</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Ablegen von Anhängen an SAP-Standardtransaktionen hat sich zu Release 4.70 komplett geändert. Konnte man vorher die Anhänge mit dem Funktionsbaustein SREL_GET_NEXT_RELATIONS lesen, ist zu 4.70 eine andere Vorgehensweise vonnöten.</p>
+<p>In den meisten SAP-Standardtransaktionen können Anhänge angefügt werden. Dazu geht man unter Menü &#8220;System &#8211; Verknüpfungen&#8221; und kann Notizen, Bilder oder andere Dateien zuordnen.</p>
+<p>Gelesen werden diese im Release 4.5 z.B. mit dem Funktionsbaustein SREL_GET_NEXT_RELATIONS:</p>
+<pre class="lang:abap decode:true ">*** Anhänge zur Qualitätsmeldung lesen
+  gs_objects-objkey  = gv_qmnum.
+  gs_objects-objtype = 'BUS2078'.  "Q-Meldung
+  CALL FUNCTION 'SREL_GET_NEXT_RELATIONS'
+    EXPORTING
+      object         = gs_objects
+    TABLES
+      links          = gt_links
+      roles          = gt_roles
+    EXCEPTIONS
+      internal_error = 1
+      OTHERS         = 2.</pre>
+<p>&nbsp;</p>
+<p>Ab Release 4.70 (oder 4.6) erhält man aber keine Ergebnisse, wenn die Anhänge über den sogenannten &#8220;Generischen Objektdienst&#8221; (GOS) gespeichert wurden.</p>
+<p>Siehe Hierzu auch den Artikel &#8220;<a href="https://tricktresor.com/content/index.php?aID=294" target="_self">Generic Object Services</a>&#8220;.</p>
+<p>Die Anhänge müssen nun wie folgt ermittelt werden (Anregung aus dem OSS-Hinweis &#8220;632997 Belegfluß: Anlagen, Notizen, URLs nicht angezeigt&#8221;):</p>
+<pre class="lang:abap decode:true ">DATA: l_sysid             LIKE tbdls-logsys.
+DATA: lt_relation_options TYPE obl_t_relt.
+DATA: ls_relation_options TYPE obl_s_relt.
+DATA: l_object            TYPE sibflporb.
+DATA: lt_links            TYPE obl_t_link.
+DATA: ls_links            TYPE obl_s_link.
+DATA: lt_roles            TYPE obl_t_role.
+DATA: ls_roles            TYPE obl_s_role.
+
+*--- Beschaffung der "Logischen System-ID" für F-Leiste L_BORIDENT
+CALL FUNCTION 'OWN_LOGICAL_SYSTEM_GET'
+  IMPORTING
+    own_logical_system             = l_sysid
+  EXCEPTIONS
+    own_logical_system_not_defined = 0.
+
+*--- Ermitteln der Verknüpfungen, die über die neue Technik zugeordnet
+*--- wurden GOS Attachments, URLs und Notizen
+l_object-typeid = 'BUS2078'.
+l_object-instid = p_qmnum.
+l_object-catid  = 'BO'.
+ls_relation_options-sign   = 'I'.
+ls_relation_options-option = 'EQ'.
+ls_relation_options-low    = 'ATTA'.
+APPEND ls_relation_options TO lt_relation_options.
+ls_relation_options-low    = 'NOTE'.
+APPEND ls_relation_options TO lt_relation_options.
+ls_relation_options-low    = 'URL'.
+APPEND ls_relation_options TO lt_relation_options.
+
+TRY.
+*--- Lesen der Verknüpften Objekte
+    CALL METHOD cl_binary_relation=&gt;read_links_of_binrels
+      EXPORTING
+        is_object           = l_object
+        ip_logsys           = l_sysid
+        it_relation_options = lt_relation_options
+      IMPORTING
+        et_links            = lt_links
+        et_roles            = lt_roles.
+  CATCH cx_obl_parameter_error .
+  CATCH cx_obl_internal_error .
+  CATCH cx_obl_model_error .
+ENDTRY.</pre>
+<h2>Weiterführende Infos</h2>
+<p>Hilfreich ist eventuell auch die Klasse CL_ATTACHMENT_LIST.</p>
+<p>Mithilfe des Funktionsbausteins BDS_ALL_CONNECTIONS_GET kann ermittelt werden, wieviele Dokumente vorhanden sind.</p>
+<p>Weitere Doku im SDN &#8220;HOW TO ATTACH DOCUMENTS TO ANY CUSTOM PROGRAM USING GENERIC OBJECT SERVICES&#8221;:  <a href="http://www.sdn.sap.com/irj/scn/go/portal/prtroot/docs/library/uuid/0e6b0d95-0a01-0010-4696-ca0a48de5fb3" target="_blank" rel="noopener noreferrer">http://www.sdn.sap.com/irj/scn/go/portal/prtroot/docs/library/uuid/0e6b0d95-0a01-0010-4696-ca0a48de5fb3</a></p>
+<p>Der Beitrag <a href="/blog/generic-object-services/">Generic Object Services</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

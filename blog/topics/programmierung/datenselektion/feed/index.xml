@@ -1,0 +1,990 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Datenbanken &amp; Datenselektion Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/programmierung/datenselektion/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 14 Apr 2020 13:02:59 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Datenbanken &amp; Datenselektion Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SELECT WHERE nur ein Eintrag vorhanden</title>
+		<link>/blog/select-where-nur-ein-eintrag-vorhanden/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 27 Aug 2019 15:27:58 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[subquery]]></category>
+		<category><![CDATA[having]]></category>
+		<guid isPermaLink="false">/?p=1022541</guid>
+
+					<description><![CDATA[<p>Select-Befehle sind in der Regel im SAP-Umfeld einigermaßen überschaubar. Meiner Meinung nach liegt es daran, dass in der Regel Programmierer am Werk sind, aber keine SQL-Spezialisten. Zudem bietet der Open-SQL-Standard von SAP auch nur einen eingeschränkten Funktionsumfang. Selbst wenn man etwas kompliziertere Selects durchführen möchte, ist das nicht unbedingt möglich. Joins sind eine andere Geschichte. Hier toben sich Programmierer gerne einmal aus und joinen was das Zeug hält. SELECT oder ABAP? In beiden Fällen, der...</p>
+<p>Der Beitrag <a href="/blog/select-where-nur-ein-eintrag-vorhanden/">SELECT WHERE nur ein Eintrag vorhanden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Select-Befehle sind in der Regel im SAP-Umfeld einigermaßen überschaubar. Meiner Meinung nach liegt es daran, dass in der Regel Programmierer am Werk sind, aber keine SQL-Spezialisten. Zudem bietet der Open-SQL-Standard von SAP auch nur einen eingeschränkten Funktionsumfang. Selbst wenn man etwas kompliziertere Selects durchführen möchte, ist das nicht unbedingt möglich.</p>
+
+
+
+<p>Joins sind eine andere Geschichte. Hier toben sich Programmierer gerne einmal aus und joinen was das Zeug hält.</p>
+
+
+
+<h2 class="wp-block-heading">SELECT oder ABAP?</h2>
+
+
+
+<p>In beiden Fällen, der Select-Anweisung und der nachträglichen Verarbeitung, gibt es Situationen, wo beides irgendwie umständlich ist. Ein solcher Fall ist es zum Beispiel, wenn man nur die Daten selektieren möchte, von denen man erst nach einer Aggregatbildung weiß, ob man sie lesen möchte oder nicht. Also zum Beispiel: Gib mir alle Belege, zu denen nur ein Eintrag in der Positionstabelle vorhanden ist.</p>
+
+
+
+<h2 class="wp-block-heading">SUBQUERY</h2>
+
+
+
+<p>Der folgende Select ermittelt genau die Einträge, bei denen nur ein Eintrag in der VBAP vorhanden ist.</p>
+
+
+
+<pre class="wp-block-code"><code>SELECT vbeln, matnr
+  FROM vbap AS v
+ WHERE vbeln IN @s_vbeln
+   AND matnr IN @s_matnr
+   AND 1 =  ( SELECT COUNT( * ) FROM vbap
+               WHERE vbeln = v~vbeln )
+ GROUP BY vbeln, matnr
+ ORDER BY vbeln, matnr
+  INTO TABLE @DATA(list).</code></pre>
+
+
+
+<h2 class="wp-block-heading">HAVING</h2>
+
+
+
+<p>durch Zufall bin ich bei der Nachstellung des Problems auf eine andere Lösung gestoßen, bei der die Anzahl der vorhandenen Sätze mittels HAVING eingeschränkt wird.</p>
+
+
+
+<pre class="wp-block-code"><code>SELECT vbeln, sum( kwmeng ) as kwmeng, vrkme
+  FROM vbap AS v
+    WHERE vbeln IN @s_vbeln
+      AND matnr IN @s_matnr
+  GROUP BY vbeln, vrkme
+  HAVING COUNT(*) = 1
+  ORDER BY vbeln, vrkme
+  INTO TABLE @data(list).</code></pre>
+
+
+
+<p>Der Vorteil bei der HAVING-Variante ist, dass hier die Anzahl der Datensätze auch variabel abgefragt werden können. Das geht mit dem oben vorgestellten Subquery nicht.</p>
+
+
+
+<h2 class="wp-block-heading">Performancevergleich</h2>
+
+
+
+<p>Ich habe beide Varianten in zwei unterschiedlichen Systemen mit unterschiedlichen Tabellen ausprobiert und einen kleinen Performancevergleich gemacht. In der einen Version ist die Variante mit dem Subquery schneller, in der anderen Version ist HAVING schneller.</p>
+
+
+
+<p>Im Gegensatz zu einer umständlichen Analyse per Programmcoding, welcher Satz nur einmal vorhanden ist, sind beide SELECT-Versionen meiner Meinung nach eleganter. Die Performance sollte man auf jeden Fall bei jeder Version im Blick haben.</p>
+<p>Der Beitrag <a href="/blog/select-where-nur-ein-eintrag-vorhanden/">SELECT WHERE nur ein Eintrag vorhanden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Selektion zur Berechtigung</title>
+		<link>/blog/selektion-zur-berechtigung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 02 Jul 2019 12:33:05 +0000</pubDate>
+				<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[authority-check]]></category>
+		<category><![CDATA[Berechtigungsprüfung]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">/?p=1022316</guid>
+
+					<description><![CDATA[<p>Berechtigungsprüfungen sind mitunter sehr komplex und weisen einige Tücken auf. Mit dem hier vorgestellten Trick ist es schon mal eine Hürde weniger.</p>
+<p>Der Beitrag <a href="/blog/selektion-zur-berechtigung/">Selektion zur Berechtigung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Berechtigungen und die dazugehörigen Berechtigungsprüfungen sind eine mitunter eine knifflige Angelegenheit. Bei einzelnen Werten ist es einfach, diese mit der entsprechenden Berechtigung zu prüfen. Wenn es jedoch um Selektionen geht, bei denen der Anwender nur die Berechtigung über einen Teil der Daten hat, dann wird es schon schwieriger&#8230;</p>
+
+
+
+<h2 class="wp-block-heading">Problem &#8211; Selektionsoptionen</h2>
+
+
+
+<p>Bei dem hier beschriebenen Problem hat der Anwender bei einem Report die Möglichkeit, ein Objekt über Selektionsoptionen (SELECT-OPTIONS) einzugrenzen. Hierfür muss ich jedoch wissen, welches die zu Grunde liegende Prüftabelle mit allen existierenden Daten ist. </p>
+
+
+
+<h3 class="wp-block-heading">Beispiel Verkaufsorganisation</h3>
+
+
+
+<p>Der Anwender selektiert Verkaufsorganisationen A* und B*.  Der Anwender hat jedoch nur die Berechtigung für A200 und B330. </p>
+
+
+
+<p>In der Prüftabelle für die Verkaufsorganisationen (Tabelle TVAK) sind die folgenden Verkaufsorganisationen gepflegt:</p>
+
+
+
+<table class="wp-block-table"><tbody><tr><td><strong>Vkorg</strong></td><td><strong>Bezeichnung</strong></td></tr><tr><td>A100</td><td>Deutschland Gebiet Nord</td></tr><tr><td>A200</td><td>Deutschland Gebiet Süd </td></tr><tr><td>A300</td><td>Deutschland Gebiet West</td></tr><tr><td>A400</td><td>Deutschland Gebiet Ost</td></tr><tr><td>B330</td><td>Nord-Italien</td></tr><tr><td>B340</td><td>Süd-Italien</td></tr><tr><td>C500</td><td>Spanien</td></tr></tbody></table>
+
+
+
+<h2 class="wp-block-heading">Lösung A &#8211; Vorselektion</h2>
+
+
+
+<p>Bei dieser Lösungsvariante wird vorab geprüft, für welche Objekte der Anwender die Berechtigung hat. Man würde also die tatsächlich vorhandenen Einträge aus der Prüftabelle selektieren und für jeden Eintrag prüfen, ob der Anwender die entsprechende Berechtigung hat.</p>
+
+
+
+<p>Mit den verbleibenden Einträgen kann man entweder eine dynamische WHERE-Bedingung bauen oder baut aus diesen Einträgen eine genaue Ranges-Tabelle auf.</p>
+
+
+
+<h2 class="wp-block-heading">Lösung B &#8211; Einzelprüfung der Daten</h2>
+
+
+
+<p>Es gibt natürlich auch die relativ einfache Möglichkeit, alle Daten einzulesen und dann bei jedem einzelnen Datensatz zu prüfen, ob der Anwender berechtigt ist, ihn zu sehen. Das ist einfach zu programmieren, kann jedoch bei großen Datenmengen ein erhebliches Laufzeitproblem werden.</p>
+
+
+
+<h2 class="wp-block-heading">Unterstützung</h2>
+
+
+
+<p>Durch Zufall bin ich auf die Klasse <a href="https://help.sap.com/doc/abapdocu_751_index_htm/7.51/de-DE/abapauthority-check.htm">CL_AUTH_OBJECTS_TO_SQL</a> gestoßen. Mit Hilfe dieser Klasse wird der Lösungsweg A eingeschlagen. Allerdings ohne, dass ich als Programmierer wissen müsste, welches die Zugrunde liegende Prüftabelle ist und ohne, dass ich die WHERE-Bedingung selber erstellen müsste.</p>
+
+
+
+<p>Der Klasse müssen folgende Daten übergeben werden:</p>
+
+
+
+<ul><li>das zu prüfende Berechtigungsobjekt</li><li>die Aktivität (Anzeigen, Ändern, Löschen etc)</li><li>Ein Field Mapping (DDIC-Grundlage der Felder)</li><li>optional: Filter für die Einschränkung auf Objekte</li></ul>
+
+
+
+<p>Mit GET_SQL_CONDITION bekommt man dann die WHERE-Bedingung für die Felder zurück, für die der Anwender eine Berechtigung hat.</p>
+
+
+
+<p>Folgendes kleine Beispiel zeigt die Anwendung für die Klasse.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="554" height="280" src="/wp-content/uploads/2019/07/sql1.png" alt="" class="wp-image-1022317" srcset="/wp-content/uploads/2019/07/sql1.png 554w, /wp-content/uploads/2019/07/sql1-300x152.png 300w, /wp-content/uploads/2019/07/sql1-272x137.png 272w" sizes="(max-width: 554px) 100vw, 554px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="wp-block-code"><code>DATA h_vkorg TYPE vkorg.
+SELECT-OPTIONS s_vkorg FOR h_vkorg DEFAULT 'A100'.
+
+START-OF-SELECTION.
+
+  DATA(lo_converter_osql) = cl_auth_objects_to_sql=>create_for_open_sql( ).
+
+  lo_converter_osql->add_authorization_object( 
+    iv_authorization_object = 'V_VBAK_VKO'
+    it_activities = VALUE #(
+             ( auth_field = 'ACTVT' value = '03' ) )
+    it_field_mapping = VALUE #(
+             ( auth_field = 'VKORG'
+               view_field = VALUE #(
+                               table_ddic_name = 'VBAK'
+                               table_alias     = ''
+                               field_name      = 'VKORG' ) ) )
+    it_filter = VALUE #( FOR selopt IN s_vkorg&#91;]
+             ( auth_field = 'VKORG' low = selopt-low high = selopt-high ) ) ).
+  
+  TRY.
+      DATA(lv_where_clause) = lo_converter_osql->get_sql_condition( ).
+      IF lv_where_clause IS INITIAL.
+        MESSAGE 'Du hast die Berechtigung für alle ausgewählten Verkaufsorganisationen' TYPE 'I'.
+      ELSE.
+        cl_demo_output=>display_text( |Deine WHERE-Bedingung: { lv_where_clause }| ).
+      ENDIF.
+    CATCH cx_auth_not_authorized.
+      MESSAGE 'Keine Berechtigung für die ausgewählten Verkaufsorganisationen' TYPE 'I'.
+  ENDTRY.</code></pre>
+<p>Der Beitrag <a href="/blog/selektion-zur-berechtigung/">Selektion zur Berechtigung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</title>
+		<link>/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 08 Nov 2017 22:20:13 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Entwickler]]></category>
+		<category><![CDATA[Datenübernahme]]></category>
+		<category><![CDATA[Programmierer]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<category><![CDATA[Anwender]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[Logik]]></category>
+		<category><![CDATA[Kunde]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[Datenstruktur]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018010</guid>
+
+					<description><![CDATA[<p>Ein paar mehr oder weniger philosophische Gedanken, die ich mir gemacht habe. Manches fließt einfach und will heraus. Ansonsten kann ich nicht schlafen, weil mir diese Gedanken immer und immer wieder im Kopf herum spuken. Um so schöner, wenn dabei der Bogen zu meinem Lieblings-AddOn "SimDia²" geschlagen werden kann. Den Kampf zwischen Anwender und Entwickler, Logik und Daten werden hoffentlich viele kennen. </p>
+<p>Der Beitrag <a href="/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich bin Programmierer aus Leidenschaft. Ich liebe es, Daten so zu malträtieren, umzuformen und anzureichern, dass eine für den Menschen sinnvolle Darstellung dabei herauskommt. Ebenso liebe ich es, Anforderungen so umzusetzen, dass am Ende ein paar zufriedene Anwender vor dem PC und wohlgeformte Daten auf der Datenbank sind. Zudem bin ich bestrebt, die Programmierungen so universell und wiederverwendbar wie möglich zu gestalten.</p>
+<p>Voraussetzung dafür ist, dass der Anwender oder Kunde sich exzellent ausdrücken kann und sehr genau weiß, was er möchte und seine Prozesse und Daten selbst gut kennt. Dabei ist nicht nur der aktuelle Zustand wichtig, sondern auch, wie es mit den Daten weiter gehen soll. Wie müssen sie weiter verarbeitet werden? Inwieweit müssen sie wie lange änderbar sein? Häufig müssen im Nachhinein wilde Verrenkungen gemacht werden, um Dinge zu prüfen oder sicherzustellen, die bei sorgfältiger Planung &#8211; ich glaube so etwas nennt man 360°-Sicht &#8211; nicht nötig gewesen wäre.</p>
+<p>Zugegebener Maßen ist das nicht immer möglich, denn sehr oft entwickeln sich Dinge einfach. Aus einem ehemals kleinen Auswertungsreport entsteht nach und nach die Schaltzentrale für eine ganze Abteilung.</p>
+<h2>Daten</h2>
+<p>Die Daten sind tatsächlich der wichtigste Bestandteil bei der Programmierung in einem ERP-System. Dadurch, dass die Daten in Strukturen abgelegt und organisiert werden, ist es recht einfach, zusammengehörende Daten zu ermitteln. Es ist allerdings sehr schwer, diese Strukturen erst einmal zu erkennen und dann zu erzeugen. Zudem ist es schwer, wenn nicht gar unmöglich, anhand der Daten die Zugehörigkeit zu Prozessen zu ermitteln. Um die zu einem Prozess notwendigen Daten zu wissen, müsste ein detailliertes Datenflussdiagramm erstellt werden. Das wird jedoch kaum gemacht, denn es ist unendlich viel Arbeit und starken Änderungen unterworfen.</p>
+<h2>Logik</h2>
+<p>Für einen Programmierer ist es sehr wichtig zu wissen, wo welche Daten stehen und wie sie verarbeitet werden müssen. Der Programmierer muss die Daten so verarbeiten, dass am Ende das gewünschte Ergebnis heraus kommt. Dafür ist es notwendig, dass er bestimmte Logiken anwendet. Einige Logiken ergeben sich aus den Einstellungen im Customizing, andere Logiken müssen vom Fachbereich bzw. dem Kunden vorgegeben werden. Sofern es genug &#8220;Beweismaterial&#8221; gibt, können aus speziellen Anforderungen allgemein gültige Logiken abgeleitet werden. Diese wiederum können im Kundeneigenen Customizing abgebildet werden. Dies hat den Vorteil, dass die Lösung flexibel und vom Kunden steuerbar ist.</p>
+<h2>Programmierer</h2>
+<p>Ja, es mag ein Klischee sein, aber Programmierer sind ein wundersames Völkchen. Ich spreche aus eigener Erfahrung&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" />  Programmierer sind in der Regel sehr Technik-affin und sind mehr daran interessiert, eine möglichst <em>figgelinsche</em> Lösung zu präsentieren oder eine besonders komplexe Aufgabenstellung zu meistern. In der Regel haben Programmierer wenig Sinn für Design und Layout. Ja, es gibt Ausnahmen&#8230;! Aber meistens bilden Programmierer genau das ab, was in der Vorgabe steht &#8211; egal wie es aussieht und ob es den SAP-Design-Vorgaben gleich in mehreren Ebenen widerspricht. Der einfachste Weg, einen Programmierer zur Arbeit zu bewegen ist, ihm zu sagen: &#8220;Das geht nicht. Haben schon andere versucht&#8221;.</p>
+<h2>Anwender</h2>
+<p>Auch Anwender sind häufig <em>speziell</em>. Sie müssen mit ihrer Arbeit fertig werden und sie wollen ihre Arbeit in der Regel gut machen. Anwender verstehen ihre Daten und ihre Prozesse. Aber sie können häufig nicht einschätzen welche Auswirkungen Änderungen in ihrem Bereich auf andere Teile der Firma haben. Zudem schätzen sie häufig die Komplexität von Programmieraufgaben falsch ein. Dinge, die einfach zu programmieren sind, weil bereits ähnliche Programmierungen vorhanden sind oder es eine SAP-Funktion dafür gibt, werden eventuell als zu komplex abgetan. Andererseits werden Dinge, die sich verbal einfach ausdrücken lassen und <em>offensichtlich</em> sind, als einfach eingeschätzt. Dabei sind gerade diese Dinge schwer und aufwändig zu programmieren.</p>
+<h2>Programmierer vs. Anwender</h2>
+<p>Im allgemeinen mehr oder weniger chaotischen Durcheinander, was in einigen Firmen <em>Alltag</em> genannt wird, müssen Programmierer und Anwender (Fachbereiche) miteinander auskommen und sich gegenseitig soweit verstehen, dass eindeutige Ergebnisse erzielt werden. Ein guter Programmierer wird versuchen, ein Schema, eine Logik, eine allgemein gültige Regel zu finden oder scheinbar allgemein gültige Regeln zu hinterfragen. Ein guter Anwender kennt seine Daten und Prozesse und erkennt Daten, die &#8220;nicht passen&#8221; oder &#8220;unsinnig&#8221; sind. Dahingehend unterscheiden sich in der Regel Programmierer und Anwender. Denn genau das, was der eine kann, kann der andere mit ziemlicher Sicherheit nicht. Ein Programmierer kann nicht erkennen, ob Daten unsinnig sind und ein Anwender erkennt selten die technische Logik hinter bestimmten Prozessen oder Funktionen.</p>
+<h2>Logik vs. Daten</h2>
+<p>Für einen Anwender ist es eventuell einfacher &#8220;seine&#8221; Daten so zu ordnen, wie sie für ihn aktuell sinnvoll und wichtig sind. Um Daten aus einem Fremdsystem oder manuell erarbeiteten Prozessen in ein SAP-System zu übernehmen gibt es im Grunde zwei maschinelle Möglichkeiten</p>
+<ol>
+<li>Anwender und Programmierer setzen sich zusammen und definieren eine Datenstruktur. Sie besprechen, welche Daten wann unter welchen Bedingungen wo hin müssen. Der Programmierer arbeitet in der Regel mit <strong>einer</strong> (je nach Anforderung natürlich auch mit mehreren) allgemeinen Datenstruktur. Felder, die für einen Datensatz nicht relevant sind, bleiben leer. Der Programmierer erstellt dann ein Programm mit den entsprechenden Regeln, um die Daten ins SAP-System zu schreiben.</li>
+<li>Der Anwender baut sich seine Daten in Gruppen so zusammen, wie sie für ihn logisch sind. Dabei ist es egal, dass er 12 Excel-Blätter hat, die alle zu 90% die gleiche Struktur haben. Für ihn ist wichtig, dass er die komplexen Daten möglichst einfach gruppieren und verwalten kann. Der Anwender kann dann einen einfachen Prozess starten, um die Daten zu übernehmen (zum Beispiel mit SimDia²).</li>
+</ol>
+<p>Die erste Lösung würde ich als Programmierer natürlich immer bevorzugen. Immerhin verdiene ich damit mein Geld. Es ist jedoch nicht von der Hand zu weisen, dass eine Programmierung fast immer recht kompliziert ist. Es sind Absprachen mit dem Auftraggeber notwendig, es muss getestet werden, es müssen Programme transportiert werden usw. Zudem erfordert die Arbeit in der Ausführung häufig zwei Leute: Einen aus der IT (Programmierer), der Daten in ein Verzeichnis schiebt, Daten hochlädt, Daten konvertiert und so weiter. Der Anwender ist hilflos, wenn etwas nicht so funktioniert, wie er es erwartet.</p>
+<p>Die zweite Lösung mag auf den ersten Blick nicht professionell erscheinen. Im Hinblick darauf, dass Daten meistens regelmäßig und von beliebigen Personen übernommen werden sollen, wird eine &#8220;Frickellösung&#8221; häufig nicht in Betracht gezogen.</p>
+<p>Dass der Anwender meistens gar nichts machen kann, liegt häufig an diesen zwei Umständen:</p>
+<ol>
+<li>Es gibt häufig keine guten Möglichkeiten für einen Anwender, Daten massenhaft in ein SAP-System zu importieren.</li>
+<li>Die IT-Abteilung hat für kleinere Aufgaben häufig keine Zeit und keine Kapazitäten.</li>
+</ol>
+<p>Die cleverste Möglichkeit, von der ich gehört habe ist die folgende: Ein Poweruser (also ein Benutzer mit hinreichend guten Berechtigungen zum Ausführen von Programmen) hat sich die Batchinputstruktur zu einem SAP-Standard-Übernahmeprogramm genommen, diese in Word bearbeitet und mit Hilfe der Serienbrieffunktion eine Batchinputdatei für seine Daten generiert. Die so erzeugten Batchinputmappen hat der Anwender dann eingespielt. Ich weiß leider nicht mehr genau, um welche Daten es sich handelte.</p>
+<p>Diese Lösung erfordert jedoch umfangreiche Berechtigungen, sehr gutes Word- und Excelwissen sowie natürlich ein vorhandenes SAP-Übernahmeprogramm.</p>
+<h2>Alternative SimDia²</h2>
+<p>Das Addon <a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> von <a href="https://ersasoft.de/de/?s=tt">Ersasoft</a> ist eine &#8211; gemessen am Nutzen &#8211; kostengünstige Alternative für den Fachbereich um alltäglich wiederkehrende Datenübernahmen einfach und effizient zu erledigen. Der Anwender hat zumeist hinreichende Excel-Kenntnisse und er kennt seine SAP-Anwendungen. Die Bedienung von SimDia² ist sehr leicht und darauf ausgelegt, wiederkehrende Datenimporte von Excel nach SAP auszuführen.</p>
+<p><a href="https://ersasoft.de/de/simdia/?s=tt"><img decoding="async" class="alignnone size-full wp-image-1018210" src="https://tricktresor.com/wp-content/uploads/2017/11/starten-sie-mit-ihren-daten-durch2.png" alt="" width="760" height="323" srcset="/wp-content/uploads/2017/11/starten-sie-mit-ihren-daten-durch2.png 760w, /wp-content/uploads/2017/11/starten-sie-mit-ihren-daten-durch2-300x128.png 300w" sizes="(max-width: 760px) 100vw, 760px" /></a></p>
+<p>Beispiele für die Anwendung sind:</p>
+<ol>
+<li>Übernahme von Vertriebsstücklisten</li>
+<li>Ausführung von Buchungen</li>
+<li>Anlage von Fertigungsaufträgen</li>
+<li>Gezieltes Ändern von Materialstämmen</li>
+</ol>
+<p>SimDia² kann sogar dazu genutzt werden, um Daten aus einem SAP-System für Auswertungszwecke zu sammeln, da SimDia² Felder einer SAP-Transaktion auslesen kann. Ein Anwender kann sich so also gezielt selber Listen erstellen, ohne dass er die entsprechenden SAP-Tabellen kennen muss. Besonders gut funktioniert das bei Daten, die für einen Programmierer nur sehr umständlich zu ermitteln sind, da die Daten auf viele untereinander verknüpfte Tabellen verteilt sind.</p>
+<p>Der Beitrag <a href="/blog/logik-vs-daten-sap-vs-simdia%c2%b2-programmierer-vs-anwender/">Logik vs. Daten // SAP vs. SimDia² // Programmierer vs. Anwender</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Auf ECATT Datencontainer zugreifen</title>
+		<link>/blog/auf-ecatt-datencontainer-zugreifen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 27 Oct 2017 13:08:21 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[testdaten]]></category>
+		<category><![CDATA[ECATT]]></category>
+		<category><![CDATA[Datencontainer]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018179</guid>
+
+					<description><![CDATA[<p>ECATT-Testdatencontainer sind eine schicke Sache. In diesem Artikel zeige ich dir, wie du auf diese Daten zugreifen kannst. Der Zugriff erfolgt über die Klasse CL_APL_ECATT_TDC_API und bietet vielfältige Möglichkeiten</p>
+<p>Der Beitrag <a href="/blog/auf-ecatt-datencontainer-zugreifen/">Auf ECATT Datencontainer zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In dem letzten Artikel &#8211; <a href="https://tricktresor.com/blog/ecatt-datencontainer-nutzen/">ECATT Datencontainer nutzen</a> &#8211; habe ich dir gezeigt, was ein Testdatencontainer ist. Den Artikel brauchte ich als Vorbereitung für diesen, viel interessanteren Artikel: Der Zugriff auf die Daten des Testdatencontainers.</p>
+<p>Ein Testdatencontainer kann wunderbar für eigene Zwecke &#8220;missbraucht&#8221; werden um mehrere verschiedenartige Daten an einer Stelle zu verwalten.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/10/ecatt6.png"><img decoding="async" class="alignnone size-full wp-image-1018178" src="https://tricktresor.com/wp-content/uploads/2017/10/ecatt6.png" alt="" width="743" height="656" srcset="/wp-content/uploads/2017/10/ecatt6.png 743w, /wp-content/uploads/2017/10/ecatt6-300x265.png 300w" sizes="(max-width: 743px) 100vw, 743px" /></a></p>
+<h2>Zugriff!</h2>
+<p>Der Zugriff auf den Datencontainer des ECATT ist durch die zur Verfügung gestellte API sehr simpel:</p>
+<pre class="lang:abap decode:true ">"Objekte für Zugriff auf Testdatencontainer
+DATA tdc_ref TYPE REF TO cl_apl_ecatt_tdc_api.
+DATA par_ref TYPE REF TO etpar_gui.
+
+"Datenstrukturen
+DATA ls_mara TYPE mara.
+DATA demo    TYPE zecatt_heads.
+
+"Objekt für Testdatencontainer erzeugen
+tdc_ref = cl_apl_ecatt_tdc_api=&gt;get_instance( 'Z1' ).
+
+"Datenselektion MARA-MATNR für Default-Variante
+tdc_ref-&gt;get_value( EXPORTING i_param_name   = 'MARA'
+                              i_path         = 'MATNR'
+                              i_variant_name = 'ECATTDEFAULT'
+                    CHANGING  e_param_value  = ls_mara-matnr ).
+
+"Datenselektion gesamte Struktur MARA für Variante A1
+tdc_ref-&gt;get_value( EXPORTING i_param_name   = 'MARA'
+                              i_variant_name = 'A1'
+                    CHANGING  e_param_value  = ls_mara ).
+
+"Datenermittlung des komplexen DEMO-Objektes aus der Default-Variante
+tdc_ref-&gt;get_value( EXPORTING i_param_name   = 'DEMO'
+                              i_variant_name = 'ECATTDEFAULT'
+                    CHANGING  e_param_value  = demo ).</pre>
+<p>Über die Klasse CL_APL_ECATT_TDC_API kann der gesamte Datencontainer per Programm verwaltet werden. Es können eigene Container erstellt werden, Attribute ausgelesen und geändert werden und die Daten können ebenfalls gelesen und manipuliert werden.</p>
+<p>Im Gegensatz zu meinem <a href="https://tricktresor.com/blog/daten-dynamisch-verwalten/">Tipp, komplexe Daten in einer INDEX-Tabelle per XML zu speichern</a>, haben die Testdatencontainer den großen Vorteil, dass die Daten strukturiert angezeigt und manipuliert werden können.</p>
+<p>Der Beitrag <a href="/blog/auf-ecatt-datencontainer-zugreifen/">Auf ECATT Datencontainer zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Falle beim Left Outer Join</title>
+		<link>/blog/falle-beim-left-outer-join/</link>
+					<comments>/blog/falle-beim-left-outer-join/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 16 Jun 2017 13:26:48 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Joins]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[left outer join]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018037</guid>
+
+					<description><![CDATA[<p>Häufig sind es die Kleinigkeiten, die einem das Leben schwer machen. Die berühmten letzten 20%. Häufig bemerkt man jedoch gar nicht, dass man überhaupt ein Problem hat, weil alles scheinbar so funktioniert, wie man es sich vorstellt. Aufgabe: SELECT Die Aufgabe sollte sein: Selektiere aus Tabelle ZZT1 alle Einträge anhand der gegebenen Selektionskriterien (AREA). Lies zusätzlich mit einem LEFT OUTER JOIN alle Einträge aus Tabelle ZZT2, die über das Feld LINK verknüpft sind hinzu. Einträge...</p>
+<p>Der Beitrag <a href="/blog/falle-beim-left-outer-join/">Falle beim Left Outer Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Häufig sind es die Kleinigkeiten, die einem das Leben schwer machen. Die berühmten letzten 20%. Häufig bemerkt man jedoch gar nicht, dass man überhaupt ein Problem hat, weil alles scheinbar so funktioniert, wie man es sich vorstellt.</p>
+<h2>Aufgabe: SELECT</h2>
+<p>Die Aufgabe sollte sein: Selektiere aus Tabelle ZZT1 alle Einträge anhand der gegebenen Selektionskriterien (AREA). Lies zusätzlich mit einem LEFT OUTER JOIN alle Einträge aus Tabelle ZZT2, die über das Feld LINK verknüpft sind hinzu. Einträge aus Tabelle ZZT2 mit gesetztem Löschkennzeichen dürfen nicht berücksichtigt werden.</p>
+<h2>Demodaten</h2>
+<p>Die folgenden Demodaten stehen zur Verfügung:</p>
+<ul>
+<li>Tabelle ZZT1</li>
+<li>Tabelle ZZT2</li>
+</ul>
+<p>Selektionskriterium soll sein: AREA = TEST</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/06/SNAG-0002.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1018041" src="https://tricktresor.com/wp-content/uploads/2017/06/SNAG-0002.png" alt="" width="558" height="310" srcset="/wp-content/uploads/2017/06/SNAG-0002.png 558w, /wp-content/uploads/2017/06/SNAG-0002-300x167.png 300w, /wp-content/uploads/2017/06/SNAG-0002-71x40.png 71w" sizes="(max-width: 558px) 100vw, 558px" /></a></p>
+<h3>Tabelle ZZT1 (links)</h3>
+<table border="1" cellpadding="4">
+<thead>
+<tr>
+<td style="text-align: center;" width="151"><strong>KEY1</strong></td>
+<td style="text-align: center;" width="151"><strong>TEXT</strong></td>
+<td style="text-align: center;" width="151"><strong>LINK</strong></td>
+<td style="text-align: center;" width="151"><strong>AREA</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;" width="151">1</td>
+<td style="text-align: center;" width="151">Eins</td>
+<td style="text-align: center;" width="151">A</td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">2</td>
+<td style="text-align: center;" width="151">Zwei</td>
+<td style="text-align: center;" width="151">B</td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">3</td>
+<td style="text-align: center;" width="151">Drei</td>
+<td style="text-align: center;" width="151">C</td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">4</td>
+<td style="text-align: center;" width="151">Vier</td>
+<td style="text-align: center;" width="151"></td>
+<td style="text-align: center;" width="151">TEST</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="151">5</td>
+<td style="text-align: center;" width="151">Fünf</td>
+<td style="text-align: center;" width="151">A</td>
+<td style="text-align: center;" width="151">NEU</td>
+</tr>
+</tbody>
+</table>
+<h3>Tabelle ZTT2 (rechts)</h3>
+<table border="1" cellpadding="4">
+<thead>
+<tr>
+<td style="text-align: center;" width="201"><strong>LINK</strong></td>
+<td style="text-align: center;" width="201"><strong>TEXT</strong></td>
+<td style="text-align: center;" width="201"><strong>LOEVM</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;" width="201">A</td>
+<td style="text-align: center;" width="201">Info A</td>
+<td style="text-align: center;" width="201"></td>
+</tr>
+<tr>
+<td style="text-align: center;" width="201">B</td>
+<td style="text-align: center;" width="201">Info B</td>
+<td style="text-align: center;" width="201">X</td>
+</tr>
+<tr>
+<td style="text-align: center;" width="201">C</td>
+<td style="text-align: center;" width="201">Info C</td>
+<td style="text-align: center;" width="201"></td>
+</tr>
+</tbody>
+</table>
+<h2>Überlegungen</h2>
+<p>Wenn aus Tabelle ZZT1 alle Einträge selektiert werden, bei denen das Feld AREA mit &#8220;TEST&#8221; gefüllt ist, dann erwarte ich, dass die folgenden Einträge selektiert werden: 1, 2, 3 und 4.</p>
+<p>Zusätzlich muss bei den Einträgen 1 und 3 der LINK_TEXT gefüllt sein, denn diese Einträge verweisen auf Einträge in Tabelle ZZT2, die keine Löschvormerkung haben.</p>
+<h3>Erster Versuch</h3>
+<p>Der erste Wurf sieht folgendermaßen aus:</p>
+<pre class="lang:abap decode:true">SELECT z1~key1,
+       z1~text,
+       z1~link,
+       z1~area,
+       z2~text AS link_text
+  FROM zzt1 AS z1
+  LEFT OUTER JOIN zzt2 AS z2 ON z1~link = z2~link
+  INTO TABLE @DATA(t_data)
+ WHERE z1~area  = 'TEST'.
+   AND z2~loevm = @space.</pre>
+<p>Der SELECT ist syntaktisch (!) fehlerfrei, liefert jedoch leider ein falsches Ergebnis:</p>
+<table title="ABAP Data" border="1" summary="data display" cellpadding="4">
+<thead>
+<tr class="header">
+<td><strong>KEY1</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>LINK</strong></td>
+<td><strong>AREA</strong></td>
+<td><strong>LINK_TEXT</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr class="body">
+<td><span class="nowrap">1</span></td>
+<td><span class="nowrap">Eins</span></td>
+<td><span class="nowrap">A</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info A</span></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">3</span></td>
+<td><span class="nowrap">Drei</span></td>
+<td><span class="nowrap">C</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info C</span></td>
+</tr>
+</tbody>
+</table>
+<h3>Zweiter Versuch</h3>
+<p>Ohne die Einschränkung über die WHERE-Bedingung auf der rechten Seite (AND z2~loevm = @space) funktioniert die Selektion wie erwartet.</p>
+<p>Das ist nicht ganz das, was ich erwartet habe&#8230; Ich habe mich dann damit beschäftigt, warum das Ergebnis so aussieht und warum Ergebniszeilen fehlen. Beziehungsweise habe ich zuerst versucht, das richtige Ergebnis zu bekommen. Der richtige Select lautet so:</p>
+<pre class="lang:abap decode:true ">SELECT z1~key1,
+       z1~text,
+       z1~link,
+       z1~area,
+       z2~text AS link_text
+  FROM zzt1 AS z1
+  LEFT OUTER JOIN zzt2 AS z2 ON z1~link = z2~link
+                            AND z2~loevm = @space
+  INTO TABLE @DATA(t_data)
+ WHERE z1~area = 'TEST'.</pre>
+<p><strong>Ergebnis:</strong></p>
+<table title="ABAP Data" border="1" summary="data display" cellpadding="4">
+<thead>
+<tr class="header">
+<td><strong>KEY1</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>LINK</strong></td>
+<td><strong>AREA</strong></td>
+<td><strong>LINK_TEXT</strong></td>
+</tr>
+</thead>
+<tbody>
+<tr class="body">
+<td><span class="nowrap">1</span></td>
+<td><span class="nowrap">Eins</span></td>
+<td><span class="nowrap">A</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info A</span></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">2</span></td>
+<td><span class="nowrap">Zwei</span></td>
+<td><span class="nowrap">B</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">3</span></td>
+<td><span class="nowrap">Drei</span></td>
+<td><span class="nowrap">C</span></td>
+<td><span class="nowrap">TEST</span></td>
+<td><span class="nowrap">Info C</span></td>
+</tr>
+<tr class="body">
+<td><span class="nowrap">4</span></td>
+<td><span class="nowrap">Vier</span></td>
+<td></td>
+<td><span class="nowrap">TEST</span></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>Lessons learned</h2>
+<p>Bei einem LEFT OUTER JOIN darf die WHERE-Bedingung keine Einschränkung auf die rechte Tabelle haben. In der <a href="https://help.sap.com/http.svc/rc/abapdocu_750_index_htm/7.50/de-DE/abapselect_join.htm">Hilfe zum JOIN</a> steht:</p>
+<blockquote><p>Eine WHERE-Bedingung für eine SELECT-Anweisung mit Joins wirkt auf die durch die Joins gebildete Ergebnismenge.</p></blockquote>
+<p>Ich deute das so, dass die WHERE-Bedingung sozusagen erst nachträglich angewendet wird. Wobei das für mich ein Zirkelschluss ist, den ich nicht verstehe. Zudem enthält die Ergebnismenge ja gar kein Feld &#8220;LOEVM&#8221;.</p>
+<p>Auf jeden Fall sollte man die Verwendung beziehungsweise die gesammelten Daten eines LEFT OUTER JOINS sehr genau prüfen. Schnell schleicht sich hier ein Fehler ein, mit dem man nicht gerechnet hat.</p>
+<p>Der Beitrag <a href="/blog/falle-beim-left-outer-join/">Falle beim Left Outer Join</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/falle-beim-left-outer-join/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Ist das gültig? (2)</title>
+		<link>/blog/ist-das-gueltig-2/</link>
+					<comments>/blog/ist-das-gueltig-2/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 05 Dec 2016 10:16:13 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Gültig-ab]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[Gültigkeit]]></category>
+		<category><![CDATA[Sub-Query]]></category>
+		<category><![CDATA[Datum]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=956837</guid>
+
+					<description><![CDATA[<p>Ist das gültig - jetzt erst recht? Dies ist eine Korrektur zum zuvor erschienenen Artikel "Ist das gültig?". Ein wichtiges Merkmal des Tricktresors ist es, dass ich die Beispiele auf das Wesentliche reduziere. Das ist beim letzten mal leicht schief gegangen...</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig-2/">Ist das gültig? (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>So. da bin ich im letzten Beitrag <a href="https://tricktresor.com/blog/ist-das-gueltig/">Ist das gültig?</a> etwas über das Ziel hinaus geschossen&#8230; Ein Merkmal des Tricktresors ist es, dass ich die Beispiele auf das Wesentlich und nur absolut Notwendige reduziere. So bleiben die Tricks einfach und klar. Im letzten Beitrag habe ich jedoch etwas zu viel reduziert und der Trick ist für das Beispiel sogar komplizierter als notwendig.</p>
+<h2>Klarstellung</h2>
+<p>Natürlich kann man von einem definierten Eintrag sehr einfach den zuletzt &#8211; bzw. aktuell &#8211; gültigen Eintrag ermitteln. Ingo hat darauf hin gewiesen, dass die folgende Variante doch deutlich einfacher ist als die von mir vorgestellte:</p>
+<pre class="">SELECT * FROM ztt_datum
+ UP TO 1 ROWS
+ INTO ls_datum
+ WHERE gueltig_ab &lt;= p_datum
+ ORDER BY gueltig_ab DESCENDING.
+ENDSELECT.</pre>
+<p>Recht hat er.</p>
+<p>Eigentlich wollte ich auch auf eine andere etwas komplexere Variante heraus. Nämlich die, bei der es nicht den einen Eintrag gibt, sondern eine unbestimmte Menge von Einträgen. Das könnten zum Beispiel alle gültigen Materialien eines Werkes sein oder Konten eines Buchungskreises sein.</p>
+<h2>Nächster Versuch</h2>
+<p>Für das neue Beispiel habe ich die folgende Tabelle erstellt:</p>
+<p>ZTT_DATUM2</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-05_10-51-52.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-956838 alignnone" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-05_10-51-52.jpg" alt="2016-12-05_10-51-52" width="226" height="172" /></a></p>
+<p>Aus dieser Tabelle möchte ich alle zu einem Datum gültigen Gruppen ermitteln. Das funktioniert gut mit dem Befehl DELETE ADJACENT DUPLICATES:</p>
+<pre class="">SELECT * FROM ztt_datum2 INTO TABLE @DATA(lt_datum)
+ WHERE datab &lt;= @p_datum
+ ORDER BY gruppe ASCENDING,
+          datab  DESCENDING.
+
+DELETE ADJACENT DUPLICATES FROM lt_datum COMPARING gruppe.</pre>
+<p>Es spricht nichts dagegen, diese Variante zu verwenden. Aber: Alles, was man mit einem Befehl anstelle von zweien lösen kann, ist irgendwie cooler. Zumal es immer <em>schöner</em> ist, nur die Daten zu lesen, die auch wirklich gebraucht werden.</p>
+<h2>Sub-query</h2>
+<p>Aus diesem Grund jetzt die wirklich hilfreiche und sinnvolle Variante mithilfe eines Sub-Queries:</p>
+<pre class="">SELECT * FROM ztt_datum2 AS z1 INTO TABLE @DATA(lt_datum)
+ WHERE datab &lt;= @p_datum
+   AND datab  = ( SELECT MAX( datab ) FROM ztt_datum2
+                   WHERE gruppe = z1~gruppe
+                     AND datab &lt;= @p_datum ).</pre>
+<p>Der Clou bei dieser Variante ist, dass man sich in der WHERE-Bedingung der Hauptselektion mit einem Sub-Query auf die jeweilige GRUPPE bezieht und hierfür das höchste Datum ermittelt.</p>
+<p>Von der Performance her kann es sein, dass die herkömmliche  Variante sogar schneller ist. Da man diesen Select jedoch wahrscheinlich nur für sehr kleine Datenmengen verwenden wird, dürfte die Geschwindigkeit hier zu vernachlässigen sein.</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig-2/">Ist das gültig? (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ist-das-gueltig-2/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Ist das gültig?</title>
+		<link>/blog/ist-das-gueltig/</link>
+					<comments>/blog/ist-das-gueltig/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 01 Dec 2016 13:55:19 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[subquery]]></category>
+		<category><![CDATA[Gültigkeit]]></category>
+		<category><![CDATA[Zeitraum]]></category>
+		<category><![CDATA[MAX]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=950065</guid>
+
+					<description><![CDATA[<p>Das fragt man sich als Programmierer häufig. Speziell dann, wenn man aus zeitlich abgegrenzten Datensätzen den richtigen Datensatz herausfinden muss. Hier zeige ich dir, wie man einfach aber sicher ans Ziel kommt.</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig/">Ist das gültig?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das fragt man sich als Programmierer häufig. Speziell dann, wenn man aus zeitlich abgegrenzten Datensätzen den richtigen Datensatz herausfinden muss. Hier zeige ich dir, wie man einfach aber sicher ans Ziel kommt.</p>
+<h2>Gültigkeitszeitraum vs. Gültig ab</h2>
+<p>Wenn Datensätze zeitlich voneinander abgegrenzt werden sollen, hat man in der Regel die folgenden zwei Möglichkeiten:</p>
+<ol>
+<li>Exakte zeitliche Abgrenzung mit &#8220;Gültig ab&#8221; und &#8220;Gültig bis&#8221;</li>
+<li>Abgrenzung mit &#8220;Gültig ab&#8221;</li>
+</ol>
+<p>Bei Variante (1) hat man den Vorteil, dass man einen Zeitraum auch &#8220;schließen&#8221; kann. Beziehungsweise im Umkehrschluss: Man <strong>muss</strong> den Zeitraum auch begrenzen. Anders bei Variante (2): Hier gibt es <strong>immer</strong> einen gültigen Eintrag (sofern mindestens ein Eintrag vorhanden ist).</p>
+<p>Der große Nachteil bei Variante (1) ist ebenfalls, dass eine exakte zeitliche Abgrenzung schwer zu administrieren und zu programmieren ist. Besonders dann, wenn Zeiträume in einen oder zwei vorhandene Zeiträume eingefügt werden sollen. Hier ist Variante (2) deutlich einfacher und pflegeleichter.</p>
+<p>Variante (2) eignet sich also besonders dann sehr gut, wenn zu einem &#8220;Objekt&#8221; immer ein gültiger Eintrag vorhanden sein soll. Deshalb werden wir uns diese Variante genauer ansehen.</p>
+<h2>Gültig ab-Tabelle<a href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-01_14-51-58.jpg"><img loading="lazy" decoding="async" class="size-full wp-image-950141 alignright" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-01_14-51-58.jpg" alt="2016-12-01_14-51-58" width="329" height="442" srcset="/wp-content/uploads/2016/12/2016-12-01_14-51-58.jpg 329w, /wp-content/uploads/2016/12/2016-12-01_14-51-58-223x300.jpg 223w" sizes="(max-width: 329px) 100vw, 329px" /></a></h2>
+<p>Als einfaches Beispiel habe ich mir eine Tabelle erstellt, die ein Gültig-Ab-Datum und eine Monatsbezeichnung hat. Es kann also für jedes Datum eine Bezeichnung vergeben werden.</p>
+<p>Diese Tabelle ist zugegebener Weise einigermaßen Sinn frei, verdeutlicht aber sehr gut das Verfahren.</p>
+<h2>Ermittlung des gültigen Eintrags &#8211; herkömmlich</h2>
+<p>Um aus der vorgestellten Tabelle zu einem Datum den jeweils gültigen Eintrag zu lesen, geht man normalerweise folgendermaßen vor:</p>
+<ol>
+<li>Lies alle Einträge, deren Gültigkeit kleiner gleich dem gewünschten Datum ist.</li>
+<li>Sortiere die Einträge nach GUELTIG_AB absteigend, so dass der aktuellste Eintrag an erster Stelle steht</li>
+<li>Lies den Eintrag an erster Stelle</li>
+</ol>
+<pre class="">SELECT * FROM ztt_datum INTO TABLE lt_datum 
+ WHERE gueltig_ab &lt;= mein_datum
+ ORDER BY gueltig_ab DESCENDING.
+READ TABLE lt_datum INTO DATA(ls_datum) INDEX 1.</pre>
+<p>Der Nachteil von dieser Variante ist, dass man alle jemals gültig gewesenen Einträge lesen muss.</p>
+<h2>Ermittlung des gültigen Eintrags &#8211; Tricktresor-Style</h2>
+<p>Mithilfe eines Subqueries ist es möglich, exakt den einen richtigen Eintrag zu finden. Ein Code-Snippet sagt mehr als tausend Worte:</p>
+<pre class="">SELECT single * FROM ztt_datum INTO @DATA(ls_datum)
+ WHERE datab = ( SELECT MAX( datab )
+                   FROM ztt_datum
+                  WHERE datab &lt;= @p_datum ).</pre>
+<h2></h2>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig/">Ist das gültig?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ist-das-gueltig/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Feldname mit doppeltem Feldnamen</title>
+		<link>/blog/feldname-mit-doppeltem-feldnamen/</link>
+					<comments>/blog/feldname-mit-doppeltem-feldnamen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 29 Sep 2016 09:00:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[Dynamische Struktur]]></category>
+		<category><![CDATA[Struktur]]></category>
+		<category><![CDATA[ALIAS]]></category>
+		<category><![CDATA[Gruppenname]]></category>
+		<category><![CDATA[Include]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=843204</guid>
+
+					<description><![CDATA[<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt. Was aber, wenn sich die Feldnamen unterscheiden?</p>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hä?</p>
+<p>Die nordfriesisch höfliche Nachfrage ist berechtigt. Wie kann ein Feldname einen doppelten Feldnamen besitzen? Aber der Reihe nach. Erst das Problem, dann die Idee und zum Schluss die Lösung.</p>
+<h2>MOVE-CORRESPONDING</h2>
+<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt.</p>
+<p>&lt;offtopic&gt;Eigentlich müsste der Befehl dann ja COPY-CORRESPONDING heißen, denn der Feldinhalt wird ja nicht verschoben, sondern kopiert&#8230;&lt;/offtopic&gt;.</p>
+<p>Der Befehl birgt aber auch Tücken, denn die Feldnamen müssen immer gleich sein. Häufig hat man jedoch den Fall, dass Feldnamen &#8211; trotz gleicher Funktion und gleichem Datenelement &#8211; in verschiedenen Strukturen anders heißen. Zum Beispiel könnte das Feld in der Quellstruktur LIFNR heißen, in der Zielstruktur heißt es jedoch LIEFERANT.</p>
+<p>Ein nachträgliches MOVE ist in diesem Fall erforderlich:</p>
+<pre>MOVE quell_struktur-lifnr TO ziel_struktrur-lieferant.</pre>
+<p>Das ist nicht weiter schlimm. Wenn man jedoch eine dynamische Struktur als Quellstruktur hat, dann muss man umständlich mittels ASSIGN COMPONENT den Quellwert lesen und dann zuweisen. Das ist umständlich und gegebenenfalls auch zeitkritisch.</p>
+<pre>ASSIGN COMPONENT 'LIFNR' OF STRUCTURE dynamische_quell_struktur TO FIELD-SYMBOLS(&lt;lifnr&gt;).
+IF sy-subrc = 0.
+  ziel_struktur-lieferant = &lt;lifnr&gt;.
+ENDIF.</pre>
+<p>Sofern es sich um kundeneigene Tabellen handelt, kann man den folgenden Trick anwenden und quasi einen ALIAS vergeben:</p>
+<h2>ALIAS-Feldname</h2>
+<p>Stichwort: Benanntes Include. Wir machen uns den Umstand zu Nutze, dass man ein Include in eine Tabelle einbinden kann und dieses Include benennen kann. Das ist eigentlich für inkludierte Strukturen gedacht, um zum Beispiel die komplette Tabelle MARA per Include einbinden zu können und diese auch MARA benennen zu können. Die komplette Struktur MARA steht dann in der inkludierten Struktur zur Verfügung:</p>
+<pre>SELECT * FROM MARA INTO my_struc-mara WHERE...</pre>
+<p>Wir verwenden diese <em>Gruppe</em> nun nicht für eine inkludierte Struktur, sondern nur für ein inkludiertes <em>Feld</em>. Die Technik ist die gleiche.</p>
+<p>Die Tabelle bestand vorher aus den Feldern</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>KENNZ</li>
+</ul>
+<p>Ich möchte diese Tabelle nun so abändern, dass das Feld KENNZ auch unter dem Namen KENNZEICHEN ansprechbar ist. Dafür lege ich einen Include an, der nur das eine Feld KENNZ enthält. Dieses Include wird in die Tabelle eingebunden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-843270" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg" alt="2016-09-26_18-01-48" width="802" height="310" srcset="/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg 802w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-300x116.jpg 300w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-768x297.jpg 768w" sizes="(max-width: 802px) 100vw, 802px" /></a></p>
+<p>Die Struktur der Tabelle ist hinterher genau so, wie vorher:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-843271" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg" alt="2016-09-26_18-02-48" width="441" height="224" srcset="/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg 441w, /wp-content/uploads/2016/09/2016-09-26_18-02-48-300x152.jpg 300w" sizes="(max-width: 441px) 100vw, 441px" /></a></p>
+<h2>Die richtige Ansprache</h2>
+<p>Den Vorteil, den ich jetzt habe: ich kann das Feld mit dem richtigen Namen KENNZ und mit dem <em>Alias KENNZEICHEN</em>, dem <em>Gruppennamen des Includes</em> ansprechen:</p>
+<pre>DATA lt_tt1 TYPE STANDARD TABLE OF ztt1.
+DATA ls_tt1 TYPE ztt1.
+
+
+SELECT * FROM ztt1 INTO TABLE lt_tt1.
+
+LOOP AT lt_tt1 INTO ls_tt1.
+ IF ls_tt1-kennz = 'X'.
+   ls_tt1-kennzeichen = 'F'.
+ ENDIF.
+ WRITE: / ls_tt1-matnr, ls_tt1-kennz.
+ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/feldname-mit-doppeltem-feldnamen/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dynamische Suchhilfe</title>
+		<link>/blog/dynamische-suchhilfe/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 27 Sep 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[suchhilfe]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<category><![CDATA[Funktionsbaustein]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=843068</guid>
+
+					<description><![CDATA[<p>Suchhilfen geben immer wieder Anlass zu viel Diskussionen. Es gibt viele Wege zum Ziel; häufig sind diese jedoch umständlich oder zumindest nicht ideal. Für den Fall, dass du mal eine Suchhilfe brauchst, von denen die Felder erst zur Laufzeit bekannt sind, kannst du folgendes Vorgehen nutzen:</p>
+<p>Der Beitrag <a href="/blog/dynamische-suchhilfe/">Dynamische Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Suchhilfen geben immer wieder Anlass zu viel Diskussionen. Es gibt viele Wege zum Ziel; häufig sind diese jedoch umständlich oder zumindest nicht ideal. Für den Fall, dass du mal eine Suchhilfe brauchst, bei der die Felder erst zur Laufzeit bekannt sind, kannst du folgendes Vorgehen nutzen:</p>
+<h2>Suchhilfe-Exit Funktionsbaustein kopieren</h2>
+<p>Als erstes benötigst du einen Suchhilfe-Exit. Dieser Exit besteht aus einem Funktionsbaustein mit definierter Schnittstelle. Am besten kopierst du den Funktionsbaustein F4IF_SHLP_EXIT_EXAMPLE auf z. B. Z_F4IF_SHLP_EXIT_NEU1.</p>
+<p>Hierfür benötigst du eine eigene Funktionsgruppe. Diese muss vor dem Kopieren vorhanden sein. In diesem Beispiel heißt der Funktionsbaustein z_f4ifshlp_exit_4_enno.</p>
+<h3>Funktionsbaustein Suchhilfe-Exit</h3>
+<pre>FUNCTION z_f4ifshlp_exit_4_enno.
+*"----------------------------------------------------------------------
+*"*"Lokale Schnittstelle:
+*" TABLES
+*" SHLP_TAB TYPE SHLP_DESCT
+*" RECORD_TAB STRUCTURE SEAHLPRES
+*" CHANGING
+*" REFERENCE(SHLP) TYPE SHLP_DESCR
+*" REFERENCE(CALLCONTROL) LIKE DDSHF4CTRL STRUCTURE DDSHF4CTRL
+*"----------------------------------------------------------------------
+
+DATA: rc TYPE sy-subrc.
+
+IF callcontrol-step = 'SELONE'.
+EXIT.
+ENDIF.
+
+IF callcontrol-step = 'PRESEL'.
+EXIT.
+ENDIF.
+
+*"----------------------------------------------------------------------
+* STEP SELECT (Select values)
+*"----------------------------------------------------------------------
+* This step may be used to overtake the data selection completely.
+* To skip the standard seletion, you should return 'DISP' as following
+* step in CALLCONTROL-STEP.
+* Normally RECORD_TAB should be filled after this step.
+* Standard function module F4UT_RESULTS_MAP may be very helpfull in this
+* step.
+IF callcontrol-step = 'SELECT'.
+PERFORM shlp_4_enno USING shlp_tab[]
+CHANGING callcontrol
+shlp
+record_tab[]
+rc.
+IF rc = 0.
+callcontrol-step = 'DISP'.
+ELSE.
+callcontrol-step = 'EXIT'.
+ENDIF.
+EXIT. "Don't process STEP DISP additionally in this call.
+ENDIF.
+
+IF callcontrol-step = 'DISP'.
+EXIT.
+ENDIF.
+
+ENDFUNCTION.</pre>
+<h3>Unterroutine</h3>
+<p>In dieser Unterroutine wird die Ergebnistabelle aufgebaut. Wir verwenden hier zwar eine feste Struktur (zshlp_4_enno_structure), aber das Ergebnis wird dynamisch an die Ergebnistabelle übergeben.<br />
+Die Struktur sieht folgendermaßen aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-41-50.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-843069 size-full" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-41-50.jpg" alt="2016-09-26_15-41-50" width="702" height="224" srcset="/wp-content/uploads/2016/09/2016-09-26_15-41-50.jpg 702w, /wp-content/uploads/2016/09/2016-09-26_15-41-50-300x96.jpg 300w" sizes="(max-width: 702px) 100vw, 702px" /></a></p>
+<pre>FORM shlp_4_enno USING it_shlp TYPE shlp_desct
+CHANGING i_callcontrol TYPE ddshf4ctrl
+i_shlp TYPE shlp_descr
+xt_records TYPE ddshreslts
+e_rc TYPE sy-subrc.
+
+DATA: lt_data TYPE STANDARD TABLE OF zshlp_4_enno_structure WITH NON-UNIQUE DEFAULT KEY,
+*--------------------------------------------------------------------*
+* Für jedes Feld das in der Selopt als Importparaemter gekennzeichnet ist eine Range erstellen
+* Kann man sicher auch dynamisch machen - aber dann wird's schwerer lesbar
+*--------------------------------------------------------------------*
+lt_r_datum TYPE RANGE OF zshlp_4_enno_structure-datum,
+lt_r_uname TYPE RANGE OF zshlp_4_enno_structure-uname,
+ls_data LIKE LINE OF lt_data,
+ls_address TYPE bapiaddr3,
+lt_return TYPE bapiret2_t.
+.
+
+FIELD-SYMBOLS: &lt;ls_selopt_line&gt; TYPE any.
+
+*--------------------------------------------------------------------*
+* Ranges für Daten-Selektion füllen
+*--------------------------------------------------------------------*
+LOOP AT i_shlp-selopt ASSIGNING FIELD-SYMBOL(&lt;ls_selopt&gt;).
+
+CASE &lt;ls_selopt&gt;-shlpfield.
+WHEN 'DATUM'.
+APPEND INITIAL LINE TO lt_r_datum ASSIGNING &lt;ls_selopt_line&gt;.
+WHEN 'UNAME'.
+APPEND INITIAL LINE TO lt_r_uname ASSIGNING &lt;ls_selopt_line&gt;.
+WHEN OTHERS.
+CONTINUE.
+ENDCASE.
+
+MOVE-CORRESPONDING &lt;ls_selopt&gt; TO &lt;ls_selopt_line&gt;.
+
+ENDLOOP.
+
+*--------------------------------------------------------------------*
+* Die so gefüllten Ranges jetzt für irgend eine Datenselektion nehmen
+*--------------------------------------------------------------------*
+SELECT bname AS uname, trdat AS datum
+FROM usr02
+WHERE bname IN @lt_r_uname
+AND trdat IN @lt_r_datum
+INTO CORRESPONDING FIELDS OF TABLE @lt_data.
+
+LOOP AT lt_data ASSIGNING FIELD-SYMBOL(&lt;ls_data&gt;).
+
+CALL FUNCTION 'BAPI_USER_GET_DETAIL'
+EXPORTING
+username = &lt;ls_data&gt;-uname
+IMPORTING
+address = ls_address
+TABLES
+return = lt_return.
+&lt;ls_data&gt;-freitext = ls_address-fullname.
+
+ENDLOOP.
+
+*--------------------------------------------------------------------*
+* Und SAP das Ganze so aufbereiten lassen, wie man es kennt
+*--------------------------------------------------------------------*
+CALL FUNCTION 'F4UT_RESULTS_MAP'
+EXPORTING
+source_structure = 'ZSHLP_4_ENNO_STRUCTURE'
+TABLES
+shlp_tab = it_shlp
+record_tab = xt_records[]
+source_tab = lt_data[]
+CHANGING
+shlp = i_shlp
+callcontrol = i_callcontrol
+EXCEPTIONS
+OTHERS = 0.
+ENDFORM.</pre>
+<h2>Suchhilfe anlegen</h2>
+<p>In Transaktion SE11 musst du nun noch eine Suchhilfe anlegen, die den Suchhilfe-Exit verwendet. Normalerweise gibst du in der Suchhilfe direkt eine <em>Selektionsmethode</em> an, also die Tabelle oder den View, aus dem gelesen wird. Da wir die Suchhilfe dynamisch aufbauen, bleibt dieses Feld leer und wir tragen nur den Baustein für den Suchhilfe-Exit ein:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-43-42.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-843070" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-43-42.jpg" alt="2016-09-26_15-43-42" width="706" height="542" srcset="/wp-content/uploads/2016/09/2016-09-26_15-43-42.jpg 706w, /wp-content/uploads/2016/09/2016-09-26_15-43-42-300x230.jpg 300w" sizes="(max-width: 706px) 100vw, 706px" /></a></p>
+<p>Das war auch schon alles. Die Suchhilfe kann direkt getestet werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-46-31.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-843071" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-46-31.jpg" alt="2016-09-26_15-46-31" width="627" height="159" srcset="/wp-content/uploads/2016/09/2016-09-26_15-46-31.jpg 627w, /wp-content/uploads/2016/09/2016-09-26_15-46-31-300x76.jpg 300w" sizes="(max-width: 627px) 100vw, 627px" /></a></p>
+<h2>Anwendungsbeispiele</h2>
+<p>Der Anwendungsfall, für den man eine dynamische Suchhilfe benötigt, ist sicherlich nicht allzu oft vorhanden. Es ist aber schön, es zu können, wenn man mal vor dieser Herausforderung steht. Eine Möglichkeit wäre zum Beispiel jeweils andere Felder zu zeigen, je nachdem welche Partnerart der Anwender für die Selektion ausgewählt hat:  Kunde, Lieferant oder Sachbearbeiter. Auch könnte ich mir vorstellen, dass zu Materialnummern unterschiedliche Felder je Materialart oder Anwendergruppe angezeigt werden.</p>
+<p>Vielen Dank an Stefan für das Beispiel!!</p>
+<p>Der Beitrag <a href="/blog/dynamische-suchhilfe/">Dynamische Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Tabellen grafisch darstellen</title>
+		<link>/blog/tabellen-grafisch-darstellen/</link>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Sun, 31 Jan 2016 15:34:48 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[SE11]]></category>
+		<category><![CDATA[grafisch]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=91898</guid>
+
+					<description><![CDATA[<p>Jeder ABAP Entwickler hegt und pflegt wohl seine kleine SAP Tabellen-Liste. Trotzdem ist man immer wieder auf der Suche nach der einen oder anderen Tabelle.<br />
+Ein Ansatz um Zusammenhänge einfacher zu finden, sieht man in der SE11.</p>
+<p>Der Beitrag <a href="/blog/tabellen-grafisch-darstellen/">Tabellen grafisch darstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Jeder ABAP Entwickler hegt und pflegt wohl seine kleine SAP Tabellen-Liste. Trotzdem ist man immer wieder auf der Suche nach der einen oder anderen Tabelle.<br />
+In der SE11 versteckt sich ein nettes Werkzeug mit dessen Hilfe man sich die Zusammenhänge der Tabellen grafisch darstellen lassen kann.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/se11_1.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91904" src="https://tricktresor.com/wp-content/uploads/2015/05/se11_1-300x214.jpg" alt="se11_1" width="300" height="214" srcset="/wp-content/uploads/2015/05/se11_1-300x214.jpg 300w, /wp-content/uploads/2015/05/se11_1.jpg 535w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Zuerst springt man in der SE11 in die Datenbanktabelle.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/se11_2.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91903" src="https://tricktresor.com/wp-content/uploads/2015/05/se11_2-300x100.jpg" alt="se11_2" width="300" height="100" srcset="/wp-content/uploads/2015/05/se11_2-300x100.jpg 300w, /wp-content/uploads/2015/05/se11_2-1024x342.jpg 1024w, /wp-content/uploads/2015/05/se11_2.jpg 1144w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Dort dann die grafische Darstellung auswählen</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/SE11_3.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91902" src="https://tricktresor.com/wp-content/uploads/2015/05/SE11_3-300x150.jpg" alt="SE11_3" width="300" height="150" srcset="/wp-content/uploads/2015/05/SE11_3-300x150.jpg 300w, /wp-content/uploads/2015/05/SE11_3.jpg 907w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Und irgend eine bekannte Tabelle im Umfeld auswählen</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/Se11_4.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91901" src="https://tricktresor.com/wp-content/uploads/2015/05/Se11_4-300x205.jpg" alt="Se11_4" width="300" height="205" srcset="/wp-content/uploads/2015/05/Se11_4-300x205.jpg 300w, /wp-content/uploads/2015/05/Se11_4.jpg 731w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Über den Button &#8220;Fremdschlüssel&#8221; gelangt man endlich zu den Tabellen die irgendwie mit der ausgewählten Tabelle in Verbindung stehen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/Se11_5.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91900" src="https://tricktresor.com/wp-content/uploads/2015/05/Se11_5-300x268.jpg" alt="Se11_5" width="300" height="268" srcset="/wp-content/uploads/2015/05/Se11_5-300x268.jpg 300w, /wp-content/uploads/2015/05/Se11_5.jpg 842w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>In diesem Beispiel findet man anhand der Liste schon alle relevanten Tabellen. EKKN, EKET, EKPO, EBAN usw.<br />
+Um die Beziehung näher zu untersuchen, werden wieder die gewünschten Elemente ausgewählt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/05/SE11_6.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-91899" src="https://tricktresor.com/wp-content/uploads/2015/05/SE11_6-300x181.jpg" alt="SE11_6" width="300" height="181" srcset="/wp-content/uploads/2015/05/SE11_6-300x181.jpg 300w, /wp-content/uploads/2015/05/SE11_6-1024x617.jpg 1024w, /wp-content/uploads/2015/05/SE11_6.jpg 1515w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>und grafisch dargestellt. Per Doppelklick auf die Beziehung zwischen den Tabellen, sieht man die verwendeten Schlüsselfelder.</p>
+<p>&nbsp;</p>
+<p>AWI, 19.05.2015</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/tabellen-grafisch-darstellen/">Tabellen grafisch darstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

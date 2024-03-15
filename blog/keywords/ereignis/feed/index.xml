@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Ereignis Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/ereignis/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 29 Aug 2018 20:07:23 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Ereignis Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Hacking SAPGUI</title>
+		<link>/blog/hacking-sapgui/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2018 18:10:48 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[event]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<category><![CDATA[control]]></category>
+		<category><![CDATA[cl_gui_picture]]></category>
+		<category><![CDATA[cl_gui_gos_container]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019117</guid>
+
+					<description><![CDATA[<p>Heute bin ich zufällig auf etwas gestoßen, dass ich erst nicht glauben konnte. Aber eigentlich hätte es klar sein müssen. Ich zeige dir erst einmal ein Bild: Vielleicht ist deine erste Reaktion genauso wie meine: via GIPHY Folgende Controls verwende ich für diesen kleinen Hack: CL_GUI_PICTURE CL_GUI_GOS_CONTAINER Normalerweise wird der GOS-Container nicht explizit aufgerufen, sondern nur implizit von der Klasse CL_GOS_MANAGER verwendet. Container ist Container Im Generic Object Services Menü wird normalerweise ein Pull-Down-Menü angezeigt:...</p>
+<p>Der Beitrag <a href="/blog/hacking-sapgui/">Hacking SAPGUI</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Heute bin ich zufällig auf etwas gestoßen, dass ich erst nicht glauben konnte. Aber eigentlich hätte es klar sein müssen. Ich zeige dir erst einmal ein Bild:</p>
+
+
+
+<figure class="wp-block-image"><img fetchpriority="high" decoding="async" width="404" height="206" src="https://tricktresor.com/wp-content/uploads/2017/09/hacking_sapgui_0.png" alt="" class="wp-image-1019120" srcset="/wp-content/uploads/2017/09/hacking_sapgui_0.png 404w, /wp-content/uploads/2017/09/hacking_sapgui_0-300x153.png 300w" sizes="(max-width: 404px) 100vw, 404px" /><figcaption>Icon an ungewöhnlicher Stelle&#8230;</figcaption></figure>
+
+
+
+<p>Vielleicht ist deine erste Reaktion genauso wie meine:</p>
+
+
+
+<p><div style="width:80%;height:0;padding-bottom:74%;position:relative;"><iframe src="https://giphy.com/embed/glmRyiSI3v5E4" width="100%" height="100%" style="position:absolute" frameborder="0" class="giphy-embed" allowfullscreen></iframe></div><p><a href="https://giphy.com/gifs/glmRyiSI3v5E4">via GIPHY</a></p></p>
+
+
+
+<p>Folgende Controls verwende ich für diesen kleinen Hack:</p>
+
+
+
+<ul><li>CL_GUI_PICTURE</li><li>CL_GUI_GOS_CONTAINER</li></ul>
+
+
+
+<p>Normalerweise wird der GOS-Container nicht explizit aufgerufen, sondern nur implizit von der Klasse CL_GOS_MANAGER verwendet.</p>
+
+
+
+<h2 class="wp-block-heading">Container ist Container</h2>
+
+
+
+<p>Im Generic Object Services Menü wird normalerweise ein Pull-Down-Menü angezeigt:</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" width="320" height="289" src="https://tricktresor.com/wp-content/uploads/2018/08/gos1.png" alt="" class="wp-image-1019119" srcset="/wp-content/uploads/2018/08/gos1.png 320w, /wp-content/uploads/2018/08/gos1-300x271.png 300w" sizes="(max-width: 320px) 100vw, 320px" /><figcaption>Das GOS-Menü in Aktion</figcaption></figure>
+
+
+
+<p>In einem Menü können jedoch alle Controls angezeigt werden. Sinnvoll sind hier nur wenige, denn der GOS-Container ist ziemlich klein. Ein Menü passt dort gut hinein. Aber auch ein Bild oder Icon.</p>
+
+
+
+<h2 class="wp-block-heading">Anzeige Icon in Container</h2>
+
+
+
+<p>Die Anzeige eines Bildes oder Icons ist ziemlich simpel und schnell erledigt:</p>
+
+
+
+<pre class="wp-block-code"><code>REPORT.
+
+PARAMETERS p_test.
+
+INITIALIZATION.
+
+  DATA(picture) = NEW cl_gui_picture( parent = NEW cl_gui_gos_container( width = 38 ) ).
+  DATA url TYPE cndp_url.
+  CALL FUNCTION 'DP_PUBLISH_WWW_URL'
+    EXPORTING
+      objid                 = 'ACHTUNG'
+      lifetime              = cndp_lifetime_transaction
+    IMPORTING
+      url                   = url
+    EXCEPTIONS
+      dp_invalid_parameters = 1
+      no_object             = 2
+      dp_error_publish      = 3.
+  IF sy-subrc = 0.
+    picture->load_picture_from_url_async( url = url ).
+    picture->set_display_mode( picture->display_mode_fit ).
+  ENDIF.</code></pre>
+
+
+
+<h2 class="wp-block-heading">Da geht noch mehr&#8230;</h2>
+
+
+
+<p>Nachdem ich ein bisschen herumgespielt habe, ist mir eine Eigenschaft aufgefallen, die nicht ganz offensichtlich ist und die ich auch so nicht erwartet hätte. So, wie man mehrere Docking-Container an ein Dynpro andocken kann, so kann man auch den CL_GUI_GOS_CONTAINER mehrfach erzeugen.</p>
+
+
+
+<p>Zusätzlich können in einem Picture-Control auch die Klick- und Doppelklick-Ereignisse aktiviert und verwendet werden.</p>
+
+
+
+<p>Auch das Ein- und Ausblenden des Controls ist möglich (Methode SET_VISIBLE).</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<p>Folgendes kleine Programm zeigt die Möglichkeiten, die sich ergeben:</p>
+
+
+
+<figure class="wp-block-image"><img loading="lazy" decoding="async" width="418" height="203" src="https://tricktresor.com/wp-content/uploads/2018/08/hacking_sapgui_2.png" alt="" class="wp-image-1019121" srcset="/wp-content/uploads/2018/08/hacking_sapgui_2.png 418w, /wp-content/uploads/2018/08/hacking_sapgui_2-300x146.png 300w" sizes="(max-width: 418px) 100vw, 418px" /><figcaption>Mehrere GOS-Container</figcaption></figure>
+
+
+
+<p>Durch Klicken des Parameters P_SHOW wird das Bild &#8220;ACHTUNG&#8221; ein- und ausgeblendet. Ein Klick auf eines der Icons zeigt eine Info-Meldung. Ich nutze solch kleine Spielereien immer gerne, um mich an die neue Syntax zu gewöhnen und auszutesten, was möglich und sinnvoll ist. Hier habe ich die Gelegenheit am Schopfe gepackt und auch funktional programmiert, so dass Method-Chaining über mehrere Methoden hinweg auf ein und das selbe Objekt möglich ist. </p>
+
+
+
+<pre class="wp-block-code"><code>REPORT.
+
+PARAMETERS p_test.
+PARAMETERS p_show AS CHECKBOX DEFAULT 'X' USER-COMMAND dummy.
+
+CLASS info DEFINITION.
+  PUBLIC SECTION.
+    METHODS icon IMPORTING name TYPE clike RETURNING VALUE(info) TYPE REF TO info.
+    METHODS pic  IMPORTING name TYPE clike RETURNING VALUE(info) TYPE REF TO info.
+    METHODS constructor IMPORTING width TYPE i.
+    METHODS with_text IMPORTING text TYPE clike RETURNING VALUE(info) TYPE REF TO info..
+    METHODS hide.
+    METHODS show.
+  PROTECTED SECTION.
+    DATA picture TYPE REF TO cl_gui_picture.
+    METHODS handle_click FOR EVENT picture_click OF cl_gui_picture.
+    DATA text TYPE string.
+ENDCLASS.
+
+CLASS info IMPLEMENTATION.
+
+  METHOD constructor.
+    picture = NEW cl_gui_picture( parent = NEW cl_gui_gos_container( width = width ) ).
+    picture->set_registered_events( VALUE #(
+                ( eventid = cl_gui_picture=>eventid_picture_click )
+                ) ).
+    SET HANDLER handle_click FOR picture.
+  ENDMETHOD.
+  METHOD icon.
+
+    picture->load_picture_from_sap_icons( name ).
+    picture->set_display_mode( picture->display_mode_fit ).
+    info = me.
+  ENDMETHOD.
+  METHOD pic.
+    DATA url TYPE cndp_url.
+    CALL FUNCTION 'DP_PUBLISH_WWW_URL'
+      EXPORTING
+        objid                 = CONV w3objid( name )
+        lifetime              = cndp_lifetime_transaction
+      IMPORTING
+        url                   = url
+      EXCEPTIONS
+        dp_invalid_parameters = 1
+        no_object             = 2
+        dp_error_publish      = 3.
+    IF sy-subrc = 0.
+      picture->load_picture_from_url_async( url = url ).
+      picture->set_display_mode( picture->display_mode_fit ).
+    ENDIF.
+
+    info = me.
+
+  ENDMETHOD.
+
+  METHOD with_text.
+    me->text = text.
+    info = me.
+  ENDMETHOD.
+
+  METHOD handle_click.
+    CHECK text IS NOT INITIAL.
+    MESSAGE text TYPE 'I'.
+  ENDMETHOD.
+
+  METHOD hide.
+    picture->set_visible( space ).
+  ENDMETHOD.
+  METHOD show.
+    picture->set_visible( 'X' ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+INITIALIZATION.
+  DATA(info)   = NEW info( 38 )->pic( 'ACHTUNG' ).
+  DATA(green)  = NEW info( 39 )->icon( icon_led_green )->with_text( 'Alles ok' ).
+  DATA(yellow) = NEW info( 39 )->icon( icon_led_yellow )->with_text( 'hmpfffff' ).
+  DATA(red)    = NEW info( 39 )->icon( icon_led_red )->with_text( 'error. error. error.' ).
+
+
+AT SELECTION-SCREEN OUTPUT.
+  CASE p_show.
+    WHEN abap_true.
+      info->show( ).
+    WHEN abap_false.
+      info->hide( ).
+  ENDCASE.</code></pre>
+
+
+
+<h2 class="wp-block-heading">WTF?!</h2>
+
+
+
+<p>Man kann übrigens jedes Control in den Container packen! Auch Text-Edit-Controls und HTML-Viewer&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /> </p>
+
+
+
+<figure class="wp-block-image"><img loading="lazy" decoding="async" width="861" height="215" src="https://tricktresor.com/wp-content/uploads/2018/08/hacking_sapgui_text_and_html.png" alt="" class="wp-image-1019126" srcset="/wp-content/uploads/2018/08/hacking_sapgui_text_and_html.png 861w, /wp-content/uploads/2018/08/hacking_sapgui_text_and_html-300x75.png 300w, /wp-content/uploads/2018/08/hacking_sapgui_text_and_html-768x192.png 768w" sizes="(max-width: 861px) 100vw, 861px" /></figure>
+
+
+
+<pre class="wp-block-code"><code>REPORT.
+PARAMETERS p_test.
+INITIALIZATION.
+
+  DATA(html) = NEW cl_gui_html_viewer( parent = NEW cl_gui_gos_container( width = 400 ) ).
+
+  DATA url TYPE c LENGTH 100.
+  DATA data TYPE STANDARD TABLE OF w3_html.
+
+  data = VALUE #( ( '&lt;html>&lt;head>&lt;style>body { margin: 0; background-color: #f9f9f9; color: #666680; font: 20px "Arial"  }&lt;/style>'
+        &amp;&amp; '&lt;title>Hacking SAPGUI&lt;/title>&lt;/head>&lt;body background=#aabbcc>&lt;marquee behavior=alternate>tricktresor.com&lt;/marquee>&lt;/body>&lt;/html>' ) ).
+
+
+  html->load_data( IMPORTING assigned_url = url
+                    CHANGING data_table   = data ).
+  html->show_url( url ).
+
+  DATA(text) = NEW cl_gui_textedit( parent = NEW cl_gui_gos_container( width = 400 ) ).
+  text->set_statusbar_mode( 0 ).
+  text->set_toolbar_mode( 0 ).
+  text->set_textstream( `Enter your name` ).
+  text->select_lines( 1 ).
+  cl_gui_control=>set_focus( text ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">SALV-Grid</h3>
+
+
+
+<p>Für ein ALV ist sicherlich nicht genug Platz…? Denkste:</p>
+
+
+
+<figure class="wp-block-image"><img decoding="async" src="blob:https://tricktresor.com/1d0f4646-f08a-4d1f-8c1e-772edc0fba69" alt=""/></figure>
+
+
+
+<figure class="wp-block-image"><img loading="lazy" decoding="async" width="490" height="190" src="https://tricktresor.com/wp-content/uploads/2018/08/hacking_sapgui_salv.png" alt="" class="wp-image-1019129" srcset="/wp-content/uploads/2018/08/hacking_sapgui_salv.png 490w, /wp-content/uploads/2018/08/hacking_sapgui_salv-300x116.png 300w, /wp-content/uploads/2018/08/hacking_sapgui_salv-487x190.png 487w" sizes="(max-width: 490px) 100vw, 490px" /><figcaption>CL_SALV_TABLE in CL_GUI_GOS_CONTAINER</figcaption></figure>
+<p>Der Beitrag <a href="/blog/hacking-sapgui/">Hacking SAPGUI</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</title>
+		<link>/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 10 Oct 2016 07:58:22 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=865485</guid>
+
+					<description><![CDATA[<p>Der SALV wird inzwischen gerne von Programmierern verwendet, da einiges einfacher und einleuchtender ist, als beim ALV-Grid. Allerdings ist auch vieles komplizierter und überhaupt nicht einleuchtend. Zudem hat der SALV einige Funktionen nicht, die der ALV-Grid schon lange zur Verfügung stellt, wie zum Beispiel Editierbarkeit. Ich brauchte neulich in einem Projekt das Ereignis "Verzögertes Reagieren auf Markierungen" in einem SALV-Grid. Leider bietet der SALV dieses Event nicht an.</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/">Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der SALV wird inzwischen gerne von Programmierern verwendet, da einiges einfacher und einleuchtender ist, als beim ALV-Grid. Allerdings ist auch vieles komplizierter und überhaupt nicht einleuchtend. Zudem hat der SALV einige Funktionen nicht, die der ALV-Grid schon lange zur Verfügung stellt, wie zum Beispiel Editierbarkeit. Ich brauchte neulich in einem Projekt das Ereignis &#8220;Verzögertes Reagieren auf Markierungen&#8221; in einem SALV-Grid. Leider bietet der SALV dieses Event nicht an. <a href="http://abapblog.com/articles/thoughts/109-sap-teched-developer-hero-2016">Developer Hero 2016 Łukasz Pęgiel</a> hat mir das unten stehende Coding zur Verfügung gestellt. <strong>Vielen Dank dafür!</strong></p>
+<h2>Was macht das Ereignis Delayed_Changed_Sel_Callback?</h2>
+<p>Das Ereignis wird immer dann &#8211; verzögert! &#8211; ausgelöst, wenn der Anwender die Markierung im Grid ändert, also zum Beispiel Zeilen, Spalten oder einzelne Zellen markiert. Standardmäßig ist die <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/ee/c8e068d52611d2b468006094192fe3/content.htm">Verzögerung von DELAYED_CHANGED_SEL_CALLBACK auf 1,5 Sekunden </a>eingestellt. Die Funktionalität kann dafür verwendet werden, um Daten anhand der markierten Zellen nachzulesen und anzuzeigen, ohne dass der Anwender eine weitere Taste drücken muss. 1,5 Sekunden sind allerdings häufig eine zu lange Zeit, denn häufig wechselt ein Anwender kurz vor dieser Zeitspanne die Markierung wieder, weil er der Meinung war, dass nun eh nichts mehr passiert. Wie diese Einstellung geändert werden kann, habe ich in dem Beispiel AUTOSUMME beschrieben.</p>
+<h2>Was ist nun der Trick?</h2>
+<p>Der Trick, um an die Events des unterliegenden ALV-Grids zu gelangen, liegt darin, das Ereignis AFTER_REFRESH FOR ALL INSTANCES zu registrieren, also auf alle aktuell instanziierten Grids anzuwenden. Zusätzlich muss der implizit immer vorhandene Importing-Parameter SENDER bei der Definition angegeben werden:</p>
+<pre> METHODS evh_refresh FOR EVENT after_refresh
+      OF cl_gui_alv_grid
+      IMPORTING sender.</pre>
+<p>In dem unten stehenden Programm wird ein einfacher SALV mit Daten aus der Flugdatenbank erzeugt. Es wird das Ereignis AFTER_REFRESH registriert um in diesem Ereignis für den SENDER &#8211; also das im SALV verwendete ALV-Grid &#8211; das eigentliche Ereignis Delayed_Change_Sel_Callback zu registrieren. Wird die Markierung im Grid geändert, so wird diese Meldung ausgegeben:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-865553" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg" alt="2016-10-10_09-46-32" width="637" height="385" srcset="/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg 637w, /wp-content/uploads/2016/10/2016-10-10_09-46-32-300x181.jpg 300w" sizes="(max-width: 637px) 100vw, 637px" /></a></p>
+<p>[notice type=&#8217;info&#8217;]Wer eine Alternative zu SALV und ALV-Grid sucht, der sollte sich das Open-Source-Tool <a href="http://abapblog.com/falv">FALV</a> von Łukasz ansehen![/notice]</p>
+<h2>Achtung</h2>
+<p>Der Zusatz FOR ALL INSTANCES greift wirklich bei ALLEN Instanzen des ALV-Grid!! Deswegen sollte er wirklich nur mit Bedacht benutzt werden und du solltest dir der möglichen Seiteneffekte bewusst sein, denn viele interne Funktionen des SALV und ALV-Grids nutzen ebenfalls wieder ein Grid (Auswahl Feldkatalog, Auswahl Layout etc.). So kann es zu ungewollten Reaktionen &#8211; zum Beispiel bei der Änderung des Layouts &#8211; kommen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-865551" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg" alt="2016-10-10_09-11-13" width="829" height="556" srcset="/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg 829w, /wp-content/uploads/2016/10/2016-10-10_09-11-13-300x201.jpg 300w, /wp-content/uploads/2016/10/2016-10-10_09-11-13-768x515.jpg 768w" sizes="(max-width: 829px) 100vw, 829px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zsalv_grid_events.
+
+CLASS lcl_grid_trick DEFINITION.
+
+ PUBLIC SECTION.
+
+ DATA spfli TYPE STANDARD TABLE OF spfli.
+ DATA salv TYPE REF TO cl_salv_table.
+
+ METHODS create_salv.
+ METHODS evh_refresh FOR EVENT after_refresh
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ METHODS evh_delayed_selection
+ FOR EVENT delayed_changed_sel_callback
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ PRIVATE SECTION.
+ DATA mv_event_registered TYPE boolean.
+
+ENDCLASS.
+
+CLASS lcl_grid_trick IMPLEMENTATION.
+
+ METHOD create_salv.
+
+ SELECT * UP TO 100 ROWS
+ INTO CORRESPONDING FIELDS OF TABLE @spfli
+ FROM spfli.
+
+ cl_salv_table=&gt;factory(
+ IMPORTING
+ r_salv_table = salv
+ CHANGING
+ t_table = spfli ).
+
+ salv-&gt;get_functions( )-&gt;set_default( abap_true ).
+
+ SET HANDLER evh_refresh FOR ALL INSTANCES.
+
+ salv-&gt;display( ).
+
+ ENDMETHOD.
+
+ METHOD evh_refresh.
+
+ CHECK mv_event_registered = abap_false.
+ SET HANDLER evh_delayed_selection FOR sender.
+ sender-&gt;register_delayed_event( i_event_id = cl_gui_alv_grid=&gt;mc_evt_delayed_change_select ).
+ mv_event_registered = abap_true.
+
+ ENDMETHOD.
+
+ METHOD evh_delayed_selection.
+
+ DATA lr_type_description TYPE REF TO cl_abap_typedescr.
+ lr_type_description = cl_abap_typedescr=&gt;describe_by_object_ref( sender ).
+ MESSAGE i001(00)
+ WITH 'Delayed Selection; SENDER ist vom Typ '
+ lr_type_description-&gt;absolute_name.
+
+ ENDMETHOD.
+
+ENDCLASS.
+
+START-OF-SELECTION.
+
+ DATA(output) = NEW lcl_grid_trick( ).
+ output-&gt;create_salv( ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/">Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Autosumme in ALV-Grid &#8211; Version 1</title>
+		<link>/blog/autosumme-in-alv-grid-version-1/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2016 17:50:59 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=861138</guid>
+
+					<description><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&#038;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen...!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Projekt wurde eine Anwendung programmiert, in der viele numerische Daten berechnet und ausgegeben wurden. Die Berechnungsergebnisse wurden auf mehrere Zellen verteilt. Um überprüfen zu können, ob die Verteilung richtig programmiert war, musste man die Summe über die verteilten Werte bilden und mit dem Ausgangswert vergleichen. Dies war immer relativ mühselig, da man entweder die Werte per Copy&amp;Paste nach Excel kopieren musste (dann gab es aber Probleme bei negativen Zahlen&#8230;!) oder man musste die komplette Tabelle in Excel öffnen. Alles natürlich möglich, aber mir doch etwas zu umständlich.</p>
+<p>Ich erinnerte mich an das Event delayed_changed_sel_callback, mit dem man eine Selektion im Grid verzögert auswerten konnte. Mit Hilfe der Tastenkombination STRG+Y kann man einzelne Zellen markieren. Diese Funktionen wollte ich nutzen, um die markierten Zellenwerte auszulesen und zu summieren.</p>
+<p>Herausgekommen ist das unten stehende Programm. Der eigentliche Teil, die Summierung der Zellen, steht komplett in der Methode HANDLE_DELAYED_SELECTION.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861506" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg" alt="2016-10-07_19-06-25" width="856" height="274" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-25.jpg 856w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-300x96.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-06-25-768x246.jpg 768w" sizes="(max-width: 856px) 100vw, 856px" /></a></p>
+<h2>Vorgehen</h2>
+<p>Event delayed_changed_sel_callback registrieren und einen Eventhandler in der Klasse zuordnen (Handle_Delayed_Selection).</p>
+<p>Wie kommt man an die markierten Zellen heran? Dafür gibt es die Methode Get_Selected_Cells. Sie liefert eine Tabelle zurück, in der die markierten Feldnamen und der Zeilenindex stehen. Mittels READ TABLE und ASSIGN COMPONENT kann man also auf einen Zellwert zugreifen.</p>
+<p>Nun muss noch mittels DESCRIBE FIELD geprüft werden, ob es sich um ein Feld mit einem numerischen Wert handelt. Wenn das der Fall ist, kann der Wert der Zelle aufsummiert werden.</p>
+<p>&nbsp;</p>
+<h2>Normale Zellen vs. Summenzeilen</h2>
+<p>Das Vorgehen bei einem ALV-Grid, in dem keine Summen oder Zwischensummen gebildet wurden, ist einfach und erfolgt nach dem oben genannten Schema. Eine Herausforderung sind jedoch die (Zwischen-) Summenstufen gewesen. Diese werden im ALV-Grid in eigenen &#8211; geschützten &#8211; Tabellen verwaltet:</p>
+<table>
+<tbody>
+<tr>
+<td>Tabelle</td>
+<td>Bedeutung</td>
+<td>Bemerkung</td>
+</tr>
+<tr>
+<td>MT_CT00</td>
+<td>Summetabelle</td>
+<td>Sie enthält in der Regel nur einen Eintrag. Ausnahme: Es sind in der Summierung der Feldwerte unterschiedliche Einheiten vorhanden.</td>
+</tr>
+<tr>
+<td>MT_CT01</td>
+<td>Zwischensummentabelle 1</td>
+<td>Erste Zwischensummenstufe</td>
+</tr>
+<tr>
+<td>MT_CTnn</td>
+<td>Zwischensummentabelle n</td>
+<td>Tabellen für Zwischensummenstufe nn</td>
+</tr>
+<tr>
+<td>MT_CT09</td>
+<td>Zwischensummentabelle 9</td>
+<td>9 ist die höchste Stufe. Mehr Zwischensummen können nicht erstellt werden.</td>
+</tr>
+</tbody>
+</table>
+<p>Immerhin gibt es in diesem Fall eine Methode, mit der man sich die Zwischensummentabellen &#8211; bzw. eine Referenz auf diese &#8211; besorgen kann: <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/9e/2c7b38180fee45e10000009b38f8cf/content.htm">Get_Subtotals</a>. Im Feld ROW_ID-ROWTYPE der Zellen-Tabelle steht, ob es sich um die Totals-Tabelle handelt (1. Zeichen = T) oder eine Zwischensumme (1. Zeichen = S). Nicht gruppierte Zellen haben den Eintrag SPACE.</p>
+<p>Eine Selektion auf ein Summenfeld liefert zum Beispiel diesen ROWTYPE: S 0101X0000000001. Der Vierstellige Code nach dem S sagt aus, um welche Hierarchiestufe es sich handelt (Stellen 1 und 2 des Codes). Die Stellen 3 und 4 des Codes sagen aus, in welcher Tabelle das markierte Feld steht. In diesem Fall ist es Level 1 der Hierarchie und Tabelle MT_CT01.</p>
+<p>Anhand dieses Code kann man also herausfinden, in welcher Zwischensummentabelle nachgeschaut werden muss. Dies tue ich hier:</p>
+<pre>lv_index = ls_cell-row_id-rowtype+4(2).
+lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ASSIGN (lv_tablename) TO &lt;ref_data&gt;.</pre>
+<p>Nachdem wir nun wissen, in welcher Tabelle wir nachsehen müssen um den markierten Zellwert zu finden, müssen wir nun noch den richtigen Index ermitteln. Dieser wird leider nicht mitgegeben, sondern muss aus der Tabelle GROUPLEVELS, die über Get_Subtotals geliefert wird, ermittelt werden:</p>
+<pre>READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+IF sy-subrc = 0.
+  ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ENDIF.</pre>
+<h2></h2>
+<p><strong>Achtung!</strong> Das Programm funktioniert nur, wenn es sich um <em>reine</em> (Zwischen-) Summen handelt! Zwischensummen, die aus mehreren Zeilen bestehen weil sich die zugehörige Einheit unterscheidet, können (noch) nicht erkannt werden. Hier muss ich noch etwas forschen&#8230;</p>
+<h2>Zwischensummen bilden</h2>
+<p>Ein kurzer Hinweis, wie man im ALV-Grid Zwischensummen bildet:</p>
+<p>Wähle als erstes mindestens eine Spalte über die du dann mit Hilfe des Summenicons <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861510" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-48-00.jpg" alt="2016-10-07_19-48-00" width="34" height="20" /></a> eine Summe bildest. Danach kannst du weitere Spalten markieren und mit dem Zwischensummenicon <a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861511" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-49-31.jpg" alt="2016-10-07_19-49-31" width="34" height="20" /></a> die Spalten definieren, über die zusätzlich eine Zwischensumme erstellt werden soll.</p>
+<h2>Aufrisssummenstufe</h2>
+<p>Über die Aufrisssummenstufe kannst du einfach festlegen, dass nur Zwischensummenzeilen einer bestimmten Hierarchie angezeigt werden sollen:</p>
+<p>Auswahl im Menü:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861508" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg" alt="2016-10-07_19-41-49" width="336" height="137" srcset="/wp-content/uploads/2016/10/2016-10-07_19-41-49.jpg 336w, /wp-content/uploads/2016/10/2016-10-07_19-41-49-300x122.jpg 300w" sizes="(max-width: 336px) 100vw, 336px" /></a></p>
+<p>Auswahl der Hierarchieebene:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861509" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg" alt="2016-10-07_19-06-45" width="364" height="208" srcset="/wp-content/uploads/2016/10/2016-10-07_19-06-45.jpg 364w, /wp-content/uploads/2016/10/2016-10-07_19-06-45-300x171.jpg 300w" sizes="(max-width: 364px) 100vw, 364px" /></a></p>
+<p>Anzeige der gewählten Zwischensummen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-861507" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg" alt="2016-10-07_19-22-39" width="847" height="139" srcset="/wp-content/uploads/2016/10/2016-10-07_19-22-39.jpg 847w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-300x49.jpg 300w, /wp-content/uploads/2016/10/2016-10-07_19-22-39-768x126.jpg 768w" sizes="(max-width: 847px) 100vw, 847px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zz_alv_autosumme.
+
+PARAMETERS p_total TYPE p DECIMALS 2.
+
+CLASS lcl_main DEFINITION.
+
+ PUBLIC SECTION.
+ METHODS start.
+ PROTECTED SECTION.
+ DATA mr_grid TYPE REF TO cl_gui_alv_grid.
+ DATA mt_data TYPE STANDARD TABLE OF spfli.
+ DATA mv_data_table TYPE tabname VALUE 'SPFLI'.
+ DATA mr_dock TYPE REF TO cl_gui_docking_container.
+ METHODS create_docker.
+ METHODS create_grid.
+ METHODS handle_delayed_selection
+ FOR EVENT delayed_changed_sel_callback
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ METHODS register_events.
+ METHODS select_data.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+ METHOD start.
+ select_data( ).
+ create_docker( ).
+ create_grid( ).
+ register_events( ).
+ ENDMETHOD.
+
+ METHOD create_docker.
+ "Create Docking container at bottom
+ CREATE OBJECT mr_dock
+ EXPORTING
+ side = cl_gui_docking_container=&gt;dock_at_bottom
+ ratio = 90
+ no_autodef_progid_dynnr = abap_false.
+
+ ENDMETHOD.
+
+ METHOD create_grid.
+ "Create ALV-Grid
+ CREATE OBJECT mr_grid
+ EXPORTING
+ i_appl_events = abap_true
+ i_parent = mr_dock.
+
+ "and display data
+ mr_grid-&gt;set_table_for_first_display(
+ EXPORTING
+ i_structure_name = mv_data_table
+ CHANGING
+ it_outtab = mt_data ).
+
+ "Set focus on grid so user can directly scroll and select cells via CTRL+Y
+ cl_gui_container=&gt;set_focus( mr_grid ).
+
+ ENDMETHOD.
+ METHOD handle_delayed_selection.
+
+ "Local data
+ DATA lt_cells TYPE lvc_t_cell.
+ DATA ls_cell LIKE LINE OF lt_cells.
+ DATA lv_total TYPE p DECIMALS 2.
+ DATA lv_val_type TYPE c.
+ DATA lv_index TYPE n LENGTH 2.
+ DATA lv_tablename TYPE string.
+ DATA lt_grouplevels TYPE lvc_t_grpl.
+ DATA ls_grouplevel LIKE LINE OF lt_grouplevels.
+
+ FIELD-SYMBOLS &lt;ref_data&gt; TYPE REF TO data.
+ FIELD-SYMBOLS &lt;table&gt; TYPE table.
+ FIELD-SYMBOLS &lt;warea&gt; TYPE any.
+ FIELD-SYMBOLS &lt;val&gt; TYPE any.
+
+ "data references to sub totals tables
+ DATA ld_ct00 TYPE REF TO data.
+ DATA ld_ct01 TYPE REF TO data.
+ DATA ld_ct02 TYPE REF TO data.
+ DATA ld_ct03 TYPE REF TO data.
+ DATA ld_ct04 TYPE REF TO data.
+ DATA ld_ct05 TYPE REF TO data.
+ DATA ld_ct06 TYPE REF TO data.
+ DATA ld_ct07 TYPE REF TO data.
+ DATA ld_ct08 TYPE REF TO data.
+ DATA ld_ct09 TYPE REF TO data.
+
+ "get selected cells (selection via CTRL + Y)
+ sender-&gt;get_selected_cells( IMPORTING et_cell = lt_cells ).
+
+ "If there is only one cell selected, we do not need to sum that...
+ CHECK lines( lt_cells ) &gt; 1.
+
+ "Read all cell values
+ LOOP AT lt_cells INTO ls_cell.
+
+ "in case of rowtype (normal cell, total or subtotal) assign correct data table
+ CASE ls_cell-row_id-rowtype(1).
+ "Total sum of all
+ WHEN 'T'.
+ sender-&gt;get_subtotals( IMPORTING ep_collect00 = ld_ct00 ).
+
+ ASSIGN ld_ct00 TO &lt;ref_data&gt;.
+ ls_cell-row_id-index = 1.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "subtotals
+ WHEN 'S'.
+ sender-&gt;get_subtotals( IMPORTING
+ ep_collect01 = ld_ct01
+ ep_collect02 = ld_ct02
+ ep_collect03 = ld_ct03
+ ep_collect04 = ld_ct04
+ ep_collect05 = ld_ct05
+ ep_collect06 = ld_ct06
+ ep_collect07 = ld_ct07
+ ep_collect08 = ld_ct08
+ ep_collect09 = ld_ct09
+ et_grouplevels = lt_grouplevels ).
+
+ lv_index = ls_cell-row_id-rowtype+4(2).
+ lv_tablename = 'LD_CT' &amp;&amp; lv_index.
+ ASSIGN (lv_tablename) TO &lt;ref_data&gt;.
+
+ READ TABLE lt_grouplevels INTO ls_grouplevel INDEX ls_cell-row_id-index.
+ IF sy-subrc = 0.
+ ls_cell-row_id-index = ls_grouplevel-cindx_from.
+ ENDIF.
+ "assign specified data table
+ ASSIGN &lt;ref_data&gt;-&gt;* TO &lt;table&gt;.
+
+ "Normal cell value
+ WHEN space.
+ ASSIGN mt_data TO &lt;table&gt;.
+ ENDCASE.
+
+
+ "Only read table line when index changes
+ AT NEW row_id.
+ READ TABLE &lt;table&gt; ASSIGNING &lt;warea&gt; INDEX ls_cell-row_id-index.
+ ENDAT.
+ "Assign selected fieldname of workarea
+ ASSIGN COMPONENT ls_cell-col_id OF STRUCTURE &lt;warea&gt; TO &lt;val&gt;.
+ IF sy-subrc = 0.
+ "check correct type of field: Only numeric fields will be taken
+ DESCRIBE FIELD &lt;val&gt; TYPE lv_val_type.
+ CASE lv_val_type.
+ WHEN 'P' "Packed
+ OR 'N' "Numchar
+ OR 'b' "Integer
+ OR 'a' "decfloat
+ OR 'e' "decfloat
+ OR 'F'. "Float?
+ "add cell value to total
+ ADD &lt;val&gt; TO lv_total.
+ ENDCASE.
+ ENDIF.
+ ENDLOOP.
+
+ IF lv_total IS NOT INITIAL.
+ "There were numeric fields selected and therefor we have a total to show:
+ MESSAGE s000(oo) WITH 'TOTAL:' space lv_total.
+ "Parameterfeld ebenfalls füllen
+ p_total = lv_total.
+ ENDIF.
+ ENDMETHOD.
+
+ METHOD register_events.
+ "Set handler
+ SET HANDLER handle_delayed_selection FOR mr_grid.
+ "register event for delayed selection
+ mr_grid-&gt;register_delayed_event( mr_grid-&gt;mc_evt_delayed_change_select ).
+ ENDMETHOD.
+
+ METHOD select_data.
+ "Select data
+ SELECT * FROM (mv_data_table) INTO TABLE mt_data UP TO 100 ROWS.
+ ENDMETHOD.
+
+ENDCLASS.
+
+INITIALIZATION.
+ DATA(gr_main) = NEW lcl_main( ).
+ gr_main-&gt;start( ).</pre>
+<p>Der Beitrag <a href="/blog/autosumme-in-alv-grid-version-1/">Autosumme in ALV-Grid &#8211; Version 1</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

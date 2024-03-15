@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>WORD Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/word/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 21 Jan 2019 15:13:48 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>WORD Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>OLE-Handle zu DOI-Objekt ermitteln</title>
+		<link>/blog/ole-handle-zu-doi-objekt-ermitteln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 21 Jan 2019 15:13:40 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ole]]></category>
+		<category><![CDATA[Desktop-Office-Integration]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[DOI]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1020085</guid>
+
+					<description><![CDATA[<p>Word und Excel sind ein täglicher Begleiter im Berufsleben. Auch die Steuerung aus SAP heraus ist möglich und häufig sinnvoll. Allerdings gibt es manchmal ein paar Tücken, die ärgerlich sind. Hier zeige ich dir, wie du ein Excel-Dokument per Desktop Office Integration erzeugst und auch später an das OLE-Handle gelangst.</p>
+<p>Der Beitrag <a href="/blog/ole-handle-zu-doi-objekt-ermitteln/">OLE-Handle zu DOI-Objekt ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Für die Integration von Word und Excel gibt es nur zwei Möglichkeiten:</p>
+
+
+
+<ul><li>OLE &#8211; Object Linking and Embedding</li><li>DOI &#8211; Desktop Office Integration</li></ul>
+
+
+
+<p>Beide Varianten haben ihre Vor- und Nachteile. Ein Nachteil bei der Verwendung von DOI ist auf jeden Fall, dass die Methode CLOSE_DOCUMENT nicht zuverlässig funktioniert, wenn man Word oder Excel in einem separaten Fenster öffnet.</p>
+
+
+
+<h2 class="wp-block-heading">Beispiel</h2>
+
+
+
+<p>Zuerst jedoch ein Beispielcode, der zeigt, wie mittels DOI eine Excel-Instanz gestartet wird. Die Drucktaste &#8220;Create&#8221; startet Excel.</p>
+
+
+
+<figure class="wp-block-image"><img fetchpriority="high" decoding="async" width="508" height="373" src="https://tricktresor.com/wp-content/uploads/2019/01/doi2.png" alt="" class="wp-image-1020087" srcset="/wp-content/uploads/2019/01/doi2.png 508w, /wp-content/uploads/2019/01/doi2-300x220.png 300w" sizes="(max-width: 508px) 100vw, 508px" /><figcaption>Desktop Office Integration hat Excel gestartet</figcaption></figure>
+
+
+
+<p>Die Schaltfläche &#8220;Create&#8221; wird dann ausgeschaltet und die Schaltflächen &#8220;Destroy with &#8220;Close_Document&#8221; und &#8220;Destroy with OLE Quit&#8221; erscheinen. Mit diesen Drucktaste kann Excel wieder geschlossen werden. Das Beenden von Excel/ Word geschieht in der Regel über <em>document->close_document</em> und <em>document->close_activex_document</em>. Falls dies jedoch aus unerfindlichen Gründen nicht funktioniert, hilft vielleicht die Methode über das OLE-Objekt und die Methode &#8220;Quit&#8221;.</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<p></p>
+
+
+
+<pre class="wp-block-code"><code>REPORT LINE-SIZE 200.
+
+
+"Create Control
+SELECTION-SCREEN PUSHBUTTON /1(30) TEXT-cre USER-COMMAND create      MODIF ID cre.
+"Destroy Control with Close_Document
+SELECTION-SCREEN PUSHBUTTON /1(30) TEXT-dst USER-COMMAND destroy     MODIF ID dst.
+"Destrpy Control with OLE and method Quit
+SELECTION-SCREEN PUSHBUTTON /1(30) TEXT-dso USER-COMMAND destroy_ole MODIF ID dst.
+
+
+CLASS demo DEFINITION.
+  PUBLIC SECTION.
+    METHODS create.
+    METHODS destroy.
+    METHODS destroy_with_ole.
+    METHODS is_destroyed RETURNING VALUE(result) TYPE i.
+  PROTECTED SECTION.
+
+    DATA mr_control       TYPE REF TO i_oi_container_control." OIContainerCtrl
+    DATA mr_document      TYPE REF TO i_oi_document_proxy.   " Office Dokument
+    DATA mr_spreadsheet   TYPE REF TO i_oi_spreadsheet.      " Spreadsheet
+
+    METHODS set_data.
+    METHODS create_application.
+
+ENDCLASS.
+
+
+INITIALIZATION.
+  DATA(go_demo) = NEW demo( ).
+
+AT SELECTION-SCREEN.
+  CASE sy-ucomm.
+    WHEN 'CREATE'.
+      go_demo->create( ).
+    WHEN 'DESTROY'.
+      go_demo->destroy( ).
+    WHEN 'DESTROY_OLE'.
+      go_demo->destroy_with_ole( ).
+  ENDCASE.
+
+AT SELECTION-SCREEN OUTPUT.
+
+  LOOP AT SCREEN.
+    CASE screen-group1.
+      WHEN 'DST'.
+        IF go_demo->is_destroyed( ) = 0.
+          screen-active = '1'.
+        ELSE.
+          screen-active = '0'.
+        ENDIF.
+
+      WHEN 'CRE'.
+        IF go_demo->is_destroyed( ) = 0.
+          screen-active = '0'.
+        ELSE.
+          screen-active = '1'.
+        ENDIF.
+    ENDCASE.
+    MODIFY SCREEN.
+  ENDLOOP.
+
+CLASS demo IMPLEMENTATION.
+
+
+  METHOD create.
+
+    create_application( ).
+    set_data( ).
+
+  ENDMETHOD.
+
+  METHOD is_destroyed.
+
+    IF mr_document IS BOUND.
+      mr_document->is_destroyed(
+        IMPORTING
+          ret_value = result
+      ).
+    ELSE.
+      result = 1.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD create_application.
+
+    DATA lr_error         TYPE REF TO i_oi_error.
+
+    c_oi_container_control_creator=>get_container_control(
+        IMPORTING
+          control = mr_control
+          error   = lr_error ).
+
+** init control
+    mr_control->init_control(
+      EXPORTING
+        inplace_enabled       = abap_false
+        no_flush              = 'X'
+        r3_application_name   = 'Test DOI'
+        inplace_show_toolbars = abap_false
+        parent                = cl_gui_container=>screen9
+      IMPORTING
+        error                 = lr_error
+      EXCEPTIONS
+        OTHERS                = 2 ).
+
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+*** Get Documentproxy
+    CALL METHOD mr_control->get_document_proxy
+      EXPORTING
+        document_type  = soi_doctype_excel_sheet "'Excel.Sheet'
+        no_flush       = 'X'
+      IMPORTING
+        document_proxy = mr_document
+        error          = lr_error.
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+    mr_document->create_document(
+      EXPORTING
+       document_title   = 'Demo-Arbeitsblatt'
+        no_flush         = 'X'
+        open_inplace     = abap_false
+      IMPORTING
+       error = lr_error ).
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+    CALL METHOD mr_document->get_spreadsheet_interface
+      IMPORTING
+        sheet_interface = mr_spreadsheet
+        error           = lr_error.
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+  ENDMETHOD.
+
+  METHOD set_data.
+
+    DATA lt_values        TYPE soi_generic_table.
+    DATA lt_ranges        TYPE soi_range_list.
+    DATA ls_range         LIKE LINE OF lt_ranges.
+    DATA lr_error         TYPE REF TO i_oi_error.
+
+
+    "Demo-Daten
+    lt_values = VALUE #(
+        ( row = 1 column = 1 value = '1' )
+        ( row = 2 column = 1 value = '2' )
+        ( row = 3 column = 1 value = '3' ) ) .
+
+*== Neuen Bereich definieren
+    mr_spreadsheet->insert_range_dim(
+       EXPORTING name = 'myarea'
+                 top       = 1
+                 left      = 1
+                 rows      = lines( lt_values )
+                 columns   = 1
+                 no_flush  = abap_false ).
+    ls_range-columns = 1.
+    ls_range-rows    = lines( lt_values ).
+    ls_range-name    = 'myarea'.
+    APPEND ls_range TO lt_ranges.
+
+    "Daten übergeben
+    mr_spreadsheet->set_ranges_data(
+      EXPORTING
+        ranges    = lt_ranges
+        contents  = lt_values
+      IMPORTING
+        error     = lr_error
+    ).
+    IF lr_error->has_failed = abap_true. lr_error->raise_message( 'I' ). RETURN. ENDIF.
+
+  ENDMETHOD.
+
+  METHOD destroy.
+
+    mr_document->close_document( ).
+    mr_document->close_activex_document( ).
+    FREE mr_document.
+
+    mr_control->destroy_control( ).
+    FREE mr_control.
+
+  ENDMETHOD.
+
+  METHOD destroy_with_ole.
+
+    DATA lv_document_cntl_handle TYPE cntl_handle.
+    DATA lv_application          TYPE ole2_object.
+    DATA lv_oi_ret               TYPE soi_ret_string.
+    DATA lr_error                TYPE REF TO i_oi_error.
+
+    mr_document->get_document_handle(
+      IMPORTING
+        handle  = lv_document_cntl_handle
+        retcode = lv_oi_ret ).
+    GET PROPERTY OF lv_document_cntl_handle-obj 'Application' = lv_application.
+    CALL METHOD OF lv_application 'Quit'.
+    FREE OBJECT lv_application.
+    FREE mr_document.
+
+  ENDMETHOD.
+
+ENDCLASS.</code></pre>
+
+
+
+<h2 class="wp-block-heading">OLE-Objekt zu DOI-Dokument erhalten</h2>
+
+
+
+<p>Wenn die Methode <em>close_document</em> aus irgendwelchen Gründen nicht funktioniert, das Excel-Fenster also nicht geschlossen wird, oder du eine Methode anwenden möchtest, die das DOI-Interface nicht unterstützt, dann kannst du dir den OLE-Handle zur Applikation besorgen:</p>
+
+
+
+<pre class="wp-block-code"><code>    DATA lv_document_cntl_handle TYPE cntl_handle.
+    DATA lv_application          TYPE ole2_object.
+    DATA lv_oi_ret               TYPE soi_ret_string.
+    DATA lr_error                TYPE REF TO i_oi_error.
+
+    mr_document->get_document_handle(
+      IMPORTING
+        handle  = lv_document_cntl_handle
+        retcode = lv_oi_ret ).
+    GET PROPERTY OF lv_document_cntl_handle-obj 'Application' = lv_application.
+    CALL METHOD OF lv_application 'Quit'.
+    FREE OBJECT lv_application.
+    FREE mr_document.</code></pre>
+
+
+
+<h2 class="wp-block-heading">SAP-Demoprogramme</h2>
+
+
+
+<p>Folgende zwei Demoprogramme zeigen noch erweiterte Funktionen des DOI-Interfaces:</p>
+
+
+
+<ul><li>SAPRDEMO_FORM_INTERFACE</li><li>SAPRDEMO_SPREADSHEET_INTERFACE</li><li>SAPRDEMO_MAILMERGE_INTERFACE</li></ul>
+
+
+
+<p>Bei diesen drei Programmen lässt sich übrigens der Fehler, dass die Applikation nicht korrekt geschlossen wird, sehr gut nachstellen.</p>
+
+
+
+<p>Bei SAPRDEMO_MAILMERGE_INTERFACE wird beim Beenden des Programms zwar das Dokument geschlossen, aber die Word-Applikation bleibt bestehen. Bei SAPRDEMO_FORM_INTERFACE wird das Programm zwar beendet, doch obwohl Close_Document und Destroy_Control aufgerufen werden, bleibt das Excel-Fenster geöffnet. Im Programm SAPRDEMO_SPREADSHEET_INTERFACE funktioniert das Beenden von Excel wiederum perfekt.</p>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/ole-handle-zu-doi-objekt-ermitteln/">OLE-Handle zu DOI-Objekt ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Launige Betrachtung zum Unicode</title>
+		<link>/blog/launige-betrachtung-zum-unicode/</link>
+					<comments>/blog/launige-betrachtung-zum-unicode/#comments</comments>
+		
+		<dc:creator><![CDATA[Gastbeitrag]]></dc:creator>
+		<pubDate>Thu, 27 Feb 2014 10:52:05 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Sprüche & Geschichten]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Unicode]]></category>
+		<category><![CDATA[color]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4515</guid>
+
+					<description><![CDATA[<p>Wenn man wie ich die 40 überschritten hat, denkt man über manche Dinge in besonderer Weise nach. Zum Beispiel über die Rechtschreibreform – einer Kapitulation vor den eher schlichten Gemütern, die nicht begreifen wollten, daß (pardon: dass) man &#8220;Katastrophe&#8221; mit ph und &#8220;doof&#8221; mit f schreibt. Delphine und Naßzellen gehören der Vergangenheit an, umfangreiche Arbeiten sind jetzt &#8220;aufwändig&#8221;, Grundfeste (&#8220;ss&#8221; nicht am Silbenende; trenne nie &#8220;st&#8221;, denn es tut ihm weh) wurden erschüttert. Nur mit...</p>
+<p>Der Beitrag <a href="/blog/launige-betrachtung-zum-unicode/">Launige Betrachtung zum Unicode</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wenn man wie ich die 40 überschritten hat, denkt man über manche Dinge in besonderer Weise nach.</p>
+<p>Zum Beispiel über die Rechtschreibreform – einer Kapitulation vor den eher schlichten Gemütern, die nicht begreifen wollten, daß (pardon: dass) man &#8220;Katastrophe&#8221; mit ph und &#8220;doof&#8221; mit f schreibt.</p>
+<p>Delphine und Naßzellen gehören der Vergangenheit an, umfangreiche Arbeiten sind jetzt &#8220;aufwändig&#8221;, Grundfeste (&#8220;ss&#8221; nicht am Silbenende; trenne nie &#8220;st&#8221;, denn es tut ihm weh) wurden erschüttert.</p>
+<p>Nur mit einem Quäntchen Glück kommt man mit 0 Fehlern durch.</p>
+<h2>1 + 1 = 3?</h2>
+<p>Die Angst ging in dieser Generation um. Ob sie wohl als nächstes an das kleine Einmaleins rangehen? 1 + 1 = 3, nur eine Frage der Zeit? Na ja, diese Kuh scheint vorerst vom Eis zu sein.<br />
+(&#8220;1 + 1 ? Hä? Alder, meine iPhone isse schneller als deine Kopf.&#8221;)</p>
+<p>Doch jetzt: Mit aller Macht kommt er, der Unicode.</p>
+<p>Vorbei sind die Zeiten &#8220;<i>&#8230; and a byte is still a byte</i>&#8220;. Unvorstellbar für die ältere Generation der Datenverarbeiter, die in Zeiten von Lochstreifen und Lochkarte das Bit quasi noch hautnah fühlen konnten. Entweder als zusätzlich gestanztes Loch in einer Lochkarte (Datenfehler), als wieder zugeklebtes Loch in einem Lochstreifen (Tippfehler) oder zumindest als Konfettibestandteil im Haar beim Studentenfasching.</p>
+<p>[pullquote float=&#8217;CENTER&#8217; color=&#8217;#000000&#8242; bgcolor=&#8217;#ff5900&#8242;]Ziel des Unicode ist es, für jedes Sinn tragende Schriftzeichen aller bekannten Schriftkulturen einen digitalen Code festzulegen.[/pullquote]</p>
+<p>Na, da freue ich mich aber für Japaner und Chinesen, die den Halbsatz &#8220;Der vom Tautropfen der Lotusblüte benetzte Strahl der Morgensonne&#8221; ja unbedingt in 3 Byte unterbringen müssen. Oder für die alten <i>Ugariter</i>, die es seit mehr als 3.000 Jahren nicht mehr gibt.</p>
+<h2>Kamasutra</h2>
+<p>Gleichsam beruhigt es mich ungemein, dass seit März 2005 auch die <i>Kharoshthi-Schrift</i> aus dem antiken Indien unicode-fähig ist. Damit kann man jetzt wohl das Kamasutra in Originalversion über Dateischnittstelle einlesen. Hauptsache es gibt keinen Kurzdump. (&#8220;Das Programm ist auf eine <i>Stellung</i> gestoßen, die nicht durch eine Ausnahme behandelt werden kann.&#8221;)</p>
+<p>Ein historischer Meilenstein wurde im Oktober 2010 erreicht: Japanische Emoticons (<i>Emoji</i>) sind codierbar. (Kein Witz!)<br />
+Die Unicode-Kenner schnalzen kollektiv mit der Zunge.</p>
+<p>Oder Musiknoten, seit März 2001 möglich. Super, dann braucht man sich den Scheiß nicht mehr anzuhören, sondern kann gleich die Noten einlesen.</p>
+<p>Hat eigentlich schon mal jemand daran gedacht, das deutsche Steuerrecht incl. aller Zusätze und Novellen in <i>phönizischer Schrift</i> darzustellen? Nicht? Wie? Ach so, macht keinen Sinn. Aha.</p>
+<p>Einigermaßen lustig ist, dass die Hauptkritik am Unicode aus dem ostasiatischen Raum zu vernehmen ist. Obwohl gerade dort diejenigen Sprachen beheimatet sind, die gern als Begründung für die Notwendigkeit eines Unicode benutzt werden. Menschenskinder, dabei hätte es sich doch jeder von uns an fünf Fingern abzählen können, dass die Jungs Schwierigkeiten mit der <i>Han-Vereinheitlichung</i> haben werden, nicht wahr?</p>
+<p>&#8220;Liebe japanische Kollegen, wir brauchen nicht mehr auf englisch zu kommunizieren, Ihr könnt Eure Daten jetzt auf japanisch schicken. Verstehen wir zwar nicht, können wir aber einlesen.&#8221;</p>
+<p>&#8220;Ja, Frau Lehmann, wir brauchen Ihre 30 monatlichen Datensätze für die Verbuchung jetzt im Unicode ISO 10646. Wir müssen sicherstellen, dass die Verbuchung auch die alten <i>Sumerer</i> hingekriegt hätten.&#8221;</p>
+<h2>Word und Unicode</h2>
+<p>Nach dem Motto &#8220;Vorfreude, schönste Freude&#8221; hier noch ein kleines Schmankerl:</p>
+<p>Man gebe in einem Word-Text das Wort &#8220;Unicode&#8221; ein. Jetzt stelle man den Cursor hinter das &#8220;U&#8221; und drückt &#8220;Alt+C&#8221;. Man sieht den Code für das &#8220;U&#8221;. (Erneut Alt+C setzt es zurück.)</p>
+<p>Man wiederhole die Übung für das &#8220;o&#8221; und das &#8220;e&#8221;. Super!</p>
+<p>Wie hieß es doch so schön: Ein bisschen Raten ist halt dabei.</p>
+<p>[pullquote float=&#8217;CENTER&#8217; color=&#8217;#ffffff&#8217; bgcolor=&#8217;#ff5900&#8242;]Der Unicode, der Unicode,<br />
+der kommt jetzt grade groß in Mod&#8217;.<br />
+Wie das Bit auch kommt,<br />
+wie das Byte auch fällt,<br />
+der Unicode, der hält.[/pullquote]</p>
+<p><b>Mannomann! Diese Kanaillen!</b></p>
+<p>PS:</p>
+<ul>
+<li>Im SAP Online-Service-System (OSS) gibt es (Stand: 15.11.2011) insgesamt 9.386 Hinweise für den Suchbegriff &#8220;Unicode&#8221;.</li>
+<li>Im Jahr 2011 sind es 1.009 Hinweise, 145 seit dem 17.10.2011.</li>
+<li>Der Suchbegriff &#8220;Verbuchung&#8221; bringt 9.184 Treffer, &#8220;FI-Beleg&#8221; 4.556 Treffer.</li>
+</ul>
+<p>Mathias Gebhardt, SAP-Berater</p>
+<p>Im November 2011</p>
+<p>Der Beitrag <a href="/blog/launige-betrachtung-zum-unicode/">Launige Betrachtung zum Unicode</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/launige-betrachtung-zum-unicode/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>redirects [Plugin]</title>
+		<link>/blog/redirect/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 13 Jan 2014 17:15:33 +0000</pubDate>
+				<category><![CDATA[plugins]]></category>
+		<category><![CDATA[Wordpress]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[Klassifizierung]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4221</guid>
+
+					<description><![CDATA[<p>In diesem Artikel beschreibe ich, wie mithilfe von .htaccess und des Plugins "redirects" die alten Tricktresor-Links auf die Wordpress-URLs umgesetzt werden.</p>
+<p>Der Beitrag <a href="/blog/redirect/">redirects [Plugin]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><em>Redirect</em> bedeutet <em>Umleitung</em>. Also eine Umleitung von einer (alten) URL auf eine neue. Hierfür gibt es mehrere Wege. Umleitung sind auch nicht ganz ungefährlich, da hier evtl. Zirkelbezüge auftreten können und der Browser dann die Meldung &#8220;Zu viele Umleitungen&#8221; ausgibt.</p>
+<h2>.htaccess</h2>
+<p>Ein Weg, eine URL umzuleiten,  ist der über .htaccess. Hier werden jedoch Umleitungen verwendet, die nach einer <em>Regel</em> umgesetzt werden können. Diese Umleitung verwende ich zum Beispiel um alte Links, bei denen die Artikelnummer über die Variable aID in der URL vorhanden ist, auf die WordPress-Notation für einen Artikel umzusetzen.</p>
+<p>Aus dieser alten URL für den Artikel mit der ID 285</p>
+<pre>/wp-content/?navID=387&amp;aID=285</pre>
+<p>wird durch eine rewriteRule in der .htaccess die folgende URL:</p>
+<pre>https://tricktresor.com/?p=285</pre>
+<p>Diese interne Darstellung wird wiederum durch die Permalink-Einstellung im WordPress übersteuert:</p>
+<address>Beitragsname: https://tricktresor.com/blog/Beispielbeitrag/</address>
+<p>Es wird daraus die URL</p>
+<pre>https://tricktresor.com/blog/methoden-word/</pre>
+<p>[notice type=&#8217;info&#8217;]Die Umleitung funktioniert in diesem Fall natürlich nur, weil die alte Artikel-ID mit der WordPress-Beitrags-ID übereinstimmt.[/notice]</p>
+<p>Die Regel in der tricktresor-.htaccess lautet übrigens:</p>
+<pre>RewriteCond %{QUERY_STRING} .*aID=([0-9]+)$
+RewriteRule ^(.*) /?p=%1 [R=301,L]</pre>
+<h2>Definierte Umleitung</h2>
+<p>Diese Form der Umleitung funktioniert natürlich nicht, wenn sich die verwendete alte ID von der neuen unterscheidet. Genau diesen Fall habe ich jedoch bei den alten Links, die mittels Themen-ID gespeichert wurden. Diese Links zeigen auf ein Verzeichnis, wie zum Beispiel dieser hier:</p>
+<pre>https://tricktresor.com/content/index.php?navID=223&amp;tID=76</pre>
+<p><img decoding="async" width="883" height="793" class="alignnone size-full wp-image-4222" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d41eba11f5b.png" srcset="/wp-content/uploads/2014/01/img_52d41eba11f5b.png 883w, /wp-content/uploads/2014/01/img_52d41eba11f5b-300x269.png 300w, /wp-content/uploads/2014/01/img_52d41eba11f5b-624x560.png 624w" sizes="(max-width: 883px) 100vw, 883px" /></p>
+<p>Wenn man auf diesen Link klickt, dann gibt es zurzeit keine Umleitung also keine entsprechende Seite und man landet auf &#8220;404 page not found&#8221;.</p>
+<p>Auf der Suche nach einer Lösung bin ich über das Plugin <a title="Plugin &quot;redirects&quot;" href="http://wordpress.org/plugins/redirects/" target="_blank">redirects</a> gestolpert. Hier können verschiedene URLs sowie eine Umleitung definiert werden.</p>
+<p>Die Themen des alten Content Management System wurden in WordPress umgesetzt in Schlagwörter (Tags). Dabei ist jedoch die ID des Schlagworts nicht erhalten geblieben. Aber ich habe die alte Zuordnung noch in einer Tabelle. Diese habe ich &#8211; entsprechend aufbereit &#8211; in das Plugin <a title="Plugin &quot;redirects&quot;" href="http://wordpress.org/plugins/redirects/" target="_blank">redirects </a>importieren können.</p>
+<p>Die Umsetzung der URLs mit &#8220;tID&#8221; ist ebenfalls in der .htaccess definiert:</p>
+<pre>RewriteCond %{QUERY_STRING} .*tID=([0-9]+)$ 
+RewriteRule ^(.*) /thema=%1? [R=301,L]</pre>
+<p>Die &#8220;Themen-URLs&#8221; wie folgt umgesetzt:</p>
+<pre>https://tricktresor.com/thema=76</pre>
+<p>den slug thema=76 habe ich in dem redirects-plugin umgesetzt auf</p>
+<pre>https://tricktresor.com/blog/keywords/klassifizierung/</pre>
+<p>Der Beitrag <a href="/blog/redirect/">redirects [Plugin]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Texte kopieren</title>
+		<link>/blog/texte-kopieren-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 11 Jan 2005 18:57:39 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[WORD]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=304</guid>
+
+					<description><![CDATA[<p>Beim Kopieren von Daten gibt es des &#246;fteren das Problem, dass man nur bestimmte Spalten aus einem Text ben&#246;tigt. Um diese dann zu isolieren, muss man den vorderen Teil l&#246;schen und dann den hinteren Teil und kann dann die Daten in die Zwischenablage kopieren. Mit MS Word geht's jedoch deutlich einfacher!</p>
+<p>Der Beitrag <a href="/blog/texte-kopieren-2/">Texte kopieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Beim Kopieren von Daten gibt es des &ouml;fteren das Problem, dass man nur bestimmte Spalten aus einem Text ben&ouml;tigt. Um diese dann zu isolieren, muss man den vorderen Teil l&ouml;schen und dann den hinteren Teil und kann dann die Daten in die Zwischenablage kopieren. Mit MS Word geht&#8217;s jedoch deutlich einfacher!<br /><P>Nehmen wir an, Sie h&auml;tten den folgenden Text vorliegen:</P><P class="sap1">1222 ABC xyz 444 555 666<BR>1933 BCD xyz 444 555 777<BR>1242 ABC xyz 444 555 666<BR>1323 ADK xyz 444 555 777<BR>1426 AHJ xyz 444 555 666<BR>1733 KOD xyz 444 555 777<BR>9202 KLC xyz 444 555 666<BR>1353 JOF xyz 444 555 777</P><P class="text1">Sie m&ouml;chten nun die dreistelligen Werte der zweiten Spalte haben, um sie in eine Tabelle einzuf&uuml;gen.</P><P class="text1">Hierzu m&uuml;ssten Sie erst die Zahl <STRONG>vor </STRONG>dem Wert l&ouml;schen und dann alles <STRONG>hinter </STRONG>dem Wert. Dann k&ouml;nnten Sie den Rest markieren und in die Zwischenablage einf&uuml;gen.</P><P class="text1">Einfacher geht es, wenn Sie Microsoft Word starten und den Text in das Dokument kopieren. Markieren Sie den gesamten Text mit CTRL-A und w&auml;hlen Sie als Schrift <STRONG>COURIER </STRONG>aus.</P><P class="text1"><STRONG>Sie k&ouml;nnen nun die Spalte markieren, wenn Sie die ALT-Taste gedr&uuml;ckt halten!</STRONG></P><P class="text1">Dr&uuml;cken Sie anschliessend CTRL-C und die Spalte befindet sich in der Zwischenablage.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/word_alt.gif"><BR>Markieren der Spalte mit gedr&uuml;ckter ALT-Taste</P></TD></TR></TBODY></TABLE></P></p>
+<p>Der Beitrag <a href="/blog/texte-kopieren-2/">Texte kopieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Desktop Office Integration (DOI)</title>
+		<link>/blog/desktop-office-integration-doi/</link>
+					<comments>/blog/desktop-office-integration-doi/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 02 Oct 2004 20:58:20 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<category><![CDATA[WORD]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=286</guid>
+
+					<description><![CDATA[<p>Mit den Tools zur "Destop Office Integration" bietet SAP eine Schnittstelle zur Arbeit mit Word und Excel.</p>
+<p>Der Beitrag <a href="/blog/desktop-office-integration-doi/">Desktop Office Integration (DOI)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit den Tools zur &#8220;Destop Office Integration&#8221; bietet SAP eine Schnittstelle zur Arbeit mit Word und Excel.<br /><P class="text1">Das Demoprogramm <STRONG><FONT>SAPRDEMO_FORM_INTERFACE</FONT></STRONG> demonstriert das Setzen von Daten aus R/3 oder auch das Holen der Daten aus der jeweiligen Anwendung (Excel oder Word).</P><P class="text1">Hier gelangen Sie zur SAP-Online-Hilfe zur DOI: <BR><A href="http://help.sap.com/saphelp_46c/helpdata/de/e9/0bee9f408e11d1893b0000e8323c4f/frameset.htm" target="_blank" Target="_blank">http://help.sap.com/saphelp_46c/helpdata/de/e9/<BR>0bee9f408e11d1893b0000e8323c4f/frameset.htm</A></P><P class="text1">Und hier eine PDF-Dokumentation:<BR><A href="http://help.sap.com/printdocu/core/Print46c/de/data/pdf/BCCIOFFI/BCCIOFFI.pdf" Target="_blank">http://help.sap.com/printdocu/core/Print46c/de/data/pdf/BCCIOFFI/BCCIOFFI.pdf</A></P><P class="text1">Die Anwendung kann im separaten Fenster oder &#8220;inplace&#8221; gestartet werden.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/word/doi_word.jpg"><BR>Ein Word-Formular, auf das aus R/3 zugegriffen wird</P></TD></TR></TBODY></TABLE></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/desktop-office-integration-doi/">Desktop Office Integration (DOI)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/desktop-office-integration-doi/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Methoden (WORD)</title>
+		<link>/blog/methoden-word/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 02 Oct 2004 18:10:51 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=285</guid>
+
+					<description><![CDATA[<p>In diesem Artikel geben wir Ihnen Informationen zu den Methoden, die Sie zur Ansteuerung eines Word-Dokuments verwenden k&#246;nnen, bzw. wo Sie die unterst&#252;tzten Methoden finden.</p>
+<p>Der Beitrag <a href="/blog/methoden-word/">Methoden (WORD)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Artikel geben wir Ihnen Informationen zu den Methoden, die Sie zur Ansteuerung eines Word-Dokuments verwenden können, bzw. wo Sie die unterstützten Methoden finden.</p>
+<p class="head1">Word.Basic</p>
+<p>In dem Artikel &#8220;Erzeugung eines Dokuments&#8221; werden bereits einige Methoden behandelt mit denen Sie ein Word-Dokument füllen und formatieren können.</p>
+<p>Das Demoprogramm verwendet veraltete Aufrufe von Word.Basic-Methoden. Diese Methoden wurden in neueren Word-Programmen von VisualBasic abgelöst.</p>
+<p>Ich bin nicht sicher, in wie weit VisualBasic-Methoden unterstützt werden, bzw. wie man dann damit ein Word-Dokument ansteuern kann. Für Informationen oder Beispielprogramme bin ich sehr dankbar.</p>
+<p>Der Aufruf der Word.Basic-Methoden jedoch funktioniert. Sie können alle Methoden verwenden, die von Word.Basic unterstützt werden.</p>
+<h2 class="head2">Tabelle OLELOAD</h2>
+<p>Sie haben einmal die Möglichkeit, in der SAP-Tabelle <strong>OLELOAD</strong> zu suchen (Sprache = &#8216;EN&#8217;, Typeinfo-Key = &#8216;WORD.BASIC&#8217;). Hier stehen alle Methoden mit den einzelnen Parametern. Leider haben die Parameter, obwohl die Möglichkeit vorgesehen ist, keine Bezeichnung. Dies macht die Verwendung natürlich schwer.</p>
+<p>Immerhin steht in dem Feld PARAMTYPE um was für einen Parametertyp es sich handelt:<br />
+5 = Integer<br />
+8 = String</p>
+<p class="text1"><strong>Eine hilfreiche Datei hat Christian Maier bei Microsoft gefunden:<br />
+</strong><a href="https://tricktresor.com/wp-content/downloads/doi_position.zip" target="_blank"><strong>POSITION.HLP</strong></a><strong>.</strong></p>
+<p>Die Datei enthält alle Befehle und auch die Parameter dazu. Daraus ist dann auch die Positionsnummer für den Aufruf aus SAP ersichtlich.</p>
+<p>Hier der komplette Link zu Microsoft:<br />
+<a href="http://support.microsoft.com/default.aspx?scid=http://support.microsoft.com:80/support/kb/articles/Q112/7/33.asp&amp;NoWebContent=1#appliesto" target="_blank"><u><span style="color: #0000ff; font-size: small;">http://support.microsoft.com/default.aspx?scid=http://support.microsoft.com:80/support/kb/<br />
+articles/Q112/7/33.asp&amp;NoWebContent=1#appliesto</span></u></a></p>
+<h2 class="head1">Methoden finden</h2>
+<p>Sie sollten deswegen den Weg über die &#8220;<strong>Visual Basic-Entsprechungen zu WordBasic-Befehlen</strong>&#8221; gehen:</p>
+<p>Starten Sie hierzu Word und wechseln Sie zum Makroeditor (Menü: <em>Extras &#8211; Makro &#8211; Visual Basic Editor</em>).</p>
+<p>Klicken Sie dann im Menü auf das &#8220;?&#8221; und &#8220;Microsoft Visual Basic-Hilfe&#8221; oder drücken Sie die F1-Taste. Es erscheint das Hilfe-Fenster in dem Sie bitte auf den Reiter [Index] wechseln. Dort geben Sie &#8220;WordBasic&#8221; ein und klicken auf [Suchen].</p>
+<p><img decoding="async" class="alignnone" src="/wp-content/uploads/tt_images/word/wordhilfe.jpg" /></p>
+<p><em>Die Ergebnisliste zu WordBasic</em></p>
+<p>Es erscheint im unteren Fenster der Eintrag &#8220;<strong>Basic-Entsprechungen zu WordBasic-Befehlen</strong>&#8220;. Diesen klicken Sie bitte an.</p>
+<p>Im rechten Fenster erscheinen Druckknöpfe mit dem Alphabet. Suchen Sie sich dort die Methoden, die Sie benötigen.</p>
+<h2 class="head1">Beispiel</h2>
+<p>Wenn Sie unter dem Eintrag &#8220;T&#8221; schauen, dann entdecken Sie den Word.Basic-Befehl</p>
+<p><strong>TableColumnWidth <em>ColumnWidth, RulerStyle</em> </strong></p>
+<p>Die Parameter, die Sie zu dieser Methode verwenden können/ müssen stehen in kursiver Schrift hinter der Methode.</p>
+<p>Der Aufruf in ABAP sähe dann wie folgt aus:</p>
+<p class="sap1">CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<br />
+EXPORTING #1 = &#8216;9 cm&#8217;.</p>
+<p class="text1">Leider gibt es einige Ungereimtheiten, zu denen ich keine Erklärung habe:</p>
+<ul>
+<li>
+<div class="text1">Die Methode <strong>TableInsertTable</strong> z.B. hat eigentlich laut Doku nur zwei Parameter (Anzahl Spalten und Anzahl Zeilen). Trotzdem müssen vier Parameter übergeben werden (Siehe Demoprogramm).</div>
+</li>
+<li>
+<div class="text1">Die o. g. Methode <strong>TableColumnWidth</strong> hat laut Doku zwei Parameter (Width und RulerStyle), wobei <em>RulerStyle</em> ein Muß ist. Die Methode funktioniert, obwohl nur der Parameter <em>Width </em>übergeben wird.</div>
+</li>
+</ul>
+<p class="text1">Falls jemand hierfür eine Erklärung hat, oder weiß, worauf man achten muss, nehme ich Infos gerne entgegen.</p>
+<p class="text1">
+<p>Der Beitrag <a href="/blog/methoden-word/">Methoden (WORD)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Erzeugung eines Dokuments</title>
+		<link>/blog/erzeugung-eines-dokuments/</link>
+					<comments>/blog/erzeugung-eines-dokuments/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 02 Oct 2004 17:20:35 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[WORD]]></category>
+		<category><![CDATA[Word & Excel]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=284</guid>
+
+					<description><![CDATA[<p>Hier stellen wir Ihnen ein ABAP-Programm vor, mit dem ein Word-Dokument erzeugt und mit Daten "gef&#252;ttert" wird. </p>
+<p>Der Beitrag <a href="/blog/erzeugung-eines-dokuments/">Erzeugung eines Dokuments</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier stellen wir Ihnen ein ABAP-Programm vor, mit dem ein Word-Dokument erzeugt und mit Daten &#8220;gef&uuml;ttert&#8221; wird. <br /><P>Mit diesem Programm stellen wir Ihnen eine M&ouml;glichkeit vor, wie Sie aus SAP heraus ein Word-Dokument erzeugen und mit Daten f&uuml;llen k&ouml;nnen.</P><P>Es werden sowohl Tabellen erzeugt und bef&uuml;llt als auch Formatierungen vorgenommen. </P><P>Das Beispiel erzeugt ein Dokument mit Kopfzeile und Tabellen. Es sieht nicht sehr sch&ouml;n aus, aber es zeigt die Anwendung der wichtigsten Methoden.</P><P>So sieht&#8217;s aus:</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/word/word.jpg"><BR>Ein Ausschnitt des erzeugten Dokuments</P></TD></TR></TBODY></TABLE></P><P class="head1">Das Coding</P><P class="sap1">REPORT zz_word .<BR><FONT color="#fb2412">**********************************************************************<BR>***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<BR>***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </FONT><A href="https://tricktresor.com/" target="_blank" Target="_blank"><FONT color="#fb2412">https://tricktresor.com/</FONT></A><FONT color="#fb2412">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<BR>***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ***<BR>**********************************************************************</FONT></P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;*<BR>*<BR>* Starten von Word und &Uuml;bergabe von Daten, Erzeugung von Tabellen,<BR>* Positionieren innerhalb der Tabellen und Formatierung von Text bzw.<BR>* Abs&auml;tzen<BR>*<BR><STRONG>* ACHTUNG: </STRONG><BR>* Ab der Version 4.7 muss die Schriftgr&ouml;&szlig;e als Integer<BR>* &uuml;bergeben werden!</FONT><FONT color="#fb2412"><BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;*</FONT></P><P class="sap1"><BR><FONT color="#fb2412">*** Ben&ouml;tigte Typinformationen f&uuml;r OLE<BR></FONT>INCLUDE ole2incl.<BR>INCLUDE docsincl.</P><P class="sap1"><FONT color="#fb2412">*** Programmvariablen</FONT><BR>DATA:<BR>&nbsp; BEGIN OF t_item OCCURS 0,<BR>&nbsp;&nbsp;&nbsp; posnr&nbsp;&nbsp;&nbsp; &nbsp;TYPE posnr,<BR>&nbsp;&nbsp;&nbsp; matnr&nbsp;&nbsp;&nbsp;&nbsp; TYPE matnr,<BR>&nbsp;&nbsp;&nbsp; mtext(40) TYPE c,<BR>&nbsp;&nbsp;&nbsp; menge(6) &nbsp;TYPE p,<BR>&nbsp;&nbsp;&nbsp; meins&nbsp;&nbsp;&nbsp; &nbsp;TYPE meins,<BR>&nbsp;&nbsp;&nbsp; netpr(6)&nbsp; TYPE p DECIMALS 2,<BR>&nbsp;&nbsp;&nbsp; waers&nbsp;&nbsp;&nbsp;&nbsp; TYPE waers,<BR>&nbsp; END OF t_item,</P><P class="sap1">&nbsp; l_menge(20),<BR>&nbsp; l_preis(20),<BR>&nbsp; l_text(80),</P><P class="sap1">&nbsp; h_word TYPE ole2_object.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1">&nbsp; PERFORM word_starten.</P><P class="sap1"><BR><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* FORM WORD_STARTEN<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM word_starten.</P><P class="sap1">&nbsp; IF h_word-header = space OR h_word-handle EQ -1.</P><P class="sap1"><FONT color="#fb2412">*** Word starten</FONT><BR>&nbsp;&nbsp;&nbsp; CREATE OBJECT h_word &#8216;Word.Basic&#8217;.<BR>&nbsp;&nbsp;&nbsp; CALL METHOD OF h_word &#8216;FileNew&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216;normal.dot&#8217;.<BR>&nbsp;&nbsp;&nbsp; CALL METHOD OF h_word &#8216;AppShow&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Kopfzeile erzeugen</FONT><BR>&nbsp;&nbsp;&nbsp; PERFORM kopfzeile.</P><P class="sap1"><FONT color="#fb2412">*** Infotext <BR></FONT>&nbsp;&nbsp;&nbsp; PERFORM infotext.</P><P class="sap1"><FONT color="#fb2412">*** Testdaten f&uuml;r die Positionstabelle&nbsp;generieren</FONT><BR>&nbsp;&nbsp;&nbsp; PERFORM testdaten.</P><P class="sap1">&nbsp;&nbsp;&nbsp; IF NOT t_item[] IS INITIAL.<BR><FONT color="#fb2412">*** &Uuml;berschirften und Tabelle</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM item_title.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><BR>&nbsp;&nbsp;&nbsp; LOOP AT t_item.<BR><FONT color="#fb2412">*** Ausgabe der Positionen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PERFORM ausgabe_position.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.</P><P class="sap1"><FONT color="#fb2412">*** Ausgabe der restlichen Informationen</FONT><BR>&nbsp;&nbsp;&nbsp; PERFORM ende.</P><P class="sap1">&nbsp; ENDIF.</P><P class="sap1">&nbsp; IF sy-subrc NE 0.<BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Error when opening word.application&#8217;, sy-msgli.<BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; FREE OBJECT h_word.<BR>&nbsp; h_word-handle = -1.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* FORM WRITE_TEXT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* &#8211;&gt; TEXT<BR>* &#8211;&gt; FONT<BR>* &#8211;&gt; SIZE<BR>* &#8211;&gt; LOOK<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM write_text USING text font size look.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;Font&#8217; EXPORTING #01 = font.<BR>&nbsp; CALL METHOD OF h_word &#8216;FontSize&#8217; EXPORTING #1 = size.</P><P class="sap1">&nbsp; IF look NE &#8221;.<BR>&nbsp;&nbsp;&nbsp; CALL METHOD OF h_word look.<BR>&nbsp; ENDIF.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;Insert&#8217; EXPORTING #1 = text.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM item_title&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>* Aufbau und F&uuml;llen der Positionstabelle<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM item_title.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableInsertTable&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = &#8216;2&#8217;&nbsp; &#8220;Spalten<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #3 = &#8216;8&#8217;&nbsp; &#8220;Zeilen<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #4 = &#8216;Auto&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;9,0 cm&#8217;. &#8220;Breite der 1. Spalte</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Adresse:&#8217; &#8216;TimesNewRoman&#8217; &#8217;14&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Informationen:&#8217; &#8216;TimesNewRoman&#8217; &#8217;14&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Tricktresor&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Information 1&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Im Banksafe 2&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Information 2&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Information 3&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;12345 Klein-Schl&uuml;ssel&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Information 4&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;EndOfDocument&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;EndOfLine&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableInsertTable&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = &#8216;6&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #3 = &#8216;1&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #4 = &#8216;Auto&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;2,0 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Material number&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;4,0 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Material description&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;TimesNewRoman&#8217; &#8217;12&#8217;&nbsp; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;2,1 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Quantity&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;1,6 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216; Unit&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;3,0 cm&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;RightPara&#8217; EXPORTING #01 = &#8216;AlignRight&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Price / Unit&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;3,2 cm&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;RightPara&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;AlignRight&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Net value&#8217; &#8216;TimesNewRoman&#8217; &#8217;12&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">ENDFORM.</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; kopfzeile<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM kopfzeile.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;ViewHeader&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Anzeige Tabellengitter (0=aus)</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;TableGridLines&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216;1&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;TableInsertTable&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = &#8216;2&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #3 = &#8216;1&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #4 = &#8216;Auto&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Kopftext links schreiben</FONT><BR>&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;TRICKTRESOR&#8217; &#8216;TimesNewRoman&#8217; &#8217;24&#8217; &#8216;Bold&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Kopftext links mit Absatzformat &#8220;&Uuml;berschrift 1&#8221; formatieren</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;FormatStyle&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216;&Uuml;berschrift 1&#8217;.</P><P class="sap1"><FONT color="#fb2412">***&nbsp;Breite der Tabellenspalte &auml;ndern</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;9,0 cm&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Logo einbinden<BR></FONT>&nbsp; CALL METHOD OF h_word &#8216;InsertPicture&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216;C:/temp/logo.bmp&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;DEMO&#8217; &#8216;TimesNewRoman&#8217; &#8217;24&#8217; &#8216;Bold&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Kopffenster wieder schlie&szlig;en</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;CloseViewHeaderFooter&#8217;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; kopfzeile</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; infotext<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM infotext.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableInsertTable&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #1 = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #2 = &#8216;2&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #3 = &#8216;1&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #4 = &#8216;Auto&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;TableColumnWidth&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;9,0 cm&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Dieses Dokument wurde aus R/3 erzeugt&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8216;TimesNewRoman &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8217;12&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221;.</P><P class="sap1"><FONT color="#fb2412">*** Absatz linksb&uuml;ndig</FONT><BR>&nbsp; CALL METHOD OF h_word &#8216;LeftPara&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Datum &uuml;bergeben</FONT><BR>&nbsp; write sy-datum to l_text.<BR>&nbsp;&nbsp;PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING l_text &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8216;Italic&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Datum rechtsb&uuml;ndig</FONT><BR>&nbsp;&nbsp;CALL METHOD OF h_word &#8216;RightPara&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;EndOfDocument&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;EndOfLine&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; infotext</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; testdaten<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM testdaten.</P><P class="sap1">&nbsp; CLEAR t_item.<BR>&nbsp; t_item-posnr = 1.<BR>&nbsp; t_item-matnr = &#8216;ABCD&#8217;.<BR>&nbsp; t_item-mtext = &#8216;Testartikel ABCD gro&szlig;&#8217;.<BR>&nbsp; t_item-menge = &#8217;10&#8217;.<BR>&nbsp; t_item-meins = &#8216;ST&#8217;.<BR>&nbsp; t_item-netpr = &#8216;21.45&#8217;.<BR>&nbsp; t_item-waers = &#8216;EUR&#8217;.<BR>&nbsp; APPEND t_item.<BR>&nbsp; t_item-posnr = 2.<BR>&nbsp; t_item-matnr = &#8216;TEST123&#8217;.<BR>&nbsp; t_item-mtext = &#8216;Testartikel 123 klein&#8217;.<BR>&nbsp; t_item-menge = &#8216;2000&#8217;.<BR>&nbsp; t_item-meins = &#8216;ST&#8217;.<BR>&nbsp; t_item-netpr = &#8216;11.45&#8217;.<BR>&nbsp; t_item-waers = &#8216;EUR&#8217;.<BR>&nbsp; APPEND t_item.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; testdaten</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; ausgabe_position<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM ausgabe_position.</P><P class="sap1">&nbsp; PERFORM write_text USING t_item-matnr &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1"><BR>&nbsp; PERFORM write_text USING t_item-mtext &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1"><BR>&nbsp; WRITE t_item-menge TO l_menge UNIT t_item-meins.<BR>&nbsp; PERFORM write_text USING l_menge &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text USING t_item-meins &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;RightPara&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;AlignRight&#8217;.<BR>&nbsp; WRITE t_item-netpr TO l_preis CURRENCY t_item-waers.<BR>&nbsp; PERFORM write_text USING l_preis &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;RightPara&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING #01 = &#8216;AlignRight&#8217;.<BR>&nbsp; l_text = t_item-menge * t_item-netpr.<BR>&nbsp; WRITE l_text TO l_text CURRENCY t_item-waers.<BR>&nbsp; PERFORM write_text USING l_text &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NextCell&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;NormalStyle&#8217;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ausgabe_position</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; ende<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM ende.</P><P class="sap1"><FONT color="#fb2412">*** Ans Ende vom Dokument springen<BR></FONT>&nbsp; CALL METHOD OF h_word &#8216;EndOfDocument&#8217;.<BR>&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;Dieses Programm&#8217; &#8216;TimesNewRoman&#8217; &#8217;14&#8217; &#8216;Bold&#8217;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;wurde Ihnen pr&auml;sentiert&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp; CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;vom Tricktresor&#8217; &#8216;TimesNewRoman&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">&nbsp;CALL METHOD OF h_word &#8216;InsertPara&#8217;.<BR>&nbsp;CALL METHOD OF h_word &#8216;InsertPara&#8217;.</P><P class="sap1">&nbsp; PERFORM write_text<BR>&nbsp;&nbsp;&nbsp; USING &#8216;https://tricktresor.com&/#8217; &#8216;Courier&#8217; &#8217;10&#8217; &#8221;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ende&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/erzeugung-eines-dokuments/">Erzeugung eines Dokuments</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/erzeugung-eines-dokuments/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

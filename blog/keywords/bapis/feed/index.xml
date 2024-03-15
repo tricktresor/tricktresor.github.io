@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>BAPIs Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/bapis/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:58 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>BAPIs Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>FI-Beleg mit Umsatzsteuer buchen</title>
+		<link>/blog/fi-beleg-mit-umsatzsteuer-buchen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Sep 2014 16:23:48 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[BAPIs]]></category>
+		<category><![CDATA[Umsatzsteuer]]></category>
+		<category><![CDATA[Mehrwertsteuer]]></category>
+		<category><![CDATA[Vorsteuer]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[Buchung]]></category>
+		<category><![CDATA[MM]]></category>
+		<category><![CDATA[Beleg]]></category>
+		<category><![CDATA[RFC]]></category>
+		<category><![CDATA[Steuersatz]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5078</guid>
+
+					<description><![CDATA[<p>Ausnahmsweise mal ein Ausflug in die Welt der Finanzbuchhaltung. Für mich ein Rotes Tuch mit Sieben Siegeln aus einem böhmischen Dorf... Ich werde trotzdem versuchen, den Sachverhalt nicht nur syntaktisch sondern auch inhaltlich korrekt wiederzugeben. Aus diesem Grund werde ich mich bewusst so schwammig wie möglich ausdrücken und Fachtermini wie "Erlöskonto", "Bilanz" oder "Buchungsschlüssel" vermeiden.</p>
+<p>Der Beitrag <a href="/blog/fi-beleg-mit-umsatzsteuer-buchen/">FI-Beleg mit Umsatzsteuer buchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ausnahmsweise mal ein Ausflug in die Welt der Finanzbuchhaltung. Für mich ein Rotes Tuch mit Sieben Siegeln aus einem böhmischen Dorf&#8230; Ich werde trotzdem versuchen, den Sachverhalt nicht nur syntaktisch sondern auch inhaltlich korrekt wiederzugeben. Aus diesem Grund werde ich mich bewusst so schwammig wie möglich ausdrücken und Fachtermini wie &#8220;Erlöskonto&#8221;, &#8220;Bilanz&#8221; oder &#8220;Buchungsschlüssel&#8221; vermeiden.</p>
+<h2>Aufgabe</h2>
+<p>Buchen eines FI-Beleges mit Umsatzsteuer. Es soll ein Bruttobetrag auf ein Konto und der zugehörige Nettobetrag auf ein Gegenkonto gebucht werden. Die Umsatzsteuer soll auf das richtige Umsatzsteuerkonto gebucht werden.</p>
+<h2>Hilfsmittel</h2>
+<p>Dass nur der BAPI_ACC_DOCUMENT_POST für diese Zwecke infrage kommt, war mir immerhin schnell klar. Wie man mit diesem Baustein bucht, habe ich ebenfalls schnell heraus gefunden. Eine Herausforderung war die Buchung der Umsatzsteuer. Von der irrigen Annahme, der Baustein könnte die Umsatzsteuer selber rechnen, habe ich mich schnell verabschieden müssen. Die Umsatzsteuer muss dem Baustein übergeben werden.</p>
+<p>Um die Umsatzsteuer zu berechnen, helfen diese beiden Bausteine:</p>
+<ul>
+<li>CALCULATE_TAX_FROM_NET_AMOUNT</li>
+<li>CALCULATE_TAX_FROM_GROSSAMOUNT</li>
+</ul>
+<p>Desweiteren notwendig ist eine Buchungsperiode. Diese lässt sich zwar auch einfach aus dem Datum errechnen, aber der Baustein CON_FIN_CURRENT_PERIOD_GET_2 hilft ebenfalls weiter. Da der Baustein sich auf den MM-Periodenverschieber bezieht, bin ich mir nicht sicher, ob der Baustein wirklich sinnvoll ist, aber in meinem Fall funktioniert er.</p>
+<h2>Beleg</h2>
+<p>Dieser Beleg kommt bei so einer Buchung heraus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/09/Beleg.png"><img decoding="async" class="alignnone size-medium wp-image-5079" src="https://tricktresor.com/wp-content/uploads/2014/09/Beleg-300x121.png" alt="Beleg" width="300" height="121" srcset="/wp-content/uploads/2014/09/Beleg-300x121.png 300w, /wp-content/uploads/2014/09/Beleg-624x252.png 624w, /wp-content/uploads/2014/09/Beleg.png 805w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT.
+PARAMETERs p_bukrs type bukrs DEFAULT '1000'.
+
+START-OF-SELECTION.
+
+  DATA ls_header TYPE bapiache09.
+  DATA lt_return TYPE STANDARD TABLE OF bapiret2.
+  DATA ls_return TYPE bapiret2.
+  DATA lt_acc_gl TYPE STANDARD TABLE OF bapiacgl09.
+  DATA ls_acc_gl LIKE LINE OF lt_acc_gl.
+  DATA lt_cur_am TYPE STANDARD TABLE OF bapiaccr09.
+  DATA ls_cur_am LIKE LINE OF lt_cur_am.
+  DATA lt_acc_tx TYPE STANDARD TABLE OF bapiactx09.
+  DATA ls_acc_tx LIKE LINE OF lt_acc_tx.
+  data lv_period type POPER.
+  data lv_year   type BDATJ.
+*== aktuelle Periode ermitteln
+  CALL FUNCTION 'CON_FIN_CURRENT_PERIOD_GET_2'
+    EXPORTING
+      id_bukrs                 = p_bukrs
+   IMPORTING
+     ED_CURRENT_YEAR          = lv_year
+     ED_CURRENT_PERIOD        = lv_period
+   EXCEPTIONS
+     INTERNAL_ERROR           = 1
+     OTHERS                   = 2.
+
+*== Header
+  ls_header-bus_act           = 'RFBU'.               "Betriebswirtschaftlicher Vorgang
+  ls_header-username          = 'ICH'.                "Name des Benutzers
+  ls_header-header_txt        = 'Test'.               "Belegkopftext
+  ls_header-comp_code         = p_bukrs.              "Buchungskreis
+  ls_header-doc_date          = sy-datum.             "Belegdatum im Beleg
+  ls_header-pstng_date        = sy-datum.             "Buchungsdatum im Beleg
+  ls_header-trans_date        = sy-datum.             "Umrechnungsdatum
+  ls_header-fisc_year         = lv_year.              "Geschäftsjahr
+  ls_header-fis_period        = lv_period.            "Geschäftsmonat
+  ls_header-doc_type          = 'SB'.                 "Belegart
+  ls_header-vatdate           = sy-datum.             "Steuermeldedatum
+
+
+*== Buchungszeile Haben
+  ls_acc_gl-itemno_acc        = 1.                    "Positionsnummer des Rechnungswesenbeleges
+  ls_acc_gl-gl_account        = '0000184040'.         "Sachkonto der Hauptbuchhaltung
+  ls_acc_gl-item_text         = 'Postext Haben'.      "Positionstext
+  ls_acc_gl-acct_key          = space.                "Vorgangsschlüssel
+  ls_acc_gl-acct_type         = 'S'.                  "Kontoart
+  ls_acc_gl-costcenter        = ''.
+  ls_acc_gl-value_date        = sy-datum.
+  APPEND ls_acc_gl TO lt_acc_gl.
+
+*== Buchungszeile Soll
+  ls_acc_gl-itemno_acc        = 2.                    "Positionsnummer des Rechnungswesenbeleges
+  ls_acc_gl-gl_account        = '0000420000'.         "Sachkonto der Hauptbuchhaltung
+  ls_acc_gl-item_text         = 'Postext Soll'  .     "Positionstext
+  ls_acc_gl-acct_key          = space.                "Vorgangsschlüssel
+  ls_acc_gl-acct_type         = 'S'.                  "Kontoart
+  ls_acc_gl-costcenter        = ''.
+  ls_acc_gl-value_date        = sy-datum.
+  ls_acc_gl-orderid           = 'XYZ'.                "Falls notwendig
+  APPEND ls_acc_gl TO lt_acc_gl.
+
+*== Haben Bruttobetrag
+  ls_cur_am-itemno_acc        = 1.
+  ls_cur_am-currency          = 'EUR'.
+  ls_cur_am-currency_iso      = 'EUR'.
+  ls_cur_am-amt_doccur        = '11.90-'.
+  ls_cur_am-curr_type         = '00'.
+  APPEND ls_cur_am TO lt_cur_am.
+
+*== Soll Nettobetrag
+  ls_cur_am-itemno_acc        = 2.
+  ls_cur_am-currency          = 'EUR'.
+  ls_cur_am-currency_iso      = 'EUR'.
+  ls_cur_am-amt_doccur        = '10.00'.
+  ls_cur_am-curr_type         = '00'.
+  APPEND ls_cur_am TO lt_cur_am.
+
+*== Soll Steuerbetrag
+  ls_cur_am-itemno_acc        = 3.
+  ls_cur_am-currency          = 'EUR'.
+  ls_cur_am-currency_iso      = 'EUR'.
+  ls_cur_am-amt_doccur        = '01.90'.
+  ls_cur_am-amt_base          = '10.00'.
+  ls_cur_am-curr_type         = '00'.
+  APPEND ls_cur_am TO lt_cur_am.
+
+*== Steuerinformation
+  ls_acc_tx-itemno_acc        = 3.
+  ls_acc_tx-tax_code          = 'AA'.
+  ls_acc_tx-cond_key          = 'MWAS'.
+  APPEND ls_acc_tx TO lt_acc_tx.
+
+*== Beleg buchen
+  CALL FUNCTION 'BAPI_ACC_DOCUMENT_POST'
+    EXPORTING
+      documentheader = ls_header
+    TABLES
+      accountgl      = lt_acc_gl
+      accounttax     = lt_acc_tx
+      currencyamount = lt_cur_am
+      return         = lt_return.
+
+*== Protokoll
+  LOOP AT lt_return INTO ls_return.
+    WRITE: / ls_return-row,
+             ls_return-message,
+           / ls_return-type,
+             ls_return-id,
+             ls_return-number,
+             ls_return-message_v1.
+  ENDLOOP.
+
+*== Commit work
+  CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+    IMPORTING
+      return = ls_return.</pre>
+<h2>Neuigkeiten</h2>
+<p>Januar 2015: SAP hat den Hinweis 2070697 zu den BAPIs BAPI_ACC_DOCUMENT_POST + BAPI_ACC_DOCUMENT_CHECK veröffentlicht:</p>
+<h3>Symptom</h3>
+<p>Es wird immer Steuer 0 errechnet oder nichtabzugsfähige Beträge werden nicht verteilt bei Verwendung der Methode gemäß Hinweis 1873588.</p>
+<h3>Ursache und Voraussetzungen</h3>
+<p>Mit Hinweis 1873588 wurde eine Methode zur Verfügung gestellt zur Ableitung der Steuerdaten für BAPIs. Die Methode soll das Füllen der Steuerdaten für die BAPIs bapi_acc_document_post und bapi_acc_document<strong>_</strong>check erleichtern, und zwar ursprünglich für die Ermittlung der Parameter für die zeilenweise Steuer mit Hinweis 1873588, weil hier grundlegende Änderungen im SAP Standard vorgenommen worden sind. Mit diesem Hinweis wird die Methode erweitert für die Berechnung von Steuern (VAT, Sales und Use Tax) inklusive Nichtabzugsfähigkeit und Anzahlungen. Es kann nun ein Gesamtsteuerbetrag für den Beleg vorgegeben werden, der dann entsprechend der berechneten Steuern verteilt wird. Ein neuer Parameter wurde eingeführt, mit dem der Methode mitgeteilt werden kann, dass der Belegsaldo die fehlende Steuer ist, die verteilt werden soll. Eine Berechnung wird nur für Belege durchgeführt, die keine Mischbelege sind, d.h. z.B. Belege mit Anzahlungen und steuerrelevanten Aufwandpositionen in einem Beleg werden <strong>nicht</strong> unterstützt. Steuern für Indien und Brasilien werden nicht durch diese Methode unterstützt. Direkte Steuern (DIRECT_TAX=&#8217;X&#8217;) werden ebenfalls nicht unterstützt.</p>
+<p>Des weiteren sind alle Änderungen inklusive der Änderungen des Hinweises 1873588 auch für SAPKH60000-60404 verfügbar, d.h. die Änderungen sind mit diesem Hinweis runtergezogen worden, wobei die zeilenweise Übergabe der Steuern erst ab SAPKH60405 möglich ist, weil die BAPIS mit SAPKH60405 um den Parameter ITEMNO_TAX erweitert worden sind. Die Serviceklasse ist somit ab SAPKH60000 verfügbar und wird in allen Enhancementpacks ab SAPKH60000 gleich gehalten. Zudem wird der Funktionsbaustein FI_TAX_SERVICES_CALCULATE angeboten, der RFC-fähig ist. Dieser kann über RFC aufgerufen werden und ruft im SAP-System anschließend die obengenannte  Methode FI_TAX_SERVICES=&gt;CALCULATE auf und gibt die Parameter zurück.</p>
+<h3>Lösung</h3>
+<p>Korrektur</p>
+<p>Der Beitrag <a href="/blog/fi-beleg-mit-umsatzsteuer-buchen/">FI-Beleg mit Umsatzsteuer buchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Allgemeines zu Adressen</title>
+		<link>/blog/allgemeines/</link>
+					<comments>/blog/allgemeines/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 22 May 2012 15:26:32 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Funktionsbausteine]]></category>
+		<category><![CDATA[Adressen]]></category>
+		<category><![CDATA[BAPIs]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=642</guid>
+
+					<description><![CDATA[<p>Allgemeines zu Adressen im SAP-System. </p>
+<p>Der Beitrag <a href="/blog/allgemeines/">Allgemeines zu Adressen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Allgemeines zu Adressen im SAP-System.</p>
+<p class="head1">Info</p>
+<p class="head2">Gültigkeit</p>
+<p class="text1">Jede Adresse hat theoretisch eine Gültigkeit. Diese Funktion wird jedoch meines Wissens nirgendwo im SAP System genutzt.</p>
+<p class="text1">Adressen sind immer vom 1.1.0001 bis zum 31.12.9999 gültig.</p>
+<p class="head1">Tabellen</p>
+<ul>
+<li>
+<div class="text1">ADRC &#8211; Enthält den Adressdatenteil zu einer Adresse.</div>
+</li>
+<li>ADR2 &#8211; Telefonnummern</li>
+<li>ADR3 &#8211; Faxnummern</li>
+<li>ADR6 &#8211; Email-Adressen</li>
+</ul>
+<p class="head1">Type-Pool SZADR</p>
+<p>Leider sind viele Strukturen nicht im Dictionary definiert, sondern &#8220;nur&#8221; im Type-Pool SZADR.</p>
+<p class="head1">Funktionsbausteine</p>
+<p>In der Regel fangen die Funktionsbausteine mit <strong>ADDR_</strong> an. Für spezielle Anwendungsfälle findet man hier sicherlich die richtigen Bausteine.</p>
+<p>Ebenfalls interessant könnten die BAPIs sein, die mit <strong>BAPI_ADDRESS</strong> beginnen.</p>
+<p>Der Beitrag <a href="/blog/allgemeines/">Allgemeines zu Adressen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/allgemeines/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Konditionen ändern</title>
+		<link>/blog/konditionen-aendern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Apr 2009 19:40:20 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Verkauf]]></category>
+		<category><![CDATA[BAPIs]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=519</guid>
+
+					<description><![CDATA[<p>Konditionen k&#246;nnen mit dem BAPI_SALESORDER_CHANGE ge&#228;ndert werden. Die M&#246;glichkeiten sind jedoch sehr beschr&#228;nkt. Bei jeder &#196;nderung wird eine neue Kondition eingef&#252;gt und die vorhandene auf "inaktiv" gesetzt. &#196;nderungen von Zu- und Abschl&#228;gen sind &#252;berhaupt nicht m&#246;glich. Mit dem folgenden Coding k&#246;nnen die Konditionen angepasst werden.</p>
+<p>Der Beitrag <a href="/blog/konditionen-aendern/">Konditionen ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Konditionen k&ouml;nnen mit dem BAPI_SALESORDER_CHANGE ge&auml;ndert werden. Die M&ouml;glichkeiten sind jedoch sehr beschr&auml;nkt. Bei jeder &Auml;nderung wird eine neue Kondition eingef&uuml;gt und die vorhandene auf &#8220;inaktiv&#8221; gesetzt. &Auml;nderungen von Zu- und Abschl&auml;gen sind &uuml;berhaupt nicht m&ouml;glich. Mit dem folgenden Coding k&ouml;nnen die Konditionen angepasst werden.<br /><P>Das Programm verwendet Standardfunktionsbausteine, die aber normalerweise nur intern genutzt werden.</P><P>Sollten Sie das folgende Coding also&nbsp;verwenden wollen, sollten Sie auf jeden Fall ausgiebig testen!</P><P>Denken Sie daran, dass es inaktive Konditionen geben kann oder eine Kondition als prozentualer&nbsp;Auf- oder Abschlag definiert als auch wertm&auml;&szlig;ig eingestellt sein kann&#8230;!</P><P>Das hier vorgestellte Coding &auml;ndert den Wert einer Kopfkondition. Diese wird auch ordnungsgem&auml;&szlig; auf die Positionen heruntergebrochen.</P><P class="sap1"><FONT color="#fb2412">*** DATA<BR></FONT>DATA gs_xkomv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE komv.<BR>DATA gt_xkomv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF komv.<BR>DATA gs_komk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;komk.<BR>DATA gs_komp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE&nbsp;komp.<BR><BR><FONT color="#fb2412">*** FIELD SYMBOLS<BR></FONT>FIELD-SYMBOLS &lt;komv&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE komv.<BR>FIELD-SYMBOLS &lt;dataloss&gt;&nbsp;&nbsp;&nbsp;&nbsp;TYPE c.<BR>FIELD-SYMBOLS &lt;konvchanged&gt;&nbsp;TYPE c.<BR><BR><FONT color="#fb2412">*** SELECTION SCREEN</FONT><BR>PARAMETERS p_vbeln TYPE vbeln DEFAULT &#8216;12345&#8217;.<BR><BR>START-OF-SELECTION.<BR><BR><FONT color="#fb2412">*** READ DOCUMENT</FONT><BR>&nbsp; CALL FUNCTION &#8216;SD_SALES_DOCUMENT_READ&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; document_number = p_vbeln.<BR><BR><FONT color="#fb2412">*** GET PRICING INFORMATION</FONT><BR>&nbsp; CALL FUNCTION &#8216;SD_SALES_PRICING_INFORMATION&#8217;<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e_komk = gs_komk<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e_komp = gs_komp<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ftkomv = gt_xkomv.<BR><BR><FONT color="#fb2412">*** CHANGE ONE HEADER CONDITION<BR></FONT>&nbsp; READ TABLE gt_xkomv ASSIGNING &lt;komv&gt; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WITH KEY kschl = &#8216;ZZZZ&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kposn = 0.<BR>&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*** CHANGE CONDITIONS VALUE</FONT><BR>&nbsp;&nbsp;&nbsp; SUBTRACT 3 FROM &lt;komv&gt;-kbetr.<BR><FONT color="#fb2412">*** CHECK IF CHANGES ARE OK:</FONT><BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;PRICING_CHECK&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; comm_head_i = gs_komk<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; comm_item_i = gs_komp<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; komv_i&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &lt;komv&gt;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; preliminary = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; condition&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc &gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Do something to stop updating the wrong condition<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp; ENDIF.<BR><BR><FONT color="#fb2412">*** ASSIGN DATA-LOSS-FLAG&nbsp;TO FORCE SAVING</FONT><BR>&nbsp; ASSIGN (&#8216;(SAPMV45A)R185D-DATALOSS&#8217;) TO &lt;dataloss&gt;.<BR>&nbsp; &lt;dataloss&gt; = &#8216;X&#8217;.<BR><BR><FONT color="#fb2412">*** ASSIGN&nbsp;CONDITIONS-CHANGED-FLAG&nbsp;TO FORCE SAVING CONDITIONS</FONT><BR>&nbsp; ASSIGN (&#8216;(SAPMV45A)KONV_GEAENDERT&#8217;) TO &lt;konvchanged&gt;.<BR>&nbsp; &lt;konvchanged&gt; = &#8216;X&#8217;.<BR><BR><FONT color="#fb2412">*** DO NOT UPDATE IF THERE ARE NO CONDITIONS</FONT><BR>&nbsp; CHECK gt_xkomv IS NOT INITIAL.<BR><BR><FONT color="#fb2412">*** SET NEW PRICING</FONT><BR>&nbsp; CALL FUNCTION &#8216;SD_SALES_PRICING_PUT&#8217;<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fxkomv = gt_xkomv.<BR><BR><FONT color="#fb2412">*** SAVE DOCUMENT</FONT><BR>&nbsp; CALL FUNCTION &#8216;SD_SALES_DOCUMENT_SAVE&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; synchron = &#8216;X&#8217;.&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/konditionen-aendern/">Konditionen ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Texte an BAPI übergeben</title>
+		<link>/blog/texte-an-bapi-uebergeben/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 22 Jun 2007 14:44:43 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SD]]></category>
+		<category><![CDATA[BAPIs]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=423</guid>
+
+					<description><![CDATA[<p>Die BAPIs zur Erstellung von Kundenauftr&#228;gen bieten keine M&#246;glichkeit, einen Text zu &#252;bergeben. Dieser kann aber durch einen EXPORT TO MEMORY an den BAPI &#252;bergeben werden. Hier zeigen wir Ihnen, wie das geht.</p>
+<p>Der Beitrag <a href="/blog/texte-an-bapi-uebergeben/">Texte an BAPI übergeben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die BAPIs zur Erstellung von Kundenauftr&auml;gen bieten keine M&ouml;glichkeit, einen Text zu &uuml;bergeben. Dieser kann aber durch einen EXPORT TO MEMORY an den BAPI &uuml;bergeben werden. Hier zeigen wir Ihnen, wie das geht.<br /><P>In folgendem Beispiel&nbsp;exportieren wir einen Kopftext. Dieser wird dann im BAPI zum Anlegen oder &Auml;ndern von Kundenauftr&auml;gen &uuml;bernommen.</P><P class="sap1"><FONT color="#fb2412">*** Structure Text for BAPI</FONT><BR>DATA: BEGIN OF gt_bapi_header_texts OCCURS 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INCLUDE STRUCTURE tlinekom.<BR>DATA: msgfn LIKE bapisdtext-function.<BR>DATA: END OF gt_bapi_header_texts.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Tabellen und Arbeitsbereich initialisieren</FONT><BR>CLEAR gt_bapi_header_texts.<BR>REFRESH gt_bapi_header_texts.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Zwei Textzeilen mit der Text-ID &#8220;Z001&#8221; einf&uuml;gen</FONT><BR>gt_bapi_header_texts-tdid&nbsp;&nbsp;&nbsp;&nbsp; =&nbsp;<FONT color="#008952">&#8216;Z001&#8217;</FONT>. <BR>gt_bapi_header_texts-tdspras&nbsp; = sy-langu.<BR>gt_bapi_header_texts-tdformat = <FONT color="#008952">&#8216;*&#8217;</FONT>.<BR>gt_bapi_header_texts-tdline&nbsp;&nbsp; = <FONT color="#008952">&#8216;Dies ist die erste Zeile&#8217;</FONT>.<BR>APPEND gt_bapi_header_texts.<BR>gt_bapi_header_texts-tdline&nbsp;&nbsp; = <FONT color="#008952">&#8216;Dies ist die zweite Zeile&#8217;</FONT>.<BR>APPEND gt_bapi_header_texts.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Texttabelle &uuml;bergeben</FONT><BR>EXPORT bapi_header_texts FROM gt_bapi_header_texts<BR>&nbsp;&nbsp;&nbsp; TO MEMORY ID &#8216;SDBAPITEXTHD&#8217;.</P><P class="text1">Nun kann z.B. der BAPI_SALESDOCU_CREATEWITHDIA aufgerufen werden. Der Text</P><P class="text1">Dies ist die erste Zeile<BR>Dies ist die zweite Zeile</P><P class="text1">wird in die Text-ID &#8220;Z001&#8221; &uuml;bernommen. Diese muss nat&uuml;rlich im Textschema vorhanden sein.</P></p>
+<p>Der Beitrag <a href="/blog/texte-an-bapi-uebergeben/">Texte an BAPI übergeben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Auftrag im Dialog anlegen</title>
+		<link>/blog/auftrag-im-dialog-anlegen/</link>
+					<comments>/blog/auftrag-im-dialog-anlegen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 22 Jun 2007 14:37:30 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[BAPIs]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=422</guid>
+
+					<description><![CDATA[<p>Hier stellen wir Ihnen ein BAPI vor, mit dem Sie Kundenauftragsfelder vorbelegen k&#246;nnen um den Kundenauftrag dann im Dialog weiter bearbeiten zu lassen. Diese Funktionalit&#228;t ist z.B. dann n&#252;tzlich, wenn f&#252;r einen Proze&#223; gleichbleibende Daten an verschiedenen Stellen erfasst werden m&#252;ssen. Die Vorbelegung vereinfacht den Proze&#223;.</p>
+<p>Der Beitrag <a href="/blog/auftrag-im-dialog-anlegen/">Auftrag im Dialog anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier stellen wir Ihnen ein BAPI vor, mit dem Sie Kundenauftragsfelder vorbelegen k&ouml;nnen um den Kundenauftrag dann im Dialog weiter bearbeiten zu lassen. Diese Funktionalit&auml;t ist z.B. dann n&uuml;tzlich, wenn f&uuml;r einen Proze&szlig; gleichbleibende Daten an verschiedenen Stellen erfasst werden m&uuml;ssen. Die Vorbelegung vereinfacht den Proze&szlig;.<br /><P class="sap1"><FONT color="#fb2412">*** Datenstrukturen f&uuml;r BAPI</FONT><BR>&nbsp; DATA ls_sales_header_in&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE bapisdhead1.<BR>&nbsp; DATA ls_sales_header_inx&nbsp;&nbsp;&nbsp;&nbsp; TYPE bapisdhead1x.<BR>&nbsp; DATA lv_salesdocument_ex&nbsp;&nbsp;&nbsp;&nbsp; TYPE vbeln.<BR>&nbsp; DATA lt_return&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF bapiret2.<BR>&nbsp; DATA ls_return&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bapiret2.<BR>&nbsp; DATA lt_sales_partners&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF bapipartnr.<BR>&nbsp; DATA ls_sales_partners&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bapipartnr.</P><P class="sap1">&nbsp; FIELD-SYMBOLS: &lt;val&gt;, &lt;valx&gt;.</P><P class="sap1"><FONT color="#fb2412">*** init data<BR></FONT>&nbsp; CLEAR: ls_sales_header_in<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , ls_sales_header_inx<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , lv_salesdocument_ex<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , lt_return<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , lt_sales_items_in<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , lt_sales_items_inx<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , lt_sales_partners<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , ls_return<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , ls_sales_items_in<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , ls_sales_items_inx<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; , ls_sales_partners.</P><P class="sap1"><FONT color="#fb2412">***&nbsp;Felder vorbelegen</FONT><BR>&nbsp; ls_sales_header_in-doc_type&nbsp;&nbsp;&nbsp; = &#8216;ZTA3&#8217;.<BR>&nbsp; ls_sales_header_in-sales_org&nbsp;&nbsp; = &#8216;1000&#8217;.<BR>&nbsp; ls_sales_header_in-distr_chan&nbsp; = &#8217;01&#8217;.<BR>&nbsp; ls_sales_header_in-division&nbsp;&nbsp;&nbsp; = &#8217;01&#8217;.<BR>&nbsp; ls_sales_header_in-sales_grp&nbsp;&nbsp; = &#8216;3A&#8217;.<BR>&nbsp; ls_sales_header_in-sales_off&nbsp;&nbsp; = &#8216;WEST&#8217;.<BR>&nbsp; ls_sales_header_in-ord_reason&nbsp; = &#8216;Z6&#8217;.<BR>&nbsp; ls_sales_header_in-compl_dlv&nbsp;&nbsp; = &#8216;X&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Partner<BR>***&nbsp;Auftraggeber<BR></FONT>&nbsp; ls_sales_partners-partn_role = &#8216;AG&#8217;.<BR>&nbsp; ls_sales_partners-partn_numb = &#8216;0000012345&#8217;.<BR>&nbsp; APPEND ls_sales_partners TO lt_sales_partners.</P><P class="sap1"><FONT color="#fb2412">***&nbsp;Warenempf&auml;nger</FONT><BR>&nbsp; IF NOT zvoev-kunwe IS INITIAL.<BR>&nbsp;&nbsp;&nbsp; ls_sales_partners-partn_role = &#8216;WE&#8217;.<BR>&nbsp;&nbsp;&nbsp; ls_sales_partners-partn_numb = &#8216;0030022222&#8217;.<BR>&nbsp;&nbsp;&nbsp; APPEND ls_sales_partners TO lt_sales_partners.<BR>&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">***&nbsp;Kundenauftrag im Dialog anlegen<BR></FONT>&nbsp; CALL FUNCTION &#8216;BAPI_SALESDOCU_CREATEWITHDIA&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sales_header_in&nbsp;&nbsp;&nbsp;&nbsp; = ls_sales_header_in<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sales_header_inx&nbsp;&nbsp;&nbsp; = ls_sales_header_inx<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; convert_parvw_auart = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; synchronous&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; salesdocument_ex&nbsp;&nbsp;&nbsp; = lv_salesdocument_ex<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_return<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sales_partners&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = lt_sales_partners.</P></p>
+<p>Der Beitrag <a href="/blog/auftrag-im-dialog-anlegen/">Auftrag im Dialog anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/auftrag-im-dialog-anlegen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

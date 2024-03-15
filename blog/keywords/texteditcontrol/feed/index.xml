@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>TextEditControl Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/texteditcontrol/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 21 Feb 2014 14:39:30 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>TextEditControl Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Drag&#8217;n&#8217;Drop mit Datei</title>
+		<link>/blog/dragndrop-mit-datei/</link>
+					<comments>/blog/dragndrop-mit-datei/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 25 Nov 2011 17:01:49 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[TextEditControl]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[docker]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[cl_gui_docking_container]]></category>
+		<category><![CDATA[ABAP-Objects]]></category>
+		<category><![CDATA[cl_gui_html_viewer]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=631</guid>
+
+					<description><![CDATA[<p>In diesem Beispiel zeigen wir, wie Sie eine Datei aus dem Windows-Explorer auf ein SAP-Control ziehen k&#246;nnen und den Dateipfad sowie Dateinamen angezeigt bekommen. So l&#228;sst sich z.B. eine Anwendung programmieren, die Dateien per Drag'n'Drop entgegen nimmt und auf den Application server hoch l&#228;dt.</p>
+<p>Der Beitrag <a href="/blog/dragndrop-mit-datei/">Drag&#8217;n&#8217;Drop mit Datei</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><a href="https://tricktresor.com/wp-content/uploads/2011/11/02_21_15_35_20.jpg"><img decoding="async" class="alignright size-medium wp-image-4505" alt="Drag and drop html" src="https://tricktresor.com/wp-content/uploads/2011/11/02_21_15_35_20-300x158.jpg" width="300" height="158" srcset="/wp-content/uploads/2011/11/02_21_15_35_20-300x158.jpg 300w, /wp-content/uploads/2011/11/02_21_15_35_20-624x330.jpg 624w, /wp-content/uploads/2011/11/02_21_15_35_20.jpg 625w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>In diesem Beispiel zeigen wir, wie Sie eine Datei aus dem Windows-Explorer auf ein SAP-Control ziehen können und den Dateipfad sowie Dateinamen angezeigt bekommen. So lässt sich z.B. eine Anwendung programmieren, die Dateien per Drag&#8217;n&#8217;Drop entgegen nimmt und auf den Application server hoch lädt.<br />
+SAP-Controls und Drag&#8217;n&#8217;Drop</p>
+<p>SAP-Controls können normalerweise nur DragDropObjekte aufnehmen, die auch von einem SAP-Control erzeugt wurden.</p>
+<p>Ausnahmen sind der ABAP-Editor und das TextEditControl: Sie können eine Textdatei auf das Control ziehen und der Inhalt wird im Control dargestellt.</p>
+<p>Leider feuert kein Control ein Event &#8220;DropComplete&#8221;, auf das man reagieren könnte, geschweige denn, dass man schon bei &#8220;onDrop&#8221; entscheiden könnte, ob man dieses Objekt haben möchte oder nicht.</p>
+<p>Eine Ausnahme bildet das HTML-Control, das ja den Internet Explorer verwendet um HTML- oder PDF-Dateien anzuzeigen.</p>
+<p>Das Control CL_GUI_HTML_VIEWER erzeugt das Ereignis &#8220;NAVIGATE_COMPLETE&#8221;, sobald die &#8220;Navigation&#8221; abgeschlossen wurde. Eine Datei, die per Drag and Drop auf dieses Control gezogen wird, löst ebenfalls dieses Ereignis aus.</p>
+<h2>Beschreibung</h2>
+<p>Dieses Programm dockt das HTML-Control an das Selektionsbild an und zeigt die URL einer ge-drop-ten Datei an.</p>
+<h2>Code</h2>
+<pre>REPORT z_dock_drop.
+*** Selection screen
+PARAMETERS: p_url     TYPE string.
+INITIALIZATION.
+  PERFORM create_objects.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS:
+      handle_navigate_complete
+          FOR EVENT navigate_complete
+          OF cl_gui_html_viewer
+            IMPORTING url sender.
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+
+  METHOD handle_navigate_complete.
+    p_url = url.
+*    sender-&gt;go_back( ). "If object should not be displayed
+  ENDMETHOD.                    "handle_sapevent
+ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CREATE_OBJECTS
+*&amp;---------------------------------------------------------------------*
+FORM create_objects.
+*** Data
+  DATA cl_docker         TYPE REF TO cl_gui_docking_container.
+  DATA t_events        TYPE cntl_simple_events.
+  DATA wa_event        LIKE LINE OF t_events.
+  DATA event_receiver  TYPE REF TO lcl_event_receiver.
+  DATA t_html          TYPE STANDARD TABLE OF text8192
+                       WITH NON-UNIQUE DEFAULT KEY.
+  DATA html            LIKE LINE OF t_html.
+  DATA url             TYPE text1000.
+  DATA cl_html         TYPE REF TO cl_gui_html_viewer.
+
+*** create docker
+  CREATE OBJECT cl_docker
+    EXPORTING
+      extension               = 300
+      side                    = cl_gui_docking_container=&gt;dock_at_bottom
+      no_autodef_progid_dynnr = 'X'.
+
+*** create HTML
+  CREATE OBJECT cl_html
+    EXPORTING
+      parent = cl_docker.
+
+*** Register NAVIGATE_COMPLETE
+  CALL METHOD cl_html-&gt;get_registered_events
+    IMPORTING
+      events = t_events.
+      wa_event-eventid    = cl_gui_html_viewer=&gt;m_id_navigate_complete.
+      wa_event-appl_event = 'X'.
+  READ TABLE t_events TRANSPORTING NO FIELDS
+        WITH KEY eventid = wa_event-eventid.
+  IF sy-subrc &lt;&gt; 0.
+    APPEND wa_event TO t_events.
+  ENDIF.
+  CALL METHOD cl_html-&gt;set_registered_events
+    EXPORTING
+      events = t_events.
+SET HANDLER lcl_event_receiver=&gt;handle_navigate_complete FOR cl_html.
+
+*** Build HTML-Code
+  CONCATENATE  '&lt;html&gt;'
+               '&lt;head&gt;&lt;title&gt;Dropzone&lt;/title&gt;'
+               '&lt;/head&gt;'
+               '&lt;body bgcolor="#22FF22"&gt;'
+               '&lt;p&gt;&lt;font size= 30&gt;hierher mit den Bildern!!&lt;/font&gt;&lt;/p&gt;'
+               '&lt;/body&gt;'
+               '&lt;/html&gt;'
+          INTO html.
+  APPEND html TO t_html.
+
+*** load HTML
+  CALL METHOD cl_html-&gt;load_data
+    IMPORTING
+      assigned_url = url
+    CHANGING
+      data_table   = t_html.
+
+*** Show HTML page
+  CALL METHOD cl_html-&gt;show_url
+    EXPORTING
+      url = url.
+ENDFORM.                    " CREATE_OBJECTS</pre>
+<p>Der Beitrag <a href="/blog/dragndrop-mit-datei/">Drag&#8217;n&#8217;Drop mit Datei</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dragndrop-mit-datei/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Textstream konvertieren</title>
+		<link>/blog/textstream-konvertieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 03 Mar 2010 14:36:39 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[TextEditControl]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=541</guid>
+
+					<description><![CDATA[<p>Texte werden in SAP in der Regel als ITF-Texte gespeichert. Das heisst, der Text besteht aus einer Formatierungsspalte und dem eigentlichen Text. Das TextEditControl kann diesen Text jedoch nicht verarbeiten. Gl&#252;cklicherweise gibt es Bausteine daf&#252;r...</p>
+<p>Der Beitrag <a href="/blog/textstream-konvertieren/">Textstream konvertieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Texte werden in SAP in der Regel als ITF-Texte gespeichert. Das heisst, der Text besteht aus einer Formatierungsspalte und dem eigentlichen Text. Das TextEditControl kann diesen Text jedoch nicht verarbeiten. Gl&uuml;cklicherweise gibt es Bausteine daf&uuml;r&#8230;<br /><P class="head1">Umwandlung von ITF zu Textstream</P><P>Funktionsbaustein CONVERT_ITF_TO_STREAM_TEXT</P><P class="head1">Umwandlung von Textstream zu ITF</P><P>Funktionsbaustein CONVERT_STREAM_TO_ITF_TEXT</P><P class="head1">Aufbereitung</P><P>Gegebenenfalls muss der ITF-Text noch mit folgenden Funktionsbausteinen aufbereitet werden:</P><P class="head2">TEXT_CONTROL_REPLACE</P><P>IF/ELSE/CASE-Strukturen in Text aufl&ouml;sen</P><P class="head2">TEXT_INCLUDE_REPLACE</P><P>Includetexte in Text aufl&ouml;sen</P><P class="head2">TEXT_SYMBOL_COLLECT</P><P>Symbole eines Textes geben</P><P class="head2">TEXT_SYMBOL_PARSE</P><P>Symbol parsen</P><P class="head2">TEXT_SYMBOL_REPLACE</P><P>Symbole durch Wert ersetzen</P><P class="head2">TEXT_SYMBOL_SETVALUE</P><P>Wert eines Symbols setzen<BR></P></p>
+<p>Der Beitrag <a href="/blog/textstream-konvertieren/">Textstream konvertieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Textbereich hervorheben</title>
+		<link>/blog/textbereich-hervorheben/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 22 Jun 2007 15:04:23 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[TextEditControl]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=424</guid>
+
+					<description><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie in einem Textcontrol einen Bereich farblich hervorheben k&#246;nnen. Was auf den ersten Blick als Spielerei aussieht, kann durchaus seine Bewandnis haben. So kann z.B. dem Anwender deutlich gemacht werden, dass nur die ersten 200 Zeichen an ein Subsystem gesendet werden. Diese sind dann farblich markiert.</p>
+<p>Der Beitrag <a href="/blog/textbereich-hervorheben/">Textbereich hervorheben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier zeigen wir Ihnen, wie Sie in einem Textcontrol einen Bereich farblich hervorheben k&ouml;nnen. Was auf den ersten Blick als Spielerei aussieht, kann durchaus seine Bewandnis haben. So kann z.B. dem Anwender deutlich gemacht werden, dass nur die ersten 200 Zeichen an ein Subsystem gesendet werden. Diese sind dann farblich markiert.<br /><P>In einem TextControl sieht die farbliche Hervorhebung z.B. so aus:</P><P><IMG src="https://tricktresor.com/wp-content/uploads/tt_images/hc_001.jpg"></P><P>Die Methoden f&uuml;r die Klasse CL_GUI_TEXTEDIT heissen so:</P><P class="sap1"><FONT color="#fb2412">***&nbsp;Die ersten&nbsp;200 Zeichen markieren&#8230;</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD gr_textctrl-&gt;set_selection_indexes<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from_index = 0<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; to_index&nbsp;&nbsp; = 120<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR><BR><FONT color="#fb2412">*** &#8230;die Selektion hervorheben&#8230;</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD gr_textctrl-&gt;highlight_selection<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; highlight_mode = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4.<BR><BR><FONT color="#fb2412">*** &#8230;und die Markierung wieder entfernen:</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD gr_textctrl-&gt;set_selection_indexes<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; from_index = 0<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; to_index&nbsp;&nbsp; = 0<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp; = 2.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/textbereich-hervorheben/">Textbereich hervorheben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

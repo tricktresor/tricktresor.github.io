@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>tabellenumsetzung Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/tabellenumsetzung/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 28 Oct 2019 16:58:04 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>tabellenumsetzung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Fehlerhafte Tabellenumsetzung korrigieren</title>
+		<link>/blog/fehlerhafte-tabellenumsetzung-korrigieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 11 Jul 2003 16:29:25 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<category><![CDATA[tabellenumsetzung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=87</guid>
+
+					<description><![CDATA[<p>Bei der &#196;nderung einer Tabellenstruktur kann es passieren, dass die Tabelle aufgrund von Konvertierungsfehlern nicht umgesetzt werden kann. Nach &#196;nderung eines Tabellenfeldes wird der Dateninhalt auf eine Schattentabelle direkt auf der Datenbank kopiert, die Struktur der Original-Tabelle wird ge&#228;ndert und dann werden die Tabelleninhalte wieder zur&#252;ckkopiert. Hierbei kann es zu Fehlern kommen. Wir zeigen Ihnen hier, wie Sie bei einem solchen Fehler Ihre Daten trotzdem retten k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/fehlerhafte-tabellenumsetzung-korrigieren/">Fehlerhafte Tabellenumsetzung korrigieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei der Änderung einer Tabellenstruktur kann es passieren, dass die Tabelle aufgrund von Konvertierungsfehlern nicht umgesetzt werden kann. Nach Änderung eines Tabellenfeldes wird der Dateninhalt auf eine Schattentabelle direkt auf der Datenbank kopiert, die Struktur der Original-Tabelle wird geändert und dann werden die Tabelleninhalte wieder zurückkopiert. Hierbei kann es zu Fehlern kommen. Wir zeigen Ihnen hier, wie Sie bei einem solchen Fehler Ihre Daten trotzdem retten können.</p>
+<p class="head1"><span style="color: #fb2412;">Achtung!</span></p>
+<p class="text1"><span style="color: #fb2412;">Dieser Tipp ist nur für Profis geeignet!!<br />
+</span><span style="color: #fb2412;">Für Datenverluste oder Fehler übernehmen wir keine Haftung!</span></p>
+<h2>Hintergrund</h2>
+<p>Wenn Sie eine Tabellenstruktur ändern, so wird der Inhalt auf eine Schattentabelle kopiert. Diese Schattentabelle existiert nicht im R/3, sondern nur auf der Datenbank.</p>
+<p>Danach wird die Struktur der Originaltabelle geändert und die Daten aus der Schattentabelle wieder &#8212; Feld für Feld &#8212; zurück kopiert.</p>
+<h2>Der Fehler</h2>
+<p>Bei dem Zurückkopieren der Daten kann es zu Fehlern kommen. Nämlich immer dann, wenn der Feldinhalt nicht in das neue Format konvertiert werden kann.</p>
+<p><strong><u>Beispiel:</u></strong></p>
+<p>Sie ändern das Feld Ihrer Tabelle vom Format &#8220;CHAR&#8221; auf das Format &#8220;NUMC&#8221;. Normalerweiser sollten dann in dem Feld nur numerische Werte stehen. Nun kann es aber sein, dass trotzdem Zeichen in diesem Feld stehen. Das Feld kann nun nicht konvertiert werden</p>
+<h2>Vorgehen</h2>
+<p>Geraten Sie nicht in Panik! Die Daten sind noch da! In der besagten Schattentabelle ist der gesamte Tabelleninhalt gespeichert.</p>
+<p>Ihre Originaltabelle ist zwar im Status &#8220;inaktiv&#8221;, Sie können sie aber trozdem kopieren. Kopieren Sie also die Tabelle, zum Beispiel von &#8220;ZTAB1&#8221; auf &#8220;ZTAB2&#8221; und ändern Sie die Felder wieder auf den ursprünglichen Typ. Aktivieren Sie die neue Tabelle.</p>
+<p>Bearbeiten Sie die Originaltabelle mit der Transaktion SE11. Gehen Sie in das Datenbankutility (Menü: <em>Hilfsmittel &#8211; Datenbankutility</em>) und rufen Sie das &#8220;Objektprotokoll&#8221; auf. Hier sehen Sie den Namen der Schattentabelle: QCMZTAB1. Wenn der Name der Originaltabelle sehr lang war, wird der Rest bei der Benamsung der QCM-Tabelle einfach abgeschnitten.</p>
+<p>Rufen Sie nun mit der SE38 das Programm RADBTCPY auf. In das Feld &#8220;<span style="color: #008952;">Quelltabelle</span>&#8221; geben Sie den Namen der Schattentabelle ein, in das Feld &#8220;<span style="color: #008952;">Zieltabelle</span>&#8221; den Namen der kopierten Tabelle.</p>
+<p>Führen Sie das Programm aus. Die Daten werden nun von der Schattentabelle in die kopierte Tabelle kopiert. Von da an sollte es kein Problem mehr sein, die Fehler in der Tabelle zu bereinigen&#8230;</p>
+<h2>Praxisbeispiel</h2>
+<h3>Die Tabelle</h3>
+<p>Die Tabelle ZTEST1 hat die Felder MANDT, LAND und WERT und ist wie folgt gefüllt:</p>
+<p>MANDT LAND             WERT<br />
+&#8212;&#8211; &#8212;- &#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+030   DE             123.45<br />
+030   DK             134,23<br />
+030   ES             120.43</p>
+<p>Wenn Sie nun den Datentyp des Feldes &#8220;WERT&#8221; von &#8220;CHAR&#8221; auf &#8220;DEC&#8221; ändern (Datenelement CHAR16 nach DEC8_2) ist die Aktivierung nicht möglich; Sie müssen den Tabellenumsetzer verwenden.</p>
+<p class="text1">Gehen Sie hierzu im Menü auf &#8220;Hilfsmittel &#8211; Datenbank-Utility&#8221; und klicken Sie auf [Aktivieren und Datenbank anpassen] [X] Daten erhalten.</p>
+<p>Sie erhalten nun einen Programmabbruch:</p>
+<p><span style="color: #ff0000;">CONVT_NO_NUMBER: &#8221; 134,23 &#8221; nicht als Zahl interpretierbar</span></p>
+<p>Sie können nun die Tabelle mit der Transaktion SE11 nicht mehr ändern, da sie gesperrt ist (Meldung &#8220;ZTEST ist gesperrt, da ein Aufsetzprotokoll existiert&#8221;).</p>
+<h3>Fehleranalyse</h3>
+<p>Gehen Sie erneut in das Datenbankutility (Transaktion SE14) und wählen Sie [Bearbeiten]. Sie sehen folgende Meldung:</p>
+<figure><img decoding="async" src="/wp-content/uploads/tt_images/db1.jpg" alt="" /><figcaption>Die Fehlerinformation nach dem Umsetzen</figcaption></figure>
+<p>Klicken Sie auf [Anpassung analysieren] und Sie erhalten die folgenden Informationen:</p>
+<figure><img decoding="async" class="alignleft" src="/wp-content/uploads/tt_images/db2.jpg" alt="" /><figcaption>Das genaue Protokoll</figcaption></figure>
+<p>Unten sehen Sie den Punkt &#8220;Umbenannte Ausgangstabelle&#8221;. Hier steht der Name der Schattentabelle. Da diese Tabelle nur auf der Datenbank existiert, aber nicht im R/3-Dictionary angelegt ist, können Sie die Tabelleninhalte mit der Transaktion SE16 nicht anzeigen lassen!</p>
+<h3>Daten Retten</h3>
+<p>Um die Daten zu erhalten, kopieren Sie in der SE11 die Tabelle ZTEST1 auf ZTEST2. Ändern Sie den Typ des Feldes &#8220;WERT&#8221; wieder auf &#8220;CHAR16&#8221; und aktivieren Sie die Tabelle.</p>
+<p>Führen Sie mit der Transaktion SE38 oder SA38 das Programm RADBTCPY aus. Geben Sie als Quelltabelle den Namen der Schattentabelle an: QCMZTEST1 und als Zieltabelle Ihre Tabellen-Kopie: ZTEST2.</p>
+<h3>Fehler beheben</h3>
+<p>Sie müssen nun die Daten der Schattentabelle QCMZTEST1 löschen, andernfalls können die Daten nicht zurück kopiert werden. Mit &#8220;normalem&#8221; ABAP kommen Sie hier nicht weiter, da die Tabelle ja im Dictionary nicht bekannt ist.</p>
+<p>Wir müssen OPEN SQL verwenden. Gehen Sie in die Pflege der Funktionsbausteine (Transaktion SE37) und &#8220;Testen&#8221; Sie den Baustein DB_EXECUTE_SQL.</p>
+<p><strong><span style="color: #fb2412;">ACHTUNG! BEI FALSCHER ANWENDUNG KÖNNEN SIE DATEN UNWIDERRUFLICH LÖSCHEN!</span></strong></p>
+<p>Im Eingabebild des Funktionsbausteins geben Sie beim Parameter STMT den folgenden SQL-Befehl ein:</p>
+<p><code>DELETE FROM QCMZTEST</code></p>
+<p>Die Tabelle QCMTEST wurde nun geleert. Beheben Sie nun die Fehler in der Tabellenkopie ZTEST2, die zu dem  Konvertierungsfehler führen. Hierzu müssen Sie einen Report schreiben, oder die Daten über die Tabellenpflege korrigieren.</p>
+<h3>Daten zurückkopieren</h3>
+<p>Verwenden Sie nun den Report RADBTCPY erneut, um die Daten von ZTEST2 nach QCMZTEST1 zu kopieren. Deaktivieren Sie das Häkchen &#8220;Tabelle exklusiv sperren&#8221;.</p>
+<p>Sollten noch Werte vorhanden sein, die nicht umgesetzt werden können, so merken Sie es hier ebenfalls an einem Programmabbruch &#8220;CONVT_NO_NUMBER&#8221;&#8230;</p>
+<h3>Umsetzung fortsetzen</h3>
+<p>Sie können nun im Datenbank-Utility mit der Umsetzung fortfahren. Die Tabelle sollte danach wieder aktiv sein und alle Daten enthalten.</p>
+<h2>Hinweis</h2>
+<p>Mit dem Report ADBC_QUERY kann der Inhalt der Schattentabelle selektiert und angezeigt werden.</p>
+<p>&lt;/p&#8221;&gt;</p>
+<p>Der Beitrag <a href="/blog/fehlerhafte-tabellenumsetzung-korrigieren/">Fehlerhafte Tabellenumsetzung korrigieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

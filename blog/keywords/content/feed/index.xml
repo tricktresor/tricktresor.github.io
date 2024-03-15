@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>content Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/content/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:00 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>content Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Content in einem Artikel verstecken [WordPress]</title>
+		<link>/blog/content-in-einem-artikel-verstecken-wordpress/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 May 2014 16:35:00 +0000</pubDate>
+				<category><![CDATA[plugins]]></category>
+		<category><![CDATA[Wordpress]]></category>
+		<category><![CDATA[inhalt]]></category>
+		<category><![CDATA[shortcode]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[wordpress]]></category>
+		<category><![CDATA[content]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4722</guid>
+
+					<description><![CDATA[<p>Im Artikel soll ein bestimmter Absatz nicht angezeigt werden, wenn auf den Artikel von extern verlinkt wurde. Ich zeige hier zwei Möglichkeiten, mit denen das einfach möglich ist.</p>
+<p>Der Beitrag <a href="/blog/content-in-einem-artikel-verstecken-wordpress/">Content in einem Artikel verstecken [WordPress]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wieder was dazu gelernt&#8230; In einem WordPress-Artikel wollte ich einen bestimmten Inhalt anders darstellen, wenn der Besucher über einen bestimmten Link auf den Artikel gelangt. Ich dachte erst daran, einfach den Artikel zu kopieren und den Inhalt entsprechend abzuändern. Allerdings wäre dann der Artikel auch zweimal auf der Startseite und in der Suche aufgetaucht. Dann dachte ich daran, den Artikel als Seite zu erstellen. Dadurch wäre die Seite jedoch in meiner Navigation aufgetaucht, was ich ebenfalls nicht wollte.</p>
+<p>Ein Freund hat mir die folgenden beiden Alternativen vorgeschlagen:</p>
+<h2>Verhindern, dass die Seite im Menü erscheint</h2>
+<p>Dies ist mit dem Plugin <a title="Exclude Pages | Plugin" href="http://wordpress.org/plugins/exclude-pages/">Exclude Pages</a> möglich. Mit diesem Plugin kann man zu jeder Seite entscheiden, ob sie im Menü erscheinen soll, oder nicht. Ich habe diese Option nicht ausprobiert, denke jedoch, dass sie funktioniert hätte.</p>
+<h2>Shortcode erstellen</h2>
+<p>Mit folgendem kleinen Coding in der functions.php im Childe-Theme-Verzeichnis ist es möglich, Absätze auszublenden, wenn der Link eine bestimmte Variable enthält.</p>
+<pre>function hidevar_shortcode( $atts, $content = null ) {
+             extract( shortcode_atts( array(
+                              'varname' =&gt; '',
+                             ), $atts ) );
+  if(!empty($varname) &amp;&amp; !empty($_REQUEST[$varname])) {
+    return false;
+  } else {
+    return $content;
+  }
+}
+
+add_shortcode( 'hidevar', 'hidevar_shortcode' );</pre>
+<h3>Anwendung im Content</h3>
+<pre>[hidevar varname='test']Dieser Text soll ggf. verschwinden[/hidevar]</pre>
+<p>Wenn Du jetzt die Seite mit</p>
+<pre>www.tricktresor.com/blog/mein-artikel/?test=yes</pre>
+<p>aufrufst wird der entsprechenden Text zwischen den Shortcode-Klammern verschwinden Und zwar egal was Du an Wert übergibst, denn derzeit wird nur geprüft, ob die Variable einen Wert besitzt.</p>
+<h2>Update</h2>
+<p>Mit irgendeinem WP-Update wurde die shortcode API geändert:</p>
+<p><a href="https://make.wordpress.org/core/2015/07/23/changes-to-the-shortcode-api/">https://make.wordpress.org/core/2015/07/23/changes-to-the-shortcode-api/</a></p>
+<p>Das hat zur Folge, das der oben genannte Trick so nicht mehr funktioniert. Normaler Inhalt wird weiterhin korrekt angezeigt bzw. ausgeblendet. Wenn du jedoch andere Shortcodes innerhalb von [hidevar] verwendest, dann funktioniert das nicht mehr.</p>
+<p>Die Lösung: Der übergebene Inhalt muss einmal aufbereitet werden:</p>
+<p><a href="https://developer.wordpress.org/reference/functions/do_shortcode/">https://developer.wordpress.org/reference/functions/do_shortcode/</a></p>
+<p>Anstelle von</p>
+<pre>return $content;</pre>
+<p>muss es nun heißen:</p>
+<pre>return do_shortcode($content);</pre>
+<p>Der Beitrag <a href="/blog/content-in-einem-artikel-verstecken-wordpress/">Content in einem Artikel verstecken [WordPress]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

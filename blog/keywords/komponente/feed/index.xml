@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Komponente Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/komponente/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:47 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Komponente Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Komponenten einem Fertigungsauftrag hinzufügen</title>
+		<link>/blog/komponenten-einem-fertigungsauftrag-hinzufuegen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 31 Mar 2017 23:42:35 +0000</pubDate>
+				<category><![CDATA[Produktion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Komponente]]></category>
+		<category><![CDATA[Fertigungsauftrag]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017963</guid>
+
+					<description><![CDATA[<p>Für den Fertigungsaufträge sind die BAPIs leider sehr rar gesät und man muss auf andere Bausteine ausweichen. Um einem Auftrag Komponenten hinzuzufügen, habe ich nur den Baustein CO_XT_COMPONENT_ADD gefunden. Die CO_XT-Funktionsbausteine sind zwar prinzipiell "extern" und in der Funktionsgruppe "APIs Fertigungsauftrag", jedoch sind die Bausteine allesamt sehr mit Vorsicht zu genießen.</p>
+<p>Der Beitrag <a href="/blog/komponenten-einem-fertigungsauftrag-hinzufuegen/">Komponenten einem Fertigungsauftrag hinzufügen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Für den Fertigungsaufträge sind die BAPIs leider sehr rar gesät und man muss auf andere Bausteine ausweichen. Um einem Auftrag Komponenten hinzuzufügen, habe ich nur den Baustein CO_XT_COMPONENT_ADD gefunden. Die CO_XT-Funktionsbausteine sind zwar prinzipiell &#8220;extern&#8221; und in der Funktionsgruppe &#8220;APIs Fertigungsauftrag&#8221;, jedoch sind die Bausteine allesamt sehr mit Vorsicht zu genießen.</p>
+<p>Das folgende Coding fügt einem Fertigungsauftrag eine Komponente (Materialnummer) hinzu.</p>
+<h2>Code</h2>
+<pre class="">"Lokale Daten
+DATA ls_return TYPE coxt_bapireturn.
+DATA lt_return TYPE coxt_t_bapireturn.
+DATA lv_error_occurred TYPE boolean.
+DATA ls_resbd_created TYPE resbd.
+DATA lt_resbt_exp TYPE STANDARD TABLE OF resbb.
+DATA lv_posnr TYPE positionno.
+
+DATA ls_quan TYPE coxt_s_quantity.
+DATA ls_stor_loc TYPE coxt_s_storage_location.
+DATA ls_stor_loc_x TYPE coxt_s_storage_locationx.
+
+ls_quan-quantity    = menge.
+ls_quan-uom         = meins.
+
+ls_stor_loc-werks   = werks.
+ls_stor_loc-lgort   = lgort.
+ls_stor_loc_x-werks = abap_true.
+ls_stor_loc_x-lgort = abap_true.
+
+"Komponente hinzufügen
+CALL FUNCTION 'CO_XT_COMPONENT_ADD'
+  EXPORTING
+    is_order_key         = aufnr
+    i_material           = matnr
+    is_requ_quan         = ls_quan
+    i_operation          = 1
+    is_storage_location  = ls_stor_loc
+    is_storage_locationx = ls_stor_loc_x
+    i_postp              = 'L' "Lagerposition
+    i_posno              = lv_posnr
+  IMPORTING
+    es_bapireturn        = ls_return
+    e_error_occurred     = lv_error_occurred
+    es_resbd_created     = ls_resbd_created
+  TABLES
+    resbt_exp            = lt_resbt_exp.
+
+IF lv_error_occurred = abap_false.
+*== PRE-Commit
+  CALL FUNCTION 'CO_XT_ORDER_PREPARE_COMMIT'
+    TABLES
+      et_bapireturn = lt_return.
+
+"Keine Fehler!
+  CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+ELSE.
+"Fehlerbehandlung
+ENDIF.</pre>
+<h2>Fehlende Positionsnummer</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-01_01-41-27.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017967 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-01_01-41-27.jpg" alt="" width="455" height="140" srcset="/wp-content/uploads/2017/04/2017-04-01_01-41-27.jpg 455w, /wp-content/uploads/2017/04/2017-04-01_01-41-27-300x92.jpg 300w" sizes="(max-width: 455px) 100vw, 455px" /></a></p>
+<p>Der Baustein hat leider einen kleinen Schönheitsfehler: Die Positionsnummer (RSB-POSNR) wird leider nicht gesetzt und kann auch nicht ohne weiteres geändert werden. Um die Positionsnummer trotzdem ändern zu können, habe ich zwei Lösungen gefunden:</p>
+<ol>
+<li>Die Änderung der internen Tabelle RESB_BT  über einen Dirty-Assign</li>
+<li>Änderung über die Standardbausteine
+<ul>
+<li>CO_BT_RESB_READ_WITH_KEY</li>
+<li>CO_BT_RESB_GET_LAST_POSNR</li>
+<li>CO_BT_RESB_UPDATE</li>
+</ul>
+</li>
+</ol>
+<p>Die Änderung muss nach dem CO_XT_COMPONENT_ADD und vor dem Commit erfolgen.</p>
+<h3>Positionsnummer ändern über Dirty-Assign</h3>
+<pre class="">*--------------------------------------------------------------------*
+* set item number
+*--------------------------------------------------------------------*
+  TYPES: BEGIN OF ts_resb_bt.
+    INCLUDE TYPE resbb.
+    TYPES: indold LIKE sy-tabix,
+    no_req_upd LIKE sy-datar,
+  END OF ts_resb_bt.
+
+  TYPES tt_resb_bt TYPE TABLE OF ts_resb_bt.
+  FIELD-SYMBOLS &lt;lt_resb_bt&gt; TYPE tt_resb_bt.
+  FIELD-SYMBOLS &lt;ls_resb_bt&gt; TYPE ts_resb_bt.
+
+  ASSIGN ('(SAPLCOBC)RESB_BT[]') TO &lt;lt_resb_bt&gt;.
+  LOOP AT &lt;lt_resb_bt&gt; ASSIGNING &lt;ls_resb_bt&gt;.
+    IF &lt;ls_resb_bt&gt;-posnr IS INITIAL.
+      &lt;ls_resb_bt&gt;-posnr = CONV numc04( &lt;ls_resb_bt&gt;-rspos * 10 ).
+    ENDIF.
+  ENDLOOP.
+</pre>
+<h3>Änderung der Positionsnummer über Funktionsbausteine</h3>
+<pre class=""> DATA resbd_exp TYPE resbd.
+ DATA posnr_max TYPE tcn41-posnr_mat.
+ DATA index_exp TYPE sy-tabix.
+ DATA vbkz_exp  TYPE resbb-vbkz.
+ DATA nfgrp_exp TYPE resbd-nfgrp.
+ DATA posnr_exp TYPE resbd-posnr.
+
+ CALL FUNCTION 'CO_BT_RESB_READ_WITH_KEY'
+   EXPORTING
+     rsart_imp = ls_resbd-rsart
+     rsnum_imp = ls_resbd-rsnum
+     rspos_imp = ls_resbd-rspos
+   IMPORTING
+     index_exp = index_exp " Index interner Tabellen
+     posnr_exp = posnr_exp " Nummer der Stücklistenposition
+     resbd_exp = resbd_exp " Reservierung/Sekundärbedarf
+     nfgrp_exp = nfgrp_exp " Ein-/Auslaufdaten: Nachfolgegruppe
+     vbkz_exp  = vbkz_exp " Verbuchungskennzeichen
+   EXCEPTIONS
+     not_found = 1
+     OTHERS    = 2.
+
+ CALL FUNCTION 'CO_BT_RESB_GET_LAST_POSNR'
+   EXPORTING
+     aufpl     = aufpl
+     aplzl     = aplzl
+   IMPORTING
+     posnr_max = posnr_max. 
+
+ resbd_exp-posnr = posnr_max + 10.
+
+ CALL FUNCTION 'CO_BT_RESB_UPDATE'
+   EXPORTING
+     resb_new  = resbd_exp
+     tabix_old = index_exp.</pre>
+<h2>Dialog oder nicht Dialog?</h2>
+<p>Ein weiteres Problem könnte der Baustein CO_XT_ORDER_PREPARE_COMMIT machen, denn bei der Änderung des Fertigungsauftrags können Popups erscheinen, die vom Anwender bestätigt werden müssen.</p>
+<p>Wenn man Dialoge verhindern möchte, dann muss der Update-Baustein CO_ZV_ORDER_POST direkt aufgerufen werden. Dieser hat einen Parameter NO_DIALOG, den man entsprechend mit X besetzen kann.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/komponenten-einem-fertigungsauftrag-hinzufuegen/">Komponenten einem Fertigungsauftrag hinzufügen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

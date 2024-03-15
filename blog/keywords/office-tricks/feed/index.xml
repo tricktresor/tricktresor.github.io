@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Office-Tricks Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/office-tricks/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 10 Jan 2014 16:52:13 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Office-Tricks Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>CSV-Export</title>
+		<link>/blog/csv-export/</link>
+					<comments>/blog/csv-export/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 28 Dec 2010 19:11:23 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[Office-Tricks]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=570</guid>
+
+					<description><![CDATA[<p>Ein kleines VB-Script um ein Arbeitsblatt als CSV-Datei mit Hochkomma zu speichern.</p>
+<p>Der Beitrag <a href="/blog/csv-export/">CSV-Export</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein kleines VB-Script um ein Arbeitsblatt als CSV-Datei mit Hochkomma zu speichern.</p>
+<p>Excel speichert CSV-Dateien nur, ohne die einzelnen Felder in Hochkommata einzuschließen. Dieses Skript von <a href="http://www.office-loesung.de/" target="_blank">www.office-loesung.de</a> macht das anders.</p>
+<h2 class="head1">Excel-CSV</h2>
+<pre class="crayon-selected">Hans,Müller,Weidenweg 12,12345,Hintertupfingen
+Angela,Knuts,Wassergasse 8A,11122,Bin Schnellweg</pre>
+<h2 class="head1">CSV mit Hochkomma</h2>
+<pre>"Hans","Müller","Weidenweg 12","12345","Hintertupfingen"
+"Angela","Knuts","Wassergasse 8A","11122","Bin Schnellweg"</pre>
+<h2 class="head1">Skript</h2>
+<pre>Sub SaveCSV() 
+
+Dim Bereich As Object, Zeile As Object, Zelle As Object 
+Dim strTemp As String 
+Dim strDateiname As String 
+Dim strTrennzeichen As String 
+Dim strMappenpfad As String 
+
+strMappenpfad = ActiveWorkbook.FullName 
+strMappenpfad = Replace(strMappenpfad, ".xls", ".csv") 
+
+strDateiname = InputBox("Wie soll die CSV-Datei heißen (c:test.csv)?", "CSV-Export", strMappenpfad) 
+If strDateiname = "" Then Exit Sub 
+
+strTrennzeichen = InputBox("Welches Trennzeichen soll verwendet werden?", "CSV-Export", ",") 
+If strTrennzeichen = "" Then Exit Sub 
+
+  Set Bereich = ActiveSheet.UsedRange 
+
+  Open strDateiname For Output As #1 
+
+  For Each Zeile In Bereich.Rows 
+    For Each Zelle In Zeile.Cells 
+      strTemp = strTemp &amp; """" &amp; CStr(Zelle.Text) &amp; """" &amp; strTrennzeichen 
+    Next 
+    If Right(strTemp, 1) = strTrennzeichen Then strTemp = Left(strTemp, Len(strTemp) - 1) 
+    Print #1, strTemp 
+    strTemp = "" 
+  Next 
+
+  Close #1 
+  Set Bereich = Nothing 
+  MsgBox "Export erfolgreich. Datei wurde exportiert nach" &amp; vbCrLf &amp; strDateiname 
+
+End Sub</pre>
+<p>Hier der Link zum kompletten Thread: <a href="http://www.office-loesung.de/ftopic14862_0_0_asc.php" target="_blank">http://www.office-loesung.de/ftopic14862_0_0_asc.php</a></p>
+<p>Der Beitrag <a href="/blog/csv-export/">CSV-Export</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/csv-export/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Eigene Formeln</title>
+		<link>/blog/eigene-formeln/</link>
+					<comments>/blog/eigene-formeln/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 02 Sep 2010 09:33:57 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Office-Tricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=559</guid>
+
+					<description><![CDATA[<p>In Excel ist es m&#246;glich, eigene Formeln zu programmieren, die dann in der Zelle wie die Standard-Excel-Formeln verwendet werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/eigene-formeln/">Eigene Formeln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In Excel ist es möglich, eigene Formeln zu programmieren, die dann in der Zelle wie die Standard-Excel-Formeln verwendet werden können.</p>
+<p>Im Visual Basic Editor von Excel müssen Sie dazu ein &#8220;Modul&#8221; einfügen und eine Funktion programmieren:</p>
+<pre class="lang:vb">Option Explicit
+Function RechtsFinden(myC As Excel.Range, myF As String) As Integer
+RechtsFinden = InStrRev(myC.Value, myF, -1)
+End Function</pre>
+<p>Diese Funktion liefert die Anzahl Zeichen zurück, die bis zum gesuchten String <strong>von rechts gesehen </strong>vorhanden sind. Angewendet wird die Formel dann so:<br />
+[notice type=&#8217;success&#8217;]=RechtsFinden(A1;&#8221;:&#8221;)[/notice]<br />
+Viel Spaß beim Entwickeln eigener Formeln!</p>
+<p>Der Beitrag <a href="/blog/eigene-formeln/">Eigene Formeln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/eigene-formeln/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Kleine Formelsammlung Excel</title>
+		<link>/blog/kleine-formelsammlung-excel/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 02 Sep 2010 09:11:51 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Office-Tricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=558</guid>
+
+					<description><![CDATA[<p>Hier sammeln wir kleine Formeln, die &#246;fters mal gebraucht werden. Oder auch Formeln, die nicht so oft ben&#246;tigt werden und gerade deswegen ein Auffinden schwieriger ist.</p>
+<p>Der Beitrag <a href="/blog/kleine-formelsammlung-excel/">Kleine Formelsammlung Excel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier sammeln wir kleine Formeln, die öfters mal gebraucht werden. Oder auch Formeln, die nicht so oft benötigt werden und gerade deswegen ein Auffinden schwieriger ist.</p>
+<h2 class="head1">Text an Trennzeichen aufteilen</h2>
+<p>Hat man einen zusammengesetzten Text, so möchte man diesen vielleicht wieder in seine Bestandteile auflösen.</p>
+<p>Beispieltext in A1: Seriennummer:AH7764-445-66</p>
+<p>Mit folgender Formel bekommt man nur die Seriennummer:</p>
+<pre>=RECHTS(A1;(LÄNGE(A1)-FINDEN(":";A1)))</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/kleine-formelsammlung-excel/">Kleine Formelsammlung Excel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Excelblätter exportieren</title>
+		<link>/blog/excelblaetter-exportieren/</link>
+					<comments>/blog/excelblaetter-exportieren/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 16 Jul 2009 13:20:43 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Excel]]></category>
+		<category><![CDATA[Office-Tricks]]></category>
+		<category><![CDATA[Office]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=525</guid>
+
+					<description><![CDATA[<p>Falls Sie die Daten aus einer Excel-Datei exportieren wollen, dann geht das in der Regel recht einfach: Speichern unter... Format wählen und schon ist die Datei gespeichert. Wenn jedoch mehrere Excel-Blätter exportiert werden sollen, dann kann man dies mit einem kleinen Makro erledigen.</p>
+<p>Der Beitrag <a href="/blog/excelblaetter-exportieren/">Excelblätter exportieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Falls Sie die Daten aus einer Excel-Datei exportieren wollen, dann geht das in der Regel recht einfach: Speichern unter&#8230; Format w&auml;hlen und schon ist die Datei gespeichert. Wenn jedoch mehrere Excel-Bl&auml;tter exportiert werden sollen, dann kann man dies mit einem kleinen Makro erledigen.<br /><P class="head1">Makro</P><P>Das Makro sieht dann folgenderma&szlig;en aus:</P><P class="sap1">Sub Export()<BR><BR>&nbsp; Dim wb As Excel.Workbook<BR>&nbsp; Dim sh As Excel.Worksheet<BR>&nbsp; Dim i As Integer, sheets As Integer<BR><BR>&nbsp; Set wb = ActiveWorkbook<BR>&nbsp; sheets = wb.sheets.Count<BR><BR>&nbsp; For i = 1 To sheets<BR>&nbsp;&nbsp;&nbsp;&nbsp; wb.sheets(i).Range(&#8220;A1&#8221;, &#8220;A1&#8221;).EntireRow.Delete<BR>&nbsp;&nbsp;&nbsp;&nbsp; wb.sheets(i).SaveAs&nbsp;&#8220;C:/export&#8221; &amp; wb.sheets(i).Name &amp; &#8220;.txt&#8221;, XlFileFormat.xlTextWindows<BR>&nbsp; Next<BR><BR>&nbsp; i = i &#8211; 1<BR>&nbsp; MsgBox (i &amp; &#8221; Bl&auml;tter exportiert&#8221;)<BR><BR>End Sub</P><P>In diesem Fall werden die Bl&auml;tter im Textformat exportiert.</P><P class="head1">Tipp</P><P>Sie k&ouml;nnen die erzeugten Text-Dateien &uuml;brigens einfach zu einer Textdatei zusammen f&uuml;gen. Rufen Sie in der Eingabeaufforderung den folgenden Befehl auf:</P><P class="sap1">copy sheet1.txt + sheet2.txt + sheet3.txt sheet_all.txt</P><P>Es werden dann alle genannten Dateien zu einer Datei &#8220;sheet_all.txt&#8221; zusammen gef&uuml;gt. </P></p>
+<p>Der Beitrag <a href="/blog/excelblaetter-exportieren/">Excelblätter exportieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/excelblaetter-exportieren/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Laufleiste zur Formelberechnung</title>
+		<link>/blog/laufleiste-zur-formelberechnung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 07 Jul 2003 14:32:54 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Office-Tricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=84</guid>
+
+					<description><![CDATA[<p>Bei komplexen Berechnung in Excel, bei denen eine oder mehrere Variablen eingesetzt werden, kann eine Bildlaufleiste eingesetzt werden, um die Ver&#228;nderung der Variablen einfacher zu gestalten.</p>
+<p>Der Beitrag <a href="/blog/laufleiste-zur-formelberechnung/">Laufleiste zur Formelberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei komplexen Berechnung in Excel, bei denen eine oder mehrere Variablen eingesetzt werden, kann eine Bildlaufleiste eingesetzt werden, um die Veränderung der Variablen einfacher zu gestalten.</p>
+<p>Bei komplexen Berechnung in Excel mit mehreren Variablen kann es hilfreich sein, Variablen nicht durch manuelle Änderungen zu verändern, sondern komfortabel mit Hilfe einer Laufleiste Änderungen verfolgen zu können.</p>
+<p>Excel bietet das Einbetten einer Laufleiste über die Steuerelemente-Toolbox. Nach Einfügen der Laufleiste gelangt man über die rechte Maustaste in das Menü &#8220;Eigenschaften&#8221;. Dort muss man drei Einträge pflegen:</p>
+<ul>
+<li>verbundene Zelle</li>
+<li>Minimalwert</li>
+<li>Maximalwert</li>
+</ul>
+<p>Die verbundene Zelle gibt den Wert aus, der mit der Laufleiste erreicht wird. Minimal- und Maximalwert sind die Werte, zwischen denen die Laufleiste sich bewegt. Achtung! Es können &#8220;nur&#8221; ganzzahlige Werte eingegeben werden.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/laufleiste-zur-formelberechnung/">Laufleiste zur Formelberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SVERWEIS</title>
+		<link>/blog/sverweis/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 30 Apr 2003 03:29:11 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Office-Tricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=26</guid>
+
+					<description><![CDATA[<p>Dazulesen von Daten anhand einer Nummer aus einer anderen Tabelle.</p>
+<p>Der Beitrag <a href="/blog/sverweis/">SVERWEIS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><span style="line-height: 1.5em;">Dazulesen von Daten anhand einer Nummer aus einer anderen Tabelle:</span></p>
+<table border="0" frame="box" rules="all" align="left">
+<caption><strong>Tabelle1: Kunden:</strong></caption>
+<tbody>
+<tr>
+<td>A</td>
+<td>B</td>
+<td>C</td>
+</tr>
+<tr>
+<td>KUNNR</td>
+<td>NAME</td>
+<td>ORT</td>
+</tr>
+<tr>
+<td>100001</td>
+<td>MEYER</td>
+<td>HANNOVER</td>
+</tr>
+<tr>
+<td>100002</td>
+<td>MÜLLER</td>
+<td>HAMBURG</td>
+</tr>
+<tr>
+<td>100003</td>
+<td>SCHULZE</td>
+<td>FRANKFURT</td>
+</tr>
+</tbody>
+</table>
+<p class="sap1">
+<p class="text1">
+<p class="text1">
+<p>[notice type=&#8217;alert&#8217;]Die Tabelle muss <strong>aufsteigend</strong> sortiert sein, ansonsten liefert SVERWEIS fehlerhafte Ergebnisse![/notice]</p>
+<table border="0" frame="box" rules="all" align="left">
+<caption>Tabelle2: Liste</caption>
+<tbody>
+<tr>
+<td>A</td>
+<td>B</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Kunde</td>
+<td>NAME</td>
+<td>ORT</td>
+</tr>
+<tr>
+<td>100002</td>
+<td>&lt;Formel&gt;</td>
+<td>&lt;Formel&gt;</td>
+</tr>
+</tbody>
+</table>
+<p class="sap1">
+<p>&nbsp;</p>
+<p><span style="text-decoration: underline;">Formel für NAME:<br />
+</span>=WENN(A2&lt;&gt;&#8221;&#8221;;SVERWEIS(A2;Kunden!A:C;2;FALSCH);&#8221;&#8221;)</p>
+<p><span style="text-decoration: underline;">Formel für Ort:</span><br />
+=WENN(A2&lt;&gt;&#8221;&#8221;;SVERWEIS(A2;Kunden!A:C;3;FALSCH);&#8221;&#8221;)</p>
+<h2 class="head1">Erklärung</h2>
+<table border="0">
+<tbody>
+<tr>
+<td>=WENN(A2&lt;&gt;&#8221;&#8221;;</td>
+<td>Wenn Kunnr vorhanden, dann Verweis suchen</td>
+</tr>
+<tr>
+<td>SVERWEIS(A2;</td>
+<td>Suchkriterium steht in &#8220;A2&#8221;</td>
+</tr>
+<tr>
+<td>Kunden!A:C;</td>
+<td>Suchbereich ist Tabelle &#8220;Kunden&#8221; Spalten A-C</td>
+</tr>
+<tr>
+<td>2;</td>
+<td>Anzeige bei Treffer: Spalte 2</td>
+</tr>
+<tr>
+<td>FALSCH)</td>
+<td>Genaue Suche!</td>
+</tr>
+<tr>
+<td>;&#8221;&#8221;)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><span style="line-height: 1.5em;">[notice type=&#8217;info&#8217;]</span>Wenn das Suchkriterium nicht in dem Array existiert, dann wird als Ergebnis der Zelleninhalt ausgegeben, der nach der Suchabbruchstelle steht. Es sei denn, man setzt den optionalen zusätzlichen Parameter &#8220;Bereichs_Verweis&#8221; auf &#8220;Falsch&#8221;, dann bekommt man den Fehlerwert #NV wenn das Suchkriterium nicht gefunden wird.[/notice]</p>
+<p>Der Beitrag <a href="/blog/sverweis/">SVERWEIS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Komfortable Datums-/Stundeneingabe</title>
+		<link>/blog/komfortable-datums-stundeneingabe/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 30 Apr 2003 03:25:14 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Office-Tricks]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=24</guid>
+
+					<description><![CDATA[<p>Mit Excel lassen sich nur sehr umst&#228;ndlich Zeiten eingeben, da jedesmal der Doppelpunkt als Trennzeichen eingegeben werden muss.Mit folgendem Trick l&#228;sst es sich vielleicht komfortabler gestalten</p>
+<p>Der Beitrag <a href="/blog/komfortable-datums-stundeneingabe/">Komfortable Datums-/Stundeneingabe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit Excel lassen sich nur sehr umständlich Zeiten eingeben, da jedesmal der Doppelpunkt als Trennzeichen eingegeben werden muss.Mit folgendem Trick lässt es sich vielleicht komfortabler gestalten</p>
+<p class="text1">Bei den folgenden Tricks wird die Eingabe nicht umgewandelt, sondern mittels einer Formel in einer zweiten Zelle anders dargestellt.</p>
+<h2 class="head1">Zeiteingabe mit Excel (1)</h2>
+<p class="text1">Tragen Sie in der Autokorrektur ein, dass &#8220;,,&#8221; durch &#8220;:&#8221; ersetzt wird. Eine Zeit lässt sich dann auf dem Ziffernblock einfach mit doppeltem Komma eingeben: 10,,00-&gt; 10:00</p>
+<h2 class="head1">Zeiteingabe mit Excel (2)</h2>
+<p>Eingabe als Stunde und Minute, also 2200 für 22:00 oder 900 für 9:00:<br />
+A1: 2200<br />
+A2: =TEXT(A1;&#8221;0000&#8243;)<br />
+A3: =VERKETTEN(LINKS(B1;2);&#8221;:&#8221;;RECHTS(B1;2))<br />
+A4: =ZEIT(LINKS(B1;2);RECHTS(B1;2);0)</p>
+<p>Und in Kurzform:<br />
+A2: <span style="color: #f49047;">=ZEIT(LINKS(TEXT(A1;&#8221;0000&#8243;);2);RECHTS(TEXT(A1;&#8221;0000&#8243;);2);0)</span></p>
+<h2 class="head1"><strong>Datumseingabe mit Excel (1)</strong></h2>
+<p>Um ein Datum in der Form &#8220;230771&#8221; für den &#8220;23.07.1971&#8221; eingeben zu können, kann folgende Formel verwendet werden:</p>
+<p><span style="color: #f49047;">=DATUM(WENN((RECHTS(E2;2)&gt;&#8221;50&#8243;);(RECHTS(E2;2)+1900);(RECHTS(E2;2)<br />
++2000));TEIL(E2;3;2);(LINKS(E2;2)))</span></p>
+<p>Jahreszahlen größer als 50 werden als Jahreszahl des 20sten Jahrhunderts gerechnet und kleiner 50 für das 21ste Jahrhundert.</p>
+<h2 class="head1">Datumseingabe mit Excel (2)</h2>
+<p class="text1">Noch komfortabler geht&#8217;s mit folgender Funktion, die auch Eingaben für &#8220;2309&#8221; für den 23.09. des aktuellen Jahres ordnungsgemäß umwandelt:<br />
+<span style="color: #f49047;">=WENN(E2&lt;&gt;&#8221;&#8221;;<br />
+DATUM(WENN(LÄNGE(E2)=4;<br />
+JAHR(JETZT());<br />
+WENN((RECHTS(E2;2)&gt;&#8221;50&#8243;);<br />
+(RECHTS(E2;2)+1900);<br />
+(RECHTS(E2;2)+2000)));<br />
+TEIL(E2;3;2);<br />
+(LINKS(E2;2)));&#8221;&#8221;)</span></p>
+<p><strong>Übrigens<br />
+STRG + .</strong> (Punkt) stellt das aktuelle Datum ins Feld&#8230;</p>
+<p class="head1">Und noch einfacher&#8230;</p>
+<p>ein Kollege gab mir den folgenden Tipp zur Datumseingabe:</p>
+<p>Die Eingabe &#8220;<span style="color: #fb2412;">Tag &#8211; Monat</span>&#8221; wandelt Excel ebenfalls automatisch in ein Datum um. <strong>Beispiel:</strong> 30-5     &#8211;&gt; 30.05. des aktuellen Jahres</p>
+<p>Der Beitrag <a href="/blog/komfortable-datums-stundeneingabe/">Komfortable Datums-/Stundeneingabe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

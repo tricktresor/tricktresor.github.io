@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Data Dictionary Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/data-dictionary/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 05 Nov 2019 11:16:39 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Data Dictionary Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Laufzeitinformation über interne Tabelle</title>
+		<link>/blog/laufzeitinformation-ueber-interne-tabelle/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Oct 2011 15:10:28 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=628</guid>
+
+					<description><![CDATA[<p>Zur Laufzeit Informationen &#252;ber im Report deklarierte Objekte (Strukturen, Tabellen, etc.) zu bekommen ist mithilfe der RTTI-Klassen (RTTI = Run Time Type Information) recht einfach. Man muss nur wissen, dass es sie gibt...</p>
+<p>Der Beitrag <a href="/blog/laufzeitinformation-ueber-interne-tabelle/">Laufzeitinformation über interne Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Zur Laufzeit Informationen über im Report deklarierte Objekte (Strukturen, Tabellen, etc.) zu bekommen ist mithilfe der RTTI-Klassen (RTTI = Run Time Type Information) recht einfach. Man muss nur wissen, dass es sie gibt&#8230;</p>
+<p>Mit dem folgenden Programm werden die Langtexte der im Datenelement hinterlegten Felddefinitionen einer internen Struktur ermittelt.</p>
+<h2>Ausgabe</h2>
+<p>Das Programm erzeugt eine Liste mit allen in der Struktur &#8220;WA_TAB&#8221; vorhandenen Felder mit der Information, ob das Feld einen Bezug zum Data Dictionary hat und falls ja: den Langtext zum Datenelement.</p>
+<pre>Info | Feld | Beschreibung des Feldes</pre>
+<h2>Coding</h2>
+<pre>REPORT.
+*== Types
+TYPES: BEGIN OF ty_test,
+         langu TYPE sylangu,
+         abcde TYPE syabcde,
+       END OF ty_test.
+
+*== data
+DATA: BEGIN OF wa_tab,
+        kunnr  LIKE knvv-kunnr,
+        matnr  LIKE mara-matnr,
+        maktx  LIKE makt-maktx,
+        kbetr  LIKE konp-kbetr,
+        flag   TYPE c LENGTH 10, " Ohne DDIC
+        werks  TYPE werks_d,     " Datenelement
+        test   TYPE ty_test,     " Struktur!!
+      END OF wa_tab.
+
+START-OF-SELECTION.
+*== explore structure:
+  PERFORM show_struc_info.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  struc
+*&amp;---------------------------------------------------------------------*
+FORM struc USING value(istruc).
+  DATA  cl_type               TYPE REF TO cl_abap_typedescr.
+  DATA  cl_struc              TYPE REF TO cl_abap_structdescr.
+  DATA  cl_elem               TYPE REF TO cl_abap_elemdescr.
+  FIELD-SYMBOLS &lt;fs_comps&gt;    TYPE abap_compdescr.
+  DATA  l_type_kind           TYPE abap_typekind.
+  DATA  l_name                TYPE string.
+  FIELD-SYMBOLS &lt;fs_any&gt;      TYPE ANY.
+  DATA wa_dfies               TYPE dfies.
+
+  cl_struc ?= cl_abap_datadescr=&gt;describe_by_data( p_data = istruc  ). 
+*== check each element of given structure 
+  LOOP AT cl_struc-&gt;components ASSIGNING &lt;fs_comps&gt;. 
+    ASSIGN COMPONENT &lt;fs_comps&gt;-name OF STRUCTURE istruc TO &lt;fs_any&gt;. 
+    IF sy-subrc EQ 0. 
+*== Describe field 
+      DESCRIBE FIELD &lt;fs_any&gt; TYPE l_type_kind. 
+      IF l_type_kind CA 'uv'. 
+*== again a structure... 
+        PERFORM struc USING &lt;fs_any&gt;. 
+      ELSE.
+*== Element: get definition 
+        cl_elem ?= cl_abap_datadescr=&gt;describe_by_data( p_data = &lt;fs_any&gt;  ). 
+*== Name of field 
+        l_name = cl_elem-&gt;get_relative_name( ). 
+*== if referenced to dictionary 
+        IF cl_elem-&gt;is_ddic_type( ) = 'X'. 
+          TRY. 
+*== get information from dictionary 
+            wa_dfies = cl_elem-&gt;get_ddic_field( ). 
+            WRITE : / 'DDIC:', 12 &lt;fs_comps&gt;-name, wa_dfies-scrtext_l. 
+          CATCH cx_root. 
+            CLEAR wa_dfies. 
+            WRITE : / 'Error DDIC:', 12 &lt;fs_comps&gt;-name, l_name. 
+          ENDTRY. 
+        ELSE. 
+*== If no dictionary reference: use elements name 
+          WRITE : / 'No DDIC:', 12 &lt;fs_comps&gt;-name, l_name. 
+        ENDIF. 
+      ENDIF. 
+    ENDIF. 
+  ENDLOOP.
+
+ENDFORM.                    "struc 
+*&amp;---------------------------------------------------------------------* 
+*&amp;      Form  show_struc_info 
+*&amp;---------------------------------------------------------------------* 
+FORM show_struc_info.
+  DATA  l_type_kind           TYPE abap_typekind. 
+*== Which kind of data? 
+  l_type_kind = cl_abap_datadescr=&gt;get_data_type_kind( p_data = wa_tab ). 
+*== extract structures 
+  IF l_type_kind CA 'uv'. 
+    PERFORM struc USING wa_tab. 
+  ENDIF. 
+
+ENDFORM.                    " test_struct</pre>
+<p>Der Beitrag <a href="/blog/laufzeitinformation-ueber-interne-tabelle/">Laufzeitinformation über interne Tabelle</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Datenbank-View inkludieren</title>
+		<link>/blog/datenbank-view-inkludieren/</link>
+					<comments>/blog/datenbank-view-inkludieren/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 08 Apr 2011 09:32:33 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=593</guid>
+
+					<description><![CDATA[<p>Wenn mehrere Tabellen in einem Datenbank-View zusammengefasst werden sollen, dann ist es nicht unbedingt ratsam, alle Felder der Tabelle einzeln aufzunehmen. Das geht zwar &#252;ber den Button "Tabellenfelder" sehr einfach, aber neue Felder in einer der Tabellen taucht dann nicht im View auf. Hier die Patentl&#246;sung...</p>
+<p>Der Beitrag <a href="/blog/datenbank-view-inkludieren/">Datenbank-View inkludieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wenn mehrere Tabellen in einem Datenbank-View zusammengefasst werden sollen, dann ist es nicht unbedingt ratsam, alle Felder der Tabelle einzeln aufzunehmen. Das geht zwar &uuml;ber den Button &#8220;Tabellenfelder&#8221; sehr einfach, aber neue Felder in einer der Tabellen taucht dann nicht im View auf. Hier die Patentl&ouml;sung&#8230;<br /><P class="head1">Datenbanktabelle inkludieren</P><P>SAP bietet in der Pflege zu Datenbank-Views die M&ouml;glichkeit, alle Felder einer Tabelle in den View einzubinden. Hierzu m&uuml;ssen im &#8220;Viewfeld&#8221; sowie im &#8220;Feldnamen&#8221; ein Sternchen eingetragen werden:</P><P><IMG src="/wp-content/uploads/tt_images/DBView.jpg"></P><P class="head1">Vorteile</P><P>Das hat die folgenden Vorteile:</P><UL><LI>Der View sieht &uuml;bersichtlicher aus. <LI>&Auml;nderungen in den Tabellen werden auch in den View &uuml;bernommen.</LI></UL><P class="head1">Vorhandene Feldnamen</P><P>Es kann allerdings sein, dass bei dieser Methode Feldnamen im View doppelt vorhanden sind. Verkn&uuml;pft man z.B. die Tabelle MARA und MARC in einem View, dann sind die Felder MANDT und MATNR doppelt vorhanden.</P><P>Es gibt nun zwei M&ouml;glichkeiten, dieses Problem zu l&ouml;sen:</P><OL><LI>Wenn Felder nicht ben&ouml;tigt werden, k&ouml;nnen sie mit einem Minus-Zeichen (&#8220;-&#8220;) ausgeblendet werden (Siehe Screenshot)</LI><LI>Doppelt vorhandene Felder k&ouml;nnen auch mit einem anderen Namen in den View aufgenommen werden, m&uuml;ssen dann aber nat&uuml;rlich ebenfalls explizit benannt werden.</LI></OL><P class="head1">Nachteile</P><P>Meiner Meinung nach gibt es bei dieser Variante des Inkludierens zwei Nachteile:</P><OL><LI>Es ist nicht auf den ersten Blick erkennbar, welche Felder in dem View vorhanden sind. Daf&uuml;r muss man in den Data Browser (SE16n) wechseln oder in der SE11 das Laufzeitobjekt ansehen.</LI><LI>In dem Datenbank-View ist hinterher nicht mehr erkennbar, welches Feld aus welche Tabelle kommt. Das ist aber ein generelles Problem von Views und hat eigentlich nichts direkt mit dem inkludieren zu tun. Sch&ouml;n w&auml;re ein Funktion, mit der man &#8220;named includes&#8221;&nbsp;verwenden k&ouml;nnte, also z.B. MARA_* um &nbsp;vor allen Feldnamen aus der Tabelle MARA den Prefix &#8220;MARA_&#8221; zu haben.</LI></OL><P><STRONG><U>SAP-Doku: <BR></U></STRONG><A href="http://help.sap.com/saphelp_erp60_sp/helpdata/DE/cf/21ec5d446011d189700000e8322d00/frameset.htm" Target="_blank">http://help.sap.com/saphelp_erp60_sp/helpdata/DE<BR>/cf/21ec5d446011d189700000e8322d00/frameset.htm</A></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/datenbank-view-inkludieren/">Datenbank-View inkludieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/datenbank-view-inkludieren/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dynamische WHERE-Bedingung</title>
+		<link>/blog/dynamische-where-bedingung/</link>
+					<comments>/blog/dynamische-where-bedingung/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 09 Sep 2010 10:33:33 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=562</guid>
+
+					<description><![CDATA[<p>Für eine dynamische erstellte WHERE-Bedingung muss man manchmal ziemlich viel programmieren und es ist leicht, hier Fehler einzubauen. Mit Bausteinen von der SAP kann man sich unter Umständen Arbeit ersparen...</p>
+<p>Der Beitrag <a href="/blog/dynamische-where-bedingung/">Dynamische WHERE-Bedingung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Für eine dynamische erstellte WHERE-Bedingung muss man manchmal ziemlich viel programmieren und es ist leicht, hier Fehler einzubauen. Mit Bausteinen von der SAP kann man sich unter Umständen Arbeit ersparen…</p>
+<p>Zum Beispiel mit diesem hier:</p>
+<p class="head1">FREE_SELECTIONS_RANGE_2_WHERE</p>
+<p>Mit diesem Funktionsbaustein können Sie anhand von vorhandenen RANGES-Tabellen eine WHERE-Bedingung aufbauen lassen. Hierzu muss die Tabelle FIELD_RANGES entsprechend gefüllt werden:</p>
+<ul>
+<li>Tabellenname</li>
+<li>Feldname</li>
+<li>SIGN</li>
+<li>OPTION</li>
+<li>LOW</li>
+<li>HIGH</li>
+</ul>
+<p>Zurück kommt eine komplette WHERE-Bedingung.</p>
+<h2>Generierung WHERE-Bedingung aus Select-Options</h2>
+<p>Die Klasse CL_SHDB_SELTAB macht es möglich: Mehrere RANGES-Tabellen können in eine Where-Bedingung umgewandelt werden.</p>
+<p>Siehe auch:</p>
+<p><a href="https://blogs.sap.com/2015/03/30/handling-of-select-options-parameters-within-amdp/">https://blogs.sap.com/2015/03/30/handling-of-select-options-parameters-within-amdp/</a></p>
+<p>Der Beitrag <a href="/blog/dynamische-where-bedingung/">Dynamische WHERE-Bedingung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dynamische-where-bedingung/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Struktur per Programm anlegen</title>
+		<link>/blog/struktur-per-programm-anlegen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Feb 2007 19:05:44 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=400</guid>
+
+					<description><![CDATA[<p>Im Customizing zu den Nachrichtenarten werden die Tabellen zu den Zugriffsfolgen generiert. Mit dem folgenden Programm k&#246;nnen Sie so eine automatische Generierung nachvollziehen.</p>
+<p>Der Beitrag <a href="/blog/struktur-per-programm-anlegen/">Struktur per Programm anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Im Customizing zu den Nachrichtenarten werden die Tabellen zu den Zugriffsfolgen generiert. Mit dem folgenden Programm können Sie so eine automatische Generierung nachvollziehen.</p>
+<pre>*---------------------------------------------------------------------*
+* Report  Z_GEN_LAENDER
+*---------------------------------------------------------------------*
+* Erzeugen einer Dictionary-Struktur
+* o Für jedes Land in der Ländertabelle, dessen Länderkürzel mit "D"
+*   beginnt, wird ein Feldname angelegt beginnend mit LAND_
+* o Die Struktur wird der Entwicklungsklasse aus dem Selektionsbild
+*   zugeordnet
+* o Die Struktur wird in einen Transportauftrag aufgenommen
+*---------------------------------------------------------------------*
+
+REPORT  z_GEN_LAENDER.
+
+DATA lt_t005      TYPE STANDARD TABLE OF t005.
+DATA ls_t005      TYPE                   t005.
+
+PARAMETERS: p_tab TYPE tabname  DEFAULT 'Z_LAENDER',
+            p_dcl type devclass default 'Z_VERKAUF'.
+
+START-OF-SELECTION.
+
+  PERFORM selection.
+  PERFORM structure.
+  PERFORM tadirentry.
+  PERFORM transport.
+  MESSAGE s000(vz) WITH 'Struktur wurde angelegt'.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  selection
+*&amp;---------------------------------------------------------------------*
+FORM selection.
+
+*** Alle Länder, deren Kürzel mit D beginnt einlesen
+  SELECT * FROM t005 INTO TABLE lt_t005
+   WHERE land1 LIKE 'D%'.
+
+*** Sort
+  SORT lt_t005.
+
+ENDFORM.                    "selection
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  structure
+*&amp;---------------------------------------------------------------------*
+FORM structure.
+
+  DATA ls_dd02v     TYPE dd02v.
+  DATA ls_dd09l     TYPE dd09l.
+  DATA lt_dd03p     TYPE STANDARD TABLE OF dd03p.
+  DATA ls_dd03p     TYPE dd03p.
+
+*** Struktur
+  CLEAR ls_dd02v.
+  ls_dd02v-tabname      = p_tab.
+  ls_dd02v-ddlanguage   = 'D'.
+  ls_dd02v-tabclass     = 'INTTAB'.
+  ls_dd02v-ddtext       = 'Automatically generated structure'.
+  ls_dd02v-applclass    = 'VIEW'.
+  ls_dd02v-as4user      = sy-uname.
+  ls_dd02v-as4date      = sy-datum.
+  ls_dd02v-as4time      = sy-uzeit.
+  ls_dd02v-exclass      = '3'.
+
+*** Technische Einstellungen werden für eine Struktur nicht benötigt
+  CLEAR ls_dd09l.
+
+*** Felder
+  CLEAR lt_dd03p.
+  LOOP AT lt_t005 INTO ls_t005.
+    CLEAR ls_dd03p.
+    ls_dd03p-tabname    = p_tab.
+    CONCATENATE 'LAND_' ls_t005-land1 INTO ls_dd03p-fieldname.
+    ls_dd03p-position   = sy-tabix.
+    ls_dd03p-rollname   = 'LAND1'.
+    ls_dd03p-domname    = 'LAND1'.
+    APPEND ls_dd03p TO lt_dd03p.
+  ENDLOOP.
+
+*** Struktur erzeugen
+  CALL FUNCTION 'DD_TABL_PUT'
+    EXPORTING
+      dd02v_wa            = ls_dd02v
+      dd09l_wa            = ls_dd09l
+      put_state           = 'A'
+      tabl_name           = p_tab
+    TABLES
+      dd03p_tab           = lt_dd03p
+    EXCEPTIONS
+      db_access_failure   = 1
+      object_inconsistent = 2
+      OTHERS              = 3.
+  IF sy-subrc &lt;&gt; 0.
+    WRITE: / 'Fehler bei DD_TABL_PUT', sy-subrc.
+    STOP.
+  ENDIF.
+
+ENDFORM.                    "structure
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  tadirentry
+*&amp;---------------------------------------------------------------------*
+FORM tadirentry.
+
+  DATA lv_srcsystem TYPE srcsystem.
+  DATA lv_obj_name  TYPE sobj_name.
+
+*** Originalsystem
+  lv_srcsystem = sy-sysid.
+*** Name der Struktur:
+  lv_obj_name = p_tab.
+
+*** TADIR-Eintrag erzeugen
+  CALL FUNCTION 'TR_TADIR_INTERFACE'
+    EXPORTING
+      wi_test_modus      = ' '
+      wi_tadir_pgmid     = 'R3TR'
+      wi_tadir_object    = 'TABL'
+      wi_tadir_obj_name  = lv_obj_name
+      wi_tadir_srcsystem = lv_srcsystem
+      wi_tadir_author    = sy-uname
+      wi_tadir_devclass  = p_dcl
+      wi_set_genflag     = 'X'
+    EXCEPTIONS
+      OTHERS             = 25.
+  IF sy-subrc &lt;&gt; 0.
+    WRITE: / 'Fehler bei TR_TADIR_INTERFACE'.
+    STOP.
+  ENDIF.
+
+ENDFORM.                    "tadirentry
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  transport
+*&amp;---------------------------------------------------------------------*
+FORM transport.
+
+*** Data
+  DATA: iko200 TYPE ko200,
+        iorder TYPE trkorr,
+        itask  TYPE trkorr.
+
+*** Object
+  iko200-pgmid    = 'R3TR'.
+  iko200-object   = 'TABL'.
+  iko200-objfunc  = space.
+  iko200-obj_name = p_tab.
+
+*** Auftrag abfragen
+  CALL FUNCTION 'TR_ORDER_CHOICE_CORRECTION'
+    EXPORTING
+      iv_category = 'SYST'
+    IMPORTING
+      ev_order    = iorder
+      ev_task     = itask
+    EXCEPTIONS
+      OTHERS      = 3.
+  IF sy-subrc &lt;&gt; 0.
+    WRITE: / 'Fehler TR_ORDER_CHOICE_CORRECTION'.
+    STOP.
+  ENDIF.
+
+*** Prüfen der Objekte
+  CALL FUNCTION 'TR_OBJECT_CHECK'
+    EXPORTING
+      wi_ko200                = iko200
+    EXCEPTIONS
+      cancel_edit_other_error = 1
+      show_only_other_error   = 2
+      OTHERS                  = 3.
+  IF sy-subrc &lt;&gt; 0.
+    WRITE: / 'Fehler TR_OBJECT_CHECK'.
+    STOP.
+  ELSE.
+
+*** Einfügen des Objektes in den Auftrag
+    CALL FUNCTION 'TR_OBJECT_INSERT'
+      EXPORTING
+        wi_order                = itask
+        wi_ko200                = iko200
+      EXCEPTIONS
+        cancel_edit_other_error = 1
+        show_only_other_error   = 2
+        OTHERS                  = 3.
+    IF sy-subrc &gt; 0.
+      WRITE: / 'Fehler TR_OBJECT_INSERT'.
+    ELSE.
+      COMMIT WORK.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.                    "transport
+
+
+</pre>
+<p>Der Beitrag <a href="/blog/struktur-per-programm-anlegen/">Struktur per Programm anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Fehlerhafte Tabellenumsetzung korrigieren</title>
+		<link>/blog/fehlerhafte-tabellenumsetzung-korrigieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 11 Jul 2003 16:29:25 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[tabellenumsetzung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=87</guid>
+
+					<description><![CDATA[<p>Bei der &#196;nderung einer Tabellenstruktur kann es passieren, dass die Tabelle aufgrund von Konvertierungsfehlern nicht umgesetzt werden kann. Nach &#196;nderung eines Tabellenfeldes wird der Dateninhalt auf eine Schattentabelle direkt auf der Datenbank kopiert, die Struktur der Original-Tabelle wird ge&#228;ndert und dann werden die Tabelleninhalte wieder zur&#252;ckkopiert. Hierbei kann es zu Fehlern kommen. Wir zeigen Ihnen hier, wie Sie bei einem solchen Fehler Ihre Daten trotzdem retten k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/fehlerhafte-tabellenumsetzung-korrigieren/">Fehlerhafte Tabellenumsetzung korrigieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei der Änderung einer Tabellenstruktur kann es passieren, dass die Tabelle aufgrund von Konvertierungsfehlern nicht umgesetzt werden kann. Nach Änderung eines Tabellenfeldes wird der Dateninhalt auf eine Schattentabelle direkt auf der Datenbank kopiert, die Struktur der Original-Tabelle wird geändert und dann werden die Tabelleninhalte wieder zurückkopiert. Hierbei kann es zu Fehlern kommen. Wir zeigen Ihnen hier, wie Sie bei einem solchen Fehler Ihre Daten trotzdem retten können.</p>
+<p class="head1"><span style="color: #fb2412;">Achtung!</span></p>
+<p class="text1"><span style="color: #fb2412;">Dieser Tipp ist nur für Profis geeignet!!<br />
+</span><span style="color: #fb2412;">Für Datenverluste oder Fehler übernehmen wir keine Haftung!</span></p>
+<h2>Hintergrund</h2>
+<p>Wenn Sie eine Tabellenstruktur ändern, so wird der Inhalt auf eine Schattentabelle kopiert. Diese Schattentabelle existiert nicht im R/3, sondern nur auf der Datenbank.</p>
+<p>Danach wird die Struktur der Originaltabelle geändert und die Daten aus der Schattentabelle wieder &#8212; Feld für Feld &#8212; zurück kopiert.</p>
+<h2>Der Fehler</h2>
+<p>Bei dem Zurückkopieren der Daten kann es zu Fehlern kommen. Nämlich immer dann, wenn der Feldinhalt nicht in das neue Format konvertiert werden kann.</p>
+<p><strong><u>Beispiel:</u></strong></p>
+<p>Sie ändern das Feld Ihrer Tabelle vom Format &#8220;CHAR&#8221; auf das Format &#8220;NUMC&#8221;. Normalerweiser sollten dann in dem Feld nur numerische Werte stehen. Nun kann es aber sein, dass trotzdem Zeichen in diesem Feld stehen. Das Feld kann nun nicht konvertiert werden</p>
+<h2>Vorgehen</h2>
+<p>Geraten Sie nicht in Panik! Die Daten sind noch da! In der besagten Schattentabelle ist der gesamte Tabelleninhalt gespeichert.</p>
+<p>Ihre Originaltabelle ist zwar im Status &#8220;inaktiv&#8221;, Sie können sie aber trozdem kopieren. Kopieren Sie also die Tabelle, zum Beispiel von &#8220;ZTAB1&#8221; auf &#8220;ZTAB2&#8221; und ändern Sie die Felder wieder auf den ursprünglichen Typ. Aktivieren Sie die neue Tabelle.</p>
+<p>Bearbeiten Sie die Originaltabelle mit der Transaktion SE11. Gehen Sie in das Datenbankutility (Menü: <em>Hilfsmittel &#8211; Datenbankutility</em>) und rufen Sie das &#8220;Objektprotokoll&#8221; auf. Hier sehen Sie den Namen der Schattentabelle: QCMZTAB1. Wenn der Name der Originaltabelle sehr lang war, wird der Rest bei der Benamsung der QCM-Tabelle einfach abgeschnitten.</p>
+<p>Rufen Sie nun mit der SE38 das Programm RADBTCPY auf. In das Feld &#8220;<span style="color: #008952;">Quelltabelle</span>&#8221; geben Sie den Namen der Schattentabelle ein, in das Feld &#8220;<span style="color: #008952;">Zieltabelle</span>&#8221; den Namen der kopierten Tabelle.</p>
+<p>Führen Sie das Programm aus. Die Daten werden nun von der Schattentabelle in die kopierte Tabelle kopiert. Von da an sollte es kein Problem mehr sein, die Fehler in der Tabelle zu bereinigen&#8230;</p>
+<h2>Praxisbeispiel</h2>
+<h3>Die Tabelle</h3>
+<p>Die Tabelle ZTEST1 hat die Felder MANDT, LAND und WERT und ist wie folgt gefüllt:</p>
+<p>MANDT LAND             WERT<br />
+&#8212;&#8211; &#8212;- &#8212;&#8212;&#8212;&#8212;&#8212;&#8211;<br />
+030   DE             123.45<br />
+030   DK             134,23<br />
+030   ES             120.43</p>
+<p>Wenn Sie nun den Datentyp des Feldes &#8220;WERT&#8221; von &#8220;CHAR&#8221; auf &#8220;DEC&#8221; ändern (Datenelement CHAR16 nach DEC8_2) ist die Aktivierung nicht möglich; Sie müssen den Tabellenumsetzer verwenden.</p>
+<p class="text1">Gehen Sie hierzu im Menü auf &#8220;Hilfsmittel &#8211; Datenbank-Utility&#8221; und klicken Sie auf [Aktivieren und Datenbank anpassen] [X] Daten erhalten.</p>
+<p>Sie erhalten nun einen Programmabbruch:</p>
+<p><span style="color: #ff0000;">CONVT_NO_NUMBER: &#8221; 134,23 &#8221; nicht als Zahl interpretierbar</span></p>
+<p>Sie können nun die Tabelle mit der Transaktion SE11 nicht mehr ändern, da sie gesperrt ist (Meldung &#8220;ZTEST ist gesperrt, da ein Aufsetzprotokoll existiert&#8221;).</p>
+<h3>Fehleranalyse</h3>
+<p>Gehen Sie erneut in das Datenbankutility (Transaktion SE14) und wählen Sie [Bearbeiten]. Sie sehen folgende Meldung:</p>
+<figure><img decoding="async" src="/wp-content/uploads/tt_images/db1.jpg" alt="" /><figcaption>Die Fehlerinformation nach dem Umsetzen</figcaption></figure>
+<p>Klicken Sie auf [Anpassung analysieren] und Sie erhalten die folgenden Informationen:</p>
+<figure><img decoding="async" class="alignleft" src="/wp-content/uploads/tt_images/db2.jpg" alt="" /><figcaption>Das genaue Protokoll</figcaption></figure>
+<p>Unten sehen Sie den Punkt &#8220;Umbenannte Ausgangstabelle&#8221;. Hier steht der Name der Schattentabelle. Da diese Tabelle nur auf der Datenbank existiert, aber nicht im R/3-Dictionary angelegt ist, können Sie die Tabelleninhalte mit der Transaktion SE16 nicht anzeigen lassen!</p>
+<h3>Daten Retten</h3>
+<p>Um die Daten zu erhalten, kopieren Sie in der SE11 die Tabelle ZTEST1 auf ZTEST2. Ändern Sie den Typ des Feldes &#8220;WERT&#8221; wieder auf &#8220;CHAR16&#8221; und aktivieren Sie die Tabelle.</p>
+<p>Führen Sie mit der Transaktion SE38 oder SA38 das Programm RADBTCPY aus. Geben Sie als Quelltabelle den Namen der Schattentabelle an: QCMZTEST1 und als Zieltabelle Ihre Tabellen-Kopie: ZTEST2.</p>
+<h3>Fehler beheben</h3>
+<p>Sie müssen nun die Daten der Schattentabelle QCMZTEST1 löschen, andernfalls können die Daten nicht zurück kopiert werden. Mit &#8220;normalem&#8221; ABAP kommen Sie hier nicht weiter, da die Tabelle ja im Dictionary nicht bekannt ist.</p>
+<p>Wir müssen OPEN SQL verwenden. Gehen Sie in die Pflege der Funktionsbausteine (Transaktion SE37) und &#8220;Testen&#8221; Sie den Baustein DB_EXECUTE_SQL.</p>
+<p><strong><span style="color: #fb2412;">ACHTUNG! BEI FALSCHER ANWENDUNG KÖNNEN SIE DATEN UNWIDERRUFLICH LÖSCHEN!</span></strong></p>
+<p>Im Eingabebild des Funktionsbausteins geben Sie beim Parameter STMT den folgenden SQL-Befehl ein:</p>
+<p><code>DELETE FROM QCMZTEST</code></p>
+<p>Die Tabelle QCMTEST wurde nun geleert. Beheben Sie nun die Fehler in der Tabellenkopie ZTEST2, die zu dem  Konvertierungsfehler führen. Hierzu müssen Sie einen Report schreiben, oder die Daten über die Tabellenpflege korrigieren.</p>
+<h3>Daten zurückkopieren</h3>
+<p>Verwenden Sie nun den Report RADBTCPY erneut, um die Daten von ZTEST2 nach QCMZTEST1 zu kopieren. Deaktivieren Sie das Häkchen &#8220;Tabelle exklusiv sperren&#8221;.</p>
+<p>Sollten noch Werte vorhanden sein, die nicht umgesetzt werden können, so merken Sie es hier ebenfalls an einem Programmabbruch &#8220;CONVT_NO_NUMBER&#8221;&#8230;</p>
+<h3>Umsetzung fortsetzen</h3>
+<p>Sie können nun im Datenbank-Utility mit der Umsetzung fortfahren. Die Tabelle sollte danach wieder aktiv sein und alle Daten enthalten.</p>
+<h2>Hinweis</h2>
+<p>Mit dem Report ADBC_QUERY kann der Inhalt der Schattentabelle selektiert und angezeigt werden.</p>
+<p>&lt;/p&#8221;&gt;</p>
+<p>Der Beitrag <a href="/blog/fehlerhafte-tabellenumsetzung-korrigieren/">Fehlerhafte Tabellenumsetzung korrigieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Fieldmapping generieren</title>
+		<link>/blog/fieldmapping-generieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 05 May 2003 23:55:10 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<category><![CDATA[move]]></category>
+		<category><![CDATA[move-corresponding]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=40</guid>
+
+					<description><![CDATA[<p>Das Umsetzen von Feldern einer Struktur in eine andere Struktur kann ziemlich nervig sein. Die SAP stellt ein Tool zur Verf&#252;gung, mit dem man dieses Fieldmapping einfach erstellen kann.</p>
+<p>Der Beitrag <a href="/blog/fieldmapping-generieren/">Fieldmapping generieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das Umsetzen von Feldern einer Struktur in eine andere Struktur kann ziemlich nervig sein. Die SAP stellt ein Tool zur Verfügung, mit dem man dieses Fieldmapping einfach erstellen kann.</p>
+<p>Das Fieldmapping zweier Strukturen läßt sich mit der Transaktion BDBS leicht generieren. Eigentlich ist er für die Umsetzung von Standardtabellen in entsprechende BAPI-Strukturen gedacht, lässt sich aber vielleicht im einen oder anderen Fall auch zweckentfremden&#8230;</p>
+<p class="head1">So geht&#8217;s</p>
+<p>Auf dem Einstiegsbild müssen Sie hierzu die beiden Strukturen angeben. Anhand des Datenelements erkennt das System evtl. zueinander passende Felder.</p>
+<p>Im folgenden Beispiel habe ich die folgenden zwei Strukturen:</p>
+<p class="sap1">Struktur 1:<br />
+<span style="text-decoration: underline;">Feld     Typ<br />
+</span>MATNR    MATNR<br />
+WERKS    WERKS_D<br />
+LGORT    LGORT_D<br />
+KENNZ    CHAR1<br />
+OPTIO    SYCHAR5<br />
+OLDMAT   MATNR</p>
+<p class="sap1">Struktur 2:<br />
+<span style="text-decoration: underline;">Feld     Typ</span><br />
+MATERIAL MATNR<br />
+WERK     WERKS_D<br />
+LAGER    LGORT_D<br />
+FLAG1    FLAG<br />
+OPTION2  OPT1<br />
+ALTMAT   MATNR</p>
+<table class="tblimg" cellpadding="4" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" src="/wp-content/uploads/tt_images/map1.gif" alt="" /><br />
+Festlegen der zu mappenden Strukturen</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<table class="tblimg" cellpadding="4" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" src="/wp-content/uploads/tt_images/map2.gif" alt="" /><br />
+Festlegen des Funktionsbausteins<br />
+<span style="color: #fb2412;">Achtung:</span> Funktionsgruppe muss vorhanden sein!</td>
+</tr>
+</tbody>
+</table>
+<table class="tblimg" cellpadding="4" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" src="/wp-content/uploads/tt_images/map3.gif" alt="" /><br />
+Das Mapping passiert weitestgehend automatisch</td>
+</tr>
+</tbody>
+</table>
+<p>In den generierten Funktionsbaustein kann man nun noch Ändernungen vornehmen, um das Mapping für Felder zu programmieren, die nicht 1:1 übernommen werden können.</p>
+<p>Der Beitrag <a href="/blog/fieldmapping-generieren/">Fieldmapping generieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Tabellen und Views</title>
+		<link>/blog/tabellen-und-views/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 18 Apr 2003 02:17:18 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=7</guid>
+
+					<description><![CDATA[<p>Tipps zur Verwendung von Tabellen, Views und wichtige Standard-Objekte.</p>
+<p>Der Beitrag <a href="/blog/tabellen-und-views/">Tabellen und Views</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Tipps zur Verwendung von Tabellen, Views und wichtige Standard-Objekte.<br /><P>Zu jedem Helpview wird ein Programm zur Datenselektion erzeugt. Das Programm hat den gleichen Namen wir der View und beginnt mit dem&nbsp; %-Zeichen.</P><P>Tabellenfelder lesen: FB DDIF_TABL_GET<BR>Tabelle aktivieren ohne Berechtigung: FB DDIC_TABL_ACTIVATE</P><P>TFTIT: Titel der Funktionsbausteine<BR>MAST: Zuordnung Material &#8211; St&uuml;ckliste<BR>MAPL: Zuordnung Material &#8211; Plan (QM, PP)</P><P>VLPMA: Vertriebsindex: Lieferungspositionen zu Material<BR>VLPKA: Vertriebsindex: Lieferungen zu Partnerrollen</P><P>MSKU: Sonderbest&auml;nde beim Kunden (Leihgut)</P><P>VRSD:&nbsp;Versionsverwaltung</P><P>TRMAC: Systemmakros (z.B. BREAK, BREAKRC, RP-DEF-BOOLEAN)</P><P>TRMTRA: &Uuml;bersetzung Zuordnungstabelle Schl&uuml;sselworte<BR>TRM020, TRM040, TRM060, TRM080, TRM255: &Uuml;bersetzungstabelle f&uuml;r die jeweilige L&auml;nger der Texte</P><P>V_ICON&nbsp;Pflege der Icon-Eigenschaften (Zweck)</P><P>S001xxx&nbsp;Statistiktabellen VIS</P><P>Ursprungslandbestimmungen:<BR>T604G&nbsp;Pr&auml;ferenzzonen<BR>T604S&nbsp;Zuordnung lieferndes Land -&gt; beliefertes Land zu Pr&auml;ferenzzone<BR>MAPE&nbsp;Materialstamm Aussenhandelsdaten: Pr&auml;ferenzzonenzuordnung</P><P>TSTC&nbsp;Transaktionen<BR>TSTCP&nbsp;Parameter zu Transaktionen&nbsp;-&gt; Feld PARAM: /*SM30 VIEWNAME=ZVXXX;UPDATE=X;<BR>TSTCT&nbsp;Texte zu Transaktionen</P><P>TSP03&nbsp;Drucker </P><P>TVCPF: Kopiersteuerung Lieferung &#8211; Faktura (Rechnungssplit)</P><P class="head1">Materialsubstitution:</P><P class="text1">Findungsart Axxx.<BR>KOTDxxx&nbsp;Kopf mit Material, das substituiert wird.<BR>KONDD&nbsp;1. Eintrag der Subst, Schl&uuml;ssel: KNUMH<BR>KONDDP&nbsp;Alle weiteren Eintr&auml;ge, Schl&uuml;ssel, KNUMH</P><P>Namensr&auml;ume<BR>TRESN: Namensraum f&uuml;r Objekte je Entwicklungsklasse bestimmen (bis Release 4.5)<BR>CTSRESNAME: Namenskonventionen in der Workbench ab Release 4.6 (TA SE03)<BR>TRESC: Reservierte Namen f&uuml;r Customizingtabellen/-objekte</P><P class="head1">Feldzuordnung im Debitorenstammsatz auf Pflegebildern:</P><P class="text1">TAB TMODP<BR>&nbsp;&#8211; FAUNA = &#8216;T077D-FAUSA&#8217;<BR>&nbsp;&#8211; MODIF = &#8216;010&#8217; (Telefon, Fax, &#8230;)</P><P>&#8211;&gt; TAB TMODU<BR>&nbsp;&#8211; FAUNA/MODIF <BR>&nbsp;&#8211;&gt; &nbsp;TABNM&nbsp;FELDN<BR>&nbsp;KNA1&nbsp;TELF1<BR>&nbsp;KNA1&nbsp;TELF2<BR>&nbsp;KNA1&nbsp;TELF<BR>&nbsp;KNA1&nbsp;TELX1<BR>FAUSA = Allgemeine Daten<BR>FAUSV = Vertriebsdaten<BR>FAUSF = Finanzbuchhaltung</P></p>
+<p>Der Beitrag <a href="/blog/tabellen-und-views/">Tabellen und Views</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Datenelemente</title>
+		<link>/blog/datenelemente/</link>
+					<comments>/blog/datenelemente/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 18 Apr 2003 02:12:30 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=6</guid>
+
+					<description><![CDATA[<p>Hilfreiche Datenelemente, Hinweise zur Verwendung</p>
+<p>Der Beitrag <a href="/blog/datenelemente/">Datenelemente</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hilfreiche Datenelemente, Hinweise zur Verwendung<br /><P>SYCHAR*&nbsp;Characterfelder jeglicher L&auml;nge (SYCHAR32, &#8230;)</P><P>Die Datenelemente der Systemtabelle SY &#8212;&nbsp;bzw. SYST &#8212; heissen immer SY + Feldname. Beispiel: SYUCOMM, SYTABIX. Dies ist hilfreich, wenn man im Programm Felder mit TYPE referieren m&ouml;chte (DATA zaehler TYPE syindex.)</P><P>Datenelemente Dokumentieren! Diese Dokumentation ist dann auf jedem referierten Feld &#8212; auch auf Listen! &#8212; mit F1 abrufbar.</P></p>
+<p>Der Beitrag <a href="/blog/datenelemente/">Datenelemente</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/datenelemente/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

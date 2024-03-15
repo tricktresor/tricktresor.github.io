@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ABAP Tools Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/abap-tools/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:02 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ABAP Tools Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Editor-Aufruf</title>
+		<link>/blog/editor-aufruf/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 21 Aug 2013 14:07:11 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Nützliche Standardprogramme]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[ABAP Tools]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=677</guid>
+
+					<description><![CDATA[<p>M&#246;glichkeiten, den ABAP-Editor aufzurufen gibt es viele. Hier zeigen wir Ihnen einige davon...</p>
+<p>Der Beitrag <a href="/blog/editor-aufruf/">Editor-Aufruf</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Möglichkeiten, den ABAP-Editor aufzurufen gibt es viele. Hier zeigen wir Ihnen einige davon&#8230;</p>
+<p><img decoding="async" class="alignnone size-medium wp-image-4055" alt="ABAP Editor" src="https://tricktresor.com/wp-content/uploads/2013/08/12_10_21_56_58-300x162.jpg" width="300" height="162" srcset="/wp-content/uploads/2013/08/12_10_21_56_58-300x162.jpg 300w, /wp-content/uploads/2013/08/12_10_21_56_58-624x338.jpg 624w, /wp-content/uploads/2013/08/12_10_21_56_58.jpg 629w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<h1 class="head1">EDITOR-CALL</h1>
+<p>Der einfachste Aufruf:</p>
+<pre>DATA lv_progname TYPE syrepid.
+lv_progname = 'ZZMEINPROGRAMM'.
+EDITOR-CALL FOR REPORT lv_progname.</pre>
+<h1 class="head1">RS_TOOL_ACCESS</h1>
+<pre>  CALL FUNCTION 'RS_TOOL_ACCESS'
+     EXPORTING
+       operation           = 'DOCS'
+       object_name         = 'ZZPROGNAME'
+       object_type         = 'PROG'
+     EXCEPTIONS
+       not_executed        = 1
+       invalid_object_type = 2
+       OTHERS              = 3.</pre>
+<h1 class="head1">Programm TPDA_EDITOR_START</h1>
+<pre>DATA prg_info  TYPE tpda_prg_info.
+DATA dynp_info TYPE tpda_dynp_info.
+
+authority-check object 'S_DEVELOP'
+  id 'DEVCLASS' field '*'
+  id 'OBJTYPE' field '*'
+  id 'OBJNAME' field '*'
+  id 'P_GROUP' field '*'
+  id 'ACTVT' field '3'.
+
+IF dynp IS NOT INITIAL.
+  dynp_info-program  = prgm.
+  dynp_info-dynpnr   = dynp.
+  dynp_info-dynpline = line.
+ELSE.
+  prg_info-program  = prgm.
+  prg_info-include  = incl.
+  prg_info-line     = line.
+ENDIF.
+
+CALL METHOD cl_tpda_services_tools=&gt;navigate_to_source
+  EXPORTING
+    p_prg_info  = prg_info
+    p_dynp_info = dynp_info.</pre>
+<h1 class="head1">Funktionsbaustein EDITOR_PROGRAM</h1>
+<pre>CALL FUNCTION 'EDITOR_PROGRAM'
+  EXPORTING
+    display = 'X'
+    program = 'ZZTESTPROG'
+  EXCEPTIONS
+    OTHERS  = 2.</pre>
+<p>Der Beitrag <a href="/blog/editor-aufruf/">Editor-Aufruf</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

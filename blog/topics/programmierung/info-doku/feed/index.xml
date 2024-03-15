@@ -1,0 +1,1435 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Info/ Doku/ Demo Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/programmierung/info-doku/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 11 Mar 2024 17:26:54 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Info/ Doku/ Demo Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>IMG-Struktur anzeigen</title>
+		<link>/blog/img-struktur-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 11 Mar 2024 17:10:33 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[einführungsleitfaden]]></category>
+		<category><![CDATA[unternehmens-img]]></category>
+		<category><![CDATA[img-struktur]]></category>
+		<category><![CDATA[Knoten]]></category>
+		<category><![CDATA[img]]></category>
+		<guid isPermaLink="false">/?p=1045109</guid>
+
+					<description><![CDATA[<p>Für den ein oder anderen Fall kann es sinnvoll sein, eine Unternehmensstruktur (IMG) direkt anzeigen oder sogar editieren zu können. Hintergrundinfo Die IMG-Struktur wird hauptsächlich in den Tabellen TTREE und TTREET verwaltet. Eine IMG-Struktur hat eine GUID und kann über den Kurztext in Tabelle TTREET ermittelt werden. IMG steht übrigens für Implementation Guide (Einführungsleitfaden). Die Knoten einer Unternehmensstruktur kannst du im SAP-Customizing über Transaktion SPRO einsehen und aufrufen. Einzelne Knoten werden mit Transaktion SIMGH angezeigt....</p>
+<p>Der Beitrag <a href="/blog/img-struktur-anzeigen/">IMG-Struktur anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Für den ein oder anderen Fall kann es sinnvoll sein, eine Unternehmensstruktur (IMG) direkt anzeigen oder sogar editieren zu können. </p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="739" height="263" src="/wp-content/uploads/2024/03/image-9.png" alt="" class="wp-image-1045110" srcset="/wp-content/uploads/2024/03/image-9.png 739w, /wp-content/uploads/2024/03/image-9-300x107.png 300w" sizes="(max-width: 739px) 100vw, 739px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Hintergrundinfo</h2>
+
+
+
+<p>Die IMG-Struktur wird hauptsächlich in den Tabellen TTREE und TTREET verwaltet. Eine IMG-Struktur hat eine GUID und kann über den Kurztext in Tabelle TTREET ermittelt werden. IMG steht übrigens für <em>Implementation Guide</em> (Einführungsleitfaden).</p>
+
+
+
+<p>Die Knoten einer Unternehmensstruktur kannst du im SAP-Customizing über Transaktion SPRO einsehen und aufrufen.</p>
+
+
+
+<p>Einzelne Knoten werden mit Transaktion SIMGH angezeigt. Erweiterungen zur Unternehmensstruktur kannst du mit Transaktion S_IMG_EXTENSION verwalten.</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<p>Das folgende Programm bietet die Möglichkeit, eine IMG-Struktur direkt anzuzeigen oder zu bearbeiten.</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="generic" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">
+PARAMETERS: 
+  p_struct TYPE ttree-id OBLIGATORY,
+  p_edit   TYPE xfeld.
+
+START-OF-SELECTION.
+  IF NOT p_struct IS INITIAL.
+    CALL FUNCTION 'STREE_EXTERNAL_EDIT'
+      EXPORTING
+        structure_id   = p_struct
+        language       = sy-langu
+        edit_structure = 'X' 
+        activity       = COND char1( WHEN p_edit = 'X' THEN 'E' ELSE 'D' ).
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/img-struktur-anzeigen/">IMG-Struktur anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid und Dropdown</title>
+		<link>/blog/alv-grid-und-dropdown/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 08 Mar 2024 21:09:41 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<guid isPermaLink="false">/?p=1045045</guid>
+
+					<description><![CDATA[<p>Es gibt einige Verhaltensweise in SAP-Objekten, bei denen ich einfach nicht verstehe, warum diese nicht schon seit langer Zeit behoben wurden. Eine dieser Missstände ist, dass im Eingabebereiten ALV-Grid Felder nicht leer gelassen werden können, wenn an der Domäne Festwerte definiert sind und zu den Festwerten kein SPACE gehört. Dann sieht es so aus: Ein anderes Phänomen sind für mich die Drop-Down-Listen, oder auch Listboxen oder Auswahllisten. Hier gibt es zwei Varianten: Variante A ist...</p>
+<p>Der Beitrag <a href="/blog/alv-grid-und-dropdown/">ALV-Grid und Dropdown</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Es gibt einige Verhaltensweise in SAP-Objekten, bei denen ich einfach nicht verstehe, warum diese nicht schon seit langer Zeit behoben wurden. Eine dieser Missstände ist, dass im Eingabebereiten ALV-Grid Felder nicht leer gelassen werden können, wenn an der Domäne Festwerte definiert sind und zu den Festwerten kein SPACE gehört. Dann sieht es so aus:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="421" height="187" src="/wp-content/uploads/2024/03/image.png" alt="" class="wp-image-1045074" srcset="/wp-content/uploads/2024/03/image.png 421w, /wp-content/uploads/2024/03/image-300x133.png 300w" sizes="(max-width: 421px) 100vw, 421px" /></figure>
+
+
+
+<p>Ein anderes Phänomen sind für mich die Drop-Down-Listen, oder auch Listboxen oder Auswahllisten. Hier gibt es zwei Varianten:</p>
+
+
+
+<ul>
+<li>Variante A: nur mit dem internen Feldwert</li>
+
+
+
+<li>Variante B: Alias, die einen internen Feldwert und eine Bezeichnung erlaubt</li>
+</ul>
+
+
+
+<p>Variante A ist fast immer nutzlos, denn in den seltensten Fällen möchte man nur den internen Wert in der Auswahlhilfe sehen. Hier ein Beispiel im Feld &#8220;Status&#8221;:</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="793" height="216" src="/wp-content/uploads/2024/03/image-1.png" alt="" class="wp-image-1045075" srcset="/wp-content/uploads/2024/03/image-1.png 793w, /wp-content/uploads/2024/03/image-1-300x82.png 300w, /wp-content/uploads/2024/03/image-1-768x209.png 768w" sizes="(max-width: 793px) 100vw, 793px" /></figure>
+
+
+
+<p>Variante B mit dem Alias ist bereits hilfreicher, denn der Anwender kann bei der Auswahl der Werte erkennen, was der Wert bedeutet. Hier ein Beispiel im Feld &#8220;Fruit&#8221;:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="793" height="216" src="/wp-content/uploads/2024/03/image-2.png" alt="" class="wp-image-1045076" srcset="/wp-content/uploads/2024/03/image-2.png 793w, /wp-content/uploads/2024/03/image-2-300x82.png 300w, /wp-content/uploads/2024/03/image-2-768x209.png 768w" sizes="(max-width: 793px) 100vw, 793px" /></figure>
+
+
+
+<p>Hier ist für mich jedoch das Manko, dass nach Auswahl der Bezeichner nicht mehr zu sehen ist. Zudem wird der interne Wert in der Drop-Down-Liste nicht angezeigt, wenn man ihn nicht explizit mit einprogrammiert. </p>
+
+
+
+<p>Beide Varianten unterscheiden sich somit von den Listboxen, die man vom Dynpro kennt. Hier kann man den beschreibenden Text nicht nur bei der Eingabe sehen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="543" height="178" src="/wp-content/uploads/2024/03/image-6.png" alt="" class="wp-image-1045080" srcset="/wp-content/uploads/2024/03/image-6.png 543w, /wp-content/uploads/2024/03/image-6-300x98.png 300w" sizes="(max-width: 543px) 100vw, 543px" /></figure>
+
+
+
+<p>Sondern auch <strong>nach </strong>der Auswahl:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="535" height="47" src="/wp-content/uploads/2024/03/image-5.png" alt="" class="wp-image-1045079" srcset="/wp-content/uploads/2024/03/image-5.png 535w, /wp-content/uploads/2024/03/image-5-300x26.png 300w" sizes="(max-width: 535px) 100vw, 535px" /></figure>
+
+
+
+<p>Im SAPGUI kannst du noch einstellen, ob du den Schlüsselwert sehen möchtest oder nicht:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="922" height="638" src="/wp-content/uploads/2024/03/image-7.png" alt="" class="wp-image-1045081" srcset="/wp-content/uploads/2024/03/image-7.png 922w, /wp-content/uploads/2024/03/image-7-300x208.png 300w, /wp-content/uploads/2024/03/image-7-768x531.png 768w" sizes="(max-width: 922px) 100vw, 922px" /></figure>
+
+
+
+<p>Das ist eine sinnvolle Darstellung von Listboxen.</p>
+
+
+
+<h2 class="wp-block-heading">Drop-Down-Liste und Festwerte</h2>
+
+
+
+<p>Für das ALV-Grid gibt es meines Wissens keine einfache Alternative um ein Feld als Listbox im Feldkatalog zu definieren, so dass vorhandene Festwerte direkt und ohne weiteres Zutun in der Drop-Down-Liste angezeigt werden.</p>
+
+
+
+<h2 class="wp-block-heading">Alternativen</h2>
+
+
+
+<p>Jedes Mal auf&#8217;s Neue kann ich nicht glaube, dass es im ALV-Grid keine andere Möglichkeit gibt, also habe ich mir folgende Alternativen überlegt. Beide Alternativen arbeiten mit einem zusätzlichen Feld.</p>
+
+
+
+<ol>
+<li>Auswahl Schlüsselfeld und Beschreibung in separates Feld</li>
+
+
+
+<li>Auswahl Textfeld und Ermittlung der ID</li>
+</ol>
+
+
+
+<p>Beide Varianten bedeuten mehr Aufwand, denn du musst das Ereignis DATA_CHANGED registrieren und ausprogrammieren. Sie bedeuten jedoch für den Anwender auch einen größeren Bedienkomfort.</p>
+
+
+
+<p>Leider habe ich noch keine Möglichkeit gefunden, dass der Text sofort nach Auswahl aktualisiert wird. Der Anwender muss in jedem Fall eine Taste drücken oder in ein anderes Feld klicken.</p>
+
+
+
+<h3 class="wp-block-heading">Auswahl Schlüsselfeld</h3>
+
+
+
+<p>Ich definiere für die Ausgabe ein separates Feld, das den Bezeichner des zugehörigen Feldes aufnimmt. In diesem Beispiel das Feld &#8220;Hardware-ID&#8221;:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="793" height="216" src="/wp-content/uploads/2024/03/image-3.png" alt="" class="wp-image-1045077" srcset="/wp-content/uploads/2024/03/image-3.png 793w, /wp-content/uploads/2024/03/image-3-300x82.png 300w, /wp-content/uploads/2024/03/image-3-768x209.png 768w" sizes="(max-width: 793px) 100vw, 793px" /></figure>
+
+
+
+<p>Ich verwende die Drop-Down-Alias-Variante. Zusätzlich wird im Ereignis CL_GUI_ALV_GRID-DATA_CHANGED der Feldwert ausgelesen und mittels MODIFY_CELL in das zugehöriger Bezeichnerfeld geschrieben. </p>
+
+
+
+<h3 class="wp-block-heading">Auswahl Textfeld</h3>
+
+
+
+<p>In dieser Variante definiere ich die Drop-Drown-Liste für das Beschreibungsfeld und ermittle aus der Beschreibung den internen Schlüssel:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="332" height="364" src="/wp-content/uploads/2024/03/image-8.png" alt="" class="wp-image-1045082" srcset="/wp-content/uploads/2024/03/image-8.png 332w, /wp-content/uploads/2024/03/image-8-274x300.png 274w" sizes="(max-width: 332px) 100vw, 332px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Welche Variante du verwendest, musst du selbst entscheiden. Meiner Meinung nach ist die erste Variante einen Tick einfacher, da hier bei dem internen Feldwert der <em>richtige</em> interne Wert direkt mitgegeben werden kann und so der Text zur ID ermittelt wird. Bei der zweiten Variante wird die ID zum Text ermittelt, was eher ungewöhnlich ist.</p>
+
+
+
+<p>Vorteil der zweiten Variante ist, dass das Schlüsselfeld mit dem internen Wert einfach versteckt werden kann und so für den Benutzer gar nicht sichtbar ist. Der Benutzer sieht also nur den Wert, der in der Regel auch sprechend und sinnvoll für ihn ist.</p>
+
+
+
+<p>In beiden Fällen muss sichergestellt werden, dass interner Wert und externe Beschreibung immer zueinander passen und korrekt ermittelt werden.</p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT.
+
+PARAMETERS p_hwid TYPE c LENGTH 1 AS LISTBOX VISIBLE LENGTH 20.
+
+
+CLASS main DEFINITION.
+  PUBLIC SECTION.
+    TYPES: BEGIN OF _line,
+             id   TYPE c LENGTH 1,
+             text TYPE c LENGTH 20,
+           END OF _line,
+           _tab TYPE SORTED TABLE OF _line WITH UNIQUE KEY id.
+
+    TYPES: BEGIN OF _data_line,
+             key         TYPE c LENGTH 2,
+             status      TYPE c LENGTH 1, "Dropdown
+             fruit       TYPE c LENGTH 1, "Dropdown Alias
+             hardware    TYPE c LENGTH 1, "Dropdown Alias + separate text field
+             hw_text     TYPE c LENGTH 20,
+             weekday_id  TYPE c LENGTH 1,
+             weekday_txt TYPE c LENGTH 20,
+           END OF _data_line,
+           _data_table TYPE STANDARD TABLE OF _data_line WITH EMPTY KEY.
+
+    CLASS-DATA hw_ids TYPE _tab.
+    CLASS-DATA weekday_ids TYPE _tab.
+
+    METHODS constructor.
+    CLASS-METHODS class_constructor.
+
+    METHODS display
+      IMPORTING
+        container TYPE REF TO cl_gui_container.
+
+  PRIVATE SECTION.
+    DATA datatable TYPE _data_table.
+    DATA grid TYPE REF TO cl_gui_alv_grid.
+
+    DATA dropdown       TYPE lvc_t_drop.
+    DATA dropdown_alias TYPE lvc_t_dral.
+
+    CONSTANTS dd_handle_status  TYPE i VALUE 1.
+    CONSTANTS dd_handle_fruit   TYPE i VALUE 2.
+    CONSTANTS dd_handle_hw      TYPE i VALUE 3.
+    CONSTANTS dd_handle_weekday TYPE i VALUE 4.
+
+    METHODS on_data_changed FOR EVENT data_changed
+      OF cl_gui_alv_grid
+      IMPORTING
+        e_onf4
+        e_onf4_after
+        e_onf4_before
+        e_ucomm
+        er_data_changed.
+
+    METHODS get_fcat
+      RETURNING VALUE(result) TYPE lvc_t_fcat.
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+  METHOD class_constructor.
+
+    hw_ids = VALUE #(
+      ( id = 'X' text = 'Tablet' )
+      ( id = 'Y' text = 'Personal Computer' )
+      ( id = 'Z' text = 'Laptop' ) ).
+
+    weekday_ids = VALUE #(
+      ( id = '1' text = 'Monday' )
+      ( id = '2' text = 'Tuesday' )
+      ( id = '3' text = 'Wednesday' )
+      ( id = '4' text = 'Thursday' )
+      ( id = '5' text = 'Friday' )
+      ( id = '6' text = 'Saturday' )
+      ( id = '7' text = 'Sunday' ) ).
+
+  ENDMETHOD.
+
+  METHOD constructor.
+
+    "Simple Dropdown: STATUS
+    dropdown = VALUE #( handle = dd_handle_status
+      ( value = '1' )
+      ( value = '2' )
+      ( value = '3' ) ).
+
+    "Dropdown-Alias: FRUITS
+    dropdown_alias = VALUE #( handle = dd_handle_fruit
+      ( int_value = 'A' value = 'Apple' )
+      ( int_value = 'B' value = 'Banana' )
+      ( int_value = 'C' value = 'Coconut' ) ).
+
+    "Dropdown-Alias with description field: HARDWARE
+    APPEND LINES OF VALUE lvc_t_dral(
+      FOR l_hw IN hw_ids (
+        handle = dd_handle_hw
+        int_value = l_hw-id
+        value = l_hw-text ) )
+          TO dropdown_alias.
+
+    "Dropdown-Alias with description selection: WEEKDAY
+    APPEND LINES OF VALUE lvc_t_dral(
+      FOR l_wd IN weekday_ids (
+        handle = dd_handle_weekday
+        int_value = l_wd-text
+        value = l_wd-text ) )
+          TO dropdown_alias.
+
+    "fill demo data in internal table
+    datatable = VALUE #(
+       ( key = '10' status = '1' fruit = 'A' hardware = 'X' weekday_id = '3' )
+       ( key = '20' )
+       ( key = '30' ) ).
+
+  ENDMETHOD.
+
+  METHOD display.
+
+    grid = NEW #( i_parent = container ).
+
+    DATA(fcat) = get_fcat( ).
+
+    LOOP AT datatable ASSIGNING FIELD-SYMBOL(&lt;data>).
+      IF &lt;data>-hardware IS NOT INITIAL.
+        &lt;data>-hw_text = dropdown_alias[ handle = dd_handle_hw int_value = &lt;data>-hardware ]-value.
+        &lt;data>-weekday_txt = weekday_ids[ id = &lt;data>-weekday_id ]-text.
+      ENDIF.
+    ENDLOOP.
+
+    grid->set_drop_down_table(
+      it_drop_down       = dropdown
+      it_drop_down_alias = dropdown_alias ).
+
+    grid->set_table_for_first_display(
+      CHANGING
+        it_outtab                     = datatable
+        it_fieldcatalog               = fcat
+      EXCEPTIONS
+        OTHERS                        = 4 ).
+    IF sy-subrc > 0.
+      RETURN.
+    ENDIF.
+
+    SET HANDLER on_data_changed FOR grid.
+    grid->register_edit_event( cl_gui_alv_grid=>mc_evt_modified ).
+
+  ENDMETHOD.
+
+  METHOD get_fcat.
+
+      result = VALUE #( tabname = '1' datatype = 'CHAR'
+      ( fieldname = 'KEY'         outputlen = 10 intlen =  2 drdn_hndl = 0                 drdn_alias = ' ' reptext = 'Key'             edit = ' ' )
+      ( fieldname = 'STATUS'      outputlen = 10 intlen =  1 drdn_hndl = dd_handle_status  drdn_alias = ' ' reptext = 'Status'          edit = 'X' )
+      ( fieldname = 'FRUIT'       outputlen = 10 intlen =  1 drdn_hndl = dd_handle_fruit   drdn_alias = 'X' reptext = 'Fruit'           edit = 'X' )
+      ( fieldname = 'HARDWARE'    outputlen = 10 intlen =  1 drdn_hndl = dd_handle_hw      drdn_alias = 'X' reptext = 'Hardware-ID'     edit = 'X' )
+      ( fieldname = 'HW_TEXT'     outputlen = 30 intlen = 20 drdn_hndl = 0                 drdn_alias = ' ' reptext = 'Hardware descr.' edit = ' ' )
+      ( fieldname = 'WEEKDAY_ID'  outputlen = 10 intlen =  1 drdn_hndl = 0                 drdn_alias = ' ' reptext = 'Weekday ID'      edit = ' ' )
+      ( fieldname = 'WEEKDAY_TXT' outputlen = 20 intlen = 20 drdn_hndl = dd_handle_weekday drdn_alias = 'X' reptext = 'Weekday'         edit = 'X' lowercase = 'X')
+        ).
+
+  ENDMETHOD.
+
+  METHOD on_data_changed.
+    DATA text TYPE string.
+
+    LOOP AT er_data_changed->mt_good_cells INTO DATA(cell).
+      CASE cell-fieldname.
+        WHEN 'HARDWARE'.
+          text = COND #( WHEN cell-value IS INITIAL THEN `` ELSE dropdown_alias[ handle = dd_handle_hw int_value = cell-value ]-value ).
+          er_data_changed->modify_cell(
+            i_row_id    = cell-row_id
+            i_tabix     = cell-tabix
+            i_fieldname = 'HW_TEXT'
+            i_value     = text ).
+        WHEN 'WEEKDAY_TXT'.
+          text = COND #( WHEN cell-value IS INITIAL THEN `` ELSE weekday_ids[ text = cell-value ]-id ).
+          er_data_changed->modify_cell(
+            i_row_id    = cell-row_id
+            i_tabix     = cell-tabix
+            i_fieldname = 'WEEKDAY_ID'
+            i_value     = text ).
+      ENDCASE.
+    ENDLOOP.
+  ENDMETHOD.
+ENDCLASS.
+
+
+INITIALIZATION.
+  DATA(docker) = NEW cl_gui_docking_container( side = cl_gui_docking_container=>dock_at_bottom ratio = 80 ).
+  DATA(app) = NEW main( ).
+  app->display( docker ).
+
+  CALL FUNCTION 'VRM_SET_VALUES'
+    EXPORTING
+      id     = 'P_HWID'
+      values = CORRESPONDING vrm_values( main=>hw_ids MAPPING key = id text = text ).</pre>
+<p>Der Beitrag <a href="/blog/alv-grid-und-dropdown/">ALV-Grid und Dropdown</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Finden ─ nicht suchen</title>
+		<link>/blog/finden-%e2%94%80-nicht-suchen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 28 Feb 2024 15:21:13 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Cross Applications]]></category>
+		<guid isPermaLink="false">/?p=1044885</guid>
+
+					<description><![CDATA[<p>Ich denke, nach beinahe 30 Jahren Erfahrung mit SAP-Systemen kann ich mich als alten Fuchs bezeichnen und es gibt wenig im ABAP-Umfeld, das ich noch nicht kenne (RAP und CAP und UI5 und so&#8217;n neumodischen Kram mal außen vor gelassen&#8230; 🙂 ). Diesen Monat sind mir jedoch bereits zwei Dinge begegnet, dir mir wirklich absolut neu sind. Das erste ist die Möglichkeit, einen Doppelklick in der Code-Vervollständigung von TYPES machen zu können. Das zweite ist...</p>
+<p>Der Beitrag <a href="/blog/finden-%e2%94%80-nicht-suchen/">Finden ─ nicht suchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Ich denke, nach beinahe 30 Jahren Erfahrung mit SAP-Systemen kann ich mich als alten Fuchs bezeichnen und es gibt wenig im ABAP-Umfeld, das ich noch nicht kenne (RAP und CAP und UI5 und so&#8217;n neumodischen Kram mal außen vor gelassen&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f642.png" alt="🙂" class="wp-smiley" style="height: 1em; max-height: 1em;" /> ). Diesen Monat sind mir jedoch bereits zwei Dinge begegnet, dir mir wirklich absolut neu sind. Das erste ist die Möglichkeit, einen <a href="https://www.linkedin.com/posts/enno-wulff_sapabap-sapdeveloper-sapabaponhana-activity-7166471749868453888-TEKv?utm_source=share&amp;utm_medium=member_desktop">Doppelklick in der Code-Vervollständigung von TYPES</a> machen zu können. Das zweite ist ein Programm, über das ich heute gestolpert bin und das mir in Zukunft viel Sucharbeit ersparen wird: </p>
+
+
+
+<p class="has-text-align-left has-pale-cyan-blue-background-color has-background has-medium-font-size"><strong>RDOCFINDER</strong> &#8211; Full Text Search for Short and Long Texts</p>
+
+
+
+<p>Bilder sagen mehr, als tausend Worte. Also bitteschön:</p>
+
+
+
+<h2 class="wp-block-heading">Selektionsbild</h2>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="558" src="/wp-content/uploads/2024/02/image-1-1024x558.png" alt="" class="wp-image-1044886" srcset="/wp-content/uploads/2024/02/image-1-1024x558.png 1024w, /wp-content/uploads/2024/02/image-1-300x163.png 300w, /wp-content/uploads/2024/02/image-1-768x418.png 768w, /wp-content/uploads/2024/02/image-1-1536x836.png 1536w, /wp-content/uploads/2024/02/image-1-71x40.png 71w, /wp-content/uploads/2024/02/image-1.png 1552w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Ergebnisliste</h2>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="539" src="/wp-content/uploads/2024/02/image-2-1024x539.png" alt="" class="wp-image-1044887" srcset="/wp-content/uploads/2024/02/image-2-1024x539.png 1024w, /wp-content/uploads/2024/02/image-2-300x158.png 300w, /wp-content/uploads/2024/02/image-2-768x404.png 768w, /wp-content/uploads/2024/02/image-2-1536x809.png 1536w, /wp-content/uploads/2024/02/image-2.png 1538w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Unterstützte Objekte</h2>
+
+
+
+<pre class="wp-block-preformatted">Suche nach Terminologie-Begriffen in folgenden Objekten:<br>- DDIC-Objekte     "Datenelemente (F1)                  DE   +<br>                   "Datenelementzusätze (F1)            DZ   +<br>                   "Schlüsselwörter der Datenelemente   DS   +<br>                   "Kurztext der Datenelemente          DK   +<br>                   "Reportüberschrift Datenelement      DR   +<br>                   "Domänen (F1)                        DO   +<br>                   "Kurztext der Domänen                DK   +<br>                   "Domänen-Festwerte (F1)              DV   +<br>                   "Tabellen/Strukturen (F1)            TB   +<br>                   "Kurztext der Tabellen               TK   +<br>                   "Feld/Komponente der Tabellen        TF   +<br>                   "Indizes der Tabellen                TX   +<br>                   "Kurztext der Tabellentypen          TT   +<br>                   "Kurztext der Views                  TV   +<br>                   "Kurztext der Suchhilfen             SH   +<br>                   "Kurztext der Sperrobjekte           EQ   +<br>- Benutzerstamm    "Benutzerstamm Objekte (F1)          UO   +<br>                   "Kurztext der Objekte                OK   +<br>                   "Benutzerstamm Profile (F1)          UP   +<br>                   "Kurztext der Profile                PK   +<br>- Nachrichten      "Nachrichten (F1)                    NA   +<br>                   "Kurztext der Nachrichten            NK   +<br>                   "Kurztext der Nachrichtenklassen     NN   +<br>                   "Syslog-Meldungen (F1)               SL   +<br>                   "Kurztext der Syslog-Meldung         SK   +<br>- Reports          "Reports (F1)                        RE   +<br>                   "numerierte Texte usw.               R... +<br>                   "Dynpro-Texte                        DY   +<br>                   "Dynpro-Titel                        DX   +<br>- Klassenbibliotheken                                   CL/IF<br>                   "Klassen - Kurztext                  KT   +<br>                   "Klassen - Langtext                  CL   +<br>                   "Klassen Attribute - Kurztext        KT   +<br>                   "Klassen Attribute - Langtext        CA   +<br>                   "Klassen Methoden - Kurztext         KT   +<br>                   "Klassen Methoden - Langtext         CO   +<br>                   "Klassen Ereignisse - Kurztext       KT   +<br>                   "Klassen Ereignisse - Langtext       CE   +<br>                   "Klassen Typen - Kurztext            KT   +<br>                   "Klassen Typen - Langtext            CT   +<br>                   "Interface - Kurztext                KT   +<br>                   "Interface - Langtext                IF   +<br>                   "Interface Attribute - Kurztext      KT   +<br>                   "Interface Attribute - Langtext      IA   +<br>                   "Interface Methoden - Kurztext       KT   +<br>                   "Interface Methoden - Langtext       IO   +<br>                   "Interface Ereignisse - Langtext     IE   +<br>                   "Interface Typen - Kurztext          KT   +<br>                   "Meth. Parameter/Ausnahmen- Kurztext SC   +<br>- Oberfläche       "Oberfläche (F1)                     CF<br>                   "Titel                               TI   +<br>                   "Funktionstastentext                 FM   +<br>                   "Ikonentext                          FI   +<br>                   "Quickinfo Ikone                     FQ   +<br>                   "Menüleiste                          MA   +<br>                   "Drucktastenbelegung                 MB   +<br>                   "GUI-Status                          MC   +<br>                   "Funktionstext                       MM   +<br>                   "Funktionstastenbelegung             MP   +<br>- Modellierungsobjekte                                  IM<br>                   "Entitätstypen - Kurztext            ET   +<br>                   "Entitätstypen - Langtext            UE   +<br>                   "Entitätstypen - Aliasname           EA   +<br>                   "Datenmodelle - Kurztext             DM   +<br>                   "Datenmodelle - Langtext             UD   +<br>                   "Beziehung - Kurztext                ER   +<br>                   "Beziehung - Langtext          UH/UR/UK   +<br>                   "Spezialisierungsart - Kurztext      ES   +<br>                   "Spezialisierungsart - Langtext      US   +<br>                   "Entitätstyp Kommentare - Langtext   UC   +<br>                   "Entitätstyp Beispiel - Langtext     UB   +<br>- IMG<br>                   "IMG-Struktur                        I    +<br>                   "IMG-Aktivität                       I0   +<br>                   "IMG-Pflegeobjekt                    I1   +<br>                   "IMG-Attribute                       I2   +<br>                   "IMG-Doku                            IG   +<br>- Test-Objekte<br>                   "CATT-Testfall - Kurztext            GK   +<br>                   "CATT-Testfall - Langtext            GT   +<br>                   "eCATT-Testskript - Titel            E0   +<br>                   "eCATT-Testskript - Par./Kommandosch.E5   +<br>                   "eCATT-Testskript - Langtext         E    +<br>                   "eCATT-Testkonfig. - Titel           E1   +<br>                   "eCATT-Testkonfig. - Variante        E6   +<br>                   "eCATT-Testkonfig. - Langtext        E    +<br>                   "eCATT-Testdaten - Titel             E2   +<br>                   "eCATT-Testdaten - Param./Variante   E7   +<br>                   "eCATT-Testdaten - Langtext          E    +<br>                   "eCATT-Systemdaten - Titel           E3   +<br>                   "eCATT-Systemdaten - Zielsystem      E8   +<br>                   "eCATT-Systemdaten - Langtext        E    +<br>                   "eCATT-Validierungsobjekt - Titel    E4   +<br>                   "eCATT-Validierungsobjekt - Langtext E    +<br>- Erweiterungen<br>                   "SAP-Erweiterung (Modifik.) - Kurzt. MK   +<br>                   "SAP-Erweiterung (Modifik.) - Langt. MO   +<br>                   "Klassisches BAdI                    BA   +<br>                   "Implementierung Klassisches BAdI    BI   +<br>                   "Zusammengesetzter Erweiterungsspot  BJ   +<br>                   "Impl. Zusammenges. Erweiterungsspot BK   +<br>                   "Erweiterungsspot                    BS   +<br>                   "Erweiterungsspot - BAdI             B0   +<br>                   "Erweiterungsspot - BAdI TechDoku    B1   +<br>                   "Erweiterungsspot - BAdI - Filter    B2   +<br>                   "Erweiterungsspot - BAdI - Menü-Erw. B3   +<br>                   "Erweiterungsspot - BAdI - Scr.-Erw. B4   +<br>                   "Impl. Erweiterungsspot              BT   +<br>                   "Impl. Erweiterungsspot - BAdI       B5   +<br>                   "Impl. Erweiterungsspot - BAdI TechD.B6   +<br>- allg. Text (TX)                                       TX   +<br>- Migrationstext (nur Langtext)                         MG   +<br>- Release-Infos (IN RELN) (nur Langtext)                IN   +<br>- SAPscript-Formulare (Langtext + Kurztext)             SF   +-<br>- SAPscript-Stile     (Kurztext)                        SS    -<br>- Funktionsbaustein-Doku (FU)                           FU   +<br>- Funktionsbaustein-Ausnahme-Doku (FX)                  FX   +<br>- Funktionsbaustein-Parameter/Ausnahme-Kurztext         FP   +<br>- Dialogbaustein-Doku<br>                   "Kurztext der Dialogbausteine        DB   +<br>                   "Langtext Dialogbaustein             DI   +<br>- Syntax-Doku (SD)<br>                   "ABAP                                S0   +<br>                   "Umgebung ABAP                       S1   +<br>                   "CONT                                S2   +<br>                   "Dynpro                              S3   +<br>                   "Editor                              S4   +<br>                   "RSYN                                S5   +<br>- Texte im Dialog (DT)                                  DT   +<br>- Kurzdump                                              KD   +<br>- SET/GET-Parameter                                     SG   +<br>- Bereichsmenüs                                         AM   +<br>- verschiedene Kurztexte<br>                   "Kurztext der Transaktionen          TA   +<br>                   "Kurztext der log. Datenbank         LD   +<br>- Gateway texts<br>                   "Data Object Hierarchy  - long text  GH<br>                   "Data Object Hierarchy  - short text GJ<br>                   "Data Object            - long text  GD<br>                   "Data Object            - short text GE<br>                   "Operation              - long text  GO<br>                   "Operation              - short text GP<br>                   "Consumption Model      - long text  GS<br>                   "Consumption Model      - short text GU</pre>
+<p>Der Beitrag <a href="/blog/finden-%e2%94%80-nicht-suchen/">Finden ─ nicht suchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Übersicht Code-Inspector-Prüfungen</title>
+		<link>/blog/uebersicht-code-inspector-pruefungen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 16 Feb 2024 09:40:06 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Code-Inspector]]></category>
+		<guid isPermaLink="false">/?p=1044656</guid>
+
+					<description><![CDATA[<p>Code-Inspector Prüfungen werden zu Varianten mit Hilfe der Transaktion SCI ein- und ausgeschaltet. Wenn du wissen möchtest, welche technische Klasse hinter der jeweiligen Prüfung steht, dann kannst du im Menü Check Variant • Display • Technical names aufrufen, aber dann siehst du alle nicht markierten Prüfungen ebenfalls. Aus diesem Grund existiert das folgende Programm. Es listet die technischen Namen der aktiven Prüfungen einer Variante auf. Default-Varianten Es gibt in der Regel zwei Default-Varianten: Die Variante...</p>
+<p>Der Beitrag <a href="/blog/uebersicht-code-inspector-pruefungen/">Übersicht Code-Inspector-Prüfungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Code-Inspector Prüfungen werden zu Varianten mit Hilfe der <em>Transaktion SCI</em> ein- und ausgeschaltet. Wenn du wissen möchtest, welche technische Klasse hinter der jeweiligen Prüfung steht, dann kannst du im Menü <em>Check Variant  • Display • Technical names</em> aufrufen, aber dann siehst du alle nicht markierten Prüfungen ebenfalls. Aus diesem Grund existiert das folgende Programm. Es listet die technischen Namen der aktiven Prüfungen einer Variante auf.</p>
+
+
+
+<h2 class="wp-block-heading">Default-Varianten</h2>
+
+
+
+<p>Es gibt in der Regel zwei Default-Varianten:</p>
+
+
+
+<ul>
+<li>DEFAULT</li>
+
+
+
+<li>TRANSPORT</li>
+</ul>
+
+
+
+<p>Die Variante DEFAULT wird verwendet, wenn die Code-Inspector-Prüfung aus dem Sourcecode heraus aufgerufen wird. Die Variante TRANSPORT wird bei Freigabe eines Transportauftrags verwendet.</p>
+
+
+
+<p>Du kannst die eingestellte DEFAULT-Variante aus Tabelle SCICHKV_ALTER lesen oder die folgende Methode verwenden:</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">cl_ci_checkvariant=>get_chkv_alter(  
+  EXPORTING
+    p_checkvname_default = 'DEFAULT'
+  IMPORTING
+    p_checkvname_new     = DATA(default_config) ).</pre>
+
+
+
+<p>Meines Wissens gibt es keine Möglichkeit, die DEFAULT-Variante im Standard zu setzen. Du musst also einen Pflegedialog für die Tabelle SCICHKV_ALTER generieren oder den Eintrag mittels SE16N in die Tabelle schreiben.</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="363" height="444" src="/wp-content/uploads/2024/02/image.png" alt="" class="wp-image-1044663" srcset="/wp-content/uploads/2024/02/image.png 363w, /wp-content/uploads/2024/02/image-245x300.png 245w" sizes="(max-width: 363px) 100vw, 363px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">PARAMETERS name  TYPE scichkv_hd-checkvname DEFAULT 'DEFAULT'.
+PARAMETERS owner TYPE scichkv_hd-ciuser     DEFAULT space.
+
+START-OF-SELECTION.
+
+  SELECT SINGLE * FROM scichkv_hd
+      WHERE checkvname = @name     ##WARN_OK
+        AND ciuser     = @owner    "#EC CI_NOORDER
+       INTO @DATA(variant_header).
+
+  DATA(main) =  cl_ci_checkvariant=>get_ref(
+       p_user                   = owner
+       p_name                   = name ).
+  CHECK main IS BOUND.
+
+  main->get_info(
+    EXCEPTIONS
+      could_not_read_variant = 1
+      OTHERS                 = 2 ).
+
+  IF sy-subrc = 0.
+    cl_demo_output=>display_data(
+      VALUE string_table(
+        FOR variant IN main->variant (
+          CONV #( variant-testname ) ) ) ).
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/uebersicht-code-inspector-pruefungen/">Übersicht Code-Inspector-Prüfungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Termin an Outlook versenden</title>
+		<link>/blog/termin-an-outlook-versenden/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 05 Sep 2023 12:01:14 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">/?p=1043455</guid>
+
+					<description><![CDATA[<p>In einem Projekt entstand die Idee, einen Termin, den eine SAP-Applikation ermittelt hat, als Termin an die verantwortliche Person zu schicken. Technisch muss man hierzu eine ICS-Datei erstellen und diese per E-Mail versenden. Wie ich gehofft hatte, hatte jemand bei SAP auch vorher schon eine ähnliche Idee und hat die Klasse CL_APPOINTMENT programmiert. Das folgende Beispielprogramm ist eine Abwandlung des Demo-Reports RSSC_DEMO_CL_APPOINTMENT_APPL mit dem Zusatz, den erstellten Termin zu versenden. Termintyp Mit der Methode SET_TYPE...</p>
+<p>Der Beitrag <a href="/blog/termin-an-outlook-versenden/">Termin an Outlook versenden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In einem Projekt entstand die Idee, einen Termin, den eine SAP-Applikation ermittelt hat, als Termin an die verantwortliche Person zu schicken. Technisch muss man hierzu eine <a href="https://praxistipps.chip.de/ics-datei-erstellen-das-muessen-sie-beim-aufbau-beachten_98011" target="_blank" rel="noreferrer noopener">ICS-Datei</a> erstellen und diese per E-Mail versenden. Wie ich gehofft hatte, hatte jemand bei SAP auch vorher schon eine ähnliche Idee und hat die Klasse CL_APPOINTMENT programmiert. </p>
+
+
+
+<p>Das folgende Beispielprogramm ist eine Abwandlung des Demo-Reports RSSC_DEMO_CL_APPOINTMENT_APPL mit dem Zusatz, den erstellten Termin zu versenden. </p>
+
+
+
+<h2 class="wp-block-heading">Termintyp</h2>
+
+
+
+<p>Mit der Methode SET_TYPE kannst du den <em>Termintypen</em> setzen. In meinem Beispiel nutze ich den Wert &#8220;MEETING&#8221;. Die möglichen Termintypen stehen in Tabelle SCAPPTTYPE. Ich schätze, dass dieser Termintyp in erster Linie für die Speicherung im SAP-Office notwendig ist. </p>
+
+
+
+<p>In meinem System habe ich den Termintyp ZREMINDER angelegt. Dieser wird in dem Termin entsprechend angezeigt:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="494" src="/wp-content/uploads/2023/09/image-3-1024x494.png" alt="" class="wp-image-1043478" srcset="/wp-content/uploads/2023/09/image-3-1024x494.png 1024w, /wp-content/uploads/2023/09/image-3-300x145.png 300w, /wp-content/uploads/2023/09/image-3-768x370.png 768w, /wp-content/uploads/2023/09/image-3.png 1087w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<p>Das Icon, das man auswählen kann (in meinem Fall die Alarm-Glocke), wird nur im SAP-Office angezeigt:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="666" height="531" src="/wp-content/uploads/2023/09/image-4.png" alt="" class="wp-image-1043479" srcset="/wp-content/uploads/2023/09/image-4.png 666w, /wp-content/uploads/2023/09/image-4-300x239.png 300w" sizes="(max-width: 666px) 100vw, 666px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Termin senden</h2>
+
+
+
+<p>Die Methode CREATE_SEND_REQUEST liefert eine Klasse vom Typ <a href="https://codezentrale.de/abap-html-email-versenden/" target="_blank" rel="noreferrer noopener">CL_BCS</a> zurück. Das bedeutet, das Versenden sowie weitere Parameter können wie gewohnt verwendet werden.</p>
+
+
+
+<h2 class="wp-block-heading">Erinnerung oder Meeting?</h2>
+
+
+
+<p>Das Programm ermöglicht es, bis zu zwei Teilnehmende zu definieren. Ein Teilnehmer muss vorhanden sein; denn einer soll schließlich den Termin auf jeden Fall bekommen. Die Person, an die die Erinnerung gesendet wird, hat dann die Möglichkeit, den Termin (unter Vorbehalt) anzunehmen oder abzusagen. Sind mehrere Personen im Termin definiert, dann muss ausgewählt werden, ob die Antwort jeweils gesendet, nicht gesendet oder vor dem Senden bearbeitet werden soll. </p>
+
+
+
+<h2 class="wp-block-heading">HTML-Body</h2>
+
+
+
+<p>Der Informationstext im Mailbody ist reiner Text. Mit Methode SET_TEXT kannst du diesen einfachen Text hinzufügen. Leider habe ich es nicht geschafft, einen Termin mit HTML-Text auszustatten. Wenn du mit SET_DOCUMENT der Klasse CL_BCS einen HTML-Text hinzufügst, dann wird das erzeugte ICS-Dokument ersetzt und du versendest am Ende eine normale E-Mail. Eventuell ist es möglich, wenn man eine <a href="https://blogs.sap.com/2014/03/11/multipart-emails/">Multipart-E-Mail</a> erzeugt, bei der das ICS-Dokument eben ein Part der Nachricht ist.</p>
+
+
+
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-luminous-vivid-amber-color">Wenn du einen Tipp hast, wie das funktioniert, schreib mir gerne eine E-Mail.</mark></p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<p>Der folgende Code zeigt exemplarisch die notwendigen Methodenaufrufe. Der Code ist ebenfalls im <a href="https://github.com/tricktresor/appointment">Github-Projek Appointment</a> zu finden.</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT zt9tr_send_appointment.
+
+INCLUDE &lt;cntn01>.
+TYPE-POOLS: sccon.
+
+PARAMETERS p_orga  TYPE xubname    DEFAULT sy-uname OBLIGATORY.
+PARAMETERS p_mail  TYPE ad_smtpadr DEFAULT 'ewf@inwerken.de' OBLIGATORY.
+PARAMETERS p_mail2 TYPE ad_smtpadr DEFAULT 'lmr@inwerken.de'.
+PARAMETERS p_title TYPE sc_txtshor DEFAULT 'Geschäftsessen'.
+PARAMETERS p_loc   TYPE sc_room    DEFAULT 'La Civetta'.
+PARAMETERS p_date  TYPE sy-datum   DEFAULT sy-datum.
+PARAMETERS p_from  TYPE sc_timefro DEFAULT '120000'.
+PARAMETERS p_to    TYPE sc_timeto  DEFAULT '130000'.
+SELECTION-SCREEN BEGIN OF BLOCK body WITH FRAME TITLE TEXT-bdy.
+PARAMETERS p_line1 TYPE so_text255 DEFAULT 'Wichtiges Essen'.
+PARAMETERS p_line2 TYPE so_text255 DEFAULT 'Schickes Hemd anziehen'.
+PARAMETERS p_line3 TYPE so_text255 DEFAULT 'Blumen mitbringen'.
+SELECTION-SCREEN END OF BLOCK body.
+
+CLASS main DEFINITION.
+  PUBLIC SECTION.
+
+    CONSTANTS c_status_confirmation_never    TYPE bcs_rqst VALUE 'N'.  "Never
+    CONSTANTS c_status_confirmation_on_error TYPE bcs_rqst VALUE 'E'.  "Only if errors occur
+    CONSTANTS c_status_confirmation_if_sent  TYPE bcs_rqst VALUE 'D'.  "If sent
+    CONSTANTS c_status_confirmation_if_read  TYPE bcs_rqst VALUE 'R'.  "If read
+    CONSTANTS c_status_confirmation_always   TYPE bcs_rqst VALUE 'A'.  "Always
+
+    METHODS start.
+  PRIVATE SECTION.
+    DATA appointment       TYPE REF TO cl_appointment.
+    DATA participant       TYPE scspart.
+
+    METHODS add_participant IMPORTING i_mail_address TYPE clike.
+ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+  METHOD start.
+    appointment = NEW #( ).
+
+    "MEETING, VACATION, CUSTOMER, ABSENT
+    appointment->set_type( 'ZREMINDER' ).
+
+    appointment->set_organizer( organizer = p_orga ).
+
+    add_participant( p_mail ).
+    IF p_mail2 IS NOT INITIAL.
+      add_participant( p_mail2 ).
+    ENDIF.
+
+    " add detail body text
+    appointment->set_text( VALUE #(
+     ( line = p_line1 ) ( line = cl_abap_char_utilities=>cr_lf )
+     ( line = p_line2 ) ( line = cl_abap_char_utilities=>cr_lf )
+     ( line = p_line3 )
+     ) ).
+
+    " set title and location
+    appointment->set_title( p_title ).
+    appointment->set_location( p_loc ).
+
+    " set date and time using default settings
+    " date_to will be the same as date_from
+    " time zone will be the one from the user master records settings
+    appointment->set_date( date_from = p_date
+                           time_from = p_from
+                           time_to   = p_to ).
+    " set it to a high priority meeting
+    appointment->set_priority( sccon_prio_very_high ).
+
+    " this meeting is not yet confirmed
+    appointment->set_status( sccon_status_planned ).
+    " Important to set this one to space. Otherwise SAP will send a not user-friendly e-mail
+    appointment->save( send_invitation = space ).
+
+    TRY.
+        " Now that we have the appointment, we can send a good one for outlook by switching to BCS
+        DATA(send_request) = appointment->create_send_request( ).
+        DATA(recipient) = cl_cam_address_bcs=>create_internet_address( p_mail ).
+        send_request->add_recipient(
+          i_recipient = recipient
+          i_copy = abap_true ).
+        IF p_mail2 IS NOT INITIAL.
+          DATA(recipient2) = cl_cam_address_bcs=>create_internet_address( p_mail2 ).
+          send_request->add_recipient(
+            i_recipient = recipient2
+            i_copy = abap_true ).
+        ENDIF.
+      CATCH cx_address_bcs INTO DATA(error_address).
+        MESSAGE error_address TYPE 'I'.
+        RETURN.
+      CATCH cx_send_req_bcs INTO DATA(error_add_recipient).
+        MESSAGE error_add_recipient TYPE 'I'.
+        RETURN.
+      CATCH cx_bcs INTO DATA(error_create_send_request).
+        MESSAGE error_create_send_request TYPE 'I'.
+        RETURN.
+    ENDTRY.
+
+    TRY.
+        " don't request read/delivery receipts
+        send_request->set_status_attributes(
+          i_requested_status = c_status_confirmation_never
+          i_status_mail      = c_status_confirmation_never ).
+        "sent mail immediately
+        send_request->set_send_immediately( abap_true ).
+        " Send it to the world
+        DATA(appointment_sent) = send_request->send( i_with_error_screen = abap_true ).
+        IF appointment_sent = abap_true.
+          COMMIT WORK AND WAIT.
+          MESSAGE 'Einladung verschickt' TYPE 'S'.
+        ELSE.
+          MESSAGE 'Fehler beim Senden der Einladung' TYPE 'I'.
+        ENDIF.
+      CATCH cx_send_req_bcs INTO DATA(error_send).
+        MESSAGE error_send TYPE 'I'.
+    ENDTRY.
+
+  ENDMETHOD.
+
+  METHOD add_participant.
+
+    DATA address           TYPE swc_object.
+    DATA address_container TYPE STANDARD TABLE OF swcont.
+
+    "set an internet address as a second partcipant of that appointment
+    swc_create_object address 'ADDRESS' space.
+    swc_set_element address_container 'AddressString'  i_mail_address.
+    swc_set_element address_container 'TypeId' 'U'.
+    swc_set_element address_container 'NoAdradmi' 'X'.
+    swc_set_element address_container 'NoIntern' 'X'.
+    swc_call_method address 'Create' address_container.
+    CHECK sy-subrc = 0.
+    "get key and type of object
+    swc_get_object_key address participant-objkey.
+    CHECK sy-subrc = 0.
+    swc_get_object_type address participant-objtype.
+    CHECK sy-subrc = 0.
+    participant-send_mail = abap_true.
+    appointment->add_participant( participant = participant ).
+
+  ENDMETHOD.
+ENDCLASS.
+
+START-OF-SELECTION.
+
+  NEW main( )->start( ).</pre>
+<p>Der Beitrag <a href="/blog/termin-an-outlook-versenden/">Termin an Outlook versenden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Code-Inspector-Prüfungen auflisten</title>
+		<link>/blog/code-inspector-pruefungen-auflisten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 01 Sep 2023 14:51:12 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">/?p=1043422</guid>
+
+					<description><![CDATA[<p>Heute stand ich vor der Herausforderung, dass ich alle Code-Inspector-Prüfungen herausfinden wollte, die in einer Prüfvariante aktiv sind. Natürlich kann man sich diese über die Pflege der Varianten im Code-Inspector über Transaktion SCI anzeigen lassen. Allerdings wird hier der gesamte Baum der verfügbaren Prüfungen aufgelistet und man muss sich die heraussuchen, die aktiviert sind. Eine nervige und Fehleranfällige Aufgabe, wenn man die aktiven Prüfungen irgendwie dokumentieren möchte. So sieht die Baumstruktur der Prüfungen aus: Um...</p>
+<p>Der Beitrag <a href="/blog/code-inspector-pruefungen-auflisten/">Code-Inspector-Prüfungen auflisten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Heute stand ich vor der Herausforderung, dass ich alle Code-Inspector-Prüfungen herausfinden wollte, die in einer Prüfvariante aktiv sind. Natürlich kann man sich diese über die Pflege der Varianten im Code-Inspector über Transaktion SCI anzeigen lassen. Allerdings wird hier der gesamte Baum der verfügbaren Prüfungen aufgelistet und man muss sich die heraussuchen, die aktiviert sind. Eine nervige und Fehleranfällige Aufgabe, wenn man die aktiven Prüfungen irgendwie dokumentieren möchte.</p>
+
+
+
+<p>So sieht die Baumstruktur der Prüfungen aus:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="778" height="201" src="/wp-content/uploads/2023/09/image.png" alt="" class="wp-image-1043423" srcset="/wp-content/uploads/2023/09/image.png 778w, /wp-content/uploads/2023/09/image-300x78.png 300w, /wp-content/uploads/2023/09/image-768x198.png 768w" sizes="(max-width: 778px) 100vw, 778px" /></figure>
+
+
+
+<p>Um die technischen Texte anstelle der Beschreibungen anzuzeigen, gehe über das Menü <em>Prüfvariante • Anzeigen • Technische Namen</em>.</p>
+
+
+
+<h2 class="wp-block-heading">Auflistung der aktiven Prüfvarianten</h2>
+
+
+
+<p>Mit dem folgenden Code werden die aktiven Prüfungen zu einer Prüfvariante ermittelt und ausgegeben. </p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="725" height="270" src="/wp-content/uploads/2023/09/image-2.png" alt="" class="wp-image-1043426" srcset="/wp-content/uploads/2023/09/image-2.png 725w, /wp-content/uploads/2023/09/image-2-300x112.png 300w" sizes="(max-width: 725px) 100vw, 725px" /></figure>
+
+
+
+<p>Wenn du die Prüfungen einer <em>globalen Prüfvariante</em> ermitteln möchtest, dann muss OWNER leer bleiben. Für eine <em>lokale Prüfvariante </em>setze den entsprechenden User ein.</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="526" height="365" src="/wp-content/uploads/2023/09/image-1.png" alt="" class="wp-image-1043425" srcset="/wp-content/uploads/2023/09/image-1.png 526w, /wp-content/uploads/2023/09/image-1-300x208.png 300w, /wp-content/uploads/2023/09/image-1-200x140.png 200w" sizes="(max-width: 526px) 100vw, 526px" /></figure>
+
+
+
+<p></p>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">PARAMETERS name  TYPE scichkv_hd-checkvname DEFAULT 'DEFAULT'.
+PARAMETERS owner TYPE scichkv_hd-ciuser     DEFAULT space.
+
+START-OF-SELECTION.
+
+  SELECT SINGLE * FROM scichkv_hd
+      WHERE checkvname = @name     ##WARN_OK
+        AND ciuser     = @owner                         "#EC CI_NOORDER
+       INTO @DATA(variant_header).
+
+  DATA(main) =  cl_ci_checkvariant=>get_ref(
+     p_user                   = owner
+     p_name                   = name ).
+  CHECK main IS BOUND.
+
+  main->get_info(
+    EXCEPTIONS
+      could_not_read_variant = 1
+      OTHERS                 = 2 ).
+
+  IF sy-subrc = 0.
+    cl_demo_output=>display_data(
+      VALUE string_table(
+        FOR variant IN main->variant (
+          CONV #( variant-testname ) ) ) ).
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/code-inspector-pruefungen-auflisten/">Code-Inspector-Prüfungen auflisten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid Tabelle direkt ändern</title>
+		<link>/blog/alv-grid-tabelle-direkt-aendern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 03 Mar 2023 17:26:06 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[interface]]></category>
+		<category><![CDATA[Friends]]></category>
+		<category><![CDATA[Navigationsprofil]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<guid isPermaLink="false">/?p=1041994</guid>
+
+					<description><![CDATA[<p>Bei einem ALV-Grid wird die anzuzeigende Datentabelle der Methode SET_TABLE_FOR_FIRST_DISPLAY mitgegeben. Eine Änderung kann eigentlich nur aus der aufrufenden Klasse oder im Ereignis DATA_CHANGED erfolgen. Wird die Datentabelle im Programm geändert, so muss die Methode REFRESH_TABLE_DISPLAY aufgerufen werden, damit die Änderungen auch im Frontend angezeigt werden. In einigen Fällen kann es jedoch erforderlich sein, die Daten von außen zu ändern. Dies ist jedoch nicht möglich, da das Attribut MT_OUTTAB, das die Datenreferenz zur Datentabelle hält,...</p>
+<p>Der Beitrag <a href="/blog/alv-grid-tabelle-direkt-aendern/">ALV-Grid Tabelle direkt ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Bei einem ALV-Grid wird die anzuzeigende Datentabelle der Methode SET_TABLE_FOR_FIRST_DISPLAY mitgegeben. Eine Änderung kann eigentlich nur aus der aufrufenden Klasse oder im Ereignis DATA_CHANGED erfolgen. Wird die Datentabelle im Programm geändert, so muss die Methode REFRESH_TABLE_DISPLAY aufgerufen werden, damit die Änderungen auch im Frontend angezeigt werden. </p>
+
+
+
+<p>In einigen Fällen kann es jedoch erforderlich sein, die Daten <em>von außen </em>zu ändern. Dies ist jedoch nicht möglich, da das Attribut MT_OUTTAB, das die Datenreferenz zur Datentabelle hält, geschützt (protected) ist. Zudem werden die folgenden beiden öffentlichen Methoden, die es ermöglichen könnten, die Daten zu ändern, nicht unterstützt:</p>
+
+
+
+<ul>
+<li>SET_DATA_CELLS</li>
+
+
+
+<li>CHANGE_DATA_FROM_INSIDE</li>
+</ul>
+
+
+
+<p>Wenn ich diese verwende, erhalte ich den Shortdump ASSERTION_FAILED in Klasse CL_DATAPTABLECACHE.</p>
+
+
+
+<p>Glücklicherweise gibt es das <a href="/blog/if-you-wanna-be-my-lover-das-friends-konzept/">If you wanna be my lover – Das FRIENDS-Konzept</a>. Das können wir uns zunutze machen, indem wir die ALV-Grid-Instanz an eine Klasse übergeben, die mit CL_GUI_ALV_GRID befreundet ist und uns die Datenreferenz von MT_OUTTAB zurückgeben lassen. </p>
+
+
+
+<h2 class="wp-block-heading">Friends-Klasse</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">CLASS alv_data DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES if_alv_rm_grid_friend .
+    CLASS-METHODS get_outtab
+      IMPORTING
+        ir_grid          TYPE REF TO cl_gui_alv_grid
+      RETURNING
+        VALUE(ro_outtab) TYPE REF TO data.
+
+ENDCLASS.
+
+CLASS alv_data IMPLEMENTATION.
+  METHOD get_outtab.
+    ro_outtab = ir_grid->mt_outtab.
+  ENDMETHOD.
+ENDCLASS.</pre>
+
+
+
+<h2 class="wp-block-heading">Nutzung</h2>
+
+
+
+<p>Wenn wir also die Instanz eines ALV-Grids haben, dann können wir dieses an die Klasse ALV_DATA=&gt;GET_OUTTAB übergeben und erhalten eine nutzbare Datenreferenz. Diese Datenreferenz können wir zu einem Feldsymbol zuweisen:</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">DATA(my_outtab) = alv_data=>get_outtab( my_grid ).
+FIELD-SYMBOLS &lt;outtab> TYPE TABLE.
+ASSIGN my_outtab->* TO &lt;outtab>.</pre>
+
+
+
+<h2 class="wp-block-heading">Anwendungsbeispiel &#8220;Navigationsprofil&#8221;</h2>
+
+
+
+<p>Wenn du dich bisher gefragt hast, wo zum Geier man sowas machen wollen würde, dann schau dir dieses Beispiel an. Es gibt die Funktionalität <a href="https://erp-up.de/navigationsprofil-im-alv-grid-control/">Navigationsprofil</a>. Mit dieser Funktionalität kannst du ein ALV-Grid erweitern und modifikationsfrei Funktionalitäten hinzufügen. Das kann zum Beispiel durch eine Klasse erfolgen, die das Interface IF_NAVIGATION_PROFILE implementiert. In der Methode USER_COMMAND werden eine Referenz auf die Daten und die Instanz des ALV-Grid übergeben. mit GET_SELECTED_ROWS ist es dann möglich, ausgewählte Zeilen zu ermitteln und aufgrund dieser eine andere Funktionalität aufzurufen.</p>
+
+
+
+<p>Allerdings ist es nicht möglich, die Daten selbst zu ändern. Es sei denn, du verwendest den oben genannten Trick. </p>
+
+
+
+<p>Wie das Beispiel im Detail funktioniert, kannst du mit dem Demoprogramm NAVP_DEMO_TABLE nachvollziehen. Hierzu musst du das Navigationsprofil ändern und einen Button hinzufügen. Wie genau das geht, kannst du <a href="https://blogs.sap.com/2013/04/23/how-to-use-navigation-profiles-with-classes/">hier</a> erfahren.</p>
+
+
+
+<p>Zuerst benötigst du jedoch eine Klasse, die die Datenänderungen vornimmt.</p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="abap" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">CLASS zcl_navigation_profile_enno DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_navigation_profile .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS ZCL_NAVIGATION_PROFILE_ENNO IMPLEMENTATION.
+
+
+* &lt;SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_NAVIGATION_PROFILE_ENNO->IF_NAVIGATION_PROFILE~USER_COMMAND
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IO_ALV                         TYPE REF TO OBJECT
+* | [--->] ID_TABLE                       TYPE REF TO DATA
+* | [--->] IS_PROFILE_KEY                 TYPE        NAVP_S_PROFILE_KEY
+* | [--->] IV_PARAMETER                   TYPE        NAVP_FUNCTION_PARAMETER
+* +--------------------------------------------------------------------------------------&lt;/SIGNATURE>
+  METHOD if_navigation_profile~user_command.
+    DATA outtab TYPE REF TO data.
+    FIELD-SYMBOLS &lt;table> TYPE table.
+
+    DATA(alv) = CAST cl_gui_alv_grid( io_alv ).
+    outtab = lcl_data=>get_outtab( alv ).
+    ASSIGN outtab->* TO &lt;table>.
+
+    DATA lt_delta TYPE lvc_t_modi.
+
+    alv->get_selected_rows( IMPORTING et_row_no = DATA(lt_row_no) ).
+
+    LOOP AT lt_row_no INTO DATA(ls_row).
+      ASSIGN &lt;table>[ ls_row-row_id ] TO FIELD-SYMBOL(&lt;line>).
+      ASSIGN COMPONENT 'FLDATE' OF STRUCTURE &lt;line> TO FIELD-SYMBOL(&lt;fldate>).
+      &lt;fldate> = sy-datum.
+    ENDLOOP.
+
+    FIELD-SYMBOLS &lt;outtab> TYPE table.
+
+    alv->refresh_table_display(
+      i_soft_refresh = abap_true
+      is_stable      = VALUE #( row = abap_true col = abap_true ) ).
+
+    alv->set_selected_rows( it_row_no = lt_row_no ).
+
+  ENDMETHOD.
+ENDCLASS.</pre>
+
+
+
+<p>Danach kannst du die neue Drucktaste anlegen:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="494" src="/wp-content/uploads/2023/03/image-1024x494.png" alt="" class="wp-image-1041995" srcset="/wp-content/uploads/2023/03/image-1024x494.png 1024w, /wp-content/uploads/2023/03/image-300x145.png 300w, /wp-content/uploads/2023/03/image-768x371.png 768w, /wp-content/uploads/2023/03/image.png 1096w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<p>Drucktaste &#8220;Set Date&#8221;</p>
+
+
+
+<p>Die Drucktaste wird nun &#8211; modifikationsfrei &#8211; in der Toolbar angezeigt:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="849" height="203" src="/wp-content/uploads/2023/03/image-2.png" alt="" class="wp-image-1041997" srcset="/wp-content/uploads/2023/03/image-2.png 849w, /wp-content/uploads/2023/03/image-2-300x72.png 300w, /wp-content/uploads/2023/03/image-2-768x184.png 768w" sizes="(max-width: 849px) 100vw, 849px" /></figure>
+
+
+
+<p>Wenn du Einträge markierst und die Drucktaste drückst, dann wird das Flugdatum der markierten Einträge auf das Tagesdatum gesetzt.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-tabelle-direkt-aendern/">ALV-Grid Tabelle direkt ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Subscreen-Bereiche anzeigen</title>
+		<link>/blog/subscreen-bereiche-anzeigen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 23 Feb 2023 15:40:22 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[subscreen]]></category>
+		<guid isPermaLink="false">/?p=1041717</guid>
+
+					<description><![CDATA[<p>Dynprogrammierung ist eine Angelegenheit mit, sagen wir mal, viel Historie. Gerade wenn man ein Programm mit Historie und Subscreens vor sich hat, ist es mitunter schwer, herauszufinden, in welchem Programm welcher Subscreen definiert wurde und welche Nummer der Subscreen hat. In Hinweis 324687 (direkter Download) wird beschrieben, wie du die Subscreen-Bereiche kenntlich machen kannst. In einem Business Partner sieht das zum Beispiel so aus: Aktivierung der Funktionalität Um die Funktionalität nutzen zu können, müssen in...</p>
+<p>Der Beitrag <a href="/blog/subscreen-bereiche-anzeigen/">Subscreen-Bereiche anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Dynprogrammierung ist eine Angelegenheit mit, sagen wir mal, viel Historie. Gerade wenn man ein Programm mit Historie und Subscreens vor sich hat, ist es mitunter schwer, herauszufinden, in welchem Programm welcher Subscreen definiert wurde und welche Nummer der Subscreen hat.</p>
+
+
+
+<p>In Hinweis <a href="https://launchpad.support.sap.com/#/notes/324687" target="_blank" rel="noreferrer noopener">324687</a> (<a href="/wp-content/uploads/2023/02/324687_D_20230223_subscreens_visualisieren.pdf" target="_blank" rel="noreferrer noopener">direkter Download</a>) wird beschrieben, wie du die Subscreen-Bereiche kenntlich machen kannst. In einem Business Partner sieht das zum Beispiel so aus:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="1024" height="785" src="/wp-content/uploads/2023/02/image-1024x785.png" alt="" class="wp-image-1041718" srcset="/wp-content/uploads/2023/02/image-1024x785.png 1024w, /wp-content/uploads/2023/02/image-300x230.png 300w, /wp-content/uploads/2023/02/image-768x588.png 768w, /wp-content/uploads/2023/02/image-117x91.png 117w, /wp-content/uploads/2023/02/image.png 1347w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Aktivierung der Funktionalität</h2>
+
+
+
+<p>Um die Funktionalität nutzen zu können, müssen in der Registry des Testrechners folgende Einträge erstellt werden: [HKEY_CURRENT_USER\Software\SAP\SAPGUI Front\SAP Frontend Server\ReleaseDebug\ShowBorders]</p>
+
+
+
+<ul>
+<li>&#8220;ENABLED&#8221; (REG_DWORD) mit Wert 1</li>
+
+
+
+<li>&#8220;SHOW_ALL&#8221; (REG_DWORD) mit Wert 0</li>
+
+
+
+<li>&#8220;CMyManager.ShowBorders&#8221; (REG_DWORD) mit Wert 1</li>
+
+
+
+<li>&#8220;CMyManager.ShowNames&#8221; (REG_DWORD) mit Wert 1</li>
+</ul>
+
+
+
+<p>Gegebenenfalls müssen zuerst der Key &#8220;ReleaseDebug&#8221; und dann innerhalb dieses Keys &#8220;ShowBorders&#8221; angelegt werden. Die Namen der Keys und Werte oben sind jeweils ohne Anführungszeichen einzutragen.</p>
+<p>Der Beitrag <a href="/blog/subscreen-bereiche-anzeigen/">Subscreen-Bereiche anzeigen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Komplexe Datenobjekte editieren</title>
+		<link>/blog/komplexe-datenobjekte-editieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 23 Jan 2023 08:17:30 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">/?p=1041230</guid>
+
+					<description><![CDATA[<p>Wer schon einmal einen Funktionsbaustein getestet hat, der kennt mit Sicherheit den Dialog zur Eingabe von strukturierten Daten und Tabellen. Der Funktionsbaustein RS_COMPLEX_OBJECT_EDIT bietet dir genau diese Möglichkeit für deine eigenen Daten an. Folgend ein kleines Demoprogramm, das die Verwendung zeigt. Code</p>
+<p>Der Beitrag <a href="/blog/komplexe-datenobjekte-editieren/">Komplexe Datenobjekte editieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Wer schon einmal einen Funktionsbaustein getestet hat, der kennt mit Sicherheit den Dialog zur Eingabe von strukturierten Daten und Tabellen. Der Funktionsbaustein RS_COMPLEX_OBJECT_EDIT bietet dir genau diese Möglichkeit für deine eigenen Daten an. Folgend ein kleines Demoprogramm, das die Verwendung zeigt.</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="530" height="289" src="/wp-content/uploads/2023/01/image.png" alt="" class="wp-image-1041247" srcset="/wp-content/uploads/2023/01/image.png 530w, /wp-content/uploads/2023/01/image-300x164.png 300w, /wp-content/uploads/2023/01/image-71x40.png 71w" sizes="(max-width: 530px) 100vw, 530px" /><figcaption class="wp-element-caption">Ändern von zwei Datensätzen</figcaption></figure>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="462" height="334" src="/wp-content/uploads/2023/01/image-1.png" alt="" class="wp-image-1041248" srcset="/wp-content/uploads/2023/01/image-1.png 462w, /wp-content/uploads/2023/01/image-1-300x217.png 300w" sizes="(max-width: 462px) 100vw, 462px" /><figcaption class="wp-element-caption">Anzeige der Struktur (Meta-Daten)</figcaption></figure>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="839" height="377" src="/wp-content/uploads/2023/01/image-2.png" alt="" class="wp-image-1041249" srcset="/wp-content/uploads/2023/01/image-2.png 839w, /wp-content/uploads/2023/01/image-2-300x135.png 300w, /wp-content/uploads/2023/01/image-2-768x345.png 768w" sizes="(max-width: 839px) 100vw, 839px" /><figcaption class="wp-element-caption">Ändern der internen Tabelle der ersten Zeile</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="generic" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">REPORT zz_edit_complex_data.
+
+PARAMETERS p_edit RADIOBUTTON GROUP mode DEFAULT 'X'.
+PARAMETERS p_show RADIOBUTTON GROUP mode.
+PARAMETERS p_meta RADIOBUTTON GROUP mode.
+
+START-OF-SELECTION.
+  TYPES: BEGIN OF ts_detail,
+           a TYPE c LENGTH 1,
+           b TYPE c LENGTH 3,
+         END OF ts_detail,
+         tt_detail TYPE STANDARD TABLE OF ts_detail WITH EMPTY KEY.
+  TYPES: BEGIN OF ts_data,
+           land1  TYPE land1,
+           landx  TYPE landx,
+           detail TYPE tt_detail,
+         END OF ts_data.
+
+  DATA gt_data TYPE STANDARD TABLE OF ts_data WITH DEFAULT KEY.
+  DATA gv_mode TYPE c LENGTH 1.
+
+  SELECT * FROM t005t INTO CORRESPONDING FIELDS OF TABLE gt_data UP TO 20 ROWS.
+
+  gt_data = VALUE #(
+    ( land1 = 'DE' landx = 'Germany' detail = VALUE #(
+          ( a = '1' b = 'AA' )
+          ( a = '2' b = 'BB' ) ) )
+    ( land1 = 'FR' landx = 'France' detail = VALUE #(
+          ( a = 'X' b = 'RR' )
+          ( a = 'Y' b = 'SS' ) ) )
+    ).
+
+  gv_mode = COND #(
+    WHEN p_edit = 'X' THEN 'X'
+    WHEN p_meta = 'X' THEN 'M'
+    ELSE space ).
+
+  CALL FUNCTION 'RS_COMPLEX_OBJECT_EDIT'
+    EXPORTING
+      object_name          = 'Edit country details'
+      mode                 = gv_mode
+      insert_tab           = ' '
+      upper_case           = ' '
+      popup                = 'X'
+      display_accessible   = 'X'
+    CHANGING
+      object               = gt_data
+    EXCEPTIONS
+      object_not_supported = 1
+      OTHERS               = 2.
+  IF sy-subrc &lt;> 0.
+    MESSAGE ID sy-msgid
+          TYPE sy-msgty
+        NUMBER sy-msgty
+          WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/komplexe-datenobjekte-editieren/">Komplexe Datenobjekte editieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SALV-Table-Popup als Suchhilfe</title>
+		<link>/blog/salv-table-popup-als-suchhilfe/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 14 Oct 2022 14:30:36 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[suchhilfe]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<guid isPermaLink="false">/?p=1039202</guid>
+
+					<description><![CDATA[<p>In diesem Artikel habe ich dir gezeigt, wie du die Klasse CL_SALV_TABLE als Popup und zur Auswahl von Daten nutzen kannst. Heute möchte ich dir zeigen, wie du diese Funktion in einer Suchhilfe mit Hilfe eines Suchhilfe-Exits nutzen kannst. In diesem Beispiel rufen wir, wie in dem verlinkten Artikel, eine Liste der Wochentage auf aus denen der Anwender einen auswählen kann. Der einzige Unterschied zum verlinkten Code ist, dass ich für die Schlüsselkomponente nun ein...</p>
+<p>Der Beitrag <a href="/blog/salv-table-popup-als-suchhilfe/">SALV-Table-Popup als Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In diesem <a class="keychainify-checked" href="/blog/cl_salv_table-als-auswahl-popup/">Artikel</a> habe ich dir gezeigt, wie du die Klasse CL_SALV_TABLE als Popup und zur Auswahl von Daten nutzen kannst. Heute möchte ich dir zeigen, wie du diese Funktion in einer Suchhilfe mit Hilfe eines Suchhilfe-Exits nutzen kannst. In diesem Beispiel rufen wir, wie in dem verlinkten Artikel, eine Liste der Wochentage auf aus denen der Anwender einen auswählen kann.</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="161" height="252" src="/wp-content/uploads/2022/10/image-6.png" alt="" class="wp-image-1039205"/><figcaption class="wp-element-caption">Auswahl Wochentag</figcaption></figure>
+
+
+
+<p>Der einzige Unterschied zum verlinkten Code ist, dass ich für die Schlüsselkomponente nun ein einstelliges Kennzeichen vom Typ WEEKDAY verwende.</p>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe</h2>
+
+
+
+<p>In der Codezentrale kannst du dir ansehen, wie du einen Wert in einem Report über eine eigenprogrammierte F4-Suchhilfe übergeben kannst:</p>
+
+
+
+<figure class="wp-block-embed is-type-wp-embed is-provider-die-codezentrale wp-block-embed-die-codezentrale"><div class="wp-block-embed__wrapper">
+<blockquote hcb-fetch-image-from="https://codezentrale.de/abap-salv-table-als-f4-suchhilfe-popup-verwenden/" class="wp-embedded-content" data-secret="z0AikdQtOG"><a href="https://codezentrale.de/abap-salv-table-als-f4-suchhilfe-popup-verwenden/">[ABAP] SALV-Table als F4-Suchhilfe-PopUp verwenden</a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" title="&#8222;[ABAP] SALV-Table als F4-Suchhilfe-PopUp verwenden&#8220; &#8212; Die Codezentrale" src="https://codezentrale.de/abap-salv-table-als-f4-suchhilfe-popup-verwenden/embed/#?secret=EJsPswRNQw#?secret=z0AikdQtOG" data-secret="z0AikdQtOG" width="600" height="338" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+</div></figure>
+
+
+
+<p>Das Verfahren nützt dir jedoch nichts, wenn du die F4-Hilfe ohne Programmierung in einem Dynprofeld nutzen möchtest. Hierfür musst du in der Transaktion SE11 eine separate Suchhilfe anlegen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="771" height="584" src="/wp-content/uploads/2022/10/image-4.png" alt="" class="wp-image-1039203" srcset="/wp-content/uploads/2022/10/image-4.png 771w, /wp-content/uploads/2022/10/image-4-300x227.png 300w, /wp-content/uploads/2022/10/image-4-768x582.png 768w" sizes="(max-width: 771px) 100vw, 771px" /><figcaption class="wp-element-caption">Suchhilfe mit Suchhilfe-Exit</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe-Exit</h2>
+
+
+
+<p>Die Anlage der Suchhilfe ist in diesem Fall jedoch erst Schritt zwei. Im ersten Schritt musst du einen Funktionsbaustein anlegen, der die Werte anzeigt und mit der Suchhilfe kommuniziert.</p>
+
+
+
+<p>Für den Suchhilfe-Exit benötigst du einen Funktionsbaustein mit einer definierten Schnittstelle. In der F1-Hilfe zum Suchhilfe-Exit erfährst du, dass du den Baustein <strong>F4IF_SHLP_EXIT_EXAMPLE</strong> als Vorlage verwenden kannst. Du  musst eine neue Funktionsgruppe anlegen (Transaktion SE37: <em>Springen • Funktionsgruppe • Funktionsgruppe anlegen</em>) und den Vorlage-Baustein in diese Gruppe kopieren.</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="399" height="142" src="/wp-content/uploads/2022/10/image-5.png" alt="" class="wp-image-1039204" srcset="/wp-content/uploads/2022/10/image-5.png 399w, /wp-content/uploads/2022/10/image-5-300x107.png 300w" sizes="(max-width: 399px) 100vw, 399px" /><figcaption class="wp-element-caption">Vorlagebaustein kopieren</figcaption></figure>
+
+
+
+<p>Am Ende des kopierten Funktionsbausteins setzt du das folgende Coding ein:</p>
+
+
+
+<pre class="wp-block-code"><code>  IF callcontrol-step = 'DISP'.
+    DATA(my_popup) = NEW main( ).
+
+    my_popup-&gt;set_items(
+      VALUE #(
+        ( key = '1' value = 'Monday' )
+        ( key = '2' value = 'Tuesday' )
+        ( key = '3' value = 'Wednesday' )
+        ( key = '4' value = 'Thursday' )
+        ( key = '5' value = 'Friday' )
+        ( key = '6' value = 'Saturday' )
+        ( key = '7' value = 'Sunday' ) ) ).
+
+    TRY.
+        DATA(selected_entry) = my_popup-&gt;ask( 'Select day' ).
+        append value #( string = conv #( selected_entry-key ) ) to record_tab.
+        callcontrol-step = 'RETURN'.
+      CATCH cancelled.
+        callcontrol-step = 'EXIT'.
+    ENDTRY.
+  ENDIF.
+</code></pre>
+
+
+
+<p>In diesem Beispiel habe ich das Coding (Siehe <a class="keychainify-checked" href="/blog/cl_salv_table-als-auswahl-popup/">CL_SALV_TABLE als Auswahl-Popup</a>) als lokale Klasse im Funktionsbaustein verwendet. Sinnvoller wäre es jedoch, die Klasse MAIN als globale Klasse anzulegen (Transaktion SE24). In diesem Fall musst du bei der Instanziierung natürlich nicht MAIN verwenden, sondern den Namen der globalen Klasse.</p>
+
+
+
+<p>Wichtig ist, dass bei Auswahl eines Eintrags die RECORD_TAB mit dem gewählten Eintrag angereichert wird und der CALLCONTROL-STEP auf &#8220;RETURN&#8221; gesetzt wird. Bricht der Benutzer den Dialog ab, dann muss CALLCONTROL-STEP auf &#8220;EXIT&#8221; gesetzt werden.</p>
+
+
+
+<p>Den Funktionsbaustein und die Funktionsgruppe musst du selbstverständlich aktivieren.</p>
+
+
+
+<h2 class="wp-block-heading">Aktivierung Suchhilfe</h2>
+
+
+
+<p>Nachdem du den Suchhilfe-Exit Funktionsbaustein in die Suchhilfe eingetragen hast, musst du die Suchhilfe aktivieren und kannst sie testen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="744" height="584" src="/wp-content/uploads/2022/10/image-7.png" alt="" class="wp-image-1039206" srcset="/wp-content/uploads/2022/10/image-7.png 744w, /wp-content/uploads/2022/10/image-7-300x235.png 300w, /wp-content/uploads/2022/10/image-7-117x91.png 117w" sizes="(max-width: 744px) 100vw, 744px" /><figcaption class="wp-element-caption">Test der Suchhilfe</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe einbinden</h2>
+
+
+
+<p>Du kannst diese Suchhilfe nun in einem Datenelement unter der Registerkarte &#8220;Weitere Eigenschaften&#8221; festlegen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="587" height="407" src="/wp-content/uploads/2022/10/image-8.png" alt="" class="wp-image-1039207" srcset="/wp-content/uploads/2022/10/image-8.png 587w, /wp-content/uploads/2022/10/image-8-300x208.png 300w, /wp-content/uploads/2022/10/image-8-200x140.png 200w" sizes="(max-width: 587px) 100vw, 587px" /><figcaption class="wp-element-caption">Suchhilfe im Datenelement definieren</figcaption></figure>
+
+
+
+<p>Die Suchhilfe steht dir nun immer zur Verfügung, wenn du dieses Datenelement in einer Struktur verwendest. </p>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe testen</h2>
+
+
+
+<p>Wenn du Suchhilfen mit Suchhilfe-Exits testest, dann achte darauf, dass du nach jeder Codeänderung im Suchhilfe-Exit-Funktionsbaustein die Transaktion SE11 neu aufrufst. Andernfalls ist das alte Coding noch geladen und du wirst die Änderungen nicht sehen!</p>
+<p>Der Beitrag <a href="/blog/salv-table-popup-als-suchhilfe/">SALV-Table-Popup als Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

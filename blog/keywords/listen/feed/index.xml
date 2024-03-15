@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Listen Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/listen/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:02 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Listen Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Zeile je nach Feldwert komplett färben</title>
+		<link>/blog/zeile-je-nach-feldwert-komplett-faerben/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 13 Jan 2014 16:42:52 +0000</pubDate>
+				<category><![CDATA[Excel]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Listen]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[farbe]]></category>
+		<category><![CDATA[farben]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4209</guid>
+
+					<description><![CDATA[<p>Bei Excel-Listen gibt es häufig die Anforderung, eine komplette Zeile abhängig von einem bestimmten Feldwert in dieser Zeile einzufärben. Das geht mit Hilfe der bedingten Formatierung. Allerdings ist diese Lösung meine Erachtens sehr komplex, unübersichtlich und schlecht zu warten. In diesem Artikel stelle ich eine Lösung vor, die mithilfe von Visual Basic die Zeilenfarbe individuell setzt.</p>
+<p>Der Beitrag <a href="/blog/zeile-je-nach-feldwert-komplett-faerben/">Zeile je nach Feldwert komplett färben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bei Excel-Listen gibt es häufig die Anforderung, eine komplette Zeile abhängig von einem bestimmten Feldwert in dieser Zeile einzufärben. Das geht mit Hilfe der bedingten Formatierung. Allerdings ist diese Lösung meine Erachtens sehr komplex, unübersichtlich und schlecht zu warten.</p>
+<p>Aus diesem Grund habe ich ein kleines Visual-Basic-Script geschrieben, mit dessen Hilfe das Einfärben einer Zeile einfach und nachvollziehbar funktioniert. Die Zeilenfarbe soll abhängig vom Status sein.</p>
+<h2>Statustabelle</h2>
+<p>Hierfür füge die folgende Tabelle ein:</p>
+<p><img decoding="async" width="200" height="100" class="alignnone size-full wp-image-4213" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d411bba6be4.png" /></p>
+<p>Um die Tabelle zu erstellen, trage die Werte wie aus dem Screenshot ersichtlich in die Zellen ein und klicke auf <em>Einfügen &#8211; Tabelle</em>. Dann markiere den Bereich:</p>
+<p><img decoding="async" width="244" height="157" class="alignnone size-full wp-image-4214" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d41226c32c0.png" /></p>
+<p>Du hast nun die Tabelle erstellt. Mit dieser Tabelle definieren wir den die Farbe der einzelnen Status.</p>
+<h2>Liste</h2>
+<p>Ausgangsbasis soll eine kleine Liste sein. Erstelle diese Liste ebenfalls als Tabelle und erstelle die Datenüberprüfung vom Typ <em>Liste</em> für das Feld <em>Status</em>. Wie das geht, ist in <a title="Datenüberprüfung/ Dropdown-Listen in Excel" href="https://tricktresor.com/blog/datenueberpruefung-dropdown-listen-in-excel/" target="_blank">diesem Artikel </a>beschrieben.</p>
+<p><img fetchpriority="high" decoding="async" width="673" height="243" class="alignnone size-full wp-image-4211" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d40ee722afd.png" srcset="/wp-content/uploads/2014/01/img_52d40ee722afd.png 673w, /wp-content/uploads/2014/01/img_52d40ee722afd-300x108.png 300w, /wp-content/uploads/2014/01/img_52d40ee722afd-624x225.png 624w" sizes="(max-width: 673px) 100vw, 673px" /></p>
+<h2>VBA</h2>
+<p>Wir erstellen nun eine kleine Visual-Basic-Routine, die bei jeder Änderung des Arbeitsblattes ausgeführt wird. Öffne in den Entwicklertools (muss gegebenenfalls in den Excel-Optionen aktiviert werden!) den Visual Basic Editor und füge für das Arbeitsblatt mit der Liste den folgenden Code ein:</p>
+<pre>Option Explicit
+Private Sub Worksheet_Change(ByVal Target As Range)
+ Dim l_column As Integer
+ Dim l_color As Integer
+ Dim l_status_row As Integer
+ Dim l_status_col As Integer
+ Dim l_number_of_columns_to_color As Integer
+
+''' Anzahl der einzufärbenden Spalten
+ l_number_of_columns_to_color = 3
+''' Index der Spalte, in der der Status definiert wurde
+ l_status_col = 1
+
+ If Target.Column = 2 Then
+
+ For l_status_row = 1 To 20
+
+ If Worksheets("Status").Cells(l_status_row, l_status_col).Value = Cells(Target.Row, Target.Column).Value Then
+ On Error GoTo NOT_AN_INTEGER
+ l_color = CInt(Worksheets("Status").Cells(l_status_row, l_status_col + 1).Value)
+ Exit For
+NOT_AN_INTEGER:
+ l_color = 0
+  End If
+ Next l_status_row
+
+ For l_column = 1 To l_number_of_columns_to_color
+ Cells(Target.Row, l_column).Interior.ColorIndex = l_color
+ Next l_column
+ End If
+
+End Sub</pre>
+<p>[notice type=&#8217;alert&#8217;]Achte darauf, dass der im Coding verwendete Name für das Arbeitsblatt Worksheets(&#8220;Status&#8221;) mit deinem überein stimmt![/notice]</p>
+<p><img loading="lazy" decoding="async" width="568" height="101" class="alignnone size-full wp-image-4215" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d4158c1e935.png" srcset="/wp-content/uploads/2014/01/img_52d4158c1e935.png 568w, /wp-content/uploads/2014/01/img_52d4158c1e935-300x53.png 300w" sizes="(max-width: 568px) 100vw, 568px" /></p>
+<p>[notice type=&#8217;info&#8217;]Die Arbeitsmappe enthält nun Coding und kann nicht mehr als normale Excel-Datei gespeichert werden. Du musst sie als XLSM-Datei (Excel-Arbeitsmappe mit Makros) speichern:</p>
+<p><img loading="lazy" decoding="async" width="810" height="179" class="alignnone size-full wp-image-4216" alt="" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d416081903d.png" srcset="/wp-content/uploads/2014/01/img_52d416081903d.png 810w, /wp-content/uploads/2014/01/img_52d416081903d-300x66.png 300w, /wp-content/uploads/2014/01/img_52d416081903d-624x137.png 624w" sizes="(max-width: 810px) 100vw, 810px" /></p>
+<p>[/notice]</p>
+<h2>Anmerkungen</h2>
+<p>Die Farbe der Zeilen wird nicht automatisch geändert, wenn der Farbindex in der Statustabelle geändert wird!</p>
+<p>Die Farbe wird neu gesetzt, sobald ein Status ausgewählt wird. Möchte man sicher sein, dass eine Zeile immer komplett eingefärbt ist, dann kann die Codezeile</p>
+<pre>If Target.Column = 2 Then</pre>
+<p>und das entsprechende End If am Ende des Codings entfernt werden. In diesem Fall wird bei jeder Änderung in der Tabelle die Farbe für die Tabellenzeile neu gesetzt.</p>
+<p>Die Anzahl der einzufärbenden Zellen muss im Coding angepasst werden. Werden Spalten an die Liste angehängt, dann muss der Wert <strong>l_number_of_columns_to_color</strong> angepasst werden.</p>
+<p>Der Beitrag <a href="/blog/zeile-je-nach-feldwert-komplett-faerben/">Zeile je nach Feldwert komplett färben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Liste ohne Applikationstoolbar</title>
+		<link>/blog/liste-ohne-applikationstoolbar/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 23 Feb 2011 12:31:40 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Listen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=579</guid>
+
+					<description><![CDATA[<p>In der "Applikationstoolbar" werden die Druckkn&#246;pfe dargestellt. In einem Dynpro kann man definieren, ob man diese Toolbar sehen m&#246;chte, oder ob sie ausgeblendet werden soll. Sind keine Druckkn&#246;pfe definiert, so hat man durch das Ausblenden mehr Platz auf dem Bildschirm.</p>
+<p>Der Beitrag <a href="/blog/liste-ohne-applikationstoolbar/">Liste ohne Applikationstoolbar</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In der &#8220;Applikationstoolbar&#8221; werden die Druckkn&ouml;pfe dargestellt. In einem Dynpro kann man definieren, ob man diese Toolbar sehen m&ouml;chte, oder ob sie ausgeblendet werden soll. Sind keine Druckkn&ouml;pfe definiert, so hat man durch das Ausblenden mehr Platz auf dem Bildschirm.<br /><P>In einem Report, der nur eine Liste ausgibt, kann man die Applikationstoolbar durch folgenden Methodenaufruf ausblenden:</P><P class="sap1">CL_ABAP_LIST_LAYOUT=&gt;SUPPRESS_TOOLBAR( ).</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/liste-ohne-applikationstoolbar/">Liste ohne Applikationstoolbar</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Gesamtseitenzahl in einer Liste</title>
+		<link>/blog/gesamtseitenzahl-in-einer-liste/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 04 Jan 2007 15:32:39 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Listen]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=392</guid>
+
+					<description><![CDATA[<p>Die Anzahl der ausgegebenen Seiten k&#246;nnen -- anders als bei SAP-Skript oder Smartforms -- erst am Ende der Liste ermittelt werden. Mit einem kleinen Trick kann die Gesamtseitenzahl jedoch in den Listenkopf integriert werden.</p>
+<p>Der Beitrag <a href="/blog/gesamtseitenzahl-in-einer-liste/">Gesamtseitenzahl in einer Liste</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Anzahl der ausgegebenen Seiten k&ouml;nnen &#8212; anders als bei SAP-Skript oder Smartforms &#8212; erst am Ende der Liste ermittelt werden. Mit einem kleinen Trick kann die Gesamtseitenzahl jedoch in den Listenkopf integriert werden.<br /><P>Die Ausgabe einer Gesamtseitenzahl ist in Listen nicht vorgesehen&#8230; Mit diesem Coding klappt es trotzdem:</P><P class="head1">Coding</P><P class="sap1">REPORT zztotalpages <BR><FONT color="#fb2412">*** Damit eine eigener Seitnkopf definiert werden kann, darf die Liste&nbsp;<BR>***&nbsp;keinen Standard-Seitenkopf bekommen:<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NO STANDARD PAGE HEADING LINE-COUNT 30.<BR><BR><FONT color="#fb2412">*** Datendeklaration</FONT><BR>DATA lv_total_pages TYPE i.<BR>DATA lv_page(3)&nbsp;&nbsp;&nbsp;&nbsp; TYPE c.<BR><BR>START-OF-SELECTION.<BR><FONT color="#fb2412">*** Ausgabe einer Dummy-Liste <BR></FONT>&nbsp; DO 100 TIMES.<BR>&nbsp;&nbsp;&nbsp; WRITE:/ sy-index.<BR>&nbsp; ENDDO.<BR><BR>END-OF-SELECTION.<BR><BR><FONT color="#fb2412">*** Platzhalter durch Gesamtseitenzahl ersetzen</FONT><BR>&nbsp; lv_page = lv_total_pages.<BR>&nbsp; DO lv_total_pages TIMES.<BR>&nbsp;&nbsp;&nbsp; READ LINE 1 OF PAGE sy-index.<BR><FONT color="#fb2412">*** Platzhalter ersetzen</FONT><BR>&nbsp;&nbsp;&nbsp; REPLACE &#8216;@@@&#8217; IN sy-lisel WITH lv_page.<BR>&nbsp;&nbsp;&nbsp; MODIFY LINE 1 OF PAGE sy-index.<BR>&nbsp; ENDDO.<BR><BR>TOP-OF-PAGE.<BR><FONT color="#fb2412">*** eigener Seitenkopf</FONT><BR>&nbsp; WRITE:/60 &#8216;Seite&#8217;, sy-pagno, &#8216;/&#8217;,&#8217;@@@&#8217;.<BR><FONT color="#fb2412">*** Gesamtseitenzahl merken</FONT><BR>&nbsp; lv_total_pages = sy-pagno.</P><P>Dank an Nitin&nbsp;Jameel</P></p>
+<p>Der Beitrag <a href="/blog/gesamtseitenzahl-in-einer-liste/">Gesamtseitenzahl in einer Liste</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Eingabe in Listen</title>
+		<link>/blog/eingabe-in-listen/</link>
+					<comments>/blog/eingabe-in-listen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 12 Oct 2006 08:29:18 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Listen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=386</guid>
+
+					<description><![CDATA[<p>In den Zeiten von TableControls und ALV-Grids sind Listen vielleicht nicht mehr ganz aktuell, aber manche kleinen Programme sind schnell als Liste programmiert. Auch Eingaben in Listen sind m&#246;glich, wie das folgende Programm zeigt.</p>
+<p>Der Beitrag <a href="/blog/eingabe-in-listen/">Eingabe in Listen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In den Zeiten von TableControls und ALV-Grids sind Listen vielleicht nicht mehr ganz aktuell, aber manche kleinen Programme sind schnell als Liste programmiert. Auch Eingaben in Listen sind m&ouml;glich, wie das folgende Programm zeigt.<br /><P><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/mark.gif"><BR>Alle Eintr&auml;ge sind markiert</P></TD></TR></TBODY></TABLE></P><P>In einer Liste mit Eintr&auml;gen zum Ankreuzen m&ouml;chte man vielleicht dem Anwender die M&ouml;glichkeit geben, alle Eintr&auml;ge zu markieren, bzw. alle Markierungen wieder zu entfernen.</P><P>Das Auslesen der markierten Punkte muss dann&nbsp;noch mittels <FONT>READ LINE</FONT> erfolgen: <A href="/wp-content/index.php?aID=386" target="_self">Eingabe in Listen</A></P><P class="head1">&nbsp;Das Programm</P><P class="sap1">REPORT zzenno14 .</P><P class="sap1">DATA:<BR>&nbsp; linex TYPE syindex,<BR>&nbsp; sel&nbsp;&nbsp; TYPE c,<BR>&nbsp; bezei TYPE sptxt.</P><P class="sap1">START-OF-SELECTION.<BR><FONT color="#fb2412">*** GUI-Status setzen<BR>*** SALL = Alle Markierungen setzen<BR>*** DALL&nbsp;= Alle Markierungen l&ouml;schen</FONT><BR>&nbsp; SET PF-STATUS &#8216;LIST&#8217;.<BR><FONT color="#fb2412">*** Daten lesen</FONT><BR>&nbsp; SELECT sptxt FROM t002t INTO bezei WHERE spras = sy-langu.<BR><FONT color="#fb2412">*** &#8230;und ausgeben</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: / sel AS CHECKBOX INPUT ON,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bezei.<BR>&nbsp; ENDSELECT.</P><P class="sap1"><BR>AT USER-COMMAND.<BR>&nbsp; CASE sy-ucomm.<BR><FONT color="#fb2412">*** Abfrage</FONT> <BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;SALL&#8217; OR &#8216;DALL&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DO.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linex = sy-index.<BR><FONT color="#fb2412">*** Zeile lesen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READ LINE linex FIELD VALUE sel bezei.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc &gt; 0. EXIT. ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CASE sy-ucomm.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;SALL&#8217;.<BR><FONT color="#fb2412">*** Marker setzen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY LINE linex FIELD VALUE sel FROM &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;DALL&#8217;.<BR><FONT color="#fb2412">*** Marker l&ouml;schen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY LINE linex FIELD VALUE sel FROM &#8216; &#8216;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDCASE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDDO.<BR>&nbsp; ENDCASE.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/eingabe-in-listen/">Eingabe in Listen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/eingabe-in-listen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Gruppenwechsel</title>
+		<link>/blog/gruppenwechsel/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 18 Jan 2005 21:15:28 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Listen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=309</guid>
+
+					<description><![CDATA[<p>Gruppenwechsel lassen sich mit SAP einfach realisieren. Leider hat das Kommando "AT" auch seine T&#252;cken. Hier ein kleiner Workaround.</p>
+<p>Der Beitrag <a href="/blog/gruppenwechsel/">Gruppenwechsel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Gruppenwechsel lassen sich mit SAP einfach realisieren. Leider hat das Kommando &#8220;AT&#8221; auch seine T&uuml;cken. Hier ein kleiner Workaround.<br /><P>Gruppenwechsel sind manchmal ein l&auml;stiges Problem, da SAP der Meinung ist, Zahlen-Felder mit * auff&uuml;llen zu m&uuml;ssen.</P><P>Mit zwei einfachen Tricks kann man dieses Problem umgehen.</P><P class="head1">Trick 1</P><P class="sap1">DATA:<BR>&nbsp; gt_kna1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE kan1 occurs 0,<BR>&nbsp; lwa_kna1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE kna1,<BR>&nbsp; lwa_kna1_dummy&nbsp;LIKE kna1.</P><P class="sap1">&nbsp; LOOP AT gt_kna1 INTO lwa_kna1_dummy.<BR><FONT><FONT color="#008952">&nbsp;&nbsp;&nbsp;</FONT>&nbsp; lwa_kna1 = lwa_kna1_dummy.</FONT><FONT color="#008952"><BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp; AT NEW kunnr.<BR><FONT color="#fb2412">*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Hier kann man auf alle Felder&nbsp;in der lwa_kna1 <BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ohne *-Inhalte&nbsp;zugreifen&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp; ENDAT.<BR>&nbsp; ENDLOOP.</P><P class="head1">Trick 2</P><P class="sap1">DATA:<BR>&nbsp; gt_kna1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE kan1 occurs 0,<BR>&nbsp; lwa_kna1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE kna1,<BR>&nbsp; <FONT>lv_at_flag</FONT>&nbsp;&nbsp;&nbsp;&nbsp; TYPE c.</P><P class="sap1">&nbsp; LOOP AT gt_kna1 INTO lwa_kna1_dummy.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLEAR lv_at_flag<BR>&nbsp;&nbsp;&nbsp;&nbsp; AT NEW kunnr.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_at_flag = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp; ENDAT.</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp; <FONT>IF lv_at_flag&nbsp;&lt;&gt; space.<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lv_at_flag = space.<BR><FONT color="#fb2412">*&nbsp;&nbsp;Hier kann man wieder auf alle Felder&nbsp;in der lwa_kna1 <BR>*&nbsp;&nbsp;zugreifen&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">&nbsp; ENDLOOP.</P><P class="text1"><U><STRONG>Anmerkung:</STRONG></U></P><P class="text1">Der ABAP-Interpreter erkennt auch Gruppenwechsel in den hinteren Feldern automatisch! Bei einer Tabelle mit FELD1, FELD2, FELD3 k&ouml;nnen Sie getrost ein</P><P class="sap1">AT NEW feld3.</P><P class="text1">programmieren, ohne auf die vorderen Felder einzugehen. Selbst Wenn FELD3 gleich bleibt, sich aber FELD 2 &auml;ndert, wird der Gruppenwechsel erkannt.</P><P class="text1" align="right">Vielen Dank an Lars Kohlhoff!</P></p>
+<p>Der Beitrag <a href="/blog/gruppenwechsel/">Gruppenwechsel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SET USER-COMMAND</title>
+		<link>/blog/set-user-command/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 02 Jun 2003 20:27:30 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Listen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=72</guid>
+
+					<description><![CDATA[<p>Manchmal kann es sinnvoll und hilfreich sein, wenn direkt nach der Ausf&#252;hrung eines Reports eine bestimmte Funktion ausgef&#252;hrt wird. Der Befehl hierzu heisst "SET USER-COMMAND". Das folgende Beispielprogramm erzeugt eine Liste und f&#252;hrt danach den System-Befehl "Suchen" aus.</p>
+<p>Der Beitrag <a href="/blog/set-user-command/">SET USER-COMMAND</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Manchmal kann es sinnvoll und hilfreich sein, wenn direkt nach der Ausf&uuml;hrung eines Reports eine bestimmte Funktion ausgef&uuml;hrt wird. Der Befehl hierzu heisst &#8220;SET USER-COMMAND&#8221;. Das folgende Beispielprogramm erzeugt eine Liste und f&uuml;hrt danach den System-Befehl &#8220;Suchen&#8221; aus.<br /><P class="sap1">REPORT zzenno15 .</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Parameter-ID f&uuml;r das Suchwort setzen &#8211;*</FONT><BR>&nbsp; SET PARAMETER ID &#8216;SCS&#8217; FIELD &#8216;Tricktresor&#8217;.</P><P class="sap1"><FONT color="#fb2412">*&#8211;&nbsp;Auszuf&uuml;hrendes Kommando&nbsp;&#8211;*</FONT><BR>&nbsp; SET USER-COMMAND &#8216;%SC&#8217;.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Ausgabe der Liste &#8211;*</FONT><BR>&nbsp; WRITE: / &#8216;Dies ist ein Programm aus dem Tricktresor!&#8217;.</P><P>&nbsp;</P><P class="head1">Und so sieht&#8217;s aus</P><P><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/setusercommand.gif"><BR>Das Ergebnis des Beispielprogramms</P></TD></TR></TBODY></TABLE></P></p>
+<p>Der Beitrag <a href="/blog/set-user-command/">SET USER-COMMAND</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Werte hoch-/ runterzählen</title>
+		<link>/blog/werte-hoch-runterzaehlen-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 30 May 2003 22:33:49 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Listen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=71</guid>
+
+					<description><![CDATA[<p>In einer Liste k&#246;nnen Werte recht einfach durch Verwendung von "HOTSPOT" und "AT LINE-SELECTION" hoch- bzw- heruntergez&#228;hlt werden. Das Beispielprogramm zeigt, wie das geht.</p>
+<p>Der Beitrag <a href="/blog/werte-hoch-runterzaehlen-2/">Werte hoch-/ runterzählen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einer Liste k&ouml;nnen Werte recht einfach durch Verwendung von &#8220;HOTSPOT&#8221; und &#8220;AT LINE-SELECTION&#8221; hoch- bzw- heruntergez&auml;hlt werden. Das Beispielprogramm zeigt, wie das geht.<br /><FONT size="3"><P class="sap1"><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/werte.gif"><BR>Werte durch Klicken hoch- oder runterz&auml;hlen</P></TD></TR></TBODY></TABLE></P><P class="head1">Beispielreport</P><P class="sap1">report zzenno16 NO STANDARD PAGE HEADING.</P><P class="sap1">include &lt;icon&gt;.</P><P class="sap1">data: feld(30),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; zeile like sy-lilli,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pos_Wert type i,</P><P class="sap1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; begin of test occurs 20,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; name(15),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; wert type i,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; end of test.</P></FONT><P class="sap1">constants: <BR>&nbsp;&nbsp;&nbsp; &nbsp; minus(4) value icon_column_left,<BR>&nbsp;&nbsp;&nbsp; &nbsp; plus(4) &nbsp;value icon_column_right.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1">&nbsp; test-name = &#8216;Carsten&#8217;. test-wert = 1. append test.<BR>&nbsp; test-name = &#8216;Peter&#8217;.&nbsp;&nbsp; test-wert = 2. append test.<BR>&nbsp; test-name = &#8216;Karen&#8217;.&nbsp;&nbsp; test-wert = 0. append test.<BR>&nbsp; test-name = &#8216;Hedwig&#8217;. &nbsp;test-wert = 1. append test.</P><P class="sap1">&nbsp; perform ausgabe.</P><B><P class="sap1">form ausgabe.</P></B><P class="sap1">&nbsp; sy-lsind = 0.</P><P class="sap1">&nbsp; loop at test.<BR>&nbsp;&nbsp;&nbsp; if sy-tabix = 1.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; write: / &#8216;Spieler&#8217;,&nbsp;24 &#8216;Punkte&#8217;.<BR>&nbsp; &nbsp; &nbsp; uline.<BR>&nbsp;&nbsp;&nbsp; endif.</P><P class="sap1">&nbsp; &nbsp; write: / test-name, at pos_wert test-wert,<BR>&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;at 30 minus as icon hotspot on,<BR>&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;at 33 plus&nbsp; as icon hotspot on.<BR>&nbsp; &nbsp; hide test.<BR>&nbsp;&nbsp;endloop.</P><P class="sap1">endform.</P><B><P class="sap1">at line-selection.</P></B><P class="sap1">&nbsp; get cursor field feld line zeile.</P><P class="sap1">&nbsp; read table test with key name = test-name.</P><P class="sap1">&nbsp; if sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp; case feld.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; when &#8216;MINUS&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if test-wert &gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subtract 1 from test-wert.<BR>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; modify test index sy-tabix.<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; perform ausgabe.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; endif.<BR>&nbsp; &nbsp; when &#8216;PLUS&#8217;.<BR>&nbsp;&nbsp;&nbsp; &nbsp; if test-wert &lt; 8.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; add 1 to test-wert.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; modify test index sy-tabix.<BR>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; perform ausgabe.<BR>&nbsp;&nbsp;&nbsp; &nbsp; endif.<BR>&nbsp; &nbsp; endcase.<BR>&nbsp; endif.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/werte-hoch-runterzaehlen-2/">Werte hoch-/ runterzählen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Überschriften Positionieren</title>
+		<link>/blog/ueberschriften-positionieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 09 May 2003 16:14:15 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Listen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=62</guid>
+
+					<description><![CDATA[<p>In einer Liste die &#220;berschriften genau zu positionieren ist mitunter eine umst&#228;ndliche Angelegenheit. Mit einem kleinen Trick kann man sich die Arbeit leichter machen...</p>
+<p>Der Beitrag <a href="/blog/ueberschriften-positionieren/">Überschriften Positionieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einer Liste die &Uuml;berschriften genau zu positionieren ist mitunter eine umst&auml;ndliche Angelegenheit. Mit einem kleinen Trick kann man sich die Arbeit leichter machen&#8230;<br /><P>Die Position eines Feldes l&auml;&szlig;t sich einfach herausfinden: Die aktuelle Spalte steht&nbsp;in dem Feld SY-CUCOL und die erste angezeigte Spalte in der Liste ist in dem Feld SY-STACO gespeichert.</P><P>Wenn Sie also eine Liste programmiert haben und nun die &Uuml;berschrift programmieren wollen&#8230;</P><P class="sap1">FORMAT COLOR COL_HEADING.<BR>ULINE.<BR>WRITE: /1 &#8216;Material&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 12 &#8216;Kurztext&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 30 &#8216;Werk&#8217;.<BR>ULINE.<BR>FORMAT COLOR OFF.</P><P>&#8230;dann &nbsp;k&ouml;nnen Sie einfach die folgende Anweisung in Programm einf&uuml;gen:</P><P class="sap1">AT LINE-SELECTION.<BR>&nbsp; DATA&nbsp;l_zeile&nbsp;TYPE systaco.<BR>&nbsp; l_zeile = sy-staco + sy-cucol &#8211; 2.<BR><BR>&nbsp; MESSAGE s000(vz) with sy-l_zeile.</P><P>Und beim Doppelklick auf eine Listzeile wird die Position angezeigt. Sie k&ouml;nnen also in einem Modus die Liste anzeigen und immer auf die gew&uuml;nschte Position doppelklicken und im anderen Modus das Programm entsprechend &auml;ndern.</P><P><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG height="294" src="/wp-content/uploads/tt_images/cursor.jpg" width="506"><BR>Doppelklick zeigt die Cursorposition in der Statuszeile</P></TD></TR></TBODY></TABLE></P></p>
+<p>Der Beitrag <a href="/blog/ueberschriften-positionieren/">Überschriften Positionieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Interaktive Liste mit Ordnerstruktur</title>
+		<link>/blog/interaktive-liste-mit-ordnerstruktur/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 08 May 2003 15:34:57 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Listen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=61</guid>
+
+					<description><![CDATA[<p>Mit der richtigen Technik k&#246;nnen Sie eine interaktive Liste mit einer Ordnerstruktur bauen. Hier sehen Sie, wie das geht.</p>
+<p>Der Beitrag <a href="/blog/interaktive-liste-mit-ordnerstruktur/">Interaktive Liste mit Ordnerstruktur</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit der richtigen Technik k&ouml;nnen Sie eine interaktive Liste mit einer Ordnerstruktur bauen. Hier sehen Sie, wie das geht.<br /><P>Das folgende Programm liest Tabellennamen und die dazugeh&ouml;rigen Feldname in eine interne Tabelle und gibt dann die Tabellennamen aus.</P><P>Mit einem Klick auf das Ordner-Symbol k&ouml;nnen dann die Felder zu der Tabelle angezeigt&nbsp;werden. Mit einem erneuten Klick auf den &#8212; nun offen dargestellten &#8212; Ordner, werden die Felder wieder ausgeblendet.</P><P>Die Anwendungsm&ouml;glichkeiten sind vielf&auml;ltig: Anzeige von Auftr&auml;gen und deren Positionen, St&uuml;cklisten und die dazugeh&ouml;rigen Komponenten, etc.</P><P class="head1">So sieht&#8217;s aus</P><P><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/ordner1.jpg"><BR>Die selektierten Tabellen </P></TD></TR></TBODY></TABLE></P><P><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/ordner2.jpg"><BR>Zu &#8220;aufgeklappten&#8221; Tabellen werden die Felder gezeigt</P></TD></TR></TBODY></TABLE></P><P class="head1">Programm</P><P class="sap1">REPORT zzliste10 NO STANDARD PAGE HEADING.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Icons bekannt machen<BR></FONT>TYPE-POOLS icon.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Variablen</FONT><BR>DATA:<BR><FONT color="#fb2412">*&#8212; GET CURSOR</FONT><BR>&nbsp; feldname(30),</P><P class="sap1"><FONT color="#fb2412">*&#8212; Aktuelle Listzeile</FONT><BR>&nbsp; staro&nbsp;&nbsp; TYPE systaro,</P><P class="sap1"><FONT color="#fb2412">*&#8211; &#8220;Kopf-Tabelle&#8221; mit Tabellennamen<BR></FONT>&nbsp; BEGIN OF t_tabelle OCCURS 0,<BR>&nbsp;&nbsp;&nbsp; tabname TYPE tabname,<BR>&nbsp;&nbsp;&nbsp; anz,<BR>&nbsp; END OF t_tabelle,</P><P class="sap1"><FONT color="#fb2412">*&#8211; &#8220;Positions-Tabelle&#8221; mit Feldnamen</FONT><BR>&nbsp; BEGIN OF t_felder OCCURS 0,<BR>&nbsp;&nbsp;&nbsp; tabname TYPE tabname,<BR>&nbsp;&nbsp;&nbsp; fldname TYPE fieldname,<BR>&nbsp; END OF t_felder.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Selektionsbild</FONT><BR>SELECT-OPTIONS s_table FOR t_tabelle-tabname DEFAULT &#8216;ED*&#8217; OPTION CP.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Programmstart</FONT><BR>START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Alle Tabellen innerhalb der Selektion lesen</FONT><BR>&nbsp; SELECT tabname FROM dd02l<BR>&nbsp;&nbsp;&nbsp; INTO CORRESPONDING FIELDS OF TABLE t_tabelle<BR>&nbsp; WHERE tabname IN s_table<BR>&nbsp;&nbsp;&nbsp; AND tabclass = &#8216;TRANSP&#8217;.<BR><FONT color="#fb2412">*&#8212; Und die Felder dazu<BR></FONT>&nbsp; SELECT tabname fieldname FROM dd03l INTO TABLE t_felder<BR>&nbsp;&nbsp;&nbsp; FOR ALL ENTRIES IN t_tabelle WHERE tabname = t_tabelle-tabname.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Tabellen ausgeben</FONT><BR>&nbsp; PERFORM liste.</P><P class="sap1"><BR><FONT color="#fb2412">*&#8211; Bei Doppelklick</FONT><BR>AT LINE-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Feldnamen ermitteln</FONT><BR>&nbsp; GET CURSOR FIELD feldname.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Aktuelle Zeile merken<BR></FONT>&nbsp; staro = sy-staro.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Nur weiter, wenn auch auf eine Zeile geklickt wurde, in der eine<BR>*&#8211; Tabelle steht:<BR></FONT>&nbsp; IF NOT t_tabelle-tabname IS INITIAL.<BR><FONT color="#fb2412">*&#8211; Tabellen lesen</FONT><BR>&nbsp;&nbsp;&nbsp; READ TABLE t_tabelle WITH KEY tabname = t_tabelle-tabname.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc = 0.<BR><FONT color="#fb2412">*&#8211; Sollen Felder der Tabelle angezeigt werden??<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF t_tabelle-anz = space.<BR><FONT color="#fb2412">*&#8211; Nein, dann aber jetzt!<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t_tabelle-anz = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*&#8211; Ja; jetzt nicht jedoch nicht mehr.<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t_tabelle-anz = space.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR><FONT color="#fb2412">*&#8211; Tabelleneintrag merken</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY t_tabelle INDEX sy-tabix.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Liste erneut ausgeben<BR></FONT>&nbsp;&nbsp;&nbsp; PERFORM liste.<BR>&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FORM liste&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>FORM liste.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Keine Verzweigungsliste erzeugen</FONT><BR>&nbsp; sy-lsind = 0.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Tabellennamen ausgeben</FONT><BR>&nbsp; LOOP AT t_tabelle.</P><P class="sap1">&nbsp;&nbsp;&nbsp; IF t_tabelle-anz = space.<BR><FONT color="#fb2412">*&#8211; Feldnamen sollen nicht angezeigt werden<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / icon_closed_folder AS ICON HOTSPOT.<BR>&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*&#8211; Feldnamen anzeigen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / icon_open_folder AS ICON HOTSPOT.<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR><FONT color="#fb2412">*&#8211; Ausgabe des Tabellennamens</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: t_tabelle-tabname.<BR><FONT color="#fb2412">*&#8211; Tabellenname f&uuml;r AT LINE-SELECTION merken<BR></FONT>&nbsp;&nbsp;&nbsp; HIDE t_tabelle-tabname.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Falls gew&uuml;nscht: Felder zur Tabelle anzeigen<BR></FONT>&nbsp;&nbsp;&nbsp; IF t_tabelle-anz = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP AT t_felder WHERE tabname = t_tabelle-tabname.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: /4 t_felder-fldname.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">&nbsp; ENDLOOP.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Variablen l&ouml;schen, damit bei Doppelklick auf eine Position nicht<BR>*&#8211; mit dem Schliessen des Tabellen-Ordners reagiert wird.<BR></FONT>&nbsp; CLEAR: t_tabelle, t_felder.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Cursor auf die letzte Position setzen</FONT><BR>&nbsp; SCROLL LIST TO FIRST PAGE LINE staro INDEX 1.</P><P class="sap1">ENDFORM.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/interaktive-liste-mit-ordnerstruktur/">Interaktive Liste mit Ordnerstruktur</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Einträge markieren/ entmarkieren</title>
+		<link>/blog/eintraege-markieren-entmarkieren/</link>
+					<comments>/blog/eintraege-markieren-entmarkieren/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 May 2003 00:31:05 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Listen]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=58</guid>
+
+					<description><![CDATA[<p>An diesem kleinen Report k&#246;nnen Sie nachvollziehen, wie Sie in einer Liste alle Eintr&#228;ge markieren bzw. alle Markierungen wieder entfernen k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/eintraege-markieren-entmarkieren/">Einträge markieren/ entmarkieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>An diesem kleinen Report k&ouml;nnen Sie nachvollziehen, wie Sie in einer Liste alle Eintr&auml;ge markieren bzw. alle Markierungen wieder entfernen k&ouml;nnen.<br /><P><TABLE class="tblimg" cellPadding="4" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/mark.gif"><BR>Alle Eintr&auml;ge sind markiert</P></TD></TR></TBODY></TABLE></P><P>In einer Liste mit Eintr&auml;gen zum Ankreuzen m&ouml;chte man vielleicht dem Anwender die M&ouml;glichkeit geben, alle Eintr&auml;ge zu markieren, bzw. alle Markierungen wieder zu entfernen.</P><P>Das Auslesen der markierten Punkte muss dann auch noch erfolgen: <A href="/wp-content/index.php?aID=386" target="_self">Eingabe in Listen</A></P><P class="head1">&nbsp;Das Programm</P><P class="sap1">REPORT zzenno14 .</P><P class="sap1">DATA:<BR>&nbsp; linex TYPE syindex,<BR>&nbsp; sel&nbsp;&nbsp; TYPE c,<BR>&nbsp; bezei TYPE sptxt.</P><P class="sap1">START-OF-SELECTION.<BR><FONT color="#fb2412">*** GUI-Status setzen<BR>*** SALL = Alle Markierungen setzen<BR>*** DALL&nbsp;= Alle Markierungen l&ouml;schen</FONT><BR>&nbsp; SET PF-STATUS &#8216;LIST&#8217;.<BR><FONT color="#fb2412">*** Daten lesen</FONT><BR>&nbsp; SELECT sptxt FROM t002t INTO bezei WHERE spras = sy-langu.<BR><FONT color="#fb2412">*** &#8230;und ausgeben</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: / sel AS CHECKBOX INPUT ON,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bezei.<BR>&nbsp; ENDSELECT.</P><P class="sap1"><BR>AT USER-COMMAND.<BR>&nbsp; CASE sy-ucomm.<BR><FONT color="#fb2412">*** Abfrage</FONT> <BR>&nbsp;&nbsp;&nbsp; WHEN &#8216;SALL&#8217; OR &#8216;DALL&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DO.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linex = sy-index.<BR><FONT color="#fb2412">*** Zeile lesen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; READ LINE linex FIELD VALUE sel bezei.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc &gt; 0. EXIT. ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CASE sy-ucomm.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;SALL&#8217;.<BR><FONT color="#fb2412">*** Marker setzen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY LINE linex FIELD VALUE sel FROM &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHEN &#8216;DALL&#8217;.<BR><FONT color="#fb2412">*** Marker l&ouml;schen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY LINE linex FIELD VALUE sel FROM &#8216; &#8216;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDCASE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDDO.<BR>&nbsp; ENDCASE.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/eintraege-markieren-entmarkieren/">Einträge markieren/ entmarkieren</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/eintraege-markieren-entmarkieren/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_xml_document Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_xml_document/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:57 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_xml_document Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Beliebige XML-Datei in interne Tabelle einlesen</title>
+		<link>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/</link>
+					<comments>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Sep 2014 17:05:16 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[parser]]></category>
+		<category><![CDATA[itab]]></category>
+		<category><![CDATA[field-symbols]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[cl_xml_document]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5081</guid>
+
+					<description><![CDATA[<p>Viele Daten werden im XML-Format ausgetauscht. Um die Daten in SAP verarbeiten zu können, muss man parsen oder eine entsprechende Transformation "programmieren". Mit XML tue ich mich manchmal etwas schwer und bin daher froh über jede Vereinfachung.</p>
+<p>Mithilfe eines kleinen generischen Programms ist es einfach möglich, die folgende XML-Datei in eine interne Tabelle zu laden.</p>
+<p>Der Beitrag <a href="/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/">Beliebige XML-Datei in interne Tabelle einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Viele Daten werden im XML-Format ausgetauscht. Um die Daten in SAP verarbeiten zu können, muss man parsen oder eine entsprechende Transformation &#8220;programmieren&#8221;. Mit XML tue ich mich manchmal etwas schwer und bin daher froh über jede Vereinfachung.</p>
+<p>Mithilfe eines kleinen generischen Programms ist es einfach möglich, die folgende XML-Datei in eine interne Tabelle zu laden:</p>
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;hierarchie1&gt;
+&lt;hierarchie2&gt;Beispiel XML&lt;/hierarchie2&gt;
+&lt;hierarchie2&gt;Tricktresor&lt;/hierarchie2&gt;
+&lt;hierarchie2&gt;Enno Wulff&lt;/hierarchie2&gt;
+&lt;/hierarchie1&gt;
+</pre>
+<figure id="attachment_5082" aria-describedby="caption-attachment-5082" style="width: 487px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/09/xml_itab.png"><img fetchpriority="high" decoding="async" class="wp-image-5082 size-full" src="https://tricktresor.com/wp-content/uploads/2014/09/xml_itab.png" alt="Interne Tabelle mit XML-Daten" width="487" height="110" srcset="/wp-content/uploads/2014/09/xml_itab.png 487w, /wp-content/uploads/2014/09/xml_itab-300x67.png 300w" sizes="(max-width: 487px) 100vw, 487px" /></a><figcaption id="caption-attachment-5082" class="wp-caption-text">Screenshot aus dem Debugger</figcaption></figure>
+<p>Man sieht deutlich, dass die einzelnen Tags der XML-Datei sequentiell in die Tabelle übernommen wurden. Für viele Anwendungsfälle dürfte das für die weitere Verarbeitung ausreichen.</p>
+<p>[notice type=&#8217;info&#8217;]Dieses Programm erzeugt lediglich die Transformation von der XML-Struktur in eine interne Tabelle. Es erfolgt keine Ausgabe![/notice]</p>
+<h2>Coding</h2>
+<pre>REPORT.
+TYPES tyt_tab_xml TYPE TABLE OF smum_xmltb.
+
+DATA: gv_xml_xstring  TYPE          xstring,
+      gt_xml_tab      TYPE TABLE OF smum_xmltb,
+      gv_filename     TYPE          localfile,
+      go_xml_document TYPE REF TO   cl_xml_document,
+      gv_subrc        TYPE          sy-subrc,
+      gv_size         TYPE          sy-tabix.
+
+
+START-OF-SELECTION.
+
+  PERFORM display_popup CHANGING gv_filename.
+
+  PERFORM upload_xml USING gv_filename
+                     CHANGING go_xml_document
+                              gv_subrc.
+  IF gv_subrc = 0.
+
+    PERFORM parse_to_xstring USING go_xml_document
+                             CHANGING gv_xml_xstring
+                                      gv_size
+                                      gv_subrc.
+    IF gv_subrc = 0.
+      PERFORM parse_xml_to_itab USING gv_xml_xstring
+                                CHANGING gt_xml_tab.
+
+    ELSE.
+      EXIT.
+    ENDIF.
+  ELSE.
+    EXIT.
+  ENDIF.
+
+END-OF-SELECTION.
+
+FORM display_popup CHANGING cv_filename TYPE localfile.
+
+  DATA: lt_filetable TYPE filetable,
+        lv_anz_dat   TYPE i.
+
+  cl_gui_frontend_services=&gt;file_open_dialog(
+    EXPORTING
+      window_title            =     'Wählen Sie eine XML.Datei aus'    " Titel des Datei-Öffnen Dialogs
+      default_filename        =     'C:\test.xml'
+      initial_directory       =     'C:\' " Ausgangsverzeichnis
+  CHANGING
+      file_table              = lt_filetable   " Tabelle, die selektierte Dateien enthält
+      rc                      = lv_anz_dat     " Rückgabewert: Anzahl Dateien oder -1 falls Fehler auftritt
+  EXCEPTIONS
+    OTHERS                  = 5
+    ).
+
+  READ TABLE lt_filetable INTO cv_filename INDEX 1.
+
+ENDFORM.
+
+FORM upload_xml USING iv_filename        TYPE localfile
+                CHANGING co_xml_document TYPE REF TO cl_xml_document
+                         cv_subrc        TYPE sy-subrc.
+*== create the object
+  CREATE OBJECT co_xml_document.
+
+*== Upload xml file
+  co_xml_document-&gt;import_from_file(
+  EXPORTING
+    filename = iv_filename
+    RECEIVING
+    retcode = cv_subrc  ).
+
+ENDFORM.
+
+FORM parse_to_xstring USING io_xml_document  TYPE REF TO cl_xml_document
+                      CHANGING cv_xml_string TYPE xstring
+                               cv_size       TYPE sy-tabix
+                               cv_subrc      TYPE sy-subrc.
+*== Convert to xstring
+  CALL METHOD io_xml_document-&gt;render_2_xstring
+    IMPORTING
+      retcode = cv_subrc      " Returncode
+      stream  = cv_xml_string " XString (STREAM)
+      size    = cv_size.      " Anzahl Zeichen
+ENDFORM.
+
+FORM parse_xml_to_itab USING iv_xml_string TYPE xstring
+                       CHANGING ct_xml_tab TYPE tyt_tab_xml.
+
+  DATA: lt_return TYPE TABLE OF bapiret2.
+
+*== Convert XML to itab
+  CALL FUNCTION 'SMUM_XML_PARSE'
+    EXPORTING
+      xml_input = iv_xml_string
+    TABLES
+      xml_table = ct_xml_tab
+      return    = lt_return.
+  BREAK-POINT.
+
+ENDFORM.</pre>
+<h2>Übertragen der generischen in eine interne Tabelle</h2>
+<p>In unserem Beispiel muss die interne Tabelle das Feld &#8220;HIERARCHIE2&#8221; besitzen. Die Zuweisung aller XML-Werte der &#8220;Hierarchiestufe 2&#8221; werden dann dem Feld &#8220;ITAB-HIERARCHIE2&#8221; zugewiesen.</p>
+<p>[notice type=&#8217;info&#8217;]Der Aufruf der Routine muss noch hinzugefügt werden. Die zu übergebene interne Tabelle kann jeden beliebigen Typ haben. In diesem Beispiel wird der Typ TYT_ITAB verwendet.[/notice]</p>
+<pre>FORM build_itab USING it_xml_tab     TYPE tyt_tab_xml
+             CHANGING itab TYPE tyt_itab.
+
+  FIELD-SYMBOLS: &lt;ls_data_tab&gt; LIKE LINE OF itab,
+                 &lt;ls_xml_tab&gt;  LIKE LINE OF it_xml_tab,
+                 &lt;lv_value&gt;    TYPE         data.
+
+  LOOP AT it_xml_tab ASSIGNING &lt;ls_xml_tab&gt; WHERE hier EQ 2.
+    TRANSLATE &lt;ls_xml_tab&gt;-cname TO UPPER CASE.
+    IF &lt;ls_xml_tab&gt;-cname = 'HIERARCHIE2'.
+      APPEND INITIAL LINE TO itab ASSIGNING &lt;ls_data_tab&gt;.
+    ENDIF.
+    ASSIGN COMPONENT &lt;ls_xml_tab&gt;-cname OF STRUCTURE &lt;ls_data_tab&gt; TO &lt;lv_value&gt;.
+    &lt;lv_value&gt; = &lt;ls_xml_tab&gt;-cvalue.
+  ENDLOOP.
+ENDFORM..</pre>
+<p>Der Beitrag <a href="/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/">Beliebige XML-Datei in interne Tabelle einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/beliebige-xml-datei-in-interne-tabelle-einlesen/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

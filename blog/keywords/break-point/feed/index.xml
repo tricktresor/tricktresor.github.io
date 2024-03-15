@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>break-point Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/break-point/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 26 Sep 2022 14:39:08 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>break-point Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Debugger-Scripting (1)</title>
+		<link>/blog/debugger-scripting-1/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 03 Dec 2015 17:14:08 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Debugger]]></category>
+		<category><![CDATA[break-point]]></category>
+		<category><![CDATA[abap740]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=367679</guid>
+
+					<description><![CDATA[<p>Es passiert des Öfteren, dass einem Authority-Checks in den Weg geworfen werden. Einem einzelnen kann man schnell Herr werden, in dem man sich einen Break-Point auf die Anweisung "AUTHORITY-CHECK" setzt, F5 (Einzelschritt) drückt, den SY-SUBRC auf "0" ändert und dann weiter macht. Aber bei vielen...?!</p>
+<p>Der Beitrag <a href="/blog/debugger-scripting-1/">Debugger-Scripting (1)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Lange habe ich mich vor den umfangreichen Funktionen es Debugger-Scripting gedrückt. Durch das sensationelle Buch von <a href="http://amzn.to/1lttbu9" target="_blank">Paul Harding &#8220;ABAP To The Future&#8221;</a> habe ich mich nun endlich getraut.</p>
+<h2>Mein erstes Debugger-Skript</h2>
+<p>Es passiert des Öfteren, dass einem Authority-Checks in den Weg geworfen werden. Einem einzelnen kann man schnell Herr werden, in dem man sich einen Break-Point auf die Anweisung &#8220;AUTHORITY-CHECK&#8221; setzt, F5 (Einzelschritt) drückt, den SY-SUBRC auf &#8220;0&#8221; ändert und dann weiter macht.</p>
+<p>Wenn es mehrere Checks sind, kann es schnell nerven.</p>
+<p>Mein erstes Debugger-Skript habe ich genau hierfür geschrieben. Es macht genau das, was ich eben beschrieben habe.</p>
+<pre>METHOD script.
+
+  debugger_controller-&gt;debug_step( 
+       p_command = cl_tpda_script_debugger_ctrl=&gt;debug_step_over ).
+
+  cl_tpda_script_data_descr=&gt;change_value(
+         p_new_value = '4'
+         p_varname = 'SY-SUBRC' ).
+
+ENDMETHOD. "script</pre>
+<p>Damit das Skript funktioniert, musst du an geeigneter Stelle den Debugger anschalten (/h, geht auch vor dem Aufruf einer Transaktion!!) und zum Tab &#8220;Script&#8221; wechseln.</p>
+<p>Dort setzt du einen Break-Point bei der Anweisung AUTHORITY-CHECK:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-03_17-55-27.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-370544" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-03_17-55-27-300x238.jpg" alt="2015-12-03_17-55-27" width="300" height="238" srcset="/wp-content/uploads/2015/12/2015-12-03_17-55-27-300x238.jpg 300w, /wp-content/uploads/2015/12/2015-12-03_17-55-27.jpg 820w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Dann musst du nur noch das oben vorgestellte Coding in der Methode SCRIPT einfügen.</p>
+<p>&#8220;Skript starten&#8221; und auf einmal werden alle Berechtigungsprüfungen wahr&#8230;</p>
+<h2>Leider&#8230;</h2>
+<p>funktioniert der Trace bei dieser Methode nicht. Normalerweise kann man das aktuelle Ereignis tracen:</p>
+<pre>trace-&gt;add_src_info( ).</pre>
+<p>Entweder ist ein AUTHORITY-CHECK kein Ereignis, oder es funktioniert aus anderen Gründen nicht.</p>
+<p>Wahrscheinlich letzteres, denn auch ein eigener Eintrag in den Trace bleibt erfolglos:</p>
+<pre> DATA trace_entry TYPE tpda_trace_custom.
+ trace_entry-value = 'hier steht was...'.
+ trace-&gt;add_custom_info( p_trace_entry = trace_entry ).</pre>
+<p>Wer hier noch Tipps hat: Immer her damit in die Kommentare!</p>
+<h2>Wizard</h2>
+<p>Wer das Debugger-Skripting weiter erforschen möchte, kann das sehr komfortabel über den Wizard machen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-03_18-01-43.jpg"><img decoding="async" class="alignnone size-medium wp-image-370545" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-03_18-01-43-247x300.jpg" alt="2015-12-03_18-01-43" width="247" height="300" srcset="/wp-content/uploads/2015/12/2015-12-03_18-01-43-247x300.jpg 247w, /wp-content/uploads/2015/12/2015-12-03_18-01-43.jpg 461w" sizes="(max-width: 247px) 100vw, 247px" /></a></p>
+<p>Alle möglichen Befehle werden hier als Muster eingefügt. Alle möglichen Konstanten, die in diesem Zusammenhang möglich sind, werden als Kommentar eingebunden:</p>
+<pre>*************************************************
+* debugger commands (p_command):
+* Step into(F5) -&gt; CL_TPDA_SCRIPT_DEBUGGER_CTRL=&gt;DEBUG_STEP_INTO
+* Execute(F6) -&gt; CL_TPDA_SCRIPT_DEBUGGER_CTRL=&gt;DEBUG_STEP_OVER
+* Return(F7) -&gt; CL_TPDA_SCRIPT_DEBUGGER_CTRL=&gt;DEBUG_STEP_OUT
+* Continue(F8) -&gt; CL_TPDA_SCRIPT_DEBUGGER_CTRL=&gt;DEBUG_CONTINUE
+*************************************************
+****************************************************************
+*Interface (CLASS = CL_TPDA_SCRIPT_DEBUGGER_CTRL / METHOD = DEBUG_STEP )
+*Importing
+* REFERENCE( P_COMMAND ) TYPE I
+****************************************************************
+
+*TRY.
+DEBUGGER_CONTROLLER-&gt;DEBUG_STEP( P_COMMAND = P_COMMAND ).
+* CATCH cx_tpda_scr_rtctrl_status .
+* CATCH cx_tpda_scr_rtctrl .
+*ENDTRY.</pre>
+<h2>Speichern &amp; Laden</h2>
+<p>Die Skripts können &#8211; inklusive erstellter Breakpoints!! &#8211; gespeichert werden. Entweder direkt im System im ABAP-Repository oder lokal auf dem Rechner.</p>
+<p>Da es sich bei den Skripten um &#8220;normale&#8221; Programme handelt (Programmtyp &#8220;Subroutinenpool&#8221;), ist es sinnvoll, sich an Namenskonventionen zu halten. Alle SAP-eigenen vorgefertigten Skripte beginnen mit &#8220;RSTPDA_SCRIPT&#8221;.</p>
+<p>Der Beitrag <a href="/blog/debugger-scripting-1/">Debugger-Scripting (1)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Checkpoint-Gruppe &#8211; Die Fahrkarten bitte!</title>
+		<link>/blog/checkpoint-gruppe-die-fahrkarten-bitte/</link>
+					<comments>/blog/checkpoint-gruppe-die-fahrkarten-bitte/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 05 Feb 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[break-point]]></category>
+		<category><![CDATA[logging]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[RFC]]></category>
+		<category><![CDATA[saab]]></category>
+		<category><![CDATA[checkpoint]]></category>
+		<category><![CDATA[log-point]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5247</guid>
+
+					<description><![CDATA[<p>Checkpoint-Gruppen sind eine nützliche Sache. Leider funktionieren Sie nur auf einem Weg: Ist ein Kontrollpunkt aktiv, verhält sich der jeweilige Befehl (LOG-POINT, BREAK-POINT, ASSERT) entsprechend. Leider kann man nicht prüfen, ob eine Protokollierung eingeschaltet ist, da die Befehle keinen SY-SUBRC liefern. Hier stelle ich eine Routine vor, die prüft, ob die Protokollierung für eine Checkpoint-Gruppe eingeschaltet ist.</p>
+<p>Der Beitrag <a href="/blog/checkpoint-gruppe-die-fahrkarten-bitte/">Checkpoint-Gruppe &#8211; Die Fahrkarten bitte!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Heute stand ich vor der Frage, wie man im Programm eine Abfrage einbaut, die man in jedem System ohne extra Parametertabelle oder ähnlichem an- oder ausschalten kann. Normalerweise gibt es dafür Parameter-Tabellen oder man könnte auch Benutzerparameter verwenden. Ersteres war jedoch zu aufwändig und die zweite Variante passte nicht, da für beliebige Benutzer (auch RFC-User) gesteuert werden sollte, ob eine Protokollierung statt findet oder nicht.</p>
+
+
+
+<p>Da ich für die Protokollierung einiger Aktionen bereits die Checkpoint-Gruppen verwendet habe, kam ich auf die Idee, diese abzufragen. Eigentlich funktioniert der Befehl LOG-POINT anders: Die Anweisung wird eingebaut und wenn in der Transaktion SAAB die Protokollierung zum aktuellen Zeitpunkt aktiviert wurde, dann wird das Protokoll geschrieben:</p>
+
+
+
+<pre class="wp-block-preformatted">LOG ID ztricktresor&nbsp;SUBKEY&nbsp;'CHECK1'&nbsp;FIELDS&nbsp;subrc.</pre>
+
+
+
+<h2 class="wp-block-heading">Transaktion SAAB</h2>
+
+
+
+<p>In der Transaktion Checkpoint-Gruppe ändern SAAB kannst du einstellen, wie sich die einzelnen Befehle LOG-POINT, ASSERT, BREAK-POINT verhalten sollen.</p>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2015/02/2015-02-04_18-25-01.png"><img decoding="async" width="300" height="171" src="https://tricktresor.com/wp-content/uploads/2015/02/2015-02-04_18-25-01-300x171.png" alt="2015-02-04_18-25-01" class="wp-image-5250" srcset="/wp-content/uploads/2015/02/2015-02-04_18-25-01-300x171.png 300w, /wp-content/uploads/2015/02/2015-02-04_18-25-01-624x356.png 624w, /wp-content/uploads/2015/02/2015-02-04_18-25-01.png 770w" sizes="(max-width: 300px) 100vw, 300px" /></a></figure>
+
+
+
+<h2 class="wp-block-heading">Andersherum wird ein Schuh draus</h2>
+
+
+
+<p>Die Aktivierungsdaten werden in die Tabelle AAB_ID_ACT geschrieben. Zusätzlich wird gespeichert, wann die Aktivierung abläuft und welche Kontrollpunkte aktiv sind (Breakpoints, Logpoints, Assertions). Diese Tabelle lese ich aus, um zu prüfen, ob das Logging zu einer Checkpoint-Gruppe aktiv ist.</p>
+
+
+
+<p>Welche Kontrollpunkte aktiv sind, wird im Feld ACTMODE bitweise gespeichert. Die Bits haben dabei folgende Bedeutung:</p>
+
+
+
+<figure class="wp-block-table"><table><tbody><tr><td>Bit 1</td><td>Bit 2</td><td>Bit 3</td><td>Bit 4</td><td>Bit 5</td><td>Bit 6</td><td>Bit 7</td><td>Bit 8</td></tr><tr><td>ohne Funktion</td><td>Logging</td><td>Assertions<br>Hintergrund<br>abbrechen</td><td>Assertions<br>Hintergrund<br>protokollieren</td><td>Assertions<br>abbrechen</td><td>Assertions<br>protokollieren</td><td>Assertions<br>anhalten</td><td>Breakpoints</td></tr></tbody></table></figure>
+
+
+
+<p>Mithilfe des Befehls GET BIT 2 OF ACTMODE bekomme ich heraus, ob das Logging eingeschaltet ist.</p>
+
+
+
+<p>Der Wert ist dann 64, Du kannst die Konstante CL_ABAP_AAB_UTILITIES=>BITMASK_LOGPOINT verwenden.</p>
+
+
+
+<h2 class="wp-block-heading">Globale Checkpoint-Aktivierungen</h2>
+
+
+
+<p>In der Transaktion SAAB legt man in der Regel die Einstellungen für sich selbst an. Du kannst jedoch über <em>Alle Aktivierungen</em> [_Benutzer_] auch globale Einstellungen vornehmen. Diese sind dann für alle Benutzer gültig. Das Feld AAB_ID_ACT-USERNAME ist in dem Fall initial.</p>
+
+
+
+<p>Ebenso kann eine Einschränkung auf Server vorgenommen werden. Ist das der Fall, dann steht im Feld AAB_ID_ACT-SERVER der Name des Applicationservers.</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT zz_checkpoint.
+
+CLASS lcl_saab DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS check_active IMPORTING name          TYPE clike
+                                         user          TYPE clike OPTIONAL
+                               RETURNING VALUE(active) TYPE boolean.
+ENDCLASS.
+
+CLASS lcl_saab IMPLEMENTATION.
+  METHOD check_active.
+*== local data
+    DATA ls_aabact  TYPE aab_id_act.
+    DATA lv_tstamp  TYPE timestamp.
+    DATA lv_actmode TYPE x.
+
+    active = abap_false.
+
+*== check checkpoint
+    SELECT SINGLE * FROM aab_id_act INTO ls_aabact
+     WHERE name     = name 
+       AND username = user.
+    IF sy-subrc = 0.
+*== Checkpoint active
+      GET TIME STAMP FIELD lv_tstamp.
+
+      IF lv_tstamp &lt;= ls_aabact-exp_tstamp. 
+*== checkpoint is valid at the moment     
+        lv_actmode = ls_aabact-actmode. 
+*== check if logging is active         
+        GET BIT 2 OF lv_actmode INTO DATA(lv_logging).         
+        IF lv_logging = 1. 
+*== yes, active           
+          active = abap_true.         
+        ENDIF.      
+      ENDIF. 
+    ENDIF.   
+  ENDMETHOD. 
+ENDCLASS. 
+
+PARAMETERS p_name TYPE progname DEFAULT 'ZTRICKTRESOR'. 
+
+START-OF-SELECTION.   
+  IF lcl_saab=&gt;check_active( p_name ) = abap_true.
+    MESSAGE i000(oo) WITH 'Checkpoint-Gruppe' p_name ' Logging ist aktiv'.
+  ELSE.
+    MESSAGE i000(oo) WITH 'Checkpoint-Gruppe' p_name 'Logging ist NICHT aktiv'.
+  ENDIF.</pre>
+
+
+
+<h2 class="wp-block-heading">Update</h2>
+
+
+
+<p>In der Zwischenzeit habe ich die Klasse CL_ABAP_AAB_UTILITIES gefunden mit der du die Aktivierung einfach prüfen kannst:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(logpoint_active) = cl_abap_aab_utilities=>is_active(
+  EXPORTING
+    id            = 'ZTRICKTRESOR'
+    mode_logpoint = abap_true ).</code></pre>
+<p>Der Beitrag <a href="/blog/checkpoint-gruppe-die-fahrkarten-bitte/">Checkpoint-Gruppe &#8211; Die Fahrkarten bitte!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/checkpoint-gruppe-die-fahrkarten-bitte/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

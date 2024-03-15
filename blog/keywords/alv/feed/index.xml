@@ -1,0 +1,829 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>ALV Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/alv/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 07 Jun 2022 09:48:15 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>ALV Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ALV-Grid aus SALV ermitteln</title>
+		<link>/blog/alv-grid-aus-salv-ermitteln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 09 Jun 2021 14:56:09 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[salv]]></category>
+		<guid isPermaLink="false">/?p=1029100</guid>
+
+					<description><![CDATA[<p>Die Klasse CL_SALV_TABLE erfreut sich seit Jahren großer Beliebtheit. In erster Linie wahrscheinlich deswegen, weil man ohne Ermittlung des Feldkatalogs oder Vorgabe der zugrunde liegenden Datenstruktur eine Tabelle als Grid anzeigen kann. Das SALV verwendet intern jedoch immer noch die Klasse CL_GUI_ALV_GRID. Und es kann durchaus sein, dass man, nachdem man etwas mit dem SALV programmiert hat, an dieses Objekt herankommen möchte. Achtung! Änderungen in System ab Release 7.55 Wie das geht, zeige ich dir...</p>
+<p>Der Beitrag <a href="/blog/alv-grid-aus-salv-ermitteln/">ALV-Grid aus SALV ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Die Klasse CL_SALV_TABLE erfreut sich seit Jahren großer Beliebtheit. In erster Linie wahrscheinlich deswegen, weil man ohne Ermittlung des Feldkatalogs oder Vorgabe der zugrunde liegenden Datenstruktur eine Tabelle als Grid anzeigen kann. Das SALV verwendet intern jedoch immer noch die Klasse CL_GUI_ALV_GRID. Und es kann durchaus sein, dass man, nachdem man etwas mit dem SALV programmiert hat, an dieses Objekt herankommen möchte.</p>
+
+
+
+<div class="wp-block-group alignfull has-background ext-my-0 ext-py-lg editor:no-inserter" style="background-color:#1966c2"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<div class="wp-block-columns alignwide are-vertically-aligned-center is-layout-flex wp-container-core-columns-is-layout-1 wp-block-columns-is-layout-flex">
+<div class="wp-block-column is-vertically-aligned-center is-layout-flow wp-block-column-is-layout-flow" style="flex-basis:100%">
+<h2 class="has-white-color has-text-color has-large-font-size ext-mt-0 wp-block-heading" id="new-755" style="font-style:normal;font-weight:400;line-height:1.1">Achtung! Änderungen in System ab Release 7.55</h2>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-font-size is-style-fill has-medium-font-size"><a class="wp-block-button__link has-white-color has-text-color has-background" href="/blog/alv-grid-aus-salv-ermitteln-ab-release-7-55/" style="background-color:#ff5900" rel="">Hier geht&#8217;s zum neuen Beitrag</a></div>
+</div>
+</div>
+</div>
+</div></div>
+
+
+
+<p>Wie das geht, zeige ich dir mit der folgenden Klasse.</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<pre class="wp-block-code"><code>CLASS lcl_access_salv DEFINITION INHERITING FROM cl_salv_model_list FINAL.
+  PUBLIC SECTION.
+    CLASS-METHODS:
+      get_cl_gui_alv_grid IMPORTING io_salv        TYPE REF TO cl_salv_model_list
+                          RETURNING VALUE(ro_grid) TYPE REF TO cl_gui_alv_grid.
+ENDCLASS.
+
+CLASS lcl_access_salv IMPLEMENTATION.
+  METHOD get_cl_gui_alv_grid.
+    DATA:lo_salv    TYPE REF TO cl_salv_table.
+*--------------------------------------------------------------------*
+* Must be bound
+*--------------------------------------------------------------------*
+    IF io_salv IS NOT BOUND.
+      RETURN.
+    ENDIF.
+*--------------------------------------------------------------------*
+* Adapter must be bound
+*--------------------------------------------------------------------*
+    IF   io_salv-&gt;r_controller IS NOT BOUND
+      OR io_salv-&gt;r_controller-&gt;r_adapter IS NOT BOUND.
+      MESSAGE 'Minor programming fault: Call GET_GRID_FROM_SALV after SALV-&gt;DISPLAY( )!'(001) 
+         TYPE 'S' DISPLAY LIKE 'W'.
+      lo_salv ?= io_salv.  " Calling method has cl_salv_table typed in interface
+      lo_salv-&gt;display( ).
+    ENDIF.
+    IF   io_salv-&gt;r_controller IS NOT BOUND
+      OR io_salv-&gt;r_controller-&gt;r_adapter IS NOT BOUND.
+      RETURN.  " Still not bound  --&gt; can't do anything
+    ENDIF.
+*--------------------------------------------------------------------*
+* If method not present or wrong return type exception will handle this and we return unbound grid
+*--------------------------------------------------------------------*
+    TRY.
+
+        " Works for CL_SALV_FULLSCREEN_ADAPTER as well as for CL_SALV_GRID_ADAPTER
+        CALL METHOD io_salv-&gt;r_controller-&gt;r_adapter-&gt;('GET_GRID')  
+          RECEIVING
+            value = ro_grid.
+      CATCH cx_root ##CATCH_ALL. " don't dump
+        RETURN.
+    ENDTRY.
+  ENDMETHOD.
+ENDCLASS.</code></pre>
+<p>Der Beitrag <a href="/blog/alv-grid-aus-salv-ermitteln/">ALV-Grid aus SALV ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Gruppensummenstufenberechnung</title>
+		<link>/blog/gruppensummenstufenberechnung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 15 Dec 2015 22:06:40 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[soft-refresh]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[Zwischensumme]]></category>
+		<category><![CDATA[Summe]]></category>
+		<category><![CDATA[Gruppe]]></category>
+		<category><![CDATA[Gruppenstufe]]></category>
+		<category><![CDATA[refresh]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=389721</guid>
+
+					<description><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten...</p>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute mal wieder ein Work-around ganz besonderer Güte: Das Beeinflussen von Gruppensummenstufen.  Das ist leider nicht ganz so einfach, wie es sich anhört, da bei einem Refresh des Grids die aufgebauten Gruppenstufen wieder zerstört werden. Also muss ein kleiner Trick herhalten&#8230;</p>
+<p>Vielen Dank an Stefan, der sich die Mühe gemacht hat, ein Minimaldemo zu erstellen.</p>
+<h2>Gruppenstufen</h2>
+<p>Nach dem Start des Demoprogramms erscheint ein &#8220;normaler&#8221; ALV mit Daten aus der Flugdatenbank:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" rel="attachment wp-att-389724"><img fetchpriority="high" decoding="async" class="alignnone wp-image-389724 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-48-55.png" alt="2015-12-15_22-48-55" width="741" height="327" srcset="/wp-content/uploads/2015/12/2015-12-15_22-48-55.png 741w, /wp-content/uploads/2015/12/2015-12-15_22-48-55-300x132.png 300w" sizes="(max-width: 741px) 100vw, 741px" /></a></p>
+<p>Bei normaler Summierung und Bildung von Gruppenstufen, gibt es keine Bezeichnung der gebildeten Gruppen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" rel="attachment wp-att-389725"><img decoding="async" class="alignnone size-full wp-image-389725" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-50-50.png" alt="2015-12-15_22-50-50" width="740" height="285" srcset="/wp-content/uploads/2015/12/2015-12-15_22-50-50.png 740w, /wp-content/uploads/2015/12/2015-12-15_22-50-50-300x116.png 300w" sizes="(max-width: 740px) 100vw, 740px" /></a></p>
+<p>Die Bildung der Gruppenbezeichnung kann sehr komplex werden. Das Beispiel demonstriert die Bezeichnung der Gruppenstufen im Feld &#8220;PLANETYPE&#8221;:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" rel="attachment wp-att-389723"><img decoding="async" class="alignnone wp-image-389723 size-full" src="https://tricktresor.com/wp-content/uploads/2015/12/2015-12-15_22-41-44.png" alt="2015-12-15_22-41-44" width="752" height="322" srcset="/wp-content/uploads/2015/12/2015-12-15_22-41-44.png 752w, /wp-content/uploads/2015/12/2015-12-15_22-41-44-300x128.png 300w" sizes="(max-width: 752px) 100vw, 752px" /></a></p>
+<p>&nbsp;</p>
+<h2>Code</h2>
+<pre>REPORT zdemo_alv_summenzeilen.
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_helper DEFINITION FINAL.
+ PUBLIC SECTION.
+
+ CLASS-METHODS: read_data,
+ display,
+ handle_after_user_command FOR EVENT after_user_command OF cl_gui_alv_grid,
+ summenzeilen_anpassen.
+
+ CLASS-DATA: mo_grid TYPE REF TO cl_gui_alv_grid,
+ mt_data TYPE STANDARD TABLE OF saplane WITH NON-UNIQUE DEFAULT KEY.
+ENDCLASS. "lcl_helper DEFINITION
+
+
+START-OF-SELECTION.
+ lcl_helper=&gt;read_data( ).
+
+END-OF-SELECTION.
+ lcl_helper=&gt;display( ).
+
+
+*----------------------------------------------------------------------*
+* CLASS lcl_helper IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_helper IMPLEMENTATION.
+
+ METHOD read_data.
+
+ SELECT *
+ INTO TABLE mt_data
+ FROM saplane.
+
+ ENDMETHOD. "read_data
+
+ METHOD display.
+
+ DATA: ls_variant TYPE disvariant.
+ WRITE:/ 'Wenn man das hier liest, ist ein interner Fehler aufgetreten'. "#EC NOTEXT
+
+*--------------------------------------------------------------------*
+* ALV erzeugen
+*--------------------------------------------------------------------*
+ CREATE OBJECT mo_grid
+ EXPORTING
+ i_parent = cl_gui_container=&gt;screen0
+ EXCEPTIONS
+ OTHERS = 1.
+
+*--------------------------------------------------------------------*
+* Event AFTER_USER_COMMAND nutzbar machen
+* Da sehr viele Usercommands ( auch SAP-Usercommands ) implizit einen
+* full-refresh des Grid durchführen, müssen wir uns stets dahinter klemmen
+* um unsere eigene Zwischensummenzeilengenerierung zu erhalten
+*--------------------------------------------------------------------*
+ SET HANDLER handle_after_user_command FOR mo_grid.
+
+*--------------------------------------------------------------------*
+* Defaultlayouts ermöglichen, um Zwischensummen ohne Userinteraktion zu demonstrieren
+*--------------------------------------------------------------------*
+ ls_variant-handle = '0001'.
+ ls_variant-report = sy-repid.
+
+*--------------------------------------------------------------------*
+* Anzeigen des grid
+*--------------------------------------------------------------------*
+ mo_grid-&gt;set_table_for_first_display( EXPORTING
+ i_structure_name = 'SAPLANE'
+ is_variant = ls_variant
+ i_save = 'A'
+ i_default = 'X'
+ CHANGING
+ it_outtab = mt_data
+ EXCEPTIONS
+ OTHERS = 1 ).
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "display
+
+ METHOD handle_after_user_command.
+*--------------------------------------------------------------------*
+* SAP hat evtl. noch keinen Refresh gemacht.
+* Daher würden Änderungen, die in der Methode summenzeilen_anpassen
+* gemacht und dann mit soft-refresh an den Grid gereicht würden im
+* Nachgang durch den ausstehenden full-refresh zunichte gemacht, da
+* der Grid beim full refresh auch die Summen- und Zwischensummenzeilen
+* neu generiert
+* Daher wird der full-refresh jetzt explizit vor unserer Anpassung
+* ausgeführt und der nachfolgende soft_refresh lässt unsere
+* Summenzeilen stehen.
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = ' ' ).
+
+
+*--------------------------------------------------------------------*
+* Summen- oder Zwischensummenzeilen manipulieren
+*--------------------------------------------------------------------*
+ summenzeilen_anpassen( ).
+
+ ENDMETHOD. "handle_AFTER_USER_COMMAND
+
+ METHOD summenzeilen_anpassen.
+
+ DATA: lr_data_summe TYPE REF TO data,
+ lr_data_zwischensumme TYPE REF TO data,
+ lt_grouplevels TYPE lvc_t_grpl, "#EC NEEDED Normalerweise braucht man das um gezielt die Zwischensummen zu manipulieren
+ lv_tabix TYPE numc2.
+
+ FIELD-SYMBOLS: &lt;lt_data&gt; LIKE mt_data,
+ &lt;ls_data&gt; LIKE LINE OF &lt;lt_data&gt;.
+*--------------------------------------------------------------------*
+* Zwischensummenzeilen holen -
+*--------------------------------------------------------------------*
+ mo_grid-&gt;get_subtotals( IMPORTING
+ ep_collect00 = lr_data_summe " Summenzeile
+ ep_collect01 = lr_data_zwischensumme " Zwischensummenzeile - Stufe 1
+* EP_COLLECT02 - EP_COLLECT09 Zwischensummenzeilen - Stufe 2-9
+ et_grouplevels = lt_grouplevels ). " Informationen welche Zwischensummenzeile(n) zu welchen Gridzeilen gehören
+
+*--------------------------------------------------------------------*
+* Hier kann das jetzt hinreichend komplex werden
+* Zur Demo werde ich in alle Summen und Zwischensummen im Feld
+* "PLANETYPE" etwas einfüllen
+*--------------------------------------------------------------------*
+ IF lr_data_summe IS BOUND.
+ ASSIGN lr_data_summe-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe1-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+ IF lr_data_zwischensumme IS BOUND.
+ ASSIGN lr_data_zwischensumme-&gt;* TO &lt;lt_data&gt;.
+ LOOP AT &lt;lt_data&gt; ASSIGNING &lt;ls_data&gt;.
+ lv_tabix = sy-tabix.
+ CONCATENATE 'Stufe2-' lv_tabix INTO &lt;ls_data&gt;-planetype. "#EC NOTEXT
+ ENDLOOP.
+ ENDIF.
+
+
+*--------------------------------------------------------------------*
+* ALV-Anzeige neu aufbauen lassen, ohne Zwischensummen vom ALV generieren zu lassen
+*--------------------------------------------------------------------*
+ mo_grid-&gt;refresh_table_display( i_soft_refresh = 'X' ).
+
+ ENDMETHOD. "summenzeilen_anpassen
+ENDCLASS. "lcl_helper IMPLEMENTATION</pre>
+<p>Der Beitrag <a href="/blog/gruppensummenstufenberechnung/">Gruppensummenstufenberechnung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Manchmal, aber nur manchmal&#8230; ♫</title>
+		<link>/blog/manchmal-aber-nur-manchmal-%e2%99%ab/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 11 Aug 2015 06:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Datentypen]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<category><![CDATA[dec]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=190554</guid>
+
+					<description><![CDATA[<p>hält SAP Überraschungen bereit, das glaubt man kaum... In einem Projekt haben wir uns gewundert, warum es in einer dynamisch generierten internen Tabelle einen CONVERSION OVERFLOW gab, obwohl das Feld vom Typ DEC ausreichend groß dimensioniert war. Die Lösung war offensichtlich. Hinterher...</p>
+<p>Der Beitrag <a href="/blog/manchmal-aber-nur-manchmal-%e2%99%ab/">Manchmal, aber nur manchmal&#8230; ♫</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>hält SAP Überraschungen bereit, das glaubt man kaum&#8230;</p>
+<p>Aber von vorne.</p>
+<p>In einem Projekt haben wir uns gewundert, warum es in einer dynamisch generierten internen Tabelle einen CONVERSION OVERFLOW gab, obwohl das Feld vom Typ DEC ausreichend groß dimensioniert war. Die Lösung war offensichtlich. Hinterher&#8230;</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-31-23.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-190690" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-31-23.jpg" alt="2015-08-10_15-31-23" width="891" height="55" srcset="/wp-content/uploads/2015/08/2015-08-10_15-31-23.jpg 891w, /wp-content/uploads/2015/08/2015-08-10_15-31-23-300x19.jpg 300w" sizes="(max-width: 891px) 100vw, 891px" /></a></p>
+<h2>Erzeugung</h2>
+<p>Wir sind bei der Erzeugung der internen Tabelle wie folgt vorgegangen:</p>
+<ul>
+<li>Definition des Feldkataloges</li>
+<li>Erzeugung der internen Tabelle mit Hilfe von cl_alv_table_create=&gt;create_dynamic_table</li>
+</ul>
+<p>Beispielhaft kann die Erzeugung folgendermaßen veranschaulicht werden:</p>
+<pre>  FIELD-SYMBOLS &lt;fcat&gt;  TYPE lvc_s_fcat.
+  DATA gt_table         TYPE lvc_t_fcat.
+
+  APPEND INITIAL LINE TO gt_fcat ASSIGNING .
+  &lt;fcat&gt;-fieldname = 'FELD1'.
+  &lt;fcat&gt;-scrtext_l = 'Feld 1: CHAR'.
+  &lt;fcat&gt;-inttype   = 'C'.
+  &lt;fcat&gt;-intlen    = 20.
+  &lt;fcat&gt;-datatype  = 'CHAR'.
+
+  APPEND INITIAL LINE TO gt_fcat ASSIGNING .
+  &lt;fcat&gt;-fieldname = 'FELD2'.
+  &lt;fcat&gt;-scrtext_l = 'Feld 2: DEC'.
+  &lt;fcat&gt;-inttype   = 'P'.
+  &lt;fcat&gt;-intlen    = 16.
+  &lt;fcat&gt;-datatype  = 'DEC'.
+  &lt;fcat&gt;-decimals  = 2.
+
+  CALL METHOD cl_alv_table_create=&gt;create_dynamic_table
+    EXPORTING
+      it_fieldcatalog           = gt_fcat
+      i_length_in_byte          = abap_true
+    IMPORTING
+      ep_table                  = gd_table
+    EXCEPTIONS
+      generate_subpool_dir_full = 9.</pre>
+<h2>Das macht SAP</h2>
+<p>Im Debugger sieht man die erzeugte Datenstruktur im Detail.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-40-25.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-190691" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-10_15-40-25.jpg" alt="2015-08-10_15-40-25" width="768" height="128" srcset="/wp-content/uploads/2015/08/2015-08-10_15-40-25.jpg 768w, /wp-content/uploads/2015/08/2015-08-10_15-40-25-300x50.jpg 300w" sizes="(max-width: 768px) 100vw, 768px" /></a></p>
+<p>Hier ist auch erkennbar, dass die gepackte Zahl im internen Format nicht 16 Bytes groß ist, sondern nur 8. Dadurch passt nur eine vierzehnstellige Zahl (plus Vorzeichen) in das Feld. Im Coding wurde jedoch die maximale Größe von intern 16 Bytes verwendet.</p>
+<h2>Versteckte Parameter</h2>
+<p>Ich habe mir die Erzeugung der internen Tabelle durch cl_alv_table_create=&gt;create_dynamic_table genauer angesehen und bin dann recht schnell auf den Parameter I_LENGTH_IN_BYTE gestoßen. Dieser Parameter ist in der Schnittstelle &#8211; wie so oft &#8211; sehr anschaulich und gut dokumentiert:</p>
+<p><em>boolsche Variable (X=true, space=false)</em></p>
+<p>Der Parameter ist optional und hat als Vorgabewert ABAP_FALSE.</p>
+<p>Um es vorweg zu nehmen: Nachdem wir den Parameter auf ABAP_TRUE gesetzt haben, funktionierte alles, wie erwartet.</p>
+<p>Beim Debuggen bin ich irgendwann auf folgende Stelle gestossen:</p>
+<pre>if ls_fieldcat-inttype eq 'P'.
+  if r_length_in_byte eq abap_true.
+    l_leng = ls_fieldcat-intlen.
+  else.
+    l_leng =  ( ls_fieldcat-intlen + 1 ) / 2.
+  endif.
+endif.
+</pre>
+<p>Meiner Meinung nach ist das Coding hier verkehrt, da gepackte Zahlen immer aus Halbbytes bestehen. An dieser Stelle darf nicht einfach die Länge halbiert werden. Warum genau diese &#8220;Halbierung&#8221; statt findet, habe ich auch nicht verstanden. Es hat wahrscheinlich mit Unicode zu tun.</p>
+<h2>Fazit</h2>
+<p>Die Erzeugung von internen Tabellen sollte meiner Meinung nach eh nicht mehr mit dem erwähnten Funktion erzeugt werden, da hier im Hintergrund Subroutine-Pools generiert werden. Die Verwendung ist nur eingeschränkt möglich (maximale Anzahl Aufrufe: 36). Inzwischen sind die Möglichkeiten mit <a href="https://tricktresor.com/blog/interne-tabelle-mit-components/">CREATE DATA &amp; RTTC</a> deutlich eleganter und zukunftssicherer. Allerdings habe ich die Verwendung von <a href="https://tricktresor.com/blog/interne-tabelle-zur-laufzeit-generieren/">CREATE_DYNMIC_TABLE </a>auch schon mal als elegant bezeichnet&#8230;</p>
+<p>Die Methode mit CREATE_DYNAMIC_TABLE hat auch einen großen Vorteil: Bei dem Aufbau der internen Tabelle kann ich gleich semantische Informationen mitgeben/ anreichern (Titel, Texte, Suchhilfen etc.), die nicht automatisch übernommen werden. Ich dann diesen Feldkatalog nicht nur zur Erzeugung der internen Tabelle verwenden, sondern auch für die Anzeige.</p>
+<p>Bei der Variante über CREATE DATA und RTTC werden fast ausschließlich die technischen Informationen ausgewertet. Wenn ein verwendetes Datenelement korrekte Überschriften hat, ist es okay, aber wenn ich eigene Felder mit einem generischen Datenelement aufbaue (FELD1, FELD2) und diese im gleichen Zug benennen will, dann muss ich dies separat tun.</p>
+<p>Der Beitrag <a href="/blog/manchmal-aber-nur-manchmal-%e2%99%ab/">Manchmal, aber nur manchmal&#8230; ♫</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</title>
+		<link>/blog/dragndrop-framwork-alv-grid/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 13 Jun 2014 16:13:04 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[grid]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Liste]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Zuordnung]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[ALV]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4805</guid>
+
+					<description><![CDATA[<p>Usability ist bei SAP ja so eine Sache... Heute habe ich eine Klasse gefunden, die Zuordnungen intuitiv und benutzerfreundlich macht. In diesem kleinen Demoprogramm zeige ich euch, wie man die Klassen benutzt.</p>
+<p>Der Beitrag <a href="/blog/dragndrop-framwork-alv-grid/">Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute bin ich beim Surfen im SAP-System über die Klasse CL_ALV_DD_LISTBOX gestolpert. Dolle Sache:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4806" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg" alt="Bild_2014_06_13_170651" width="729" height="351" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg 729w, /wp-content/uploads/2014/06/Bild_2014_06_13_170651-300x144.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_170651-624x300.jpg 624w" sizes="(max-width: 729px) 100vw, 729px" /></a></p>
+<p>&nbsp;</p>
+<p>Einfach zwei Datentabellen definieren, zwei Grids erzeugen, der Instanz von  cl_alv_dd_double_listbox übergeben und die zwei Funktionscodes zum Bewegen der Einträge definieren. Aufrufen und am Ende hat man in seinen zwei Datentabellen die vom Anwender definierten Einträge.</p>
+<p>Die Anregung stammt aus dem Report RSPLS_ENQUEUE_INFO.</p>
+<h2>Coding</h2>
+<pre>DATA gr_dd     TYPE REF TO cl_alv_dd_double_listbox.
+DATA gr_grid_s TYPE REF TO cl_alv_dd_listbox.              "source
+DATA gr_grid_t TYPE REF TO cl_alv_dd_listbox.              "target
+DATA gr_cont_s TYPE REF TO cl_gui_custom_container.        "source
+DATA gr_cont_t TYPE REF TO cl_gui_custom_container.        "target
+DATA gs_layo_s TYPE lvc_s_layo.
+DATA gs_layo_t TYPE lvc_s_layo.
+
+DATA gt_fcat   TYPE lvc_t_fcat.
+DATA gt_sort   TYPE lvc_t_sort.
+
+DATA gt_data_s TYPE STANDARD TABLE OF t006a.
+DATA gt_data_t TYPE STANDARD TABLE OF t006a.
+
+
+START-OF-SELECTION.
+
+  PERFORM init.
+
+  CALL SCREEN 100.
+
+
+*----------------------------------------------------------------------*
+*  MODULE pbo OUTPUT
+*----------------------------------------------------------------------*
+MODULE pbo OUTPUT.
+
+  SET PF-STATUS 'DD_GRID'.
+
+  PERFORM prepare_grid USING gr_grid_s
+                             gr_cont_s
+                             'CONT_SOURCE'
+                             gs_layo_s
+                             gt_data_s.
+
+  PERFORM prepare_grid USING gr_grid_t
+                             gr_cont_t
+                             'CONT_TARGET'
+                             gs_layo_t
+                             gt_data_t.
+
+  IF gr_dd IS INITIAL.
+    CREATE OBJECT gr_dd
+      EXPORTING
+        i_grid1 = gr_grid_s
+        i_grid2 = gr_grid_t.
+  ENDIF.
+
+ENDMODULE.                                                 "pbo OUTPUT
+
+
+*----------------------------------------------------------------------*
+*  MODULE pai INPUT
+*----------------------------------------------------------------------*
+MODULE pai INPUT.
+  CASE sy-ucomm.
+    WHEN 'BACK'.
+      SET SCREEN 0. LEAVE SCREEN.
+
+    WHEN 'MOVE_TO_TARGET'.
+      CALL METHOD gr_dd-&gt;movetogrid2
+        EXPORTING
+          i_ok_code = sy-ucomm.
+
+    WHEN 'MOVE_TO_SOURCE'.
+      CALL METHOD gr_dd-&gt;movetogrid1
+        EXPORTING
+          i_ok_code = sy-ucomm.
+  ENDCASE.
+
+*  IF NOT gr_dd IS INITIAL.
+*    CALL METHOD gr_dd-&gt;set_grids_state( abap_true ). "X = display/ space = edit
+*  ENDIF.
+
+ENDMODULE.                                                 "pai INPUT
+
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  prepare_grid
+*&amp;---------------------------------------------------------------------*
+FORM prepare_grid USING grid TYPE REF TO cl_alv_dd_listbox
+                        cont TYPE REF TO cl_gui_custom_container
+                        name TYPE        clike
+                        layo TYPE        lvc_s_layo
+                        data TYPE STANDARD TABLE.
+
+  IF cont IS INITIAL.
+*==   create container
+    CREATE OBJECT cont
+      EXPORTING
+        container_name = name.
+  ENDIF.
+
+  IF grid IS INITIAL.
+*== create grid
+    CREATE OBJECT grid
+      EXPORTING
+        i_parent     = cont
+        i_grid_style = 1.
+
+*== set  grid
+    CALL METHOD grid-&gt;set_table_for_first_display
+      EXPORTING
+        is_layout       = layo
+      CHANGING
+        it_outtab       = data
+        it_fieldcatalog = gt_fcat
+        it_sort         = gt_sort.
+  ELSE.
+*== refresh
+    CALL METHOD grid-&gt;set_frontend_fieldcatalog
+      EXPORTING
+        it_fieldcatalog = gt_fcat.
+    CALL METHOD grid-&gt;set_frontend_layout
+      EXPORTING
+        is_layout = gs_layo_s.
+    CALL METHOD grid-&gt;refresh_table_display.
+  ENDIF.
+
+ENDFORM.                    "prepare_grid
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  init
+*&amp;---------------------------------------------------------------------*
+FORM init.
+
+*== local data
+  FIELD-SYMBOLS  LIKE LINE OF gt_fcat.
+
+*== get source data
+  SELECT * FROM t006a INTO TABLE gt_data_s
+      UP TO 20 ROWS
+   WHERE spras = sy-langu.
+
+
+*== set title for source:
+  gs_layo_s-grid_title = text-003.
+  gs_layo_s-smalltitle = 'X'.
+  gs_layo_s-cwidth_opt = 'X'.
+  gs_layo_s-sel_mode   = 'A'.
+
+*== set title for target:
+  gs_layo_t-grid_title = text-004.
+  gs_layo_t-smalltitle = 'X'.
+  gs_layo_t-cwidth_opt = 'X'.
+  gs_layo_t-sel_mode   = 'A'.
+
+*== get fieldcatalog
+  CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_structure_name       = 'T006A'
+      i_client_never_display = 'X'
+    CHANGING
+      ct_fieldcat            = gt_fcat
+    EXCEPTIONS
+      OTHERS                 = 3.
+
+*== display only unit and text
+  LOOP AT gt_fcat ASSIGNING .
+    CASE -fieldname.
+      WHEN 'MSEHI' OR 'MSEH3' OR 'MSEH6'.
+        -tech = abap_true.
+    ENDCASE.
+  ENDLOOP.
+
+ENDFORM.                    "init</pre>
+<h2>Dynpro</h2>
+<h3>Ablauflogik</h3>
+<p>PROCESS BEFORE OUTPUT.<br />
+MODULE pbo.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE pai.</p>
+<h2><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4808" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg" alt="Bild_2014_06_13_180645" width="562" height="423" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg 562w, /wp-content/uploads/2014/06/Bild_2014_06_13_180645-300x225.jpg 300w" sizes="(max-width: 562px) 100vw, 562px" /></a></h2>
+<h2>GUI-Status</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4807" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg" alt="Bild_2014_06_13_180616" width="808" height="483" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg 808w, /wp-content/uploads/2014/06/Bild_2014_06_13_180616-300x179.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_180616-624x373.jpg 624w" sizes="(max-width: 808px) 100vw, 808px" /></a></p>
+<p>[notice type = &#8216;info&#8217;]Leider haben die Klassen eine kleine Macken. Sobald die ersten Einträge per Funktionstasten verschoben wurden, erscheint die Markierspalte und es ist kein Drag-and-Drop mehr möglich&#8230; :([/notice]</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/dragndrop-framwork-alv-grid/">Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Layout gegen Überschreiben schützen</title>
+		<link>/blog/alv-layout-gegen-ueberschreiben-schuetzen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 16 Jan 2014 13:44:23 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Layout]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<category><![CDATA[SQL]]></category>
+		<category><![CDATA[Eigene Programme]]></category>
+		<category><![CDATA[ALV]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4254</guid>
+
+					<description><![CDATA[<p>Die Layoutverwaltung von ALVs ist nicht ganz einfach und hat einige Macken. In diesem Artikel erfährst du, wie ein Layout gegen unbeabsichtigtes Überschreiben geschützt werden kann.</p>
+<p>Der Beitrag <a href="/blog/alv-layout-gegen-ueberschreiben-schuetzen/">ALV-Layout gegen Überschreiben schützen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Layoutverwaltung des ALV (Grid als auch Liste) hat ein paar Macken. Eine davon ist die, dass es nur ein Berechtigungsobjekt S_ALV_LAYO gibt. Mit diesem Objekt wird definiert, ob ein Anwender Layouts ändern darf, oder nicht. Es gibt keine Unterscheidung zwischen System- und Benutzerlayouts.</p>
+<h2>Speicherung</h2>
+<p>Die Varianten werden in den Clustertabellen LTDX und LTDXT gespeichert. Benutzerlayouts müssen mit einer Zahl oder einem Buchstaben anfangen, Systemlayouts mit einem Schrägstrich. Diesen Umstand machen wir uns zu nutze, indem wir ein vorhandenes Layout einfach auf ein Layout kopieren, das mit einem Sonderzeichen beginnt, wie z.B. der Tilde. Dieses Layout kann dann nicht mehr geändert werden, da der Name unzulässig ist:</p>
+<p><img loading="lazy" decoding="async" width="511" height="492" class="alignnone size-full wp-image-4256" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d7e09bc93a5.png" alt="" srcset="/wp-content/uploads/2014/01/img_52d7e09bc93a5.png 511w, /wp-content/uploads/2014/01/img_52d7e09bc93a5-300x288.png 300w" sizes="(max-width: 511px) 100vw, 511px" /></p>
+<h2>Layout schützen</h2>
+<p>Der folgende Programmcode liest ein vorhandenes Layout ein und speichert es unter neuem Namen ab.</p>
+<p>[notice type=&#8217;info&#8217;]Der Eintrag für die Texte im Cluster LTDXT wird nicht kopiert. Dies sollte der Vollständigkeit halber ebenfalls gemacht werden![/notice]</p>
+<pre>  DATA: gt_ltdx TYPE STANDARD TABLE OF ltdx WITH NON-UNIQUE DEFAULT KEY,
+        gs_ltdx LIKE LINE OF lt_ltdx.
+
+  PARAMETERS: p_report TYPE repid       OBLIGATORY.
+  PARAMETERS: p_handle TYPE slis_handl  OBLIGATORY.
+  PARAMETERS: p_layout TYPE slis_vari   OBLIGATORY.
+  SELECT *
+    INTO TABLE gt_ltdx
+    FROM ltdx
+    WHERE relid   = 'LT'
+      AND report  = p_report
+      AND handle  = p_handle
+      AND variant = p_layout
+      AND type    = 'F'.
+  CHECK sy-subrc = 0.
+
+*== Replace first character in variant with "unallowed" character "~"
+  gs_ltdx-variant = p_layout.
+  gs_ltdx-variant(1) = '~'.
+
+  MODIFY gt_ltdx FROM gs_ltdx TRANSPORTING variant WHERE variant &lt;&gt; gs_ltdx-variant.
+
+  TRY.
+      INSERT ltdx FROM TABLE gt_ltdx.
+      COMMIT WORK.
+      MESSAGE i000(oo) WITH 'Layout kopiert:' gs_ltdx-variant.
+    CATCH cx_sy_open_sql_db.
+      MESSAGE i000(oo) WITH 'Fehler beim Kopieren!'.
+  ENDTRY.</pre>
+<h2>Fertig</h2>
+<p>Nachdem ein Layout kopiert wurde, taucht es in der Layoutverwaltung auf und kann ausgewählt und verwendet werden. Allerdings kann es nicht mehr geändert werden, denn der Name kann aufgrund des Sonderzeichens im Dialog nicht verwendet werden.</p>
+<p><img loading="lazy" decoding="async" width="517" height="166" class="alignnone size-full wp-image-4255" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d7d7abf260e.png" alt="" srcset="/wp-content/uploads/2014/01/img_52d7d7abf260e.png 517w, /wp-content/uploads/2014/01/img_52d7d7abf260e-300x96.png 300w" sizes="(max-width: 517px) 100vw, 517px" /></p>
+<p>[notice type=&#8217;alert&#8217;]Das Layout ist nur durch Überschreiben geschützt! Es kann jedoch nach wie vor gelöscht werden![/notice]</p>
+<h2>Komplettes Programm</h2>
+<p>Hier das komplette Programm mit Berücksichtigung der Texte und F4-Hilfe für vorhandene Layouts.</p>
+<p>[accordian]<br />
+[accordian_list title=&#8217;ZZ_PROTECT_ALV_LAYOUT&#8217;]</p>
+<pre>REPORT  zz_protect_alv_layout.
+
+DATA c_protection_character TYPE c LENGTH 1 VALUE '~'.
+
+SELECTION-SCREEN BEGIN OF BLOCK bl1 WITH FRAME TITLE text-bl1.
+PARAMETERS  p_report TYPE repid       OBLIGATORY.
+PARAMETERS: p_handle TYPE slis_handl  OBLIGATORY.
+PARAMETERS: p_layout TYPE slis_vari   OBLIGATORY.
+SELECTION-SCREEN END OF BLOCK bl1.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_layout.
+  PERFORM f4_layout.
+
+AT SELECTION-SCREEN ON p_layout.
+  IF p_layout(1)  &lt;&gt; '/'.
+    MESSAGE 'Nur ungeschütze Standardlayouts (beginnend mit /) können geschützt werden' TYPE 'E'.
+  ENDIF.
+
+START-OF-SELECTION.
+
+  PERFORM protect.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  PROTECT
+*&amp;---------------------------------------------------------------------*
+* Replace first character in ALV-Layout with "unallowed" character
+* This way this variant can't be saved any more and thus not be overwritten
+*&amp;---------------------------------------------------------------------*
+FORM protect .
+
+  DATA lt_ltdx  TYPE STANDARD TABLE OF ltdx  WITH NON-UNIQUE DEFAULT KEY.
+  DATA ls_ltdx  LIKE LINE OF lt_ltdx.
+  DATA lt_ltdxt TYPE STANDARD TABLE OF ltdxt WITH NON-UNIQUE DEFAULT KEY.
+  DATA ls_ltdxt LIKE LINE OF lt_ltdxt.
+
+*== read layout (main data)
+  SELECT * INTO TABLE lt_ltdx
+    FROM ltdx
+    WHERE relid   = 'LT'
+      AND report  = p_report
+      AND handle  = p_handle
+      AND variant = p_layout
+      AND type    = 'F'.
+  CHECK sy-subrc = 0.
+
+*--------------------------------------------------------------------*
+* Replace first character in variant with unallowed character
+*--------------------------------------------------------------------*
+  ls_ltdx-variant = p_layout.
+  ls_ltdx-variant(1) = c_protection_character.
+
+  MODIFY lt_ltdx FROM ls_ltdx TRANSPORTING variant WHERE variant &lt;&gt; ls_ltdx-variant.
+
+  TRY.
+*== Insert layout (main data)
+      INSERT ltdx FROM TABLE lt_ltdx.
+*== read layout (texts)
+      SELECT * FROM ltdxt INTO TABLE lt_ltdxt
+        WHERE relid   = 'LT'
+          AND report  = p_report
+          AND handle  = p_handle
+          AND variant = p_layout
+          AND type    = 'F'.
+      IF sy-subrc = 0.
+*== Insert Layout (text)
+        ls_ltdxt-variant = ls_ltdx-variant.
+        MODIFY lt_ltdxt FROM ls_ltdxt TRANSPORTING variant WHERE variant &lt;&gt; ls_ltdxt-variant.
+        INSERT ltdxt FROM TABLE lt_ltdxt.
+      ENDIF.
+      COMMIT WORK.
+      MESSAGE i000(oo) WITH 'Geschützte Variante' ls_ltdx-variant 'wurde neu angelegt'.
+    CATCH cx_sy_open_sql_db.
+      MESSAGE 'ALV-Layout existiert schon und wird nicht überschrieben' TYPE 'I'.
+  ENDTRY.
+
+ENDFORM.                    " PROTECT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  F4_LAYOUT
+*&amp;---------------------------------------------------------------------*
+FORM f4_layout.
+
+  DATA lv_repid      TYPE syrepid.
+  data lv_dynnr      TYPE sydynnr.
+  data lt_dynpfields TYPE STANDARD TABLE OF dynpread WITH NON-UNIQUE DEFAULT KEY.
+  DATA ls_variant    TYPE disvariant.
+
+  FIELD-SYMBOLS: &lt;ls_dynpfield&gt; LIKE LINE OF lt_dynpfields.
+
+*== Layout parameters
+  ls_variant-report  = p_report.
+  ls_variant-variant = p_layout.
+  ls_variant-handle  = p_handle.
+
+*== updating from current screen
+*--------------------------------------------------------------------*
+  lv_repid = sy-repid.
+  lv_dynnr = '1000'.
+
+  CALL FUNCTION 'DYNP_VALUES_READ'                          "#EC
+    EXPORTING
+      dyname               = lv_repid
+      dynumb               = lv_dynnr
+      translate_to_upper   = 'X'
+      request              = 'A'
+    TABLES
+      dynpfields           = lt_dynpfields
+    EXCEPTIONS             = 11.
+
+  READ TABLE lt_dynpfields WITH KEY fieldname = 'P_REPORT'   ASSIGNING &lt;ls_dynpfield&gt;.
+  IF sy-subrc = 0.
+    ls_variant-report = &lt;ls_dynpfield&gt;-fieldvalue.
+  ENDIF.
+
+  READ TABLE lt_dynpfields WITH KEY fieldname = 'P_HANDLE'   ASSIGNING &lt;ls_dynpfield&gt;.
+  IF sy-subrc = 0.
+    ls_variant-handle = &lt;ls_dynpfield&gt;-fieldvalue.
+  ENDIF.
+
+*--------------------------------------------------------------------*
+* Standard ALV-F4
+*--------------------------------------------------------------------*
+  CALL FUNCTION 'REUSE_ALV_VARIANT_F4'
+    EXPORTING
+      is_variant         = ls_variant
+      i_save             = 'X'
+      i_display_via_grid = 'X'  " Only standard variants here
+    IMPORTING
+      es_variant         = ls_variant
+    EXCEPTIONS
+      not_found          = 1
+      program_error      = 2
+      OTHERS             = 3.
+  CHECK sy-subrc = 0.
+  CHECK ls_variant-variant IS NOT INITIAL.
+  p_layout = ls_variant-variant.
+
+ENDFORM.                    " F4_LAYOUT</pre>
+<p>[/accordian_list]<br />
+[/accordian]</p>
+<p>Der Beitrag <a href="/blog/alv-layout-gegen-ueberschreiben-schuetzen/">ALV-Layout gegen Überschreiben schützen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

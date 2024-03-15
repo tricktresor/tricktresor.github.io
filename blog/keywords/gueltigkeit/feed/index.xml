@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Gültigkeit Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/gueltigkeit/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:48 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Gültigkeit Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Ist das gültig? (2)</title>
+		<link>/blog/ist-das-gueltig-2/</link>
+					<comments>/blog/ist-das-gueltig-2/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 05 Dec 2016 10:16:13 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[Gültigkeit]]></category>
+		<category><![CDATA[Sub-Query]]></category>
+		<category><![CDATA[Datum]]></category>
+		<category><![CDATA[Gültig-ab]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=956837</guid>
+
+					<description><![CDATA[<p>Ist das gültig - jetzt erst recht? Dies ist eine Korrektur zum zuvor erschienenen Artikel "Ist das gültig?". Ein wichtiges Merkmal des Tricktresors ist es, dass ich die Beispiele auf das Wesentliche reduziere. Das ist beim letzten mal leicht schief gegangen...</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig-2/">Ist das gültig? (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>So. da bin ich im letzten Beitrag <a href="https://tricktresor.com/blog/ist-das-gueltig/">Ist das gültig?</a> etwas über das Ziel hinaus geschossen&#8230; Ein Merkmal des Tricktresors ist es, dass ich die Beispiele auf das Wesentlich und nur absolut Notwendige reduziere. So bleiben die Tricks einfach und klar. Im letzten Beitrag habe ich jedoch etwas zu viel reduziert und der Trick ist für das Beispiel sogar komplizierter als notwendig.</p>
+<h2>Klarstellung</h2>
+<p>Natürlich kann man von einem definierten Eintrag sehr einfach den zuletzt &#8211; bzw. aktuell &#8211; gültigen Eintrag ermitteln. Ingo hat darauf hin gewiesen, dass die folgende Variante doch deutlich einfacher ist als die von mir vorgestellte:</p>
+<pre class="">SELECT * FROM ztt_datum
+ UP TO 1 ROWS
+ INTO ls_datum
+ WHERE gueltig_ab &lt;= p_datum
+ ORDER BY gueltig_ab DESCENDING.
+ENDSELECT.</pre>
+<p>Recht hat er.</p>
+<p>Eigentlich wollte ich auch auf eine andere etwas komplexere Variante heraus. Nämlich die, bei der es nicht den einen Eintrag gibt, sondern eine unbestimmte Menge von Einträgen. Das könnten zum Beispiel alle gültigen Materialien eines Werkes sein oder Konten eines Buchungskreises sein.</p>
+<h2>Nächster Versuch</h2>
+<p>Für das neue Beispiel habe ich die folgende Tabelle erstellt:</p>
+<p>ZTT_DATUM2</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-05_10-51-52.jpg"><img decoding="async" class="size-full wp-image-956838 alignnone" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-05_10-51-52.jpg" alt="2016-12-05_10-51-52" width="226" height="172" /></a></p>
+<p>Aus dieser Tabelle möchte ich alle zu einem Datum gültigen Gruppen ermitteln. Das funktioniert gut mit dem Befehl DELETE ADJACENT DUPLICATES:</p>
+<pre class="">SELECT * FROM ztt_datum2 INTO TABLE @DATA(lt_datum)
+ WHERE datab &lt;= @p_datum
+ ORDER BY gruppe ASCENDING,
+          datab  DESCENDING.
+
+DELETE ADJACENT DUPLICATES FROM lt_datum COMPARING gruppe.</pre>
+<p>Es spricht nichts dagegen, diese Variante zu verwenden. Aber: Alles, was man mit einem Befehl anstelle von zweien lösen kann, ist irgendwie cooler. Zumal es immer <em>schöner</em> ist, nur die Daten zu lesen, die auch wirklich gebraucht werden.</p>
+<h2>Sub-query</h2>
+<p>Aus diesem Grund jetzt die wirklich hilfreiche und sinnvolle Variante mithilfe eines Sub-Queries:</p>
+<pre class="">SELECT * FROM ztt_datum2 AS z1 INTO TABLE @DATA(lt_datum)
+ WHERE datab &lt;= @p_datum
+   AND datab  = ( SELECT MAX( datab ) FROM ztt_datum2
+                   WHERE gruppe = z1~gruppe
+                     AND datab &lt;= @p_datum ).</pre>
+<p>Der Clou bei dieser Variante ist, dass man sich in der WHERE-Bedingung der Hauptselektion mit einem Sub-Query auf die jeweilige GRUPPE bezieht und hierfür das höchste Datum ermittelt.</p>
+<p>Von der Performance her kann es sein, dass die herkömmliche  Variante sogar schneller ist. Da man diesen Select jedoch wahrscheinlich nur für sehr kleine Datenmengen verwenden wird, dürfte die Geschwindigkeit hier zu vernachlässigen sein.</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig-2/">Ist das gültig? (2)</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ist-das-gueltig-2/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Ist das gültig?</title>
+		<link>/blog/ist-das-gueltig/</link>
+					<comments>/blog/ist-das-gueltig/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 01 Dec 2016 13:55:19 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Zeitraum]]></category>
+		<category><![CDATA[MAX]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[subquery]]></category>
+		<category><![CDATA[Gültigkeit]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=950065</guid>
+
+					<description><![CDATA[<p>Das fragt man sich als Programmierer häufig. Speziell dann, wenn man aus zeitlich abgegrenzten Datensätzen den richtigen Datensatz herausfinden muss. Hier zeige ich dir, wie man einfach aber sicher ans Ziel kommt.</p>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig/">Ist das gültig?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Das fragt man sich als Programmierer häufig. Speziell dann, wenn man aus zeitlich abgegrenzten Datensätzen den richtigen Datensatz herausfinden muss. Hier zeige ich dir, wie man einfach aber sicher ans Ziel kommt.</p>
+<h2>Gültigkeitszeitraum vs. Gültig ab</h2>
+<p>Wenn Datensätze zeitlich voneinander abgegrenzt werden sollen, hat man in der Regel die folgenden zwei Möglichkeiten:</p>
+<ol>
+<li>Exakte zeitliche Abgrenzung mit &#8220;Gültig ab&#8221; und &#8220;Gültig bis&#8221;</li>
+<li>Abgrenzung mit &#8220;Gültig ab&#8221;</li>
+</ol>
+<p>Bei Variante (1) hat man den Vorteil, dass man einen Zeitraum auch &#8220;schließen&#8221; kann. Beziehungsweise im Umkehrschluss: Man <strong>muss</strong> den Zeitraum auch begrenzen. Anders bei Variante (2): Hier gibt es <strong>immer</strong> einen gültigen Eintrag (sofern mindestens ein Eintrag vorhanden ist).</p>
+<p>Der große Nachteil bei Variante (1) ist ebenfalls, dass eine exakte zeitliche Abgrenzung schwer zu administrieren und zu programmieren ist. Besonders dann, wenn Zeiträume in einen oder zwei vorhandene Zeiträume eingefügt werden sollen. Hier ist Variante (2) deutlich einfacher und pflegeleichter.</p>
+<p>Variante (2) eignet sich also besonders dann sehr gut, wenn zu einem &#8220;Objekt&#8221; immer ein gültiger Eintrag vorhanden sein soll. Deshalb werden wir uns diese Variante genauer ansehen.</p>
+<h2>Gültig ab-Tabelle<a href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-01_14-51-58.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-950141 alignright" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-01_14-51-58.jpg" alt="2016-12-01_14-51-58" width="329" height="442" srcset="/wp-content/uploads/2016/12/2016-12-01_14-51-58.jpg 329w, /wp-content/uploads/2016/12/2016-12-01_14-51-58-223x300.jpg 223w" sizes="(max-width: 329px) 100vw, 329px" /></a></h2>
+<p>Als einfaches Beispiel habe ich mir eine Tabelle erstellt, die ein Gültig-Ab-Datum und eine Monatsbezeichnung hat. Es kann also für jedes Datum eine Bezeichnung vergeben werden.</p>
+<p>Diese Tabelle ist zugegebener Weise einigermaßen Sinn frei, verdeutlicht aber sehr gut das Verfahren.</p>
+<h2>Ermittlung des gültigen Eintrags &#8211; herkömmlich</h2>
+<p>Um aus der vorgestellten Tabelle zu einem Datum den jeweils gültigen Eintrag zu lesen, geht man normalerweise folgendermaßen vor:</p>
+<ol>
+<li>Lies alle Einträge, deren Gültigkeit kleiner gleich dem gewünschten Datum ist.</li>
+<li>Sortiere die Einträge nach GUELTIG_AB absteigend, so dass der aktuellste Eintrag an erster Stelle steht</li>
+<li>Lies den Eintrag an erster Stelle</li>
+</ol>
+<pre class="">SELECT * FROM ztt_datum INTO TABLE lt_datum 
+ WHERE gueltig_ab &lt;= mein_datum
+ ORDER BY gueltig_ab DESCENDING.
+READ TABLE lt_datum INTO DATA(ls_datum) INDEX 1.</pre>
+<p>Der Nachteil von dieser Variante ist, dass man alle jemals gültig gewesenen Einträge lesen muss.</p>
+<h2>Ermittlung des gültigen Eintrags &#8211; Tricktresor-Style</h2>
+<p>Mithilfe eines Subqueries ist es möglich, exakt den einen richtigen Eintrag zu finden. Ein Code-Snippet sagt mehr als tausend Worte:</p>
+<pre class="">SELECT single * FROM ztt_datum INTO @DATA(ls_datum)
+ WHERE datab = ( SELECT MAX( datab )
+                   FROM ztt_datum
+                  WHERE datab &lt;= @p_datum ).</pre>
+<h2></h2>
+<p>Der Beitrag <a href="/blog/ist-das-gueltig/">Ist das gültig?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ist-das-gueltig/feed/</wfw:commentRss>
+			<slash:comments>3</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

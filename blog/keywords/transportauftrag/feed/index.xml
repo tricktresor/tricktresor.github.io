@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Transportauftrag Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/transportauftrag/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 24 Oct 2022 15:35:45 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Transportauftrag Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Übersicht über gesperrte Objekte</title>
+		<link>/blog/uebersicht-ueber-gesperrte-objekte/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Jan 2022 18:13:35 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Transportauftrag]]></category>
+		<guid isPermaLink="false">/?p=1033240</guid>
+
+					<description><![CDATA[<p>Bevor man damit beginnt, eine vorhandene Applikation zu erweitern oder umfangreich anzupassen, könnte man auf die Idee kommen, prüfen zu wollen, ob die beteiligten Objekte eventuell gerade gesperrt sind. In diesem Fall könnte man die Entwicklung nämlich nicht reibungslos durchführen. Die Änderung des gesperrten Objektes wird dann nämlich dem bereits vorhandenen Transportauftrag zugeordnet. Das wiederum bedeutet, dass die Transportaufträge gemeinsam transportiert werden müssen. Um prüfen zu können, welche Objekte gesperrt sind, habe ich einen kleinen...</p>
+<p>Der Beitrag <a href="/blog/uebersicht-ueber-gesperrte-objekte/">Übersicht über gesperrte Objekte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Bevor man damit beginnt, eine vorhandene Applikation zu erweitern oder umfangreich anzupassen, könnte man auf die Idee kommen, prüfen zu wollen, ob die beteiligten Objekte eventuell gerade gesperrt sind. In diesem Fall könnte man die Entwicklung nämlich nicht reibungslos durchführen. Die Änderung des gesperrten Objektes wird dann nämlich dem bereits vorhandenen Transportauftrag zugeordnet. Das wiederum bedeutet, dass die Transportaufträge gemeinsam transportiert werden müssen. </p>
+
+
+
+<p>Um prüfen zu können, welche Objekte gesperrt sind, habe ich einen kleinen Report geschrieben. Er gibt eine Liste der selektierten Objekte aus und zeigt an, ob diese gesperrt sind oder nicht. Sind sie gesperrt, dann wird auch der Transportauftrag angezeigt, in dem das Objekt gesperrt ist.</p>
+
+
+
+<p>Mit einem Klick auf den Transportauftrag wird dieser angezeigt.</p>
+
+
+
+<h2 class="wp-block-heading" id="code">Code</h2>
+
+
+
+<pre class="wp-block-preformatted">REPORT.
+
+DATA gs_tadir TYPE tadir.
+DATA gv_trkorr TYPE trkorr.
+
+SELECT-OPTIONS so_objt FOR gs_tadir-object   DEFAULT 'PROG'.
+SELECT-OPTIONS so_objn FOR gs_tadir-obj_name DEFAULT 'ZVTEST*' OPTION CP.
+SELECT-OPTIONS so_devc FOR gs_tadir-devclass.
+
+PARAMETERS     pa_onlyl AS CHECKBOX DEFAULT space.
+
+AT LINE-SELECTION.
+
+  CHECK gv_trkorr IS NOT INITIAL.
+  CALL FUNCTION 'TR_DISPLAY_REQUEST'
+    EXPORTING
+      i_trkorr = gv_trkorr.
+
+START-OF-SELECTION.
+
+  PERFORM start.
+
+FORM start.
+  DATA ls_lockkey TYPE tlock_int.
+  DATA lv_locked TYPE abap_bool.
+  DATA lt_locks TYPE STANDARD TABLE OF tlock WITH DEFAULT KEY.
+
+  SELECT * FROM tadir INTO TABLE @DATA(lt_tadir)
+    WHERE object   IN @so_objt
+      AND obj_name IN @so_objn
+  AND devclass IN @so_devc.
+
+  LOOP AT lt_tadir INTO gs_tadir.
+
+    ls_lockkey-obj     = gs_tadir-object.
+    ls_lockkey-low     = gs_tadir-obj_name.
+    ls_lockkey-hi      = gs_tadir-obj_name &amp;&amp; '*'.
+
+    CALL FUNCTION 'TRINT_CHECK_LOCKS'
+      EXPORTING
+        wi_lock_key = ls_lockkey
+      IMPORTING
+        we_lockflag = lv_locked
+      TABLES
+        wt_tlock    = lt_locks
+      EXCEPTIONS
+        empty_key   = 1.
+    IF lv_locked = abap_false AND pa_onlyl = abap_true.
+      CONTINUE.
+    ENDIF.
+
+    WRITE: /
+      gs_tadir-object,
+      gs_tadir-obj_name,
+      gs_tadir-devclass.
+    HIDE gs_tadir.
+
+    IF lv_locked = abap_true.
+      WRITE lv_locked COLOR COL_GROUP.
+      gv_trkorr = lt_locks[ 1 ]-trkorr.
+      HIDE gv_trkorr.
+      SELECT * FROM e07t
+        INTO TABLE @DATA(lt_e07t)
+      WHERE trkorr = @gv_trkorr.
+      WRITE: gv_trkorr HOTSPOT ON.
+      IF sy-subrc = 0.
+        DATA(lv_trtxt) = lt_e07t[ 1 ]-as4text.
+        WRITE:  lv_trtxt.
+      ENDIF.
+
+    ENDIF.
+
+  ENDLOOP.
+
+  CLEAR gs_tadir.
+  CLEAR gv_trkorr.
+
+ENDFORM.</pre>
+<p>Der Beitrag <a href="/blog/uebersicht-ueber-gesperrte-objekte/">Übersicht über gesperrte Objekte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Löschauftrag erstellen</title>
+		<link>/blog/loeschauftrag-erstellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 18 Mar 2021 11:21:22 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Allgemein]]></category>
+		<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Transportauftrag]]></category>
+		<category><![CDATA[löschen]]></category>
+		<category><![CDATA[Löschauftrag]]></category>
+		<guid isPermaLink="false">/?p=1026567</guid>
+
+					<description><![CDATA[<p>Das Anlegen von Objekten gehört zum Alltag eines SAP-Entwicklers. Auch das Löschen von Objekten gehört dazu. Wenn man ein Objekt löscht, wird es jedoch als ganz normales Objekt in einen ganz normalen Transportauftrag aufgenommen. Erst bei Freigabe des Transportauftrags prüft das System, ob das Objekt vorhanden ist oder nicht. Ist es nicht vorhanden, dann wird in dem Transportauftrag das Objekt als &#8220;zu löschen&#8221; markiert. Leider funktioniert es nicht, das Löschkennzeichen in der Tabelle E071, in...</p>
+<p>Der Beitrag <a href="/blog/loeschauftrag-erstellen/">Löschauftrag erstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Das Anlegen von Objekten gehört zum Alltag eines SAP-Entwicklers. Auch das Löschen von Objekten gehört dazu. Wenn man ein Objekt löscht, wird es jedoch als ganz normales Objekt in einen ganz normalen Transportauftrag aufgenommen. Erst bei Freigabe des Transportauftrags prüft das System, ob das Objekt vorhanden ist oder nicht. Ist es nicht vorhanden, dann wird in dem Transportauftrag das Objekt als &#8220;zu löschen&#8221; markiert. </p>
+
+
+
+<p>Leider funktioniert es nicht, das Löschkennzeichen in der Tabelle E071, in der die Transportobjekte eines Auftrags gespeichert werden, zu setzen. Um einen Löschauftrag zu erzeugen, benötigt man in der Regel ein anderes System, in dem die Objekte nicht vorhanden sind. In diesem System übernimmt man die Objekte in einen Transportauftrag und gibt diesen frei. </p>
+
+
+
+<p>Eine andere Möglichkeit, ist die Erzeugung eines &#8220;echten&#8221; Löschauftrags per Programm. Hierbei muss allerdings ein bisschen getrickst werden, weil das Verfahren von SAP offiziell nicht unterstützt wird.</p>
+
+
+
+<h2 class="wp-block-heading">Vorgehen</h2>
+
+
+
+<p>Folgendes Vorgehen ist notwendig, um einen Löschauftrag zu erstellen.</p>
+
+
+
+<h3 class="wp-block-heading">Anlage eines Transport-Of-Copies </h3>
+
+
+
+<p>Ein Löschauftrag kann nicht direkt angelegt werden. Deswegen Legst du einen Auftrag vom Typ <em>Transport von Kopien</em> an. Du kannst auch einen normalen Workbench-Auftrag anlegen, aber wenn die Objekte evtl. noch in einem Transportauftrag gesperrt sind, dann ist nur ein Transport-von-Kopien möglich.</p>
+
+
+
+<h3 class="wp-block-heading">Übernahme der Objekte</h3>
+
+
+
+<p>Die zu löschenden Objekte übernimmst du nun manuell oder durch die Funktion <em>Auftrag/ Aufgabe ● Objektliste </em>● <em>Objekte aufnehmen </em>im Transport Organizer.</p>
+
+
+
+<h3 class="wp-block-heading">Update E070 für den neuen Auftrag</h3>
+
+
+
+<p>In Tabelle E070 werden die Transportaufträge gespeichert. In dieser Tabelle musst du, zum Beispiel mit Hilfe der Transaktion SE16n und der Funktion &amp;sap_edit, die Funktion &#8220;L = Löschauftrag&#8221; im Feld TRFUNCTION setzen.</p>
+
+
+
+<p><strong><span style="text-decoration: underline;">Achtung!</span></strong> Der Auftrag taucht nun nicht mehr in der Übersicht im Transport-Organizer auf!</p>
+
+
+
+<h3 class="wp-block-heading">Freigabe des Löschauftrags </h3>
+
+
+
+<p>Da der Löschauftrag nicht mehr in der Übersicht im Transport-Organizer auftaucht (Transaktion SE09), kannst du den Auftrag auch nicht manuell im Dialog freigeben.</p>
+
+
+
+<p>Um den Auftrag freizugeben, musst du den Function Builder (Transaktion SE37) aufrufen und den Funktionsbaustein TRINT_TP_INTERFACE ausführen.</p>
+
+
+
+<p>Fülle die Parameter IV_TP_COMMAND mit &#8220;R3E&#8221;, IV_TRANSPORT_REQUEST mit der Nummer deines Lösch-Transportauftrags und IV_UMODES mit &#8220;1&#8221;. Dann <em>Ausführen </em>klicken und der Auftrag wird exportiert. Eventuell taucht der Auftrag nicht in der Transportqueue des Folgesystems auf. In dem Fall musst du den Auftrag in der Transaktion STMS manuell über <em>Zusätze ● Weitere Aufträge ● Anhängen</em> in die Transportqueue stellen.</p>
+<p>Der Beitrag <a href="/blog/loeschauftrag-erstellen/">Löschauftrag erstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

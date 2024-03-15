@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>READ_TEXT Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/read_text/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 26 Jan 2023 07:06:55 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>READ_TEXT Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Auftragserfassung: Automatische (Positions-) Texte</title>
+		<link>/blog/auftragserfassung-automatische-positions-texte/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 17 May 2022 11:45:55 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[READ_TEXT]]></category>
+		<category><![CDATA[INIT_TEXT]]></category>
+		<category><![CDATA[COMMIT_TEXT]]></category>
+		<category><![CDATA[Langtext]]></category>
+		<category><![CDATA[ITF]]></category>
+		<category><![CDATA[SAVE_TEXT]]></category>
+		<guid isPermaLink="false">/?p=1035891</guid>
+
+					<description><![CDATA[<p>Über Langtexte im SAP wird oft geschimpft, da sie aus historischen Gründen umständlicher verwaltet werden, als man es aktuell tun würde. Dieser Artikel soll eine kurze Übersicht über Texte im Allgemeinen und die Verwendung von Langtexten im SAPMV45A-Umfeld.</p>
+<p>Der Beitrag <a href="/blog/auftragserfassung-automatische-positions-texte/">Auftragserfassung: Automatische (Positions-) Texte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In der Auftragserfassung (Modulpool SAPMV45A) sollen bei Auftragsanlage oder -änderung kundenindividuelle Texte definiert werden. </p>
+
+
+
+<h2 class="wp-block-heading">Standard-Textfindung</h2>
+
+
+
+<p>Im Standard lässt sich bereits eine umfangreiche Textfindung einstellen. Hier geht es jedoch darum, Texte aus anderen Objekten (Vorgängerbelegen, Kunden, Materialien, &#8230;) zu finden und zu übernehmen.</p>
+
+
+
+<p>Ausgangspunkt ist die Transaktion VOFM, Menü <em>Kopierbedingungen • Texte</em> oder <em>Datenübernahme • Texte</em>. Hier kannst du Bedingungen programmieren und zuordnen, die den gewünschten Text ermitteln.</p>
+
+
+
+<h2 class="wp-block-heading">Textverwaltung in SAP</h2>
+
+
+
+<p>In diesem Artikel geht es darum, individuelle Texte in eine Auftragsposition zu bekommen. Um das zu realisieren, muss man wissen, wie die Textverwaltung im SAP funktioniert. Darum hier ein kurzer Abriss zu den SAP-Langtexten.</p>
+
+
+
+<p>Standardlangtexte können in der Transaktion SO10 erstellt und bearbeitet werden. Zur Bearbeitung hast die Auswahl zwischen dem uralten Zeilen-Editor und dem PC-Editor, der zwischenzeitlich durch Microsoft Word abgelöst wurde.</p>
+
+
+
+<h3 class="wp-block-heading">Absatzformate</h3>
+
+
+
+<p>Ein SAP-Langtext oder auch SAP-Script- oder ITF-Text, besteht aus einem Absatzformat und einer Zeile. Absatzformate können in <em>Stilen </em>definiert und zugeordnet werden (Transaktion SE72).</p>
+
+
+
+<p>Das Sternchen * ist das Standardabsatzformat. Steht das * in der Spalte Absatzformat, dann erfolgt auf jeden Fall ein Zeilenumbruch. Bei einem Fließtext ist das Absatzformat leer.</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="682" height="501" src="/wp-content/uploads/2022/05/image.png" alt="" class="wp-image-1035903" srcset="/wp-content/uploads/2022/05/image.png 682w, /wp-content/uploads/2022/05/image-300x220.png 300w" sizes="(max-width: 682px) 100vw, 682px" /><figcaption class="wp-element-caption">Alter Zeileneditor</figcaption></figure>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="908" height="650" src="/wp-content/uploads/2022/05/image-1.png" alt="" class="wp-image-1035904" srcset="/wp-content/uploads/2022/05/image-1.png 908w, /wp-content/uploads/2022/05/image-1-300x215.png 300w, /wp-content/uploads/2022/05/image-1-768x550.png 768w, /wp-content/uploads/2022/05/image-1-240x172.png 240w" sizes="(max-width: 908px) 100vw, 908px" /><figcaption class="wp-element-caption">Microsoft Word Editor</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Felder</h3>
+
+
+
+<p>Um einen Text eindeutig zu identifizieren, sind die folgenden Felder notwendig:</p>
+
+
+
+<figure class="wp-block-table"><table><thead><tr><th>Feldname</th><th>Beschreibung</th><th>Infos</th></tr></thead><tbody><tr><td>TDOBJECT</td><td>Textobjekt</td><td>Definiert den Anwendungsbereich. Standardtexte haben das Textobjekt TEXT, Auftragskopftexte VBBK und Auftragspositionstexte VBBP, Materialstamm hat MATERIAL und MVKE. Textobjekte werden mit Hilfe der Transaktion SE75 definiert. Für eigene Anwendungen können im Kundennamensraum eigene Objekte definiert werden.</td></tr><tr><td>TDNAME</td><td>Textname</td><td>Der Textname besteht bei Texten zu Anwendungsobjekten (Aufträge, Kunden, Materialien, etc.) aus den Schlüsselfeldern der zugehörigen Tabelle. Beispiel: Vertriebstext Material (MVKE): &lt;matnr&gt;&lt;vkorg&gt;&lt;vtweg&gt;</td></tr><tr><td>TDID</td><td>Text-ID</td><td>Die Id definiert Texte innerhalb eines Text-Objektes. Sie muss im Customizing definiert werden (Transaktion SE75).</td></tr><tr><td>TDSPRAS</td><td>Sprache</td><td>Sprache des Textes.</td></tr></tbody></table><figcaption class="wp-element-caption">Schlüsselfelder STXH</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Speicherort</h3>
+
+
+
+<p>Die Texte werden in den Tabellen STXH (Kopfdaten) und STXL (Textzeilen) gespeichert. Die Tabelle STXH kann man in der Tabellenanzeige (Transaktion SE16n) einsehen. In der STXL werden die Textzeilen jedoch komprimiert gespeichert und können nicht angesehen werden.</p>
+
+
+
+<h3 class="wp-block-heading">Texte lesen</h3>
+
+
+
+<p>Um Texte einzulesen, solltest du den Funktionsbaustein READ_TEXT verwenden. Um Texte zu suchen, kannst du direkt die Tabelle STXH durchsuchen oder du verwendest den Funktionsbaustein SELECT_TEXT.</p>
+
+
+
+<h3 class="wp-block-heading">Speichern von Texten</h3>
+
+
+
+<p>Die Speicherung von Texten erfolgt mit Hilfe des Funktionsbausteins SAVE_TEXT. Diesem Baustein müssen die Schlüsselfelder übergeben werden. Wenn man weiß, dass der Text noch nicht existiert, dann sollte aus Performancegründen der Parameter <code>INSERT = X</code> gesetzt werden. Möchte man den Text in einer eigenen Anwendung sofort sichern, so kann der Parameter <code>SAVEMODE_DIRECT = X</code> gesetzt werden. Beim Speichern von mehreren Texten sollte der Funktionsbaustein COMMIT_TEXT verwendet werden.</p>
+
+
+
+<p>Mit dem Funktionsbaustein INIT_TEXT können Texte angelegt werden. </p>
+
+
+
+<p>Funktionsbaustein DELETE_TEXT löscht vorhandene Texte.</p>
+
+
+
+<h3 class="wp-block-heading">Zentrales Textmemory</h3>
+
+
+
+<p>Die Textverwaltung hat ein zentrales Memory. Aus diesem Grund sollte immer mit den entsprechenden Funktionsbausteinen auf die Texte zugegriffen werden. Der READ_TEXT liest den Text aus dem Textmemory, sofern vorhanden.</p>
+
+
+
+<h2 class="wp-block-heading">Textverwaltung SAPMV45A</h2>
+
+
+
+<p>Kommen wir nun endlich zum Ausgangsthema zurück: Programmatische Bearbeitung von Texten in der Auftragsbearbeitung (Modulpool SAPMV45A). Du solltest wegen des zentralen Textmemories zur Bearbeitung immer die oben beschriebenen Funktionsbausteine verwenden. So kannst du in der Transaktion den Baustein READ_TEXT verwenden, um zu prüfen, ob bereits ein Auftragskopftext zu einer bestimmten ID oder zu einer Position schon ein Text angelegt wurde, auch wenn diese noch nicht auf der Datenbank gespeichert wurde.</p>
+
+
+
+<p>Eine separate Speicherung ist nicht notwendig bzw. sogar verboten -, denn die Speicherung erfolgt zentral durch die Applikation. Wird die Transaktion abgebrochen, dann werden die Texte auch nicht gespeichert.</p>
+
+
+
+<p><strong>Auf keinen Fall darfst du im Baustein SAVE_TEXT den Parameter SAVEMODE_DIRECT setzen, den Baustein COMMIT_TEXT oder COMMIT WORK verwenden! Das wird von der Applikation SAPMV45A beim Sichern gemacht!</strong></p>
+
+
+
+<p>Verwendest du doch einen COMMIT in den Exits, dann riskierst du einen Datenschiefstand und Fehlfunktionen von BAPIs.</p>
+
+
+
+<h3 class="wp-block-heading">Codebeispiel</h3>
+
+
+
+<p>In folgendem Code-Beispiel wird der Text zu einem neu eingegebenen Material aus dem Literal &#8220;ARKTX:&#8221; und dem aktuellen Artikeltext erstellt.</p>
+
+
+
+<p></p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="generic" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">FORM userexit_move_field_to_vbap.
+  DATA ls_header     TYPE thead.
+  DATA lt_lines      TYPE STANDARD TABLE OF tline.
+
+  IF vbap-vbeln IS INITIAL.
+    ls_header-tdname   = 'XXXXXXXXXX' &amp;&amp; vbap-posnr.
+  ELSE.
+    ls_header-tdname   = vbap-vbeln &amp;&amp; vbap-posnr.
+  ENDIF.
+  ls_header-tdobject = 'VBBP'.
+  ls_header-tdid     = '0001'.
+  ls_header-tdspras  = sy-langu.
+  CALL FUNCTION 'READ_TEXT'
+    EXPORTING
+      id        = ls_header-tdid
+      language  = ls_header-tdspras
+      name      = ls_header-tdname
+      object    = ls_header-tdobject
+      local_cat = space
+    IMPORTING
+      header    = ls_header
+    TABLES
+      lines     = lt_lines
+    EXCEPTIONS
+      OTHERS    = 8.
+  IF sy-subrc &lt;> 0.
+    lt_lines = VALUE #( ( tdformat = '*' tdline = |test { vbap-arktx }| ) ).
+    CALL FUNCTION 'SAVE_TEXT'
+      EXPORTING
+        header          = ls_header
+        insert          = abap_true
+        savemode_direct = space
+        local_cat       = space
+      TABLES
+        lines           = lt_lines
+      EXCEPTIONS
+        OTHERS          = 5.
+  ENDIF.
+
+ENDFORM.</pre>
+<p>Der Beitrag <a href="/blog/auftragserfassung-automatische-positions-texte/">Auftragserfassung: Automatische (Positions-) Texte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

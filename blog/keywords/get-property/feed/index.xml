@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>get property Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/get-property/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:51 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>get property Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Speak!</title>
+		<link>/blog/speak/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 03 May 2016 09:53:55 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[set property]]></category>
+		<category><![CDATA[call method]]></category>
+		<category><![CDATA[get property]]></category>
+		<category><![CDATA[ole]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[Agenten]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=634</guid>
+
+					<description><![CDATA[<p>SAP kann sprechen. Mit der Microsoft Speech API 5.3</p>
+<p>Der Beitrag <a href="/blog/speak/">Speak!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>SAP kann sprechen. Mit der Microsoft Speech API 5.3</p>
+<figure id="attachment_608883" aria-describedby="caption-attachment-608883" style="width: 500px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2012/02/2016-05-03_11-51-10.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-608883" src="https://tricktresor.com/wp-content/uploads/2012/02/2016-05-03_11-51-10.jpg" alt="https://pixabay.com/de/sound-welle-stimme-h%C3%B6ren-856770/" width="500" height="300" srcset="/wp-content/uploads/2012/02/2016-05-03_11-51-10.jpg 500w, /wp-content/uploads/2012/02/2016-05-03_11-51-10-300x180.jpg 300w" sizes="(max-width: 500px) 100vw, 500px" /></a><figcaption id="caption-attachment-608883" class="wp-caption-text">https://pixabay.com/de/sound-welle-stimme-h%C3%B6ren-856770/</figcaption></figure>
+<p>Auf der Seite <a href="http://abapdn.blogspot.com/" target="_blank">http://abapdn.blogspot.com/</a> bin ich auf folgenden interessanten Code gestoßen:</p>
+<pre>INCLUDE ole2incl.
+DATA : v_objole      TYPE ole2_object,
+       v_objolevoice TYPE ole2_object,
+       v_strtotalk   TYPE string.
+
+CREATE OBJECT v_objolevoice 'SAPI.SpVoice'.
+
+SET PROPERTY OF v_objolevoice 'Volume' = 80.
+SET PROPERTY OF v_objolevoice 'Rate' = -1.
+
+v_strtotalk = 'This is great'.
+
+CALL METHOD OF v_objolevoice 'Speak' = v_objole
+EXPORTING #1 = v_strtotalk.
+
+FREE: v_objolevoice,v_objole.</pre>
+<p>Und SAP kann sprechen&#8230; Leider ist es mir nicht gelungen, andere Stimmen zu aktivieren. Es spricht standardmäßig &#8220;Anna&#8221; (&#8220;Mary&#8221; laut Doku). Es müsste aber auch noch &#8220;Mike&#8221; vorhanden sein.</p>
+<h2>Get Voice</h2>
+<p>Mit diesem Code-Schnipsel kann man die eingestellte Stimme ermitteln.</p>
+<pre>DATA v_voicename TYPE string.
+DATA v_voice     TYPE ole2_object.
+GET PROPERTY OF v_objolevoice 'Voice' = v_voice.
+CALL METHOD OF v_voice 'GetDescription' = v_voicename.</pre>
+<p>Umgestellt werden kann die Stimme leider nicht, denn dafür müsste man per OLE ein indiziertes Array ansprechen, was aber nicht geht. Aufgrund von Lizenzproblemen ist häufig aber auch nur eine Sprache (und Stimme) installiert.</p>
+<h2>Asynchrone Sprachausgabe</h2>
+<p>In der Defaulteinstellung wird die Verarbeitung erst fort gesetzt, wenn die Sprachausgabe beendet ist. Mit dem Parameter SVSFlagAsync der Methode SPEAK kann die Sprachausgabe jedoch auch asynchron erfolgen. Das ist beispielsweise dann sinnvoll, wenn eine per MESSAGE ausgegebene Meldung auch gesprochen werden soll. Die Meldung sollte dann natürlich nicht erst erscheinen, wenn sie bereits vorab einmal komplett gesprochen wurde&#8230;</p>
+<pre>CALL METHOD OF v_objolevoice 'Speak' = v_objolevoice
+EXPORTING #1 = v_strtotalk
+#2 = 1.  "SVSFlagsAsync</pre>
+<h2>Links</h2>
+<p>Hier der Link zum Artikel:<br />
+<a href="http://abapdn.blogspot.com/2010/09/sap-knows-how-to-speak.html" target="_blank">http://abapdn.blogspot.com/2010/09/sap-knows-how-to-speak.html</a></p>
+<p>Und hier der Link zur API-Dokumentation:<br />
+<a href="http://msdn.microsoft.com/en-us/library/ms723614(v=vs.85).aspx" target="_blank">http://msdn.microsoft.com/en-us/library/ms723614(v=vs.85).aspx</a></p>
+<h1>Kürzer!</h1>
+<p>Hier noch eine kürzere <a title="NES | code.google.com" href="https://code.google.com/p/nes-abapgames/wiki/Hello_World">Variante von Nalon</a>:</p>
+<pre>DATA ovoice TYPE ole2_object.
+CREATE OBJECT ovoice 'SAPI.SpVoice'.
+IF sy-subrc = 0.
+  CALL METHOD OF ovoice 'Speak'
+    EXPORTING #1 = 'Ich will sprechen'.
+ENDIF.</pre>
+<p>Der Beitrag <a href="/blog/speak/">Speak!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

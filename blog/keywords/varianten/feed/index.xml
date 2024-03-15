@@ -1,0 +1,2971 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Varianten Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/varianten/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 29 May 2018 13:08:05 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Varianten Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Persönliches Favoriten-Menü</title>
+		<link>/blog/persoenliches-favoriten-menue/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 02 May 2018 18:02:50 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[report]]></category>
+		<category><![CDATA[Menü]]></category>
+		<category><![CDATA[selection-screen]]></category>
+		<category><![CDATA[macros]]></category>
+		<category><![CDATA[Varianten]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018447</guid>
+
+					<description><![CDATA[<p>Die Favoriten im SAP-Menü erleichtern die Arbeit vieler Anwender bereits deutlich. Die am häufigsten genutzten Transaktionen können im Enjoy-Menü einfach verwaltet werden. Allerdings beschränkt sich das Ganze auf Transaktionen und Web-Adressen (plus ein paar andere &#8220;sonstige Objekte&#8221;). Wilfried Schäfer hat einen Report geschrieben, mit dem du dir dein persönliches Menü zusammenbauen kannst. Hierbei können nicht nur Transaktionen aufgenommen werden, sondern auch Reports inklusive Varianten. Aber auch Tabellen (SE16n), Pflegeviews (SM30) und Viewcluster (SM34) können aufgenommen...</p>
+<p>Der Beitrag <a href="/blog/persoenliches-favoriten-menue/">Persönliches Favoriten-Menü</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Favoriten im SAP-Menü erleichtern die Arbeit vieler Anwender bereits deutlich. Die am häufigsten genutzten Transaktionen können im Enjoy-Menü einfach verwaltet werden. Allerdings beschränkt sich das Ganze auf <em>Transaktionen</em> und <em>Web-Adressen</em> (plus ein paar andere &#8220;sonstige Objekte&#8221;).</p>
+<p>Wilfried Schäfer hat einen Report geschrieben, mit dem du dir dein persönliches Menü zusammenbauen kannst. Hierbei können nicht nur Transaktionen aufgenommen werden, sondern auch Reports inklusive Varianten.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/05/ws01.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018448" src="https://tricktresor.com/wp-content/uploads/2018/05/ws01.png" alt="" width="690" height="139" srcset="/wp-content/uploads/2018/05/ws01.png 690w, /wp-content/uploads/2018/05/ws01-300x60.png 300w" sizes="(max-width: 690px) 100vw, 690px" /></a></p>
+<p>Aber auch Tabellen (SE16n), Pflegeviews (SM30) und Viewcluster (SM34) können aufgenommen werden.</p>
+<h2>Trick</h2>
+<p>Der geniale Trick bei diesem Report ist, dass die einzelnen Einträge als <em>stinknormale</em> Variante abgespeichert werden. Auch die Texte und Eingabebereitschaft der einzelnen Felder wird in der Variante gespeichert.</p>
+<h2>Verwendung</h2>
+<p>Der Report kann gut zur Gruppierung von Funktionen verwendet werden, die entweder ebenfalls häufig benötigt werden, oder eben auch nur recht selten (Monats,- Jahresabschluss).</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/05/ws02.png"><img decoding="async" class="alignnone size-full wp-image-1018450" src="https://tricktresor.com/wp-content/uploads/2018/05/ws02.png" alt="" width="687" height="303" srcset="/wp-content/uploads/2018/05/ws02.png 687w, /wp-content/uploads/2018/05/ws02-300x132.png 300w" sizes="(max-width: 687px) 100vw, 687px" /></a></p>
+<h2>Code und Doku</h2>
+<p>Die Dokumentation und der Quelltext kannst du dir hier herunterladen: <a href="https://tricktresor.com/wp-content/uploads/2018/05/Report-ZZ_ME.pdf">Report ZZ_ME.pdf</a></p>
+<h2>Code</h2>
+<pre class="lang:abap decode:true ">REPORT zz_menue.
+
+*=======================================================================
+*
+* Funktion:     Start Transaktion, Submit Reports mit und ohne Varianten
+* Beschreibung: Das Selektionsbild dieses Reports wird benutzt, um mit
+*               gesepeicherten Varianten eine Art von Menue-Liste zu
+*               erhalten. Aus dem Selektionsbild können die Varianten
+*               geöffnet oder gestartet werden.
+*
+*               User ohne SA38-Berechtigung können keine Reports ein-
+*               tragen. Das Starten von Transaktionen mit Varianten
+*               wird auch unterstützt.
+*
+*               Alles was nicht Transaktion oder Report ist, wird als
+*               Kommentar interpretiert.
+*
+*                                             Wilfried Schäfer
+*
+*                                             wilfried.schaefer@arcor.de
+*=======================================================================
+* Möglicher Inhalt der Spalte "Variant / Table" abhängig vom Inhalt der
+* Spalte "Report/Transaktion"
+*
+*  Report/Transaktion  Variant / Table
+* ______________________________________
+*
+*  SE11  oder
+*  SE16  oder
+*  SE16N oder
+*  SE17  oder
+*  SE54  oder
+*  SM30  oder
+*  SM31                Tabelle
+*  SM34                View Clusters
+*  SE37                Funktionsbaustein
+*  SA38  oder
+*  SE38                Report
+*  SE51                Report
+*  SE71                SAPscript Formular
+*
+*  Reportname          Variante
+*  Transaktionscode    Variante
+*  GR55.Reportgruppe   Variante
+*
+*=======================================================================
+*
+* Aktionstypen: B Berichtsgruppe
+*               C Kommentar
+*               H Report mit Variante zur Ausführung im Hintergrund
+*               h Transaktion mit Variante zur Ausführung im Hintergrund
+*               R Report
+*               T Transaktion
+*               V Report mit Variante / Berichtsgruppe mit Variante
+*               v Transaktion mit Variante
+*
+*=======================================================================
+
+INCLUDE &lt;list&gt;.                   " List enthält alle icons
+
+TABLES: trdir, trdirt,    " Reports
+        tfdir,            " Funktionsbausteine
+        tstc,  tstct,     " SAP-Transaktions-Codes
+        tstcp,            " Parameter zu Transaktionen
+        dd02l, dd02t,     " SAP-Tabellen /-Texte
+        varid, varit,     " Varianten
+        sscrfields,       " Felder auf Selektionsbildern
+        t803vp,           " Report Writer: Generierte Programmversionen
+        vcldir, vcldirt,  " Viewcluster.
+        stxh,             " STXD SAPscript Text-Datei Header
+        tftit.            " Kurztext Funktionsbaustein
+
+*============= Selektionskriterien ====================================
+
+SELECTION-SCREEN FUNCTION KEY 1.
+SELECTION-SCREEN FUNCTION KEY 2.
+SELECTION-SCREEN FUNCTION KEY 3.
+SELECTION-SCREEN FUNCTION KEY 4.
+
+SELECTION-SCREEN BEGIN OF BLOCK comment_lines.
+*                             WITH FRAME. " TITLE text_U11.
+
+* 1. Comment line
+SELECTION-SCREEN BEGIN OF LINE.
+SELECTION-SCREEN POSITION 01.  SELECTION-SCREEN COMMENT (07) text_u11.
+SELECTION-SCREEN POSITION 10.   PARAMETERS  pm_c001(60) LOWER CASE
+                                                        MODIF ID com.
+SELECTION-SCREEN END OF LINE.
+
+* 2. Comment line
+SELECTION-SCREEN BEGIN OF LINE.
+SELECTION-SCREEN POSITION 10.   PARAMETERS  pm_c002(50) LOWER CASE
+                                                        MODIF ID com.
+SELECTION-SCREEN POSITION 79.
+SELECTION-SCREEN END OF LINE.
+
+* 3. Comment line
+SELECTION-SCREEN BEGIN OF LINE.
+SELECTION-SCREEN POSITION 10.   PARAMETERS  pm_c003(50) LOWER CASE
+                                                        MODIF ID com.
+SELECTION-SCREEN END OF LINE.
+
+* 4. Comment line
+SELECTION-SCREEN BEGIN OF LINE.
+SELECTION-SCREEN POSITION 10.   PARAMETERS  pm_c004(50) LOWER CASE
+                                                        MODIF ID com.
+SELECTION-SCREEN POSITION 68.
+SELECTION-SCREEN PUSHBUTTON (45) pb1_txt USER-COMMAND uc_refresh_comm
+                                        MODIF ID pb
+                                        VISIBLE LENGTH 45.
+SELECTION-SCREEN END OF LINE.
+
+* 5. Comment line
+SELECTION-SCREEN BEGIN OF LINE.
+SELECTION-SCREEN POSITION 10.   PARAMETERS  pm_c005(50) LOWER CASE
+                                                        MODIF ID com.
+SELECTION-SCREEN POSITION 61.
+PARAMETERS: p_hide01(7) MODIF ID nod.
+SELECTION-SCREEN POSITION 68.
+SELECTION-SCREEN PUSHBUTTON (45) pb2_txt USER-COMMAND
+                                          uc_refresh_line_comm
+                                          MODIF ID pb
+                                          VISIBLE LENGTH 45.
+
+
+SELECTION-SCREEN END OF LINE.
+SELECTION-SCREEN SKIP.
+
+* Eine Selop, die nicht angezeigt wird, ist notwendig, damit SY-OPTI
+* abgefragt werden kann.
+SELECT-OPTIONS pm_vari FOR varid-variant MODIF ID nod.
+
+SELECTION-SCREEN END OF BLOCK comment_lines.
+
+*Wenn die Zeile mit "Report / Transaktions" beginnt
+*SELECTION-SCREEN BEGIN OF LINE.
+* SELECTION-SCREEN POSITION  3. SELECTION-SCREEN COMMENT (28) TEXT_U01.
+* SELECTION-SCREEN POSITION 34. SELECTION-SCREEN COMMENT (16) TEXT_U02.
+* SELECTION-SCREEN POSITION 60. SELECTION-SCREEN COMMENT (04) TEXT_U03.
+* SELECTION-SCREEN POSITION 66. SELECTION-SCREEN COMMENT (04) TEXT_U04.
+* SELECTION-SCREEN POSITION 72. SELECTION-SCREEN COMMENT (09) TEXT_U12.
+* SELECTION-SCREEN POSITION 81.
+*SELECTION-SCREEN END OF LINE.
+
+*Wenn die Zeile mit "Description" beginnt
+SELECTION-SCREEN BEGIN OF LINE.
+SELECTION-SCREEN POSITION  1. SELECTION-SCREEN COMMENT (15) text_u12.
+SELECTION-SCREEN POSITION 46. SELECTION-SCREEN COMMENT (04) text_u03.
+SELECTION-SCREEN POSITION 52. SELECTION-SCREEN COMMENT (04) text_u04.
+SELECTION-SCREEN POSITION 57. SELECTION-SCREEN COMMENT (20) text_u01.
+SELECTION-SCREEN POSITION 83. SELECTION-SCREEN COMMENT (16) text_u02.
+SELECTION-SCREEN END OF LINE.
+
+*============================================================
+
+SELECTION-SCREEN BEGIN OF BLOCK action_lines.
+
+SELECTION-SCREEN BEGIN OF LINE.
+PARAMETERS  p_c_togl(10)               MODIF ID nd2.
+SELECTION-SCREEN END OF LINE.
+
+SELECTION-SCREEN BEGIN OF LINE.
+PARAMETERS  p_r_togl(100)              MODIF ID nd2.
+SELECTION-SCREEN END OF LINE.
+
+SELECTION-SCREEN BEGIN OF LINE.
+PARAMETERS  p_v_togl(100)              MODIF ID nd2.
+SELECTION-SCREEN END OF LINE.
+
+SELECTION-SCREEN BEGIN OF LINE.
+PARAMETERS  p_i_togl(100)              MODIF ID nd2.
+SELECTION-SCREEN END OF LINE.
+
+*============================================================
+
+TYPES: text40 TYPE c LENGTH 40.
+
+DATA: wk_p_v(30),
+      wk_c40k    LIKE makt-maktx,
+      wk_c30k    LIKE docclsst-text30.
+
+*=======================================================================
+DEFINE line6.
+*     p_r_&amp;1         Report
+*     p_v_&amp;1         Variante
+*     p_i_&amp;1         Information / comment.
+
+*Wenn die Zeile mit "Report / Transaktions" beginnt
+*SELECTION-SCREEN BEGIN OF LINE.
+*SELECTION-SCREEN POSITION 1.  PARAMETERS: P_R_&amp;1(40) LOWER CASE
+*                                                     VISIBLE LENGTH 30
+*                                                     MODIF ID P_R.
+*SELECTION-SCREEN POSITION 32. PARAMETERS: P_V_&amp;1(30) LOWER CASE
+*                                                     VISIBLE LENGTH 25
+*                                                     MODIF ID CHK.
+*SELECTION-SCREEN PUSHBUTTON 58(4) T_B1&amp;1 USER-COMMAND OPEN_&amp;1
+*                                                     MODIF ID OPN
+*                                                     VISIBLE LENGTH 4.
+*SELECTION-SCREEN PUSHBUTTON 63(4) T_B2&amp;1 USER-COMMAND SUBM_&amp;1
+*                                                     MODIF ID SUB
+*                                                     VISIBLE LENGTH 4.
+*
+*SELECTION-SCREEN POSITION 70. PARAMETERS: P_I_&amp;1(70) LOWER CASE
+*                                          VISIBLE LENGTH 70
+*                                          MODIF ID P_I.
+*
+*SELECTION-SCREEN END OF LINE.
+
+*Wenn die Zeile mit "Description" beginnt
+  SELECTION-SCREEN BEGIN OF LINE.
+  SELECTION-SCREEN POSITION 1. PARAMETERS: p_i_&amp;1(100) LOWER CASE
+                                            VISIBLE LENGTH 45
+                                            MODIF ID p_i.
+  SELECTION-SCREEN PUSHBUTTON 47(4) t_b1&amp;1 USER-COMMAND open_&amp;1
+                                                       MODIF ID opn
+                                                       VISIBLE LENGTH 4.
+  SELECTION-SCREEN PUSHBUTTON 52(60) t_b2&amp;1 USER-COMMAND subm_&amp;1
+                                                       MODIF ID sub
+                                                       VISIBLE LENGTH 4.
+
+  SELECTION-SCREEN POSITION 57.  PARAMETERS: p_r_&amp;1(40) LOWER CASE
+                                                       VISIBLE LENGTH 25
+                                                       MODIF ID p_r.
+  SELECTION-SCREEN POSITION 83. PARAMETERS: p_v_&amp;1(30) LOWER CASE
+                                                       VISIBLE LENGTH 30
+                                                       MODIF ID chk.
+
+  SELECTION-SCREEN END OF LINE.
+
+END-OF-DEFINITION.                   "Line6
+*=======================================================================
+
+line6 s001. line6 s002. line6 s003. line6 s004. line6 s005.
+line6 s006. line6 s007. line6 s008. line6 s009. line6 s010.
+
+line6 s011. line6 s012. line6 s013. line6 s014. line6 s015.
+line6 s016. line6 s017. line6 s018. line6 s019. line6 s020.
+
+line6 s021. line6 s022. line6 s023. line6 s024. line6 s025.
+line6 s026. line6 s027. line6 s028. line6 s029. line6 s030.
+
+line6 s031. line6 s032. line6 s033. line6 s034. line6 s035.
+line6 s036. line6 s037. line6 s038. line6 s039. line6 s040.
+
+line6 s041. line6 s042. line6 s043. line6 s044. line6 s045.
+line6 s046. line6 s047. line6 s048. line6 s049. line6 s050.
+
+line6 s051. line6 s052. line6 s053. line6 s054. line6 s055.
+line6 s056. line6 s057. line6 s058. line6 s059. line6 s060.
+
+line6 s061. line6 s062. line6 s063. line6 s064. line6 s065.
+line6 s066. line6 s067. line6 s068. line6 s069. line6 s070.
+
+line6 s071. line6 s072. line6 s073. line6 s074. line6 s075.
+line6 s076. line6 s077. line6 s078. line6 s079. line6 s080.
+
+line6 s081. line6 s082. line6 s083. line6 s084. line6 s085.
+line6 s086. line6 s087. line6 s088. line6 s089. line6 s090.
+
+line6 s091. line6 s092. line6 s093. line6 s094. line6 s095.
+line6 s096. line6 s097. line6 s098. line6 s099.
+
+*=======================================================================
+DEFINE sine6.
+
+  DATA: s_r_&amp;1    TYPE programm,            "Report
+        s_v_&amp;1    TYPE varid-variant,       "Variante
+        s_i_&amp;1(55).                         "Description
+
+END-OF-DEFINITION.
+
+sine6 s001. sine6 s002. sine6 s003. sine6 s004. sine6 s005.
+sine6 s006. sine6 s007. sine6 s008. sine6 s009. sine6 s010.
+
+sine6 s011. sine6 s012. sine6 s013. sine6 s014. sine6 s015.
+sine6 s016. sine6 s017. sine6 s018. sine6 s019. sine6 s020.
+
+sine6 s021. sine6 s022. sine6 s023. sine6 s024. sine6 s025.
+sine6 s026. sine6 s027. sine6 s028. sine6 s029. sine6 s030.
+
+sine6 s031. sine6 s032. sine6 s033. sine6 s034. sine6 s035.
+sine6 s036. sine6 s037. sine6 s038. sine6 s039. sine6 s040.
+
+sine6 s041. sine6 s042. sine6 s043. sine6 s044. sine6 s045.
+sine6 s046. sine6 s047. sine6 s048. sine6 s049. sine6 s050.
+
+
+sine6 s051. sine6 s052. sine6 s053. sine6 s054. sine6 s055.
+sine6 s056. sine6 s057. sine6 s058. sine6 s059. sine6 s060.
+
+sine6 s061. sine6 s062. sine6 s063. sine6 s064. sine6 s065.
+sine6 s066. sine6 s067. sine6 s068. sine6 s069. sine6 s070.
+
+sine6 s071. sine6 s072. sine6 s073. sine6 s074. sine6 s075.
+sine6 s076. sine6 s077. sine6 s078. sine6 s079. sine6 s080.
+
+sine6 s081. sine6 s082. sine6 s083. sine6 s084. sine6 s085.
+sine6 s086. sine6 s087. sine6 s088. sine6 s089. sine6 s090.
+
+sine6 s091. sine6 s092. sine6 s093. sine6 s094. sine6 s095.
+sine6 s096. sine6 s097. sine6 s098. sine6 s099.
+
+SELECTION-SCREEN END OF BLOCK action_lines.
+*=====================================================================
+
+DATA: wk_filename          LIKE rlgrap-filename,
+      wk_flength           TYPE f,
+      wk_zae1(3)           TYPE p,
+      wk_div_0             TYPE p,
+      wk_div_1             TYPE p,
+      wk_first_step(3)     TYPE n   VALUE 1,
+      wk_last_step(3)      TYPE n,
+      wk_message(100),
+      wk_cursor_field(20),
+      wk_field_content(40),
+      wk_dyntxt            LIKE smp_dyntxt,
+      wk_memcheck,
+      wk_actiontype        TYPE text120,
+      wk_zz_me             TYPE text120,
+      wk_variant           LIKE varid-variant,
+      wk_refresh_line(3)   TYPE n,
+      wk_nothing_to_do,
+      wk_gr55_repname(40),
+      wk_tstcp_repname(40),
+      wk_sa38_allowed,
+      wk_ucomm             LIKE sy-ucomm,
+
+      wk_ende.
+
+DATA: us_repid LIKE trdir-name,
+      us_vari  LIKE varid-variant,
+      us_cond,
+      us_date  LIKE sy-datum,
+      us_x(2)  TYPE n.
+
+DATA: l_nod,
+      x_opn       TYPE i,
+      x_sub       TYPE i,
+      fn_repid(8),              " like trdir-name,
+      fn_vari(8),               " like varid-variant,
+      x(3)        TYPE n,
+
+      ende.
+
+DATA: BEGIN OF tab  OCCURS 0,
+        step(2)          TYPE n,
+        next(3)          TYPE n,
+        rep              LIKE trdir-name,
+        vari(30),
+        cond(1),
+        date             LIKE sy-datum,
+        info(55),
+        ignore_line,
+        error_reason(50),
+      END OF tab.
+
+DATA: BEGIN  OF memory_prerep,
+        prerep LIKE sy-repid.
+DATA: END OF memory_prerep.
+
+DATA: BEGIN  OF memory_info,
+        step_hierarchy(40).
+DATA: END OF memory_info.
+
+DATA: BEGIN OF s_mem,
+        memory(20),
+        service(1),
+        2nd_run(1),
+        exit_1(1),
+        exit_2(1),
+        zvariant_default LIKE varid-variant,
+        no_uname_select,
+        prev_rep         LIKE sy-repid.
+DATA: END OF s_mem.
+
+DATA: BEGIN OF s_mem2,
+        zvariant_default LIKE varid-variant.
+DATA: END OF s_mem2.
+
+DATA: cdd_seltab    TYPE TABLE OF rsparams,
+      cdd_seltab_wa LIKE LINE OF cdd_seltab.
+
+RANGES r_vari   FOR varid-variant.
+
+FIELD-SYMBOLS: &lt;fs_1&gt;, &lt;fs_repid&gt;, &lt;fs_vari&gt;, &lt;fs_text&gt;, &lt;fs_date&gt;.
+
+*================ Aufbereiten Selektionsbild vor 1. Anzeige ===========
+
+INITIALIZATION.
+
+  IF sy-slset = space.
+    PERFORM pruef_default_variant.
+  ENDIF.
+
+*Feststellen, ob der User SA38-Berechtigung hat.
+
+  AUTHORITY-CHECK OBJECT 'S_TCODE'
+                  ID     'TCD'  FIELD  'SA38'.
+  IF sy-subrc = 0.
+    text_u01 = 'Report / Transaction'.
+    wk_sa38_allowed = 'X'.
+  ELSE.
+    text_u01 = 'Transaction'.
+  ENDIF.
+
+  text_u02 = 'Variant / Table'.
+  text_u03 = 'Open'.
+  text_u04 = 'Run'.
+  text_u11 = 'Comment'.
+  text_u12 = 'Description'.
+
+  DATA: lpb1t(8) VALUE 'T_B1S',
+        lpb2t(8) VALUE 'T_B2S'.
+
+  FIELD-SYMBOLS: &lt;fs_pb1&gt;, &lt;fs_pb2&gt;.
+
+  DO 99 TIMES.
+    ADD 1 TO x.
+    lpb1t+5 = x.
+    lpb2t+5 = x.
+    ASSIGN (lpb1t) TO &lt;fs_pb1&gt;. &lt;fs_pb1&gt; =  '@09@'.
+    ASSIGN (lpb2t) TO &lt;fs_pb2&gt;. &lt;fs_pb2&gt; =  '@08@'.
+  ENDDO.
+
+  pb1_txt  = '@42@Refresh all descriptions'.
+  pb2_txt  = '@4K@Refresh description of cursor line'.
+
+  CLEAR wk_dyntxt.
+  MOVE 'Field toggle display/modify'
+    TO  wk_dyntxt-text.                                       "Text
+  MOVE 'Toggle on cursor field between display/modify mode!'
+    TO  wk_dyntxt-quickinfo.                                  "Quickinfo
+  MOVE  icon_toggle_display_change
+    TO  wk_dyntxt-icon_id.
+  MOVE 'Field toggle display/modify'
+    TO  wk_dyntxt-icon_text.                                  "Ikonentext
+  MOVE  wk_dyntxt TO sscrfields-functxt_01.
+
+  CLEAR wk_dyntxt.
+  MOVE 'Insert Line'               TO wk_dyntxt-text.      "Text
+  MOVE 'Insert a line on cursor position'
+    TO  wk_dyntxt-quickinfo. "Quickinfo
+  MOVE icon_insert_row             TO wk_dyntxt-icon_id.
+  MOVE 'Insert Line '
+    TO                                              wk_dyntxt-icon_text.
+  "Ikonentext
+  MOVE wk_dyntxt TO sscrfields-functxt_02.
+
+  CLEAR wk_dyntxt.
+  MOVE 'Delete Line'               TO wk_dyntxt-text.      "Text
+  MOVE 'Delete the line of cursor position'
+    TO  wk_dyntxt-quickinfo. "Quickinfo
+  MOVE  icon_delete_row             TO wk_dyntxt-icon_id.
+  MOVE 'Delete Line '
+    TO   wk_dyntxt-icon_text. "Ikonentext
+  MOVE wk_dyntxt TO sscrfields-functxt_03.
+
+  CLEAR wk_dyntxt.
+  MOVE 'Clear Screen'              TO wk_dyntxt-text.      "Text
+  MOVE 'clear Screen          '    TO wk_dyntxt-quickinfo. "Quickinfo
+  MOVE icon_erase                  TO wk_dyntxt-icon_id.
+  MOVE 'Clear screen      '        TO wk_dyntxt-icon_text. "Ikonentext
+  MOVE wk_dyntxt TO sscrfields-functxt_04.
+
+* LOOP AT SCREEN.
+*   IF SCREEN-GROUP1 = 'VIW'.
+*      SCREEN-INPUT       = 'OFF'.
+*      MODIFY SCREEN.
+*   ENDIF.
+* ENDLOOP.
+
+*======================================================================
+FORM pruef_default_variant.
+*======================================================================
+
+  IMPORT wk_memcheck        FROM MEMORY ID 'WK_MEMCHECK'.
+  FREE MEMORY                           ID 'WK_MEMCHECK'.
+  CHECK wk_memcheck = space.
+
+  DATA wk_back.
+  IMPORT wk_back            FROM MEMORY ID 'WK_BACK'.
+  IF sy-slset &lt;&gt; space.
+    FREE MEMORY                        ID 'WK_BACK'.
+  ENDIF.
+  CHECK wk_back = space.
+
+* Gibt es für den User nur eine Variante, dann wird diese gestartet.
+
+  DATA: l_count   TYPE i,
+        l_variant LIKE varid-variant.
+
+  RANGES r_variant FOR varid-variant.
+
+  SELECT * FROM varid WHERE report = sy-repid
+                       AND  ename  = sy-uname.
+
+    IF varid-variant(2) = 'Z:'.
+      CHECK varid-variant+2 = sy-uname.
+    ENDIF.
+
+    ADD 1 TO l_count.
+    l_variant = varid-variant.
+
+    IF l_count &gt; 1.
+      EXIT.
+    ENDIF.
+  ENDSELECT.
+
+*Es kann auch eine Z:USERNAME-Variante geben, die ein anderer
+*User angelegt hat.
+
+  IF l_count = 0.
+    CONCATENATE 'Z:' sy-uname INTO l_variant.
+    SELECT SINGLE * FROM varid WHERE report  = sy-repid
+                          AND  variant = l_variant.
+    IF sy-subrc = 0.
+      ADD 1 TO l_count.
+    ENDIF.
+  ENDIF.
+
+  IF l_count  = 1.
+    wk_memcheck = 'X'.
+    EXPORT wk_memcheck            TO MEMORY ID 'WK_MEMCHECK'.
+
+    SUBMIT (sy-repid) VIA SELECTION-SCREEN
+                      USING SELECTION-SET l_variant.
+  ENDIF.
+
+  PERFORM check_user_vari_exist.
+
+ENDFORM.
+*=====================================================================
+FORM check_user_vari_exist.
+*=====================================================================
+  RANGES r_vari   FOR varid-variant.
+
+* Gibt es für diesen Report keine Z:USERNAME-Variante keine
+* USERNAME:-Varianten und nicht nur eine Variante, dann wird der
+* Sel-Screen mit den vorhandenen Varianten (max. 99) gefüllt.
+
+**DATA: BEGIN OF T_ZVISE OCCURS 0.
+**      INCLUDE STRUCTURE ZVISE.
+**DATA: END OF T_ZVISE.
+**
+**DATA: BEGIN OF SELTAB_1 OCCURS 0,
+**      TABNAME LIKE ZVISE-TABNAME.
+**DATA: END OF SELTAB_1.
+**
+**DATA: BEGIN OF S_MEM,
+**      MEMORY(20),
+**      SERVICE(1),
+**      2ND_RUN(1),
+**      EXIT_1(1),
+**      EXIT_2(1),
+**      ZVARIANT_DEFAULT  LIKE VARID-VARIANT,
+**      NO_UNAME_SELECT,
+**      PREV_REP          LIKE SY-REPID.
+**DATA: END OF S_MEM.
+
+  DATA: wk_uname             LIKE sy-uname,
+        wk_clear_entry,
+        wk_vari_default_list.
+
+  wk_uname = sy-uname.
+
+  DATA: l_vari               LIKE varid-variant,
+        l_strlen             TYPE i,
+        l_count              TYPE i,
+        l_num3(3)            TYPE n,
+        l_screen_field_r(20),
+        l_screen_field_v(20).
+
+  FIELD-SYMBOLS &lt;fs_screen_r&gt;.
+  FIELD-SYMBOLS &lt;fs_screen_v&gt;.
+
+  CONCATENATE sy-uname ':' INTO l_vari.
+  l_strlen = strlen( l_vari ).
+
+  CLEAR cdd_seltab.
+  cdd_seltab_wa-selname = 'P_REPORT'.
+  cdd_seltab_wa-kind    = 'S'.
+  cdd_seltab_wa-sign    = 'I'.
+  cdd_seltab_wa-option  = 'EQ'.
+  cdd_seltab_wa-low     =  sy-repid.
+
+  SELECT * FROM varid WHERE report  =  sy-repid
+                       AND  ename   =  sy-uname.
+
+    IF varid-variant(2)      = 'Z:'.
+      CHECK varid-variant+2 = sy-uname.
+    ENDIF.
+
+    ADD 1 TO l_count.
+
+* Hier nun den Sel-Screen mit den vorhandenen Varianten füllen
+
+    IF l_count &lt; 99.
+      ADD 1 TO l_num3.
+      CONCATENATE 'P_R_S' l_num3 INTO l_screen_field_r.
+      CONCATENATE 'P_V_S' l_num3 INTO l_screen_field_v.
+      ASSIGN (l_screen_field_r) TO &lt;fs_screen_r&gt;.
+      ASSIGN (l_screen_field_v) TO &lt;fs_screen_v&gt;.
+
+      &lt;fs_screen_r&gt; = varid-report.
+      &lt;fs_screen_v&gt; = varid-variant.
+    ENDIF.
+  ENDSELECT.
+
+*Jetzt noch die Z:USERNAME-Variante, die von einem anderen User
+*angelegt wurde.
+
+  IF l_count &lt; 99.
+    CONCATENATE 'Z:' sy-uname INTO l_vari.
+
+    SELECT SINGLE * FROM varid WHERE report  =  sy-repid
+                                AND  ename   &lt;&gt; sy-uname
+                                AND  variant =  l_vari.
+    IF sy-subrc = 0.
+      ADD 1 TO l_count.
+      ADD 1 TO l_num3.
+      CONCATENATE 'P_R_S' l_num3 INTO l_screen_field_r.
+      CONCATENATE 'P_V_S' l_num3 INTO l_screen_field_v.
+      ASSIGN (l_screen_field_r) TO &lt;fs_screen_r&gt;.
+      ASSIGN (l_screen_field_v) TO &lt;fs_screen_v&gt;.
+
+      &lt;fs_screen_r&gt; = varid-report.
+      &lt;fs_screen_v&gt; = varid-variant.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.
+
+*================ Aufbereiten Selektionsbild vor jeder Anzeige ========
+AT SELECTION-SCREEN OUTPUT.
+*======================================================================
+  DATA: l_nod,
+        x_opn       TYPE i,
+        x_sub       TYPE i,
+        fn_repid(8),              " like trdir-name,
+        fn_vari(8),               " like varid-variant,
+        fn_info(8),
+        x(3)        TYPE n,
+        l_pos(3)    TYPE n,
+        l_b1(8)     VALUE 'T_B1S000',
+        l_b2(8)     VALUE 'T_B2S000',
+        n3(3)       TYPE n,
+
+        ende.
+
+  FIELD-SYMBOLS: &lt;fs_1&gt;,  &lt;fs_repid&gt;, &lt;fs_vari&gt;, &lt;fs_text&gt;, &lt;fs_date&gt;,
+                 &lt;fs_b1&gt;, &lt;fs_b2&gt;,    &lt;fs_info&gt;.
+
+*Feststellen, ob der User SA38-Berechtigung hat.
+
+  AUTHORITY-CHECK OBJECT 'S_TCODE'
+                  ID     'TCD'  FIELD  'SA38'.
+  IF sy-subrc = 0.
+    text_u01 = 'Report / Transaction'.
+    wk_sa38_allowed = 'X'.
+  ELSE.
+    text_u01 = 'Transaction'.
+  ENDIF.
+
+  LOOP AT SCREEN.
+
+    IF p_hide01 &lt;&gt; 'DISPLAY'.
+      IF screen-name   = 'C2_DIS' OR
+         screen-name   = 'C4_MOD'.
+        screen-input  = '0'.
+        screen-output = '0'.
+        screen-invisible   = '1'.
+        MODIFY SCREEN.
+      ENDIF.
+    ENDIF.
+
+    IF screen-name BETWEEN 'PM_C001' AND 'PM_C199'.
+      l_pos = screen-name+5.
+      IF p_c_togl+l_pos(1)  &lt;&gt; ' '.
+        screen-input  = '0'.
+        MODIFY SCREEN.
+      ENDIF.
+
+      fn_info =  screen-name.  ASSIGN (fn_info)  TO &lt;fs_info&gt;.
+      IF &lt;fs_info&gt;+0(1) = '@'  AND
+         &lt;fs_info&gt;+3(1) = '@'.
+        TRANSLATE &lt;fs_info&gt;+1(2) TO UPPER CASE.
+      ENDIF.
+
+    ENDIF.
+
+    IF screen-name BETWEEN 'P_R_S001' AND 'P_R_S199'.
+      l_pos = screen-name+6.
+      IF p_r_togl+l_pos(1)  &lt;&gt; ' '.
+        screen-input  = '0'.
+        MODIFY SCREEN.
+      ENDIF.
+    ENDIF.
+
+    IF screen-name BETWEEN 'P_V_S001' AND 'P_V_S199'.
+      l_pos = screen-name+6.
+      IF p_v_togl+l_pos(1)  &lt;&gt; ' '.
+        screen-input  = '0'.
+        MODIFY SCREEN.
+      ENDIF.
+    ENDIF.
+
+    IF screen-name BETWEEN 'P_I_S001' AND 'P_I_S199'.
+      l_pos = screen-name+6.
+      IF p_i_togl+l_pos(1)  &lt;&gt; ' '.
+        screen-input  = '0'.
+        MODIFY SCREEN.
+      ENDIF.
+      fn_info =  screen-name.  ASSIGN (fn_info)  TO &lt;fs_info&gt;.
+      IF &lt;fs_info&gt;+0(1) = '@'  AND
+         &lt;fs_info&gt;+3(1) = '@'.
+        TRANSLATE &lt;fs_info&gt;+1(2) TO UPPER CASE.
+      ENDIF.
+    ENDIF.
+
+    IF screen-group1 = 'CHK'.
+      fn_vari       =  screen-name.  ASSIGN (fn_vari)  TO &lt;fs_vari&gt;.
+      fn_repid      =  fn_vari.
+      fn_repid+2(1) = 'R'.           ASSIGN (fn_repid) TO &lt;fs_repid&gt;.
+
+      IF &lt;fs_vari&gt;+0(1) = '@'  AND
+         &lt;fs_vari&gt;+3(1) = '@'.
+        TRANSLATE &lt;fs_vari&gt;+1(2) TO UPPER CASE.
+      ENDIF.
+
+      x = fn_vari.
+
+      IF &lt;fs_repid&gt; = space.
+        wk_actiontype+x(1) = 'C'.
+      ELSE.
+        PERFORM pruef_step USING  x &lt;fs_repid&gt; &lt;fs_vari&gt;
+                                     fn_repid   fn_vari.
+      ENDIF.
+    ENDIF.
+
+* IF SCREEN-GROUP1      = 'VIW'.
+*    SCREEN-INPUT       = 'OFF'.
+*    MODIFY SCREEN.
+* ENDIF.
+
+    IF screen-group1      = 'NOD'.
+      screen-invisible   = '1'.
+      screen-input       = '0'.
+      screen-output      = '0'.
+      MODIFY SCREEN.
+    ENDIF.
+
+    IF screen-group1      = 'ND2'.
+      screen-invisible   = '1'.
+      screen-input       = '0'.
+      screen-output      = '0'.
+      MODIFY SCREEN.
+    ENDIF.
+
+    IF screen-group1      =  'PB3'.
+      screen-invisible   = '1'.
+      screen-input       = '0'.
+      screen-output      = '0'.
+      MODIFY SCREEN.
+    ENDIF.
+  ENDLOOP.
+
+  x_opn = 0.
+  x_sub = 0.
+
+  LOOP AT SCREEN.
+
+    IF screen-group1 = 'CHK'.
+      fn_vari       =  screen-name.  ASSIGN (fn_vari)  TO &lt;fs_vari&gt;.
+      fn_repid      =  fn_vari.
+      fn_repid+2(1) = 'R'.           ASSIGN (fn_repid) TO &lt;fs_repid&gt;.
+    ENDIF.
+
+    IF screen-group1 = 'OPN'.
+      ADD 1 TO x_opn.
+
+      IF wk_actiontype+x_opn(1) = 'C' OR
+         wk_actiontype+x_opn(1) = ' '.
+        screen-invisible   = '1'.
+        screen-input       = '0'.
+        screen-output      = '0'.
+        MODIFY SCREEN.
+      ELSE.
+        n3 = x_opn.
+        l_b1+5 = n3.
+        ASSIGN (l_b1) TO &lt;fs_b1&gt;.
+        &lt;fs_b1&gt; = '@09@'.
+        MODIFY SCREEN.
+      ENDIF.
+    ENDIF.
+
+    IF screen-group1 = 'SUB'.
+      ADD 1 TO x_sub.
+
+      n3 = x_sub.
+      l_b2+5 = n3.
+      ASSIGN (l_b2) TO &lt;fs_b2&gt;.
+
+      IF wk_actiontype+x_sub(1) = 'H' OR
+         wk_actiontype+x_sub(1) = 'h'.
+        &lt;fs_b2&gt; = '@M4@'.
+        &lt;fs_b2&gt;+5
+                = 'Variant has flag "Only for Background Processing"'.
+        MODIFY SCREEN.
+      ELSE.
+        &lt;fs_b2&gt; = '@08@'.
+        MODIFY SCREEN.
+      ENDIF.
+
+      IF wk_actiontype+x_sub(1) = 'v' OR
+         wk_actiontype+x_sub(1) = 'V' OR
+         wk_actiontype+x_sub(1) = 'H' OR
+         wk_actiontype+x_sub(1) = 'h'.
+      ELSE.
+        screen-invisible   = '1'.
+        screen-input       = '0'.
+        screen-output      = '0'.
+        MODIFY SCREEN.
+      ENDIF.
+
+      IF wk_zz_me+x_sub(1)  = 'X'.
+        screen-invisible   = '1'.
+        screen-input       = '0'.
+        screen-output      = '0'.
+        MODIFY SCREEN.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+
+  IF wk_ucomm = 'UC_ZZ_DIS_MODE'  OR
+     p_hide01 = 'DISPLAY'.
+    p_hide01 = 'DISPLAY'.
+    MODIFY SCREEN.
+    PERFORM switch_to_display_mode.
+  ENDIF.
+
+  IF wk_ucomm = 'UC_ZZ_MOD_MODE'             OR
+     p_hide01 = 'MODIFY'  OR
+     p_hide01 =  space.
+    p_hide01 = 'MODIFY'.
+    MODIFY SCREEN.
+    PERFORM switch_to_modify_mode.
+  ENDIF.
+
+  IF p_hide01 &lt;&gt; 'DISPLAY'.
+    LOOP AT SCREEN.
+      CHECK screen-name(4) = 'PM_C'
+       OR   screen-name(4) = 'P_R_'
+       OR   screen-name(4) = 'P_V_'
+       OR   screen-name(4) = 'P_I_'.
+      l_pos = screen-name+5.
+
+      CASE screen-name(4).
+        WHEN 'PM_C'.
+          IF    p_c_togl+l_pos(1) = space.
+            screen-input = '1'.
+          ELSE.
+            screen-input = '0'.
+            screen-display_3d   = '1'.
+          ENDIF.
+        WHEN 'P_R_'.
+          IF    p_r_togl+l_pos(1) = space.
+            screen-input = '1'.
+          ELSE.
+            screen-input = '0'.
+            screen-display_3d   = '1'.
+          ENDIF.
+        WHEN 'P_V_'.
+          IF    p_v_togl+l_pos(1) = space.
+            screen-input = '1'.
+          ELSE.
+            screen-input = '0'.
+            screen-display_3d   = '1'.
+          ENDIF.
+        WHEN 'P_I_'.
+          IF    p_i_togl+l_pos(1) = space.
+            screen-input = '1'.
+          ELSE.
+            screen-input = '0'.
+            screen-display_3d   = '1'.
+          ENDIF.
+      ENDCASE.
+      MODIFY SCREEN.
+    ENDLOOP.
+  ENDIF.
+
+  PERFORM get_comments.
+
+*======================================================================
+FORM switch_to_display_mode.
+*======================================================================
+
+  LOOP AT SCREEN.
+    IF screen-group1 = 'PBM'.
+      screen-input       = '1'.
+      MODIFY SCREEN.
+    ENDIF.
+    CHECK screen-group1 = 'P_R'
+       OR  screen-group1 = 'P_I'
+       OR  screen-group1 = 'CHK'
+       OR  screen-group1 = 'COM'
+       OR  screen-group1 = 'PBD'
+       OR  screen-group1 = 'PB'.
+    .
+    screen-input        = '0'.
+    screen-intensified  = '0'.
+    screen-display_3d   = '1'.
+    MODIFY SCREEN.
+  ENDLOOP.
+
+ENDFORM.
+*======================================================================
+FORM switch_to_modify_mode.
+*======================================================================
+
+  LOOP AT SCREEN.
+    IF screen-group1 = 'PBM'.
+      screen-input       = '0'.
+      MODIFY SCREEN.
+    ENDIF.
+    CHECK screen-group1 = 'P_R'
+      OR  screen-group1 = 'P_I'
+      OR  screen-group1 = 'CHK'
+      OR  screen-group1 = 'COM'
+      OR  screen-group1 = 'PBD'
+      OR  screen-group1 = 'PB'.
+    screen-input        = '1'.
+    screen-intensified  = '0'.
+    screen-display_3d   = '0'.
+    MODIFY SCREEN.
+  ENDLOOP.
+
+ENDFORM.
+*======================================================================
+FORM get_comments.
+*======================================================================
+  DATA: fn_text(8),
+        l_repid      LIKE sy-repid,
+        ls_repid     TYPE program,
+        ls_vari(30),
+        l_actiontype.
+
+  DATA: BEGIN OF t_varid,
+          report  LIKE varid-report,
+          variant LIKE varid-variant,
+          mlangu  LIKE varid-mlangu,
+          langu   LIKE varit-langu,
+          vtext   LIKE varit-vtext.
+  DATA  END OF t_varid.
+
+  DATA: BEGIN OF t_varid_trans,
+          tcode   LIKE tstc-tcode,
+          report  LIKE varid-report,
+          variant LIKE varid-variant,
+          mlangu  LIKE varid-mlangu,
+          langu   LIKE varit-langu,
+          vtext   LIKE varit-vtext.
+  DATA  END OF t_varid_trans.
+
+  DATA: lt_varid       LIKE TABLE OF t_varid,
+        lt_varid_trans LIKE TABLE OF t_varid_trans,
+        ll_varid       LIKE t_varid,
+        ll_varid_trans LIKE t_varid_trans.
+
+  CLEAR x.
+
+  DO 99 TIMES.
+    ADD 1 TO x.
+
+    CONCATENATE 'P_V_S' x INTO fn_vari.   ASSIGN (fn_vari)  TO &lt;fs_vari&gt;.
+    fn_repid      =  fn_vari.
+    fn_repid+2(1) = 'R'.                  ASSIGN (fn_repid) TO &lt;fs_repid&gt;.
+
+    CHECK &lt;fs_repid&gt; &lt;&gt; space.
+
+    fn_text       =  fn_vari.
+    fn_text+2(1)  = 'I'.                  ASSIGN (fn_text)  TO &lt;fs_text&gt;.
+
+    IF sy-ucomm = 'UC_REFRESH_COMM'.
+      CASE wk_actiontype+x(1).
+        WHEN 'V'
+         OR  'v'
+         OR  'R'
+         OR  'T'
+         OR  'G'
+         OR  'H'
+         OR  'h'.    CLEAR &lt;fs_text&gt;.
+      ENDCASE.
+    ENDIF.
+    IF sy-ucomm = 'UC_REFRESH_LINE_COMM'.
+      CHECK wk_refresh_line = x.
+      CASE wk_actiontype+x(1).
+        WHEN 'V'
+         OR  'v'
+         OR  'R'
+         OR  'T'
+         OR  'G'
+         OR  'H'
+         OR  'h'.    CLEAR &lt;fs_text&gt;.
+        WHEN OTHERS.
+          wk_nothing_to_do = 'X'.
+          EXIT.
+      ENDCASE.
+    ENDIF.
+
+    CHECK &lt;fs_text&gt;  =  space.
+
+    ls_repid = &lt;fs_repid&gt;.
+    IF ls_repid(5) = 'GR55 '.
+      ls_repid(5) = 'GR55.'.
+      CONDENSE  ls_repid+5 NO-GAPS.
+    ELSE.
+      CONDENSE  ls_repid NO-GAPS.
+    ENDIF.
+    TRANSLATE ls_repid TO UPPER CASE.
+    IF ls_repid(1)   = '@'  AND
+       ls_repid+3(1) = '@'.
+      ls_repid      =  ls_repid+4.
+    ENDIF.
+
+    ls_vari  = &lt;fs_vari&gt;.
+    TRANSLATE ls_vari TO UPPER CASE.
+
+    CASE wk_actiontype+x(1).
+      WHEN 'G'.
+        REFRESH lt_varid.
+        CLEAR   t_varid.
+        l_repid =  ls_repid.
+        CLEAR wk_tstcp_repname.
+        PERFORM get_tstcp_reportname USING 1  ls_repid   ls_vari
+                                              ls_repid   ls_vari.
+        l_repid = wk_tstcp_repname.
+
+        DO 2 TIMES.
+          SELECT a~report a~variant a~mlangu b~langu b~vtext
+                 APPENDING TABLE lt_varid
+                 FROM varid AS a
+                  INNER JOIN varit AS b ON  a~report = b~report
+                                        AND a~variant = b~variant
+                  WHERE a~report = l_repid
+                   AND  a~variant = ls_vari.
+
+          IF sy-dbcnt &gt; 1.
+            SORT lt_varid BY mlangu DESCENDING langu.
+            LOOP AT lt_varid INTO t_varid.
+              IF sy-langu = t_varid-langu.
+                CLEAR t_varid-langu.
+                MODIFY lt_varid FROM t_varid.
+              ENDIF.
+            ENDLOOP.
+
+            SORT lt_varid BY langu mlangu.
+          ENDIF.
+
+          LOOP AT lt_varid INTO t_varid.
+            EXIT.
+          ENDLOOP.
+
+          IF t_varid-vtext &lt;&gt; space.
+            WRITE t_varid-vtext TO &lt;fs_text&gt;.
+            EXIT.
+          ENDIF.
+
+          IF ls_vari+0(1) = '@' AND
+             ls_vari+3(1) = '@'.
+            ls_vari = ls_vari+4.
+          ELSE.
+            EXIT.
+          ENDIF.
+        ENDDO.
+
+      WHEN 'V'
+      OR   'H'. REFRESH lt_varid.
+        CLEAR   t_varid.
+        l_repid =  ls_repid.
+        IF l_repid(5) = 'GR55=' OR
+           l_repid(5) = 'GR55-' OR
+           l_repid(5) = 'GR55_' OR
+           l_repid(5) = 'GR55.' OR
+           l_repid(5) = 'GR55,' OR
+           l_repid(5) = 'GR55&gt;' OR
+           l_repid(5) = 'GR55/'.
+          CLEAR wk_gr55_repname.
+          l_actiontype = wk_actiontype+x(1).
+          PERFORM get_gr55_reportname USING 1  ls_repid   ls_vari
+                                               ls_repid   ls_vari.
+          l_repid = wk_gr55_repname.
+          wk_actiontype+x(1) = l_actiontype.
+        ENDIF.
+
+        DO 2 TIMES.
+          SELECT a~report a~variant a~mlangu b~langu b~vtext
+                 APPENDING TABLE lt_varid
+                 FROM varid AS a
+                  INNER JOIN varit AS b ON  a~report = b~report
+                                        AND a~variant = b~variant
+                 WHERE a~report = l_repid
+                  AND  a~variant = ls_vari.
+
+          IF sy-dbcnt &gt; 1.
+            SORT lt_varid BY mlangu DESCENDING langu.
+            LOOP AT lt_varid INTO t_varid.
+              IF sy-langu = t_varid-langu.
+                CLEAR t_varid-langu.
+                MODIFY lt_varid FROM t_varid.
+              ENDIF.
+            ENDLOOP.
+
+            SORT lt_varid BY langu mlangu.
+          ENDIF.
+
+          LOOP AT lt_varid INTO t_varid.
+            EXIT.
+          ENDLOOP.
+
+          IF t_varid-vtext &lt;&gt; space.
+            WRITE t_varid-vtext TO &lt;fs_text&gt;.
+            EXIT.
+          ENDIF.
+
+          IF ls_vari+0(1) = '@' AND
+             ls_vari+3(1) = '@'.
+            ls_vari = ls_vari+4.
+          ELSE.
+            EXIT.
+          ENDIF.
+        ENDDO.
+
+      WHEN 'v'
+      OR   'h'. REFRESH lt_varid_trans.
+        l_repid =  ls_repid.
+        IF       ls_repid(3)  = '/T/'.
+          l_repid  = ls_repid+3.
+        ELSE.
+          l_repid  = ls_repid.
+        ENDIF.
+
+        DO 2 TIMES.
+          SELECT t~tcode a~report a~variant a~mlangu b~langu b~vtext
+                 APPENDING TABLE lt_varid_trans
+                 FROM tstc AS t
+                  INNER JOIN varid AS a ON  t~pgmna = a~report
+                  INNER JOIN varit AS b ON  a~report = b~report
+                                        AND a~variant = b~variant
+                  WHERE t~tcode   = l_repid
+                   AND  a~variant = ls_vari.
+
+          IF sy-dbcnt &gt; 1.
+            SORT lt_varid_trans BY mlangu DESCENDING langu.
+            LOOP AT lt_varid_trans INTO t_varid_trans.
+              IF sy-langu = t_varid_trans-langu.
+                CLEAR t_varid_trans-langu.
+                MODIFY lt_varid_trans FROM t_varid_trans.
+              ENDIF.
+            ENDLOOP.
+
+            SORT lt_varid_trans BY langu mlangu.
+          ENDIF.
+
+          LOOP AT lt_varid_trans INTO t_varid_trans.
+            EXIT.
+          ENDLOOP.
+
+          IF t_varid_trans-vtext &lt;&gt; space.
+            WRITE t_varid_trans-vtext TO &lt;fs_text&gt;.
+            EXIT.
+          ENDIF.
+
+          IF ls_vari+0(1) = '@' AND
+             ls_vari+3(1) = '@'.
+            ls_vari = ls_vari+4.
+          ELSE.
+            EXIT.
+          ENDIF.
+        ENDDO.
+
+      WHEN 'R'.
+        IF trdirt-name &lt;&gt; &lt;fs_repid&gt;.
+          CLEAR trdirt.
+        ENDIF.
+        IF trdirt-text = space.
+          SELECT SINGLE * FROM trdirt WHERE name  =  ls_repid
+                                       AND  sprsl = sy-langu.
+          IF sy-subrc &lt;&gt; 0.
+            SELECT SINGLE * FROM trdirt WHERE name  =  ls_repid
+                                         AND  sprsl = 'E'.
+          ENDIF.
+          IF sy-subrc &lt;&gt; 0.
+            SELECT SINGLE * FROM trdirt WHERE name  =  ls_repid
+                                         AND  sprsl = 'D'.
+          ENDIF.
+        ENDIF.
+        &lt;fs_text&gt; = trdirt-text.
+
+      WHEN 'B'.                                   "Berichtsgruppe aus GR55
+        IF ls_vari+0(1) = '@'  AND
+           ls_vari+3(1) = '@'.
+          ls_vari = ls_vari+4.
+        ENDIF.
+        PERFORM get_gr55_reportname USING 1  ls_repid   ls_vari
+                                             ls_repid   ls_vari.
+
+        IF trdirt-name &lt;&gt; wk_gr55_repname.
+          CLEAR trdirt.
+        ENDIF.
+        IF trdirt-text = space.
+          SELECT SINGLE * FROM trdirt WHERE name = wk_gr55_repname
+                                      AND  sprsl = sy-langu.
+          IF sy-subrc &lt;&gt; 0.
+            SELECT SINGLE * FROM trdirt WHERE name =
+            wk_gr55_repname
+                                        AND  sprsl = 'E'.
+          ENDIF.
+          IF sy-subrc &lt;&gt; 0.
+            SELECT SINGLE * FROM trdirt WHERE name =
+            wk_gr55_repname
+                                        AND  sprsl = 'D'.
+          ENDIF.
+        ENDIF.
+        &lt;fs_text&gt; = trdirt-text.
+
+      WHEN 'T'.
+        IF tstct-tcode &lt;&gt; &lt;fs_repid&gt;
+         OR sy-ucomm = 'UC_REFRESH_LINE_COMM'
+         OR sy-ucomm = 'UC_REFRESH_'.
+          CLEAR: tstct, dd02t.
+        ENDIF.
+        CLEAR &lt;fs_text&gt;.
+
+        IF &lt;fs_vari&gt;  &lt;&gt; space.
+
+          IF ls_vari+0(1) = '@'  AND
+             ls_vari+3(1) = '@'.
+            ls_vari = ls_vari+4.
+          ENDIF.
+          CONDENSE ls_vari NO-GAPS.
+
+          CASE  ls_repid.
+            WHEN 'SE11'
+             OR  'SE16'
+             OR  'SE16N'
+             OR  'SE17'
+             OR  'SE54'
+             OR  'SM30'
+             OR  'SM31'.
+              SELECT SINGLE * FROM dd02l WHERE tabname =  ls_vari.
+              IF sy-subrc = 0.
+                SELECT SINGLE * FROM dd02t
+                       WHERE tabname    =  ls_vari
+                        AND  ddlanguage = sy-langu.
+                IF sy-subrc &lt;&gt; 0.
+                  SELECT SINGLE * FROM dd02t
+                      WHERE tabname    =  ls_vari
+                          AND  ddlanguage = 'E'.
+                ENDIF.
+                IF sy-subrc &lt;&gt; 0.
+                  SELECT SINGLE * FROM dd02t
+                      WHERE tabname    =  ls_vari
+                          AND  ddlanguage = 'D'.
+                ENDIF.                     .
+                IF dd02t-ddtext &lt;&gt; space.
+                  &lt;fs_text&gt;   = dd02t-ddtext.
+                  tstct-ttext = dd02t-ddtext.
+                ENDIF.
+              ENDIF.
+
+            WHEN 'SM34'.
+              SELECT SINGLE * FROM vcldirt
+                              WHERE vclname    =  ls_vari
+                               AND  spras   = sy-langu.
+              IF sy-subrc = 0.
+                &lt;fs_text&gt;   = vcldirt-text.
+                tstct-ttext = vcldirt-text.
+              ENDIF.
+
+            WHEN 'SE71'.
+              SELECT SINGLE * FROM stxh WHERE tdobject = 'FORM'
+                                         AND  tdname    =  ls_vari
+                                         AND  tdid     = 'TXT'
+                                         AND  tdspras  = sy-langu.
+              IF sy-subrc = 0.
+                &lt;fs_text&gt;   = stxh-tdtitle.
+                tstct-ttext = stxh-tdtitle.
+              ENDIF.
+            WHEN 'SE37'.
+              SELECT SINGLE * FROM tftit
+                              WHERE spras    = sy-langu
+                               AND  funcname =  ls_vari.
+              IF sy-subrc &lt;&gt; 0.
+                SELECT SINGLE * FROM tftit
+                                WHERE spras    = 'E'
+                              AND  funcname =  ls_vari.
+              ENDIF.
+              IF sy-subrc &lt;&gt; 0.
+                SELECT SINGLE * FROM tftit
+                                WHERE spras    = 'D'
+                              AND  funcname =  ls_vari.
+              ENDIF.
+              &lt;fs_text&gt; = tftit-stext.
+
+            WHEN 'SE38'
+             OR  'SA38'
+             OR  'SE51'
+             OR  'SE80'.
+              SELECT SINGLE * FROM trdirt WHERE name  =  ls_vari
+                                           AND  sprsl = sy-langu.
+              IF sy-subrc &lt;&gt; 0.
+                SELECT SINGLE * FROM trdirt
+                                WHERE name  =  ls_vari
+                                 AND  sprsl = 'E'.
+              ENDIF.
+              IF sy-subrc &lt;&gt; 0.
+                SELECT SINGLE * FROM trdirt
+                                WHERE name  =  ls_vari
+                                 AND  sprsl = 'D'.
+              ENDIF.
+              &lt;fs_text&gt; = trdirt-text.
+
+          ENDCASE.
+        ENDIF.
+
+        CHECK &lt;fs_text&gt;   = space.
+
+        IF       ls_repid(3)  = '/T/'.
+          l_repid  = ls_repid+3.
+        ELSE.
+          l_repid  = ls_repid.
+        ENDIF.
+
+        IF tstct-ttext = space.
+          SELECT SINGLE * FROM tstct WHERE tcode = l_repid
+                                      AND  sprsl = sy-langu.
+
+          IF sy-subrc &lt;&gt; 0.
+            SELECT SINGLE * FROM tstct WHERE tcode =  l_repid
+                                        AND  sprsl = 'E'.
+          ENDIF.
+          IF sy-subrc &lt;&gt; 0.
+            SELECT SINGLE * FROM tstct WHERE tcode =  l_repid
+                                        AND  sprsl = 'D'.
+          ENDIF.
+          SELECT SINGLE * FROM tstc WHERE tcode = tstct-tcode.
+          IF sy-subrc = 0  AND
+             tstc-pgmna(4) = 'MENU'.
+            CLEAR tstct.
+          ENDIF.
+        ENDIF.
+
+        &lt;fs_text&gt; = tstct-ttext.
+    ENDCASE.
+
+    IF sy-ucomm = 'UC_REFRESH_LINE_COMM' AND
+       wk_refresh_line = x.
+      EXIT.
+    ENDIF.
+  ENDDO.
+
+ENDFORM.
+*======================================================================
+AT SELECTION-SCREEN.
+*======================================================================
+
+  IF sy-ucomm = 'SPOS'.
+    LOOP AT SCREEN.
+      IF screen-group1 = 'ND2'.
+        screen-invisible   = '0'.
+        screen-input       = '1'.
+        screen-output      = '1'.
+        MODIFY SCREEN.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
+
+  CLEAR wk_nothing_to_do.
+
+  IF sy-ucomm = 'UC_ZZ_DIS_MODE' OR
+     sy-ucomm = 'UC_ZZ_MOD_MODE' OR
+     sy-ucomm = 'OPTI'.
+    wk_ucomm = sy-ucomm.
+  ENDIF.
+
+  IF sy-ucomm = 'UC_REFRESH_COMM'.
+    PERFORM get_comments.
+    MESSAGE 'If result is OK, do not forget to save the variant!'
+            TYPE 'I'.
+  ENDIF.
+
+  IF sy-ucomm = 'UC_REFRESH_LINE_COMM'.
+    GET CURSOR FIELD wk_cursor_field VALUE wk_field_content.
+    IF wk_cursor_field+4 BETWEEN 'S001' AND 'S099'.
+      wk_refresh_line = wk_cursor_field+5.
+      PERFORM get_comments.
+      IF wk_nothing_to_do = space.
+        MESSAGE 'If result is OK, do not forget to save the variant!'
+                TYPE 'I'.
+      ELSE.
+        MESSAGE 'Nothing to do fort that line!'
+                TYPE 'I'.
+      ENDIF.
+    ELSE.
+      MESSAGE 'Position your cursor on a valid line and try again!'
+              TYPE 'I'.
+    ENDIF.
+  ENDIF.
+
+*LOOP AT SCREEN.
+*  IF SCREEN-GROUP1  = 'VIW'.
+*     SCREEN-INPUT   = 'OFF'.
+*     MODIFY SCREEN.
+*  ENDIF.
+*ENDLOOP.
+
+  FIELD-SYMBOLS: &lt;fs_repid&gt;,  &lt;fs_vari&gt;,  &lt;fs_cond&gt;,  &lt;fs_date&gt;,
+                 &lt;fs_fromu&gt;,  &lt;fs_comm&gt;,
+
+                 &lt;fs_prepid&gt;, &lt;fs_pvari&gt;, &lt;fs_pcond&gt;, &lt;fs_pdate&gt;,
+                 &lt;fs_pfromu&gt;, &lt;fs_pcomm&gt;.
+
+  DATA: fn_repid(8),              " like trdir-name,
+        fn_vari(8),               " like varid-variant,
+        fn_cond(8),
+        fn_date     LIKE sy-datum,
+        fn_fromu(8),
+        fn_comm(8),
+        x(3)        TYPE n,
+        ende.
+
+  IF sy-ucomm = 'OPTI'.
+    sy-ucomm = 'FC01'.    "Zur Vermeidung unsinniger Meldung
+
+    wk_message = 'Open Variant'.
+    PERFORM open_variant.
+  ENDIF.
+
+  IF sy-ucomm(6) = 'OPEN_S'.
+    PERFORM open_variant.
+  ENDIF.
+
+  IF sy-ucomm(6) = 'SUBM_S'.
+    PERFORM submit_variant.
+  ENDIF.
+
+  IF sscrfields-ucomm = 'FC01'.
+    IF sscrfields-functxt_01 &lt;&gt; space.
+      PERFORM toggle_field.
+      EXIT.
+    ENDIF.
+  ENDIF.
+
+  IF sscrfields-ucomm = 'FC02'.
+    IF sscrfields-functxt_02 &lt;&gt; space.
+      PERFORM insert_line.
+      EXIT.
+    ENDIF.
+  ENDIF.
+
+  IF sscrfields-ucomm = 'FC03'.
+    IF sscrfields-functxt_03 &lt;&gt; space.
+      PERFORM delete_line.
+      EXIT.
+    ENDIF.
+  ENDIF.
+
+  IF sscrfields-ucomm = 'FC04'.
+    IF sscrfields-functxt_04 &lt;&gt; space.
+      PERFORM clear_screen.
+      EXIT.
+    ENDIF.
+  ENDIF.
+
+  x = 0.
+
+  DO 99 TIMES.                        "For 99 possible Steps
+    ADD 1 TO x.
+
+    CLEAR tab.
+    fn_repid = 'P_R_S'. fn_repid+5 = x. ASSIGN (fn_repid) TO &lt;fs_repid&gt;.
+    fn_vari  = 'P_V_S'. fn_vari+5  = x. ASSIGN (fn_vari)  TO &lt;fs_vari&gt;.
+    fn_cond  = 'P_C_S'. fn_cond+5  = x. ASSIGN (fn_cond)  TO &lt;fs_cond&gt;.
+    fn_date  = 'P_D_S'. fn_date+5  = x. ASSIGN (fn_date)  TO &lt;fs_date&gt;.
+
+    PERFORM pruef_step USING  x &lt;fs_repid&gt; &lt;fs_vari&gt;
+                                 fn_repid   fn_vari.
+  ENDDO.
+
+*======================================================================
+FORM  pruef_step USING us_x us_repid us_vari
+                            fn_repid fn_vari.
+*======================================================================
+
+  DATA: line(120),
+        ls_repid  TYPE program,
+        ls_repidu TYPE program,
+        ls_variu  LIKE wk_c30k,
+        ls_vari   LIKE wk_c30k.
+
+  CLEAR wk_actiontype+us_x(1).
+  CLEAR wk_zz_me+us_x(1).
+
+  CHECK us_repid &lt;&gt; space.
+
+  ls_repidu = us_repid.
+  TRANSLATE ls_repidu TO UPPER CASE.
+  ls_variu  = us_vari.
+  TRANSLATE ls_variu  TO UPPER CASE.
+
+  ls_repid = ls_repidu.
+  ls_vari  = ls_variu.
+
+  IF ls_repid(5) = 'GR55 '.
+    ls_repid(5) = 'GR55.'.
+    CONDENSE ls_repid+5 NO-GAPS.
+  ELSE.
+    CONDENSE ls_repid NO-GAPS.
+  ENDIF.
+  IF ls_repid(1)   = '@'  AND
+     ls_repid+3(1) = '@'.
+    ls_repid      =  ls_repid+4.
+    TRANSLATE us_repid+1(2) TO UPPER CASE.
+  ENDIF.
+
+  IF ls_repid(4) = 'GR55'.
+    CASE ls_repid+4(1).
+      WHEN '='
+       OR  '-'
+       OR  '_'
+       OR  '.'
+       OR  ','
+       OR  '&gt;'
+       OR  '/'.
+      WHEN OTHERS. ls_repid+5 = ls_repid+4. CLEAR ls_repid+4(1).
+    ENDCASE.
+  ENDIF.
+
+  IF wk_sa38_allowed = 'X'.
+    SELECT SINGLE * FROM trdir WHERE name = ls_repid.
+    IF sy-subrc &lt;&gt; 0.
+      line      = 'Line'.
+      line+5    = us_x.
+      line+9    = 'Report:'.
+      line+18   = ls_repid.
+      line+62   = 'does not exist!'.
+      CONDENSE line.
+      CLEAR wk_actiontype+us_x(1).
+    ELSE.
+      wk_actiontype+us_x(1) = 'R'.          "Report
+    ENDIF.
+
+    IF wk_actiontype+us_x(1) = 'R' AND          "Report
+       us_vari  &lt;&gt; space.
+      DO 2 TIMES.
+        SELECT SINGLE * FROM varid WHERE report  = ls_repid
+                                    AND  variant = ls_vari.
+        IF sy-subrc = 0  OR
+           ls_vari+0(1) &lt;&gt; '@'.
+          EXIT.
+        ENDIF.
+        IF  ls_vari+0(1) = '@' AND
+            ls_vari+3(1) = '@'.
+          ls_vari      =  ls_vari+4.
+        ENDIF.
+      ENDDO.
+
+      IF sy-subrc &lt;&gt; 0.
+        line      = 'Line'.
+        line+5    = us_x.
+        line+9    = 'Variant:'.
+        line+18   = ls_vari.
+        line+62   = 'does not exist!'.
+        CONDENSE line.
+      ELSE.
+        IF varid-environmnt = 'B'.
+          wk_actiontype+us_x(1) = 'H'.   "Rep. with vari for background
+        ELSE.
+          wk_actiontype+us_x(1) = 'V'.   "Report with variant
+        ENDIF.
+        us_vari = ls_variu.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+  IF wk_actiontype+us_x(1) &lt;&gt; space.
+    us_repid = ls_repidu.
+  ENDIF.
+  CHECK wk_actiontype+us_x(1) = space.
+
+  DATA: l_repid(40).
+
+  SELECT SINGLE * FROM tstc WHERE tcode = ls_repid.
+  IF sy-subrc     &lt;&gt;  0.
+    IF       ls_repid(3)  =  '/T/'.
+      l_repid = ls_repid+3.
+    ENDIF.
+    IF l_repid &lt;&gt; space.
+      SELECT SINGLE * FROM tstc WHERE tcode = l_repid.
+    ENDIF.
+  ENDIF.
+
+  IF sy-subrc      =   0     AND
+     tstc-pgmna(4) &lt;&gt; 'MENU'.
+    wk_actiontype+us_x(1) = 'T'.        "Transaction
+    us_repid = ls_repidu.
+  ENDIF.
+
+  IF wk_actiontype+us_x(1) = 'T' AND          "Transaktion
+     us_vari  &lt;&gt; space.
+    DO 2 TIMES.
+      SELECT SINGLE * FROM varid WHERE report  = tstc-pgmna
+                                  AND  variant = ls_vari.
+      IF sy-subrc = 0  OR
+         ls_vari+0(1) &lt;&gt; '@'.
+        EXIT.
+      ENDIF.
+      IF  ls_vari+0(1) = '@' AND
+          ls_vari+3(1) = '@'.
+        ls_vari      =  ls_vari+4.
+      ENDIF.
+    ENDDO.
+
+    IF sy-subrc &lt;&gt; 0.
+      line      = 'Line'.
+      line+5    = us_x.
+      line+9    = 'Variant:'.
+      line+18   = us_vari.
+      line+62   = 'does not exist!'.
+      CONDENSE line.
+    ELSE.
+      IF varid-environmnt = 'B'.
+        wk_actiontype+us_x(1) = 'h'.   "Trans with vari for background
+      ELSE.
+        wk_actiontype+us_x(1) = 'v'.        "Transaction with variant
+      ENDIF.
+      us_vari = ls_variu.
+    ENDIF.
+  ENDIF.
+
+  IF wk_actiontype+us_x(1) = 'T' AND          "Transaktion
+     us_vari  &lt;&gt; space.
+    CONDENSE ls_vari NO-GAPS.
+
+    CASE  ls_repid.
+      WHEN 'SE11'
+       OR  'SE16'
+       OR  'SE16N'
+       OR  'SE17'
+       OR  'SE54'
+       OR  'SM30'
+       OR  'SM31'. SELECT SINGLE * FROM dd02l WHERE tabname =  ls_vari.
+        IF sy-subrc = 0.
+          us_vari = ls_variu.
+        ENDIF.
+        WHEN 'SM34'. SELECT SINGLE * FROM vcldirt WHERE vclname = ls_vari
+                                                   AND  spras   = sy-langu.
+        IF sy-subrc = 0.
+          us_vari = ls_variu.
+        ENDIF.
+
+        WHEN 'SE71'. SELECT SINGLE * FROM stxh WHERE tdobject = 'FORM'
+                                                AND  tdname   =  ls_vari
+                                                AND  tdid     = 'TXT'
+                                                AND  tdspras  = sy-langu.
+        IF sy-subrc = 0.
+          us_vari = ls_variu.
+        ENDIF.
+      WHEN 'SE38'
+       OR  'SA38'
+       OR  'SE51'
+       OR  'SE80'. SELECT SINGLE * FROM trdirt WHERE name  =  ls_vari
+        AND  sprsl = sy-langu.
+        IF sy-subrc &lt;&gt; 0.
+          SELECT SINGLE * FROM trdirt WHERE name  =  ls_vari
+                                       AND  sprsl = 'E'.
+        ENDIF.
+        IF sy-subrc &lt;&gt; 0.
+          SELECT SINGLE * FROM trdirt WHERE name  =  ls_vari
+                                       AND  sprsl = 'D'.
+        ENDIF.
+        IF sy-subrc = 0.
+          us_vari = ls_variu.
+        ENDIF.
+    ENDCASE.
+  ENDIF.
+
+  IF wk_actiontype+us_x(1) = space  .
+    IF ls_repid(4) = 'GR55'   AND
+       ls_repid+5 &lt;&gt; space.
+      IF ls_repid(5) = 'GR55=' OR
+         ls_repid(5) = 'GR55-' OR
+         ls_repid(5) = 'GR55_' OR
+         ls_repid(5) = 'GR55.' OR
+         ls_repid(5) = 'GR55,' OR
+         ls_repid(5) = 'GR55&gt;' OR
+         ls_repid(5) = 'GR55/'.
+
+        PERFORM get_gr55_reportname USING us_x ls_repid us_vari
+                                               fn_repid fn_vari.
+
+        IF wk_actiontype+us_x(1) = 'B'.
+          us_repid = ls_repidu.
+        ENDIF.
+
+        IF wk_actiontype+us_x(1) = 'B' AND          "Berichtsgruppe
+           us_vari          &lt;&gt; space   AND
+           wk_gr55_repname  &lt;&gt; space.
+          DO 2 TIMES.
+            SELECT SINGLE * FROM varid WHERE report  = wk_gr55_repname
+                                        AND  variant = ls_vari.
+            IF sy-subrc = 0  OR
+               ls_vari+0(1) &lt;&gt; '@'.
+              EXIT.
+            ENDIF.
+            IF  ls_vari+0(1) = '@' AND
+                ls_vari+3(1) = '@'.
+              ls_vari      =  ls_vari+4.
+            ENDIF.
+          ENDDO.
+
+
+          IF sy-subrc &lt;&gt; 0.
+            line      = 'Line'.
+            line+5    = us_x.
+            line+9    = 'Variant:'.
+            line+18   = us_vari.
+            line+62   = 'does not exist!'.
+            CONDENSE line.
+          ELSE.
+            IF varid-environmnt = 'B'.
+              wk_actiontype+us_x(1) = 'H'."Rep. with vari for background
+            ELSE.
+              wk_actiontype+us_x(1) = 'V'.   "Report with variant
+            ENDIF.
+            us_vari = ls_variu.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+
+* Nun kann es sich noch um eine Berichtsgruppen Transaktion handeln
+* der Reportname muss hier über die Tab. TSTCP ermittelt werden.
+
+  IF wk_actiontype+us_x(1) = 'T' AND          "Transaktion
+     us_vari  &lt;&gt; space.
+    PERFORM get_tstcp_reportname USING us_x ls_repid ls_variu
+                                            fn_repid fn_vari.
+  ENDIF.
+
+  IF wk_actiontype+us_x(1) =  'G'.
+    us_vari = ls_variu.
+  ENDIF.
+
+  IF wk_actiontype+us_x(1) = space.
+    wk_actiontype+us_x(1) =  'C'.
+  ENDIF.
+
+ENDFORM.
+*======================================================================
+FORM get_gr55_reportname USING us_x us_repid us_vari
+                                    fn_repid fn_vari.
+*======================================================================
+  DATA: l_generated,
+        l_e30_job(4),
+        l_prog_name  TYPE progname,
+        l_subrc      LIKE sy-subrc.
+
+  CLEAR wk_gr55_repname.
+
+  IF us_repid(5) = 'GR55=' OR
+     us_repid(5) = 'GR55-' OR
+     us_repid(5) = 'GR55_' OR
+     us_repid(5) = 'GR55.' OR
+     us_repid(5) = 'GR55,' OR
+     us_repid(5) = 'GR55&gt;' OR
+     us_repid(5) = 'GR55/' OR
+     us_repid(5) = 'GR55 '.
+    l_e30_job   = us_repid+5.
+  ELSE.
+    l_e30_job = us_repid+4.
+  ENDIF.
+
+  SELECT * FROM t803vp WHERE rgjnr      =  l_e30_job
+                        AND  progclass  = 'RW_EXECUTION'
+                        ORDER BY versn DESCENDING.
+    EXIT.
+  ENDSELECT.
+
+  IF sy-subrc = 0.
+    CONCATENATE 'GP' t803vp-uni_idc25 sy-mandt INTO wk_gr55_repname.
+    wk_actiontype+us_x(1) =  'B'.
+    EXIT.
+  ENDIF.
+
+  CALL FUNCTION 'GRW_JOB_SUBMIT_PREPARE'
+    EXPORTING
+      i_report_group = l_e30_job
+      i_program_type = 'X'
+    IMPORTING
+      e_subrc        = l_subrc
+      e_program_name = l_prog_name
+    EXCEPTIONS
+      OTHERS         = 4.
+
+  CHECK sy-subrc = 0.
+
+  wk_actiontype+us_x(1) =  'B'.
+  wk_gr55_repname = l_prog_name.
+
+ENDFORM.
+*======================================================================
+FORM get_tstcp_reportname USING us_x us_repid us_vari
+                                     fn_repid fn_vari.
+*======================================================================
+  DATA: l_generated,
+        l_e30_job(4),
+        l_prog_name  TYPE progname,
+        l_subrc      LIKE sy-subrc,
+        l_trans(40),
+        l_f1(60),
+        l_f2(60),
+        l_f3(60).
+
+  CLEAR wk_tstcp_repname.
+
+  IF     us_repid(3) = '/T/'.
+    l_trans = us_repid+3.
+  ELSE.
+    l_trans = us_repid.
+  ENDIF.
+
+  SELECT SINGLE * FROM tstc  WHERE tcode = l_trans.
+  CHECK sy-subrc   = 0.
+  CHECK tstc-pgmna = space.
+
+  SELECT SINGLE * FROM tstcp WHERE tcode = l_trans.
+  CHECK sy-subrc = 0.
+
+  SPLIT tstcp-param AT ';' INTO l_f1 l_f2 l_f3.
+
+  CHECK l_f1+27 = 'REPORTTYPE=RW'.
+
+  l_e30_job = l_f2+19.
+  SELECT * FROM t803vp WHERE rgjnr      =  l_e30_job
+                        AND  progclass  = 'RW_EXECUTION'
+                        ORDER BY versn DESCENDING.
+    EXIT.
+  ENDSELECT.
+
+  IF sy-subrc = 0.
+    CONCATENATE 'GP' t803vp-uni_idc25 sy-mandt INTO wk_tstcp_repname.
+    SELECT SINGLE * FROM varid WHERE report  = wk_tstcp_repname
+                                AND  variant = us_vari.
+    IF sy-subrc = 0.
+      wk_actiontype+us_x(1) =  'G'.
+      EXIT.
+    ENDIF.
+    EXIT.
+  ENDIF.
+
+  CALL FUNCTION 'GRW_JOB_SUBMIT_PREPARE'
+    EXPORTING
+      i_report_group = l_e30_job
+      i_program_type = 'X'
+    IMPORTING
+      e_subrc        = l_subrc
+      e_program_name = l_prog_name
+    EXCEPTIONS
+      OTHERS         = 4.
+
+  CHECK sy-subrc = 0.
+
+  wk_tstcp_repname = l_prog_name.
+  SELECT SINGLE * FROM varid WHERE report  = wk_tstcp_repname
+                              AND  variant = us_vari.
+  IF sy-subrc = 0.
+    wk_actiontype+us_x(1) =  'G'.
+  ENDIF.
+
+ENDFORM.
+*======================================================================
+
+DATA: t_fields LIKE help_value OCCURS 0 WITH HEADER LINE.
+
+DATA: BEGIN OF t_fnames OCCURS 0,
+      fname(21),                      END OF t_fnames.
+
+DATA: BEGIN OF t_abstg  OCCURS 0,
+      kennzahl LIKE sy-repid,
+      text     TYPE text80,      END OF t_abstg.
+
+DATA: wk_selectionfield LIKE help_info-fieldname,
+      wk_l_index        LIKE sy-tabix,
+      wk_vr_titel(40).
+
+DATA: dynpfields LIKE dynpread OCCURS 0 WITH HEADER LINE,
+      li_rep     LIKE sy-repid.
+
+DATA: wk_ff_index(5)              TYPE n,
+      wk_ff_line(150),
+      wk_ff_line_reset,
+      wk_ff_filter_index(5)       TYPE n,
+      wk_ff_num5(5)               TYPE n,
+      wk_ff_nodel_t_loaded_filter,
+      wk_ff_screen(4),
+      wk_ff_answer,
+      wk_ff_msg(60),
+      wk_ff_textline1(60),
+      wk_ff_textline2(60),
+      wk_ff_textline3(60),
+      wk_ff_text_option1(10),
+      wk_ff_text_option2(10),
+      wk_ff_titel(25),
+      wk_ff_uname                 LIKE sy-uname,
+      wk_ff_repid                 LIKE sy-repid,
+      wk_ff_total_lines(6)        TYPE n,
+      wk_ff_current_line(6)       TYPE n,
+      wk_ff_remark_no_lines,
+
+      wk_ff_ende2.
+
+DEFINE macro_value_request.
+  AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_v_s&amp;1.
+     PERFORM show_variants CHANGING        p_v_s&amp;1.
+END-OF-DEFINITION.
+
+macro_value_request 001.
+macro_value_request 002.
+macro_value_request 003.
+macro_value_request 004.
+macro_value_request 005.
+macro_value_request 006.
+macro_value_request 007.
+macro_value_request 008.
+macro_value_request 009.
+macro_value_request 010.
+macro_value_request 011.
+macro_value_request 012.
+macro_value_request 013.
+macro_value_request 014.
+macro_value_request 015.
+macro_value_request 016.
+macro_value_request 017.
+macro_value_request 018.
+macro_value_request 019.
+macro_value_request 020.
+macro_value_request 021.
+macro_value_request 022.
+macro_value_request 023.
+macro_value_request 024.
+macro_value_request 025.
+macro_value_request 026.
+macro_value_request 027.
+macro_value_request 028.
+macro_value_request 029.
+macro_value_request 030.
+macro_value_request 031.
+macro_value_request 032.
+macro_value_request 033.
+macro_value_request 034.
+macro_value_request 035.
+macro_value_request 036.
+macro_value_request 037.
+macro_value_request 038.
+macro_value_request 039.
+macro_value_request 040.
+macro_value_request 041.
+macro_value_request 042.
+macro_value_request 043.
+macro_value_request 044.
+macro_value_request 045.
+macro_value_request 046.
+macro_value_request 047.
+macro_value_request 048.
+macro_value_request 049.
+
+macro_value_request 050.
+macro_value_request 051.
+macro_value_request 052.
+macro_value_request 053.
+macro_value_request 054.
+macro_value_request 055.
+macro_value_request 056.
+macro_value_request 057.
+macro_value_request 058.
+macro_value_request 059.
+macro_value_request 060.
+macro_value_request 061.
+macro_value_request 062.
+macro_value_request 063.
+macro_value_request 064.
+macro_value_request 065.
+macro_value_request 066.
+macro_value_request 067.
+macro_value_request 068.
+macro_value_request 069.
+macro_value_request 070.
+macro_value_request 071.
+macro_value_request 072.
+macro_value_request 073.
+macro_value_request 074.
+macro_value_request 075.
+macro_value_request 076.
+macro_value_request 077.
+macro_value_request 078.
+macro_value_request 079.
+macro_value_request 080.
+macro_value_request 081.
+macro_value_request 082.
+macro_value_request 083.
+macro_value_request 084.
+macro_value_request 085.
+macro_value_request 086.
+macro_value_request 087.
+macro_value_request 088.
+macro_value_request 089.
+macro_value_request 090.
+macro_value_request 091.
+macro_value_request 092.
+macro_value_request 093.
+macro_value_request 094.
+macro_value_request 095.
+macro_value_request 096.
+macro_value_request 097.
+macro_value_request 098.
+macro_value_request 099.
+
+*======================================================================
+FORM show_variants CHANGING l_vari.
+*======================================================================
+  DATA l_curr_line(3) TYPE n.
+
+  CLEAR:   t_fields, t_fnames, t_abstg.
+  REFRESH: t_fields, t_fnames, t_abstg.
+
+  t_fnames-fname = 'VARIT-VARIANT'. APPEND t_fnames.
+  t_fnames-fname = 'ZVISH-TITEL'.   APPEND t_fnames.
+  wk_selectionfield = 'KENNZAHL'.
+
+  GET CURSOR FIELD wk_cursor_field VALUE wk_field_content.
+
+  l_curr_line  =  wk_cursor_field+5.
+
+  fn_repid = 'P_R_S'. fn_repid+5 =  l_curr_line.
+  ASSIGN (fn_repid) TO &lt;fs_repid&gt;.
+
+  CLEAR dynpfields. REFRESH dynpfields.
+  dynpfields-fieldname = fn_repid.
+  APPEND dynpfields.
+
+  wk_ff_repid = sy-repid.
+
+  CALL FUNCTION 'DYNP_VALUES_READ'
+    EXPORTING
+      dyname               = wk_ff_repid
+      dynumb               = '1000'
+    TABLES
+      dynpfields           = dynpfields
+    EXCEPTIONS
+      invalid_abapworkarea = 1.
+  IF    sy-subrc &lt;&gt; 0.
+    CLEAR li_rep.
+  ELSE.
+    li_rep = dynpfields-fieldvalue.
+    TRANSLATE li_rep TO UPPER CASE.
+  ENDIF.
+
+  CASE wk_actiontype+l_curr_line(1).
+    WHEN  'R'.
+      SELECT * FROM varit WHERE langu   = sy-langu
+                           AND  report  = li_rep.
+        t_abstg-kennzahl = varit-variant.
+        t_abstg-text     = varit-vtext.
+        APPEND t_abstg.
+        CLEAR  t_abstg.
+      ENDSELECT.
+
+      CONCATENATE 'Variants of report' &lt;fs_repid&gt;
+             INTO  wk_vr_titel
+        SEPARATED BY space.
+    WHEN  'T'.
+      SELECT SINGLE * FROM tstc WHERE tcode = li_rep.
+      IF sy-subrc = 0.
+        SELECT * FROM varit WHERE langu   = sy-langu
+                             AND  report  = tstc-pgmna.
+          t_abstg-kennzahl = varit-variant.
+          t_abstg-text     = varit-vtext.
+          APPEND t_abstg.
+          CLEAR  t_abstg.
+        ENDSELECT.
+
+        CONCATENATE 'Variants of transaction' &lt;fs_repid&gt;
+               INTO  wk_vr_titel
+          SEPARATED BY space.
+      ENDIF.
+  ENDCASE.
+
+  PERFORM display_requst_values TABLES t_abstg.
+
+  CHECK sy-subrc = 0.
+  READ TABLE t_abstg INDEX wk_l_index.
+  IF sy-subrc = 0.
+    MOVE t_abstg-kennzahl TO l_vari.
+  ENDIF.
+
+ENDFORM.
+*======================================================================
+FORM display_requst_values TABLES form_table1.
+*======================================================================
+
+  CALL FUNCTION 'TRANSFER_NAMES_TO_FIELDS'
+    EXPORTING
+      selectfield        = wk_selectionfield
+    TABLES
+      fields             = t_fields
+      namelist           = t_fnames
+    EXCEPTIONS
+      wrong_format_given = 1
+      OTHERS             = 2.
+  IF sy-subrc = 0. ENDIF.
+
+  CALL FUNCTION 'HELP_VALUES_GET_NO_DD_NAME'
+    EXPORTING
+      selectfield                  = wk_selectionfield
+      titel                        = wk_vr_titel
+    IMPORTING
+      ind                          = wk_l_index
+    TABLES
+      fields                       = t_fields
+      full_table                   = form_table1
+    EXCEPTIONS
+      full_table_empty             = 1
+      no_tablestructure_given      = 2
+      no_tablefields_in_dictionary = 3
+      more_then_one_selectfield    = 4
+      no_selectfield               = 5
+      OTHERS                       = 6.
+  IF sy-subrc = 0. ENDIF.
+
+ENDFORM.
+
+*======================================================================
+START-OF-SELECTION.
+*======================================================================
+  IMPORT memory_prerep FROM MEMORY ID 'MEMORY_PREREP'.
+  FREE                      MEMORY ID 'MEMORY_PREREP'.
+
+  CHECK memory_prerep-prerep &lt;&gt; sy-repid.
+
+  SET PF-STATUS 'LISTE'.
+
+  IF sy-slset &lt;&gt; space.
+    memory_prerep-prerep = sy-repid.
+    EXPORT memory_prerep TO MEMORY ID 'MEMORY_PREREP'.
+    SUBMIT (sy-repid)  VIA SELECTION-SCREEN
+                       USING SELECTION-SET sy-slset  AND RETURN.
+  ENDIF.
+
+  wk_message  = '  Start of processing'.
+
+*======================================================================
+FORM open_variant.
+*======================================================================
+  DATA: ls_repid     TYPE program,
+        ls_vari(30),
+        l_vari_valid,
+        l_actiontype.
+
+  IF sy-ucomm(6) &lt;&gt; 'OPEN_S'.
+    GET CURSOR FIELD wk_cursor_field VALUE wk_field_content.
+
+    IF wk_cursor_field(5) = 'P_R_S'.
+      EXIT.
+    ENDIF.
+
+    IF wk_cursor_field = space        OR
+       wk_cursor_field(5) &lt;&gt; 'P_V_S'.
+      MESSAGE 'Select a Variant in column "Variant"!'
+              TYPE 'E'.
+    ENDIF.
+  ELSE.
+    CONCATENATE 'P_V_' sy-ucomm+5 INTO wk_cursor_field.
+  ENDIF.
+
+  FIELD-SYMBOLS: &lt;fs_repid&gt;, &lt;fs_vari&gt;, &lt;fs_cond&gt;, &lt;fs_date&gt;.
+
+  DATA: fn_repid(8),              " like trdir-name,
+        fn_vari(8),               " like varid-variant,
+        x(3)        TYPE n,
+
+        ende.
+
+  fn_vari       =  wk_cursor_field.  ASSIGN (fn_vari)  TO &lt;fs_vari&gt;.
+  fn_repid      =  fn_vari.
+  fn_repid+2(1) = 'R'.               ASSIGN (fn_repid) TO &lt;fs_repid&gt;.
+
+  ls_repid = &lt;fs_repid&gt;.
+  TRANSLATE ls_repid TO UPPER CASE.
+  CONDENSE ls_repid NO-GAPS.
+  IF ls_repid(1)   = '@'  AND
+     ls_repid+3(1) = '@'.
+    ls_repid      =  ls_repid+4.
+  ENDIF.
+
+  x = fn_vari.
+
+  IF  ls_repid  = space.
+    MESSAGE 'Report missing in current line'
+            TYPE 'E'.
+  ENDIF.
+
+  IF ls_repid(4) = 'GR55'.
+    CASE ls_repid+4(1).
+      WHEN '='
+       OR  '-'
+       OR  '_'
+       OR  '.'
+       OR  ','
+       OR  '&gt;'
+       OR  '/'
+       OR  ' '.
+      WHEN OTHERS. ls_repid+5 = ls_repid+4. CLEAR ls_repid+4(1).
+    ENDCASE.
+  ENDIF.
+
+  IF  ls_repid(5) = 'GR55=' OR
+      ls_repid(5) = 'GR55-' OR
+      ls_repid(5) = 'GR55_' OR
+      ls_repid(5) = 'GR55.' OR
+      ls_repid(5) = 'GR55,' OR
+      ls_repid(5) = 'GR55&gt;' OR
+      ls_repid(5) = 'GR55/' OR
+      ls_repid(5) = 'GR55 '.
+
+    l_actiontype = wk_actiontype+x(1).
+    PERFORM get_gr55_reportname USING 1  ls_repid  &lt;fs_vari&gt;
+                                         ls_repid  &lt;fs_vari&gt;.
+    tab-rep = wk_gr55_repname.
+    wk_actiontype+x(1) = l_actiontype.
+  ELSE.
+    PERFORM pruef_step USING  x  ls_repid  &lt;fs_vari&gt;
+                                 fn_repid   fn_vari.
+    tab-rep  =  ls_repid.
+    IF wk_actiontype+x(1) = 'G'.
+      tab-rep = wk_tstcp_repname.
+    ENDIF.
+  ENDIF.
+
+  tab-vari = &lt;fs_vari&gt;.
+  TRANSLATE tab-vari TO UPPER CASE.
+
+  IF wk_actiontype+x(1) = 'v'.
+    ASSIGN (tstc-pgmna) TO &lt;fs_repid&gt;.
+  ELSE.
+    ASSIGN (tab-rep)    TO &lt;fs_repid&gt;.
+  ENDIF.
+
+  IF wk_actiontype+x(1) = 'v'.
+    ASSIGN (tstc-pgmna) TO &lt;fs_repid&gt;.
+  ELSE.
+    ASSIGN (tab-rep)    TO &lt;fs_repid&gt;.
+  ENDIF.
+
+  IF tab-vari+0(1) = '@' AND
+     tab-vari+3(1) = '@'.
+    SELECT SINGLE * FROM varid WHERE report  = &lt;fs_repid&gt;
+                                AND  variant = &lt;fs_vari&gt;.
+    IF sy-subrc &lt;&gt; 0.
+      tab-vari = tab-vari+4.
+    ENDIF.
+  ENDIF.
+
+  CASE wk_actiontype+x(1).
+    WHEN 'R'
+     OR  'B'.  SUBMIT (tab-rep)   VIA SELECTION-SCREEN          AND RETURN.
+    WHEN 'V'
+     OR  'G'
+     OR  'H'.  SUBMIT (tab-rep)   VIA SELECTION-SCREEN
+      USING SELECTION-SET tab-vari  AND RETURN.
+    WHEN 'v'
+     OR  'h'.  SUBMIT (tstc-pgmna)  VIA SELECTION-SCREEN
+      USING SELECTION-SET tab-vari  AND RETURN.
+  ENDCASE.
+
+  ls_vari  =  &lt;fs_vari&gt;.
+
+  CASE wk_actiontype+x(1).
+    WHEN 'T'.
+      IF ls_vari+0(1) = '@' AND
+         ls_vari+3(1) = '@'.
+        ls_vari = ls_vari+4.
+      ENDIF.
+      CONDENSE ls_vari NO-GAPS.
+      CASE  ls_repid.
+        WHEN 'SE11'
+         OR  'SE16'
+         OR  'SE16N'
+         OR  'SE17'
+         OR  'SE54'
+         OR  'SM30'
+         OR  'SM31'.
+          IF &lt;fs_vari&gt;  &lt;&gt; space.
+            SELECT SINGLE * FROM dd02l WHERE tabname =  ls_vari.
+            IF sy-subrc = 0.
+              l_vari_valid = 'X'.
+              CASE  ls_repid.
+                WHEN 'SE11'
+                 OR  'SE16'
+                 OR  'SE16N'
+                 OR  'SE17'. SET PARAMETER ID 'DTB' FIELD  ls_vari.
+                WHEN 'SM30'
+                 OR  'SM31'
+                 OR  'SE54'. SET PARAMETER ID 'DVI' FIELD  ls_vari.
+              ENDCASE.
+            ENDIF.
+          ENDIF.
+        WHEN 'SM34'.  SET PARAMETER ID 'VCL' FIELD  ls_vari.
+        WHEN 'SE71'.  SET PARAMETER ID 'TXF' FIELD  ls_vari.
+        WHEN 'SE37'.  SET PARAMETER ID 'LIB' FIELD  ls_vari.
+        WHEN 'SA38'
+         OR  'SE38'
+         OR  'SE80'.  SET PARAMETER ID 'RID' FIELD  ls_vari.
+          IF ls_repid = 'SA38'.
+            IF sy-subrc = 0.
+              l_vari_valid = 'X'.
+            ENDIF.
+          ENDIF.
+        WHEN 'SE51'.  SET PARAMETER ID 'DYR' FIELD  ls_vari.
+      ENDCASE.
+
+      DATA l_trans LIKE tstc-tcode.
+
+      IF     tab-rep(3) = '/T/'.
+        l_trans = tab-rep+3.
+      ELSE.
+        l_trans = tab-rep.
+      ENDIF.
+
+      SET CURSOR FIELD fn_repid.
+      CALL FUNCTION 'AUTHORITY_CHECK_TCODE'
+        EXPORTING
+          tcode  = l_trans
+        EXCEPTIONS
+          ok     = 1
+          not_ok = 2
+          OTHERS = 3.
+
+      IF sy-subrc &gt; 1.
+        SET CURSOR FIELD fn_repid.
+        CONCATENATE 'No authority for transaction: '
+                     l_trans
+                     INTO wk_message
+           SEPARATED BY space.
+        MESSAGE wk_message
+                TYPE 'I'.
+      ELSE.
+        IF    l_vari_valid = 'X'.
+          CALL TRANSACTION l_trans AND SKIP FIRST SCREEN.
+        ELSE.
+          CALL TRANSACTION l_trans.
+        ENDIF.
+      ENDIF.
+      EXIT.
+  ENDCASE.
+
+ENDFORM.
+*======================================================================
+FORM submit_variant.
+*======================================================================
+  DATA: ls_repid     TYPE program,
+        ls_vari(30),
+        l_vari_valid,
+        l_actiontype.
+
+  IF sy-ucomm(6) &lt;&gt; 'SUBM_S'.
+    GET CURSOR FIELD wk_cursor_field VALUE wk_field_content.
+
+    IF wk_cursor_field = space        OR
+       wk_cursor_field(5) &lt;&gt; 'P_V_S'.
+      MESSAGE 'Select a Variant in column "Variant"!'
+              TYPE 'E'.
+    ENDIF.
+  ELSE.
+    CONCATENATE 'P_V_' sy-ucomm+5 INTO wk_cursor_field.
+  ENDIF.
+
+  FIELD-SYMBOLS: &lt;fs_repid&gt;, &lt;fs_vari&gt;, &lt;fs_cond&gt;, &lt;fs_date&gt;.
+
+  DATA: fn_repid(8),              " like trdir-name,
+        fn_vari(8),               " like varid-variant,
+        x(3)        TYPE n,
+        ende.
+
+  fn_vari       =  wk_cursor_field.  ASSIGN (fn_vari)  TO &lt;fs_vari&gt;.
+  fn_repid      =  fn_vari.
+  fn_repid+2(1) = 'R'.               ASSIGN (fn_repid) TO &lt;fs_repid&gt;.
+
+  ls_repid = &lt;fs_repid&gt;.
+  TRANSLATE ls_repid TO UPPER CASE.
+  CONDENSE ls_repid NO-GAPS.
+  IF ls_repid(1)   = '@'  AND
+     ls_repid+3(1) = '@'.
+    ls_repid      =  ls_repid+4.
+  ENDIF.
+
+  ls_vari  =  &lt;fs_vari&gt;.
+  TRANSLATE ls_vari TO UPPER CASE.
+
+  x = fn_vari.
+
+  IF &lt;fs_repid&gt; = space.
+    MESSAGE 'Report missing in current line'
+            TYPE 'I'.
+  ENDIF.
+
+  IF ls_repid(4) = 'GR55' AND
+     ls_repid+5 &lt;&gt;  space.
+    l_actiontype = wk_actiontype+x(1).
+    PERFORM get_gr55_reportname USING 1  ls_repid  &lt;fs_vari&gt;
+                                         ls_repid  &lt;fs_vari&gt;.
+    tab-rep = wk_gr55_repname.
+    wk_actiontype+x(1) = l_actiontype.
+  ELSE.
+    PERFORM pruef_step USING  x  ls_repid   ls_vari
+                                 fn_repid   fn_vari.
+
+    tab-rep  =  ls_repid.
+    IF wk_actiontype+x(1) = 'G'.
+      tab-rep = wk_tstcp_repname.
+    ENDIF.
+  ENDIF.
+
+  tab-vari = &lt;fs_vari&gt;.
+
+  CASE wk_actiontype+x(1).
+    WHEN 'T'.
+      IF ls_vari+0(1) = '@' AND
+         ls_vari+3(1) = '@'.
+        ls_vari = ls_vari+4.
+      ENDIF.
+      CONDENSE ls_vari NO-GAPS.
+      CASE  ls_repid.
+        WHEN 'SE11'
+         OR  'SE16'
+         OR  'SE16N'
+         OR  'SE17'
+         OR  'SE54'
+         OR  'SM30'
+         OR  'SM31'.
+          IF &lt;fs_vari&gt;  &lt;&gt; space.
+            SELECT SINGLE * FROM dd02l WHERE tabname =  ls_vari.
+            IF sy-subrc = 0.
+              l_vari_valid = 'X'.
+              CASE  ls_repid.
+                WHEN 'SE11'
+                 OR  'SE16'
+                 OR  'SE16N'
+                 OR  'SE17'. SET PARAMETER ID 'DTB' FIELD  ls_vari.
+                WHEN 'SM30'
+                 OR  'SM31'
+                 OR  'SE54'. SET PARAMETER ID 'DVI' FIELD  ls_vari.
+              ENDCASE.
+            ENDIF.
+          ENDIF.
+        WHEN 'SM34'.  SET PARAMETER ID 'VCL' FIELD  ls_vari.
+        WHEN 'SE71'.  SET PARAMETER ID 'TXF' FIELD  ls_vari.
+        WHEN 'SE37'.  SET PARAMETER ID 'LIB' FIELD  ls_vari.
+        WHEN 'SA38'
+         OR  'SE38'
+         OR  'SE80'.  SET PARAMETER ID 'RID' FIELD  ls_vari.
+          IF ls_repid = 'SA38'.
+            IF sy-subrc = 0.
+              l_vari_valid = 'X'.
+            ENDIF.
+          ENDIF.
+        WHEN 'SE51'.  SET PARAMETER ID 'DYR' FIELD  ls_vari.
+      ENDCASE.
+
+      DATA l_trans LIKE tstc-tcode.
+
+      IF     tab-rep(3) = '/T/'.
+        l_trans = tab-rep+3.
+      ELSE.
+        l_trans = tab-rep.
+      ENDIF.
+
+      SET CURSOR FIELD fn_repid.
+      CALL FUNCTION 'AUTHORITY_CHECK_TCODE'
+        EXPORTING
+          tcode  = l_trans
+        EXCEPTIONS
+          ok     = 1
+          not_ok = 2
+          OTHERS = 3.
+
+      IF sy-subrc &gt; 1.
+        SET CURSOR FIELD fn_repid.
+        CONCATENATE 'No authority for transaction: '
+                     l_trans
+                     INTO wk_message
+           SEPARATED BY space.
+        MESSAGE wk_message
+                TYPE 'I'.
+      ELSE.
+        IF    l_vari_valid = 'X'.
+          CALL TRANSACTION l_trans AND SKIP FIRST SCREEN.
+        ELSE.
+          CALL TRANSACTION l_trans.
+        ENDIF.
+      ENDIF.
+      EXIT.
+  ENDCASE.
+
+  IF wk_actiontype+x(1) = 'v'.
+    ASSIGN (tstc-pgmna) TO &lt;fs_repid&gt;.
+  ELSE.
+    ASSIGN (tab-rep)    TO &lt;fs_repid&gt;.
+  ENDIF.
+
+  IF tab-vari+0(1) = '@' AND
+     tab-vari+3(1) = '@'.
+    SELECT SINGLE * FROM varid WHERE report  = &lt;fs_repid&gt;
+                                AND  variant = &lt;fs_vari&gt;.
+    IF sy-subrc &lt;&gt; 0.
+      tab-vari = tab-vari+4.
+    ENDIF.
+  ENDIF.
+
+  CASE wk_actiontype+x(1).
+    WHEN 'V'
+     OR  'R'
+     OR  'G'.
+      IF &lt;fs_vari&gt; = space.
+        SUBMIT (tab-rep)   AND RETURN.
+      ELSE.
+        SUBMIT (tab-rep)   USING SELECTION-SET tab-vari  AND RETURN.
+      ENDIF.
+
+    WHEN 'v'.
+      SUBMIT (tstc-pgmna)   USING SELECTION-SET tab-vari  AND RETURN.
+    WHEN 'H'
+     OR  'H'.
+      CONCATENATE 'Variant &gt;'
+                  tab-vari
+                  '&lt; has flag "Only for Background Processing'
+             INTO wk_message
+             SEPARATED BY space.
+
+      MESSAGE wk_message
+              TYPE 'I'.
+
+  ENDCASE.
+
+*=======================================================================
+* Direkt als Job ausführen
+*=======================================================================
+*
+* http://www.abapforum.com/forum/viewtopic.php?t=2472 / 27.11.2004
+*
+* Henry fragt zuerst und liefert dann später auch die Antwort
+*
+* Ich möchte eine Report aus der Selektionmaske heraus im Hintergrund
+* starten. Der Ablauf sollte ohne die SAP Standardfunktionalität "F9"
+* erfolgen.
+*
+*falls jemand schon mal das Problem hatte hier eine Lösung die ich
+* herausgefunden habe:
+*
+* 1) Aktuelle Selektionparameter holen mit
+*    FUBA CALL FUNCTION 'RS_REFRESH_FROM_SELECTOPTIONS'
+*
+* 2) Job Öffnen
+*    CALL FUNCTION 'JOB_OPEN'
+*
+* 3) Report für Job definieren
+*    SUBMIT (l_report) VIA SELECTION-SCREEN
+*                      VIA JOB l_job NUMBER l_jobnum
+*                      WITH SELECTION-TABLE l_selopt   AND RETURN.
+*
+* 4) Job abschließen
+*    CALL FUNCTION 'JOB_CLOSE'
+*
+* Fubktioniert einwandfrei und es lassen sich auch noch Option für
+* Jobdatum/-Zeit mitgeben.
+*
+* Allerdings wäre es für andere Einsatzzwecke manchmal sehr hilfreich,
+* trotzdem das aktuelle Selektionbild (u.U. mit verschiedenen Tabstrips)
+* als Variante direkt ohne den SAP Standard-Popup speichern zu können.
+* Also falls hierzu jemand was weiß, wäre ich für Hilfe sehr dankbar.
+*
+* Henry hfahrian
+*
+* ForumUser
+* Beiträge: 33 Registriert: 15.11.2004, 11:10
+* Wohnort: Frankenland   Dank erhalten: 0 mal
+*
+
+ENDFORM.
+*======================================================================
+FORM toggle_field.
+*======================================================================
+  DATA:  l_pos(3) TYPE n.
+
+  GET CURSOR FIELD wk_cursor_field VALUE wk_field_content.
+
+  CHECK wk_cursor_field+4 &lt;&gt; 'TOGL'.
+
+  LOOP AT SCREEN.
+    IF screen-group1 = 'ND2'.
+      screen-invisible   = '0'.
+      screen-input       = '1'.
+      screen-output      = '1'.
+      MODIFY SCREEN.
+    ENDIF.
+  ENDLOOP.
+
+  l_pos = wk_cursor_field+5.
+
+  CASE wk_cursor_field(4).
+    WHEN 'PM_C'.
+      IF    p_c_togl+l_pos(1) = space.
+        p_c_togl+l_pos(1) = 'X'.
+      ELSE.
+        p_c_togl+l_pos(1) = ' '.
+      ENDIF.
+    WHEN 'P_R_'.
+      IF    p_r_togl+l_pos(1) = space.
+        p_r_togl+l_pos(1) = 'X'.
+      ELSE.
+        p_r_togl+l_pos(1) = ' '.
+      ENDIF.
+    WHEN 'P_V_'.
+      IF    p_v_togl+l_pos(1) = space.
+        p_v_togl+l_pos(1) = 'X'.
+      ELSE.
+        p_v_togl+l_pos(1) = ' '.
+      ENDIF.
+    WHEN 'P_I_'.
+      IF    p_i_togl+l_pos(1) = space.
+        p_i_togl+l_pos(1) = 'X'.
+      ELSE.
+        p_i_togl+l_pos(1) = ' '.
+      ENDIF.
+  ENDCASE.
+
+  LOOP AT SCREEN.
+    CHECK screen-name = wk_cursor_field.
+    l_pos = screen-name+5.
+
+    CASE wk_cursor_field(4).
+      WHEN 'PM_C'.
+        IF    p_c_togl+l_pos(1) = space.
+          screen-input = '1'.
+        ELSE.
+          screen-input = '0'.
+        ENDIF.
+      WHEN 'PM_R'.
+        IF    p_r_togl+l_pos(1) = space.
+          screen-input = '1'.
+        ELSE.
+          screen-input = '0'.
+        ENDIF.
+      WHEN 'PM_V'.
+        IF    p_v_togl+l_pos(1) = space.
+          screen-input = '1'.
+        ELSE.
+          screen-input = '0'.
+        ENDIF.
+      WHEN 'PM_I'.
+        IF    p_i_togl+l_pos(1) = space.
+          screen-input = '1'.
+        ELSE.
+          screen-input = '0'.
+        ENDIF.
+    ENDCASE.
+    MODIFY SCREEN.
+  ENDLOOP.
+
+ENDFORM.
+*======================================================================
+FORM insert_line.
+*======================================================================
+  DATA: wk_curr_line(3)    TYPE n,
+        wk_last_line(3)    TYPE n VALUE 99,
+        wk_beflast_line(3) TYPE n VALUE 98,
+        wk_insert_possible,
+        wk_successful.
+
+  FIELD-SYMBOLS: &lt;fs_repid&gt;,  &lt;fs_vari&gt;,  &lt;fs_cond&gt;,  &lt;fs_date&gt;,
+                 &lt;fs_fromu&gt;,  &lt;fs_comm&gt;,
+
+                 &lt;fs_prepid&gt;, &lt;fs_pvari&gt;, &lt;fs_pcond&gt;, &lt;fs_pdate&gt;,
+                 &lt;fs_pfromu&gt;, &lt;fs_pcomm&gt;,
+
+                 &lt;fs_nrepid&gt;, &lt;fs_nvari&gt;, &lt;fs_ncond&gt;, &lt;fs_ndate&gt;,
+                 &lt;fs_nfromu&gt;, &lt;fs_ncomm&gt;.
+
+  DATA: fn_repid(8),              " like trdir-name,
+        fn_vari(8),               " like varid-variant,
+        fn_fromu(8),
+        fn_comm(8),
+
+        fn_prepid(8),              " like trdir-name,
+        fn_pvari(8),               " like varid-variant,
+        fn_pfromu(8),
+        fn_pcomm(8),
+
+        fn_nrepid(8),              " like trdir-name,
+        fn_nvari(8),               " like varid-variant,
+        fn_nfromu(8),
+        fn_ncomm(8).
+
+  GET CURSOR FIELD wk_cursor_field VALUE wk_field_content.
+
+  IF wk_cursor_field(2) &lt;&gt; 'P_'.
+    MESSAGE 'Position your cursor on a STEP line!'
+            TYPE 'E'.
+  ENDIF.
+
+  IF wk_cursor_field+5 = '099'.
+    MESSAGE 'Insert on last line not possible!'
+            TYPE 'E'.
+  ENDIF.
+
+  wk_curr_line  =  wk_cursor_field+5.
+
+  DO 99 TIMES.
+    IF wk_beflast_line &lt; wk_curr_line.
+      EXIT.
+    ENDIF.
+
+    fn_repid = 'P_R_S'. fn_repid+5 = wk_last_line.
+    ASSIGN (fn_repid) TO &lt;fs_repid&gt;.
+    fn_vari  = 'P_V_S'. fn_vari+5  = wk_last_line.
+    ASSIGN (fn_vari)  TO &lt;fs_vari&gt;.
+    fn_comm  = 'P_I_S'. fn_comm+5  = wk_last_line.
+    ASSIGN (fn_comm)  TO &lt;fs_comm&gt;.
+
+    IF &lt;fs_repid&gt; = space      AND
+       &lt;fs_vari&gt;  = space      AND
+       &lt;fs_comm&gt;  = space      AND
+       p_r_togl+wk_last_line(1) = space AND
+       p_v_togl+wk_last_line(1) = space AND
+       p_i_togl+wk_last_line(1) = space.
+      wk_insert_possible = 'X'.
+    ELSE.
+      SUBTRACT 1 FROM wk_last_line.
+      SUBTRACT 1 FROM wk_beflast_line.
+      CONTINUE.
+    ENDIF.
+
+    fn_prepid = 'P_R_S'. fn_prepid+5 = wk_beflast_line.
+    ASSIGN (fn_prepid) TO &lt;fs_prepid&gt;.
+    fn_pvari  = 'P_V_S'. fn_pvari+5  = wk_beflast_line.
+    ASSIGN (fn_pvari)  TO &lt;fs_pvari&gt;.
+    fn_pcomm  = 'P_I_S'. fn_pcomm+5  = wk_beflast_line.
+    ASSIGN (fn_pcomm)  TO &lt;fs_pcomm&gt;.
+
+    IF &lt;fs_prepid&gt; =  space      AND
+       &lt;fs_pvari&gt;  =  space      AND
+       &lt;fs_pcomm&gt;  =  space      AND
+       p_r_togl+wk_beflast_line(1)  = ' ' AND
+       p_v_togl+wk_beflast_line(1)  = ' ' AND
+       p_i_togl+wk_beflast_line(1)  = ' '.
+      SUBTRACT 1 FROM wk_last_line.
+      SUBTRACT 1 FROM wk_beflast_line.
+      CONTINUE.
+    ENDIF.
+
+    MOVE &lt;fs_prepid&gt; TO &lt;fs_repid&gt;. CLEAR &lt;fs_prepid&gt;.
+    MOVE &lt;fs_pvari&gt;  TO &lt;fs_vari&gt;.  CLEAR &lt;fs_pvari&gt;.
+    MOVE &lt;fs_pcomm&gt;  TO &lt;fs_comm&gt;.  CLEAR &lt;fs_pcomm&gt;.
+
+    MOVE  p_r_togl+wk_beflast_line(1) TO p_r_togl+wk_last_line(1).
+    CLEAR p_r_togl+wk_beflast_line(1).
+    MOVE  p_v_togl+wk_beflast_line(1) TO p_v_togl+wk_last_line(1).
+    CLEAR p_v_togl+wk_beflast_line(1).
+    MOVE  p_i_togl+wk_beflast_line(1) TO p_i_togl+wk_last_line(1).
+    CLEAR p_i_togl+wk_beflast_line(1).
+
+    wk_successful = 'X'.
+
+    SUBTRACT 1 FROM wk_last_line.
+    SUBTRACT 1 FROM wk_beflast_line.
+
+  ENDDO.
+
+ENDFORM.
+*======================================================================
+FORM delete_line.
+*======================================================================
+  DATA: wk_curr_line(3)    TYPE n,
+        wk_last_line(3)    TYPE n VALUE 99,
+        wk_next_line(3)    TYPE n VALUE 1,
+        wk_beflast_line(3) TYPE n VALUE 98,
+        wk_do_line(3)      TYPE n,
+        wk_insert_possible,
+        wk_successful.
+
+  FIELD-SYMBOLS: &lt;fs_repid&gt;,  &lt;fs_vari&gt;,  &lt;fs_cond&gt;,  &lt;fs_date&gt;,
+                 &lt;fs_fromu&gt;,  &lt;fs_comm&gt;,
+
+                 &lt;fs_prepid&gt;, &lt;fs_pvari&gt;, &lt;fs_pcond&gt;, &lt;fs_pdate&gt;,
+                 &lt;fs_pfromu&gt;, &lt;fs_pcomm&gt;,
+
+                 &lt;fs_nrepid&gt;, &lt;fs_nvari&gt;, &lt;fs_ncond&gt;, &lt;fs_ndate&gt;,
+                 &lt;fs_nfromu&gt;, &lt;fs_ncomm&gt;.
+
+  DATA: fn_repid(8),              " like trdir-name,
+        fn_vari(8),               " like varid-variant,
+        fn_cond(8),
+        fn_date      LIKE sy-datum,
+        fn_fromu(8),
+        fn_comm(8),
+
+        fn_prepid(8),              " like trdir-name,
+        fn_pvari(8),               " like varid-variant,
+        fn_pcond(8),
+        fn_pdate     LIKE sy-datum,
+        fn_pfromu(8),
+        fn_pcomm(8),
+
+        fn_nrepid(8),              " like trdir-name,
+        fn_nvari(8),               " like varid-variant,
+        fn_ncond(8),
+        fn_ndate     LIKE sy-datum,
+        fn_nfromu(8),
+        fn_ncomm(8).
+
+  GET CURSOR FIELD wk_cursor_field VALUE wk_field_content.
+
+  IF wk_cursor_field(2) &lt;&gt; 'P_'.
+    MESSAGE 'Position your cursor on a STEP line!'
+            TYPE 'E'.
+  ENDIF.
+
+  wk_curr_line  =  wk_cursor_field+5.
+
+  DO 99 TIMES.
+    ADD 1 TO wk_do_line.
+    ADD 1 TO wk_next_line.
+    IF wk_do_line &lt; wk_curr_line.
+      CONTINUE.
+    ENDIF.
+
+    IF wk_next_line &lt; 100.
+      fn_repid = 'P_R_S'. fn_repid+5 =  wk_next_line.
+      ASSIGN (fn_repid) TO &lt;fs_repid&gt;.
+      fn_vari  = 'P_V_S'. fn_vari+5  =  wk_next_line.
+      ASSIGN (fn_vari)  TO &lt;fs_vari&gt;.
+      fn_comm  = 'P_I_S'. fn_comm+5  =  wk_next_line.
+      ASSIGN (fn_comm)  TO &lt;fs_comm&gt;.
+    ENDIF.
+
+    fn_prepid = 'P_R_S'. fn_prepid+5 = wk_do_line.
+    ASSIGN (fn_prepid) TO &lt;fs_prepid&gt;.
+    fn_pvari  = 'P_V_S'. fn_pvari+5  = wk_do_line.
+    ASSIGN (fn_pvari)  TO &lt;fs_pvari&gt;.
+    fn_pcomm  = 'P_I_S'. fn_pcomm+5  = wk_do_line.
+    ASSIGN (fn_pcomm)  TO &lt;fs_pcomm&gt;.
+
+    IF wk_do_line &lt; 99.
+      MOVE &lt;fs_repid&gt; TO &lt;fs_prepid&gt;.
+      MOVE &lt;fs_vari&gt;  TO &lt;fs_pvari&gt;.
+      MOVE &lt;fs_comm&gt;  TO &lt;fs_pcomm&gt;.
+
+      MOVE  p_r_togl+wk_next_line(1) TO p_r_togl+wk_do_line(1).
+      CLEAR p_r_togl+wk_next_line(1).
+      MOVE  p_v_togl+wk_next_line(1) TO p_v_togl+wk_do_line(1).
+      CLEAR p_v_togl+wk_next_line(1).
+      MOVE  p_i_togl+wk_next_line(1) TO p_i_togl+wk_do_line(1).
+      CLEAR p_i_togl+wk_next_line(1).
+    ENDIF.
+
+    IF wk_next_line = 99.
+      CLEAR &lt;fs_repid&gt;.
+      CLEAR &lt;fs_vari&gt;.
+      CLEAR &lt;fs_comm&gt;.
+    ENDIF.
+
+    wk_successful = 'X'.
+  ENDDO.
+
+ENDFORM.
+*======================================================================
+FORM clear_screen.
+*======================================================================
+  FIELD-SYMBOLS: &lt;fs_clr_screen&gt;.
+
+  LOOP AT SCREEN.
+    CHECK screen-name(4) &lt;&gt; 'TEXT'.
+    CHECK screen-invisible = 0.
+    CHECK screen-active    = 1.
+    CHECK screen-group1(2) &lt;&gt; 'PB'.
+    ASSIGN (screen-name) TO &lt;fs_clr_screen&gt;.
+    CHECK &lt;fs_clr_screen&gt; &lt;&gt; space.
+    CLEAR &lt;fs_clr_screen&gt;.
+  ENDLOOP.
+
+ENDFORM.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/persoenliches-favoriten-menue/">Persönliches Favoriten-Menü</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

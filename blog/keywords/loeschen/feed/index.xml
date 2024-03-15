@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>löschen Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/loeschen/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 18 Mar 2021 11:21:23 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>löschen Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Löschauftrag erstellen</title>
+		<link>/blog/loeschauftrag-erstellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 18 Mar 2021 11:21:22 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Allgemein]]></category>
+		<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[löschen]]></category>
+		<category><![CDATA[Löschauftrag]]></category>
+		<category><![CDATA[Transportauftrag]]></category>
+		<guid isPermaLink="false">/?p=1026567</guid>
+
+					<description><![CDATA[<p>Das Anlegen von Objekten gehört zum Alltag eines SAP-Entwicklers. Auch das Löschen von Objekten gehört dazu. Wenn man ein Objekt löscht, wird es jedoch als ganz normales Objekt in einen ganz normalen Transportauftrag aufgenommen. Erst bei Freigabe des Transportauftrags prüft das System, ob das Objekt vorhanden ist oder nicht. Ist es nicht vorhanden, dann wird in dem Transportauftrag das Objekt als &#8220;zu löschen&#8221; markiert. Leider funktioniert es nicht, das Löschkennzeichen in der Tabelle E071, in...</p>
+<p>Der Beitrag <a href="/blog/loeschauftrag-erstellen/">Löschauftrag erstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Das Anlegen von Objekten gehört zum Alltag eines SAP-Entwicklers. Auch das Löschen von Objekten gehört dazu. Wenn man ein Objekt löscht, wird es jedoch als ganz normales Objekt in einen ganz normalen Transportauftrag aufgenommen. Erst bei Freigabe des Transportauftrags prüft das System, ob das Objekt vorhanden ist oder nicht. Ist es nicht vorhanden, dann wird in dem Transportauftrag das Objekt als &#8220;zu löschen&#8221; markiert. </p>
+
+
+
+<p>Leider funktioniert es nicht, das Löschkennzeichen in der Tabelle E071, in der die Transportobjekte eines Auftrags gespeichert werden, zu setzen. Um einen Löschauftrag zu erzeugen, benötigt man in der Regel ein anderes System, in dem die Objekte nicht vorhanden sind. In diesem System übernimmt man die Objekte in einen Transportauftrag und gibt diesen frei. </p>
+
+
+
+<p>Eine andere Möglichkeit, ist die Erzeugung eines &#8220;echten&#8221; Löschauftrags per Programm. Hierbei muss allerdings ein bisschen getrickst werden, weil das Verfahren von SAP offiziell nicht unterstützt wird.</p>
+
+
+
+<h2 class="wp-block-heading">Vorgehen</h2>
+
+
+
+<p>Folgendes Vorgehen ist notwendig, um einen Löschauftrag zu erstellen.</p>
+
+
+
+<h3 class="wp-block-heading">Anlage eines Transport-Of-Copies </h3>
+
+
+
+<p>Ein Löschauftrag kann nicht direkt angelegt werden. Deswegen Legst du einen Auftrag vom Typ <em>Transport von Kopien</em> an. Du kannst auch einen normalen Workbench-Auftrag anlegen, aber wenn die Objekte evtl. noch in einem Transportauftrag gesperrt sind, dann ist nur ein Transport-von-Kopien möglich.</p>
+
+
+
+<h3 class="wp-block-heading">Übernahme der Objekte</h3>
+
+
+
+<p>Die zu löschenden Objekte übernimmst du nun manuell oder durch die Funktion <em>Auftrag/ Aufgabe ● Objektliste </em>● <em>Objekte aufnehmen </em>im Transport Organizer.</p>
+
+
+
+<h3 class="wp-block-heading">Update E070 für den neuen Auftrag</h3>
+
+
+
+<p>In Tabelle E070 werden die Transportaufträge gespeichert. In dieser Tabelle musst du, zum Beispiel mit Hilfe der Transaktion SE16n und der Funktion &amp;sap_edit, die Funktion &#8220;L = Löschauftrag&#8221; im Feld TRFUNCTION setzen.</p>
+
+
+
+<p><strong><span style="text-decoration: underline;">Achtung!</span></strong> Der Auftrag taucht nun nicht mehr in der Übersicht im Transport-Organizer auf!</p>
+
+
+
+<h3 class="wp-block-heading">Freigabe des Löschauftrags </h3>
+
+
+
+<p>Da der Löschauftrag nicht mehr in der Übersicht im Transport-Organizer auftaucht (Transaktion SE09), kannst du den Auftrag auch nicht manuell im Dialog freigeben.</p>
+
+
+
+<p>Um den Auftrag freizugeben, musst du den Function Builder (Transaktion SE37) aufrufen und den Funktionsbaustein TRINT_TP_INTERFACE ausführen.</p>
+
+
+
+<p>Fülle die Parameter IV_TP_COMMAND mit &#8220;R3E&#8221;, IV_TRANSPORT_REQUEST mit der Nummer deines Lösch-Transportauftrags und IV_UMODES mit &#8220;1&#8221;. Dann <em>Ausführen </em>klicken und der Auftrag wird exportiert. Eventuell taucht der Auftrag nicht in der Transportqueue des Folgesystems auf. In dem Fall musst du den Auftrag in der Transaktion STMS manuell über <em>Zusätze ● Weitere Aufträge ● Anhängen</em> in die Transportqueue stellen.</p>
+<p>Der Beitrag <a href="/blog/loeschauftrag-erstellen/">Löschauftrag erstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Repository-Objekte massenhaft löschen?</title>
+		<link>/blog/repository-objekte-massenhaft-loeschen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Feb 2014 08:58:02 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[klassen]]></category>
+		<category><![CDATA[löschen]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4460</guid>
+
+					<description><![CDATA[<p>Wenn du viele Repository-Objekte (Klassen, Programme, Tabellen, Datenelemente etc) löschen möchtest, dann geht dies sehr einfach. Man muss es nur wissen...</p>
+<p>Der Beitrag <a href="/blog/repository-objekte-massenhaft-loeschen/">Repository-Objekte massenhaft löschen?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hin und wieder müssen viele Objekte eines Programmierers oder eines Paketes gelöscht werden. Das massenhafte Löschen von zum Beispiel Klassen, Programmen, Tabellen, Datenelementen und so weiter ist dabei sehr einfach: Gehe in die entsprechende Transaktion und drücke STRG+F oder den Suchen-Druckknopf in der Buttonleiste. Grenze die Suchkriterien wie gewünscht ein und drücke <em>Ausführen</em>.</p>
+<p><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-4461" alt="Suche Repository-Objekte" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_09_45_25-239x300.jpg" width="239" height="300" srcset="/wp-content/uploads/2014/02/02_20_09_45_25-239x300.jpg 239w, /wp-content/uploads/2014/02/02_20_09_45_25.jpg 471w" sizes="(max-width: 239px) 100vw, 239px" /></p>
+<p>Es erscheint die Liste der gefundenen Objekte.</p>
+<p><img decoding="async" class="alignnone size-medium wp-image-4462" alt="Objektliste" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_09_46_11-300x126.jpg" width="300" height="126" srcset="/wp-content/uploads/2014/02/02_20_09_46_11-300x126.jpg 300w, /wp-content/uploads/2014/02/02_20_09_46_11.jpg 528w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<p>In dieser Liste gibt es immer ganz links einen Menüpunkt, der so heißt wie das entsprechende Repository-Objekt (Tabellen, Klassen etc.). Hier gibt es den Punkt <em>Löschen</em>.</p>
+<p><img decoding="async" class="alignnone size-medium wp-image-4463" alt="Objekte löschen" src="https://tricktresor.com/wp-content/uploads/2014/02/02_20_09_46_31-300x229.jpg" width="300" height="229" srcset="/wp-content/uploads/2014/02/02_20_09_46_31-300x229.jpg 300w, /wp-content/uploads/2014/02/02_20_09_46_31.jpg 430w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<p>Hierzu müssen alle zu löschenden Einträge markiert werden. Es werden alle entsprechenden Prüfungen berücksichtigt (Verwendungsnachweise, Vererbung usw.).</p>
+<p>Der Beitrag <a href="/blog/repository-objekte-massenhaft-loeschen/">Repository-Objekte massenhaft löschen?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

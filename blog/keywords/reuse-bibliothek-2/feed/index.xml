@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Reuse-Bibliothek Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/reuse-bibliothek-2/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 06 Jun 2014 15:48:30 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Reuse-Bibliothek Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Get_Globals</title>
+		<link>/blog/get_globals/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Dec 2011 15:30:09 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[usercommand]]></category>
+		<category><![CDATA[register events]]></category>
+		<category><![CDATA[set handler]]></category>
+		<category><![CDATA[REUSE_ALV_GRID_DISPLAY]]></category>
+		<category><![CDATA[GET_GLOBALS_FROM_SLVC_FULLSCR]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Reuse-Bibliothek]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=632</guid>
+
+					<description><![CDATA[<p>Der Baustein REUSE_ALV_GRID_DISPLAY dient eigentlich dazu, eine Tabelle auf einfachste Art und Weise anzuzeigen. Manchmal m&#246;chte man aber doch auf die verwendete Klasse CL_GUI_ALV_GRID zugreifen k&#246;nnen da bestimmte Funktionen nur hier und nicht im REUSE-Baustein m&#246;glich sind. </p>
+<p>Der Beitrag <a href="/blog/get_globals/">Get_Globals</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der Baustein REUSE_ALV_GRID_DISPLAY dient eigentlich dazu, eine Tabelle auf einfachste Art und Weise anzuzeigen. Manchmal möchte man aber doch auf die verwendete Klasse CL_GUI_ALV_GRID zugreifen können da bestimmte Funktionen nur hier und nicht im REUSE-Baustein möglich sind.</p>
+<p>Möglich ist das durch die Verwendung des Funktionsbausteins GET_GLOBALS_FROM_SLVC_FULLSCR. Der Baustein muss in einem Caller-Exit aufgerufen werden und liefert eine Referenz auf das verwendete Grid zurück.</p>
+<p>In diesem Beispiel zeigen wir, wie Sie mit Hilfe des Bausteins ein Kontext-Menü im REUSE-Grid verwenden können.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2011/12/Bild_2014_06_06_170623.jpg"><img fetchpriority="high" decoding="async" class="alignnone wp-image-4775 size-full" src="https://tricktresor.com/wp-content/uploads/2011/12/Bild_2014_06_06_170623.jpg" alt="Bild_2014_06_06_170623" width="355" height="142" srcset="/wp-content/uploads/2011/12/Bild_2014_06_06_170623.jpg 355w, /wp-content/uploads/2011/12/Bild_2014_06_06_170623-300x120.jpg 300w" sizes="(max-width: 355px) 100vw, 355px" /></a></p>
+<p>In dem Report wird für die Spalte &#8220;Bezeichnung&#8221; bei Rechtsklick ein Kontext-Menü eingeblendet. Der entsprechende Funktionscode wird im ALV-Exit &#8220;USER_COMMAND&#8221; ausgewertet.</p>
+<h2>Coding</h2>
+<pre>REPORT.
+DATA gt_data TYPE STANDARD TABLE OF t005t.
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS: handle_context_menu_req
+                       FOR EVENT context_menu_request OF cl_gui_alv_grid
+                       IMPORTING e_object sender.
+ENDCLASS.                    "lcl_event_receiver DEFINITION
+*----------------------------------------------------------------------*
+*       CLASS lcl_event_receiver IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_event_receiver IMPLEMENTATION.
+  METHOD handle_context_menu_req.
+    DATA lr_menu   TYPE REF TO cl_ctmenu.
+    DATA lr_grid   TYPE REF TO cl_gui_alv_grid.
+    DATA ls_row    TYPE lvc_s_row.
+    DATA ls_col    TYPE lvc_s_col.
+    DATA fcode     TYPE ui_func.
+    DATA ftext     TYPE gui_text.
+    DATA ls_data   TYPE t005t.
+    
+    sender-&gt;get_current_cell( IMPORTING  es_row_id = ls_row
+                                         es_col_id = ls_col ).
+    CLEAR ls_data.
+    READ TABLE gt_data INTO ls_data INDEX ls_row-index.
+    CASE ls_col-fieldname.
+      WHEN 'LANDX'.
+*-- Kontext-Menu nur für das Feld "Bezeichnung"
+        lr_menu ?= e_object.
+        lr_menu-&gt;clear( ).
+        fcode = 'EDIT'.
+        ftext = 'Edit Entry'.
+        lr_menu-&gt;add_function( fcode = fcode
+                               text  = ftext ).
+                               fcode = 'SHOW'.    
+        CONCATENATE 'Show' ls_data-landx INTO ftext SEPARATED BY space.
+        lr_menu-&gt;add_function( fcode = fcode
+                               text  = ftext ).
+      WHEN OTHERS.
+        EXIT.
+    ENDCASE.
+  ENDMETHOD.                    "handle_context_menu_req
+ENDCLASS.                    "lcl_event_receiver IMPLEMENTATION
+START-OF-SELECTION.
+  PERFORM get_data.
+  PERFORM display.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_data
+*&amp;---------------------------------------------------------------------*
+FORM get_data.
+  SELECT * FROM t005t
+    INTO TABLE gt_data UP TO 100 ROWS
+   WHERE spras = sy-langu.
+ENDFORM.                    "get_data
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  display
+*&amp;---------------------------------------------------------------------*
+FORM display.
+  DATA lt_events TYPE slis_t_event.
+
+  PERFORM set_events CHANGING lt_events.
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+       EXPORTING
+         i_callback_program = sy-cprog
+         i_structure_name   = 'T005T'
+         it_events          = lt_events
+       TABLES
+         t_outtab           = gt_data
+       EXCEPTIONS
+         program_error      = 1
+         OTHERS             = 2.
+ENDFORM.                    "display
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  set_events
+*&amp;---------------------------------------------------------------------*
+FORM set_events CHANGING ct_events TYPE slis_t_event.
+
+  FIELD-SYMBOLS: &lt;ls_event&gt; TYPE slis_alv_event.
+  DATA: l_event  TYPE lvc_fname.
+
+  CALL FUNCTION 'REUSE_ALV_EVENTS_GET'
+       EXPORTING
+         i_list_type     = 4
+       IMPORTING
+         et_events       = ct_events
+       EXCEPTIONS
+         list_type_wrong = 1
+         OTHERS          = 2.
+  IF sy-subrc = 0.
+    READ TABLE ct_events ASSIGNING &lt;ls_event&gt;
+          WITH KEY name = 'CALLER_EXIT'.
+    IF sy-subrc EQ 0.
+      CONCATENATE 'ALV_EVENT_' &lt;ls_event&gt;-name
+             INTO &lt;ls_event&gt;-form.
+    ENDIF.
+    READ TABLE ct_events ASSIGNING &lt;ls_event&gt;
+          WITH KEY name = 'USER_COMMAND'.
+    IF sy-subrc EQ 0.
+      CONCATENATE 'ALV_EVENT_' &lt;ls_event&gt;-name
+             INTO &lt;ls_event&gt;-form.
+    ENDIF.
+  ENDIF.
+ENDFORM.                    "set_events
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  alv_event_caller_exit
+*&amp;---------------------------------------------------------------------*
+FORM alv_event_caller_exit USING cs_data TYPE slis_data_caller_exit..
+
+  DATA: lr_grid TYPE REF TO cl_gui_alv_grid.
+
+  CALL FUNCTION 'GET_GLOBALS_FROM_SLVC_FULLSCR'
+       IMPORTING
+         e_grid = lr_grid.
+  SET HANDLER lcl_event_receiver=&gt;handle_context_menu_req FOR lr_grid.
+
+ENDFORM.                    "alv_event_caller_exit
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  alv_event_user_command
+*&amp;---------------------------------------------------------------------*
+FORM alv_event_user_command USING r_ucomm     LIKE sy-ucomm
+                                  rs_selfield TYPE slis_selfield.
+  CASE r_ucomm.
+    WHEN 'EDIT'.
+      MESSAGE i000(oo) WITH 'EDIT!!'.
+    WHEN 'SHOW'.
+      MESSAGE s000(oo) WITH 'Wurde angezeigt!'.
+  ENDCASE.
+ENDFORM.                    "alv_event_user_command</pre>
+<p>Der Beitrag <a href="/blog/get_globals/">Get_Globals</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Personalisierung</title>
+		<link>/blog/personalisierung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 26 Nov 2008 16:38:16 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Reuse-Bibliothek]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=514</guid>
+
+					<description><![CDATA[<p>Ab dem Netweaver-Release gibt es ein zentrales Tool zum Zugriff und zur Pflege personalisierter Daten. Dies sind Parameter, die jeder Benutzer f&#252;r verschiedene Applikationen f&#252;r sich einstellen kann. Das Objekt kann in den Benutzerstammsatz eingebunden werden und von dort ebenfalls gepflegt werden.</p>
+<p>Der Beitrag <a href="/blog/personalisierung/">Personalisierung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ab dem Netweaver-Release gibt es ein zentrales Tool zum Zugriff und zur Pflege personalisierter Daten. Dies sind Parameter, die jeder Benutzer f&uuml;r verschiedene Applikationen f&uuml;r sich einstellen kann. Das Objekt kann in den Benutzerstammsatz eingebunden werden und von dort ebenfalls gepflegt werden.<br /><P><STRONG>SAP-Hilfe: <BR></STRONG><A href="http://help.sap.com/saphelp_nw04/helpdata/de/ab/e70538389511d5974400a0c930dcc1/frameset.htm" target="_blank" Target="_blank">http://help.sap.com/saphelp_nw04/helpdata/de/ab/<BR>e70538389511d5974400a0c930dcc1/frameset.htm</A></P><P class="head1">Registrierung</P><P>Zuerst muss mit der Transaktion PERSREG ein Personalisierungsobjekt registriert werden.</P><P class="head1">Personalisierungsdialog</P><P>Dann sollten Sie noch einen Dialogbaustein programmieren, in dem die Werte ge&auml;ndert werden k&ouml;nnen. Das muss aber nicht unbedingt sein, denn Sie k&ouml;nnen die Funktionen auch verwenden, um die Gr&ouml;&szlig;e eines Splitters zu speichern oder welches Dokument der Benutzer zuletzt verwendet hat.</P><P>Ein typischer Dialog k&ouml;nnte z.B. so aussehen:</P><P><IMG src="/wp-content/uploads/tt_images/pers/eck_020.jpg"></P><P class="head1">Verwendung</P><P>Sie k&ouml;nnen eine beliebige Struktur zur Speicherung der Daten verwenden. Es werden nur die einzelnen Fedlnamen und deren Wert gespeichert.</P><P class="sap1">DATA: BEGIN OF pdata,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; splitter_width TYPE i,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; last_doc_no&nbsp;&nbsp;&nbsp; TYPE char10,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; default_mode&nbsp;&nbsp; TYPE c,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; END OF pdata.<BR></P><P class="head1">Speicherung</P><P class="sap1">CALL METHOD cl_pers_admin=&gt;set_data<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; p_pers_key&nbsp;&nbsp;=&nbsp;&#8216;ZMYOBJECT&#8217;<BR>&nbsp;&nbsp;&nbsp; p_pers_data&nbsp;= pdata<BR>&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 6.<BR></P><P class="head1">Lesen</P><P class="sap1">CLEAR pdata.<BR>CALL METHOD cl_pers_admin=&gt;get_data<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; p_pers_key&nbsp;&nbsp;= gv_key<BR>&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp; p_pers_data&nbsp;= pdata<BR>&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 6.<BR></P><P class="head1">Test</P><P>Getestet werden kann der Dialog mit Hilfe der Transaktion SPERS_DIALOG. Wie sich der Dialog beim Kopieren auf andere User verh&auml;lt, kann mit Transation SPERS_TEST gepr&uuml;ft werden.</P><P class="head1">Personalisierungsobjekte eines Benutzers</P><P>Alle einem Benutzer oder einer Rolle zugeordneten Personalisierungsobjekte k&ouml;nnen mit der Transaktion SPERS_MAINT bearbeitet werden.</P></p>
+<p>Der Beitrag <a href="/blog/personalisierung/">Personalisierung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Reuse-Library</title>
+		<link>/blog/reuse-library/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 07 Aug 2008 17:00:59 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Reuse-Bibliothek]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=507</guid>
+
+					<description><![CDATA[<p>Die Reuse-Library der SAP kann man f&#252;r seine eigenen Zwecke verwenden! Sie k&#246;nnen die SAP-Bibliothek erweitern oder verwenden Sie Ihre Bibliotheken in einer eigenen Transaktion.</p>
+<p>Der Beitrag <a href="/blog/reuse-library/">Reuse-Library</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Reuse-Library der SAP kann man für seine eigenen Zwecke verwenden! Sie können die SAP-Bibliothek erweitern oder verwenden Sie Ihre Bibliotheken in einer eigenen Transaktion.</p>
+<p>Mit der Transaktion <strong>SLIB </strong>können Sie eigene Bibliotheken aufbauen. Legen Sie einfach eine neue Bibliothek an und fügen Sie Unterpunkte hinzu.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2008/08/Bild_2014_06_06_170612.jpg"><img decoding="async" class="alignnone wp-image-4770 size-full" src="https://tricktresor.com/wp-content/uploads/2008/08/Bild_2014_06_06_170612.jpg" alt="Bild_2014_06_06_170612" width="441" height="167" srcset="/wp-content/uploads/2008/08/Bild_2014_06_06_170612.jpg 441w, /wp-content/uploads/2008/08/Bild_2014_06_06_170612-300x113.jpg 300w" sizes="(max-width: 441px) 100vw, 441px" /></a></p>
+<p>Diese Unterpunkte können ein Verzeichnis sein, ein &#8220;Reuse-Produkt&#8221; oder eine andere &#8220;Reuse-Bibliothek&#8221;.</p>
+<p>Wählen Sie den Tabreiter &#8220;Reuse-Produkt&#8221;, geben einen Namen ein und klicken auf &#8220;Anlegen&#8221;. Hier können Sie Programme, Objekte und weitere Hilfen eintragen.</p>
+<p>Um die neue Bibliothek mit einer eigenen Transaktion zu versehen, kopieren Sie am besten mithilfe der Transaktion <strong>SE93</strong> die Transaktion &#8220;SE83&#8221; und tragen Sie in den Parametern Ihre Bibliothek ein.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2008/08/Bild_2014_06_06_170638-2.jpg"><img decoding="async" class="alignnone wp-image-4771 size-full" src="https://tricktresor.com/wp-content/uploads/2008/08/Bild_2014_06_06_170638-2.jpg" alt="Bild_2014_06_06_170638 (2)" width="591" height="258" srcset="/wp-content/uploads/2008/08/Bild_2014_06_06_170638-2.jpg 591w, /wp-content/uploads/2008/08/Bild_2014_06_06_170638-2-300x130.jpg 300w" sizes="(max-width: 591px) 100vw, 591px" /></a></p>
+<p>Der Beitrag <a href="/blog/reuse-library/">Reuse-Library</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Listpopup mit Auswahl</title>
+		<link>/blog/listpopup-mit-auswahl/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 21 Jan 2005 12:40:58 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Popups]]></category>
+		<category><![CDATA[Reuse-Bibliothek]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=311</guid>
+
+					<description><![CDATA[<p>Mit diesem Funktionsbaustein k&#246;nnen Sie eine Liste zur Auswahl &#252;bergeben. Ausserdem k&#246;nnen Sie einen Titel als &#220;berschrift &#252;ber der Liste definieren. Zudem gibt es die M&#246;glichkeit einen eigenen Status zu setzen und die Funktionscodes &#252;ber eine Callback-Routine auszuwerten. </p>
+<p>Der Beitrag <a href="/blog/listpopup-mit-auswahl/">Listpopup mit Auswahl</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Funktionsbaustein k&ouml;nnen Sie eine Liste zur Auswahl &uuml;bergeben. Ausserdem k&ouml;nnen Sie einen Titel als &Uuml;berschrift &uuml;ber der Liste definieren. Zudem gibt es die M&ouml;glichkeit einen eigenen Status zu setzen und die Funktionscodes &uuml;ber eine Callback-Routine auszuwerten. <br /><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/popup/rhpopup.gif"><BR>Auswahl mehrerer&nbsp;Eintr&auml;ge</P></TD></TR></TBODY></TABLE></P><P>Der Funktionsbaustein kann eine Liste ausgeben, aus der genau <STRONG>ein</STRONG> <STRONG>Eintrag</STRONG> ausgew&auml;hlt werden kann oder aber <STRONG>mehrere Eintr&auml;ge</STRONG>. Bei mehreren Eintr&auml;gen kann man noch festlegen, wieviele Eintr&auml;ge maximal erlaubt sind.</P><P>Das folgende Coding stellt eine Liste dar, aus der maximal zwei Eintr&auml;ge ausgew&auml;hlt werden d&uuml;rfen.</P><P class="sap1"><FONT color="#fb2412">*** Variablen<BR></FONT>DATA:<BR>&nbsp;&nbsp;BEGIN OF T_HEAD OCCURS 0,<BR>&nbsp;&nbsp;&nbsp; LINE(100),<BR>&nbsp;&nbsp;END OF T_HEAD,<BR>&nbsp;&nbsp;T_LIST&nbsp; LIKE T_HEAD OCCURS 0 WITH HEADER LINE,<BR>&nbsp;&nbsp;T_MARK&nbsp; LIKE T_HEAD OCCURS 0 WITH HEADER LINE.</P><P class="sap1">START-OF-SELECTION.<BR><FONT color="#fb2412">*** &Uuml;berschrift</FONT><BR>&nbsp; APPEND &#8216;List&uuml;berschrift Zeile 1&#8217; TO T_HEAD.<BR>&nbsp; APPEND &#8216;List&uuml;berschrift Zeile 2&#8217; TO T_HEAD.</P><P class="sap1"><FONT color="#fb2412">*** Tabelleneintr&auml;ge zur Asuwahl</FONT><BR>&nbsp; APPEND &#8216;1Eins&#8217; TO T_LIST.<BR>&nbsp; APPEND &#8216;2Zwei&#8217; TO T_LIST.<BR>&nbsp; APPEND &#8216;3Drei&#8217; TO T_LIST.<BR>&nbsp; APPEND &#8216;4Vier&#8217; TO T_LIST.<BR>&nbsp; APPEND &#8216;5F&uuml;nf&#8217; TO T_LIST.</P><P class="sap1"><FONT color="#fb2412">*** Popup anzeigen</FONT><BR>&nbsp; CALL FUNCTION &#8216;RH_LISTPOPUP&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TITLE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;Auswahlfenster&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MARK_MODE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MARK_MAX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FULLSCREEN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CUCOL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CUROW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VISIBLE_OFFSET&nbsp; = 1&nbsp;&nbsp; &#8220;Erstes Zeichen nicht ausgeben<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VISIBLE_LENGTH&nbsp; = 20&nbsp; &#8220;20 Zeichen der Tabelle ausgeben<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PAGE_HEADER&nbsp;&nbsp;&nbsp;&nbsp; = T_HEAD<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = T_LIST<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MARKED_LINES&nbsp;&nbsp;&nbsp; = T_MARK<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIST_EMPTY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRONG_MARK_MODE = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; F15&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4.<BR>&nbsp; IF SY-SUBRC = 0 AND NOT T_MARK[] IS INITIAL.<BR><FONT color="#fb2412">*** Es wurde eine Auswahl getroffen:</FONT><BR>&nbsp;&nbsp;&nbsp; LOOP AT T_MARK.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / T_MARK-LINE.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** Es wurde keine Auswahl getroffen</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Keine Auswahl getroffen.&#8217;.<BR>&nbsp; ENDIF.</P><P class="head1">Alternative</P><P class="text1">&Auml;hnlich funktionieren tut der Baustein G_DISPLAY_SELECTION_DYNPRO</P></p>
+<p>Der Beitrag <a href="/blog/listpopup-mit-auswahl/">Listpopup mit Auswahl</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Ausgabe BAPI-Messages</title>
+		<link>/blog/ausgabe-bapi-messages/</link>
+					<comments>/blog/ausgabe-bapi-messages/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 31 Mar 2004 00:34:35 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Reuse-Bibliothek]]></category>
+		<category><![CDATA[Eigenes]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=230</guid>
+
+					<description><![CDATA[<p>Mit diesem Funktionsbaustein k&#246;nnen Sie in Ihren Programmen in einfacher Weise die Meldungen ausgeben, die ein BAPI erzeugt hat. Sie k&#246;nnen die Parameter auch einfach an andere Message-Tabellen anpassen um hier ebenfalls eine Ausgabe zu realisieren.</p>
+<p>Der Beitrag <a href="/blog/ausgabe-bapi-messages/">Ausgabe BAPI-Messages</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem Funktionsbaustein k&ouml;nnen Sie in Ihren Programmen in einfacher Weise die Meldungen ausgeben, die ein BAPI erzeugt hat. Sie k&ouml;nnen die Parameter auch einfach an andere Message-Tabellen anpassen um hier ebenfalls eine Ausgabe zu realisieren.<br /><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/popup_messages2.gif"><BR>Eine &uuml;bersichtliche Ausgabe von Meldungen</P></TD></TR></TBODY></TABLE></P><P>FUNCTION z_meldungsausgabe_bapi. <BR><FONT color="#fb2412">*&#8221;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;- <BR>*&#8221;*&#8221;Lokale Schnittstelle: <BR>*&#8221;&nbsp; IMPORTING <BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp; REFERENCE(I_AMODAL_WINDOW) TYPE&nbsp; CHAR1 <BR>*&#8221;&nbsp; TABLES <BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IT_RETURN_BAPI STRUCTURE&nbsp; BAPIRET2 OPTIONAL <BR>*&#8221;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IT_RETURN_IDOC STRUCTURE&nbsp; BDIDOCSTAT OPTIONAL <BR>*&#8221;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-</FONT> </P><P class="sap1"><FONT color="#fb2412">*** INIT ***</FONT> <BR>&nbsp; CALL FUNCTION &#8216;MESSAGES_INITIALIZE&#8217;. </P><P class="sap1"><FONT color="#fb2412">*** BAPI-MELDUNGEN ***</FONT> <BR>&nbsp; LOOP AT it_return_bapi. <BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;MESSAGE_STORE&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; arbgb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_bapi-id <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exception_if_not_active = &#8216; &#8216; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_bapi-type <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_bapi-message_v1 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_bapi-message_v2 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_bapi-message_v3 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_bapi-message_v4 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; txtnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_bapi-number <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; zeile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; message_type_not_valid&nbsp; = 1 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_active&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3. <BR>&nbsp; ENDLOOP. </P><P class="sap1"><FONT color="#fb2412">*** IDOC-MELDUNGEN ***</FONT> <BR>&nbsp; LOOP AT it_return_idoc. <BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;MESSAGE_STORE&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; arbgb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_idoc-msgid <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exception_if_not_active = &#8216; &#8216; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_idoc-msgty <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_idoc-msgv1 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_idoc-msgv2 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_idoc-msgv3 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; msgv4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_idoc-msgv4 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; txtnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = it_return_idoc-msgno <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; zeile&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; message_type_not_valid&nbsp; = 1 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_active&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3. <BR>&nbsp; ENDLOOP. </P><P class="sap1"><FONT color="#fb2412">*** STOP um &#8220;Fehler in Message-Handling&#8221; zu vermeiden <BR></FONT>&nbsp; CALL FUNCTION &#8216;MESSAGES_STOP&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a_message = 04 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e_message = 03 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_message = 02 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; w_message = 01. </P><P class="sap1">&nbsp; IF NOT sy-subrc IS INITIAL. <BR><FONT color="#fb2412">*** AUSGABE ***</FONT> <BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;MESSAGES_SHOW&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_use_grid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;X&#8217; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_amodal_window&nbsp;&nbsp;&nbsp; = i_amodal_window <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inconsistent_range = 1 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_messages&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2 <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3. <BR>&nbsp; ENDIF. </P><P class="sap1">ENDFUNCTION. </P></p>
+<p>Der Beitrag <a href="/blog/ausgabe-bapi-messages/">Ausgabe BAPI-Messages</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/ausgabe-bapi-messages/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Popup-Demonstrationsprogramme</title>
+		<link>/blog/demonstrationsprogramme/</link>
+					<comments>/blog/demonstrationsprogramme/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 22 Mar 2004 10:40:51 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Reuse-Bibliothek]]></category>
+		<category><![CDATA[Popups]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=224</guid>
+
+					<description><![CDATA[<p>Diese Demonstrationsprogramme der SAP zeigen die M&#246;glichkeiten der verschiedenen Popup's auf.</p>
+<p>Der Beitrag <a href="/blog/demonstrationsprogramme/">Popup-Demonstrationsprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Diese Demonstrationsprogramme der SAP zeigen die Möglichkeiten der verschiedenen Popup&#8217;s auf.</p>
+<ul>
+<li><strong>RSSPO100</strong><br />
+Beispiele zur Anwendung der Fbe der Gruppe SPO1</li>
+<li><strong>RSSPO120</strong><br />
+Beispiele zur Anwendung der Fbe der Gruppe SPO1</li>
+<li><strong>RSSPO200</strong><br />
+Beispiele zur Anwendung der Fbe der Gruppe SPO2</li>
+<li><strong>RSSPO410</strong><br />
+Beispiele zum Funktionsbaustein POPUP_GET_VALUES</li>
+<li><strong>RSSPO420</strong><br />
+Beispiele zum Funktionsbaustein POPUP GET VALUES DB CHECKED</li>
+<li><strong>RSSPO430<br />
+</strong>Beispiele zum Funktionsbaustein POPUP GET VALUES USER CHECKED</li>
+<li><strong>RSSPO440<br />
+</strong>Beispiele zum Funktionsbaustein POPUP GET VALUES USER HELP</li>
+<li><strong>RSSPO450</strong><br />
+Beispiele zum Funktionsbaustein POPUP_GET_VALUES_USER_BUTTONS</li>
+<li><strong>RSSPO500<br />
+</strong>Beispiele zum Funktionsbaustein POPUP_TO_DECIDE_LIST</li>
+<li><strong>RSSPO501<br />
+</strong>Beispiele zum Funktionsbaustein POPUP TO DECDE LIST</li>
+<li><strong>RSSPO600</strong><br />
+Beispiele zur Anwendung der Fbe der Gruppe SPO6</li>
+<li><strong>RSSPO601<br />
+</strong>Testprogram für POPUP_DISPLAY_TEXT_USER_BUTTON</li>
+</ul>
+<p>Der Beitrag <a href="/blog/demonstrationsprogramme/">Popup-Demonstrationsprogramme</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/demonstrationsprogramme/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>POPUP_TO_DECIDE</title>
+		<link>/blog/popup_to_decide/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 22 Mar 2004 10:23:29 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Reuse-Bibliothek]]></category>
+		<category><![CDATA[Popups]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=223</guid>
+
+					<description><![CDATA[<p>Ein einfaches Popup, um dem Anwender zwischen zwei M&#246;glichkeiten w&#228;hlen zu lassen.</p>
+<p>Der Beitrag <a href="/blog/popup_to_decide/">POPUP_TO_DECIDE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein einfaches Popup, um dem Anwender zwischen zwei M&ouml;glichkeiten w&auml;hlen zu lassen.<br /><P>Programm <STRONG>RSSPO200</STRONG> zeigt die Verwendung der Bausteine <STRONG><FONT color="#fb2412">POPUP_TO_DECIDE</FONT></STRONG> und <STRONG><FONT color="#fb2412">POPUP_TO_DECIDE_WITH_MESSAGE</FONT></STRONG>.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/popup/popup2.jpg"><BR>POPUP_TO_DECIDE: Auswahl mit Textzeilen und drei </P></TD></TR></TBODY></TABLE></P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/popup/popup3.jpg"><BR>POPUP_TO_DECIDE_WITH_MESSAGE</P></TD></TR></TBODY></TABLE></P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/popup_to_decide/">POPUP_TO_DECIDE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Popup_To_Confirm</title>
+		<link>/blog/popup_to_confirm/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 22 Mar 2004 10:18:44 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Popups]]></category>
+		<category><![CDATA[Reuse-Bibliothek]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=222</guid>
+
+					<description><![CDATA[<p>Standard-Popup zur Anzeige eines Textes, einer Textzeile, drei Buttons und der M&#246;glichkeit, Textsymbole im angezeigten Text zu ersetzen.</p>
+<p>Der Beitrag <a href="/blog/popup_to_confirm/">Popup_To_Confirm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Standard-Popup zur Anzeige eines Textes, einer Textzeile, drei Buttons und der M&ouml;glichkeit, Textsymbole im angezeigten Text zu ersetzen.<br /><P>Report <STRONG>RSSPO120</STRONG> zeigt die Verwendung dieses vielseitigen Popup&#8217;s.</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/popup/popup1.jpg"><BR>Eine Anwendungsm&ouml;glichkeit</P></TD></TR></TBODY></TABLE></P><P>In&nbsp;Report <STRONG>RSSPO100 </STRONG>werden noch die folgenden Funktionsbausteine in einem &#8220;phantastischen Test&#8221; demonstriert:</P><UL><LI>POPUP_TO_CONFIRM_STEP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </LI><LI>POPUP_TO_CONFIRM ohne CANCEL&nbsp;&nbsp;&nbsp; </LI><LI>POPUP_TO_CONFIRM_WITH_VALUE&nbsp;&nbsp;&nbsp;&nbsp; </LI><LI>POPUP_TO_CONFIRM_WITH_MESSAGE&nbsp;&nbsp; </LI><LI>POPUP_TO_CONFIRM_LOSS_OF_DATA&nbsp;&nbsp; <BR></LI></UL></p>
+<p>Der Beitrag <a href="/blog/popup_to_confirm/">Popup_To_Confirm</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

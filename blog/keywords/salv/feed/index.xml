@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>salv Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/salv/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 07 Jun 2022 09:48:15 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>salv Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ALV-Grid aus SALV ermitteln</title>
+		<link>/blog/alv-grid-aus-salv-ermitteln/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 09 Jun 2021 14:56:09 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[salv]]></category>
+		<guid isPermaLink="false">/?p=1029100</guid>
+
+					<description><![CDATA[<p>Die Klasse CL_SALV_TABLE erfreut sich seit Jahren großer Beliebtheit. In erster Linie wahrscheinlich deswegen, weil man ohne Ermittlung des Feldkatalogs oder Vorgabe der zugrunde liegenden Datenstruktur eine Tabelle als Grid anzeigen kann. Das SALV verwendet intern jedoch immer noch die Klasse CL_GUI_ALV_GRID. Und es kann durchaus sein, dass man, nachdem man etwas mit dem SALV programmiert hat, an dieses Objekt herankommen möchte. Achtung! Änderungen in System ab Release 7.55 Wie das geht, zeige ich dir...</p>
+<p>Der Beitrag <a href="/blog/alv-grid-aus-salv-ermitteln/">ALV-Grid aus SALV ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Die Klasse CL_SALV_TABLE erfreut sich seit Jahren großer Beliebtheit. In erster Linie wahrscheinlich deswegen, weil man ohne Ermittlung des Feldkatalogs oder Vorgabe der zugrunde liegenden Datenstruktur eine Tabelle als Grid anzeigen kann. Das SALV verwendet intern jedoch immer noch die Klasse CL_GUI_ALV_GRID. Und es kann durchaus sein, dass man, nachdem man etwas mit dem SALV programmiert hat, an dieses Objekt herankommen möchte.</p>
+
+
+
+<div class="wp-block-group alignfull has-background ext-my-0 ext-py-lg editor:no-inserter" style="background-color:#1966c2"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<div class="wp-block-columns alignwide are-vertically-aligned-center is-layout-flex wp-container-core-columns-is-layout-1 wp-block-columns-is-layout-flex">
+<div class="wp-block-column is-vertically-aligned-center is-layout-flow wp-block-column-is-layout-flow" style="flex-basis:100%">
+<h2 class="has-white-color has-text-color has-large-font-size ext-mt-0 wp-block-heading" id="new-755" style="font-style:normal;font-weight:400;line-height:1.1">Achtung! Änderungen in System ab Release 7.55</h2>
+
+
+
+<div class="wp-block-buttons is-layout-flex wp-block-buttons-is-layout-flex">
+<div class="wp-block-button has-custom-font-size is-style-fill has-medium-font-size"><a class="wp-block-button__link has-white-color has-text-color has-background" href="/blog/alv-grid-aus-salv-ermitteln-ab-release-7-55/" style="background-color:#ff5900" rel="">Hier geht&#8217;s zum neuen Beitrag</a></div>
+</div>
+</div>
+</div>
+</div></div>
+
+
+
+<p>Wie das geht, zeige ich dir mit der folgenden Klasse.</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<pre class="wp-block-code"><code>CLASS lcl_access_salv DEFINITION INHERITING FROM cl_salv_model_list FINAL.
+  PUBLIC SECTION.
+    CLASS-METHODS:
+      get_cl_gui_alv_grid IMPORTING io_salv        TYPE REF TO cl_salv_model_list
+                          RETURNING VALUE(ro_grid) TYPE REF TO cl_gui_alv_grid.
+ENDCLASS.
+
+CLASS lcl_access_salv IMPLEMENTATION.
+  METHOD get_cl_gui_alv_grid.
+    DATA:lo_salv    TYPE REF TO cl_salv_table.
+*--------------------------------------------------------------------*
+* Must be bound
+*--------------------------------------------------------------------*
+    IF io_salv IS NOT BOUND.
+      RETURN.
+    ENDIF.
+*--------------------------------------------------------------------*
+* Adapter must be bound
+*--------------------------------------------------------------------*
+    IF   io_salv-&gt;r_controller IS NOT BOUND
+      OR io_salv-&gt;r_controller-&gt;r_adapter IS NOT BOUND.
+      MESSAGE 'Minor programming fault: Call GET_GRID_FROM_SALV after SALV-&gt;DISPLAY( )!'(001) 
+         TYPE 'S' DISPLAY LIKE 'W'.
+      lo_salv ?= io_salv.  " Calling method has cl_salv_table typed in interface
+      lo_salv-&gt;display( ).
+    ENDIF.
+    IF   io_salv-&gt;r_controller IS NOT BOUND
+      OR io_salv-&gt;r_controller-&gt;r_adapter IS NOT BOUND.
+      RETURN.  " Still not bound  --&gt; can't do anything
+    ENDIF.
+*--------------------------------------------------------------------*
+* If method not present or wrong return type exception will handle this and we return unbound grid
+*--------------------------------------------------------------------*
+    TRY.
+
+        " Works for CL_SALV_FULLSCREEN_ADAPTER as well as for CL_SALV_GRID_ADAPTER
+        CALL METHOD io_salv-&gt;r_controller-&gt;r_adapter-&gt;('GET_GRID')  
+          RECEIVING
+            value = ro_grid.
+      CATCH cx_root ##CATCH_ALL. " don't dump
+        RETURN.
+    ENDTRY.
+  ENDMETHOD.
+ENDCLASS.</code></pre>
+<p>Der Beitrag <a href="/blog/alv-grid-aus-salv-ermitteln/">ALV-Grid aus SALV ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</title>
+		<link>/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 10 Oct 2016 07:58:22 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Ereignis]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Markierung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=865485</guid>
+
+					<description><![CDATA[<p>Der SALV wird inzwischen gerne von Programmierern verwendet, da einiges einfacher und einleuchtender ist, als beim ALV-Grid. Allerdings ist auch vieles komplizierter und überhaupt nicht einleuchtend. Zudem hat der SALV einige Funktionen nicht, die der ALV-Grid schon lange zur Verfügung stellt, wie zum Beispiel Editierbarkeit. Ich brauchte neulich in einem Projekt das Ereignis "Verzögertes Reagieren auf Markierungen" in einem SALV-Grid. Leider bietet der SALV dieses Event nicht an.</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/">Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der SALV wird inzwischen gerne von Programmierern verwendet, da einiges einfacher und einleuchtender ist, als beim ALV-Grid. Allerdings ist auch vieles komplizierter und überhaupt nicht einleuchtend. Zudem hat der SALV einige Funktionen nicht, die der ALV-Grid schon lange zur Verfügung stellt, wie zum Beispiel Editierbarkeit. Ich brauchte neulich in einem Projekt das Ereignis &#8220;Verzögertes Reagieren auf Markierungen&#8221; in einem SALV-Grid. Leider bietet der SALV dieses Event nicht an. <a href="http://abapblog.com/articles/thoughts/109-sap-teched-developer-hero-2016">Developer Hero 2016 Łukasz Pęgiel</a> hat mir das unten stehende Coding zur Verfügung gestellt. <strong>Vielen Dank dafür!</strong></p>
+<h2>Was macht das Ereignis Delayed_Changed_Sel_Callback?</h2>
+<p>Das Ereignis wird immer dann &#8211; verzögert! &#8211; ausgelöst, wenn der Anwender die Markierung im Grid ändert, also zum Beispiel Zeilen, Spalten oder einzelne Zellen markiert. Standardmäßig ist die <a href="http://help.sap.com/saphelp_erp60_sp/helpdata/de/ee/c8e068d52611d2b468006094192fe3/content.htm">Verzögerung von DELAYED_CHANGED_SEL_CALLBACK auf 1,5 Sekunden </a>eingestellt. Die Funktionalität kann dafür verwendet werden, um Daten anhand der markierten Zellen nachzulesen und anzuzeigen, ohne dass der Anwender eine weitere Taste drücken muss. 1,5 Sekunden sind allerdings häufig eine zu lange Zeit, denn häufig wechselt ein Anwender kurz vor dieser Zeitspanne die Markierung wieder, weil er der Meinung war, dass nun eh nichts mehr passiert. Wie diese Einstellung geändert werden kann, habe ich in dem Beispiel AUTOSUMME beschrieben.</p>
+<h2>Was ist nun der Trick?</h2>
+<p>Der Trick, um an die Events des unterliegenden ALV-Grids zu gelangen, liegt darin, das Ereignis AFTER_REFRESH FOR ALL INSTANCES zu registrieren, also auf alle aktuell instanziierten Grids anzuwenden. Zusätzlich muss der implizit immer vorhandene Importing-Parameter SENDER bei der Definition angegeben werden:</p>
+<pre> METHODS evh_refresh FOR EVENT after_refresh
+      OF cl_gui_alv_grid
+      IMPORTING sender.</pre>
+<p>In dem unten stehenden Programm wird ein einfacher SALV mit Daten aus der Flugdatenbank erzeugt. Es wird das Ereignis AFTER_REFRESH registriert um in diesem Ereignis für den SENDER &#8211; also das im SALV verwendete ALV-Grid &#8211; das eigentliche Ereignis Delayed_Change_Sel_Callback zu registrieren. Wird die Markierung im Grid geändert, so wird diese Meldung ausgegeben:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-865553" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg" alt="2016-10-10_09-46-32" width="637" height="385" srcset="/wp-content/uploads/2016/10/2016-10-10_09-46-32.jpg 637w, /wp-content/uploads/2016/10/2016-10-10_09-46-32-300x181.jpg 300w" sizes="(max-width: 637px) 100vw, 637px" /></a></p>
+<p>[notice type=&#8217;info&#8217;]Wer eine Alternative zu SALV und ALV-Grid sucht, der sollte sich das Open-Source-Tool <a href="http://abapblog.com/falv">FALV</a> von Łukasz ansehen![/notice]</p>
+<h2>Achtung</h2>
+<p>Der Zusatz FOR ALL INSTANCES greift wirklich bei ALLEN Instanzen des ALV-Grid!! Deswegen sollte er wirklich nur mit Bedacht benutzt werden und du solltest dir der möglichen Seiteneffekte bewusst sein, denn viele interne Funktionen des SALV und ALV-Grids nutzen ebenfalls wieder ein Grid (Auswahl Feldkatalog, Auswahl Layout etc.). So kann es zu ungewollten Reaktionen &#8211; zum Beispiel bei der Änderung des Layouts &#8211; kommen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg"><img decoding="async" class="alignnone size-full wp-image-865551" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg" alt="2016-10-10_09-11-13" width="829" height="556" srcset="/wp-content/uploads/2016/10/2016-10-10_09-11-13.jpg 829w, /wp-content/uploads/2016/10/2016-10-10_09-11-13-300x201.jpg 300w, /wp-content/uploads/2016/10/2016-10-10_09-11-13-768x515.jpg 768w" sizes="(max-width: 829px) 100vw, 829px" /></a></p>
+<h2>Code</h2>
+<pre>REPORT zsalv_grid_events.
+
+CLASS lcl_grid_trick DEFINITION.
+
+ PUBLIC SECTION.
+
+ DATA spfli TYPE STANDARD TABLE OF spfli.
+ DATA salv TYPE REF TO cl_salv_table.
+
+ METHODS create_salv.
+ METHODS evh_refresh FOR EVENT after_refresh
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ METHODS evh_delayed_selection
+ FOR EVENT delayed_changed_sel_callback
+ OF cl_gui_alv_grid
+ IMPORTING sender.
+ PRIVATE SECTION.
+ DATA mv_event_registered TYPE boolean.
+
+ENDCLASS.
+
+CLASS lcl_grid_trick IMPLEMENTATION.
+
+ METHOD create_salv.
+
+ SELECT * UP TO 100 ROWS
+ INTO CORRESPONDING FIELDS OF TABLE @spfli
+ FROM spfli.
+
+ cl_salv_table=&gt;factory(
+ IMPORTING
+ r_salv_table = salv
+ CHANGING
+ t_table = spfli ).
+
+ salv-&gt;get_functions( )-&gt;set_default( abap_true ).
+
+ SET HANDLER evh_refresh FOR ALL INSTANCES.
+
+ salv-&gt;display( ).
+
+ ENDMETHOD.
+
+ METHOD evh_refresh.
+
+ CHECK mv_event_registered = abap_false.
+ SET HANDLER evh_delayed_selection FOR sender.
+ sender-&gt;register_delayed_event( i_event_id = cl_gui_alv_grid=&gt;mc_evt_delayed_change_select ).
+ mv_event_registered = abap_true.
+
+ ENDMETHOD.
+
+ METHOD evh_delayed_selection.
+
+ DATA lr_type_description TYPE REF TO cl_abap_typedescr.
+ lr_type_description = cl_abap_typedescr=&gt;describe_by_object_ref( sender ).
+ MESSAGE i001(00)
+ WITH 'Delayed Selection; SENDER ist vom Typ '
+ lr_type_description-&gt;absolute_name.
+
+ ENDMETHOD.
+
+ENDCLASS.
+
+START-OF-SELECTION.
+
+ DATA(output) = NEW lcl_grid_trick( ).
+ output-&gt;create_salv( ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/zugriff-auf-nicht-unterstuetzte-ereignisse-des-cl_salv_table/">Zugriff auf nicht unterstützte Ereignisse des CL_SALV_TABLE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Smart Filter</title>
+		<link>/blog/smart-filter/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 17 Nov 2015 16:47:07 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Filter]]></category>
+		<category><![CDATA[Befehlsverkettung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=345381</guid>
+
+					<description><![CDATA[<p>Vor einiger Zeit habe ich euch den Magic Filter vorgestellt. Hier habe ich den aktuellen Filter eines Grids auf mehrere Objekte angewendet.</p>
+<p>Heute möchte ich euch eine weitere Möglichkeit der Filterung vorstellen: Die Filterung anhand einer Mehrfachselektion. Damit es ins Konzept passt und weil jedes Kind einen Namen braucht, habe ich es Smart Filter genannt.</p>
+<p>Der Beitrag <a href="/blog/smart-filter/">Smart Filter</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Vor einiger Zeit habe ich euch den <a href="https://tricktresor.com/blog/magic-filter/">Magic Filter</a> vorgestellt. Hier habe ich den aktuellen Filter eines Grids auf mehrere Objekte angewendet.</p>
+<p>Heute möchte ich euch eine weitere Möglichkeit der Filterung vorstellen: Die Filterung anhand einer Mehrfachselektion. Damit es ins Konzept passt und weil jedes Kind einen Namen braucht, habe ich es <em>Smart Filter</em> genannt.</p>
+<h2>Smart Filter: Anwendung</h2>
+<p>Am Anfang war das Grid (oder genauer: Der SALV-Table). Als Beispieldaten dienen die Länderbezeichnungen.</p>
+<p>Das Grid besitzt eine selbst definierte Funktion &#8220;Filter&#8221;:</p>
+<p><img decoding="async" class="alignnone wp-image-345382 size-full" src="https://tricktresor.com/wp-content/uploads/2015/11/filter_sel1.png" alt="filter_sel1" width="538" height="275" srcset="/wp-content/uploads/2015/11/filter_sel1.png 538w, /wp-content/uploads/2015/11/filter_sel1-300x153.png 300w" sizes="(max-width: 538px) 100vw, 538px" /></p>
+<p>Um diese Funktion zu verwenden, müssen mindestens eine Zeile und mindestens eine Spalte markiert werden (STRG gedrückt halten für Mehrfachselektion!):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/11/filter_sel2.png"><img loading="lazy" decoding="async" class="alignnone wp-image-345383 size-full" src="https://tricktresor.com/wp-content/uploads/2015/11/filter_sel2.png" alt="filter_sel2" width="522" height="213" srcset="/wp-content/uploads/2015/11/filter_sel2.png 522w, /wp-content/uploads/2015/11/filter_sel2-300x122.png 300w" sizes="(max-width: 522px) 100vw, 522px" /></a></p>
+<p>Mit einem Klick auf &#8220;Filter&#8221; wird dann die &#8220;Schnittmenge&#8221; gefiltert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/11/filter_sel3.png"><img loading="lazy" decoding="async" class="alignnone wp-image-345384 size-full" src="https://tricktresor.com/wp-content/uploads/2015/11/filter_sel3.png" alt="filter_sel3" width="534" height="192" srcset="/wp-content/uploads/2015/11/filter_sel3.png 534w, /wp-content/uploads/2015/11/filter_sel3-300x108.png 300w" sizes="(max-width: 534px) 100vw, 534px" /></a></p>
+<p>Die Anwendungsmöglichkeiten sind sicherlich beschränkt, aber bei größeren Listen, die anhand bestimmter Felder und Feldwerte kontrolliert werden müssen, sicherlich sehr hilfreich.</p>
+<h2>Anmerkungen zum Code</h2>
+<p>Da der zusätzliche Button in dieser Variante nicht im Fullscreen-Grid funktioniert, muss die Darstellung in einem Docking-Container erfolgen.</p>
+<p>Um dies einfach zu tun, habe ich den PARAMETER <em>dummy</em> verwendet, damit ein Selektionsbild angezeigt wird.</p>
+<p>Mit Druck auf die Enter-Taste wird das Grid angezeigt.</p>
+<p>Um den Zusatzbutton anzuzeigen, wird <em>Command Chaining</em> verwendet:</p>
+<pre>mr_salv-&gt;get_functions( )-&gt;add_function( ... )</pre>
+<h2>Code</h2>
+<pre>REPORT.
+
+PARAMETERS dummy.
+
+*----------------------------------------------------------------------*
+* CLASS lcl_grid DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_grid DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS start.
+ PROTECTED SECTION.
+ CLASS-DATA mt_data TYPE STANDARD TABLE OF t005t.
+ CLASS-DATA mr_salv TYPE REF TO cl_salv_table.
+ CLASS-METHODS add_filter_value
+ IMPORTING
+ structure TYPE any
+ fieldname TYPE fieldname
+ CHANGING
+ filter TYPE lvc_t_filt.
+ CLASS-METHODS add_filter_selection.
+ CLASS-METHODS set_filter
+ IMPORTING
+ filter TYPE lvc_t_filt.
+ CLASS-METHODS add_function.
+ CLASS-METHODS on_function FOR EVENT added_function
+ OF cl_salv_events_table
+ IMPORTING e_salv_function.
+
+
+ENDCLASS. "lcl_grid DEFINITION
+
+*----------------------------------------------------------------------*
+* CLASS lcl_grid IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_grid IMPLEMENTATION.
+ METHOD start.
+
+*== Daten lesen
+ SELECT * FROM t005t INTO TABLE mt_data.
+
+*== Docker erzeugen
+ DATA lr_docker TYPE REF TO cl_gui_docking_container.
+ CREATE OBJECT lr_docker
+ EXPORTING
+ side = cl_gui_docking_container=&gt;dock_at_bottom
+ ratio = 80.
+
+*== SALV-Table erzeugen
+ CALL METHOD cl_salv_table=&gt;factory
+ EXPORTING
+ r_container = lr_docker
+ IMPORTING
+ r_salv_table = mr_salv
+ CHANGING
+ t_table = mt_data.
+
+*== alle Funktionen einblenden, um Filter löschen zu können
+ DATA lr_funcs TYPE REF TO cl_salv_functions_list.
+ lr_funcs = mr_salv-&gt;get_functions( ).
+ lr_funcs-&gt;set_all( ).
+*== Eigene Funktion einblenden
+ add_function( ).
+
+*== ON_Usercommand registrieren
+ DATA lr_events TYPE REF TO cl_salv_events_table.
+ lr_events = mr_salv-&gt;get_event( ).
+ SET HANDLER on_function FOR lr_events.
+
+*== Anzeige
+ mr_salv-&gt;display( ).
+
+ ENDMETHOD. "start
+
+ METHOD add_function.
+
+*== Eigene Funktion einfügen
+ mr_salv-&gt;get_functions( )-&gt;add_function(
+ name = 'ZFilterSel'
+ icon = |{ icon_filter }|
+ text = |Filter|
+ tooltip = |Filter anhand Selektion|
+ position = if_salv_c_function_position=&gt;right_of_salv_functions ).
+
+ ENDMETHOD. "add_function
+
+ METHOD on_function.
+
+ CASE e_salv_function.
+ WHEN 'ZFilterSel'.
+*== Filter anhand Selektion setzen
+ add_filter_selection( ).
+ ENDCASE.
+
+ ENDMETHOD. "on_function
+
+ METHOD add_filter_value.
+
+ DATA ls_filter TYPE lvc_s_filt.
+ FIELD-SYMBOLS &lt;value&gt; TYPE any.
+
+*== Filterzeile hinzufügen
+ ls_filter-fieldname = fieldname.
+ ls_filter-sign = 'I'.
+ ls_filter-option = 'EQ'.
+ ASSIGN COMPONENT fieldname OF STRUCTURE structure TO &lt;value&gt;.
+ IF sy-subrc = 0.
+ ls_filter-low = &lt;value&gt;.
+ SHIFT ls_filter-low LEFT DELETING LEADING space.
+ READ TABLE filter WITH KEY fieldname = ls_filter-fieldname
+ sign = ls_filter-sign
+ option = ls_filter-option
+ low = ls_filter-low
+ TRANSPORTING NO FIELDS.
+ IF sy-subrc &gt; 0.
+ APPEND ls_filter TO filter.
+ ENDIF.
+ ENDIF.
+
+ ENDMETHOD. "add_filter_field
+
+ METHOD add_filter_selection.
+
+*== Lokale Daten
+ DATA lt_filter TYPE lvc_t_filt.
+
+ DATA lt_rows TYPE salv_t_row.
+ FIELD-SYMBOLS &lt;row&gt; LIKE LINE OF lt_rows..
+ DATA lt_cols TYPE salv_t_column.
+ FIELD-SYMBOLS &lt;col&gt; LIKE LINE OF lt_cols.
+ DATA lr_selection TYPE REF TO cl_salv_selections.
+
+ FIELD-SYMBOLS &lt;table_line&gt; TYPE any.
+
+
+*== Selektierte Spalten und Zeilen ermitteln
+ lr_selection = mr_salv-&gt;get_selections( ).
+ lt_rows = lr_selection-&gt;get_selected_rows( ).
+ lt_cols = lr_selection-&gt;get_selected_columns( ).
+
+*== Filter anhand der aktuellen Selektion setzen
+ LOOP AT lt_rows ASSIGNING &lt;row&gt;.
+ IF sy-subrc = 0.
+ READ TABLE mt_data ASSIGNING &lt;table_line&gt; INDEX &lt;row&gt;.
+ IF sy-subrc = 0.
+ LOOP AT lt_cols ASSIGNING &lt;col&gt;.
+ add_filter_value( EXPORTING structure = &lt;table_line&gt; fieldname = &lt;col&gt;
+ CHANGING filter = lt_filter ).
+
+ ENDLOOP.
+ ENDIF.
+ ENDIF.
+ ENDLOOP.
+
+*== Filter setzen
+ set_filter( filter = lt_filter ).
+
+ ENDMETHOD. "add_filter_selection
+
+ METHOD set_filter.
+
+*== Filter auf SAL-Table anwenden
+ DATA lv_index TYPE i.
+ DATA lr_display TYPE REF TO cl_salv_display_settings.
+ DATA lv_title TYPE lvc_title.
+ FIELD-SYMBOLS &lt;filter&gt; TYPE lvc_s_filt.
+
+ cl_salv_controller_metadata=&gt;set_lvc_filter( t_filter = filter
+ r_filters = mr_salv-&gt;get_filters( ) ).
+ lr_display = mr_salv-&gt;get_display_settings( ).
+
+ LOOP AT filter ASSIGNING &lt;filter&gt;.
+ IF lv_title IS INITIAL.
+ lv_title = &lt;filter&gt;-fieldname.
+ ELSE.
+ CONCATENATE '/' &lt;filter&gt;-fieldname INTO lv_title.
+ ENDIF.
+ ENDLOOP.
+
+ CONCATENATE 'Filter ist aktiv (' lv_title ')' INTO lv_title .
+
+ lr_display-&gt;set_list_header( lv_title ).
+
+ mr_salv-&gt;refresh( ).
+ ENDMETHOD. "set_filter
+
+ENDCLASS. "lcl_grid IMPLEMENTATION
+
+AT SELECTION-SCREEN.
+
+ lcl_grid=&gt;start( ).</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/smart-filter/">Smart Filter</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Befehlsverkettung &#8211; Don&#8217;t try this at home!</title>
+		<link>/blog/befehlsverkettung-dont-try-this-at-home/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 14 Nov 2015 09:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Befehlsverkettung]]></category>
+		<category><![CDATA[cl_salv]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=339017</guid>
+
+					<description><![CDATA[<p>Eine kleine Spielerei mit funktionalen Aufrufen. Ich wollte wissen, ob man die Erzeugung eines SALV-Tables plus Anzeige in einen funktionalen Aufruf schreiben kann. Geklappt hat es nicht 100%ig, aber trotzdem interessant. Nicht zur Nachahmung geeignet. </p>
+<p>Der Beitrag <a href="/blog/befehlsverkettung-dont-try-this-at-home/">Befehlsverkettung &#8211; Don&#8217;t try this at home!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Den CL_SALV_TABLE kann man leider nicht &#8220;elegant&#8221; erzeugen. Darunter verstehe ich, dass man die SALV-Referenz per RECEIVING bekommt. Sobald ein Exporting- oder Changing-Parameter in der Methode verwendet wird, kann RETURNING nicht mehr benutzt werden.</p>
+<p>Der Aufruf ist zwar kompakt:</p>
+<pre>CALL METHOD cl_salv_table=&gt;factory
+ EXPORTING
+ r_container = gr_dock
+ IMPORTING
+ r_salv_table = gr_salv
+ CHANGING
+ t_table = gt_data.
+gr_salv-&gt;display( ).</pre>
+<p>aber man kann ihn nicht wie folgt verwenden:</p>
+<pre>cl_salv_table=&gt;factory( ... )-&gt;display( ).</pre>
+<p>Ich wollte nun wissen, ob man die Erzeugung eines SALV-Tables plus Anzeige trotzdem in einen funktionalen Aufruf schreiben kann. Geklappt hat es zwar, jedoch wiederum mit einem Nachteil.</p>
+<h2>Befehlsverkettung</h2>
+<p>Methoden von durch RETURNING übergebenen Objektreferenzen können direkt durch Befehlsverkettung ausgeführt werden.</p>
+<p>Dazu ein kleines Testprogramm mit einer FACTORY-Methode:</p>
+<pre>*----------------------------------------------------------------------*
+* CLASS lcl_test DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_test DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS factory RETURNING value(object) TYPE REF TO lcl_test.
+ METHODS show.
+ENDCLASS. "lcl_salv DEFINITION
+
+*----------------------------------------------------------------------*
+* CLASS lcl_salv IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_test IMPLEMENTATION.
+ METHOD factory.
+ CREATE OBJECT object.
+ ENDMETHOD. "factory
+
+ METHOD show.
+ MESSAGE 'Hallo' TYPE 'I'.
+ ENDMETHOD. "show
+
+ENDCLASS. "lcl_test IMPLEMENTATION</pre>
+<p>Normalerweise würde man die Methode SHOW folgendermaßen aufrufen:</p>
+<pre>DATA lr_test TYPE REF TO lcl_test.
+lr_test = lcl_test=&gt;factory( ).
+lr_test-&gt;show( ).</pre>
+<p>Durch Verwendung einer Befehlsverkettung kann der Aufruf wie folgt aussehen:</p>
+<pre>lcl_test=&gt;factory( )-&gt;show( ).</pre>
+<p>In diesem Umfang ist die Befehlsverkettung auch vertretbar. Sie kann jedoch Auswüchse annehmen, die ich nicht mehr warten möchte&#8230;</p>
+<h2>CL_SALV_TABLE</h2>
+<p>Zurück zum meinem eigentlich Problem: Die Anzeige des SALV-Grid mit einem Aufruf. Hindernis dabei ist, dass die SALV-Referenz eben nicht per RETURNING zurück gegeben wird, sondern als IMPORTING-Parameter.</p>
+<p>Ich schrieb also ein kleines Wrapper-Programm. Ich habe die Übergabe der einzelnen Parameter in einzelne Methoden ausgelagert um diese nacheinander &#8220;funktional&#8221; aufrufen zu können. Dafür muss die eigene Instanz jeweils an den Aufrufer übergeben werden.</p>
+<p>Auch dabei musste ich tricksen, denn die anzuzeigende Tabelle kann nicht als CHANGING übergeben werden. Ich musste deswegen mit einer Referenz auf die Tabelle arbeiten.</p>
+<pre> DATA gd_table TYPE REF TO data.
+ GET REFERENCE OF gt_data INTO gd_table.</pre>
+<p>Dadurch erreiche ich natürlich nicht das, was ich eigentlich wollte, nämlich <strong>einen</strong> kompakten Methodenaufruf. Immerhin: Der Aufruf sieht nun wirklich interessant aus:</p>
+<pre>lcl_salv=&gt;factory( )-&gt;set_table( gd_table )-&gt;create_grid( )-&gt;display( ).</pre>
+<p>DISPLAY ist hierbei bereits die Methode des SALV-Table, die durch CREATE_GRID erzeugt wird!</p>
+<p>Sicherlich nicht elegant, aber es lässt sich gut demonstrieren, wie die funktionalen Aufrufe funktionieren.</p>
+<p>Diese Methode ist selbstverständlich nur dann sinnvoll, wenn man sicher ist, dass man das SALV-Objekt nicht mehr benötigt, denn bei diesem Aufruf erzeugt man das Objekt, benutzt es, aber die Referenz darauf ist sofort wieder weg.</p>
+<h2>Code</h2>
+<pre>*----------------------------------------------------------------------*
+* CLASS lcl_salv DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_salv DEFINITION.
+ PUBLIC SECTION.
+ DATA mt_table TYPE REF TO data.
+ CLASS-METHODS factory RETURNING value(object) TYPE REF TO lcl_salv.
+ METHODS create_grid RETURNING value(salv) TYPE REF TO cl_salv_table.
+ METHODS set_table IMPORTING table TYPE REF TO data
+ RETURNING value(object) TYPE REF TO lcl_salv.
+ENDCLASS. "lcl_salv DEFINITION
+
+*----------------------------------------------------------------------*
+* CLASS lcl_salv IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_salv IMPLEMENTATION.
+ METHOD factory.
+ create object object.
+ ENDMETHOD. "factory
+
+ METHOD create_grid.
+
+ FIELD-SYMBOLS &lt;table&gt; TYPE ANY TABLE.
+ ASSIGN mt_table-&gt;* TO &lt;table&gt;.
+
+ CALL METHOD cl_salv_table=&gt;factory
+ IMPORTING
+ r_salv_table = salv
+ CHANGING
+ t_table = &lt;table&gt;.
+
+ ENDMETHOD. "factory
+
+ METHOD set_table.
+ mt_table = table.
+ object = me.
+ ENDMETHOD. "set_table
+ENDCLASS. "lcl_salv IMPLEMENTATION</pre>
+<p>Der Beitrag <a href="/blog/befehlsverkettung-dont-try-this-at-home/">Befehlsverkettung &#8211; Don&#8217;t try this at home!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SALV-Table mit &#8220;Grafik&#8221;</title>
+		<link>/blog/salv-table-mit-grafik/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Jun 2014 19:04:27 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[ascii]]></category>
+		<category><![CDATA[zeichensatz]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Sonderzeichen]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4891</guid>
+
+					<description><![CDATA[<p>Heute kam mir die Idee, Daten in einem ALV-Grid einmal grafisch darzustellen. Ich hatte eigentlich vor, die grafischen Zeichen aus dem DOS-Zeichensatz zu verwenden, aber diese stehen leider nicht zur Verfügung. Hier also eine Variante mit verfügbaren Sonderzeichen.</p>
+<p>Der Beitrag <a href="/blog/salv-table-mit-grafik/">SALV-Table mit &#8220;Grafik&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute kam mir die Idee, Daten in einem ALV-Grid einmal grafisch darzustellen. Ich hatte eigentlich vor, die grafischen Zeichen aus dem DOS-Zeichensatz zu verwenden:</p>
+<p><a href="http://www.torsten-horn.de/techdocs/ascii.htm"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4893" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_210631-300x179.jpg" alt="Bild_2014_06_26_210631" width="300" height="179" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_210631-300x179.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_26_210631-624x372.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_26_210631.jpg 626w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Leider war das nicht möglich. Ich habe mich dann für ein anderes Sonderzeichen entschieden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4892 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg" alt="Bild_2014_06_26_200626 (2)" width="588" height="330" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_200626-2.jpg 588w, /wp-content/uploads/2014/06/Bild_2014_06_26_200626-2-300x168.jpg 300w" sizes="(max-width: 588px) 100vw, 588px" /></a></p>
+<p>Die Länge des &#8220;Balkens&#8221; wird anhand der verwenden Feldgröße von 20 Zeichen berechnet.</p>
+<p>Das Pipe-Symbol | sieht auch gut aus. Nimmt nicht so viel Platz weg&#8230;</p>
+<p><img loading="lazy" decoding="async" class="alignnone wp-image-4894 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_26_210606.jpg" alt="Bild_2014_06_26_210606" width="484" height="193" srcset="/wp-content/uploads/2014/06/Bild_2014_06_26_210606.jpg 484w, /wp-content/uploads/2014/06/Bild_2014_06_26_210606-300x119.jpg 300w" sizes="(max-width: 484px) 100vw, 484px" /></p>
+<h2>Coding</h2>
+<pre>REPORT z.
+
+*== global data
+DATA:
+  BEGIN OF gs_data,
+    matnr   TYPE char10,
+    descr   TYPE text20,
+    amount  TYPE i,
+    camount TYPE char20,
+  END OF gs_data,
+  gt_data LIKE TABLE OF gs_data,
+  hex TYPE x VALUE 7.
+
+FIELD-SYMBOLS  TYPE c.
+
+*== start of program
+START-OF-SELECTION.
+  PERFORM main.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  main
+*&amp;---------------------------------------------------------------------*
+FORM main.
+
+*== local data
+  DATA lo_grid      TYPE REF TO cl_salv_table.
+  FIELD-SYMBOLS  LIKE LINE OF gt_data.
+
+*== assign special Character
+  ASSIGN hex TO  CASTING.
+
+*== Fill testdata
+  gs_data-matnr = '1000'. gs_data-descr = 'Screw'.      gs_data-amount = 120. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1300'. gs_data-descr = 'Nut 1"'.     gs_data-amount = 030. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1506'. gs_data-descr = 'Driver'.     gs_data-amount = 222. APPEND gs_data TO gt_data.
+  gs_data-matnr = '1660'. gs_data-descr = 'Tool '.      gs_data-amount = 180. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2040'. gs_data-descr = 'Screw 0.4"'. gs_data-amount = 178. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2220'. gs_data-descr = 'Screw 0.6"'. gs_data-amount = 660. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2456'. gs_data-descr = 'Gripper'.    gs_data-amount = 066. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2660'. gs_data-descr = 'Nipper'.     gs_data-amount = 510. APPEND gs_data TO gt_data.
+  gs_data-matnr = '2807'. gs_data-descr = 'Pincer'.     gs_data-amount = 790. APPEND gs_data TO gt_data.
+
+*== calc amount
+  LOOP AT gt_data ASSIGNING .
+    PERFORM calc CHANGING .
+  ENDLOOP.
+
+*== call SALV
+  TRY.
+      CALL METHOD cl_salv_table=&gt;factory
+        IMPORTING
+          r_salv_table = lo_grid
+        CHANGING
+          t_table      = gt_data.
+      lo_grid-&gt;display( ).
+
+    CATCH cx_salv_msg.
+      WRITE: / 'Error: ALV exception CX_SALV_MSG'.
+  ENDTRY.
+
+ENDFORM.                    "main
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  calc
+*&amp;---------------------------------------------------------------------*
+FORM calc CHANGING cs_data LIKE gs_data.
+
+*== local data
+  DATA number TYPE i.
+  DATA max TYPE i VALUE 1000.
+
+*== calculate bar
+  number = cs_data-amount * 100 / 1000 / 5.
+
+*== Fill bar
+  DO number TIMES.
+     CONCATENATE cs_data-camount  INTO cs_data-camount.
+  ENDDO.
+
+ENDFORM.                    "calc</pre>
+<p>Der Beitrag <a href="/blog/salv-table-mit-grafik/">SALV-Table mit &#8220;Grafik&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

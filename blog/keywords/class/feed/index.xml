@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>class Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/class/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 23 Jun 2017 13:58:29 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>class Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Aufrufhierarchie ermitteln</title>
+		<link>/blog/aktuelle-form-routine-ermitteln/</link>
+					<comments>/blog/aktuelle-form-routine-ermitteln/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 May 2003 00:17:37 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Profitricks]]></category>
+		<category><![CDATA[Include]]></category>
+		<category><![CDATA[callstack]]></category>
+		<category><![CDATA[aufrufhierarchie]]></category>
+		<category><![CDATA[class]]></category>
+		<category><![CDATA[program]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=57</guid>
+
+					<description><![CDATA[<p>Beim Programmdebugging ist es manchmal sinnvoll, zu dokumentieren, welche Routine wann durchlaufen wird (SAPMV45A und die Userexits...). Die folgende Funktionen leisten das.</p>
+<p>Der Beitrag <a href="/blog/aktuelle-form-routine-ermitteln/">Aufrufhierarchie ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Beim Programmdebugging ist es manchmal sinnvoll, zu dokumentieren, welche Routine oder Methode von welchem Aufrufer gerufen wurde (SAPMV45A und die Userexits&#8230;). Die folgende Routine leistet das.</p>
+<p>Wird bei dem CALL-Befehl unter DEPTH die Zahl -1 angegeben, so wird die Tabelle TAB mit der gesamten Aufrufhierarchie gefüllt.</p>
+<p>Die folgende Routine können Sie in ein eigenes Programm setzen und dann aus jedem beliebigen anderen Programm heraus aufrufen.</p>
+<h2 class="head1">Die Routine</h2>
+<p class="sap1">
+<pre class="lang:abap decode:true ">FORM aktuelle_routine.
+
+  TYPES: 
+    begin of abap_call_stack_entry,
+      mainprogram  like sy-repid,
+      include      like sy-repid,
+      line         type i,
+      eventtype    like abdbg-leventtype,
+      event        like abdbg-levent,
+      flag_system  type c,
+    end of abap_call_stack_entry.
+ 
+  DATA: 
+    acse type abap_call_stack_entry,
+    tab  type table of abap_call_stack_entry.
+
+  CALL 'ABAP_CALLSTACK' ID 'DEPTH'     FIELD 2
+                        ID 'CALLSTACK' FIELD tab.
+
+    LOOP AT tab INTO acse FROM 2.
+*-- Der Start ab dem zweiten Eintrag ist notwendig, weil in
+*-- der ersten Tabellenzeile der aktuelle Eintrag steht, also
+*-- diese FORM-Routine. 
+      WRITE: 
+      / 'Mainprog:', acse-mainprogram,
+      / 'Include: ', acse-include,
+      / 'Event:   ', acse-eventtype,
+                     acse-event.
+
+    ENDLOOP.
+
+ENDFORM.</pre>
+<h2 class="head1">Funktionsbaustein</h2>
+<p class="text1">Hilfreich ist auch der Funktionsbaustein <strong>SYSTEM_CALLSTACK</strong>, der ebenfalls Informationen über die Aufrufhierarchie liefert!</p>
+<h2>Klasse</h2>
+<p>Die Klasse <strong>CL_ABAP_GET_CALL_STACK</strong> liefert mit Hilfe der Methode <strong>GET_CALL_STACK</strong> ebenfalls die aktuelle Aufrufhierarchie.</p>
+<p>Wahrscheinlich ist die aufbereitete Form des Aufrufstapels in der Regel nützlicher:</p>
+<pre class="lang:abap decode:true">DATA(stack) = cl_abap_get_call_stack=&gt;format_call_stack_with_struct( cl_abap_get_call_stack=&gt;get_call_stack( ) ).
+</pre>
+<figure id="attachment_1018064" aria-describedby="caption-attachment-1018064" style="width: 1013px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2003/05/callstack.png"><img fetchpriority="high" decoding="async" class="wp-image-1018064 size-full" src="https://tricktresor.com/wp-content/uploads/2003/05/callstack.png" alt="" width="1013" height="480" srcset="/wp-content/uploads/2003/05/callstack.png 1013w, /wp-content/uploads/2003/05/callstack-300x142.png 300w, /wp-content/uploads/2003/05/callstack-768x364.png 768w" sizes="(max-width: 1013px) 100vw, 1013px" /></a><figcaption id="caption-attachment-1018064" class="wp-caption-text">Ausgabe der Aufrufhierarchie aus der Testumgebung des Class Builders mit CL_DEMO_OUTPUT.</figcaption></figure>
+<p>Der Beitrag <a href="/blog/aktuelle-form-routine-ermitteln/">Aufrufhierarchie ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/aktuelle-form-routine-ermitteln/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

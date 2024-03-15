@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Hilfsprogramme Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/hilfsprogramme/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 18 Feb 2014 07:57:07 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Hilfsprogramme Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Grafischer Belegfluß</title>
+		<link>/blog/grafischer-belegfluss/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 19 Mar 2008 16:59:48 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Hilfsprogramme]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Verkauf]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Tree]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=467</guid>
+
+					<description><![CDATA[<p>Auf http://www.erpgenie.com/ wurde ein Programm bereitgestellt, mit dem man den Belegfluss zu Belegen grafisch darstellen kann. Es ist ein sehr nettes Tool, das vielleicht bei der täglichen Arbeit weiter hilft.</p>
+<p>Der Beitrag <a href="/blog/grafischer-belegfluss/">Grafischer Belegfluß</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Auf http://www.erpgenie.com/ wurde ein Programm bereitgestellt, mit dem man den Belegfluss zu Belegen grafisch darstellen kann. Es ist ein sehr nettes Tool, das vielleicht bei der täglichen Arbeit weiter hilft.</p>
+<p class="text1">Das hier vorgestellte Coding ist leicht verschlankt. Eine Version mit Doppelklick-Funktionalität und Screenshots sehen Sie bei <a title="Sales Order Workflow | ERP Genie" href="http://www.erpgenie.com/sap/abap/SalesOrderFlow.htm" target="_blank">ERPgenie</a>.</p>
+<h2>Screenshot</h2>
+<p><img decoding="async" alt="" src="/wp-content/uploads/tt_images/screenshots/Bild006.jpg" /> Belegfluss für Aufträge</p>
+<h2 class="head1">Coding</h2>
+<pre>*Sales Order Flow - Tree Report
+REPORT z_sales_tree_rpt .
+*http://www.erpgenie.com/sap/abap/SalesOrderFlow.htm
+
+* Table Definitions
+TABLES: vbak,            "Sales Document: Header Data
+        vbfa.            "Sales Document Flow
+
+* Type definitions
+TYPES: BEGIN OF itab_type,
+         folder   TYPE flag,
+         node_key TYPE mtreeitm,
+         relatkey TYPE tv_nodekey,
+         type     LIKE vbak-vbtyp,
+         vbeln    LIKE vbak-vbeln,
+         posnn    LIKE vbfa-posnn,
+         rfmng(10) TYPE c,
+         rfwrt(12) TYPE c,
+       END OF itab_type.
+
+TYPES: BEGIN OF sel_type,
+         vbeln    LIKE vbak-vbeln,
+         vbtyp    LIKE vbak-vbtyp,
+       END OF sel_type.
+
+* Data Definitions
+DATA: okcode    LIKE sy-ucomm,
+      itab_data TYPE itab_type OCCURS 0,
+      itab_selection TYPE sel_type OCCURS 0.
+DATA: BEGIN OF it_vbfa OCCURS 0.
+        INCLUDE STRUCTURE vbfa.
+DATA: END OF it_vbfa,
+
+      is_vbfa   LIKE LINE OF it_vbfa,
+      is_vbc06  LIKE vbco6,
+      wa_vbelv  LIKE vbfa-vbelv,
+      wj_vbelv  LIKE vbfa-vbelv,
+      wa_posnv  LIKE vbfa-posnv,
+      wj_posnv  LIKE vbfa-posnv,
+      wa_nodekey TYPE tv_nodekey,
+      t_screen(3) TYPE c,
+      t_dynnr LIKE sy-dynnr,
+      wa_data   TYPE itab_type.
+
+* Tree list definitions
+
+CLASS cl_gui_cfw      DEFINITION LOAD.
+
+TYPES: item_table_type LIKE STANDARD TABLE OF mtreeitm  WITH DEFAULT KEY.
+
+DATA: g_custom_container TYPE REF TO cl_gui_custom_container,
+      g_tree             TYPE REF TO cl_gui_list_tree,
+      g_ok_code          TYPE sy-ucomm.
+
+*******************************************************************
+*  Create a tree report of sales orders to deliveries to invoices *
+*******************************************************************
+
+SELECTION-SCREEN BEGIN OF BLOCK a0 WITH FRAME TITLE text-001.
+
+SELECT-OPTIONS:
+  s_vbeln FOR vbak-vbeln,
+  s_erdat FOR vbak-erdat,
+  s_ernam FOR vbak-ernam.
+PARAMETERS: p_vbtyp LIKE vbfa-vbtyp_n DEFAULT 'C'.
+
+SELECTION-SCREEN END OF BLOCK a0.
+
+*----------------------------------------------------------------------*
+* Start of Selection
+*----------------------------------------------------------------------*
+START-OF-SELECTION.
+
+  REFRESH: itab_data, itab_selection.
+  PERFORM update_selection_table TABLES itab_selection.
+  PERFORM create_input_table TABLES itab_data
+                                    itab_selection.
+
+  IF NOT itab_data IS INITIAL.
+    CALL SCREEN 2000.
+  ENDIF.
+
+END-OF-SELECTION.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  create_and_init_tree
+*&amp;---------------------------------------------------------------------*
+FORM create_and_init_tree.
+
+  DATA: node_table TYPE treev_ntab,
+        item_table TYPE item_table_type.
+
+* create a container for the tree control
+  CREATE OBJECT g_custom_container
+    EXPORTING
+      container_name = 'TREE_CONTROL'.
+
+* create a list tree control
+  CREATE OBJECT g_tree
+    EXPORTING
+      parent              = g_custom_container
+      node_selection_mode = cl_gui_list_tree=&gt;node_sel_mode_single
+      item_selection     = 'X'
+      with_headers       = ' '.
+
+  PERFORM build_node_and_item_table USING node_table item_table.
+
+  CALL METHOD g_tree-&gt;add_nodes_and_items
+    EXPORTING
+      node_table                     = node_table
+      item_table                     = item_table
+      item_table_structure_name      = 'MTREEITM'.
+
+ENDFORM.                    " create_and_init_tree
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  build_node_and_item_table
+*&amp;---------------------------------------------------------------------*
+FORM build_node_and_item_table  USING
+                                       node_table TYPE treev_ntab
+                                       item_table TYPE item_table_type.
+  DATA: node TYPE treev_node,
+        item TYPE mtreeitm.
+
+* Build the node and item table.
+  LOOP AT itab_data INTO wa_data.
+    CLEAR node.
+
+    node-node_key = wa_data-node_key-node_key.
+    node-relatkey = wa_data-relatkey.
+    node-isfolder = wa_data-folder.
+    IF wa_data-relatkey IS INITIAL.
+      CLEAR: node-relatship,
+             node-exp_image,
+             node-expander.
+      node-hidden = ' '.
+      node-disabled = ' '.
+    ELSE.
+      node-relatship = cl_gui_list_tree=&gt;relat_last_child.
+    ENDIF.
+    APPEND node TO node_table.
+
+* Update Items
+    CLEAR item.
+    item-node_key   = wa_data-node_key-node_key.
+    item-item_name  = '1'.
+    item-length     = 10.
+    item-class      = cl_gui_list_tree=&gt;item_class_text. " Text Item
+    item-alignment  = cl_gui_list_tree=&gt;align_auto.
+    item-font       = cl_gui_list_tree=&gt;item_font_prop.
+    CASE wa_data-type.
+      WHEN 'C'.
+        item-text = 'Order'.
+      WHEN 'J'.
+        item-text = 'Delivery'.
+      WHEN 'M'.
+        item-text = 'Invoice'.
+      WHEN '+'.
+        item-text = 'Payment'.
+      WHEN 'Q'.
+        item-text = 'Warehouse Xfer'.
+      WHEN 'R'.
+        item-text = 'Goods Mvmt'.
+      WHEN 'H'.
+        item-text = 'Return Gds'.
+    ENDCASE.
+    APPEND item TO item_table.
+
+    CLEAR item.
+    item-node_key   = wa_data-node_key-node_key.
+    item-item_name  = '2'.
+    item-length     = 10.
+    item-class      = cl_gui_list_tree=&gt;item_class_text. " Text Item
+    item-alignment  = cl_gui_list_tree=&gt;align_auto.
+    item-font       = cl_gui_list_tree=&gt;item_font_prop.
+    item-text       = wa_data-vbeln.
+    APPEND item TO item_table.
+
+    CLEAR item.
+    item-node_key   = wa_data-node_key-node_key.
+    item-item_name  = '3'.
+    item-length     = 6.
+    item-class      = cl_gui_list_tree=&gt;item_class_text. " Text Item
+    item-alignment  = cl_gui_list_tree=&gt;align_auto.
+    item-font       = cl_gui_list_tree=&gt;item_font_prop.
+    item-text       = wa_data-posnn.
+    APPEND item TO item_table.
+
+    CLEAR item.
+    item-node_key   = wa_data-node_key-node_key.
+    item-item_name  = '4'.
+    item-length     = 10.
+    item-class      = cl_gui_list_tree=&gt;item_class_text. " Text Item
+    item-alignment  = cl_gui_list_tree=&gt;align_auto.
+    item-font       = cl_gui_list_tree=&gt;item_font_prop.
+    item-text       = wa_data-rfmng.
+    APPEND item TO item_table.
+
+    CLEAR item.
+    item-node_key   = wa_data-node_key-node_key.
+    item-item_name  = '5'.
+    item-length     = 10.
+    item-class      = cl_gui_list_tree=&gt;item_class_text. " Text Item
+    item-alignment  = cl_gui_list_tree=&gt;align_auto.
+    item-font       = cl_gui_list_tree=&gt;item_font_prop.
+    item-text       = wa_data-rfwrt.
+    APPEND item TO item_table.
+
+  ENDLOOP.
+
+ENDFORM.                    " build_node_and_item_table
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  create_input_table
+*&amp;---------------------------------------------------------------------*
+FORM create_input_table TABLES   p_itab_data LIKE itab_data
+                                 p_itab_selection LIKE itab_selection.
+
+  DATA: l_tabix LIKE sy-tabix,
+        lm_tabix LIKE sy-tabix,
+        BEGIN OF wl_data,
+          vbeln   LIKE vbfa-vbeln,
+          posnn   LIKE vbfa-posnn,
+        END OF  wl_data,
+        t_counter(4) TYPE n,
+        t_parent(4) TYPE c,
+        t_parent1(4) TYPE c,
+        t_exit TYPE flag,
+        is_del_data LIKE LINE OF itab_data,
+        it_inv_data TYPE itab_type OCCURS 0.
+
+  t_counter = 1.
+  LOOP AT p_itab_selection.
+
+    CLEAR: t_parent, t_parent1, t_exit.
+    REFRESH it_vbfa.
+    is_vbc06-vbeln = p_itab_selection-vbeln.
+    CALL FUNCTION 'RV_ORDER_FLOW_INFORMATION'
+      EXPORTING
+        aufbereitung        = '2'
+        comwa               = is_vbc06
+        nachfolger          = 'X'
+        n_stufen            = '50'
+        vorgaenger          = 'X'
+        v_stufen            = '50'
+      TABLES
+        vbfa_tab            =  it_vbfa
+      EXCEPTIONS
+        no_vbfa             = 1
+        no_vbuk_found       = 2
+        OTHERS              = 3.
+
+    CLEAR: wa_data.
+    wa_data-folder = 'X'.
+    WRITE t_counter TO wa_data-node_key-node_key..
+    wa_data-relatkey = t_parent.
+    wa_data-type     = p_itab_selection-vbtyp.
+    wa_data-vbeln    = p_itab_selection-vbeln.
+    wa_data-posnn    = '0'.
+    APPEND wa_data TO p_itab_data.
+    t_parent = t_counter.
+    ADD 1 TO t_counter.
+
+* Find any deliveries for this order
+    LOOP AT it_vbfa WHERE vbtyp_n = 'J'.      " Delivery
+
+      CLEAR: wa_data.
+      wa_data-folder = 'X'.
+      WRITE t_counter TO wa_data-node_key-node_key..
+      wa_data-relatkey = t_parent.
+      wa_data-type     = it_vbfa-vbtyp_n.
+      wa_data-vbeln    = it_vbfa-vbeln.
+      wa_data-posnn    = it_vbfa-posnn.
+      wa_data-rfmng    = it_vbfa-rfmng.
+      is_del_data      = wa_data.
+*
+      t_parent1 = t_counter.
+      ADD 1 TO t_counter.
+      wa_vbelv  = it_vbfa-vbeln.
+      wa_posnv  = it_vbfa-posnn.
+      l_tabix   = sy-tabix.
+* Find any invoices Warehouse xfers or Goods Movements for this delivery
+      REFRESH: it_inv_data.
+      LOOP AT it_vbfa WHERE vbelv = wa_vbelv
+                      AND   posnv = wa_posnv.
+
+        CASE it_vbfa-vbtyp_n.
+          WHEN 'M'.    "Invoice
+            CLEAR: wa_data.
+            wa_data-folder = ' '.
+            wa_data-node_key-node_key = t_counter.
+            wa_data-relatkey = t_parent1.
+            wa_data-type     = it_vbfa-vbtyp_n.
+            wa_data-vbeln    = it_vbfa-vbeln.
+            wa_data-posnn    = it_vbfa-posnn.
+            wa_data-rfmng    = it_vbfa-rfmng.
+            wa_data-rfwrt    = it_vbfa-rfwrt.
+            APPEND wa_data TO it_inv_data.
+            wj_vbelv         = it_vbfa-vbeln.
+            wj_posnv         = it_vbfa-posnn.
+            wa_nodekey       = wa_data-node_key.
+            DESCRIBE TABLE it_inv_data LINES lm_tabix.
+            ADD 1 TO t_counter.
+            PERFORM get_payment  TABLES it_inv_data USING t_counter.
+            PERFORM get_returns  TABLES it_inv_data USING t_counter.
+            DESCRIBE TABLE it_inv_data LINES l_tabix.
+            IF l_tabix &gt; lm_tabix.
+              READ TABLE it_inv_data INDEX lm_tabix INTO wa_data.
+              wa_data-folder = 'X'.
+             MODIFY it_inv_data INDEX lm_tabix FROM wa_data.
+            ENDIF.
+
+          WHEN 'Q' OR 'R'.    " WMS transfer, or Goods Mvmt
+            CLEAR: wa_data.
+            wa_data-folder = ' '.
+            wa_data-node_key-node_key = t_counter.
+            wa_data-relatkey = t_parent1.
+            wa_data-type     = it_vbfa-vbtyp_n.
+            wa_data-vbeln    = it_vbfa-vbeln.
+            wa_data-posnn    = it_vbfa-posnn.
+            wa_data-rfmng    = it_vbfa-rfmng.
+            APPEND wa_data TO it_inv_data.
+            ADD 1 TO t_counter.
+          WHEN OTHERS.
+        ENDCASE.
+
+      ENDLOOP.              " finding any matching invoices
+      IF it_inv_data IS INITIAL.
+        is_del_data-folder = ' '.
+      ENDIF.
+     APPEND is_del_data TO p_itab_data.
+     APPEND LINES OF it_inv_data TO p_itab_data.
+      REFRESH: it_inv_data.
+    ENDLOOP.                " finding any deliveries
+
+  ENDLOOP.
+  CLEAR: t_parent, t_parent1, t_exit.
+
+ENDFORM.                    " create_input_table
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  update_selection_table
+*&amp;---------------------------------------------------------------------*
+FORM update_selection_table TABLES  itab_selection.
+
+  IF NOT s_ernam IS INITIAL OR
+     NOT s_erdat IS INITIAL OR
+     NOT p_vbtyp IS INITIAL OR
+     NOT s_vbeln IS INITIAL.
+
+    SELECT vbeln vbtyp INTO CORRESPONDING FIELDS OF
+    TABLE  itab_selection
+    FROM   vbak
+    WHERE vbeln IN s_vbeln AND
+          erdat IN s_erdat AND
+          ernam IN s_ernam AND
+          vbtyp =  p_vbtyp.
+  ENDIF.
+
+ENDFORM.                    " update_selection_table
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_payment
+*&amp;---------------------------------------------------------------------*
+FORM get_payment  TABLES it_inv_data USING pt_counter .
+
+  LOOP AT it_vbfa WHERE vbelv = wj_vbelv
+                  AND   posnv = wj_posnv
+                  AND   vbtyp_n = '+'.
+    wa_data-folder = ' '.
+    wa_data-relatkey = wa_nodekey.
+    wa_data-node_key-node_key = pt_counter.
+    wa_data-type     = it_vbfa-vbtyp_n.
+    wa_data-vbeln    = it_vbfa-vbeln.
+    wa_data-posnn    = it_vbfa-posnn.
+    wa_data-rfmng    = it_vbfa-rfmng.
+    wa_data-rfwrt    = it_vbfa-rfwrt.
+    APPEND wa_data TO it_inv_data.
+    ADD 1 TO pt_counter.
+  ENDLOOP.
+
+ENDFORM.                    " get_payment
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_returns
+*&amp;---------------------------------------------------------------------*
+FORM get_returns   TABLES it_inv_data USING pt_counter .
+
+  DATA: ld_rfwrt(11) TYPE c,
+        ld_tabix LIKE sy-tabix.
+
+  LOOP AT it_vbfa WHERE vbelv = wj_vbelv
+                  AND   posnv = wj_posnv
+                  AND   vbtyp_n = 'H'.
+    ld_tabix         = sy-tabix.
+    wa_data-folder   = ' '.
+    wa_data-relatkey = wa_nodekey.
+    wa_data-node_key-node_key = pt_counter.
+    wa_data-type     = it_vbfa-vbtyp_n.
+    wa_data-vbeln    = it_vbfa-vbeln.
+    wa_data-posnn    = it_vbfa-posnn.
+    wa_data-rfmng    = it_vbfa-rfmng.
+    ld_rfwrt         = it_vbfa-rfwrt.
+    CONCATENATE ld_rfwrt '-' INTO  ld_rfwrt.
+    wa_data-rfwrt    = ld_rfwrt.
+    APPEND wa_data TO it_inv_data.
+    ADD 1 TO pt_counter.
+  ENDLOOP.
+
+ENDFORM.                    "get_returns
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  STATUS_2000  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE status_2000 OUTPUT.
+
+  SET PF-STATUS 'Z_SALES_TREE_2000'.
+  SET TITLEBAR 'Z_SALES_TREE_2000'.
+
+ENDMODULE.                 " STATUS_2000  OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  init_data_2000  OUTPUT
+*&amp;---------------------------------------------------------------------*
+MODULE init_data_2000 OUTPUT.
+
+  IF g_tree IS INITIAL.
+    PERFORM create_and_init_tree.
+  ENDIF.
+
+ENDMODULE.                    "init_data_2000 OUTPUT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Module  USER_COMMAND_2000  INPUT
+*&amp;---------------------------------------------------------------------*
+MODULE user_command_2000 INPUT.
+
+  DATA: return_code TYPE i.
+
+  CALL METHOD cl_gui_cfw=&gt;dispatch
+    IMPORTING
+      return_code = return_code.
+
+  IF return_code &lt;&gt; cl_gui_cfw=&gt;rc_noevent.
+    CLEAR okcode.
+    EXIT.
+  ENDIF.
+
+  CASE okcode.
+    WHEN 'EXIT' OR 'RETURN'. " Finish program
+      IF NOT g_custom_container IS INITIAL.
+        " destroy tree container (detroys contained tree control, too)
+        CALL METHOD g_custom_container-&gt;free
+          EXCEPTIONS
+            cntl_system_error = 1
+            cntl_error        = 2.
+        IF sy-subrc &lt;&gt; 0.
+          MESSAGE a000(tree_control_msg).
+        ENDIF.
+        CLEAR g_custom_container.
+        CLEAR g_tree.
+      ENDIF.
+      LEAVE TO SCREEN 0.
+  ENDCASE.
+
+  CLEAR okcode.
+
+ENDMODULE.                 " USER_COMMAND_2000  INPUT</pre>
+<p>Der Beitrag <a href="/blog/grafischer-belegfluss/">Grafischer Belegfluß</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Sammlung</title>
+		<link>/blog/sammlung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 29 May 2006 18:16:10 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SD]]></category>
+		<category><![CDATA[Hilfsprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=373</guid>
+
+					<description><![CDATA[<p>In diesem Artikel finden Sie Programme, die Ihnen bei der t&#228;glichen Arbeit evtl. weiterhelfen.</p>
+<p>Der Beitrag <a href="/blog/sammlung/">Sammlung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Artikel finden Sie Programme, die Ihnen bei der t&auml;glichen Arbeit evtl. weiterhelfen.<br /><UL><LI><FONT color="#fb2412"><STRONG>RV16ACHD</STRONG></FONT> Konditionen suchen, die in einem bestimmten Zeitraum ge&auml;ndert wurden</LI></UL><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/sammlung/">Sammlung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Kunden löschen</title>
+		<link>/blog/kunden-loeschen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 04 Jan 2006 11:18:25 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SD]]></category>
+		<category><![CDATA[Hilfsprogramme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=362</guid>
+
+					<description><![CDATA[<p>Kunden k&#246;nnen normalerweise nur einen L&#246;schvermerk erhalten. Mit einem Standardreport ist es jedoch m&#246;glich, die Stammdaten eines Kunden zu l&#246;schen.</p>
+<p>Der Beitrag <a href="/blog/kunden-loeschen/">Kunden löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Kunden k&ouml;nnen normalerweise nur einen L&ouml;schvermerk erhalten. Mit einem Standardreport ist es jedoch m&ouml;glich, die Stammdaten eines Kunden zu l&ouml;schen.<br /><P>Der Report lautet SAPV019</P><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/Verkauf/SAPV019x.JPG"><BR>Stammdaten l&ouml;schen</P></TD></TR></TBODY></TABLE></P></p>
+<p>Der Beitrag <a href="/blog/kunden-loeschen/">Kunden löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Nachrichtenkonditionen mit ungültigem Drucker</title>
+		<link>/blog/nachrichtenkonditionen-mit-ungueltigem-drucker/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 12 Feb 2004 12:11:18 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Hilfsprogramme]]></category>
+		<category><![CDATA[SD]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=172</guid>
+
+					<description><![CDATA[<p>Dieser Hilfsreport zeigt alle Nachrichtenkonditionen an, in denen ein Drucker gepflegt wurde, der nicht existiert. Dies kann z. B. nach einer Druckerumstellung schnell passieren. </p>
+<p>Der Beitrag <a href="/blog/nachrichtenkonditionen-mit-ungueltigem-drucker/">Nachrichtenkonditionen mit ungültigem Drucker</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Dieser Hilfsreport zeigt alle Nachrichtenkonditionen an, in denen ein Drucker gepflegt wurde, der nicht existiert. Dies kann z. B. nach einer Druckerumstellung schnell passieren. <br /><P class="sap1">REPORT zv_drucker_check LINE-SIZE 200.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Datendeklaration &#8211;*</FONT><BR>DATA:<BR>&nbsp; t685&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE t685&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t682&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LIKE t682&nbsp; OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t682i&nbsp;&nbsp;&nbsp;&nbsp; LIKE t682i OCCURS 0 WITH HEADER LINE,<BR>&nbsp; t685t&nbsp;&nbsp;&nbsp;&nbsp; LIKE t685t OCCURS 0 WITH HEADER LINE,</P><P class="sap1">&nbsp; l_tabelle(16),<BR>&nbsp; l_komb&nbsp;&nbsp;&nbsp; TYPE komb,<BR>&nbsp; l_prog&nbsp;&nbsp;&nbsp; TYPE programm,<BR>&nbsp; l_vtext&nbsp;&nbsp; TYPE ddtext,<BR>&nbsp; l_drucker TYPE rspopname,<BR>&nbsp; l_knumh&nbsp;&nbsp; TYPE knumh,<BR>&nbsp; l_nach&nbsp;&nbsp;&nbsp; TYPE nach.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Auswahl &#8220;Applikation&#8221; / &#8220;Nachrichtenart&#8221;</FONT><BR>SELECT-OPTIONS:<BR>&nbsp; s_kappl FOR t685-kappl,<BR>&nbsp; s_kschl FOR t685-kschl.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Nachrichtenarten lesen &#8211;*</FONT><BR>&nbsp; SELECT * FROM t685 INTO TABLE t685<BR>&nbsp;&nbsp; WHERE kvewe = &#8216;B&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND kappl IN s_kappl<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND kschl IN s_kschl.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Zugriffsfolgen zu den Nachrichten &#8211;*</FONT><BR>&nbsp; SELECT * FROM t682 INTO TABLE t682<BR>&nbsp;&nbsp; FOR ALL ENTRIES IN t685<BR>&nbsp;&nbsp; WHERE kvewe = t685-kvewe<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND kappl = t685-kappl<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND kozgf = t685-kozgf.</P><P class="sap1">&nbsp; SORT t682.<BR>&nbsp; DELETE ADJACENT DUPLICATES FROM t682.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Informationen zu Zugriffsfolgen &#8211;*</FONT><BR>&nbsp; SELECT * FROM t682i INTO TABLE t682i<BR>&nbsp;&nbsp;&nbsp;&nbsp; FOR ALL ENTRIES IN t682<BR>&nbsp;&nbsp; WHERE kvewe = t682-kvewe<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND kappl = t682-kappl<BR>&nbsp;&nbsp;&nbsp;&nbsp; AND kozgf = t682-kozgf.</P><P class="sap1">&nbsp; SORT t682i.<BR>&nbsp; DELETE ADJACENT DUPLICATES FROM t682i.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Alle gesammelten Zugriffsfolgen analysieren &#8211;*</FONT><BR>&nbsp; LOOP AT t682i.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Name der Konditionstabelle &#8211;*</FONT><BR>&nbsp;&nbsp;&nbsp; CONCATENATE &#8216;B&#8217; t682i-kotabnr INTO l_tabelle.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Schl&uuml;ssel (KNUMH) zur Kondition ermitteln &#8211;*</FONT><BR>&nbsp;&nbsp;&nbsp; SELECT knumh FROM (l_tabelle) INTO l_knumh.<BR><FONT color="#fb2412">*&#8211; Konditionssatz (=Drucker) lesen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SELECT * FROM nach INTO l_nach<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHERE knumh = l_knumh.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK NOT l_nach-ldest IS INITIAL.<BR><FONT color="#fb2412">*&#8211;&nbsp;Ist der Drucker vorhanden? &#8211;*</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SELECT SINGLE padest FROM tsp03 INTO l_drucker<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHERE padest = l_nach-ldest.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF sy-subrc &gt; 0.<BR><FONT color="#fb2412">*&#8211; Drucker ist nicht vorhanden: Satz Ausgeben &#8211;*</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLEAR l_vtext.<BR><FONT color="#fb2412">*&#8211; Bezeichnung der Tabelle&nbsp;&#8211;*</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SELECT SINGLE gstxt FROM tmc1t INTO l_vtext<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WHERE spras = sy-langu<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND gstru = l_tabelle.<BR><FONT color="#fb2412">*&#8211; Informationen zur Kondition ausgeben &#8211;*<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: /(6) l_nach-ldest,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_nach-kappl,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_nach-kschl HOTSPOT ON COLOR COL_NORMAL,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_nach-kotabnr,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_vtext,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_nach-vakey.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HIDE l_nach.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDSELECT.<BR>&nbsp;&nbsp;&nbsp; ENDSELECT.<BR>&nbsp; ENDLOOP.<BR>&nbsp; CLEAR l_nach.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Mit Doppelklick kann in die Pflege der Kondition verzweigt werden</FONT><BR>AT LINE-SELECTION.<BR>&nbsp; CHECK NOT l_nach IS INITIAL.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Pflegereport ermitteln und generieren<BR></FONT>&nbsp; CALL FUNCTION &#8216;RV_T681_SELECT_AND_GENERATE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; caa_kvewe&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = l_nach-kvewe<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; caa_kotabnr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = l_nach-kotabnr<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; caa_select_text&nbsp;&nbsp;&nbsp; = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; caa_access_program = l_prog<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.</P><P class="sap1"><FONT color="#fb2412">*&#8211; Programm aufrufen</FONT><BR>&nbsp; SUBMIT (l_prog) VIA SELECTION-SCREEN AND RETURN.</P></p>
+<p>Der Beitrag <a href="/blog/nachrichtenkonditionen-mit-ungueltigem-drucker/">Nachrichtenkonditionen mit ungültigem Drucker</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

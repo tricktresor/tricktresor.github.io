@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:series="https://publishpress.com/"
+	
+	>
+<channel>
+	<title>
+	Kommentare zu: Ist das gültig? (2)	</title>
+	<atom:link href="/blog/ist-das-gueltig-2/feed/" rel="self" type="application/rss+xml" />
+	<link>/blog/ist-das-gueltig-2/</link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:48 +0000</lastBuildDate>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+	<item>
+		<title>
+		Von: Enno Wulff		</title>
+		<link>/blog/ist-das-gueltig-2/#comment-2697</link>
+
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 11 Apr 2017 15:22:35 +0000</pubDate>
+		<guid isPermaLink="false">https://tricktresor.com/?p=956837#comment-2697</guid>
+
+					<description><![CDATA[Als Antwort auf &lt;a href=&quot;/blog/ist-das-gueltig-2/#comment-2696&quot;&gt;cacique&lt;/a&gt;.
+
+Hi Christian, es geht hier nicht in erster Linie um Schnelligkeit.
+Prinzipiell dürftest du jedoch Recht haben.
+Danke für deinen alternativen SELECT!
+Gruß Enno]]></description>
+			<content:encoded><![CDATA[<p>Als Antwort auf <a href="/blog/ist-das-gueltig-2/#comment-2696">cacique</a>.</p>
+<p>Hi Christian, es geht hier nicht in erster Linie um Schnelligkeit.<br />
+Prinzipiell dürftest du jedoch Recht haben.<br />
+Danke für deinen alternativen SELECT!<br />
+Gruß Enno</p>
+]]></content:encoded>
+		
+			</item>
+		<item>
+		<title>
+		Von: cacique		</title>
+		<link>/blog/ist-das-gueltig-2/#comment-2696</link>
+
+		<dc:creator><![CDATA[cacique]]></dc:creator>
+		<pubDate>Tue, 11 Apr 2017 08:32:38 +0000</pubDate>
+		<guid isPermaLink="false">https://tricktresor.com/?p=956837#comment-2696</guid>
+
+					<description><![CDATA[Hi Enno,
+
+zunächst mal vielen Dank für diesen Post. Dennoch hätte ich hier eine Anmerkung / Alternative.
+Zu dem Sub-SELECT: dieser ist an sich ja relativ Performance-intensiv, da für jede Zeile die im äußeren SELECT durchlaufen wird einmal der Sub-SELECT ausgeführt wird.
+Wäre es hier nicht sinnvoller den Sub-SELECT einmalig in eine Interne Tabelle zu lesen und das ganze mit einem FOR ALL ENTRIES IN zu lösen?
+
+Hier das Coding (ist allerdings von mir ungetestet):
+SELECT gruppe, MAX( datab ) as datab
+INTO TABLE ltab
+FROM ztt_datum2
+WHERE datab &#060;= @p_Datum
+GROUP BY gruppe.
+
+SELECT *
+INTO TABLE @DATA(lt_datum)
+FROM ztt_datum2 AS z1
+FOR ALL ENTRIES IN ltab
+WHERE gruppe = ltab-gruppe
+AND datab = ltab-datab.
+
+Korrigier mich bitte, sollte ich falsch liegen, aber nach meinem aktuellem Stand wäre das doch die performantere Lösung und dürfte zum selben Ergebnis führen.
+
+Gruß,
+
+Christian]]></description>
+			<content:encoded><![CDATA[<p>Hi Enno,</p>
+<p>zunächst mal vielen Dank für diesen Post. Dennoch hätte ich hier eine Anmerkung / Alternative.<br />
+Zu dem Sub-SELECT: dieser ist an sich ja relativ Performance-intensiv, da für jede Zeile die im äußeren SELECT durchlaufen wird einmal der Sub-SELECT ausgeführt wird.<br />
+Wäre es hier nicht sinnvoller den Sub-SELECT einmalig in eine Interne Tabelle zu lesen und das ganze mit einem FOR ALL ENTRIES IN zu lösen?</p>
+<p>Hier das Coding (ist allerdings von mir ungetestet):<br />
+SELECT gruppe, MAX( datab ) as datab<br />
+INTO TABLE ltab<br />
+FROM ztt_datum2<br />
+WHERE datab &lt;= @p_Datum<br />
+GROUP BY gruppe.</p>
+<p>SELECT *<br />
+INTO TABLE @DATA(lt_datum)<br />
+FROM ztt_datum2 AS z1<br />
+FOR ALL ENTRIES IN ltab<br />
+WHERE gruppe = ltab-gruppe<br />
+AND datab = ltab-datab.</p>
+<p>Korrigier mich bitte, sollte ich falsch liegen, aber nach meinem aktuellem Stand wäre das doch die performantere Lösung und dürfte zum selben Ergebnis führen.</p>
+<p>Gruß,</p>
+<p>Christian</p>
+]]></content:encoded>
+		
+			</item>
+		<item>
+		<title>
+		Von: abapkadabra		</title>
+		<link>/blog/ist-das-gueltig-2/#comment-2678</link>
+
+		<dc:creator><![CDATA[abapkadabra]]></dc:creator>
+		<pubDate>Mon, 05 Dec 2016 15:55:35 +0000</pubDate>
+		<guid isPermaLink="false">https://tricktresor.com/?p=956837#comment-2678</guid>
+
+					<description><![CDATA[Danke für die Erläuterungen und das praktische Beispiel für Sub-Queries!]]></description>
+			<content:encoded><![CDATA[<p>Danke für die Erläuterungen und das praktische Beispiel für Sub-Queries!</p>
+]]></content:encoded>
+		
+			</item>
+	</channel>
+</rss>

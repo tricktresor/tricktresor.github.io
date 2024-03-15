@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>x86 Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/x86/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:49 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>x86 Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>64-bit Programme mit dem SAP GUI für Windows ausführen</title>
+		<link>/blog/64-bit-programme-mit-dem-sap-gui-fuer-windows-ausfuehren/</link>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Sun, 20 Nov 2016 17:11:28 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[x86]]></category>
+		<category><![CDATA[x64]]></category>
+		<category><![CDATA[Applikation]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=932359</guid>
+
+					<description><![CDATA[<p>Immer mehr kommen 64-bit Programme im 64-bit Windows-Umfeld zum Einsatz. 32-bit Programme, manchmal auch mit der Extension x86 versehen, werden langsam aber sicher weniger. So stellte sich mir die Frage, ob es mit dem SAP GUI für Windows, der ja bekanntlich eine 32-bit Applikation ist, möglich ist auch x64-Programme zu starten. Um Programme auf dem Frontend-Server zu starten wird aus ABAP im Normalfall die Methode Execute der Klasse cl_gui_frontend_services verwendet. Diese Methode nutzt unter Windows...</p>
+<p>Der Beitrag <a href="/blog/64-bit-programme-mit-dem-sap-gui-fuer-windows-ausfuehren/">64-bit Programme mit dem SAP GUI für Windows ausführen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Immer mehr kommen 64-bit Programme im 64-bit Windows-Umfeld zum Einsatz. 32-bit Programme, manchmal auch mit der Extension x86 versehen, werden langsam aber sicher weniger. So stellte sich mir die Frage, ob es mit dem SAP GUI für Windows, der ja bekanntlich eine 32-bit Applikation ist, möglich ist auch x64-Programme zu starten. Um Programme auf dem Frontend-Server zu starten wird aus ABAP im Normalfall die Methode Execute der Klasse cl_gui_frontend_services verwendet. Diese Methode nutzt unter Windows native die API-Funktion ShellExecute und diese kann auch x64-Programme von einem 32-bit-Prozess starten, wie <a href="https://msdn.microsoft.com/de-de/library/windows/desktop/aa384203(v=vs.85).aspx">hier</a> zu lesen ist. Also ist es kein Problem, und so ist es auch. Zum Testen habe ich den Editor notepad gestartet, wie im folgenden Code-Snippet zu sehen ist:</p>
+<pre>*-Begin-----------------------------------------------------------------
+Program zExecuteTest.
+
+  Data:
+    lr_fe_serv Type Ref To CL_GUI_FRONTEND_SERVICES.
+
+  Create Object lr_fe_serv.
+
+  Check lr_fe_serv-&gt;Get_Platform( ) = 14.
+
+  lr_fe_serv-&gt;Execute(
+    Exporting
+
+      "Das Verzeichnis Sysnative ist nur auf x64-Windows sichtbar und es
+      "kann nur mit x86-Software darauf zugegriffen werden
+      Application = '%windir%\Sysnative\notepad.exe'
+
+      "Im Verzeichnis System32 sind alle x64 Applikationen zu finden
+      "Application = '%windir%\System32\notepad.exe'
+
+      "Im Verzeichnis SysWOW64 sind alle x86 Applicationen zu finden
+      "Application = '%windir%\SysWOW64\notepad.exe'
+
+    Exceptions
+      CNTL_ERROR = 1
+      ERROR_NO_GUI = 2
+      BAD_PARAMETER = 3
+      FILE_NOT_FOUND = 4
+      PATH_NOT_FOUND = 5
+      FILE_EXTENSION_UNKNOWN = 6
+      ERROR_EXECUTE_FAILED = 7
+      SYNCHRONOUS_FAILED = 8
+      NOT_SUPPORTED_BY_GUI = 9
+      Others = 10
+    ).
+
+    If sy-subrc &lt;&gt; 0.
+
+    EndIf.
+
+*-End-------------------------------------------------------------------</pre>
+<p>Nebenbei zeigt dieses Beispiel noch wie über das virtuelle System-Verzeichnis Sysnative auf Windows-eigene 64-bit Applikationen zugegriffen werden kann. Auf diesem Wege wird das automatische Redirectoring umgangen. Ein Versuch ein Programm direkt aus dem Verzeichnis System32 aufzurufen, wie in der auskommentierten Zeile zu sehen, funktioniert so nicht, da wird man automatisch zu SysWOW64 umgeleitet und der 32-bit Pendant wird verwendet. So steht der Nutzung von x64-Software im Kontext des SAP GUI für Windows nichts entgegen.</p>
+<p>Der Beitrag <a href="/blog/64-bit-programme-mit-dem-sap-gui-fuer-windows-ausfuehren/">64-bit Programme mit dem SAP GUI für Windows ausführen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

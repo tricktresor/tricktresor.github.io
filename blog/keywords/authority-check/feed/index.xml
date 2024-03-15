@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>authority-check Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/authority-check/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 02 Jul 2019 12:33:05 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>authority-check Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Selektion zur Berechtigung</title>
+		<link>/blog/selektion-zur-berechtigung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 02 Jul 2019 12:33:05 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[authority-check]]></category>
+		<category><![CDATA[Berechtigungsprüfung]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">/?p=1022316</guid>
+
+					<description><![CDATA[<p>Berechtigungsprüfungen sind mitunter sehr komplex und weisen einige Tücken auf. Mit dem hier vorgestellten Trick ist es schon mal eine Hürde weniger.</p>
+<p>Der Beitrag <a href="/blog/selektion-zur-berechtigung/">Selektion zur Berechtigung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Berechtigungen und die dazugehörigen Berechtigungsprüfungen sind eine mitunter eine knifflige Angelegenheit. Bei einzelnen Werten ist es einfach, diese mit der entsprechenden Berechtigung zu prüfen. Wenn es jedoch um Selektionen geht, bei denen der Anwender nur die Berechtigung über einen Teil der Daten hat, dann wird es schon schwieriger&#8230;</p>
+
+
+
+<h2 class="wp-block-heading">Problem &#8211; Selektionsoptionen</h2>
+
+
+
+<p>Bei dem hier beschriebenen Problem hat der Anwender bei einem Report die Möglichkeit, ein Objekt über Selektionsoptionen (SELECT-OPTIONS) einzugrenzen. Hierfür muss ich jedoch wissen, welches die zu Grunde liegende Prüftabelle mit allen existierenden Daten ist. </p>
+
+
+
+<h3 class="wp-block-heading">Beispiel Verkaufsorganisation</h3>
+
+
+
+<p>Der Anwender selektiert Verkaufsorganisationen A* und B*.  Der Anwender hat jedoch nur die Berechtigung für A200 und B330. </p>
+
+
+
+<p>In der Prüftabelle für die Verkaufsorganisationen (Tabelle TVAK) sind die folgenden Verkaufsorganisationen gepflegt:</p>
+
+
+
+<table class="wp-block-table"><tbody><tr><td><strong>Vkorg</strong></td><td><strong>Bezeichnung</strong></td></tr><tr><td>A100</td><td>Deutschland Gebiet Nord</td></tr><tr><td>A200</td><td>Deutschland Gebiet Süd </td></tr><tr><td>A300</td><td>Deutschland Gebiet West</td></tr><tr><td>A400</td><td>Deutschland Gebiet Ost</td></tr><tr><td>B330</td><td>Nord-Italien</td></tr><tr><td>B340</td><td>Süd-Italien</td></tr><tr><td>C500</td><td>Spanien</td></tr></tbody></table>
+
+
+
+<h2 class="wp-block-heading">Lösung A &#8211; Vorselektion</h2>
+
+
+
+<p>Bei dieser Lösungsvariante wird vorab geprüft, für welche Objekte der Anwender die Berechtigung hat. Man würde also die tatsächlich vorhandenen Einträge aus der Prüftabelle selektieren und für jeden Eintrag prüfen, ob der Anwender die entsprechende Berechtigung hat.</p>
+
+
+
+<p>Mit den verbleibenden Einträgen kann man entweder eine dynamische WHERE-Bedingung bauen oder baut aus diesen Einträgen eine genaue Ranges-Tabelle auf.</p>
+
+
+
+<h2 class="wp-block-heading">Lösung B &#8211; Einzelprüfung der Daten</h2>
+
+
+
+<p>Es gibt natürlich auch die relativ einfache Möglichkeit, alle Daten einzulesen und dann bei jedem einzelnen Datensatz zu prüfen, ob der Anwender berechtigt ist, ihn zu sehen. Das ist einfach zu programmieren, kann jedoch bei großen Datenmengen ein erhebliches Laufzeitproblem werden.</p>
+
+
+
+<h2 class="wp-block-heading">Unterstützung</h2>
+
+
+
+<p>Durch Zufall bin ich auf die Klasse <a href="https://help.sap.com/doc/abapdocu_751_index_htm/7.51/de-DE/abapauthority-check.htm">CL_AUTH_OBJECTS_TO_SQL</a> gestoßen. Mit Hilfe dieser Klasse wird der Lösungsweg A eingeschlagen. Allerdings ohne, dass ich als Programmierer wissen müsste, welches die Zugrunde liegende Prüftabelle ist und ohne, dass ich die WHERE-Bedingung selber erstellen müsste.</p>
+
+
+
+<p>Der Klasse müssen folgende Daten übergeben werden:</p>
+
+
+
+<ul><li>das zu prüfende Berechtigungsobjekt</li><li>die Aktivität (Anzeigen, Ändern, Löschen etc)</li><li>Ein Field Mapping (DDIC-Grundlage der Felder)</li><li>optional: Filter für die Einschränkung auf Objekte</li></ul>
+
+
+
+<p>Mit GET_SQL_CONDITION bekommt man dann die WHERE-Bedingung für die Felder zurück, für die der Anwender eine Berechtigung hat.</p>
+
+
+
+<p>Folgendes kleine Beispiel zeigt die Anwendung für die Klasse.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="554" height="280" src="/wp-content/uploads/2019/07/sql1.png" alt="" class="wp-image-1022317" srcset="/wp-content/uploads/2019/07/sql1.png 554w, /wp-content/uploads/2019/07/sql1-300x152.png 300w, /wp-content/uploads/2019/07/sql1-272x137.png 272w" sizes="(max-width: 554px) 100vw, 554px" /></figure>
+
+
+
+<h2 class="wp-block-heading">Code</h2>
+
+
+
+<pre class="wp-block-code"><code>DATA h_vkorg TYPE vkorg.
+SELECT-OPTIONS s_vkorg FOR h_vkorg DEFAULT 'A100'.
+
+START-OF-SELECTION.
+
+  DATA(lo_converter_osql) = cl_auth_objects_to_sql=>create_for_open_sql( ).
+
+  lo_converter_osql->add_authorization_object( 
+    iv_authorization_object = 'V_VBAK_VKO'
+    it_activities = VALUE #(
+             ( auth_field = 'ACTVT' value = '03' ) )
+    it_field_mapping = VALUE #(
+             ( auth_field = 'VKORG'
+               view_field = VALUE #(
+                               table_ddic_name = 'VBAK'
+                               table_alias     = ''
+                               field_name      = 'VKORG' ) ) )
+    it_filter = VALUE #( FOR selopt IN s_vkorg&#91;]
+             ( auth_field = 'VKORG' low = selopt-low high = selopt-high ) ) ).
+  
+  TRY.
+      DATA(lv_where_clause) = lo_converter_osql->get_sql_condition( ).
+      IF lv_where_clause IS INITIAL.
+        MESSAGE 'Du hast die Berechtigung für alle ausgewählten Verkaufsorganisationen' TYPE 'I'.
+      ELSE.
+        cl_demo_output=>display_text( |Deine WHERE-Bedingung: { lv_where_clause }| ).
+      ENDIF.
+    CATCH cx_auth_not_authorized.
+      MESSAGE 'Keine Berechtigung für die ausgewählten Verkaufsorganisationen' TYPE 'I'.
+  ENDTRY.</code></pre>
+<p>Der Beitrag <a href="/blog/selektion-zur-berechtigung/">Selektion zur Berechtigung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

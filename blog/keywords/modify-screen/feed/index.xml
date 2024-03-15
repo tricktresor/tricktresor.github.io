@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>modify screen Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/modify-screen/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:01 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>modify screen Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Feld im Selektionsbild nur bei Anlage einer Variante sichtbar?</title>
+		<link>/blog/feld-im-selektionsbild-nur-bei-anlage-einer-variante-sichtbar/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 14 Feb 2014 15:36:43 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[variante]]></category>
+		<category><![CDATA[modify screen]]></category>
+		<category><![CDATA[Selektionsbilder]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4393</guid>
+
+					<description><![CDATA[<p>Eine von diesen Anforderungen, die mir einfach so über den Weg laufen: Ich wollte einen Parameter auf dem Selektionsbild ausblenden. Allerdings sollte es möglich sein, bei Anlage einer Variante, diesen Parameter zu ändern. </p>
+<p>Der Beitrag <a href="/blog/feld-im-selektionsbild-nur-bei-anlage-einer-variante-sichtbar/">Feld im Selektionsbild nur bei Anlage einer Variante sichtbar?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich bin gerade über die Aufgabe gestolpert, dass ein Feld im Selektionsbild generell ausgeblendet werden soll. Bei der Anlage einer Variante jedoch, muss das Feld sichtbar sein.</p>
+<p>Die Lösung ist relativ einfach: Im PBO des Reports (AT SELECTION-SCREEN OUTPUT) fragen wir das Systemfeld SUBTY ab und steuern mittels MODIFY SCREEN die Sichtbarkeit der Felder.</p>
+<h2>Coding</h2>
+<pre>*== Parameter soll immer angezeigt werden
+PARAMETERS p_diag TYPE char10.
+*== Parameter soll nur in der Variantenansicht eingabebereit sein
+PARAMETERS p_vari TYPE char10 MODIF ID var.
+
+AT SELECTION-SCREEN OUTPUT.
+  IF sy-subty = 20. "Hex:14, Bin:00010100"
+    LOOP AT SCREEN.
+      IF screen-group1 = 'VAR'.
+        IF sy-slset = space.
+*== Keine Variante geladen: Feld ausblenden
+          screen-active = '0'.
+        ELSE.
+*== Variante ist geladen: Feld anzeigen (nicht eingabebereit)
+          screen-input = '0'.
+        ENDIF.
+        MODIFY SCREEN.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.</pre>
+<h2>Hardcore</h2>
+<p>Auf der Suche nach einer Lösung habe ich auch eine Alternative gefunden per Dirty-Assign im Systemprogramm RSDBRUNT eine Variable abzufragen:</p>
+<pre>FIELD-SYMBOLS &lt;mode_Vari&gt; TYPE c.
+ASSIGN ('(RSDBRUNT)SUBMIT_INFO-MODE_VARI') TO &lt;mode_vari&gt;.
+IF &lt;mode_vari&gt; IS ASSIGNED AND &lt;mode_vari&gt; = 'X'.
+  "Pflege der Variante
+ENDIF.</pre>
+<p>Die Variante muss in beiden Fällen über die Transaktion SE38 angelegt werden.</p>
+<p>Der Beitrag <a href="/blog/feld-im-selektionsbild-nur-bei-anlage-einer-variante-sichtbar/">Feld im Selektionsbild nur bei Anlage einer Variante sichtbar?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

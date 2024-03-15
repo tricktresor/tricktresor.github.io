@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>export Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/export/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 11 May 2017 16:03:18 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>export Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Daten dynamisch verwalten</title>
+		<link>/blog/daten-dynamisch-verwalten/</link>
+					<comments>/blog/daten-dynamisch-verwalten/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 31 May 2012 16:05:40 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[export to database]]></category>
+		<category><![CDATA[export]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[call transformation]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[rtti]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=647</guid>
+
+					<description><![CDATA[<p>Daten werden in der Regel in Tabellen abgelegt. Bei komplexen Datenstrukturen oder auch bei Daten, die nicht allzulange vorgehalten werden m&#252;ssen, bietet sich ein EXPORT TO DATABASE an. Zusammen mit der Umwandlung von Daten ins XML-Format kann man eine Menge interessanter Dinge machen. In diesem Beispiel Speichern wir eine Tabelle mit einer bestimmten Struktur und lesen die Daten danach wieder in eine Tabelle mit einer anderen Struktur.</p>
+<p>Der Beitrag <a href="/blog/daten-dynamisch-verwalten/">Daten dynamisch verwalten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Daten werden in der Regel in Tabellen abgelegt. Bei komplexen Datenstrukturen oder auch bei Daten, die nicht allzulange vorgehalten werden müssen, bietet sich ein EXPORT TO DATABASE an. Zusammen mit der Umwandlung von Daten ins XML-Format kann man eine Menge interessanter Dinge machen. In diesem Beispiel Speichern wir eine Tabelle mit einer bestimmten Struktur und lesen die Daten danach wieder in eine Tabelle mit einer anderen Struktur.</p>
+<h2 class="head1">Um was geht es?</h2>
+<p>Wir simulieren in diesem Beispiel eine Strukturänderung, die in Folge einer Programmerweiterung auftreten kann.</p>
+<p>Stellen Sie sich vor, Sie haben eine Struktur in der Sie die Materialnummer und eine Serialnummer zu einem &#8220;Vorgang&#8221; speichern.</p>
+<p>Die Struktur sähe dann z.B. so aus:</p>
+<pre class="lang:abap decode:true ">TYPES: BEGIN OF ty_struc,
+         vorgang TYPE c LENGTH 10,
+         matnr   TYPE c LENGTH 18,
+         sernr   TYPE c LENGTH 18,
+       END OF ty_struc.</pre>
+<p>Die Speicherung erfolgt durch EXPORT TO DATABASE:</p>
+<p class="sap1">EXPORT gt_data TO DATABASE indx(zz) ID &#8216;$mydata$&#8217;.</p>
+<p>Das Programm läuft und funktioniert gut. Es werden zu einem Vorgang Materialnummer und Serialnummer gespeichert und gelesen.</p>
+<h2 class="head1">Strukturänderung</h2>
+<p>Nach einiger Zeit erweist es sich jedoch als hilfreich, die Equipmentnummer zum Vorgang ebenfalls zu speichern. Sie fügen den Feldern VORGANG, MATNR und SERNR also das Feld EQUNR hinzu:</p>
+<pre class="lang:abap decode:true ">TYPES: BEGIN OF ty_struc,
+         vorgang TYPE c LENGTH 10,
+         equnr   TYPE c LENGTH 18,
+         matnr   TYPE c LENGTH 18,
+         sernr   TYPE c LENGTH 18,
+       END OF ty_struc.</pre>
+<p>Wenn Sie nun allerdings einen alten Vorgang bearbeiten, werden Sie einen Shortdump bekommen:</p>
+<p class="sap1">Laufzeitfehler         CONNE_IMPORT_WRONG_COMP_LENG<br />
+Ausnahme               CX_SY_IMPORT_MISMATCH_ERROR</p>
+<p class="text1">Die Zusätze IGNORING STRUCTURE BOUNDARIES oder IGNORING CONVERSION CONVERSION ERRORS helfen uns leider nicht weiter.</p>
+<h2 class="head1">Die Lösung</h2>
+<p class="text1">Man kann einfach Abhilfe schaffen, in dem man von Anfang an die Daten in ein XML-Objekt umwandelt. Das geht mithilfe von CALL TRANSFORMATION extrem schnell, unkompliziert und sicher.</p>
+<pre class="lang:abap decode:true ">CALL TRANSFORMATION id 
+     SOURCE data = gt_data
+     RESULT XML xml_string.</pre>
+<p>Der Trick dabei ist, dass im Datencluster nicht vorhandene Felder einfach ignoriert werden. Ebenso werden Felder ignoriert, die zwar im Datencluster, aber nicht in der zu importierenden Struktur/ Tabelle vorhanden sind.</p>
+<p class="text1">Die Struktur kann fast beliebig geändert werden, solange die Feldnamen identisch bleiben. Sogar Feldtypen können problemlos geändert werden.</p>
+<p class="text1">Wenn natürlich ein CHAR-Feld in ein INT-Feld geändert wird, dann kann ein C-Wert natürlich nicht in ein numerisches Feld gewandelt werden.</p>
+<h2 class="head1">Und wozu brauche ich das?</h2>
+<p class="text1">Die Anwendung ist sicherlich nicht ganz alltäglich, denn normalerweise wird man wohl eine Datenbank-Tabelle definieren und die Daten dort strukturiert ablegen.</p>
+<p class="text1">Interessant wird es, wenn die Daten zu einer Anwendung teilweise dynamisch &#8211; zum Beispiel unterschiedliche Felder je Belegart &#8211; verwaltet werden. Sie könnten dann per Customizing zusätzliche Felder definieren, die in einer Anwendung geändert werden sollen. Mittels RTTI ist es inzwischen einfach, anhand eines Feldkatalogs eine interne Tabelle zu generieren.</p>
+<p class="text1">siehe: <a href="/wp-content/index.php?aID=426" target="_self">Interne Tabelle zur Laufzeit generieren</a></p>
+<p class="text1">Zur Anzeige oder Änderung kann dann ein ALV-Grid verwendet werden. Wenn Sie diese Art der Datenspeicherung verwenden, dann kann die Tabellenstruktur fast beliebig geändert werden.</p>
+<h2 class="head1">Coding</h2>
+<p class="text1">Das folgende Programm demonstriert das Vorgehen und simuliert die zeitliche Änderung einer Struktur dadurch, das einfach zwei verschiedene Strukturen verwendet werden.</p>
+<pre class="lang:abap decode:true ">*== old structure
+TYPES: BEGIN OF ty_test1,
+         eins TYPE c LENGTH 2,
+         zwei TYPE c LENGTH 2,
+         drei TYPE c LENGTH 2,
+       END OF ty_test1.
+
+*== new structure
+TYPES: BEGIN OF ty_test2,
+         neu TYPE c LENGTH 2,
+         eins TYPE c LENGTH 5,
+         zwei TYPE i,
+       END OF ty_test2.
+
+*== data tables
+DATA gt_test1 TYPE STANDARD TABLE OF ty_test1.
+DATA gt_test2 TYPE STANDARD TABLE OF ty_test2.
+*== id for storing data
+DATA gc_id TYPE c LENGTH 20 VALUE '$TRICKTRESOR!'.
+*== XML-String containing the data in XML-format
+DATA gv_xml TYPE string.
+*== exception reference CALL TRANSFORMATION
+DATA gx_error TYPE REF TO cx_dynamic_check.
+
+START-OF-SELECTION.
+
+*== add test data to "old" table
+  APPEND 'AA1111' TO gt_test1.
+  APPEND 'BB2222' TO gt_test1.
+  APPEND 'CC3333' TO gt_test1.</pre>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/screenshots/gt_test1.jpg" alt="" /></p>
+<p class="sap1">
+<pre class="lang:abap decode:true">*== save xml string into&amp;nbsp;data cluster*== Transform data table into xml string
+CALL TRANSFORMATION id
+     SOURCE test = gt_test1
+     RESULT XML gv_xml.
+
+EXPORT test = gv_xml TO DATABASE indx(zv) ID gc_id.
+
+*== clearance
+CLEAR gt_test1.
+CLEAR gt_test2.
+CLEAR gv_xml.
+
+*== import data into xml string
+IMPORT test TO gv_xml FROM DATABASE indx(zv) ID gc_id.
+
+TRY .
+*== transform xml data into table with NEW structure
+  CALL TRANSFORMATION id
+       SOURCE XML gv_xml
+       RESULT test = gt_test2.
+    CATCH cx_transformation_error INTO gx_error.
+  BREAK-POINT.
+ENDTRY.</pre>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/screenshots/gt_test2.jpg" alt="" /></p>
+<p>Der Beitrag <a href="/blog/daten-dynamisch-verwalten/">Daten dynamisch verwalten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/daten-dynamisch-verwalten/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

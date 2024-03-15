@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>BAPI Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/bapi/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 15 May 2023 12:15:20 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>BAPI Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Preisfindung im Kundenauftrag von außen anstossen</title>
+		<link>/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Mar 2017 20:25:15 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_SALESORDER_CHANGE]]></category>
+		<category><![CDATA[Vertriebsbeleg]]></category>
+		<category><![CDATA[Preisfindung]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017958</guid>
+
+					<description><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus: Userexit in SAPMV45A anpassen Parameter setzen BAPI aufrufen Parameter zurücknehmen Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:...</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus:</p>
+<ol>
+<li>Userexit in SAPMV45A anpassen</li>
+<li>Parameter setzen</li>
+<li>BAPI aufrufen</li>
+<li>Parameter zurücknehmen</li>
+</ol>
+<p>Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:</p>
+<ol>
+<li>EXPORT TO MEMORY und IMPORT FROM MEMORY</li>
+<li>Öffentliches Attribut der eigenen globalen Klasse</li>
+</ol>
+<h2>Anlage der globalen Klasse</h2>
+<p>Als erstes musst du eine Klasse anlegen mit der die neue Preisfindung durchgeführt werden soll. In meinem Beispiel heißt sie ZCL_SD_NP (New Pricing).</p>
+<p>Lege das öffentliche Klassenattribut KNPRS vom Typ KNPRS an (static). Das ist die Preisfindungsart, mit der die Art der neuen Preisfindung gesteuert werden kann.</p>
+<h2>Quelltext (relevanter Teil ) in MV45AFZB:</h2>
+<pre class="">FORM userexit_new_pricing_vbap CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL.  
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBAP</pre>
+<pre class="">FORM userexit_new_pricing_vbkd CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL. 
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBKD</pre>
+<h2>Quelltext Klasse</h2>
+<p>Nun brauchen wir noch die Methode TRIGGER_NEW_PRICING</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017959 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png" alt="" width="776" height="177" srcset="/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png 776w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-300x68.png 300w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-768x175.png 768w" sizes="(max-width: 776px) 100vw, 776px" /></a></p>
+<pre class="">DATA: 
+  ls_bapisdh1x  TYPE bapisdh1x,
+  lt_pos        TYPE STANDARD TABLE OF bapisditm WITH NON-UNIQUE DEFAULT KEY,
+  lt_posx       TYPE STANDARD TABLE OF bapisditmx WITH NON-UNIQUE DEFAULT KEY,
+  lt_return     TYPE bapiret2_t.
+FIELD-SYMBOLS: 
+  &lt;ls_pos&gt;      LIKE LINE OF lt_pos,
+  &lt;ls_posx&gt;     LIKE LINE OF lt_posx.
+
+
+CLEAR ct_bapiret2.
+knprs = iv_knprs.
+*--------------------------------------------------------------------*
+* Get all positions to be redermined
+*--------------------------------------------------------------------*
+SELECT posnr AS itm_number werks AS plant
+INTO CORRESPONDING FIELDS OF TABLE lt_pos
+FROM vbap
+WHERE vbeln = iv_vbeln_va.
+
+LOOP AT lt_pos ASSIGNING &lt;ls_pos&gt;.
+APPEND INITIAL LINE TO lt_posx ASSIGNING &lt;ls_posx&gt;.
+&lt;ls_posx&gt;-itm_number = &lt;ls_pos&gt;-itm_number.
+&lt;ls_posx&gt;-updateflag = 'U'.
+ENDLOOP.
+
+ls_bapisdh1x-updateflag = 'U'.
+CALL FUNCTION 'BAPI_SALESORDER_CHANGE'
+  EXPORTING
+    salesdocument    = iv_vbeln_va
+    order_header_inx = ls_bapisdh1x
+  TABLES
+    return           = ct_bapiret2
+    order_item_in    = lt_pos
+    order_item_inx   = lt_posx
+  EXCEPTIONS
+    ERROR_MESSAGE = 1.
+
+CLEAR knprs.  " Only once
+
+TRY.
+    DATA(ls_return) = ct_bapiret2[ type = 'E' ].
+    CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
+    RAISE EXCEPTION TYPE zcx_my_exception.
+  CATCH CX_SY_ITAB_LINE_NOT_FOUND.
+    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+ENDTRY.
+</pre>
+<p>Durch Aufruf der Methode ZCL_SD_NP=&gt;TRIGGER_NEW_PRICING( &#8230; ) kannst du nun einen Beleg dazu bewegen, eine neue Preisfindung durchzuführen.</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Projektsystem: Hierarchie PSP-Element ändern</title>
+		<link>/blog/projektsystem-hierarchie-psp-element-aendern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sun, 29 May 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Projektsystem]]></category>
+		<category><![CDATA[projekt]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_PROJECT_MAINTAIN]]></category>
+		<category><![CDATA[PSP-Element]]></category>
+		<category><![CDATA[Hierarchie]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=647155</guid>
+
+					<description><![CDATA[<p>PSP-Elemente können in einem Projekt hierarchisch angeordnet werden. Hier zeige ich dir, wie das mit dem BAPI_PROJECT_MAINTAIN funktioniert.</p>
+<p>Der Beitrag <a href="/blog/projektsystem-hierarchie-psp-element-aendern/">Projektsystem: Hierarchie PSP-Element ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine Projektstruktur ist zwangsläufig eine Hierarchie. Einzelne PSP-Elemente können ebenfalls hierarchisch angeordnet sein. Eine einfache Struktur sieht beispielsweise so aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-26-05.jpg"><img decoding="async" class="alignnone size-full wp-image-647158" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-26-05.jpg" alt="2016-05-26_17-26-05" width="399" height="186" srcset="/wp-content/uploads/2016/05/2016-05-26_17-26-05.jpg 399w, /wp-content/uploads/2016/05/2016-05-26_17-26-05-300x140.jpg 300w" sizes="(max-width: 399px) 100vw, 399px" /></a><br />
+[notice type=&#8217;info&#8217;]Die Projektstruktur wird im SAP-Standard mit der Transaktion CJ20n bearbeitet.[/notice]<br />
+Mit dem kleinen Hierarchieänderungsprogramm soll die Struktur nun dahingehend geändert werden, dass das PSP-Element 43 unter das PSP-Element Nummer 42 gehängt wird. Der Aufruf sieht folgendermaßen aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-30-54.jpg"><img decoding="async" class="alignnone size-full wp-image-647232" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-30-54.jpg" alt="2016-05-26_18-30-54" width="436" height="174" srcset="/wp-content/uploads/2016/05/2016-05-26_18-30-54.jpg 436w, /wp-content/uploads/2016/05/2016-05-26_18-30-54-300x120.jpg 300w" sizes="(max-width: 436px) 100vw, 436px" /></a></p>
+<p>Die Übergabetabelle LT_HIERARCHY:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-32-09.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647233" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-32-09.jpg" alt="2016-05-26_18-32-09" width="778" height="87" srcset="/wp-content/uploads/2016/05/2016-05-26_18-32-09.jpg 778w, /wp-content/uploads/2016/05/2016-05-26_18-32-09-300x34.jpg 300w, /wp-content/uploads/2016/05/2016-05-26_18-32-09-768x86.jpg 768w" sizes="(max-width: 778px) 100vw, 778px" /></a></p>
+<p>Das Ergebnis ist glücklicherweise wie erwartet:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-27-35.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647157" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-27-35.jpg" alt="2016-05-26_17-27-35" width="399" height="186" srcset="/wp-content/uploads/2016/05/2016-05-26_17-27-35.jpg 399w, /wp-content/uploads/2016/05/2016-05-26_17-27-35-300x140.jpg 300w" sizes="(max-width: 399px) 100vw, 399px" /></a></p>
+<h2>Hinweis</h2>
+<p>Wenn die Hierarchie geändert werden soll, dann kann dies leider nicht beliebig passieren. In jedem Fall muss immer die Hierarchie aller beteiligten PSP-Elemente definiert werden. Soll das PSP-Element Nummer 43 wieder &#8220;heraufgestuft&#8221; werden, dann müssen Nr. 42 und Nr. 43 jeweils mit &#8220;UP = P-0000004&#8221;  und &#8220;DOWN = space&#8221; an den Baustein übergeben werden. Nr. 4 muss ebenfalls übergeben werden. Hier der Aufruf für Nr. 43. Eigentlich müsste auch hier Nr. 42 berücksichtigt werden, da es ebenfalls beteiligt ist, denn es &#8220;verliert&#8221; ja sein Kind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-36-46.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647234" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-36-46.jpg" alt="2016-05-26_18-36-46" width="778" height="66" srcset="/wp-content/uploads/2016/05/2016-05-26_18-36-46.jpg 778w, /wp-content/uploads/2016/05/2016-05-26_18-36-46-300x25.jpg 300w, /wp-content/uploads/2016/05/2016-05-26_18-36-46-768x65.jpg 768w" sizes="(max-width: 778px) 100vw, 778px" /></a></p>
+<p>Dies ist das Ergebnis:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-41-13.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647161" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-41-13.jpg" alt="2016-05-26_17-41-13" width="399" height="186" srcset="/wp-content/uploads/2016/05/2016-05-26_17-41-13.jpg 399w, /wp-content/uploads/2016/05/2016-05-26_17-41-13-300x140.jpg 300w" sizes="(max-width: 399px) 100vw, 399px" /></a></p>
+<p>Wie du siehst, ist die Reihenfolge vertauscht: Erst kommt Element 43, danach 42. Eine Sortierung gibt es nicht. Die &#8220;Geschwister&#8221; müssen genau definiert werden (LEFT und RIGHT). Soll die Reihenfolge anders herum sein, also erst 42, dann 43, dann muss die Übergabetabelle folgendermaßen aussehen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-53-09.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647227" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_17-53-09.jpg" alt="2016-05-26_17-53-09" width="778" height="87" srcset="/wp-content/uploads/2016/05/2016-05-26_17-53-09.jpg 778w, /wp-content/uploads/2016/05/2016-05-26_17-53-09-300x34.jpg 300w, /wp-content/uploads/2016/05/2016-05-26_17-53-09-768x86.jpg 768w" sizes="(max-width: 778px) 100vw, 778px" /></a></p>
+<p>Die Geschwister müssen nicht immer definiert werden. Manchmal funktioniert eine Operation jedoch nur dann, wenn auch die Geschwister korrekt angegeben werden.</p>
+<p>Am besten ist es, die Hierarchie 100%ig genau zu definieren. Wann sich der Baustein unvollständigen Definitionen tolerant verhält und wann nicht, ist für mich nicht nachvollziehbar.</p>
+<h2>Fehler &#8220;Wurzelelement der Hierarchie darf nicht verschoben werden&#8221;</h2>
+<p><em>Fehler 469(CJ)</em></p>
+<p>Bei der Änderung der Hierarchie müssen alle beteiligten Elemente definiert werden! Wenn aus der Ausgangsposition &#8220;43 ist 42 untergeordnet&#8221; die Änderung &#8220;42 ist 43 untergeordnet&#8221; erfolgen soll, dann muss das ROOT-Element P-0000004 erwähnt werden. Das passiert in dem Demoprogramm, allerdings zeige ich den Fehler hier auf, weil er nicht auf die Fehlerursache schließen lässt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-21-16.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-647231" src="https://tricktresor.com/wp-content/uploads/2016/05/2016-05-26_18-21-16.jpg" alt="2016-05-26_18-21-16" width="778" height="87" srcset="/wp-content/uploads/2016/05/2016-05-26_18-21-16.jpg 778w, /wp-content/uploads/2016/05/2016-05-26_18-21-16-300x34.jpg 300w, /wp-content/uploads/2016/05/2016-05-26_18-21-16-768x86.jpg 768w" sizes="(max-width: 778px) 100vw, 778px" /></a></p>
+<h2>Code</h2>
+<pre class="lang:abap decode:true " > PARAMETERS p_projn  TYPE ps_pspid DEFAULT 'K-0000001'.
+ PARAMETERS p_root   TYPE ps_posid DEFAULT 'P-0000004'.
+ PARAMETERS p_parent TYPE ps_posid DEFAULT 'P-00000042'.
+ PARAMETERS p_child  TYPE ps_posid DEFAULT 'P-00000043'.
+ 
+ START-OF-SELECTION.
+ 
+   PERFORM go.
+ 
+ *&amp;---------------------------------------------------------------------*
+ *&amp;      Form  go
+ *&amp;---------------------------------------------------------------------*
+ FORM go.
+ 
+   DATA ls_project_def      TYPE bapi_project_definition.
+   DATA ls_project_def_upd  TYPE bapi_project_definition_up.
+   DATA lt_messages         TYPE STANDARD TABLE OF bapi_meth_message.
+   DATA ls_message          TYPE bapi_meth_message.
+   DATA ls_return           TYPE bapireturn1.
+   DATA lt_methods          TYPE STANDARD TABLE OF bapi_method_project.
+   DATA ls_method           TYPE bapi_method_project.
+   DATA lt_hierarchy        TYPE STANDARD TABLE OF bapi_wbs_hierarchie.
+   DATA ls_hierarchy        TYPE bapi_wbs_hierarchie.
+ 
+   ls_project_def-project_definition = p_projn.
+ 
+ 
+   ls_method-method     = 'Create'.
+   ls_method-objecttype = 'WBS-Hierarchy'.
+   APPEND ls_method TO lt_methods.
+ 
+ 
+   CLEAR ls_method.
+   ls_method-method     = 'SaveAndWait'.
+   APPEND ls_method TO lt_methods.
+ 
+   CLEAR ls_hierarchy.
+   ls_hierarchy-project_definition = p_projn.
+   ls_hierarchy-wbs_element        = p_root.
+   ls_hierarchy-down               = p_parent.
+   APPEND ls_hierarchy TO lt_hierarchy.
+ 
+ 
+   CLEAR ls_hierarchy.
+   ls_hierarchy-project_definition = p_projn.
+   ls_hierarchy-wbs_element        = p_parent.
+   ls_hierarchy-down               = p_child.
+   ls_hierarchy-up                 = p_root.
+   APPEND ls_hierarchy TO lt_hierarchy.
+ 
+   IF p_child IS NOT INITIAL.
+     CLEAR ls_hierarchy.
+     ls_hierarchy-project_definition = p_projn.
+     ls_hierarchy-wbs_element        = p_child.
+     ls_hierarchy-up                 = p_parent.
+     APPEND ls_hierarchy TO lt_hierarchy.
+   ENDIF.
+ 
+ 
+   CALL FUNCTION 'BAPI_PROJECT_MAINTAIN'
+     EXPORTING
+       i_project_definition     = ls_project_def
+       i_project_definition_upd = ls_project_def_upd
+     IMPORTING
+       return                   = ls_return
+     TABLES
+       e_message_table          = lt_messages
+       i_method_project         = lt_methods
+       i_wbs_hierarchie_table   = lt_hierarchy.
+ 
+   WRITE: / ls_return-message.
+   LOOP AT lt_messages INTO ls_message.
+     WRITE: / ls_message-message_text.
+   ENDLOOP.
+ 
+   CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+     EXPORTING
+       wait = abap_true.
+ 
+ ENDFORM.                    "go</pre>
+<p>Der Beitrag <a href="/blog/projektsystem-hierarchie-psp-element-aendern/">Projektsystem: Hierarchie PSP-Element ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Kundenfelder in BAPI-Struktur füllen</title>
+		<link>/blog/kundenfelder-in-bapi-struktur-fuellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 18 May 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_SALESORDER_CREATEFROMDAT2]]></category>
+		<category><![CDATA[EXTENSION]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=631934</guid>
+
+					<description><![CDATA[<p>Ein kleiner Überblick über das Befüllen von kundeneigenen Feldern im BAPI_SALESORDER_CREATEFROMDAT2. Hier gehe ich speziell auf die Zuweisung der Feldstruktur zu dem EXTENSION-Container ein. </p>
+<p>Der Beitrag <a href="/blog/kundenfelder-in-bapi-struktur-fuellen/">Kundenfelder in BAPI-Struktur füllen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Das Befüllen von Kundeneigenen Feldern in einem BAPI stellt einen häufig vor Probleme. Ich stelle dir hier eine kurze Doku mit Beispielcoding vor, um Kundenfelder korrekt und beschwerdefrei übergeben zu können.<br>Als Beispiel verwenden ich den BAPI_SALESORDER_CREATEFROMDAT2 zum Anlegen von Kundenaufträgen.</p>
+
+
+
+<h2 class="wp-block-heading">Vorbedingung BAPE_VBAK</h2>
+
+
+
+<p>Alle kundeneigenen Felder, die mittels APPEND an die Kopfstruktur VBAK angehängt wurden, müssen ebenfalls in einem APPEND an die Struktur BAPE_VBAK appendiert werden. Hierbei ist es wichtig, dass die Felder zeichenartig sein müssen! Es dürfen also keine Felder vom Typ FLOAT, DEC oder INT verwendet werden! Entweder müssen diese Felder außen vor gelassen werden (sie können dann nicht mittels BAPI geändert werden), oder es muss ein eigenes zeichenartiges Datenelement speziell für den BAPI angelegt werden.</p>
+
+
+
+<h2 class="wp-block-heading">Beispiel</h2>
+
+
+
+<p>Die Umwandlung einer Struktur in einen &#8220;Container&#8221; braucht man immer, wenn man Kundenfelder in BAPIs verwenden möchte. In vielen BAPIs gibt es einen EXTENSION-Parameter, dem alle Kundenfelder übergeben werden. In diesem speziellen Fall ist es die Übergabetabelle EXTENSIONIN.</p>
+
+
+
+<p>Die Anweisung zum Füllen der EXTENSIONIN sieht klassischerweise in etwa so aus:</p>
+
+
+
+<pre class="wp-block-preformatted">DATA ls_bape_vbak &nbsp;TYPE bape_vbak.<br>DATA ls_extension &nbsp;TYPE bapiparex.<br>DATA lt_extensions TYPE STANDARD TABLE OF bapiparex.<br><br>ls_bape_vbak-zzfeld1 &nbsp; &nbsp;= '1'.<br>ls_bape_vbak-zzfeld2 &nbsp; &nbsp;= 'ABCD'.<br><br>ls_extension-structure &nbsp;= 'BAPE_VBAK'.<br>ls_extension+30(960) &nbsp; &nbsp;= ls_bape_vbak. "(bapiparex-valuepart1 - 4)<br>APPEND ls_extension TO lt_extensions.</pre>
+
+
+
+<p>Abgesehen davon, dass die Unterteilung der Kundenfelder in VALUEPART1 bis VALUEPART4 absoluter Schwachsinn ist, ist es unter Unicode nicht mehr einfach möglich, die Strukturen zuzuweisen. Im ABAP-Editor erhältst du dann die Meldung:</p>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow">
+<p>&#8220;LS_EXTENSION+30(960)&#8221; und &#8220;LS_BAPE_VBAK&#8221; sind in einem<br>Unicode-Programm nicht ineinander konvertierbar.</p>
+</blockquote>
+
+
+
+<h2 class="wp-block-heading">Casting notwendig</h2>
+
+
+
+<p>Entweder bedient man sich des Tricks mit dem <a href="https://tricktresor.com/blog/casting-zwischen-strukturen/">X-Casting</a> oder man verwendet die entsprechende Klasse von SAP:&nbsp;<a href="https://help.sap.com/saphelp_nw73/helpdata/de/79/c554d3b3dc11d5993800508b6b8b11/content.htm?original_fqdn=help.sap.de">CL_ABAP_CONTAINER_UTILITIES</a>.<br>Mit dieser Klasse &#8211; und speziell der Methode FILL_CONTAINER_C &#8211; ist es möglich, die typgerechte Umwandlung vorzunehmen.</p>
+
+
+
+<pre class="wp-block-preformatted">cl_abap_container_utilities=&gt;fill_container_c<br>&nbsp; EXPORTING<br>&nbsp; &nbsp; im_value &nbsp; &nbsp; = ls_bape_vbak<br>&nbsp; IMPORTING<br>&nbsp; &nbsp; ex_container = ls_extension+30(960)<br>&nbsp; EXCEPTIONS<br>&nbsp; &nbsp; illegal_parameter_type = 1<br>&nbsp; &nbsp; OTHERS = 2.</pre>
+
+
+
+<h2 class="wp-block-heading">VBAKKOZ und VBAKKOZX</h2>
+
+
+
+<p>Damit die Verarbeitung letztendlich funktioniert, müssen die Strukturen VBAKKOZ und VBAKKOZX ebenfalls in gleicher Weise erweitert werden.</p>
+
+
+
+<p>Hierbei ist es wichtig, dass die Felder die gleiche Struktur haben. Fehlt in der VBAKKOZX ein Feld, dann funktioniert die Übertragung der Daten nicht.</p>
+
+
+
+<p>Gleiches gilt für die Felder der VBAP-Struktur.</p>
+
+
+
+<h2 class="wp-block-heading">SAP-Hinweis</h2>
+
+
+
+<p>Nützliche Informationen stehen in <a href="https://me.sap.com/notes/143580">SAP-Hinweis 143580</a>. </p>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/kundenfelder-in-bapi-struktur-fuellen/">Kundenfelder in BAPI-Struktur füllen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>FI-Beleg mit Umsatzsteuer buchen</title>
+		<link>/blog/fi-beleg-mit-umsatzsteuer-buchen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Sep 2014 16:23:48 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[Umsatzsteuer]]></category>
+		<category><![CDATA[Mehrwertsteuer]]></category>
+		<category><![CDATA[Vorsteuer]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[Buchung]]></category>
+		<category><![CDATA[MM]]></category>
+		<category><![CDATA[Beleg]]></category>
+		<category><![CDATA[RFC]]></category>
+		<category><![CDATA[Steuersatz]]></category>
+		<category><![CDATA[BAPIs]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5078</guid>
+
+					<description><![CDATA[<p>Ausnahmsweise mal ein Ausflug in die Welt der Finanzbuchhaltung. Für mich ein Rotes Tuch mit Sieben Siegeln aus einem böhmischen Dorf... Ich werde trotzdem versuchen, den Sachverhalt nicht nur syntaktisch sondern auch inhaltlich korrekt wiederzugeben. Aus diesem Grund werde ich mich bewusst so schwammig wie möglich ausdrücken und Fachtermini wie "Erlöskonto", "Bilanz" oder "Buchungsschlüssel" vermeiden.</p>
+<p>Der Beitrag <a href="/blog/fi-beleg-mit-umsatzsteuer-buchen/">FI-Beleg mit Umsatzsteuer buchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ausnahmsweise mal ein Ausflug in die Welt der Finanzbuchhaltung. Für mich ein Rotes Tuch mit Sieben Siegeln aus einem böhmischen Dorf&#8230; Ich werde trotzdem versuchen, den Sachverhalt nicht nur syntaktisch sondern auch inhaltlich korrekt wiederzugeben. Aus diesem Grund werde ich mich bewusst so schwammig wie möglich ausdrücken und Fachtermini wie &#8220;Erlöskonto&#8221;, &#8220;Bilanz&#8221; oder &#8220;Buchungsschlüssel&#8221; vermeiden.</p>
+<h2>Aufgabe</h2>
+<p>Buchen eines FI-Beleges mit Umsatzsteuer. Es soll ein Bruttobetrag auf ein Konto und der zugehörige Nettobetrag auf ein Gegenkonto gebucht werden. Die Umsatzsteuer soll auf das richtige Umsatzsteuerkonto gebucht werden.</p>
+<h2>Hilfsmittel</h2>
+<p>Dass nur der BAPI_ACC_DOCUMENT_POST für diese Zwecke infrage kommt, war mir immerhin schnell klar. Wie man mit diesem Baustein bucht, habe ich ebenfalls schnell heraus gefunden. Eine Herausforderung war die Buchung der Umsatzsteuer. Von der irrigen Annahme, der Baustein könnte die Umsatzsteuer selber rechnen, habe ich mich schnell verabschieden müssen. Die Umsatzsteuer muss dem Baustein übergeben werden.</p>
+<p>Um die Umsatzsteuer zu berechnen, helfen diese beiden Bausteine:</p>
+<ul>
+<li>CALCULATE_TAX_FROM_NET_AMOUNT</li>
+<li>CALCULATE_TAX_FROM_GROSSAMOUNT</li>
+</ul>
+<p>Desweiteren notwendig ist eine Buchungsperiode. Diese lässt sich zwar auch einfach aus dem Datum errechnen, aber der Baustein CON_FIN_CURRENT_PERIOD_GET_2 hilft ebenfalls weiter. Da der Baustein sich auf den MM-Periodenverschieber bezieht, bin ich mir nicht sicher, ob der Baustein wirklich sinnvoll ist, aber in meinem Fall funktioniert er.</p>
+<h2>Beleg</h2>
+<p>Dieser Beleg kommt bei so einer Buchung heraus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/09/Beleg.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5079" src="https://tricktresor.com/wp-content/uploads/2014/09/Beleg-300x121.png" alt="Beleg" width="300" height="121" srcset="/wp-content/uploads/2014/09/Beleg-300x121.png 300w, /wp-content/uploads/2014/09/Beleg-624x252.png 624w, /wp-content/uploads/2014/09/Beleg.png 805w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT.
+PARAMETERs p_bukrs type bukrs DEFAULT '1000'.
+
+START-OF-SELECTION.
+
+  DATA ls_header TYPE bapiache09.
+  DATA lt_return TYPE STANDARD TABLE OF bapiret2.
+  DATA ls_return TYPE bapiret2.
+  DATA lt_acc_gl TYPE STANDARD TABLE OF bapiacgl09.
+  DATA ls_acc_gl LIKE LINE OF lt_acc_gl.
+  DATA lt_cur_am TYPE STANDARD TABLE OF bapiaccr09.
+  DATA ls_cur_am LIKE LINE OF lt_cur_am.
+  DATA lt_acc_tx TYPE STANDARD TABLE OF bapiactx09.
+  DATA ls_acc_tx LIKE LINE OF lt_acc_tx.
+  data lv_period type POPER.
+  data lv_year   type BDATJ.
+*== aktuelle Periode ermitteln
+  CALL FUNCTION 'CON_FIN_CURRENT_PERIOD_GET_2'
+    EXPORTING
+      id_bukrs                 = p_bukrs
+   IMPORTING
+     ED_CURRENT_YEAR          = lv_year
+     ED_CURRENT_PERIOD        = lv_period
+   EXCEPTIONS
+     INTERNAL_ERROR           = 1
+     OTHERS                   = 2.
+
+*== Header
+  ls_header-bus_act           = 'RFBU'.               "Betriebswirtschaftlicher Vorgang
+  ls_header-username          = 'ICH'.                "Name des Benutzers
+  ls_header-header_txt        = 'Test'.               "Belegkopftext
+  ls_header-comp_code         = p_bukrs.              "Buchungskreis
+  ls_header-doc_date          = sy-datum.             "Belegdatum im Beleg
+  ls_header-pstng_date        = sy-datum.             "Buchungsdatum im Beleg
+  ls_header-trans_date        = sy-datum.             "Umrechnungsdatum
+  ls_header-fisc_year         = lv_year.              "Geschäftsjahr
+  ls_header-fis_period        = lv_period.            "Geschäftsmonat
+  ls_header-doc_type          = 'SB'.                 "Belegart
+  ls_header-vatdate           = sy-datum.             "Steuermeldedatum
+
+
+*== Buchungszeile Haben
+  ls_acc_gl-itemno_acc        = 1.                    "Positionsnummer des Rechnungswesenbeleges
+  ls_acc_gl-gl_account        = '0000184040'.         "Sachkonto der Hauptbuchhaltung
+  ls_acc_gl-item_text         = 'Postext Haben'.      "Positionstext
+  ls_acc_gl-acct_key          = space.                "Vorgangsschlüssel
+  ls_acc_gl-acct_type         = 'S'.                  "Kontoart
+  ls_acc_gl-costcenter        = ''.
+  ls_acc_gl-value_date        = sy-datum.
+  APPEND ls_acc_gl TO lt_acc_gl.
+
+*== Buchungszeile Soll
+  ls_acc_gl-itemno_acc        = 2.                    "Positionsnummer des Rechnungswesenbeleges
+  ls_acc_gl-gl_account        = '0000420000'.         "Sachkonto der Hauptbuchhaltung
+  ls_acc_gl-item_text         = 'Postext Soll'  .     "Positionstext
+  ls_acc_gl-acct_key          = space.                "Vorgangsschlüssel
+  ls_acc_gl-acct_type         = 'S'.                  "Kontoart
+  ls_acc_gl-costcenter        = ''.
+  ls_acc_gl-value_date        = sy-datum.
+  ls_acc_gl-orderid           = 'XYZ'.                "Falls notwendig
+  APPEND ls_acc_gl TO lt_acc_gl.
+
+*== Haben Bruttobetrag
+  ls_cur_am-itemno_acc        = 1.
+  ls_cur_am-currency          = 'EUR'.
+  ls_cur_am-currency_iso      = 'EUR'.
+  ls_cur_am-amt_doccur        = '11.90-'.
+  ls_cur_am-curr_type         = '00'.
+  APPEND ls_cur_am TO lt_cur_am.
+
+*== Soll Nettobetrag
+  ls_cur_am-itemno_acc        = 2.
+  ls_cur_am-currency          = 'EUR'.
+  ls_cur_am-currency_iso      = 'EUR'.
+  ls_cur_am-amt_doccur        = '10.00'.
+  ls_cur_am-curr_type         = '00'.
+  APPEND ls_cur_am TO lt_cur_am.
+
+*== Soll Steuerbetrag
+  ls_cur_am-itemno_acc        = 3.
+  ls_cur_am-currency          = 'EUR'.
+  ls_cur_am-currency_iso      = 'EUR'.
+  ls_cur_am-amt_doccur        = '01.90'.
+  ls_cur_am-amt_base          = '10.00'.
+  ls_cur_am-curr_type         = '00'.
+  APPEND ls_cur_am TO lt_cur_am.
+
+*== Steuerinformation
+  ls_acc_tx-itemno_acc        = 3.
+  ls_acc_tx-tax_code          = 'AA'.
+  ls_acc_tx-cond_key          = 'MWAS'.
+  APPEND ls_acc_tx TO lt_acc_tx.
+
+*== Beleg buchen
+  CALL FUNCTION 'BAPI_ACC_DOCUMENT_POST'
+    EXPORTING
+      documentheader = ls_header
+    TABLES
+      accountgl      = lt_acc_gl
+      accounttax     = lt_acc_tx
+      currencyamount = lt_cur_am
+      return         = lt_return.
+
+*== Protokoll
+  LOOP AT lt_return INTO ls_return.
+    WRITE: / ls_return-row,
+             ls_return-message,
+           / ls_return-type,
+             ls_return-id,
+             ls_return-number,
+             ls_return-message_v1.
+  ENDLOOP.
+
+*== Commit work
+  CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+    IMPORTING
+      return = ls_return.</pre>
+<h2>Neuigkeiten</h2>
+<p>Januar 2015: SAP hat den Hinweis 2070697 zu den BAPIs BAPI_ACC_DOCUMENT_POST + BAPI_ACC_DOCUMENT_CHECK veröffentlicht:</p>
+<h3>Symptom</h3>
+<p>Es wird immer Steuer 0 errechnet oder nichtabzugsfähige Beträge werden nicht verteilt bei Verwendung der Methode gemäß Hinweis 1873588.</p>
+<h3>Ursache und Voraussetzungen</h3>
+<p>Mit Hinweis 1873588 wurde eine Methode zur Verfügung gestellt zur Ableitung der Steuerdaten für BAPIs. Die Methode soll das Füllen der Steuerdaten für die BAPIs bapi_acc_document_post und bapi_acc_document<strong>_</strong>check erleichtern, und zwar ursprünglich für die Ermittlung der Parameter für die zeilenweise Steuer mit Hinweis 1873588, weil hier grundlegende Änderungen im SAP Standard vorgenommen worden sind. Mit diesem Hinweis wird die Methode erweitert für die Berechnung von Steuern (VAT, Sales und Use Tax) inklusive Nichtabzugsfähigkeit und Anzahlungen. Es kann nun ein Gesamtsteuerbetrag für den Beleg vorgegeben werden, der dann entsprechend der berechneten Steuern verteilt wird. Ein neuer Parameter wurde eingeführt, mit dem der Methode mitgeteilt werden kann, dass der Belegsaldo die fehlende Steuer ist, die verteilt werden soll. Eine Berechnung wird nur für Belege durchgeführt, die keine Mischbelege sind, d.h. z.B. Belege mit Anzahlungen und steuerrelevanten Aufwandpositionen in einem Beleg werden <strong>nicht</strong> unterstützt. Steuern für Indien und Brasilien werden nicht durch diese Methode unterstützt. Direkte Steuern (DIRECT_TAX=&#8217;X&#8217;) werden ebenfalls nicht unterstützt.</p>
+<p>Des weiteren sind alle Änderungen inklusive der Änderungen des Hinweises 1873588 auch für SAPKH60000-60404 verfügbar, d.h. die Änderungen sind mit diesem Hinweis runtergezogen worden, wobei die zeilenweise Übergabe der Steuern erst ab SAPKH60405 möglich ist, weil die BAPIS mit SAPKH60405 um den Parameter ITEMNO_TAX erweitert worden sind. Die Serviceklasse ist somit ab SAPKH60000 verfügbar und wird in allen Enhancementpacks ab SAPKH60000 gleich gehalten. Zudem wird der Funktionsbaustein FI_TAX_SERVICES_CALCULATE angeboten, der RFC-fähig ist. Dieser kann über RFC aufgerufen werden und ruft im SAP-System anschließend die obengenannte  Methode FI_TAX_SERVICES=&gt;CALCULATE auf und gibt die Parameter zurück.</p>
+<h3>Lösung</h3>
+<p>Korrektur</p>
+<p>Der Beitrag <a href="/blog/fi-beleg-mit-umsatzsteuer-buchen/">FI-Beleg mit Umsatzsteuer buchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Grundsätzliches</title>
+		<link>/blog/grundsaetzliches-2/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 26 Aug 2010 15:31:03 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Instandhaltung]]></category>
+		<category><![CDATA[Equipments]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[EQUI]]></category>
+		<category><![CDATA[IH]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=556</guid>
+
+					<description><![CDATA[<p>Grunds&#228;tzliches zu Equipments: Funktionsbausteine, Tabellen, Suchhilfen etc.</p>
+<p>Der Beitrag <a href="/blog/grundsaetzliches-2/">Grundsätzliches</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Grundsätzliches zu Equipments: Funktionsbausteine, Tabellen, Suchhilfen etc.</p>
+<h2 class="head1">Funktionsbausteine</h2>
+<h3 class="head2">EQUIPMENT_READ_VIEW</h3>
+<p class="text1">Lesen eines Equipments. Das Equi kann beim Lesen bereits gesperrt werden.</p>
+<h3 class="head2">EQUIPMENT_MODIFY</h3>
+<p class="text1">Ändern eines Equipments. Am besten vorher mit EQUIPMENT_READ_VIEW lesen.</p>
+<h3 class="head2">EQUIPMENT_LOCK / EQUIPMENT_UNLOCK</h3>
+<p class="text1">Sperren und Entsperren eines Equipments</p>
+<h3 class="head2">EQUIPMENT_TRANSMIT_DATA</h3>
+<p>Datenweitergabe an untergeordnete Equipments</p>
+<h2 class="head1">BAPIS</h2>
+<h3 class="head2">BAPI_EQUI_CHANGE</h3>
+<p class="text1">Equipment ändern.</p>
+<h3 class="head2">BAPI_EQUI_CREATE</h3>
+<p class="text1">Equipment anlegen.</p>
+<h3 class="head2">BAPI_EQUI_INSTALL</h3>
+<p class="text1">Equipment einem anderen Equipment unterordnen/ einbauen.</p>
+<h3 class="head2">BAPI_EQUI_DISMANTLE</h3>
+<p class="text1">Equipment ausbauen</p>
+<h3 class="head2">BAPI_OBJCL_GETCLASSES</h3>
+<p>Prüfen, ob ein Equipment klassifiziert ist</p>
+<pre class="lang:abap decode:true ">*** check if equipment is classified
+    CALL FUNCTION 'BAPI_OBJCL_GETCLASSES'
+      EXPORTING
+        objectkey_imp   = lv_objkey
+        objecttable_imp = 'EQUI'
+        classtype_imp   = '002'
+      TABLES
+        alloclist       = lt_alloc
+        return          = lt_return.</pre>
+<h3>EQUIPMENT_CLASS_ALLOCATE</h3>
+<p>Equipment klassifizieren</p>
+<pre class="lang:abap decode:true ">*** classify equipment
+      CALL FUNCTION 'EQUIPMENT_CLASS_ALLOCATE'
+        EXPORTING
+          read_sequi         = ' '
+          eq_class           = 'OBJECTINFO'
+          eq_class_type      = '002'
+          update_new         = 'X'
+          commit_new         = 'S'
+        CHANGING
+          s_equi             = v_equi
+        EXCEPTIONS
+          err_class_allocate = 1
+          OTHERS             = 2.</pre>
+<h2>Tabellen und Views</h2>
+<h3 class="head2">EQUI</h3>
+<p>Haupttabelle für die Equipments</p>
+<h3 class="head2">EQKT</h3>
+<p>Texttabelle</p>
+<h3 class="head2">EQUZ</h3>
+<p>Zeitabhängige Zusatzdaten</p>
+<h3 class="head2">ILOA</h3>
+<p>Standortdaten. Verknüpfung über EQUZ-ILOAN</p>
+<h3 class="head2">EQUI_ADDR</h3>
+<p>Adreßview für Sammelsuchhilfe EQUI über ADRC &#8211; ILOA &#8211; EQUZ &#8211; EQKT</p>
+<h3 class="head2">V_EQUI</h3>
+<p>Technische Objekte PM; View über EQUI &#8211; EQUZ &#8211; EQKT &#8211; ILOA</p>
+<h3 class="head2">EQST</h3>
+<p>Verbindungstabelle Equipment &#8211; Stückliste</p>
+<h3 class="head2">EQBS</h3>
+<p class="text1">Bestandssegment</p>
+<p>Der Beitrag <a href="/blog/grundsaetzliches-2/">Grundsätzliches</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

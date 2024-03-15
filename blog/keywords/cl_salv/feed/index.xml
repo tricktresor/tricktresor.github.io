@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_salv Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_salv/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:54 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_salv Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Befehlsverkettung &#8211; Don&#8217;t try this at home!</title>
+		<link>/blog/befehlsverkettung-dont-try-this-at-home/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 14 Nov 2015 09:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[salv]]></category>
+		<category><![CDATA[Befehlsverkettung]]></category>
+		<category><![CDATA[cl_salv]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=339017</guid>
+
+					<description><![CDATA[<p>Eine kleine Spielerei mit funktionalen Aufrufen. Ich wollte wissen, ob man die Erzeugung eines SALV-Tables plus Anzeige in einen funktionalen Aufruf schreiben kann. Geklappt hat es nicht 100%ig, aber trotzdem interessant. Nicht zur Nachahmung geeignet. </p>
+<p>Der Beitrag <a href="/blog/befehlsverkettung-dont-try-this-at-home/">Befehlsverkettung &#8211; Don&#8217;t try this at home!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Den CL_SALV_TABLE kann man leider nicht &#8220;elegant&#8221; erzeugen. Darunter verstehe ich, dass man die SALV-Referenz per RECEIVING bekommt. Sobald ein Exporting- oder Changing-Parameter in der Methode verwendet wird, kann RETURNING nicht mehr benutzt werden.</p>
+<p>Der Aufruf ist zwar kompakt:</p>
+<pre>CALL METHOD cl_salv_table=&gt;factory
+ EXPORTING
+ r_container = gr_dock
+ IMPORTING
+ r_salv_table = gr_salv
+ CHANGING
+ t_table = gt_data.
+gr_salv-&gt;display( ).</pre>
+<p>aber man kann ihn nicht wie folgt verwenden:</p>
+<pre>cl_salv_table=&gt;factory( ... )-&gt;display( ).</pre>
+<p>Ich wollte nun wissen, ob man die Erzeugung eines SALV-Tables plus Anzeige trotzdem in einen funktionalen Aufruf schreiben kann. Geklappt hat es zwar, jedoch wiederum mit einem Nachteil.</p>
+<h2>Befehlsverkettung</h2>
+<p>Methoden von durch RETURNING übergebenen Objektreferenzen können direkt durch Befehlsverkettung ausgeführt werden.</p>
+<p>Dazu ein kleines Testprogramm mit einer FACTORY-Methode:</p>
+<pre>*----------------------------------------------------------------------*
+* CLASS lcl_test DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_test DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS factory RETURNING value(object) TYPE REF TO lcl_test.
+ METHODS show.
+ENDCLASS. "lcl_salv DEFINITION
+
+*----------------------------------------------------------------------*
+* CLASS lcl_salv IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_test IMPLEMENTATION.
+ METHOD factory.
+ CREATE OBJECT object.
+ ENDMETHOD. "factory
+
+ METHOD show.
+ MESSAGE 'Hallo' TYPE 'I'.
+ ENDMETHOD. "show
+
+ENDCLASS. "lcl_test IMPLEMENTATION</pre>
+<p>Normalerweise würde man die Methode SHOW folgendermaßen aufrufen:</p>
+<pre>DATA lr_test TYPE REF TO lcl_test.
+lr_test = lcl_test=&gt;factory( ).
+lr_test-&gt;show( ).</pre>
+<p>Durch Verwendung einer Befehlsverkettung kann der Aufruf wie folgt aussehen:</p>
+<pre>lcl_test=&gt;factory( )-&gt;show( ).</pre>
+<p>In diesem Umfang ist die Befehlsverkettung auch vertretbar. Sie kann jedoch Auswüchse annehmen, die ich nicht mehr warten möchte&#8230;</p>
+<h2>CL_SALV_TABLE</h2>
+<p>Zurück zum meinem eigentlich Problem: Die Anzeige des SALV-Grid mit einem Aufruf. Hindernis dabei ist, dass die SALV-Referenz eben nicht per RETURNING zurück gegeben wird, sondern als IMPORTING-Parameter.</p>
+<p>Ich schrieb also ein kleines Wrapper-Programm. Ich habe die Übergabe der einzelnen Parameter in einzelne Methoden ausgelagert um diese nacheinander &#8220;funktional&#8221; aufrufen zu können. Dafür muss die eigene Instanz jeweils an den Aufrufer übergeben werden.</p>
+<p>Auch dabei musste ich tricksen, denn die anzuzeigende Tabelle kann nicht als CHANGING übergeben werden. Ich musste deswegen mit einer Referenz auf die Tabelle arbeiten.</p>
+<pre> DATA gd_table TYPE REF TO data.
+ GET REFERENCE OF gt_data INTO gd_table.</pre>
+<p>Dadurch erreiche ich natürlich nicht das, was ich eigentlich wollte, nämlich <strong>einen</strong> kompakten Methodenaufruf. Immerhin: Der Aufruf sieht nun wirklich interessant aus:</p>
+<pre>lcl_salv=&gt;factory( )-&gt;set_table( gd_table )-&gt;create_grid( )-&gt;display( ).</pre>
+<p>DISPLAY ist hierbei bereits die Methode des SALV-Table, die durch CREATE_GRID erzeugt wird!</p>
+<p>Sicherlich nicht elegant, aber es lässt sich gut demonstrieren, wie die funktionalen Aufrufe funktionieren.</p>
+<p>Diese Methode ist selbstverständlich nur dann sinnvoll, wenn man sicher ist, dass man das SALV-Objekt nicht mehr benötigt, denn bei diesem Aufruf erzeugt man das Objekt, benutzt es, aber die Referenz darauf ist sofort wieder weg.</p>
+<h2>Code</h2>
+<pre>*----------------------------------------------------------------------*
+* CLASS lcl_salv DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_salv DEFINITION.
+ PUBLIC SECTION.
+ DATA mt_table TYPE REF TO data.
+ CLASS-METHODS factory RETURNING value(object) TYPE REF TO lcl_salv.
+ METHODS create_grid RETURNING value(salv) TYPE REF TO cl_salv_table.
+ METHODS set_table IMPORTING table TYPE REF TO data
+ RETURNING value(object) TYPE REF TO lcl_salv.
+ENDCLASS. "lcl_salv DEFINITION
+
+*----------------------------------------------------------------------*
+* CLASS lcl_salv IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_salv IMPLEMENTATION.
+ METHOD factory.
+ create object object.
+ ENDMETHOD. "factory
+
+ METHOD create_grid.
+
+ FIELD-SYMBOLS &lt;table&gt; TYPE ANY TABLE.
+ ASSIGN mt_table-&gt;* TO &lt;table&gt;.
+
+ CALL METHOD cl_salv_table=&gt;factory
+ IMPORTING
+ r_salv_table = salv
+ CHANGING
+ t_table = &lt;table&gt;.
+
+ ENDMETHOD. "factory
+
+ METHOD set_table.
+ mt_table = table.
+ object = me.
+ ENDMETHOD. "set_table
+ENDCLASS. "lcl_salv IMPLEMENTATION</pre>
+<p>Der Beitrag <a href="/blog/befehlsverkettung-dont-try-this-at-home/">Befehlsverkettung &#8211; Don&#8217;t try this at home!</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

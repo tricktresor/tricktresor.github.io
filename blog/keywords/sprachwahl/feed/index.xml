@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Sprachwahl Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/sprachwahl/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:50 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Sprachwahl Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Login in anderer Sprache</title>
+		<link>/blog/login-in-anderer-sprache/</link>
+					<comments>/blog/login-in-anderer-sprache/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 23 Aug 2016 14:08:09 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[DESTINATION]]></category>
+		<category><![CDATA[Remote Login]]></category>
+		<category><![CDATA[Sprache]]></category>
+		<category><![CDATA[Sprachwahl]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=789594</guid>
+
+					<description><![CDATA[<p>In einigen Firmen gibt es immer wieder das Problem, dass man sich schnell mal eine Maske in einer anderen Sprache anschauen möchte. Dafür muss man sich jedoch abmelden und in der anderen Sprache anmelden, da häufig Mehrfachanmeldungen verboten sind. Hier zeigen wir dir, wie du dir mit einem Funktionsbaustein behelfen kannst.</p>
+<p>Der Beitrag <a href="/blog/login-in-anderer-sprache/">Login in anderer Sprache</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einigen Firmen gibt es immer wieder das Problem, dass man sich <em>schnell mal</em> eine Maske in einer anderen Sprache anschauen möchte. Dafür muss man sich jedoch abmelden und in der anderen Sprache anmelden, da häufig Mehrfachanmeldungen verboten sind.</p>
+<p>Martin hat dafür einen kleinen Report gemacht:</p>
+<pre>REPORT ZLOGON_LANGUAGE.
+
+DATA lv_destination type RFCDEST.
+
+*== Sprachwahl über Transaktion herausfinden
+
+CONCATENATE sy-sysid sy-mandt '_' sy-tcode+2(2) into lv_destination.
+
+call function 'SYSTEM_REMOTE_LOGIN'
+ EXPORTING
+ SYSTEM = SY-SYSID
+ HOST = ' '
+ SERVICE = '00'
+ DESTINATION = lv_destination
+ EXCEPTIONS
+ CANNOT_START = 1
+ PARAMETER_INCOMPLETE = 2
+ OTHERS = 3.</pre>
+<p>Dieser Funktionsbaustein wird über die Transaktionen Z_EN, Z_FR usw. aufgerufen.</p>
+<p>Außerdem wurden in Transaktion SM59 RFC-Verbindungen eingerichtet, die immer wie folgt lauten:<br />
+SysidMandt_Sprache, Z.B. T01901_EN</p>
+<p>Unter Anmeldung und Sicherheit im SM59 gibt man dann die Sprache an und hakt aktuellen Benutzer an. Das ist alles. Schon funktioniert es. Mit aufrufen der Transaktion öffnet sich ein neues Fenster in der gewünschten Sprache .</p>
+<p>Vielen Dank, Martin!</p>
+<p>Der Beitrag <a href="/blog/login-in-anderer-sprache/">Login in anderer Sprache</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/login-in-anderer-sprache/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

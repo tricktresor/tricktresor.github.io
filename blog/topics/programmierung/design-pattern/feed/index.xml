@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Entwurfsmuster Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/programmierung/design-pattern/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:00 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Entwurfsmuster Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Iterator [Design Pattern]</title>
+		<link>/blog/iterator-design-pattern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 02 Feb 2016 22:21:45 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Entwurfsmuster]]></category>
+		<category><![CDATA[Design Pattern]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=466738</guid>
+
+					<description><![CDATA[<p>Design Pattern. Da hilft nur: Selber machen. Dieses Mal stelle ich euch den Iterator vor. Auf Deutsch hört es sich etwas blöd an: Der Wiederholer. Nicht sehr geläufig, aber wenn man den Iterator braucht, ist es gut zu wissen, wie er funktioniert.</p>
+<p>Der Beitrag <a href="/blog/iterator-design-pattern/">Iterator [Design Pattern]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Es bleibt mir eigentlich nur das Abschreiben von ABAP-Guru Naimesh: <a href="http://zevolving.com/2012/01/abap-objects-design-patterns-iterator/">Iterator Pattern</a></p>
+<p>Ich kann kein UML, deswegen verweise ich auf die exzellent aufbereitete Seite von Naimesh.</p>
+<p>Aber damit ich auch was dazu lerne, habe ich mit <a href="https://www.yworks.com/products/yed">yEd</a> das Diagramm einfach mal abgezeichnet:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/02/dp_iterator.jpg" rel="attachment wp-att-466805"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-466805" src="https://tricktresor.com/wp-content/uploads/2016/02/dp_iterator.jpg" alt="dp_iterator" width="926" height="305" srcset="/wp-content/uploads/2016/02/dp_iterator.jpg 926w, /wp-content/uploads/2016/02/dp_iterator-300x99.jpg 300w, /wp-content/uploads/2016/02/dp_iterator-768x253.jpg 768w" sizes="(max-width: 926px) 100vw, 926px" /></a></p>
+<h2>Was macht der Iterator?</h2>
+<p>Der Iterator &#8211; Wiederholer &#8211; ist ein Entwurfsmuster, das dazu verwendet werden kann, mehrere identische Objekte zu verwalten. Der Zugang zu den einzelnen Objekten erfolgt inder Regel über die Methode GET_NEXT in einer Schleife um alle Elemente abzuarbeiten. Der Zugriff kann ebenfalls über eine Index erfolgen. Ob ein Iterator noch zu bearbeitende Elemente hat, wird über die Methode HAS_NEXT abgefragt.</p>
+<h2>Verwendungsmöglichkeiten</h2>
+<p>Das Iterator-Pattern lässt sich immer dann gut verwenden, wenn ein Objekte mehrere Unterobjekte enthält, deren Anzahl unterschiedlich sein kann. Das Open-Source-Projekt ABAP2XLS verwendet den Iterator beispielsweise für die Verwaltung von Sheets, Styles oder Ranges.</p>
+<p>Der Iterator lässt sich also immer dann gut benutzen, wenn ein Objekt eine unterschiedliche Anzahl von Objekten hat. Neue Objekte werden dann mittels <em>add( object )</em> zu einer <em>Collection</em> hinzugefügt.</p>
+<h2>Unterstützung durch SAP</h2>
+<p>SAP unterstützt die Verwendung des Iterator Pattern durch die Klassen CL_OBJECT_COLLECTION_ITERATOR und CL_OBJECT_COLLECTION. Die beiden Klassen werden in dem Beispielprogramm verwendet.</p>
+<p>Im Gegensatz zu Naimesh denke ich jedoch nicht, dass die von SAP zur Verfügung gestellten Klassen nutzlos sind. Sie lassen sich sehr gut verwenden, wie das unten gezeigte Beispiel beweist.</p>
+<h2>Beispiel</h2>
+<p>In dem folgenden Beispiel habe ich ein Objekt für einen Buchungskreis definiert (LCL_BUKRS) und alle Buchungskreise aus der Tabelle T001 eingelesen und zu einer Collection hinzugefügt. Die Abarbeitung erfolgt dann über eine Schleife, die Abfragt, ob noch Elemente vorhanden sind.</p>
+<p>Der Iterator besitzt keine Methode um den Index wieder auf &#8220;1&#8221; zu setzen. Um das zu erreichen, muss ein aktuelles ITERATOR-Objekt geholt werden.</p>
+<h2>Weitere Informationen</h2>
+<p>Ein Beispiel im SAP-Standard ist das Programm TCL_ITERATOR_EXAMPLE</p>
+<p>Das Beispiel benutzt eigene Klassen für die Iteratoren.</p>
+<pre>*&amp;---------------------------------------------------------------------*
+*&amp; This program is a short introduction in using the ABAP Foundation
+*&amp; classes CL_TCL_AGGREGATE and CL_TCL_ITERATOR.
+*&amp; The development of this classes was inspired by the book
+*&amp; "Design Patterns, Elements of Reusable Object-Oriented Software".
+*&amp; This example demonstrates the power of the Iterator design pattern
+*&amp; (and ABAP Objects too :-). Using the Iterator design pattern you are
+*&amp; able to design and develop robust programs with ability of easy
+*&amp; functionalty improvements. High performance programms with the main
+*&amp; focus to save every possible microsecond should use other concepts,
+*&amp; if the OOO (Object Orientation Overhead ;-) is an issue.
+*&amp;---------------------------------------------------------------------*</pre>
+<h2>Code</h2>
+<pre>REPORT zz_dp_iterator.
+
+CLASS lcl_bukrs DEFINITION.
+
+ PUBLIC SECTION.
+ DATA ms_t001 TYPE t001.
+ METHODS constructor IMPORTING bukrs TYPE bukrs.
+ METHODS get_info RETURNING VALUE(t001) TYPE t001.
+
+ENDCLASS.
+
+CLASS lcl_bukrs IMPLEMENTATION.
+ METHOD constructor.
+ SELECT SINGLE * FROM t001 INTO ms_t001 WHERE bukrs = bukrs.
+ ENDMETHOD.
+ METHOD get_info.
+ t001 = ms_t001.
+ ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_main DEFINITION.
+ PUBLIC SECTION.
+ METHODS start.
+ METHODS get_iterator RETURNING VALUE(itERATOR) TYPE REF TO CL_OBJECT_COLLECTION_ITERATOR.
+ METHODS GET_OBJECT IMPORTING INDEX TYPE I
+ RETURNING VALUE(OBJECT) TYPE REF TO OBJECT .
+
+ PROTECTED SECTION.
+ DATA MR_OBJECT_COLLECTION TYPE REF TO CL_OBJECT_COLLECTION.
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+
+ METHOD start.
+ DATA lr_bukrs TYPE REF TO lcl_bukrs.
+ DATA lt_bukrs TYPE STANDARD TABLE OF bukrs.
+ DATA lv_bukrs TYPE bukrs.
+ SELECT bukrs FROM t001 INTO TABLE lt_bukrs.
+ CREATE OBJECT mr_object_collection.
+
+ LOOP AT lt_bukrs INTO lv_bukrs.
+ CREATE OBJECT lr_bukrs EXPORTING bukrs = lv_bukrs.
+ mr_object_collection-&gt;add( lr_bukrs ).
+
+ ENDLOOP.
+ ENDMETHOD.
+
+ METHOD get_iterator.
+ iterator = mr_object_collection-&gt;if_object_collection~get_iterator( ).
+ ENDMETHOD.
+
+ METHOD get_object.
+ object = mr_object_collection-&gt;get( index ).
+ ENDMETHOD.
+
+ENDCLASS.
+
+DATA gr_main TYPE REF TO lcl_main.
+
+START-OF-SELECTION.
+ CREATE OBJECT gr_main.
+
+ DATA gr_iterator TYPE REF TO cl_object_collection_iterator.
+ DATA gr_bukrs TYPE REF TO lcl_bukrs.
+ DATA gv_butxt TYPE string.
+ DATA gv_index TYPE i.
+ DATA gv_bukrs TYPE bukrs.
+
+ gr_main-&gt;start( ).
+ gr_iterator = gr_main-&gt;get_iterator( ).
+ WHILE gr_iterator-&gt;has_next( ).
+ gr_bukrs ?= gr_iterator-&gt;get_next( ).
+ gv_butxt = gr_bukrs-&gt;get_info( )-butxt.
+ WRITE: / gv_butxt.
+ IF gv_butxt = 'SAP A.G.'.
+ gv_index = gr_iterator-&gt;get_index( ).
+ ENDIF.
+ ENDWHILE.
+
+
+ IF gv_index IS NOT INITIAL.
+ gr_bukrs ?= gr_main-&gt;get_object( gv_index ).
+ gv_bukrs = gr_bukrs-&gt;get_info( )-bukrs.
+ WRITE: / gv_bukrs COLOR COL_GROUP.
+ ENDIF.
+
+ gr_iterator = gr_main-&gt;get_iterator( ).
+
+ WHILE gr_iterator-&gt;has_next( ).
+ gr_bukrs ?= gr_iterator-&gt;get_next( ).
+ gv_butxt = gr_bukrs-&gt;get_info( )-butxt.
+ WRITE: / gv_butxt.
+ IF gv_butxt = 'SAP A.G.'.
+ gv_index = gr_iterator-&gt;get_index( ).
+ ENDIF.
+ ENDWHILE.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/iterator-design-pattern/">Iterator [Design Pattern]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAP und bunte Bilder &#8211; geht das?</title>
+		<link>/blog/sap-und-bunte-bilder-cl_gui_html_viewer/</link>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Wed, 12 Nov 2014 13:54:52 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Entwurfsmuster]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[cl_gui_html_viewer]]></category>
+		<category><![CDATA[MM]]></category>
+		<category><![CDATA[Diagramme]]></category>
+		<category><![CDATA[DOKU]]></category>
+		<category><![CDATA[google]]></category>
+		<category><![CDATA[Bilder]]></category>
+		<category><![CDATA[Charts]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5107</guid>
+
+					<description><![CDATA[<p>SAP ERP kann viel. Kleine Tabellen, große Tabellen ALV Tabellen und im NWBC auch neue PowerListen.<br />
+Sobald man Daten jedoch grafisch anzeigen möchte kommt recht schnell Ernüchterung ins Spiel. In diesem Artikel zeige ich, wie Daten einfach und trotzdem grafisch anspruchsvoll dargestellt werden können.</p>
+<p>Der Beitrag <a href="/blog/sap-und-bunte-bilder-cl_gui_html_viewer/">SAP und bunte Bilder &#8211; geht das?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>SAP ERP kann viel. Kleine Tabellen, große Tabellen ALV Tabellen und im NWBC auch neue PowerListen.<br />
+Sobald man Daten jedoch grafisch anzeigen möchte kommt recht schnell Ernüchterung ins Spiel.<br />
+Die Prognose bzw. MD04 Diagramme stammen wohl noch aus den frühen 90er Jahren.</p>
+<p>Im SAP Demo-Programm <strong>GRAPHICS_GUI_CE_DEMO </strong>sieht man ein Beispiel mit der Chart-Engine. Der Aufwand diese Diagramme richtig zu formatieren und einzubinden wird oftmals bei knappen Entwicklungsbudgets als erstes zusammengestrichen.</p>
+<p>Eine alternative Lösung um <em>unkritische</em> Daten optisch ansprechend zu verpacken ist die <a title="Google Charts" href="https://developers.google.com/chart/" target="_blank">Google-Chart API</a>.<br />
+Firmendaten an GOOGLE schicken?!? Es ist jedem selbst überlassen welche Daten wirklich übergeben werden.<br />
+01.01.2014 &#8211; 100<br />
+01.02.2014 &#8211; 80<br />
+01.03.2014 &#8211; 70<br />
+01.04.2014 &#8211; 100<br />
+01.05.2014 &#8211; 200<br />
+Datum + Zahl<br />
+Ob das Verkaufsmengen, Einkaufswerte,Anzahl  Mitarbeiter oder Umsatz in t€ ist kann man ja bequem über dem Diagramm im HTML ausgeben.<br />
+Google versichert zudem die übergebenen Daten nicht zu speichern oder auszuwerten. Wie weit man das glaubt sei wieder jedem selbst überlassen.</p>
+<p>Beispiele:</p>
+<figure id="attachment_5109" aria-describedby="caption-attachment-5109" style="width: 300px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/11/pie.png"><img decoding="async" class="size-medium wp-image-5109" src="https://tricktresor.com/wp-content/uploads/2014/11/pie-300x206.png" alt="Google Chart Pie Chart " width="300" height="206" srcset="/wp-content/uploads/2014/11/pie-300x206.png 300w, /wp-content/uploads/2014/11/pie.png 321w" sizes="(max-width: 300px) 100vw, 300px" /></a><figcaption id="caption-attachment-5109" class="wp-caption-text">Google Chart Pie Chart</figcaption></figure>
+<figure id="attachment_5110" aria-describedby="caption-attachment-5110" style="width: 300px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/11/line.png"><img decoding="async" class="size-medium wp-image-5110" src="https://tricktresor.com/wp-content/uploads/2014/11/line-300x156.png" alt="Google Chart Line Chart" width="300" height="156" srcset="/wp-content/uploads/2014/11/line-300x156.png 300w, /wp-content/uploads/2014/11/line.png 381w" sizes="(max-width: 300px) 100vw, 300px" /></a><figcaption id="caption-attachment-5110" class="wp-caption-text">Google Chart Line Chart</figcaption></figure>
+<figure id="attachment_5108" aria-describedby="caption-attachment-5108" style="width: 300px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2014/11/geo.png"><img loading="lazy" decoding="async" class="size-medium wp-image-5108" src="https://tricktresor.com/wp-content/uploads/2014/11/geo-300x176.png" alt="Google Chart Geo-Chart" width="300" height="176" srcset="/wp-content/uploads/2014/11/geo-300x176.png 300w, /wp-content/uploads/2014/11/geo.png 445w" sizes="(max-width: 300px) 100vw, 300px" /></a><figcaption id="caption-attachment-5108" class="wp-caption-text">Google Chart Geo Chart</figcaption></figure>
+<h2><strong>Hier ein konkretes Beispiel Coding zum Nachbauen:</strong></h2>
+<p>Ziel die MM Bestände der einzelnen Werke als Tortendiagramm darstellen.<br />
+Datengrundlage: MM Bestandsstatistik &#8211;&gt;S032</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/bestand_werk.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5114" src="https://tricktresor.com/wp-content/uploads/2014/11/bestand_werk-300x220.png" alt="bestand_werk" width="300" height="220" srcset="/wp-content/uploads/2014/11/bestand_werk-300x220.png 300w, /wp-content/uploads/2014/11/bestand_werk.png 461w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Das HTML Coding findet man <a href="https://developers.google.com/chart/interactive/docs/gallery/piechart" target="_blank">hier</a>.<br />
+HTML Kenntnisse sind sicherlich hilfreich. Es muss jedoch lediglich der rot markierte Bereich angepasst werden.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/HTML.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5112" src="https://tricktresor.com/wp-content/uploads/2014/11/HTML-300x196.png" alt="HTML" width="300" height="196" srcset="/wp-content/uploads/2014/11/HTML-300x196.png 300w, /wp-content/uploads/2014/11/HTML-624x409.png 624w, /wp-content/uploads/2014/11/HTML.png 977w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT zz_google_chart.
+*&amp;---------------------------------------------------------------------*
+*&amp; Report ZMM_HTML_TEST
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp; Kleines Testprogramm als Demo für CL_GUI_HTML_VIEWER
+*&amp; Dieser Report selektiert alle Bestände aus der Tabellen S032 (MM Statitik) und gibt das Ergebnis als Google Chart aus.
+*&amp; M&amp;Mler (AWI) 11/2014
+*&amp; Keine Garantie, kein Support, keine Kosten.
+*&amp;---------------------------------------------------------------------*
+
+define html.
+ ls_html = &amp;1. "HTML schreiben
+ APPEND ls_html TO lt_html. "An HTML Ausgabetabelle hängen
+end-OF-DEFINITION.
+
+TABLES: s032.
+TYPES: BEGIN OF ty_s032,
+ werks TYPE werks_d,
+ wbwbest TYPE wbwbest,
+ END OF ty_s032.
+"Daten
+DATA: gt_data TYPE TABLE OF ty_s032.
+"Für HTML ausgabe
+DATA: lt_html TYPE TABLE OF char255, "hier landet der HTMl Code drin
+ ls_html LIKE LINE OF lt_html, "eine zeile HTML Code
+ lo_container TYPE REF TO cl_gui_custom_container, "für die Ausgabe
+ lo_html_control TYPE REF TO cl_gui_html_viewer, "für die Ausgabe
+ lf_url(1024),
+ lf_lines TYPE i, " Anzahl Zeilen
+ lf_komma(1). "letzter Datensatz darf kein Komma haben
+FIELD-SYMBOLS: &lt;fs_data&gt; TYPE ty_s032.
+SELECT-OPTIONS: s_werks FOR s032-werks.
+
+START-OF-SELECTION.
+  "Alle Bestände je Werk aus der S032 summieren
+  SELECT werks SUM( wbwbest ) AS wbwbest
+    FROM s032
+    INTO CORRESPONDING FIELDS OF TABLE gt_data
+   WHERE werks IN s_werks
+     AND vrsio = '000'
+     GROUP BY werks .
+ "Sodele, itab gt_data ist gefüllt --&gt; Ausgabe als Kuchendiagramm.
+ "Das folgende Coding füllt den HTML Code in eine interne Tabelle.
+ "per ABAP macro wird der Code deutlich leserlicher
+   html `&lt;html&gt;`. "HTML schreiben
+   html ` &lt;head&gt;`. "HTML schreiben
+   html ` &lt;script type="text/javascript" src="https://www.google.com/jsapi"&gt;&lt;/script&gt;`.
+   html ` &lt;script type="text/javascript"&gt;`.
+   html ` google.load("visualization", "1", {packages:["corechart"]});`.
+   html ` google.setOnLoadCallback(drawChart);`.
+   html ` function drawChart() {`.
+   html ` var data = google.visualization.arrayToDataTable([`.
+ "Hier kommt der spannende Teil, in dem die "Nutzdaten" gefüllt werden
+   html ` ['Werk', 'Bestand'],`.
+   lf_lines = lines( gt_data ).
+ "jetzt per Loop die itab in JavaScript "umbauen"
+ "Der letzte Datensatz darf nicht mit Komma abgeschlossen werden, daher lf_komma
+   lf_komma = ','.
+   LOOP AT gt_data ASSIGNING &lt;fs_data&gt;.
+     IF sy-tabix = lf_lines. "letzter Datensatz? Dann kein Komma
+       FREE: lf_komma.
+     ENDIF.
+     ls_html = ` ['` &amp;&amp; &lt;fs_data&gt;-werks &amp;&amp; `', ` &amp;&amp; &lt;fs_data&gt;-wbwbest &amp;&amp; `] ` &amp;&amp; lf_komma.
+     append ls_html to lt_html.
+   ENDLOOP.
+   html ` ]);`.
+   html ` var options = {`.
+   html ` title: 'Hier kann ein Titel eingegeben werden'`.
+   html ` };`.
+   html ` var chart = new google.visualization.PieChart(document.getElementById('piechart'));`.
+   html ` chart.draw(data, options);`.
+   html ` }`.
+   html ` &lt;/script&gt;`.
+   html ` &lt;/head&gt;`.
+ "Ab hier kommt der BODY des HTML Dokuments. Wenn man keinen TITLE an die Grafik schickt, kann man dies hier im HTML machen
+   html ` &lt;body&gt;`.
+   html ` &lt;div id="piechart" style="width: 900px; height: 500px;"&gt;&lt;/div&gt;`.
+   html ` &lt;/body&gt;`.
+   html `&lt;/html&gt;`.
+
+   CREATE OBJECT lo_html_control
+     EXPORTING
+       parent = cl_gui_container=&gt;screen0.
+       lf_url = 'AWI.html'.
+   CALL METHOD lo_html_control-&gt;load_data
+     EXPORTING
+       url = lf_url
+     IMPORTING
+       assigned_url = lf_url
+     CHANGING
+       data_table = lt_html[].
+* HTML im VIEWER anzeigen
+   lo_html_control-&gt;show_url( lf_url ).
+ 
+  write space. "Dummy für SCREEN0
+</pre>
+<h3>Weitere Hinweise und Anregungen:</h3>
+<p>&#8211; Mit den Geo-Charts kann man nur anhand einer Postleitzahl und eines Wertes schöne Kartendarstellungen erzeugen. Darstellung der Kunden, Lieferanten Verkaufsaktionen usw.<br />
+&#8211; Die Charts können auch interaktiv &#8220;eingestellt&#8221; werden. In ABAP kann man die Java-Script Events abfangen. (Wenn ein talentierterer Entwickler als ich es bin mir ein Beispiel zukommen lässt, ergänze ich das gerne in dieser Doku)</p>
+<p>12.11.2014 AWI</p>
+<p>Der Beitrag <a href="/blog/sap-und-bunte-bilder-cl_gui_html_viewer/">SAP und bunte Bilder &#8211; geht das?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Warum Entwurfsmuster?</title>
+		<link>/blog/warum-entwurfsmuster/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 07 Mar 2014 14:25:51 +0000</pubDate>
+				<category><![CDATA[Entwurfsmuster]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[Zevolving]]></category>
+		<category><![CDATA[Muster]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4541</guid>
+
+					<description><![CDATA[<p>Entwurfsmuster (engl.: "Design Pattern") sind inzwischen ein nützliches Werkzeug in der Programmierung. Allerdings sind Entwurfsmuster teilweise sehr komplex, abstrakt und schwer zu erkennen. In der Tricktresor-Rubrik Entwurfsmuster möchte ich Entwurfsmuster selbst, Anwendungshinweise, Vor- und Nachteile und alles andere, was irgendwie mit Entwurfsmustern zu tun hat, sammeln.</p>
+<p>Der Beitrag <a href="/blog/warum-entwurfsmuster/">Warum Entwurfsmuster?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Entwurfsmuster (engl.: &#8220;Design Pattern&#8221;) sind inzwischen ein nützliches Werkzeug in der Programmierung. Allerdings sind Entwurfsmuster teilweise sehr komplex, abstrakt und schwer zu erkennen. In der Tricktresor-Rubrik <em>Entwurfsmuster</em> möchte ich Entwurfsmuster selbst, Anwendungshinweise, Vor- und Nachteile und alles andere, was irgendwie mit Entwurfsmustern zu tun hat, sammeln. Dass hierbei der Fokus auf SAP und ABAP liegt, ist hoffentlich selbstverständlich&#8230;?! <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<h2>Was ist ein Entwurfsmuster?</h2>
+<p>Entwurfsmuster sind Lösungen für definierte programmiertechnische Probleme. Ein Entwurfsmuster hat bestimmte Eigenschaften, die speziell für immer wiederkehrende Probleme in der Softwareentwicklung erdacht wurden.</p>
+<h2>Und was heißt das jetzt konkret?</h2>
+<p>Ich mag Vergleiche. Auch wenn nicht alles, was hinkt, ein Vergleich ist&#8230; Mein Vater hat mich früher immer genervt, wenn er alles bei Computern mit Autos verglichen hat. Aber selbst bei teilweise übel hinkenden Analogien kann man eine abstrakte Sache sehr  gut beschreiben.</p>
+<p>Ich versuche das mal nicht mit Autos, sondern mit Holz. Nehmen wir an, dass Holz die Programmiersprache ist und Softwareentwicklung das Tischlerhandwerk ist. Der Tischler kann mit Holz vieles bauen, was der Kunde wünscht: Carports, Tische, Bänke, Schränke usw. Für einige Wünsche reicht die Programmiersprache &#8220;Holz&#8221; unter Umständen nicht aus: Waschbecken, Auto, Mikrowelle.</p>
+<p>Aber bei den meisten alltäglichen Wünschen, reicht der Werkstoff Holz jedoch. Zudem weiß der Kunde meistens auch, dass er für seinen Wunsch einen Tischler (ABAP-Programmierer) bestellen muss. Damit der Tischler nicht jedes Mal neu forschen muss, wie er am besten die Beine eines Stuhles oder Tisches zusammen leimt, hat er dafür ein <em>Entwurfsmuster</em> gelernt. Das gibt dem Tischler die Sicherheit, dass die Beine stabil und robust sind.</p>
+<p>Und auch die realen Gegenstände in der Welt des Tischlers sind häufig Entwurfsmuster: Stuhl, Hocker, Tisch, Apothekerschrank, Carport, &#8230; Der Vorteil hierbei ist: Jeder weiß sofort, über was gesprochen wird und was für Eigenschaften das Objekt hat. Der Kunde muss dem Tischler nicht erklären, dass er &#8220;etwas haben möchte, worauf man sitzen kann&#8221;. Weder Tischler noch Kunde müssen sich Gedanken darüber machen, ob man vielleicht eine große Kiste nehmen könnte und ob das Objekt auch eine Last von 500 kg aushalten muss und auch nicht, ob es schwimmen können muss. Die Eigenschaften sind klar und alle Beteiligten können sich über Details unterhalten. Gegebenenfalls muss das Entwurfsmuster gewechselt werden, wenn bei den Details heraus kommt, dass noch andere Eigenschaften gefordert sind, die das bisherige Entwurfsmuster nicht leisten kann. In dem Beispiel mit dem Stuhl könnte man eventuell zum <em>Entwurfsmuster</em> Bank wechseln.</p>
+<h2>Historie</h2>
+<p>Die Entwurfsmuster gehen zurück auf die <a title="Gang Of Four | Wikipedia" href="http://de.wikipedia.org/wiki/Viererbande_(Softwareentwicklung)"><em>Gang Of Four</em></a>. Die vier &#8220;Bandenmitglieder&#8221; Erich Gamma, Richard Helm, Ralph Johnson und John Vlissides haben die Entwurfsmuster zwar nicht erfunden, aber sie waren die ersten, die die Muster in einem Katalog zusammen gefasst haben. Diese Sammlung von 1995 <a title="Design Patterns | amazon.de" href="http://www.amazon.de/Patterns-Elements-Reusable-Object-Oriented-Software/dp/0201633612/ref=sr_1_1?ie=UTF8&amp;qid=1394198450&amp;sr=8-1&amp;keywords=gang+of+four+design+pattern"><em>Design Patterns. Elements Of Reusable Object-Oriented Software</em></a> gehört mittlerweile zum Standardwerk in der Softwareentwicklung.</p>
+<h2>Vorteile</h2>
+<p>Zwei Vorteile von Entwurfsmustern sind bei dem Tischlerbeispiel bereits deutlich geworden:</p>
+<ul>
+<li>Eindeutigkeit: trotzdem ein Sachverhalt komplex ist, kann er mithilfe von Entwurfsmustern einfach dargestellt und diskutiert werden</li>
+<li>Erprobte Lösungen für wiederkehrende Aufgaben: Der Programmierer muss sich keine Gedanken machen, wie bestimmte Fragestellungen gelöst werden können. Er kann sich in der Werkzeugkiste Entwurfsmuster bedienen.</li>
+</ul>
+<p>Weitere Vorteile sind (abhängig vom Entwurfsmuster):</p>
+<ul>
+<li>leichte Erweiterbarkeit</li>
+<li>Wartbarkeit</li>
+<li>Flexibilität</li>
+<li>Vor- und Nachteile eines Entwurfsmusters sind im Voraus bekannt</li>
+</ul>
+<h2>Nachteile</h2>
+<p>Wo Licht ist, da ist auch Schatten. Entwurfsmuster sind teilweise extrem komplex und zudem höchst abstrakt. Das bedeutet für den Programmierer, dass er sich intensiv mit dem Thema &#8220;Entwurfsmuster&#8221; beschäftigen muss. Um wirklich gut mit Entwurfsmustern arbeiten zu können, müssen diese in Fleisch und Blut übergehen. Ich bin fast versucht zu sagen, dass man dabei eine höhere <em>Programmierer-Bewusstseinsebene</em> erreicht&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Entwurfsmuster sind schwer bis gar nicht zu erkennen. Wenn selbst ein einfaches Muster nicht durch den Namen &#8211; zum Beispiel als SINGLETON oder FACTORY &#8211; gekennzeichnet ist, ist es schwer, es als dieses zu erkennen. Da die Objekte eines Entwurfsmusters nicht zwingend zusammen hängen, sondern als einzelne Klassen durch das SAP-System geistern, ist es wichtig, dass diese erstens entsprechend gekennzeichnet und zweitens gut dokumentiert werden.</p>
+<h2>Fazit</h2>
+<p>Meines Erachtens führt für einen Entwickler, der seinen Job ernst nimmt, kein Weg mehr an Entwurfsmustern vorbei. Die Entwicklung im ABAP wird immer &#8220;Objekt lastiger&#8221;. Dementsprechend werden auch Entwurfsmuster wichtiger. Sie werden von der SAP eingesetzt und müssen vom ABAP-Entwickler benutzt werden.</p>
+<p>Auch sind die Zeiten vorbei, in der man sich zu jedem Problem eine eigene Lösung einfallen lassen musste. Es gibt viele ständig wiederkehrende Aufgabenstellungen, bei denen der Kunde wenig Verständnis zeigen wird, wenn man hierzu eine eigene Lösung entwickeln will.</p>
+<h2>Weitere Quellen</h2>
+<ul>
+<li><a title="Zevolving | Naimesh Patel" href="http://zevolving.com/category/abapobjects/oo-design-patterns/">ABAP-Blog: ZEVOLVING</a></li>
+<li><a title="SCN Blog | Igor Barbaric" href="http://scn.sap.com/people/igor.barbaric/blog">SCN Blog of Igor Barbaric</a></li>
+<li><a title="SCN | SAP contributors" href="http://search.sap.com/ui/scn#query=oo+abap+design+pattern&amp;startindex=1&amp;filter=scm_a_site%28scm_v_Site11%29&amp;filter=scm_a_modDate%28*%29&amp;timeScope=all">SCN-Beiträge zu ABAP OO Design Patterns</a></li>
+<li><a title="Pattern Library | Hillside" href="http://hillside.net/patterns/">Design Pattern Library</a></li>
+</ul>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/warum-entwurfsmuster/">Warum Entwurfsmuster?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

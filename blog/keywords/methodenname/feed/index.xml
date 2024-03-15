@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Methodenname Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/methodenname/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 14 Sep 2022 12:54:10 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Methodenname Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Classname Utilities</title>
+		<link>/blog/classname-utilities/</link>
+					<comments>/blog/classname-utilities/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 08 Dec 2016 13:46:15 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[klasse]]></category>
+		<category><![CDATA[Include]]></category>
+		<category><![CDATA[Klassenname]]></category>
+		<category><![CDATA[Methodenname]]></category>
+		<category><![CDATA[Methode]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=962285</guid>
+
+					<description><![CDATA[<p>Klassen sind inzwischen von ABAP nicht mehr wegzudenken. Die Verwaltung der Klassen erfolgt jedoch immer noch in INCLUDES. Diese Includes interessieren in der Regel niemanden. Hin und wieder tauchen diese Klassen-Include jedoch in Shortdumps auf. Der Name der Klasse selbst ist eindeutig aus dem Includenamen zu erkennen. Der Name der Methode jedoch nicht. Häufig gibt es zwar auch die zusätzlich notwendige Information, um welche Methode es sich handelt, aber das ist nicht immer der Fall.</p>
+<p>Der Beitrag <a href="/blog/classname-utilities/">Classname Utilities</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Klassen sind inzwischen von ABAP nicht mehr wegzudenken. Die Verwaltung der Klassen erfolgt jedoch immer noch in INCLUDES. Diese Includes interessieren in der Regel niemanden. Hin und wieder tauchen diese Klassen-Include jedoch in Shortdumps auf. Der Name der Klasse selbst ist eindeutig aus dem Includenamen zu erkennen. Der Name der Methode jedoch nicht. Häufig gibt es zwar auch die zusätzlich notwendige Information, um welche Methode es sich handelt, aber das ist nicht immer der Fall.</p>
+
+
+
+<p>Einzelne Includes sehen zum Beispiel so aus:</p>
+
+
+
+<pre class="wp-block-preformatted">CL_OO_CLASSNAME_SERVICE=======CCDEF
+CL_OO_CLASSNAME_SERVICE=======CCMAC
+CL_OO_CLASSNAME_SERVICE=======CCIMP
+CL_OO_CLASSNAME_SERVICE=======CCAU
+CL_OO_CLASSNAME_SERVICE=======CU
+CL_OO_CLASSNAME_SERVICE=======CO
+CL_OO_CLASSNAME_SERVICE=======CI
+CL_OO_CLASSNAME_SERVICE=======CP
+CL_OO_CLASSNAME_SERVICE=======CT
+CL_OO_CLASSNAME_SERVICE=======CS
+CL_OO_CLASSNAME_SERVICE=======CM001
+CL_OO_CLASSNAME_SERVICE=======CM002
+CL_OO_CLASSNAME_SERVICE=======CM003
+CL_OO_CLASSNAME_SERVICE=======CM004</pre>
+
+
+
+<h2 class="wp-block-heading">CL_OO_CLASSNAME_SERVICE</h2>
+
+
+
+<figure class="wp-block-image"><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-08_14-33-36.jpg"><img fetchpriority="high" decoding="async" width="709" height="392" src="https://tricktresor.com/wp-content/uploads/2016/12/2016-12-08_14-33-36.jpg" alt="" class="wp-image-962286" srcset="/wp-content/uploads/2016/12/2016-12-08_14-33-36.jpg 709w, /wp-content/uploads/2016/12/2016-12-08_14-33-36-300x166.jpg 300w" sizes="(max-width: 709px) 100vw, 709px" /></a></figure>
+
+
+
+<p>Um die einzelnen intern verwendeten Objekte (Includes) verwalten zu können, gibt es die Klasse CL_OO_CLASSNAME_SERVICE. Mit dieser Klasse kannst du herausfinden, welche Methode zu welchem Include gehört und umgekehrt.</p>
+
+
+
+<p>GET_METHOD_INCLUDE liefert zum Beispiel für die gleichnamige Methode den Includenamen&nbsp;CL_OO_CLASSNAME_SERVICE=======CM00B.</p>
+
+
+
+<p>Umgekehrt liefert die Methode GET_METHOD_BY_INCLUDE die Methode zum Includenamen.</p>
+
+
+
+<p>die Methode&nbsp;GET_ALL_CLASS_INCLUDES liefert eine komplette Liste der verwendeten Klassen-Includes.</p>
+
+
+
+<h2 class="wp-block-heading">Nummerierung</h2>
+
+
+
+<p>Interessant finde ich, dass die Methodenincludes nicht numerisch hochgezählt werden, sondern erst numerisch (1-9) und dann alphabetisch (A-Z). Bei einem drei-stelligen numerischen Feld, wie das verwendete (==CMnnn) würden 999 Methoden in eine Klasse passen. Eigentlich mehr als ausreichend, sollte man meinen.</p>
+
+
+
+<p>Die Nummerierung erfolgt übrigens in Funktionsbaustein&nbsp;SEO_METHOD_GENERATE_INCLUDE mit Hilfe des folgenden System-Calls:</p>
+
+
+
+<pre class="wp-block-preformatted">system-call&nbsp;create&nbsp;method&nbsp;mtdkey-cpdname&nbsp;of&nbsp;class&nbsp;mtdkey-clsname
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;include&nbsp;into&nbsp;filename.</pre>
+
+
+
+<p>Die Struktur FILENAME hat dann zum Beispiel folgenden Wert:</p>
+
+
+
+<figure class="wp-block-table"><table><thead><tr><td><strong>Komponente</strong></td><td><strong>Wert</strong></td></tr></thead><tbody><tr><td>ROOTNAME</td><td>ZCL_ABC=======================</td></tr><tr><td>CATEGORYA</td><td>C</td></tr><tr><td>CODEA</td><td>M001</td></tr><tr><td>CATEGORYB</td><td>&nbsp;</td></tr><tr><td>CODEB</td><td>&nbsp;</td></tr></tbody></table></figure>
+
+
+
+<h2 class="wp-block-heading">Alternative</h2>
+
+
+
+<p>Ebenfalls möglich ist die Verwendung von Klasse CL_OO_INCLUDE_NAMING. Auch hier bekommt man Informationen zu den Includes einer Klasse:</p>
+
+
+
+<pre class="wp-block-code"><code>data(cifref) = cl_oo_include_naming=>get_instance_by_cifkey( class_interface_id ).</code></pre>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/classname-utilities/">Classname Utilities</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/classname-utilities/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Welche Methode ist das eigentlich?</title>
+		<link>/blog/welche-methode-ist-das-eigentlich/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 18 Oct 2016 08:30:37 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Klassenname]]></category>
+		<category><![CDATA[Methodenname]]></category>
+		<category><![CDATA[Protokoll]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=878639</guid>
+
+					<description><![CDATA[<p>Heute ein wirklich kurzer Trick, um den Klassen- und Methodennamen der Methode heraus zu bekommen, in der man sich gerade befindet. Diese Information ist sehr nützlich, um genauere Protokolle zu schreiben oder dem Anwender oder Entwickler bessere Informationen bei einem Programmfehler geben zu können.</p>
+<p>Der Beitrag <a href="/blog/welche-methode-ist-das-eigentlich/">Welche Methode ist das eigentlich?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute ein wirklich kurzer Trick, um den Klassen- und Methodennamen der Methode heraus zu bekommen, in der man sich gerade befindet. Diese Information ist sehr nützlich, um genauere Protokolle zu schreiben oder dem Anwender oder Entwickler bessere Informationen bei einem Programmfehler geben zu können.</p>
+<p>Eine Einschränkung gibt es bei diesem Trick: Der Name der Methode kann leider bei einer <em>lokalen Klasse</em> nicht ermittelt werden.</p>
+<p>Achtung! Hier kommt er:</p>
+<p>Type-Pool BCB in den Eigenschaften der globalen Klasse bekannt geben:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-18_10-23-19.jpg"><img decoding="async" class="size-full wp-image-878640 aligncenter" src="https://tricktresor.com/wp-content/uploads/2016/10/2016-10-18_10-23-19.jpg" alt="2016-10-18_10-23-19" width="727" height="386" srcset="/wp-content/uploads/2016/10/2016-10-18_10-23-19.jpg 727w, /wp-content/uploads/2016/10/2016-10-18_10-23-19-300x159.jpg 300w" sizes="(max-width: 727px) 100vw, 727px" /></a></p>
+<p>In der Methode folgendes Coding aufrufen:</p>
+<pre class="lang:abap decode:true ">*== Klassennamen ermitteln
+bcb_constant_class_name.
+write: / 'Class:', class_name.
+
+*== Klassennamen-&gt;Methodenname ermitteln
+bcb_constant_method_name.
+write: / 'Method:', method_name.</pre>
+<h2>Das Original</h2>
+<p>Hier der Vollständigkeit halber das zu Grunde liegende Coding der beiden Makros aus dem Type-Pool BCB:</p>
+<h3>bcb_constant_class_name</h3>
+<pre class="lang:abap decode:true">data __class_descr__ type ref to cl_abap_typedescr.
+__class_descr__ = cl_abap_classdescr=&gt;describe_by_object_ref( me ).
+data class_name type string.
+class_name = __class_descr__-&gt;get_relative_name( ).</pre>
+<h3>bcb_constant_method_name</h3>
+<pre class="lang:abap decode:true">data __exception__ type ref to cx_bcb_exception.
+try.
+* force an exception...
+   raise exception type cx_bcb_exception
+         exporting area_code = '0' error_code = '0' msg = '0'.
+catch cx_bcb_exception into __exception__.
+*  ... caught right after
+  data __include__ type syrepid.
+__exception__-&gt;get_source_position( importing include_name = __include__ ).
+*   map include name to method name
+  data __program_name__ type programm.
+__program_name__ = __include__.
+  data __method__ type seocpdkey.
+  call function 'SEO_METHOD_GET_NAME_BY_INCLUDE'
+       exporting
+         progname = __program_name__
+       importing
+         mtdkey   = __method__.
+*  get class and method names
+*  data class_name  type string.
+*  class_name = __method__-CPDNAME.
+  data method_name type string.
+  concatenate __method__-clsname '-&gt;' __method__-cpdname into method_name.
+endtry.</pre>
+<p>[notice type=&#8217;info&#8217;]Weiterhin funktionieren tut natürlich auch der Trick mit <a href="https://tricktresor.com/blog/aktuelle-form-routine-ermitteln/">ABAP_CALLSTACK</a>.[/notice]</p>
+<p>Der Beitrag <a href="/blog/welche-methode-ist-das-eigentlich/">Welche Methode ist das eigentlich?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

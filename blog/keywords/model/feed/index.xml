@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Model Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/model/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 09 Nov 2017 18:16:20 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Model Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Simple Tree Model mit User-Object</title>
+		<link>/blog/simple-tree-model-mit-user-object/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 09 Nov 2017 18:16:20 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[cl_simple_tree_model]]></category>
+		<category><![CDATA[Tree-Control]]></category>
+		<category><![CDATA[Model]]></category>
+		<category><![CDATA[NEW]]></category>
+		<category><![CDATA[abap750]]></category>
+		<category><![CDATA[abap740]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018219</guid>
+
+					<description><![CDATA[<p>Baumdarstellungen sind immer eine Herausforderung. Allerdings eine spannende, finde ich. Mit der Klasse CL_SIMPLE_TREE_MODEL zeige ich, wie du einfach auf Informationen zu einem Knoten zugreifen kannst. </p>
+<p>Der Beitrag <a href="/blog/simple-tree-model-mit-user-object/">Simple Tree Model mit User-Object</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Bäume sind immer interessant, finde ich. Sie sind nicht so eintönig gleichmäßig wie die meisten Listen. Der CL_SIMPLE_TREE_MODEL hat jedoch zudem auch in der Programmierung eine schöne Besonderheit: Zu jedem Knoten kann die Instanz einer beliebigen Klasse übergeben werden. Mit der Methode NODE_GET_USER_OBJECT kann man sich dann die Instanz geben lassen und hiermit weiter arbeiten.</p>
+<h2>Tree-Ausgabe</h2>
+<p>Als Beispielaufgabe habe ich mir die folgende gestellt: Zeige alle Materialien zu einer Selektion nach Materialart unterteilt an. Also: Hauptknoten &#8211; Materialart &#8211; Materialien. Die Selektion der Daten erfolgt im Selektionsbild des Reports bei AT SELECTION-SCREEN. Auf unserem IDES-System haben ich nur ein paar Dutzend Materialien, da geht die Selektion zügig.</p>
+<p>Mit Doppelklick auf einen Eintrag soll &#8211; je nach Knotenart &#8220;Materialart&#8221; oder &#8220;Materialnummer&#8221; &#8211; die jeweilige Information ausgegeben werden. Es muss also bei dem Knoten &#8220;Materialart&#8221; eine andere Klasse verwendet werden, als bei der Knotenart &#8220;Materialnummer&#8221;.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/11/cl_simple_tree_model.png"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-1018221" src="https://tricktresor.com/wp-content/uploads/2017/11/cl_simple_tree_model.png" alt="" width="725" height="358" srcset="/wp-content/uploads/2017/11/cl_simple_tree_model.png 725w, /wp-content/uploads/2017/11/cl_simple_tree_model-300x148.png 300w" sizes="(max-width: 725px) 100vw, 725px" /></a></p>
+<p>Zusätzlich zur Demonstration des CL_SIMPLE_TREE_MODEL habe ich versucht, möglichst viele neue Sprachbefehle zu verwenden. Gerade bei der Verwendung des User-Objects macht der Befehl NEW zur Instantiierung einer Klasse die Programmierung wirklich elegant.</p>
+<h2>User-Object</h2>
+<p>für das User-Object habe ich eine Hauptklasse LCL_USER_OBJECT_MARA definiert:</p>
+<pre class="lang:abap decode:true">CLASS lcl_user_object_mara DEFINITION ABSTRACT.
+  PUBLIC SECTION.
+    DATA mara TYPE mara.
+    METHODS constructor IMPORTING i_mara TYPE mara.
+    METHODS get_text.
+ENDCLASS.
+
+CLASS lcl_user_object_mara IMPLEMENTATION.
+  METHOD constructor.
+    mara = i_mara.
+  ENDMETHOD.
+  METHOD get_text.
+    SELECT SINGLE maktx FROM makt INTO @DATA(text)
+     WHERE matnr = @mara-matnr
+       AND spras = @sy-langu.
+    IF sy-subrc = 0.
+      MESSAGE text TYPE 'I'.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.</pre>
+<p>Die Klasse hat nur das Attribut MARA, das bei der Erzeugung mitgegeben werden muss und die Methode GET_TEXT mit der ein Text zum Objekt ermittelt wird.</p>
+<p>Da ich die Klasse als ABSTRAKT definiert habe, kann ich diese Klasse nicht instantiieren. Das geht nur bei den von dieser Klasse abgeleiteten Klassen:</p>
+<pre class="lang:abap decode:true">CLASS lcl_user_object_mtart DEFINITION INHERITING FROM lcl_user_object_mara.
+  PUBLIC SECTION.
+    METHODS get_text REDEFINITION.
+ENDCLASS.
+CLASS lcl_user_object_mtart IMPLEMENTATION.
+  METHOD get_text.
+    MESSAGE |Materialart { mara-mtart }|  TYPE 'I'.
+  ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_user_object_matnr DEFINITION INHERITING FROM lcl_user_object_mara.
+  PUBLIC SECTION.
+ENDCLASS.</pre>
+<p>In der Klasse <em>MTART</em> redefiniere ich die Methode &#8220;GET_TEXT&#8221; um einen eigenen Text für <em>Materialart</em> zu bekommen.</p>
+<p>Die Klasse <em>MATNR</em> ist nur eine leere Hülle, da sie alles andere von der Hauptklasse erbt.</p>
+<p>Natürlich hätte ich auch zwei komplett unterschiedliche und voneinander unabhängige Klassen definieren können.</p>
+<h2>Hauptprogramm</h2>
+<p>Das Hauptprogramm besteht nur den Selektionsparametern und aus zwei Ereignissen:</p>
+<ol>
+<li>dem Ereignis INITIALIZATION, in dem ich den Docking-Container erzeuge und</li>
+<li>dem Ereignis AT SELECTION-SCREEN, in dem ich die Daten selektiere und den Baum erzeuge</li>
+</ol>
+<pre class="lang:abap decode:true">REPORT z_simple_tree_model.
+
+DATA s_mara TYPE mara.
+
+SELECT-OPTIONS s_matnr FOR s_mara-matnr.
+SELECT-OPTIONS s_mtart FOR s_mara-mtart.
+
+[...Klassendefinition...]
+
+INITIALIZATION.
+  lcl_main=&gt;create_docker( ).
+
+AT SELECTION-SCREEN.
+  TRY.
+      lcl_main=&gt;get_data( ).
+      lcl_main=&gt;create_tree( ).
+      lcl_main=&gt;add_nodes( ).
+    CATCH lcx_error.
+      MESSAGE 'Fehler bei Selektion' TYPE 'I'.
+  ENDTRY.</pre>
+<h2>Hauptklasse</h2>
+<p>Die Klasse LCL_MAIN, in der die Logik des Programms vorhanden ist, besteht aus diesen vier Methoden:</p>
+<ol>
+<li>Create_Docker</li>
+<li>Create_Tree</li>
+<li>Get_Data</li>
+<li>Add_Nodes</li>
+</ol>
+<p>Zusätzlich gibt es noch die Methode zur Ereignisbehandlung des Doppelklicks auf einen Knoten: Handle_Node_Double_Click.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/11/cl_simple_tree_model-se80.png"><img decoding="async" class="alignnone size-full wp-image-1018220" src="https://tricktresor.com/wp-content/uploads/2017/11/cl_simple_tree_model-se80.png" alt="" width="331" height="372" srcset="/wp-content/uploads/2017/11/cl_simple_tree_model-se80.png 331w, /wp-content/uploads/2017/11/cl_simple_tree_model-se80-267x300.png 267w" sizes="(max-width: 331px) 100vw, 331px" /></a></p>
+<h3>Create_Docker</h3>
+<p>So simple:</p>
+<pre class="lang:abap decode:true">    IF docker IS INITIAL.
+      docker = NEW #( side = cl_gui_docking_container=&gt;dock_at_bottom ratio = 50 ).
+    ENDIF.</pre>
+<p>&nbsp;</p>
+<h3>Get_Data</h3>
+<p>Ebenfalls nicht spektakulär:</p>
+<pre class="lang:abap decode:true">    SELECT * FROM mara INTO TABLE t_mara
+     WHERE matnr IN s_matnr
+       AND mtart IN s_mtart.
+    IF sy-subrc &gt; 0.
+      RAISE EXCEPTION TYPE lcx_error.
+    ENDIF.</pre>
+<p>Zur Fehlerbehandlung habe ich eine eigene Exception-class erstellt:</p>
+<pre class="lang:abap decode:true">CLASS lcx_error DEFINITION INHERITING FROM cx_no_check.
+ENDCLASS.</pre>
+<h3>Create_Tree</h3>
+<p>Bei der Erzeugung des CL_SIMPLE_TREE_MODEL bin ich auf die erste Hürde gestoßen, denn die Erzeugung des Control läuft etwas anders, als bei den meisten anderen GUI-Controls. Normalerweise instantiiert man das GUI-Control unter Angabe des Containers in das das Control eingefügt werden soll (Parameter PARENT). Nicht so bei dieser Klasse. Hier wird erst das Tree-Objekt erzeugt und danach mit der Methode CREATE_TREE_CONTROL an den PARENT-Container gehängt:</p>
+<pre class="lang:abap decode:true">    IF tree IS BOUND.
+      tree-&gt;delete_all_nodes( ).
+    ELSE.
+      tree   = NEW #( node_selection_mode = cl_simple_tree_model=&gt;node_sel_mode_single ).
+      tree-&gt;create_tree_control( EXPORTING parent = docker ).
+
+      tree-&gt;set_registered_events(
+              EXPORTING events = VALUE #(
+                 ( eventid = cl_simple_tree_model=&gt;eventid_node_double_click appl_event = space ) ) ).
+
+      SET HANDLER handle_node_double_click FOR tree.
+    ENDIF.
+
+    tree-&gt;add_node(
+             node_key = 'Root'                              "#EC NOTEXT
+             isfolder = 'X'
+             text     = 'Materialien zur Selektion' ).</pre>
+<p>Das Event Doppelklick wird hier ebenfalls registriert und der event handler dafür installiert. Zusätzlich wird der Hauptknoten ROOT eingefügt.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h3>Add_Nodes</h3>
+<p>Mit der Methode ADD_NODE des Tree-Controls werden einzelne Knoten in den Baum eingehängt. Immer unter Angabe des Knoten-ID, des übergeordneten Knotens, Text und ein paar anderen. An dieser Stelle kann das User-Object übergeben werden, dass dann zur Knoten-ID zur Verfügung steht:</p>
+<pre class="lang:abap decode:true">    DATA l_mtart TYPE mtart.
+
+    SORT t_mara BY mtart matnr.
+
+    LOOP AT t_mara INTO DATA(mara).
+
+      IF l_mtart &lt;&gt; mara-mtart.
+        l_mtart = mara-mtart.
+        "Knoten MATERIALART
+        tree-&gt;add_node(
+            node_key = CONV #( mara-mtart )
+            relative_node_key = 'Root'
+            relationship = cl_simple_tree_model=&gt;relat_last_child
+            isfolder = 'X'
+            text     = |Materialart { mara-mtart } |
+            user_object = NEW lcl_user_object_mtart( i_mara = mara ) ).
+      ENDIF.
+
+      "Knoten MATERIALNUMMER
+      tree-&gt;add_node(
+          node_key          = |{ mara-matnr ALPHA = OUT }|
+          relative_node_key = CONV #( mara-mtart )
+          relationship      = cl_simple_tree_model=&gt;relat_last_child
+          isfolder          = space
+          text              = |{ mara-matnr ALPHA = OUT }|
+          user_object       = NEW lcl_user_object_matnr( i_mara = mara ) ).
+
+    ENDLOOP.
+
+    tree-&gt;expand_root_nodes( ).</pre>
+<h2>Ereignisbehandler</h2>
+<p>Im Ereignisbehandler prüfen wir, welchen Objekttyp das User-Object hat, um gegebenenfalls anders reagieren zu können:</p>
+<pre class="lang:abap decode:true ">    DATA o_user_object_matnr TYPE REF TO lcl_user_object_matnr.
+    DATA o_user_object_mtart TYPE REF TO lcl_user_object_mtart.
+    DATA o_object TYPE REF TO object.
+
+    tree-&gt;node_get_user_object( EXPORTING node_key    = node_key
+                                IMPORTING user_object = o_object ).
+
+    IF o_object IS INSTANCE OF lcl_user_object_mtart.
+      o_user_object_mtart ?= o_object.
+      o_user_object_mtart-&gt;get_text( ).
+      EXIT.
+    ENDIF.
+
+    IF o_object IS INSTANCE OF lcl_user_object_matnr.
+      o_user_object_matnr ?= o_object.
+      o_user_object_matnr-&gt;get_text( ).
+      EXIT.
+    ENDIF.</pre>
+<p>In diesem Fall verwenden wir zwar für MTART und MATNR die gleiche Methode GET_TEXT, aber hier könnte man je Objekt eine andere Funktion ausführen. Falls im ABAP Release die Syntax IS INSTANCE OF noch nicht verfügbar ist, muss mit TRY &#8211; CATCH geprüft werden, ob der Cast zwischen OBJECT und User-Object erfolgreich war oder nicht:</p>
+<pre class="lang:abap decode:true ">    TRY.
+        o_user_object_matnr ?= o_object.
+        o_user_object_matnr-&gt;get_text( ).
+      CATCH cx_sy_move_cast_error.
+    ENDTRY.</pre>
+<h2>Das komplette Programm</h2>
+<pre class="lang:abap decode:true ">REPORT zdemo_simple_tree_model.
+
+
+DATA s_mara TYPE mara.
+
+SELECT-OPTIONS s_matnr FOR s_mara-matnr.
+SELECT-OPTIONS s_mtart FOR s_mara-mtart.
+
+CLASS lcx_error DEFINITION INHERITING FROM cx_no_check.
+ENDCLASS.
+
+CLASS lcl_user_object_mara DEFINITION ABSTRACT.
+  PUBLIC SECTION.
+    DATA mara TYPE mara.
+    METHODS constructor IMPORTING i_mara TYPE mara.
+    METHODS get_text.
+ENDCLASS.
+
+CLASS lcl_user_object_mara IMPLEMENTATION.
+  METHOD constructor.
+    mara = i_mara.
+  ENDMETHOD.
+  METHOD get_text.
+    SELECT SINGLE maktx FROM makt INTO @DATA(text)
+     WHERE matnr = @mara-matnr
+       AND spras = @sy-langu.
+    IF sy-subrc = 0.
+      MESSAGE text TYPE 'I'.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_user_object_mtart DEFINITION INHERITING FROM lcl_user_object_mara.
+  PUBLIC SECTION.
+    METHODS get_text REDEFINITION.
+ENDCLASS.
+
+CLASS lcl_user_object_mtart IMPLEMENTATION.
+  METHOD get_text.
+    MESSAGE |Materialart { mara-mtart }|  TYPE 'I'.
+  ENDMETHOD.
+ENDCLASS.
+CLASS lcl_user_object_matnr DEFINITION INHERITING FROM lcl_user_object_mara.
+  PUBLIC SECTION.
+ENDCLASS.
+
+
+
+CLASS lcl_main DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS get_data.
+    CLASS-METHODS create_tree.
+    CLASS-METHODS add_nodes.
+    CLASS-METHODS create_docker.
+    CLASS-METHODS handle_node_double_click
+      FOR EVENT node_double_click
+                  OF cl_simple_tree_model
+      IMPORTING node_key.
+
+    CLASS-DATA docker TYPE REF TO cl_gui_docking_container.
+    CLASS-DATA tree   TYPE REF TO cl_simple_tree_model.
+    CLASS-DATA t_mara TYPE STANDARD TABLE OF mara.
+    CLASS-DATA s_mara TYPE mara.
+
+ENDCLASS.
+
+CLASS lcl_main IMPLEMENTATION.
+  METHOD create_docker.
+    IF docker IS INITIAL.
+      docker = NEW #( side = cl_gui_docking_container=&gt;dock_at_bottom ratio = 50 ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD handle_node_double_click.
+
+    DATA o_user_object_matnr TYPE REF TO lcl_user_object_matnr.
+    DATA o_user_object_mtart TYPE REF TO lcl_user_object_mtart.
+    DATA o_object TYPE REF TO object.
+
+    tree-&gt;node_get_user_object( EXPORTING node_key    = node_key
+                                IMPORTING user_object = o_object ).
+
+    IF o_object IS INSTANCE OF lcl_user_object_mtart.
+      o_user_object_mtart ?= o_object.
+      o_user_object_mtart-&gt;get_text( ).
+      EXIT.
+    ENDIF.
+
+    IF o_object IS INSTANCE OF lcl_user_object_matnr.
+      o_user_object_matnr ?= o_object.
+      o_user_object_matnr-&gt;get_text( ).
+      EXIT.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD get_data.
+
+    SELECT * FROM mara INTO TABLE t_mara
+     WHERE matnr IN s_matnr
+       AND mtart IN s_mtart.
+    IF sy-subrc &gt; 0.
+      RAISE EXCEPTION TYPE lcx_error.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD create_tree.
+
+    IF tree IS BOUND.
+      tree-&gt;delete_all_nodes( ).
+    ELSE.
+      tree   = NEW #( node_selection_mode = cl_simple_tree_model=&gt;node_sel_mode_single ).
+      tree-&gt;create_tree_control( EXPORTING parent = docker ).
+
+      tree-&gt;set_registered_events(
+              EXPORTING events = VALUE #(
+                 ( eventid = cl_simple_tree_model=&gt;eventid_node_double_click appl_event = space ) ) ).
+
+      SET HANDLER handle_node_double_click FOR tree.
+    ENDIF.
+
+    tree-&gt;add_node(
+             node_key = 'Root'                              "#EC NOTEXT
+             isfolder = 'X'
+             text     = 'Materialien zur Selektion' ).
+
+  ENDMETHOD.
+
+  METHOD add_nodes.
+
+    DATA l_mtart TYPE mtart.
+
+    SORT t_mara BY mtart matnr.
+
+    LOOP AT t_mara INTO DATA(mara).
+
+      IF l_mtart &lt;&gt; mara-mtart.
+        l_mtart = mara-mtart.
+        "Knoten MATERIALART
+        tree-&gt;add_node(
+            node_key = CONV #( mara-mtart )
+            relative_node_key = 'Root'
+            relationship = cl_simple_tree_model=&gt;relat_last_child
+            isfolder = 'X'
+            text     = |Materialart { mara-mtart } |
+            user_object = NEW lcl_user_object_mtart( i_mara = mara ) ).
+      ENDIF.
+
+      "Knoten MATERIALNUMMER
+      tree-&gt;add_node(
+          node_key          = |{ mara-matnr ALPHA = OUT }|
+          relative_node_key = CONV #( mara-mtart )
+          relationship      = cl_simple_tree_model=&gt;relat_last_child
+          isfolder          = space
+          text              = |{ mara-matnr ALPHA = OUT }|
+          user_object       = NEW lcl_user_object_matnr( i_mara = mara ) ).
+      .
+
+    ENDLOOP.
+
+    tree-&gt;expand_root_nodes( ).
+
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+
+INITIALIZATION.
+  lcl_main=&gt;create_docker( ).
+
+AT SELECTION-SCREEN.
+  TRY.
+      lcl_main=&gt;get_data( ).
+      lcl_main=&gt;create_tree( ).
+      lcl_main=&gt;add_nodes( ).
+    CATCH lcx_error.
+      MESSAGE 'Fehler bei Selektion' TYPE 'I'.
+  ENDTRY.</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/simple-tree-model-mit-user-object/">Simple Tree Model mit User-Object</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

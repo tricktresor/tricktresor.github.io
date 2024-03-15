@@ -1,0 +1,227 @@
+*&---------------------------------------------------------------------*
+*& Report  ZSTW_UPL_DOWNL_AUFTRAG
+*&---------------------------------------------------------------------*
+
+report  zstw_upl_downl_auftrag.
+
+tables: e070.                                               "#EC NEEDED
+
+types: t_buffer type x.
+
+parameters: p_auftr type e070-trkorr       default 'SIEK900126'
+          , p_upl   radiobutton group task
+          , p_downl radiobutton group task default 'X'
+          .
+
+start-of-selection.
+  perform a_up_downl using p_auftr.
+
+
+*&---------------------------------------------------------------------*
+*&      Form  a_up_downl
+*&---------------------------------------------------------------------*
+form a_up_downl using im_auftr type e070-trkorr.
+
+  data: l_file_front_end type char100
+      , l_file_appl      type char100
+      , l_trans_verz     type char100
+      , l_file_auftrag   type char100
+      , l_verz_lokal     type char100 value 'C:\TEMP\'
+      .
+
+  call 'C_SAPGPARAM' id 'NAME'  field 'DIR_TRANS'
+                     id 'VALUE' field l_trans_verz.
+  write:/ 'Transport-Verzeichnis:', l_trans_verz.           "#EC NOTEXT
+
+  concatenate im_auftr+4 '.' im_auftr(3) into l_file_auftrag.
+  concatenate l_verz_lokal 'K'          l_file_auftrag into l_file_front_end.
+  concatenate l_trans_verz '\cofiles\K' l_file_auftrag into l_file_appl.
+  if l_file_appl(1) = '/'.
+    replace all occurrences of '\' in l_file_appl with '/'.
+  endif.
+  write:/ 'Server-Datei:', l_file_appl      color col_group. "#EC NOTEXT
+  write:/ 'Lokale Datei:', l_file_front_end color col_group. "#EC NOTEXT
+  if p_upl = 'X'.
+    perform a_upl_datei using l_file_appl l_file_front_end.
+  else.
+    perform a_downl_datei using l_file_appl l_file_front_end.
+  endif.
+
+  concatenate l_verz_lokal 'R'          l_file_auftrag into l_file_front_end.
+  concatenate l_trans_verz '\data\R'    l_file_auftrag into l_file_appl.
+  if l_file_appl(1) = '/'.
+    replace all occurrences of '\' in l_file_appl with '/'.
+  endif.
+  write:/ 'Server-Datei:', l_file_appl      color col_group. "#EC NOTEXT
+  write:/ 'Lokale Datei:', l_file_front_end color col_group. "#EC NOTEXT
+  if p_upl = 'X'.
+    perform a_upl_datei using l_file_appl l_file_front_end.
+  else.
+    perform a_downl_datei  using l_file_appl l_file_front_end.
+    perform a_downl_sapcar using im_auftr.
+  endif.
+
+endform.                    "a_up_downl
+
+
+*&---------------------------------------------------------------------*
+*&      Form  a_upl_datei
+*&---------------------------------------------------------------------*
+form a_upl_datei using im_file_appl im_file_front_end.
+
+  data: l_file_front_end type string
+      , lt_buffer        type t_buffer occurs 0 with header line
+      , l_filesize       type i
+      , l_strlen         type i
+      .
+
+  l_file_front_end = im_file_front_end.
+  call function 'GUI_UPLOAD'
+    exporting
+      filename                = l_file_front_end
+      filetype                = 'BIN'
+    importing
+      filelength              = l_filesize
+    tables
+      data_tab                = lt_buffer
+    exceptions
+      file_open_error         = 1
+      file_read_error         = 2
+      no_batch                = 3
+      gui_refuse_filetransfer = 4
+      invalid_type            = 5
+      no_authority            = 6
+      unknown_error           = 7
+      bad_data_format         = 8
+      header_not_allowed      = 9
+      separator_not_allowed   = 10
+      header_too_long         = 11
+      unknown_dp_error        = 12
+      access_denied           = 13
+      dp_out_of_memory        = 14
+      disk_full               = 15
+      dp_timeout              = 16
+      others                  = 17.
+  if sy-subrc <> 0.
+    message id sy-msgid type sy-msgty number sy-msgno with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    return.
+  endif.
+  write:/ l_filesize, 'Zeichen gelesen'.                    "#EC NOTEXT
+
+  open dataset im_file_appl for output in binary mode.
+  if sy-subrc <> 0.
+    write:/ 'Server-Datei kann nicht geöffnet werden!' color col_negative. "#EC NOTEXT
+    return.
+  endif.
+  loop at lt_buffer.
+    l_strlen = 1.
+    transfer lt_buffer to im_file_appl length l_strlen.
+  endloop.
+  close dataset im_file_appl.
+
+endform.                    "a_upl_datei
+
+
+*&---------------------------------------------------------------------*
+*&      Form  a_downl_sapcar
+*&---------------------------------------------------------------------*
+form a_downl_sapcar using im_auftr type e070-trkorr.
+
+  data: l_file_front_end type char100.
+
+  uline.
+  write:/ 'c:'.
+  write:/ 'cd \TEMP'.                                       "#EC NOTEXT
+  concatenate 'sapcar -cvf K'                               "#EC NOTEXT
+              im_auftr+4
+              '.CAR *'
+              im_auftr+4
+              '.' im_auftr(3)
+         into l_file_front_end.
+  write:/ l_file_front_end.
+  concatenate 'sapcar -tvf K'                               "#EC NOTEXT
+              im_auftr+4
+              '.CAR'
+         into l_file_front_end.
+  write:/ l_file_front_end.
+  write:/ ''.
+  uline.
+endform.                    "a_downl
+
+
+
+*&---------------------------------------------------------------------*
+*&      Form  a_downl_datei
+*&---------------------------------------------------------------------*
+form a_downl_datei using im_file_appl im_file_front_end.
+
+  data: l_file_front_end type string
+      , lt_buffer        type t_buffer occurs 0 with header line
+      , l_filesize       type i
+      .
+
+  open dataset im_file_appl in binary mode for input.
+  if sy-subrc <> 0.
+    write:/ 'Server-Datei kann nicht geöffnet werden!' color col_negative. "#EC NOTEXT
+    return.
+  endif.
+  l_filesize = 0.
+  do.
+    read dataset im_file_appl into lt_buffer.
+    if sy-subrc <> 0.
+      exit.
+    endif.
+    append lt_buffer.
+    l_filesize = l_filesize + 1.
+  enddo.
+  close dataset im_file_appl.
+  if l_filesize = 0.
+    write:/ 'Null Zeichen gelesen!' color col_negative.     "#EC NOTEXT
+  else.
+    write:/ l_filesize, 'Zeichen gelesen'.                  "#EC NOTEXT
+  endif.
+
+  l_filesize = 0.
+  l_file_front_end = im_file_front_end.
+  call function 'GUI_DOWNLOAD'
+    exporting
+      filename                = l_file_front_end
+      filetype                = 'BIN'
+    importing
+      filelength              = l_filesize
+    tables
+      data_tab                = lt_buffer
+    exceptions
+      file_write_error        = 1
+      no_batch                = 2
+      gui_refuse_filetransfer = 3
+      invalid_type            = 4
+      no_authority            = 5
+      unknown_error           = 6
+      header_not_allowed      = 7
+      separator_not_allowed   = 8
+      filesize_not_allowed    = 9
+      header_too_long         = 10
+      dp_error_create         = 11
+      dp_error_send           = 12
+      dp_error_write          = 13
+      unknown_dp_error        = 14
+      access_denied           = 15
+      dp_out_of_memory        = 16
+      disk_full               = 17
+      dp_timeout              = 18
+      file_not_found          = 19
+      dataprovider_exception  = 20
+      control_flush_error     = 21
+      others                  = 22.
+  if sy-subrc <> 0.
+    message id sy-msgid type sy-msgty number sy-msgno with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    return.
+  endif.
+  if l_filesize = 0.
+    write:/ 'Null Zeichen geschrieben!'.                    "#EC NOTEXT
+  else.
+    write:/ l_filesize, 'Zeichen geschrieben'.              "#EC NOTEXT
+  endif.
+
+endform.                    "a_downl_datei

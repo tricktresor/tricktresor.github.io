@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Business Documents Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/business-documents/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 27 Feb 2018 17:07:52 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Business Documents Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>BOR-Integration</title>
+		<link>/blog/bor-integration/</link>
+					<comments>/blog/bor-integration/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Feb 2010 18:51:46 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[DOI]]></category>
+		<category><![CDATA[Business Documents]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=539</guid>
+
+					<description><![CDATA[<p>In diesem Beispiel laden wir eine im BOR (Business Object Repository) gespeicherte Excel-Datei, ver&#228;ndern diese und Speichern sie als neues Dokument wieder im BOR ab. Dabei wird die Excel-Datei nicht auf dem PC zwischengespeichert. Stattdessen werden die entsprechenden Methoden der Desktop Office Integration verwendet.</p>
+<p>Der Beitrag <a href="/blog/bor-integration/">BOR-Integration</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beispiel laden wir eine im BOR (Business Object Repository) gespeicherte Excel-Datei, verändern diese und Speichern sie als neues Dokument wieder im BOR ab. Dabei wird die Excel-Datei nicht auf dem PC zwischengespeichert. Stattdessen werden die entsprechenden Methoden der Desktop Office Integration verwendet.</p>
+<p class="head1">Information</p>
+<p class="text1">Die in diesem Fall als Template verwendete Excel-Datei muss mithilfe der Transaktion <strong>OAER</strong> in das Business Objects Repository geladen werden!</p>
+<p class="text1"><strong><u>TIPP 1:</u></strong><br />
+Sie können auch eigene &#8220;Klassen&#8221; definieren. Um ZMYCLASS zu erstellen, rufen Sie die Transaktion <strong>SBDSV1</strong> auf und pflegen Sie den Eintrag ZMYCLASS und ordnen Sie den Objekttyp &#8220;OT&#8221; zu. Mit Transaktion <strong>SBDSV3 </strong>können Sie einen Text definieren.<br />
+<strong>Sie können auch einen Exit-Funktionsbaustein eintragen</strong>, wie z.B. DYNDOC_BDS_APPLICATION_EXIT, der bei PICTURES-OT hinterlegt ist. Wenn Sie Ihren eigenen Exit verwenden, können Sie z.B. das Hochladen bestimmter Dateitypen in bestimmten Klassen verhindern, automatisch Schlagworte hinzufügen oder zusätzlich wichtige Attribute abfragen.</p>
+<p class="text1"><strong><u>TIPP 2:</u></strong><br />
+In diesem Programmbeispiel wird die Exceldatei wieder unter dem Typ &#8220;BDS_SHEET &#8211; Tabellenvorlage&#8221; gespeichert. Sie können auch einen anderen Typen festlegen! Schauen Sie dazu in die Transaktion <strong>OAC2</strong>.</p>
+<p>&nbsp;</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true">REPORT ZZ_BOR_DOI_DEMO.
+
+*** Definition of Control references
+DATA cl_container   TYPE REF TO cl_gui_container.
+DATA cl_control     TYPE REF TO i_oi_container_control."OIContainerCtrl
+DATA cl_document    TYPE REF TO i_oi_document_proxy.   "Office Dokument
+DATA cl_spreadsheet TYPE REF TO i_oi_spreadsheet.       " Spreadsheet
+DATA gv_url         TYPE bds_uri.
+TYPE-POOLS: soi.
+
+*** Selection screen
+PARAMETER p_class  TYPE bds_clsnam DEFAULT 'ZMYCLASS'.
+PARAMETER p_cltyp  TYPE bds_clstyp DEFAULT 'OT'.
+PARAMETER p_tmpnam TYPE bds_typeid DEFAULT 'TEMPLATE'.
+PARAMETER p_newnam TYPE bds_typeid DEFAULT 'NewDocument_1'.
+
+START-OF-SELECTION.
+
+*** Get URL for desired template
+  PERFORM get_template_url CHANGING gv_url.
+
+*** Create document using DOI and load from BOR
+  PERFORM load_document USING gv_url.
+
+*** Save changed document as new document in BOR
+  PERFORM save_document_as.
+
+*** Clean up work
+  PERFORM cleanup.
+
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_template_url
+*&amp;---------------------------------------------------------------------*
+FORM get_template_url CHANGING cv_url.
+
+  DATA lt_uris TYPE STANDARD TABLE OF bapiuri.
+  DATA ls_uri  TYPE bapiuri.
+
+*** get URL for desired template
+  CALL FUNCTION 'BDS_BUSINESSDOCUMENT_GET_URL'
+    EXPORTING
+      classname       = p_class
+      classtype       = p_cltyp
+      object_key      = p_tmpnam
+    TABLES
+      uris            = lt_uris
+    EXCEPTIONS
+      OTHERS          = 7.
+
+*** if more versions exist, you might use the SIGNATURE parameter 
+*** to define the right version
+  READ TABLE lt_uris INTO ls_uri INDEX 1.
+  cv_url = ls_uri-uri.
+
+ENDFORM.                    "get_template_url
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  load_document
+*&amp;---------------------------------------------------------------------*
+FORM load_document USING iv_url.
+
+  TYPES: tyt_errors    TYPE STANDARD TABLE OF REF TO i_oi_error
+                             WITH NON-UNIQUE DEFAULT KEY.
+
+  DATA:  error         TYPE REF TO i_oi_error,
+         t_errors      TYPE tyt_errors,
+         ole_sheet     TYPE ole2_object,
+         ole_appl      TYPE ole2_object,
+         ole_cell      TYPE ole2_object,
+         lv_handle     TYPE cntl_handle.
+
+
+*** Create instance of OI
+  CALL METHOD c_oi_container_control_creator=&gt;get_container_control
+    IMPORTING
+      control = cl_control
+      error   = error.
+  APPEND error TO t_errors.
+
+*** init control
+  CALL METHOD cl_control-&gt;init_control
+    EXPORTING
+      inplace_enabled     = space
+      no_flush            = 'X'
+      r3_application_name = 'Demo BOR'
+      parent              = cl_container
+    IMPORTING
+      error               = error
+    EXCEPTIONS
+      OTHERS              = 2.
+  APPEND error TO t_errors.
+
+*** Get Documentproxy
+  CALL METHOD cl_control-&gt;get_document_proxy
+      EXPORTING
+          document_type      = 'Excel.Sheet'                " EXCEL
+*          document_type      = 'Word.Document'              " WORD
+          no_flush           = 'X'
+      IMPORTING
+          document_proxy     = cl_document
+          error              = error.
+  APPEND error TO t_errors.
+
+*** Load document from BOR
+  CALL METHOD cl_document-&gt;open_document
+    EXPORTING
+      document_title = 'Demo BOR'
+      document_url   = iv_url
+      no_flush       = 'X'
+      open_inplace   = space
+    IMPORTING
+      error          = error.
+  APPEND error TO t_errors.
+
+*** generate Spreadsheetinterface
+  CALL METHOD cl_document-&gt;get_spreadsheet_interface
+    EXPORTING
+      no_flush        = ' '
+    IMPORTING
+      error           = error
+      sheet_interface = cl_spreadsheet.
+  APPEND error TO t_errors.
+
+*** get handle of document for work with OLE
+  CALL METHOD cl_document-&gt;get_document_handle
+    EXPORTING
+      no_flush = 'X'
+    IMPORTING
+      error    = error
+      handle   = lv_handle.
+  APPEND error TO t_errors.
+
+*** get OLE application object
+  GET PROPERTY OF lv_handle-obj 'Application' = ole_appl.
+
+*** get OLE cell object
+  CALL METHOD OF ole_appl 'Cells' = ole_cell
+       EXPORTING
+          #1 = 1                                            "line
+          #2 = 5.                                           "column
+
+*** set cell value
+  SET PROPERTY OF ole_cell 'Value' = 'Document changed!'.
+
+*** get active sheet for other operations...
+  GET PROPERTY OF lv_handle-obj 'ActiveSheet' = ole_sheet.
+
+*** display errors
+  LOOP AT t_errors INTO error.
+    CALL METHOD error-&gt;raise_message
+      EXPORTING
+        type           = 'E'
+      EXCEPTIONS
+        message_raised = 1
+        flush_failed   = 2.
+  ENDLOOP.
+
+ENDFORM.                    " build_spreadsheet_interface
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  save_document_as
+*&amp;---------------------------------------------------------------------*
+FORM save_document_as .
+
+  DATA lt_uris       TYPE STANDARD TABLE OF bapiuri.
+  DATA ls_uri        TYPE bapiuri.
+  DATA lv_object_key TYPE bapibds01-objkey.
+  DATA lt_data       TYPE STANDARD TABLE OF bapiconten.
+  DATA lv_doc_size   TYPE i.
+  DATA lt_signature  TYPE STANDARD TABLE OF bapisignat.
+  DATA ls_signature  TYPE bapisignat.
+  DATA lt_components TYPE STANDARD TABLE OF bapicompon.
+  DATA ls_component  TYPE bapicompon.
+
+*** Save DOI document to internal table
+  CALL METHOD cl_document-&gt;save_document_to_table
+    CHANGING
+      document_size  = lv_doc_size
+      document_table = lt_data.
+
+*** fill signature
+  ls_signature-prop_name  = 'BDS_DOCUMENTTYPE'.           "#EC NOTEXT
+  ls_signature-prop_value = 'BDS_SHEET'.
+  APPEND ls_signature TO lt_signature.
+
+  ls_signature-prop_name  = 'BDS_DOCUMENTCLASS'.          "#EC NOTEXT
+  ls_signature-prop_value = 'XLS'.
+  APPEND ls_signature TO lt_signature.
+
+  ls_signature-prop_name  = 'DESCRIPTION'.                "#EC NOTEXT
+  ls_signature-prop_value = 'Tricktresor.de'.
+  APPEND ls_signature TO lt_signature.
+
+  ls_signature-prop_name  = 'LANGUAGE'.                   "#EC NOTEXT
+  ls_signature-prop_value = sy-langu.
+  APPEND ls_signature TO lt_signature.
+
+*** fill component info
+  CONCATENATE p_newnam '.xls' INTO ls_component-comp_id.
+  ls_component-mimetype    = 'application/vnd.ms-excel'.
+  ls_component-comp_size   = lv_doc_size.
+  APPEND ls_component TO lt_components.
+
+*** create new document from changed template
+  CALL FUNCTION 'BDS_BUSINESSDOCUMENT_CREA_TAB'
+    EXPORTING
+      classname       = p_class
+      classtype       = p_cltyp
+      client          = sy-mandt
+      object_key      = p_newnam
+    TABLES
+      signature       = lt_signature
+      components      = lt_components
+      content         = lt_data
+    EXCEPTIONS
+      OTHERS          = 7.
+  IF sy-subrc &lt;&gt; 0.
+    BREAK-POINT.
+  ENDIF.
+
+ENDFORM.                    " save_as
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  cleanup
+*&amp;---------------------------------------------------------------------*
+FORM cleanup.
+
+*** close document
+  CALL METHOD cl_document-&gt;close_document.
+
+*** destroy control
+  CALL METHOD cl_control-&gt;destroy_control
+    EXPORTING
+      no_flush = ' '.
+
+*** free objects
+  FREE cl_spreadsheet.
+  CLEAR: cl_spreadsheet.
+
+  IF NOT cl_document IS INITIAL.
+    CALL METHOD cl_document-&gt;release_document.
+  ENDIF.
+
+  FREE:  cl_document,
+         cl_control.
+
+  CLEAR: cl_document,
+         cl_control.
+
+ENDFORM.                    "cleanup</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/bor-integration/">BOR-Integration</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bor-integration/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dokumentationen</title>
+		<link>/blog/dokumentationen/</link>
+					<comments>/blog/dokumentationen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 25 Feb 2008 16:52:22 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Kleinigkeiten]]></category>
+		<category><![CDATA[Business Documents]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=457</guid>
+
+					<description><![CDATA[<p>Dokumentationen zu BDS und GOS</p>
+<p>Der Beitrag <a href="/blog/dokumentationen/">Dokumentationen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Dokumentationen zu BDS und GOS<br /><P>Generic Business Tools f&uuml;r Anwendungsentwickler (BC-SRV-GBT):</P><P><A href="http://help.sap.com/printdocu/core/Print46c/de/data/pdf/BCSRVGBT/BCSRVGBT_STRUCTURE.pdf" target="_blank" Target="_blank">http://help.sap.com/printdocu/core/Print46c/de/data/pdf/<BR>BCSRVGBT/BCSRVGBT_STRUCTURE.pdf</A></P><P>Generische Objektdienste:</P><P><A href="http://help.sap.com/printdocu/core/Print46c/de/data/pdf/BCSRVOBS/BCSRVOBS.pdf" target="_blank" Target="_blank">http://help.sap.com/printdocu/core/Print46c/de/data/pdf/<BR>BCSRVOBS/BCSRVOBS.pdf</A></P><P>Hilf- und Aufschlu&szlig;reich&nbsp;ist auch der OSS-Hinweis 530792:<BR><A href="https://service.sap.com/sap/support/notes/530792" target="_blank" Target="_blank">https://service.sap.com/sap/support/notes/530792</A></P><P>Hier gibt es eine ausf&uuml;hrliche Beschreibung, wie GOS in eigene Programme einzubinden ist:</P><P><A href="http://www.sdn.sap.com/irj/scn/go/portal/prtroot/docs/library/uuid/0e6b0d95-0a01-0010-4696-ca0a48de5fb3?QuickLink=index&amp;overridelayout=true" target="_blank" Target="_blank">http://www.sdn.sap.com/irj/scn/go/portal/prtroot/docs/library/uuid/0e6b0d95-0a01-0010-4696-ca0a48de5fb3?QuickLink=index&amp;overridelayout=true</A></P></p>
+<p>Der Beitrag <a href="/blog/dokumentationen/">Dokumentationen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokumentationen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid mit Logo</title>
+		<link>/blog/alv-grid-mit-logo/</link>
+					<comments>/blog/alv-grid-mit-logo/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 Feb 2007 13:39:37 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[BDS]]></category>
+		<category><![CDATA[Business Documents]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=399</guid>
+
+					<description><![CDATA[<p>Ein im BDS gespeichertes Bild k&#246;nnen Sie im Header eines ALV-Grid anzeigen lassen. Das hier vorgestellte Programm macht dies.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-mit-logo/">ALV-Grid mit Logo</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein im BDS gespeichertes Bild k&ouml;nnen Sie im Header eines ALV-Grid anzeigen lassen. Das hier vorgestellte Programm macht dies.<br /><P><TABLE class="tblimg" cellPadding="0" align="left"><TBODY><TR><TD vAlign="top"><P><IMG src="/wp-content/uploads/tt_images/BDS/alv_logo.jpg"><BR>ALV-Grid mit Logo</P></TD></TR></TBODY></TABLE></P><P class="head1">Coding</P><P class="sap1">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp; Anzeige ALV-Grid mit Logo<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>REPORT&nbsp; z_alv_logo.</P><P class="sap1">TYPE-POOLS: slis.</P><P class="sap1"><FONT color="#fb2412">*** Variablen<BR></FONT>DATA:<BR>&nbsp; gt_t005t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE STANDARD TABLE OF t005t.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*** Beispieldaten lesen</FONT><BR>&nbsp; SELECT * FROM t005t INTO TABLE gt_t005t WHERE landx LIKE &#8216;D%&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** ALV-Grid anzeigen</FONT><BR>&nbsp; CALL FUNCTION &#8216;REUSE_ALV_GRID_DISPLAY&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_callback_program&nbsp;&nbsp;&nbsp;&nbsp; = sy-cprog<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_callback_top_of_page = &#8216;CALLBACK_TOP_OF_PAGE&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_structure_name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;T005T&#8217;<BR>&nbsp;&nbsp;&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; t_outtab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gt_t005t<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; program_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; callback_top_of_page<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM callback_top_of_page.</P><P class="sap1"><FONT color="#fb2412">*** Datendeklaration f&uuml;r den Listenkopf</FONT><BR>&nbsp; DATA lt_listheader TYPE slis_t_listheader.<BR>&nbsp; DATA ls_listheader TYPE slis_listheader.</P><P class="sap1"><FONT color="#fb2412">*** &Uuml;berschrift</FONT><BR>&nbsp; CLEAR ls_listheader.<BR>&nbsp; ls_listheader-typ = &#8216;H&#8217;.<BR>&nbsp; ls_listheader-key = &#8216;wird nicht angezeigt&#8217;.<BR>&nbsp; ls_listheader-info = &#8216;Information&#8217;.<BR>&nbsp; APPEND ls_listheader TO lt_listheader.<BR><FONT color="#fb2412">*** Zus&auml;tzliche Information</FONT><BR>&nbsp; CLEAR ls_listheader.<BR>&nbsp; ls_listheader-typ = &#8216;S&#8217;.<BR>&nbsp; ls_listheader-key = &#8216;Quelle&#8217;.<BR>&nbsp; ls_listheader-info = &#8216;www.Tricktresor.de&#8217;.<BR>&nbsp; APPEND ls_listheader TO lt_listheader.<BR><FONT color="#fb2412">*** Zus&auml;tzliche Information</FONT><BR>&nbsp; CLEAR ls_listheader.<BR>&nbsp; ls_listheader-typ = &#8216;A&#8217;.<BR>&nbsp; ls_listheader-key = &#8216;Wird nicht angezeigt&#8217;.<BR>&nbsp; ls_listheader-info = &#8216;Bitte alle Informationen vertraulich behandeln!&#8217;.<BR>&nbsp; APPEND ls_listheader TO lt_listheader.</P><P class="sap1"><FONT color="#fb2412">*** Listenkopf setzen</FONT><BR>&nbsp; CALL FUNCTION &#8216;REUSE_ALV_COMMENTARY_WRITE&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it_list_commentary = lt_listheader<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i_logo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;ENJOYSAP_LOGO&#8217;.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;top</P></p>
+<p>Der Beitrag <a href="/blog/alv-grid-mit-logo/">ALV-Grid mit Logo</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/alv-grid-mit-logo/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Auf Dokument zugreifen</title>
+		<link>/blog/auf-dokument-zugreifen/</link>
+					<comments>/blog/auf-dokument-zugreifen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 Feb 2007 13:25:31 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[BDS]]></category>
+		<category><![CDATA[Business Documents]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=398</guid>
+
+					<description><![CDATA[<p>Mit diesem kurzen Programm zeigen wir Ihnen, wie Sie an das im BDS gespeicherte Bild kommen und es auf dem Dynpro ausgeben.</p>
+<p>Der Beitrag <a href="/blog/auf-dokument-zugreifen/">Auf Dokument zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit diesem kurzen Programm zeige ich dir, wie du an das im BDS gespeicherte Bild kommst und es auf dem Dynpro ausgeben kannst.</p>
+<p>Eigene Bilder speicherst du mit der Transaktion OAER.</p>
+<h2 class="head1">Info</h2>
+<p>Zu dem folgenden Programm musst du ein Dynpro mit CustomControl anlegen. Doppelklicke dazu auf &#8220;5000&#8221; bei der Anweisung CALL SCREEN 5000.</p>
+<p>In der Elementliste des Dynpros trage zum Typ &#8220;OK&#8221; das Feld &#8220;SY-UCOMM&#8221; ein.</p>
+<h2>Ablauflogik</h2>
+<p>Die Ablauflogik sieht wie folgt aus:</p>
+<p class="sap1">PROCESS BEFORE OUTPUT.<br />
+MODULE STATUS_5000.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE USER_COMMAND_5000.</p>
+<p>Im Module &#8220;<strong>STATUS_5000</strong>&#8221; müssen Sie noch mit Doppelklick auf <strong>&#8220;5000&#8221;</strong> bei der Anweisung &#8220;<strong>SET PF-STATUS &#8216;5000&#8217;</strong>&#8221; den GUI-Status anlegen. Tragen Sie zu den Funktionscodes für den grünen Pfeil zurück, den gelben Pfeil nach oben und das rote Kreuz jeweils &#8220;BACK&#8221; ein.</p>
+<p><u><strong>Hinweis:<br />
+</strong></u>Zu einem BDS-Objekt (p_pic) können mehrere Objekte gespeichert werden. Die Methode GET_WITH_URL liefert in dem Fall mehrere URLs zurück.<br />
+Um Informationen zu den enthaltenen Dokumenten zu erhalten, benutzen Sie bitte die Methode cl_bds_document_set=&gt;<strong>GET_INFO</strong>.</p>
+<h2 class="head1">Ergebnis</h2>
+<table class="tblimg" cellpadding="0" align="left">
+<tbody>
+<tr>
+<td valign="top"><img decoding="async" src="/wp-content/uploads/tt_images/BDS/bdspic.jpg" alt="" /><br />
+Anzeige eines Bildes aus dem BDS</td>
+</tr>
+</tbody>
+</table>
+<h2 class="head1">Code</h2>
+<p class="sap1">REPORT  z_bds_pic_show.</p>
+<p class="sap1">PARAMETERS p_pic TYPE bds_typeid DEFAULT &#8216;ENJOYSAP_LOGO&#8217;.</p>
+<p class="sap1">
+START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*** Benötigte Variablen</span><br />
+DATA:<br />
+lref_cont TYPE REF TO cl_gui_custom_container,<br />
+lref_img  TYPE REF TO cl_gui_picture,<br />
+lt_url    TYPE TABLE OF bapiuri,<br />
+ls_url    TYPE          bapiuri.</p>
+<p class="sap1">
+IF lref_cont IS INITIAL.<br />
+<span style="color: #fb2412;">*** Container erzeugen<br />
+*** Der Name des CustomControls auf dem Dynpro heisst &#8220;PICTURE&#8221;</span><br />
+CREATE OBJECT lref_cont<br />
+EXPORTING<br />
+container_name              = &#8216;PICTURE&#8217; .<br />
+<span style="color: #fb2412;">*** Picture Control erzeugen</span><br />
+CREATE OBJECT lref_img<br />
+EXPORTING<br />
+parent = lref_cont.<br />
+<span style="color: #fb2412;">*** Ermitteln der URL zum Bild</span><br />
+CALL METHOD cl_bds_document_set=&gt;get_with_url<br />
+EXPORTING<br />
+classname  = &#8216;PICTURES&#8217;<br />
+classtype  = &#8216;OT&#8217;<br />
+object_key = p_pic<br />
+CHANGING<br />
+uris       = lt_url.<br />
+<span style="color: #fb2412;">*** Ermittelte URL lesen</span><br />
+READ TABLE lt_url INTO ls_url INDEX 1.<br />
+<span style="color: #fb2412;">*** &#8230;und in das PictureControl laden</span><br />
+CALL METHOD lref_img-&gt;load_picture_from_url<br />
+EXPORTING<br />
+url    = ls_url-uri<br />
+EXCEPTIONS<br />
+OTHERS = 1.<br />
+ENDIF.</p>
+<p class="sap1">  CALL SCREEN 5000.</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Module  USER_COMMAND_5000  INPUT<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+</span>MODULE user_command_5000 INPUT.</p>
+<p class="sap1">  IF sy-ucomm = &#8216;BACK&#8217;.<br />
+SET SCREEN 0. LEAVE SCREEN.<br />
+ENDIF.</p>
+<p class="sap1">ENDMODULE.                 &#8221; USER_COMMAND_5000  INPUT</p>
+<p class="sap1"><span style="color: #fb2412;">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<br />
+*&amp;      Module  STATUS_5000  OUTPUT<br />
+*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</span><br />
+MODULE status_5000 OUTPUT.</p>
+<p class="sap1">  SET PF-STATUS &#8216;5000&#8217;.</p>
+<p class="sap1">ENDMODULE.                 &#8221; STATUS_5000  OUTPUT</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/auf-dokument-zugreifen/">Auf Dokument zugreifen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/auf-dokument-zugreifen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dokument anlegen</title>
+		<link>/blog/dokument-anlegen/</link>
+					<comments>/blog/dokument-anlegen/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 Feb 2007 12:13:47 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Business Documents]]></category>
+		<category><![CDATA[BDS]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=397</guid>
+
+					<description><![CDATA[<p>Eine einfache Anleitung zum Speichern eines Bildes im Business Documents Server (BDS). Das Bild kann dann in einem ALV-Grid als Kopfinformation angezeigt werden.</p>
+<p>Der Beitrag <a href="/blog/dokument-anlegen/">Dokument anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine einfache Anleitung zum Speichern eines Bildes im Business Documents Server (BDS). Das Bild kann dann in einem ALV-Grid als Kopfinformation angezeigt werden.<br /><P class="head1">1. Schritt</P><P>Transaktion OAER starten.</P><P>Selektionsparameter:</P><P>Klassenname &#8220;PICTURES&#8221; <BR>Klassentyp &#8220;OT&#8221; <BR>Objektschl&uuml;ssel &#8220;Z_MEIN_BILD1&#8221; </P><P class="head1">2. Schritt</P><P class="text1">In der unteren Bildschirmh&auml;lfte alles vollst&auml;ndig expandieren und beim Knoten &#8220;Bild&#8221; einen rechten Mausklick machen und dann &#8220;Datei importieren&#8221; w&auml;hlen. Suchen Sie das Bild, dass Sie im BDS speichern m&ouml;chten.</P><P class="head1">3. Schritt</P><P>&#8220;OK&#8221; dr&uuml;cken und Bild verlassen. </P><P class="head1"><BR>4. Schritt</P><P>Schritt 1 wiederholen.&nbsp;Das importierte Bild wird angezeigt. <BR>Men&uuml;punkt: <EM>Dokument &#8211; Transportieren</EM> auch noch w&auml;hlen, damit das Ganze via Transport auch ins Produktivsystem gelangt.</P></p>
+<p>Der Beitrag <a href="/blog/dokument-anlegen/">Dokument anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dokument-anlegen/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

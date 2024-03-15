@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Vertrieb Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/module/vertrieb/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 15 May 2023 12:15:20 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Vertrieb Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Auftragserfassung: Automatische (Positions-) Texte</title>
+		<link>/blog/auftragserfassung-automatische-positions-texte/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 17 May 2022 11:45:55 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[SAVE_TEXT]]></category>
+		<category><![CDATA[READ_TEXT]]></category>
+		<category><![CDATA[INIT_TEXT]]></category>
+		<category><![CDATA[COMMIT_TEXT]]></category>
+		<category><![CDATA[Langtext]]></category>
+		<category><![CDATA[ITF]]></category>
+		<guid isPermaLink="false">/?p=1035891</guid>
+
+					<description><![CDATA[<p>Über Langtexte im SAP wird oft geschimpft, da sie aus historischen Gründen umständlicher verwaltet werden, als man es aktuell tun würde. Dieser Artikel soll eine kurze Übersicht über Texte im Allgemeinen und die Verwendung von Langtexten im SAPMV45A-Umfeld.</p>
+<p>Der Beitrag <a href="/blog/auftragserfassung-automatische-positions-texte/">Auftragserfassung: Automatische (Positions-) Texte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In der Auftragserfassung (Modulpool SAPMV45A) sollen bei Auftragsanlage oder -änderung kundenindividuelle Texte definiert werden. </p>
+
+
+
+<h2 class="wp-block-heading">Standard-Textfindung</h2>
+
+
+
+<p>Im Standard lässt sich bereits eine umfangreiche Textfindung einstellen. Hier geht es jedoch darum, Texte aus anderen Objekten (Vorgängerbelegen, Kunden, Materialien, &#8230;) zu finden und zu übernehmen.</p>
+
+
+
+<p>Ausgangspunkt ist die Transaktion VOFM, Menü <em>Kopierbedingungen • Texte</em> oder <em>Datenübernahme • Texte</em>. Hier kannst du Bedingungen programmieren und zuordnen, die den gewünschten Text ermitteln.</p>
+
+
+
+<h2 class="wp-block-heading">Textverwaltung in SAP</h2>
+
+
+
+<p>In diesem Artikel geht es darum, individuelle Texte in eine Auftragsposition zu bekommen. Um das zu realisieren, muss man wissen, wie die Textverwaltung im SAP funktioniert. Darum hier ein kurzer Abriss zu den SAP-Langtexten.</p>
+
+
+
+<p>Standardlangtexte können in der Transaktion SO10 erstellt und bearbeitet werden. Zur Bearbeitung hast die Auswahl zwischen dem uralten Zeilen-Editor und dem PC-Editor, der zwischenzeitlich durch Microsoft Word abgelöst wurde.</p>
+
+
+
+<h3 class="wp-block-heading">Absatzformate</h3>
+
+
+
+<p>Ein SAP-Langtext oder auch SAP-Script- oder ITF-Text, besteht aus einem Absatzformat und einer Zeile. Absatzformate können in <em>Stilen </em>definiert und zugeordnet werden (Transaktion SE72).</p>
+
+
+
+<p>Das Sternchen * ist das Standardabsatzformat. Steht das * in der Spalte Absatzformat, dann erfolgt auf jeden Fall ein Zeilenumbruch. Bei einem Fließtext ist das Absatzformat leer.</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="682" height="501" src="/wp-content/uploads/2022/05/image.png" alt="" class="wp-image-1035903" srcset="/wp-content/uploads/2022/05/image.png 682w, /wp-content/uploads/2022/05/image-300x220.png 300w" sizes="(max-width: 682px) 100vw, 682px" /><figcaption class="wp-element-caption">Alter Zeileneditor</figcaption></figure>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="908" height="650" src="/wp-content/uploads/2022/05/image-1.png" alt="" class="wp-image-1035904" srcset="/wp-content/uploads/2022/05/image-1.png 908w, /wp-content/uploads/2022/05/image-1-300x215.png 300w, /wp-content/uploads/2022/05/image-1-768x550.png 768w, /wp-content/uploads/2022/05/image-1-240x172.png 240w" sizes="(max-width: 908px) 100vw, 908px" /><figcaption class="wp-element-caption">Microsoft Word Editor</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Felder</h3>
+
+
+
+<p>Um einen Text eindeutig zu identifizieren, sind die folgenden Felder notwendig:</p>
+
+
+
+<figure class="wp-block-table"><table><thead><tr><th>Feldname</th><th>Beschreibung</th><th>Infos</th></tr></thead><tbody><tr><td>TDOBJECT</td><td>Textobjekt</td><td>Definiert den Anwendungsbereich. Standardtexte haben das Textobjekt TEXT, Auftragskopftexte VBBK und Auftragspositionstexte VBBP, Materialstamm hat MATERIAL und MVKE. Textobjekte werden mit Hilfe der Transaktion SE75 definiert. Für eigene Anwendungen können im Kundennamensraum eigene Objekte definiert werden.</td></tr><tr><td>TDNAME</td><td>Textname</td><td>Der Textname besteht bei Texten zu Anwendungsobjekten (Aufträge, Kunden, Materialien, etc.) aus den Schlüsselfeldern der zugehörigen Tabelle. Beispiel: Vertriebstext Material (MVKE): &lt;matnr&gt;&lt;vkorg&gt;&lt;vtweg&gt;</td></tr><tr><td>TDID</td><td>Text-ID</td><td>Die Id definiert Texte innerhalb eines Text-Objektes. Sie muss im Customizing definiert werden (Transaktion SE75).</td></tr><tr><td>TDSPRAS</td><td>Sprache</td><td>Sprache des Textes.</td></tr></tbody></table><figcaption class="wp-element-caption">Schlüsselfelder STXH</figcaption></figure>
+
+
+
+<h3 class="wp-block-heading">Speicherort</h3>
+
+
+
+<p>Die Texte werden in den Tabellen STXH (Kopfdaten) und STXL (Textzeilen) gespeichert. Die Tabelle STXH kann man in der Tabellenanzeige (Transaktion SE16n) einsehen. In der STXL werden die Textzeilen jedoch komprimiert gespeichert und können nicht angesehen werden.</p>
+
+
+
+<h3 class="wp-block-heading">Texte lesen</h3>
+
+
+
+<p>Um Texte einzulesen, solltest du den Funktionsbaustein READ_TEXT verwenden. Um Texte zu suchen, kannst du direkt die Tabelle STXH durchsuchen oder du verwendest den Funktionsbaustein SELECT_TEXT.</p>
+
+
+
+<h3 class="wp-block-heading">Speichern von Texten</h3>
+
+
+
+<p>Die Speicherung von Texten erfolgt mit Hilfe des Funktionsbausteins SAVE_TEXT. Diesem Baustein müssen die Schlüsselfelder übergeben werden. Wenn man weiß, dass der Text noch nicht existiert, dann sollte aus Performancegründen der Parameter <code>INSERT = X</code> gesetzt werden. Möchte man den Text in einer eigenen Anwendung sofort sichern, so kann der Parameter <code>SAVEMODE_DIRECT = X</code> gesetzt werden. Beim Speichern von mehreren Texten sollte der Funktionsbaustein COMMIT_TEXT verwendet werden.</p>
+
+
+
+<p>Mit dem Funktionsbaustein INIT_TEXT können Texte angelegt werden. </p>
+
+
+
+<p>Funktionsbaustein DELETE_TEXT löscht vorhandene Texte.</p>
+
+
+
+<h3 class="wp-block-heading">Zentrales Textmemory</h3>
+
+
+
+<p>Die Textverwaltung hat ein zentrales Memory. Aus diesem Grund sollte immer mit den entsprechenden Funktionsbausteinen auf die Texte zugegriffen werden. Der READ_TEXT liest den Text aus dem Textmemory, sofern vorhanden.</p>
+
+
+
+<h2 class="wp-block-heading">Textverwaltung SAPMV45A</h2>
+
+
+
+<p>Kommen wir nun endlich zum Ausgangsthema zurück: Programmatische Bearbeitung von Texten in der Auftragsbearbeitung (Modulpool SAPMV45A). Du solltest wegen des zentralen Textmemories zur Bearbeitung immer die oben beschriebenen Funktionsbausteine verwenden. So kannst du in der Transaktion den Baustein READ_TEXT verwenden, um zu prüfen, ob bereits ein Auftragskopftext zu einer bestimmten ID oder zu einer Position schon ein Text angelegt wurde, auch wenn diese noch nicht auf der Datenbank gespeichert wurde.</p>
+
+
+
+<p>Eine separate Speicherung ist nicht notwendig bzw. sogar verboten -, denn die Speicherung erfolgt zentral durch die Applikation. Wird die Transaktion abgebrochen, dann werden die Texte auch nicht gespeichert.</p>
+
+
+
+<p><strong>Auf keinen Fall darfst du im Baustein SAVE_TEXT den Parameter SAVEMODE_DIRECT setzen, den Baustein COMMIT_TEXT oder COMMIT WORK verwenden! Das wird von der Applikation SAPMV45A beim Sichern gemacht!</strong></p>
+
+
+
+<p>Verwendest du doch einen COMMIT in den Exits, dann riskierst du einen Datenschiefstand und Fehlfunktionen von BAPIs.</p>
+
+
+
+<h3 class="wp-block-heading">Codebeispiel</h3>
+
+
+
+<p>In folgendem Code-Beispiel wird der Text zu einem neu eingegebenen Material aus dem Literal &#8220;ARKTX:&#8221; und dem aktuellen Artikeltext erstellt.</p>
+
+
+
+<p></p>
+
+
+
+<pre class="EnlighterJSRAW" data-enlighter-language="generic" data-enlighter-theme="" data-enlighter-highlight="" data-enlighter-linenumbers="" data-enlighter-lineoffset="" data-enlighter-title="" data-enlighter-group="">FORM userexit_move_field_to_vbap.
+  DATA ls_header     TYPE thead.
+  DATA lt_lines      TYPE STANDARD TABLE OF tline.
+
+  IF vbap-vbeln IS INITIAL.
+    ls_header-tdname   = 'XXXXXXXXXX' &amp;&amp; vbap-posnr.
+  ELSE.
+    ls_header-tdname   = vbap-vbeln &amp;&amp; vbap-posnr.
+  ENDIF.
+  ls_header-tdobject = 'VBBP'.
+  ls_header-tdid     = '0001'.
+  ls_header-tdspras  = sy-langu.
+  CALL FUNCTION 'READ_TEXT'
+    EXPORTING
+      id        = ls_header-tdid
+      language  = ls_header-tdspras
+      name      = ls_header-tdname
+      object    = ls_header-tdobject
+      local_cat = space
+    IMPORTING
+      header    = ls_header
+    TABLES
+      lines     = lt_lines
+    EXCEPTIONS
+      OTHERS    = 8.
+  IF sy-subrc &lt;> 0.
+    lt_lines = VALUE #( ( tdformat = '*' tdline = |test { vbap-arktx }| ) ).
+    CALL FUNCTION 'SAVE_TEXT'
+      EXPORTING
+        header          = ls_header
+        insert          = abap_true
+        savemode_direct = space
+        local_cat       = space
+      TABLES
+        lines           = lt_lines
+      EXCEPTIONS
+        OTHERS          = 5.
+  ENDIF.
+
+ENDFORM.</pre>
+<p>Der Beitrag <a href="/blog/auftragserfassung-automatische-positions-texte/">Auftragserfassung: Automatische (Positions-) Texte</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Preisfindung im Kundenauftrag von außen anstossen</title>
+		<link>/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Mar 2017 20:25:15 +0000</pubDate>
+				<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_SALESORDER_CHANGE]]></category>
+		<category><![CDATA[Vertriebsbeleg]]></category>
+		<category><![CDATA[Preisfindung]]></category>
+		<category><![CDATA[SAPMV45A]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017958</guid>
+
+					<description><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus: Userexit in SAPMV45A anpassen Parameter setzen BAPI aufrufen Parameter zurücknehmen Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:...</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beitrag zeige ich dir, wie du die Preisfindung eines Kundenauftrags neu ausführen lassen kannst. Das grundsätzliche Verfahren sieht so aus:</p>
+<ol>
+<li>Userexit in SAPMV45A anpassen</li>
+<li>Parameter setzen</li>
+<li>BAPI aufrufen</li>
+<li>Parameter zurücknehmen</li>
+</ol>
+<p>Um die Preisfindung von außen triggern zu können, musst du Änderungen im Programm SAPMV45A durchführen. Zuerst benötigst du jedoch die Möglichkeit, einen Parameter zur Laufzeit zu setzen, der dann im SAPMV45A abgefragt werden kann. Das kann gut über eine der beiden Methoden erfolgen:</p>
+<ol>
+<li>EXPORT TO MEMORY und IMPORT FROM MEMORY</li>
+<li>Öffentliches Attribut der eigenen globalen Klasse</li>
+</ol>
+<h2>Anlage der globalen Klasse</h2>
+<p>Als erstes musst du eine Klasse anlegen mit der die neue Preisfindung durchgeführt werden soll. In meinem Beispiel heißt sie ZCL_SD_NP (New Pricing).</p>
+<p>Lege das öffentliche Klassenattribut KNPRS vom Typ KNPRS an (static). Das ist die Preisfindungsart, mit der die Art der neuen Preisfindung gesteuert werden kann.</p>
+<h2>Quelltext (relevanter Teil ) in MV45AFZB:</h2>
+<pre class="">FORM userexit_new_pricing_vbap CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL.  
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBAP</pre>
+<pre class="">FORM userexit_new_pricing_vbkd CHANGING new_pricing.
+  IF zcl_sd_np=&gt;knprs IS NOT INITIAL. 
+     new_pricing = zcl_sd_np=&gt;knprs.
+   ENDIF.
+ENDFORM.                    "USEREXIT_NEW_PRICING_VBKD</pre>
+<h2>Quelltext Klasse</h2>
+<p>Nun brauchen wir noch die Methode TRIGGER_NEW_PRICING</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png"><img decoding="async" class="size-full wp-image-1017959 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png" alt="" width="776" height="177" srcset="/wp-content/uploads/2017/03/zcl_sd_np-e1490818768143.png 776w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-300x68.png 300w, /wp-content/uploads/2017/03/zcl_sd_np-e1490818768143-768x175.png 768w" sizes="(max-width: 776px) 100vw, 776px" /></a></p>
+<pre class="">DATA: 
+  ls_bapisdh1x  TYPE bapisdh1x,
+  lt_pos        TYPE STANDARD TABLE OF bapisditm WITH NON-UNIQUE DEFAULT KEY,
+  lt_posx       TYPE STANDARD TABLE OF bapisditmx WITH NON-UNIQUE DEFAULT KEY,
+  lt_return     TYPE bapiret2_t.
+FIELD-SYMBOLS: 
+  &lt;ls_pos&gt;      LIKE LINE OF lt_pos,
+  &lt;ls_posx&gt;     LIKE LINE OF lt_posx.
+
+
+CLEAR ct_bapiret2.
+knprs = iv_knprs.
+*--------------------------------------------------------------------*
+* Get all positions to be redermined
+*--------------------------------------------------------------------*
+SELECT posnr AS itm_number werks AS plant
+INTO CORRESPONDING FIELDS OF TABLE lt_pos
+FROM vbap
+WHERE vbeln = iv_vbeln_va.
+
+LOOP AT lt_pos ASSIGNING &lt;ls_pos&gt;.
+APPEND INITIAL LINE TO lt_posx ASSIGNING &lt;ls_posx&gt;.
+&lt;ls_posx&gt;-itm_number = &lt;ls_pos&gt;-itm_number.
+&lt;ls_posx&gt;-updateflag = 'U'.
+ENDLOOP.
+
+ls_bapisdh1x-updateflag = 'U'.
+CALL FUNCTION 'BAPI_SALESORDER_CHANGE'
+  EXPORTING
+    salesdocument    = iv_vbeln_va
+    order_header_inx = ls_bapisdh1x
+  TABLES
+    return           = ct_bapiret2
+    order_item_in    = lt_pos
+    order_item_inx   = lt_posx
+  EXCEPTIONS
+    ERROR_MESSAGE = 1.
+
+CLEAR knprs.  " Only once
+
+TRY.
+    DATA(ls_return) = ct_bapiret2[ type = 'E' ].
+    CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
+    RAISE EXCEPTION TYPE zcx_my_exception.
+  CATCH CX_SY_ITAB_LINE_NOT_FOUND.
+    CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+ENDTRY.
+</pre>
+<p>Durch Aufruf der Methode ZCL_SD_NP=&gt;TRIGGER_NEW_PRICING( &#8230; ) kannst du nun einen Beleg dazu bewegen, eine neue Preisfindung durchzuführen.</p>
+<p>Der Beitrag <a href="/blog/preisfindung-im-kundenauftrag-von-aussen-anstossen/">Preisfindung im Kundenauftrag von außen anstossen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Kundenfelder in BAPI-Struktur füllen</title>
+		<link>/blog/kundenfelder-in-bapi-struktur-fuellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 18 May 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[BAPI_SALESORDER_CREATEFROMDAT2]]></category>
+		<category><![CDATA[EXTENSION]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=631934</guid>
+
+					<description><![CDATA[<p>Ein kleiner Überblick über das Befüllen von kundeneigenen Feldern im BAPI_SALESORDER_CREATEFROMDAT2. Hier gehe ich speziell auf die Zuweisung der Feldstruktur zu dem EXTENSION-Container ein. </p>
+<p>Der Beitrag <a href="/blog/kundenfelder-in-bapi-struktur-fuellen/">Kundenfelder in BAPI-Struktur füllen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Das Befüllen von Kundeneigenen Feldern in einem BAPI stellt einen häufig vor Probleme. Ich stelle dir hier eine kurze Doku mit Beispielcoding vor, um Kundenfelder korrekt und beschwerdefrei übergeben zu können.<br>Als Beispiel verwenden ich den BAPI_SALESORDER_CREATEFROMDAT2 zum Anlegen von Kundenaufträgen.</p>
+
+
+
+<h2 class="wp-block-heading">Vorbedingung BAPE_VBAK</h2>
+
+
+
+<p>Alle kundeneigenen Felder, die mittels APPEND an die Kopfstruktur VBAK angehängt wurden, müssen ebenfalls in einem APPEND an die Struktur BAPE_VBAK appendiert werden. Hierbei ist es wichtig, dass die Felder zeichenartig sein müssen! Es dürfen also keine Felder vom Typ FLOAT, DEC oder INT verwendet werden! Entweder müssen diese Felder außen vor gelassen werden (sie können dann nicht mittels BAPI geändert werden), oder es muss ein eigenes zeichenartiges Datenelement speziell für den BAPI angelegt werden.</p>
+
+
+
+<h2 class="wp-block-heading">Beispiel</h2>
+
+
+
+<p>Die Umwandlung einer Struktur in einen &#8220;Container&#8221; braucht man immer, wenn man Kundenfelder in BAPIs verwenden möchte. In vielen BAPIs gibt es einen EXTENSION-Parameter, dem alle Kundenfelder übergeben werden. In diesem speziellen Fall ist es die Übergabetabelle EXTENSIONIN.</p>
+
+
+
+<p>Die Anweisung zum Füllen der EXTENSIONIN sieht klassischerweise in etwa so aus:</p>
+
+
+
+<pre class="wp-block-preformatted">DATA ls_bape_vbak &nbsp;TYPE bape_vbak.<br>DATA ls_extension &nbsp;TYPE bapiparex.<br>DATA lt_extensions TYPE STANDARD TABLE OF bapiparex.<br><br>ls_bape_vbak-zzfeld1 &nbsp; &nbsp;= '1'.<br>ls_bape_vbak-zzfeld2 &nbsp; &nbsp;= 'ABCD'.<br><br>ls_extension-structure &nbsp;= 'BAPE_VBAK'.<br>ls_extension+30(960) &nbsp; &nbsp;= ls_bape_vbak. "(bapiparex-valuepart1 - 4)<br>APPEND ls_extension TO lt_extensions.</pre>
+
+
+
+<p>Abgesehen davon, dass die Unterteilung der Kundenfelder in VALUEPART1 bis VALUEPART4 absoluter Schwachsinn ist, ist es unter Unicode nicht mehr einfach möglich, die Strukturen zuzuweisen. Im ABAP-Editor erhältst du dann die Meldung:</p>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow">
+<p>&#8220;LS_EXTENSION+30(960)&#8221; und &#8220;LS_BAPE_VBAK&#8221; sind in einem<br>Unicode-Programm nicht ineinander konvertierbar.</p>
+</blockquote>
+
+
+
+<h2 class="wp-block-heading">Casting notwendig</h2>
+
+
+
+<p>Entweder bedient man sich des Tricks mit dem <a href="https://tricktresor.com/blog/casting-zwischen-strukturen/">X-Casting</a> oder man verwendet die entsprechende Klasse von SAP:&nbsp;<a href="https://help.sap.com/saphelp_nw73/helpdata/de/79/c554d3b3dc11d5993800508b6b8b11/content.htm?original_fqdn=help.sap.de">CL_ABAP_CONTAINER_UTILITIES</a>.<br>Mit dieser Klasse &#8211; und speziell der Methode FILL_CONTAINER_C &#8211; ist es möglich, die typgerechte Umwandlung vorzunehmen.</p>
+
+
+
+<pre class="wp-block-preformatted">cl_abap_container_utilities=&gt;fill_container_c<br>&nbsp; EXPORTING<br>&nbsp; &nbsp; im_value &nbsp; &nbsp; = ls_bape_vbak<br>&nbsp; IMPORTING<br>&nbsp; &nbsp; ex_container = ls_extension+30(960)<br>&nbsp; EXCEPTIONS<br>&nbsp; &nbsp; illegal_parameter_type = 1<br>&nbsp; &nbsp; OTHERS = 2.</pre>
+
+
+
+<h2 class="wp-block-heading">VBAKKOZ und VBAKKOZX</h2>
+
+
+
+<p>Damit die Verarbeitung letztendlich funktioniert, müssen die Strukturen VBAKKOZ und VBAKKOZX ebenfalls in gleicher Weise erweitert werden.</p>
+
+
+
+<p>Hierbei ist es wichtig, dass die Felder die gleiche Struktur haben. Fehlt in der VBAKKOZX ein Feld, dann funktioniert die Übertragung der Daten nicht.</p>
+
+
+
+<p>Gleiches gilt für die Felder der VBAP-Struktur.</p>
+
+
+
+<h2 class="wp-block-heading">SAP-Hinweis</h2>
+
+
+
+<p>Nützliche Informationen stehen in <a href="https://me.sap.com/notes/143580">SAP-Hinweis 143580</a>. </p>
+
+
+
+<p></p>
+<p>Der Beitrag <a href="/blog/kundenfelder-in-bapi-struktur-fuellen/">Kundenfelder in BAPI-Struktur füllen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Customizing übersetzen</title>
+		<link>/blog/customizing-uebersetzen/</link>
+					<comments>/blog/customizing-uebersetzen/#comments</comments>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Sat, 29 Nov 2014 00:00:00 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<category><![CDATA[Übersetzung]]></category>
+		<category><![CDATA[Rollout]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5154</guid>
+
+					<description><![CDATA[<p>Neuer Rollout &#8211; Neues Glück. Spätestens beim ersten internationalen Rollout kommt die Frage auf welche Customizing Objekte zu übersetzen sind. In der SPRO ist &#8211; etwas versteckt &#8211; eine sehr nützliche Standard-Funktion. &#160; &#160;</p>
+<p>Der Beitrag <a href="/blog/customizing-uebersetzen/">Customizing übersetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Neuer Rollout &#8211; Neues Glück.<br />
+Spätestens beim ersten internationalen Rollout kommt die Frage auf welche Customizing Objekte zu übersetzen sind.<br />
+In der SPRO ist &#8211; etwas versteckt &#8211; eine sehr nützliche Standard-Funktion.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/Spro-übersetzung.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5155" src="https://tricktresor.com/wp-content/uploads/2014/11/Spro-übersetzung-259x300.png" alt="Spro übersetzung" width="259" height="300" srcset="/wp-content/uploads/2014/11/Spro-übersetzung-259x300.png 259w, /wp-content/uploads/2014/11/Spro-übersetzung-624x720.png 624w, /wp-content/uploads/2014/11/Spro-übersetzung.png 846w" sizes="(max-width: 259px) 100vw, 259px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/11/uebersetzung2.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5156" src="https://tricktresor.com/wp-content/uploads/2014/11/uebersetzung2-300x234.png" alt="uebersetzung2" width="300" height="234" srcset="/wp-content/uploads/2014/11/uebersetzung2-300x234.png 300w, /wp-content/uploads/2014/11/uebersetzung2-624x487.png 624w, /wp-content/uploads/2014/11/uebersetzung2.png 907w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/customizing-uebersetzen/">Customizing übersetzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/customizing-uebersetzen/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Partner und ihre Tücken</title>
+		<link>/blog/partner-und-ihre-tuecken/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 25 Nov 2014 17:49:27 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Partner]]></category>
+		<category><![CDATA[Kunde]]></category>
+		<category><![CDATA[Auftraggeber]]></category>
+		<category><![CDATA[MM]]></category>
+		<category><![CDATA[VBPA]]></category>
+		<category><![CDATA[SD]]></category>
+		<category><![CDATA[Spediteur]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[Ansprechpartner]]></category>
+		<category><![CDATA[Partnerart]]></category>
+		<category><![CDATA[Partnerrolle]]></category>
+		<category><![CDATA[Eigenes]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5143</guid>
+
+					<description><![CDATA[<p>Partner im SD-Umfeld sind sehr vielfältig. Es gibt verschiedene Partnerrollen (PARVW), die je Belegart in einem Partnerschema eingebunden werden können. Die Partnerrollen sind einer Partnerart zugeordnet (NRART). Möchte man Programme schreiben, die nicht auf eine Partnerrolle oder eine Partnerart eingeschränkt sind, dann stehen einige Hilfsmittel zur Verfügung. Man muss sie nur kennen...</p>
+<p>Der Beitrag <a href="/blog/partner-und-ihre-tuecken/">Partner und ihre Tücken</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Partner im SD-Umfeld sind sehr vielfältig. Es gibt verschiedene Partnerrollen (PARVW), die je Belegart in einem Partnerschema eingebunden werden können. Die Partnerrollen sind einer Partnerart zugeordnet (NRART). Möchte man Programme schreiben, die nicht auf eine Partnerrolle oder eine Partnerart eingeschränkt sind, dann stehen einige Hilfsmittel zur Verfügung. Man muss sie nur kennen&#8230;</p>
+<h2>Partnerrollen</h2>
+<p>In der Tabelle in der die Partner zu einem SD-Beleg gespeichert werden (Tabelle VBPA), gibt es für jede Partnerart ein eigenes Feld:</p>
+<ul style="list-style-type: circle;">
+<li>KUNNR &#8211; Kundennummer (Auftraggeber, Rechnungsempfänger, Regulierer, &#8230;)</li>
+<li>LIFNR &#8211; Lieferantennummer (Spediteur, Zollagent, Rechnungssteller, &#8230;)</li>
+<li>PERNR &#8211; Personalnummer (Verkäufer, zuständiger Mitarbeiter, &#8230;)</li>
+<li>PARNR &#8211; Ansprechpartner (Ansprechpartner, Qualitätszeugnisempfänger, &#8230;)</li>
+</ul>
+<h2>Partnerarten</h2>
+<p>Möchte man wissen, welches Feld man bei welcher Partnerrolle ansprechen soll, dann muss man wissen, welche Partnerart eine Partnerrolle hat.</p>
+<p>Die einzelnen Partnerarten können sein:</p>
+<ul style="list-style-type: circle;">
+<li>KU &#8211; Kunde</li>
+<li>LI &#8211; Lieferanten</li>
+<li>PE &#8211; Personalnummer</li>
+<li>AP &#8211; Ansprechpartner</li>
+<li>US &#8211; Benutzer</li>
+<li>weitere</li>
+</ul>
+<p>In der Partnerartentabelle TVPA steht genau, welche Partnerart gegen welche Tabelle geprüft werden kann.</p>
+<h2>Tools</h2>
+<p>Im Folgenden ein paar Tools, die im Umfeld von &#8220;Partnern&#8221; hilfreich sein können.</p>
+<h3>Partnerart ermitteln</h3>
+<p>Mithilfe des Funktionsbausteins MM_PARTNER_TYPE kann die Partnerart (KU, LI, PE etc.) ermittelt werden. Er greift auf die Tabelle TPAR zu und liefert die Partnerart (NRART) zurück</p>
+<h3>Anzeige eines Partners</h3>
+<p>Unabhängig von der Partnerrolle und Partnerart kann der Funktionsbaustein SD_PARTNER_DISPLAY dazu verwendet werden, um die Partnerdaten anzuzeigen.</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/partner-und-ihre-tuecken/">Partner und ihre Tücken</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Adresse im Kundenauftrag geändert?</title>
+		<link>/blog/adresse-im-kundenauftrag-geaendert/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 19 Mar 2014 13:54:11 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Konfiguration]]></category>
+		<category><![CDATA[Änderungsbelege]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4643</guid>
+
+					<description><![CDATA[<p>In einem Kundenauftrag kann die Adresse eines Partners geändert werden. Häufig werden zum Beispiel in der Adresse des Warenempfängers noch zusätzliche Informationen hinterlegt. Leider werden diese Änderungen nicht in den Änderungsbelegen zum Kundenauftrag angezeigt... Hier verraten wir dir, wie du trotzdem sehen kannst, welche Änderungen gemacht wurden.</p>
+<p>Der Beitrag <a href="/blog/adresse-im-kundenauftrag-geaendert/">Adresse im Kundenauftrag geändert?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Kundenauftrag kann die Adresse eines Partners geändert werden. Häufig werden zum Beispiel in der Adresse des Warenempfängers noch zusätzliche Informationen hinterlegt. Technisch gesehen steht in der Partnertabelle VBPA die Adressnummer aus dem Kundenstamm. Wird die Adresse geändert, bekommt der Partner eine neue Adressnummer. Diese Adressnummer verweist &#8211; wie auch die Adresse der Stammdaten &#8211; auf einen Eintrag in der Tabelle ADRC.</p>
+<h2>Änderungsbelege Fehlanzeige?</h2>
+<p>Möchte man die Änderungen eines Partner aus dem Kundenauftrag nachvollziehen, so funktioniert dies leider nicht über die aus dem Auftrag wählbare Anzeige der Änderungen im Menü <em>Umfeld &#8211; Änderungen</em>. Warum man sich hier nicht auf die Anzeige der Änderungen verlassen kann, sondern sich einen Tricks bedienen muss, wird ein Geheimnis der SAP bleiben.</p>
+<h2>Änderungen ermitteln</h2>
+<p>Um die Partneränderungen zu ermitteln, musst du zuerst die Adressnummer (Feld ADRNR) aus der Tabelle VBPA zum Auftrag ermitteln. Also: SE16n aufrufen, Belegnummer eingeben, auf gewünschte Partnerart einschränken (WE für Warenempfänger) und die Adressnummer &#8211; oder -nummern bei unterschiedlichen Partnern auf Positionseben &#8211;  in die Zwischenablage kopieren.</p>
+<p>Mit diesen Adressnummern &#8220;im Gepäck&#8221; musst du erst einmal den genauen <em>Objektwert</em> ermitteln. Der Objektwert (OBJECTID) ist die Nummer, für die eine Änderung gespeichert wird. Zu der OBJECTID benötigst du noch das Änderungsbelegobjekt (OBJECTCLAS) <strong>ADRESSE</strong>.</p>
+<p>Normalerweise ist der Objektwert gleich dem Objekt selbst, also z.B. der Nummer des Auftrags. Im Falle der Adressnummer wird jedoch noch die <em>Adressgruppe</em>. Die Adressnummer ist zwar auch ohne die Adressgruppe eindeutig, sie wird jedoch im Änderungsbeleg benötigt.</p>
+<p>Also: Mit SE16n in die Tabelle CDHDR schauen, hier am Beispiel der Adressnummer 9001234567:</p>
+<pre>OBJECTCLAS ADRESSE
+OJBECTID   *9001234567</pre>
+<p>Das Ergebnis kann zum Beispiel den Objektwert BP  9001234567 (Gruppe BP) oder SD019001234567 (Gruppe SD01) ergeben.</p>
+<p>Diese Nummer benötigst du nun, um die Änderungsbelege zu dieser Adressnummer anzeigen zu lassen: Rufe Report RSSCD200 auf:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_19_14_51_40.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4644" alt="RSSCD200" src="https://tricktresor.com/wp-content/uploads/2014/03/03_19_14_51_40-300x159.jpg" width="300" height="159" srcset="/wp-content/uploads/2014/03/03_19_14_51_40-300x159.jpg 300w, /wp-content/uploads/2014/03/03_19_14_51_40.jpg 575w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Nach Start des Reports &#8211; und sofern Änderungen vorhanden sind &#8211; siehst du die Liste mit den Änderungen.</p>
+<p>[notice type=&#8217;info&#8217;]Wenn du dir nicht sicher bist, ob die Adresse geändert wurde: Das Adresskennzeichen (Feld VBAP-ADRDA) sagt dir, ob es sich bei der Adressnummer um die Adressnummer des Stammsatzes handelt (ADRDA = D) oder ob die Adresse nachträglich geändert wurde (ADRDA = E). Je nach Konfiguration und Anwendung können auch andere Kennzeichen verwendet werden. Diese sind in der Werthilfe zum Feld ADRDA hinterlegt.[/notice]</p>
+<p>Der Beitrag <a href="/blog/adresse-im-kundenauftrag-geaendert/">Adresse im Kundenauftrag geändert?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Anzeige des Belegflusses</title>
+		<link>/blog/anzeige-des-belegflusses/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 18 Mar 2014 13:33:26 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4576</guid>
+
+					<description><![CDATA[<p>Der weitgehend unbekannte Transaktionscode ALO1 (Buchstabe O, nicht Null) zeigt vollständige Belegflüsse für Einkaufs-, Material- Vertriebs- und FI-Belege an. Das klappt sowohl Richtung Belegvorgänger als auch für die Nachfolger. Daneben bietet die ALO1 Reporting-Möglichkeiten für diese Belegarten und ist in der Lage, die Daten auch aus Archiven zu lesen.</p>
+<p>Der Beitrag <a href="/blog/anzeige-des-belegflusses/">Anzeige des Belegflusses</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der weitgehend unbekannte Transaktionscode ALO1 (Buchstabe O, nicht Null) zeigt vollständige Belegflüsse für Einkaufs-, Material- Vertriebs- und FI-Belege an. Das klappt sowohl Richtung Belegvorgänger als auch für die Nachfolger. Daneben bietet die ALO1 Reporting-Möglichkeiten für diese Belegarten und ist in der Lage, die Daten auch aus Archiven zu lesen.</p>
+<p>Im Einstiegsbild kann ausgewählt werden, über welchen Belegtyp man mit der Suche beginnen möchte.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_18_14_26_10.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4578" alt="Transaktion ALO1" src="https://tricktresor.com/wp-content/uploads/2014/03/03_18_14_26_10-254x300.jpg" width="254" height="300" srcset="/wp-content/uploads/2014/03/03_18_14_26_10-254x300.jpg 254w, /wp-content/uploads/2014/03/03_18_14_26_10.jpg 429w" sizes="(max-width: 254px) 100vw, 254px" /></a></p>
+<p>Über die nun dargestellte Liste kann in die Einzelansicht des Belegflusses verzweigt werden.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_18_14_31_05.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4579" alt="ALO1 - belegfluss" src="https://tricktresor.com/wp-content/uploads/2014/03/03_18_14_31_05-300x113.jpg" width="300" height="113" srcset="/wp-content/uploads/2014/03/03_18_14_31_05-300x113.jpg 300w, /wp-content/uploads/2014/03/03_18_14_31_05.jpg 436w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>[notice type=&#8217;alert&#8217;]Achtung: Die Selektion kann durchaus etwas länger dauern&#8230;[/notice]</p>
+<p>Der Beitrag <a href="/blog/anzeige-des-belegflusses/">Anzeige des Belegflusses</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Packvorschriften lesen</title>
+		<link>/blog/packvorschriften-lesen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 06 Aug 2013 14:30:22 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[HU]]></category>
+		<category><![CDATA[Packvorschriften]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=676</guid>
+
+					<description><![CDATA[<p>Mithilfe eines Funktionsbausteins ist das Lesen der mittels POF1 oder POP1 erzeugten Packvorschriften sehr einfach.</p>
+<p>Der Beitrag <a href="/blog/packvorschriften-lesen/">Packvorschriften lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mithilfe eines Funktionsbausteins ist das Lesen der mittels POF1 oder POP1 erzeugten Packvorschriften sehr einfach.<br /><P>Der Funktionsbaustein VHUPO_PACK_INSTRUCTION_SHOW liefert alle relevanten Informationen.</P><P class="sap1">DATA ls_pikp_exp&nbsp;&nbsp;&nbsp; LIKE&nbsp; pikp.<BR>DATA ls_cmvhupo_exp LIKE&nbsp; cmvhupo.<BR>DATA ls_pikp_imp&nbsp;&nbsp;&nbsp; LIKE&nbsp; pikp.</P><P class="sap1">ls_cmvhupo_exp-nodia&nbsp; = &#8216;X&#8217; .&nbsp; &#8220;No Dialog<BR>ls_cmvhupo_exp-contxt = &#8216;3&#8217; .&nbsp; &#8220;Display packing instructions<BR>ls_pikp_exp-packnr&nbsp;&nbsp;&nbsp; =&nbsp;packnr &#8220;Unique internal packing object number.<BR>ls_pikp_exp-piid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = piid . &#8221; ID of packing instruction</P><P class="sap1">*==&nbsp;Use &#8220;Display function&#8221; to read packing instructions<BR>&nbsp; CALL FUNCTION &#8216;VHUPO_PACK_INSTRUCTION_SHOW&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pikp_imp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_pikp_exp<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cmvhupo_imp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = ls_cmvhupo_exp<BR>&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp; pikp_exp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; = ls_pikp_imp<BR>&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp; locked&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;= 1<BR>&nbsp;&nbsp;&nbsp;&nbsp; not_found&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;= 2<BR>&nbsp;&nbsp;&nbsp;&nbsp; data_missed&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;= 3<BR>&nbsp;&nbsp;&nbsp;&nbsp; data_wrong&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;= 4<BR>&nbsp;&nbsp;&nbsp;&nbsp; quantity_wrong&nbsp;&nbsp; &nbsp;= 5<BR>&nbsp;&nbsp;&nbsp;&nbsp; missed_pos_type&nbsp; &nbsp;= 6<BR>&nbsp;&nbsp;&nbsp;&nbsp; no_new_number&nbsp;&nbsp;&nbsp; &nbsp;= 7<BR>&nbsp;&nbsp;&nbsp;&nbsp; baseunit_wrong&nbsp;&nbsp; &nbsp;= 8<BR>&nbsp;&nbsp;&nbsp;&nbsp; not_saved&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;= 9<BR>&nbsp;&nbsp;&nbsp;&nbsp; inconsistent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 10<BR>&nbsp;&nbsp;&nbsp;&nbsp; marked_for_delete&nbsp;= 11<BR>&nbsp;&nbsp;&nbsp;&nbsp; exsist&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 12<BR>&nbsp;&nbsp;&nbsp;&nbsp; material_unkown&nbsp;&nbsp;&nbsp;= 13<BR>&nbsp;&nbsp;&nbsp;&nbsp; quantity_changed&nbsp;&nbsp;= 14<BR>&nbsp;&nbsp;&nbsp;&nbsp; clint_unkown&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 15<BR>&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 16&nbsp; .</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/packvorschriften-lesen/">Packvorschriften lesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Lieferbeleg gelöscht?</title>
+		<link>/blog/lieferbeleg-geloescht/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Jul 2012 20:11:49 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[V2 - Lieferung]]></category>
+		<category><![CDATA[Lieferung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=650</guid>
+
+					<description><![CDATA[<p>Wie findet man heraus, von wem ein Lieferbeleg gel&#246;scht wurde? Der Beleg ist ja weg. Das stimmt, aber die &#196;nderungsbelege sind noch da...</p>
+<p>Der Beitrag <a href="/blog/lieferbeleg-geloescht/">Lieferbeleg gelöscht?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wie findet man heraus, von wem ein Lieferbeleg gel&ouml;scht wurde? Der Beleg ist ja weg. Das stimmt, aber die &Auml;nderungsbelege sind noch da&#8230;<br /><P>&Ouml;ffnen Sie die Transaktion VL03N, dort dann&nbsp;die Belegnummer eines noch existierenden Belegs eingeben und &nbsp;in den Beleg wechseln.</P><P>Nun &uuml;ber das Men&uuml; in den Punkt Umfeld/&Auml;nderungen springen -&gt; da geht dann ein neues Fenster auf, in welchem die Belegnummer steht. Diese Nummer kann&nbsp;aber &uuml;berschrieben werden.</P><P>Tragen Sie hier&nbsp;die Nummer des <STRONG>gel&ouml;schten Belegs </STRONG>ein und klicken Sie auf&nbsp;&bdquo;Ausf&uuml;hren&rdquo;.</P><P>Schon bekommen Sie angezeigt, welcher User den Beleg gel&ouml;scht hat.</P><P><STRONG>Kleine Abk&uuml;rzung: <BR></STRONG>Rufen Sie gleich die Transaktion VL22N auf&#8230;</P><P>Es handelt sich dabei um den Report WSCDSHOW_ALV, der nat&uuml;rlich direkt in der SA38 gestartet werden kann.</P></p>
+<p>Der Beitrag <a href="/blog/lieferbeleg-geloescht/">Lieferbeleg gelöscht?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Kunde/ Lieferant anlegen</title>
+		<link>/blog/kunde-lieferant-anlegen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 24 Feb 2012 14:12:59 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Verkauf]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=637</guid>
+
+					<description><![CDATA[<p>Die BAPIs f&#252;r das erstellen von Kundenstamms&#228;tzen oder Lieferantenstamms&#228;tzen sind mehr als &#252;bersichtlich - sie sind n&#228;mlich nicht vorhanden. Es gibt aber inzwischen zwei Klassen, die man gut verwenden kann.</p>
+<p>Der Beitrag <a href="/blog/kunde-lieferant-anlegen/">Kunde/ Lieferant anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die BAPIs f&uuml;r das erstellen von Kundenstamms&auml;tzen oder Lieferantenstamms&auml;tzen sind mehr als &uuml;bersichtlich &#8211; sie sind n&auml;mlich nicht vorhanden. Es gibt aber inzwischen zwei Klassen, die man gut verwenden kann.<br /><P class="head1">Info</P><P class="text1">Die Klassen sehen wohlsortiert aus, die Datenstrukturen komplex, aber ordentlich strukturiert.</P><P class="text1">Da geht was&#8230;!</P><P class="head1">Kundenbearbeitungs-API: CMD_EI_API</P><P>Hier folgen Beizeiten Infos zum Anlegen und &Auml;ndern.</P><P class="head1">Lieferantenbearbeitungs-API: VMD_EI_API</P><P>Hier folgen Beizeiten Infos zum Anlegen und &Auml;ndern.</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/kunde-lieferant-anlegen/">Kunde/ Lieferant anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,2274 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Finanz- und Rechnungswesen Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/module/finanz-und-rechnungswesen/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 04 Dec 2018 17:33:38 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Finanz- und Rechnungswesen Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Buchungsbelege erstellen</title>
+		<link>/blog/buchungsbelege-erstellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 28 Jun 2018 13:48:59 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[CO-Beleg]]></category>
+		<category><![CDATA[Kreditor]]></category>
+		<category><![CDATA[Debitor]]></category>
+		<category><![CDATA[Sachkonto]]></category>
+		<category><![CDATA[Ergebnisobjekt]]></category>
+		<category><![CDATA[FI-Beleg]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018903</guid>
+
+					<description><![CDATA[<p>Folgend ein Report, der exemplarisch zeigt, wie FI-Belege gebucht werden können. Es werden Die Bausteine BAPI_ACC_DOCUMENT_CHECK und BAPI_ACC_DOCUMENT_POST verwendet. Aktuell macht der Report gar nichts! Die Kopf- und Positionsdaten müssen in LT_BKPF und LT_BSEG entsprechend eingefügt werden. Wie genau das geht, erfährst du in dieser ausführlichen Doku: Dokumentation FI Buchungen mittels BAPI_ACC_DOCUMENT_POST Vorgaben Ich gehe davon aus, das die zu buchenden Daten in der Form Kopf/Position vorliegen. Sollte dies nicht der Fall sein, so sollten...</p>
+<p>Der Beitrag <a href="/blog/buchungsbelege-erstellen/">Buchungsbelege erstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Folgend ein Report, der exemplarisch zeigt, wie FI-Belege gebucht werden können. Es werden Die Bausteine BAPI_ACC_DOCUMENT_CHECK und BAPI_ACC_DOCUMENT_POST verwendet.</p>
+<p>Aktuell macht der Report gar nichts!</p>
+<p>Die Kopf- und Positionsdaten müssen in LT_BKPF und LT_BSEG entsprechend eingefügt werden. Wie genau das geht, erfährst du in dieser ausführlichen Doku:</p>
+<h2>Dokumentation</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/06/FI-Buchungen-mittels-BAPI_ACC_DOCUMENT_POST.pdf">FI Buchungen mittels BAPI_ACC_DOCUMENT_POST</a></p>
+<h2>Vorgaben</h2>
+<p>Ich gehe davon aus, das die zu buchenden Daten in der Form Kopf/Position vorliegen. Sollte dies nicht der Fall sein, so sollten diese vorher so aufbereitet werden, da dies den Umgang beim Programmieren wesentlich vereinfacht.</p>
+<p>Das folgende Beispiel behandelt exemplarisch eine kreditorische Buchung,<br />
+läßt sich jedoch prinzipiell ebenso auf debitorische oder Sachkonten-<br />
+buchungen übertragen.<br />
+Als Schmankerl wird ein zusätzliches Feld, welches nicht in der Sachkontenzeile<br />
+enthalten ist (LZBKZ &#8211; Landeszentralbankkennzeichen) mitgegeben und die Steuer<br />
+mit einem Steuerschema gebucht, welches zwei Steuerzeilen enthält.</p>
+<p>Prinzipiell muss man folgendes Wissen zur Buchung von FI-Belegen wissen:</p>
+<ol>
+<li>Die erste Zeile des zu buchenden Beleges enthält den Betrag IMMER als Brutto-Wert! Unabhängig davon ob diese kreditorisch, debitorisch oder eine Sachkontenbuchung ist.</li>
+<li>Bei kreditorischen oder debitorischen Buchungen tauchen diese als Zeile nur ein mal als erste Zeile auf!</li>
+<li>Steuerkennzeichen MÜSSEN mitgeliefert werden sonst kann keine Steuer gebucht werden.</li>
+</ol>
+<h3>Kopfdaten</h3>
+<p>Wenn die Daten aus einem R3-System kommen, liegen die Daten normalerweise in der Form BUKRS/BELNR/GJAHR + Datenteil (für BKPF/BSEG) vor.<br />
+Sollte dies nicht der Fall, so erhält man normalerweise, wie in diesem Beispiel, eine laufende, eindeutige Nummer als Identifikator.<br />
+Für den Kopf auf jeden Fall müssen mitgegeben werden:</p>
+<ul>
+<li>BUDAT &#8211; Buchungsdatum</li>
+<li>BLDAT &#8211; Belegdatum</li>
+<li>BUKRS &#8211; Buchungskreis</li>
+<li>BLART &#8211; Belegart</li>
+<li>WAERS &#8211; Währung in der gebucht werden soll (Belegwährung)</li>
+</ul>
+<p>Bei Fremdwährungsbuchungen müssen zusätzlich das Feld</p>
+<ul>
+<li>KURSF &#8211; Umrechnungskurs zur Buchungskreiswährung (Zeilentyp BAPIACCR09)<br />
+<em><strong>ODER!!!!</strong></em></li>
+<li>WWERT &#8211; Umrechnungsdatum (Zeilentyp BAPIACHE09)</li>
+</ul>
+<p>mitgegeben werden &#8211; keinesfalls beide!</p>
+<p>Bei kreditorischen Buchungen ist z.B. auch die Referenz zu füllen</p>
+<ul>
+<li>XBLNR &#8211; Referenznummer (Belegnummer des Lieferanten)</li>
+</ul>
+<p>All diese Werte müssen bekannt sein und mitgegeben werden.</p>
+<p>Das Buchungsdatum kann auch leer gelassen werden, dann wird aus dem Systemdatum die entsprechenden Werte für GJAHR und POPER errechnet (siehe Routine ADD_DATA_BKPF).<br />
+Ansonsten wird das mitgegebene Buchungsdatum verwendet und zur Berechnung verwendet</p>
+<ul>
+<li>BKTXT &#8211; Kopftext (braucht man manchmal)</li>
+</ul>
+<h2>Positionsdaten</h2>
+<ul>
+<li>Als Mussdaten sind notwendig:</li>
+<li>BUZEI fortlaufende Buchungszeilennummer.<br />
+Kann man auch &#8220;on the fly&#8221; erzeugen einfacher ist es, wenn sie bereits gefüllt ist. Die Buchungszeile stellt über den in jedem Segment vorhandenen Parameter ITEMNO_ACC die Verbindung bzw. die Sortierung der einzelnen Zeilen des Beleges untereinander sicher</li>
+<li>KOART Kontoart<br />
+K &#8211; Kreditorische Buchungszeile, D &#8211; Debitorische Buchungszeile,<br />
+S &#8211; Sachkontenzeile</li>
+<li>SHKZG Soll-/Haben Kennzeichen S/H<br />
+Auch aus Fremdsystemen erhält man normalerweise dieses Kennzeichen. Es dient dazu, das Vorzeichen für die Beträge, welche dem BAPI übergeben werden, richtig zu ermitteln. Dies setzt voraus, das die Beträge (!!) immer als positive Werte übergeben werden &#8211; was im R/3 immer der Fall ist und bei Fremdsystembelegen zu 99% (SAP hat schließlich die Buchhaltung nicht erfunden <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /> )<br />
+Habenwerte sind hierbei immmer mit -1 zu multiplizieren, Sollwerte behalten Ihr positives Vorzeichen</li>
+<li>GKONT Gegenkonto<br />
+Im Fall einer kreditorischen bzw. debitorischen Zeile die Lieferanten- bzw. Kundennummer. Im Fall einer Sachkontenzeile die Kontonummer, auf welche gebucht werden soll</li>
+<li>MWSKZ Mehrwertsteuerkennzeichen<br />
+MUSS, im Falle einer ggf. zu buchenden Steuer, mitgegeben werden. Hierüber werden die zu buchenden Steuerzeilen ermittelt</li>
+<li>BRUTTO Bruttowert der Buchungszeile. Wird immer benutzt bei &#8220;Kopfzeilen&#8221; d.h. bei kreditorische, debitorischen oder der 1. Zeile eines Sachkontenbeleges</li>
+<li>NETTO Nettowert der Buchungszeile d.h. ohne Steuer<br />
+Wird bei allen &#8220;Positionszeilen&#8221;, d.h. ab Zeile 2 des Beleges benutzt</li>
+</ul>
+<h3>Kontierungen</h3>
+<p>Im Beispiel habe ich Kontierungen auf Kostenstellen, Innenaufträge, SD-Belege und Anlagen vorgesehen.</p>
+<ul>
+<li>SGTXT Positionstext (braucht man manchmal)</li>
+<li>LANDL Lieferland<br />
+Wird benötigt, wenn der Lieferant im Ausland ansässig ist &#8211; kann man aber auch durch nachlesen des Landes aus der Adresse des Lieferanten holen. Hier der Einfachheit halber in der Struktur</li>
+</ul>
+<h4>Schmankerl 1</h4>
+<ul>
+<li>LZBKZ Landeszentralbankkennzeichen<br />
+Die betrifft Rechnungen von ausländischen Lieferanten die eine Sonstige Leistung i.S. des Umsatzsteuergesetzes erbracht haben. Der §13b UStG regelt unter einzelnen Punkten in welchen Fällen der Leistungsempfänger für die Leistungen die Umsatzsteuer schuldet.<br />
+Gleichzeitig darf der Leistungsempfänger sich diesen Betrag als Vorsteuer in Abzug bringen.<br />
+Steht in der BSEG als Feld zur Verfügung, ist aber nicht in der kreditorischen Struktur BAPIACAP09 vorhanden!!! Muß über die Tabelle extension2 des BAPI&#8217;s übergeben werden<br />
+Ausführungen dazu in der Unterroutine für die Kreditorenzeile</li>
+</ul>
+<h4>Schmankerl 2</h4>
+<ul>
+<li>CO-PA Kontierung<br />
+Bei Kontierung auf CO-PA Objekte (Ergebnisobjekte) kommt es oft genug vor, das vom Kunden nur der Vertriebsbeleg vorgegeben wird und alles andere soll ermittelt werden. Wir befinden uns nicht in der FB01 oder FB60 und können auf den Knopf &#8220;Ableitung&#8221; drücken.<br />
+Was also tun? Siehe hierzu die Unterroutine &#8220;ADD_COPA_LINE&#8217;.</li>
+</ul>
+<h2>Coding</h2>
+<pre class="lang:abap decode:true">*&amp;---------------------------------------------------------------------*
+*&amp; Report Z_POST_ACC_DOCUMENT
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;---------------------------------------------------------------------*
+REPORT z_post_acc_document.
+
+******** KOPFDATEN **************
+TYPES: BEGIN OF gtys_bkpf,
+         id    TYPE numc10,
+         bukrs TYPE bkpf-bukrs,
+         gjahr TYPE bkpf-gjahr,
+         poper TYPE poper,
+         blart TYPE bkpf-blart,
+         bldat TYPE bkpf-bldat,
+         budat TYPE bkpf-budat,
+         xblnr TYPE bkpf-xblnr,
+         bktxt TYPE bkpf-bktxt,
+         waers TYPE bkpf-waers,
+         kursf TYPE bkpf-kursf,
+         wwert TYPE bkpf-wwert,
+         belnr TYPE bkpf-belnr,
+       END OF gtys_bkpf,
+       gtyt_bkpf TYPE STANDARD TABLE OF gtys_bkpf.
+
+******** POSITIONSDATEN ***********
+* Schmankerl 1
+* LZBKZ  Landeszentralbankkennzeichen
+*        Die betrifft Rechnungen von ausländischen Lieferanten die eine Sonstige Leistung
+*        i.S. des Umsatzsteuergesetzes erbracht haben. Der §13b UStG regelt unter einzelnen
+*        Punkten in welchen Fällen der Leistungsempfänger für die Leistungen die Umsatzsteuer schuldet.
+*        Gleichzeitig darf der Leistungsempfänger sich diesen Betrag als Vorsteuer in Abzug bringen.
+*        Steht in der BSEG als Feld zur Verfügung, ist aber nicht in der kreditorischen
+*        Struktur BAPIACAP09 vorhanden!!! Muß über die Tabelle extension2 des BAPI's übergeben werden
+*        Ausführungen dazu in der Unterroutine für die Kreditorenzeile "ADD_CRED_LINE"
+* Schmankerl 2
+* VBELN   CO-PA Kontierung
+*        Bei Kontierung auf CO-PA Objekte (Ergebnisobjekte) kommt es oft genug vor,
+*        das vom Kunden nur der Vertriebsbeleg vorgegeben wird und alles andere soll
+*        ermittelt werden. Wir befinden uns nicht in der FB01 oder FB60 und können auf
+*        den Knopf "Ableitung" drücken.
+*        Was also tun?
+*        Siehe hierzu die Unterroutine "ADD_COPA_LINE'.
+* Schmankerl 3
+* BWASL  Bewegungsartenschlüssel
+*        Bei der direkten Buchung von Kreditor auf Anlage muß der Bewegungsartenschlüssel
+*        vorgegeben werden. Dieser ist zwingend notwendig, sonst kommt keine Buchung zustande
+*        bzw. wird abgelehnt.
+*        Näheres hierzu in der Unterroutine "ADD_SACH_LINE'.
+TYPES: BEGIN OF gtys_bseg,
+         id     TYPE numc10,
+         buzei  TYPE bseg-buzei,
+         koart  TYPE bseg-koart,
+         shkzg  TYPE bseg-shkzg,
+         gkont  TYPE gkont,
+         brutto TYPE bseg-wrbtr,
+         netto  TYPE bseg-wrbtr,
+         mwskz  TYPE bseg-mwskz,
+         sgtxt  TYPE bseg-sgtxt,
+         kostl  TYPE bseg-kostl,
+         aufnr  TYPE bseg-aufnr,
+         vbeln  TYPE bseg-vbeln,
+         posnr  TYPE bseg-posn2,
+         anln1  TYPE bseg-anln1,
+         anln2  TYPE bseg-anln2,
+         lzbkz  TYPE bseg-lzbkz,
+         landl  TYPE bseg-landl,
+         bwasl  TYPE bwasl,
+       END OF gtys_bseg,
+       gtyt_bseg TYPE STANDARD TABLE OF gtys_bseg.
+
+* Struktur für den Aufbau der Steuerzeilen
+TYPES: BEGIN OF gtys_tax,
+         mwskz TYPE mwskz,
+         wmwst TYPE wmwst,
+         msatz TYPE msatz_f05l,
+         ktosl TYPE ktosl,
+         kawrt TYPE kawrt,
+         hkont TYPE hkont,
+         kschl TYPE kschl,
+       END OF gtys_tax,
+       gtyt_tax TYPE STANDARD TABLE OF gtys_tax.
+
+* Org-Daten für CO-PA Ermittlung
+TYPES: BEGIN OF gtys_org_copa,
+         bukrs TYPE bukrs,
+         kokrs TYPE kokrs,
+         erkrs TYPE erkrs,
+       END OF gtys_org_copa,
+       gtyt_org_copa_hash TYPE HASHED TABLE OF gtys_org_copa
+                       WITH UNIQUE KEY bukrs.
+* Neue CO-PA Ableitung
+TYPES: gtyt_copadata TYPE copadata_tab.
+
+* Testparameter
+PARAMETERS: p_xtest TYPE xfeld DEFAULT 'X'.
+
+START-OF-SELECTION.
+  PERFORM processing.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  PROCESSING
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM processing .
+
+  DATA: lt_bkpf  TYPE gtyt_bkpf.
+  DATA: ls_bkpf  TYPE gtys_bkpf.
+  DATA: lt_bseg  TYPE gtyt_bseg.
+  DATA: ls_bseg  TYPE gtys_bseg.
+
+* Die Datentabellen sind in diesem Beispiel nicht gefüllt
+* Im beiliegenden PDF sind exemplarisch einige Buchungssätze zusammengestellt,
+* welche aber nur für das System gültig sind, in dem Sie verbucht wurden.
+* Um das Beispiel nutzen zu können, müßt ihr hier die Daten entsprechend
+* Eurem System von Hand aufbauen
+* Das Buchungsdatum habe ich leer gelassen, da in diesem Beispiel immer mit dem
+* aktuellen Tagesdatum gebucht wird.
+* Die Felder GJAHR und POPER werden während des Programmlaufes ermittelt
+* und dann in die LS_BKPF übertragen - für den Fall, das man das ganze
+* als Vorlage für eine Schnittstelle laufen lassen will ;-)
+*
+* Für die Standardbuchung habe ich den Buchungssatz hier ausgesternt schon
+* einmal vorbereitet:
+*  CLEAR ls_bkpf.
+*  ls_bkpf-id    = '1'.
+*  ls_bkpf-budat = '00000000'.
+*  ls_bkpf-bldat = '20180611'.
+*  ls_bkpf-bukrs = '1000'.
+*  ls_bkpf-gjahr = '0000'.
+*  ls_bkpf-poper = '000'.
+*  ls_bkpf-xblnr = '123'.
+*  ls_bkpf-waers = 'EUR'.
+*  APPEND ls_bkpf TO lt_bkpf.
+*
+*  CLEAR ls_bseg.
+*  ls_bseg-id    = '1'.
+*  ls_bseg-buzei = '001'
+*  ls_bseg-koart = 'K'.
+*  ls_bseg-shgkz = 'H'.
+*  ls_bseg-gkont = '0000100205'.
+*  ls_bseg-mwskz = abap_false.
+*  ls_bseg-brutto = '1725.00'.
+*  ls_bkpf-landl = 'DE'.
+*  ls_bkpf-lzbkz = abap_false. "kein Nicht Deutscher Kreditor
+*  APPEND ls_bseg TO lt_bseg.
+*
+*  CLEAR ls_bseg.
+*  ls_bseg-id    = '1'.
+*  ls_bseg-buzei = '002'.
+*  ls_bseg-koart = 'S'.
+*  ls_bseg-shgkz = 'S'.
+*  ls_bseg-gkont = '0000479100'.
+*  ls_bseg-mwskz = 'V3'.
+*  ls_bseg-netto = '500.00'.
+*  ls_bseg-kostl = '0000000100'.
+*  ls_bseg-aufnr  = space.
+*  ls_bseg-vbeln  = space.
+*  ls_bseg-posnr  = '000000'.
+*  ls_bseg-anln1  = space.
+*  ls_bseg-anln2 = space.
+*  ls_bseg-bwasl = space.
+*  APPEND ls_besg TO lt_bseg.
+*
+*  CLEAR ls_bseg.
+*  ls_bseg-id    = '1'.
+*  ls_bseg-buzei = '003'.
+*  ls_bseg-koart = 'S'.
+*  ls_bseg-shgkz = 'S'.
+*  ls_bseg-gkont = '0000479100'.
+*  ls_bseg-mwskz = 'V2'.
+*  ls_bseg-netto = '500.00'.
+*  ls_bseg-kostl = '0000000100'.
+*  ls_bseg-aufnr  = space.
+*  ls_bseg-vbeln  = space.
+*  ls_bseg-posnr  = '000000'.
+*  ls_bseg-anln1  = space.
+*  ls_bseg-anln2 = space.
+*  ls_bseg-bwasl = space.
+*  APPEND ls_besg TO lt_bseg.
+*
+*  CLEAR ls_bseg.
+*  ls_bseg-id    = '1'.
+*  ls_bseg-buzei = '004'.
+*  ls_bseg-koart = 'S'.
+*  ls_bseg-shgkz = 'S'.
+*  ls_bseg-gkont = '0000479100'.
+*  ls_bseg-mwskz = 'V3'.
+*  ls_bseg-netto = '500.00'.
+*  ls_bseg-kostl = '0000000140'.
+*  ls_bseg-aufnr  = space.
+*  ls_bseg-vbeln  = space.
+*  ls_bseg-posnr  = '000000'.
+*  ls_bseg-anln1  = space.
+*  ls_bseg-anln2 = space.
+*  ls_bseg-bwasl = space.
+*  APPEND ls_besg TO lt_bseg.
+
+  LOOP AT lt_bkpf INTO ls_bkpf.
+
+    PERFORM post_acc_doc USING ls_bkpf
+                               lt_bseg.
+  ENDLOOP.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  POST_ACC_DOC
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM post_acc_doc USING pis_bkpf  TYPE gtys_bkpf
+                        pit_bseg  TYPE gtyt_bseg.
+
+  DATA: ls_bkpf   TYPE gtys_bkpf.
+  DATA: lt_bseg   TYPE gtyt_bseg.
+  DATA: ls_bseg   TYPE gtys_bseg.
+  DATA: lt_tax    TYPE gtyt_tax.
+
+  DATA: BEGIN OF ls_awkey,
+          belnr TYPE bkpf-belnr,
+          bukrs TYPE bkpf-bukrs,
+          gjahr TYPE bkpf-gjahr,
+        END OF ls_awkey.
+
+  DATA: lv_buzei TYPE bseg-buzei.
+  DATA: lv_tabix TYPE sy-tabix.
+  DATA: lv_subrc TYPE sy-subrc.
+  DATA: lv_exit  TYPE xfeld.
+
+* BAPI-Definitionen
+* BKPF
+  DATA ls_header TYPE bapiache09.
+* BAPI-Protokoll
+  DATA lt_return TYPE bapiret2_tab.
+  DATA ls_return TYPE bapiret2.
+* Sachkontenzeile
+  DATA lt_acc_gl TYPE bapiacgl09_tab.
+* Kreditorenzeile
+  DATA lt_acc_py TYPE bapiacap09_tab.
+* Debitorenzeile - Im Beispiel nicht ausgeführt
+  DATA lt_acc_rv TYPE bapiacar09_tab               ##NEEDED.
+* Wertzeile
+  DATA lt_cur_am TYPE bapiaccr09_tab.
+* Steuerzeile
+  DATA lt_acc_tx TYPE bapiactx09_tab.
+* Zusätzliche Parameter (siehe Routine add_cred_line)
+  DATA lt_ext2   TYPE tt_bapiparex.
+* CO-PA Merkmalstabelle
+  DATA lt_acc_crit  TYPE bapiackec9_tab.
+* CO-PA Wertetabelle
+  DATA lt_acc_value TYPE bapiackev9_tab.
+
+  ls_bkpf = pis_bkpf.
+
+* Kopfdaten aufbereiten
+  PERFORM add_head_line CHANGING ls_bkpf
+                                 ls_header.
+
+* Loop über alle Buchungszeilen des Beleges
+  LOOP AT pit_bseg INTO ls_bseg
+    WHERE id EQ ls_bkpf-id.
+    lv_tabix = sy-tabix.
+*   Kopieren der aktuellen Buchungszeile
+*   Brauchen wir später, wenn wir die Steuerzeilen erzeugen wollen
+    lv_buzei = ls_bseg-buzei.
+
+*   Unterscheidung nach Kontoart
+    CASE ls_bseg-koart.
+*     Debitorenzeile
+      WHEN 'D'.
+*       Behandeln wir hier nicht - ist aber analog zum Kreditoren
+
+*     Kreditorenzeile
+      WHEN 'K'.
+*       Kreditorenzeile aufbauen
+        PERFORM add_cred_line USING    pis_bkpf
+                                       ls_bseg
+                              CHANGING lt_acc_py
+                                       lt_ext2.
+
+*       Betragszeile
+        PERFORM add_curr_line USING    pis_bkpf
+                                       ls_bseg
+                                       lv_tabix
+                              CHANGING lt_cur_am.
+      WHEN 'S'.
+*       Sachkontenzeile
+        PERFORM add_sach_line USING    ls_bkpf
+                                       ls_bseg
+                              CHANGING lt_acc_gl
+                                       lt_acc_crit
+                                       lt_acc_value
+                                       lt_ext2
+                                       lv_subrc.
+        IF lv_subrc NE 0.
+          lv_exit = abap_true.
+          EXIT.
+        ENDIF.
+
+*       Betragszeile
+        PERFORM add_curr_line USING    pis_bkpf
+                                       ls_bseg
+                                       lv_tabix
+                              CHANGING lt_cur_am.
+
+*       Steuer für Sachkontenpositionszeilen ermitteln
+        PERFORM get_tax USING    pis_bkpf
+                                 ls_bseg
+                                 lv_tabix
+                        CHANGING lt_tax.
+
+    ENDCASE.
+  ENDLOOP.
+
+* Fehler bei der CO-PA Ermittlung - und raus
+  IF lv_exit EQ abap_true.
+    RETURN.
+  ENDIF.
+
+* Nachdem wir auf den Sachkontenzeilen alle Steuern
+* gesammelt haben, bauen wir daraus jetzt die Steuerzeilen auf
+  PERFORM add_tax_lines USING    lt_tax
+                                 pis_bkpf
+                                 lv_buzei
+                        CHANGING lt_acc_tx
+                                 lt_cur_am.
+
+* Beleg prüfen
+  CALL FUNCTION 'BAPI_ACC_DOCUMENT_CHECK'
+    EXPORTING
+      documentheader = ls_header
+    TABLES
+      accountgl      = lt_acc_gl
+      accountpayable = lt_acc_py
+      accounttax     = lt_acc_tx
+      currencyamount = lt_cur_am
+      extension2     = lt_ext2
+      return         = lt_return.
+* Protokoll auswerten
+  READ TABLE lt_return INTO ls_return
+    WITH KEY type   = 'S'
+             id     = 'RW'
+             number = '614'.
+  IF sy-subrc EQ 0.
+*   Testflag abfragen
+*   Wenn gesetzt, raus
+    IF NOT p_xtest IS INITIAL.
+      FORMAT COLOR COL_POSITIVE.
+      WRITE:/ 'ID', pis_bkpf-id,
+            'erfolgreich gebucht'                       ##NO_TEXT.
+      FORMAT COLOR OFF.
+      RETURN.
+    ENDIF.
+*   Kein Testflag. Buchen
+    FREE lt_return.
+    CALL FUNCTION 'BAPI_ACC_DOCUMENT_POST'
+      EXPORTING
+        documentheader = ls_header
+      TABLES
+        accountgl      = lt_acc_gl
+        accountpayable = lt_acc_py
+        accounttax     = lt_acc_tx
+        currencyamount = lt_cur_am
+        extension2     = lt_ext2
+        return         = lt_return.
+    READ TABLE lt_return INTO ls_return
+      WITH KEY type   = 'S'
+               id     = 'RW'
+               number = '605'.
+    IF sy-subrc EQ 0.
+      MOVE ls_return-message_v2 TO ls_awkey.
+*     Commit Work durchführen
+      CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+        IMPORTING
+          return = ls_return.
+      IF NOT ls_return IS INITIAL.
+      ELSE.
+        FORMAT COLOR COL_POSITIVE.
+        WRITE:/ 'ID', pis_bkpf-id,
+                'erfolgreich gebucht'                  ##NO_TEXT.
+        FORMAT COLOR OFF.
+        WRITE:/ 'Beleg'                                ##NO_TEXT,
+                pis_bkpf-id,
+                ls_awkey-bukrs,
+                ls_awkey-belnr,
+                ls_awkey-gjahr,
+                'erfolgreich gebucht'                  ##NO_TEXT.
+      ENDIF.
+    ELSE.
+      FORMAT COLOR COL_NEGATIVE.
+      WRITE: /'ID', pis_bkpf-id, 'fehlerhaft'          ##NO_TEXT.
+      FORMAT COLOR OFF.
+      LOOP AT lt_return INTO ls_return
+      WHERE type NE 'S'
+      AND   type NE 'I'.
+        IF ls_return-id     EQ 'RW' AND
+           ls_return-number EQ '609'.
+          CONTINUE.
+        ENDIF.
+        WRITE: / pis_bkpf-id,
+                 ls_return-row,
+                 ls_return-type,
+                 ls_return-id,
+                 ls_return-number,
+                 ls_return-message.
+      ENDLOOP.
+    ENDIF.
+* Fehler bei der Belegprüfung
+  ELSE.
+    FORMAT COLOR COL_NEGATIVE.
+    WRITE: /'ID', pis_bkpf-id, 'fehlerhaft'            ##NO_TEXT.
+    FORMAT COLOR OFF.
+    LOOP AT lt_return INTO ls_return
+    WHERE type NE 'S'
+    AND   type NE 'I'.
+      IF ls_return-id EQ 'RW' AND
+       ls_return-number EQ '609'.
+        CONTINUE.
+      ENDIF.
+      WRITE:/ pis_bkpf-id,
+              ls_return-row,
+              ls_return-type,
+              ls_return-id,
+              ls_return-number,
+              ls_return-message.
+    ENDLOOP.
+  ENDIF.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ADD_HEAD_LINE
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM add_head_line  CHANGING pcs_bkpf   TYPE gtys_bkpf
+                             pes_header TYPE bapiache09.
+
+  CLEAR pes_header.
+
+  DATA: ls_header TYPE bapiache09.
+
+  ls_header-bus_act           = 'RFBU'.               "Betriebswirtschaftlicher Vorgang
+  ls_header-username          = sy-uname.             "Name des Benutzers
+  ls_header-header_txt        = pcs_bkpf-bktxt.       "Belegkopftext
+  ls_header-comp_code         = pcs_bkpf-bukrs.       "Buchungskreis
+  ls_header-doc_date          = pcs_bkpf-bldat.       "Belegdatum
+
+* Ermitteln von Geschäftsjahr und Periode aus dem Buchungsdatum
+* In unserem Fall ist das Buchungsdatum leer, also nehmen wir das
+* Tagesdatum. Es kann aber auch ein bestimmtes Datum übergeben werden
+* Dann aber darauf achten, das die entsprechenden Perioden zum
+* Buchen offen sind
+  PERFORM add_data_to_bkpf CHANGING pcs_bkpf.
+  IF pcs_bkpf-budat IS INITIAL.
+    ls_header-pstng_date      = sy-datum.             "Buchungsdatum
+  ELSE.
+    ls_header-pstng_date      = pcs_bkpf-budat.     "Buchungsdatum
+  ENDIF.
+
+  ls_header-trans_date        = sy-datum.             "Umrechnungsdatum
+  ls_header-fisc_year         = pcs_bkpf-gjahr.       "Geschäftsjahr
+  ls_header-fis_period        = pcs_bkpf-poper.       "Geschäftsmonat
+  ls_header-doc_type          = pcs_bkpf-blart.       "Belegart
+  ls_header-ref_doc_no        = pcs_bkpf-xblnr.       "Referenznummer
+
+* Achtung !!!!
+* Entweder Umrechnungsdatum oder Kurs - nicht beides mitgeben !!!!!
+  IF NOT pcs_bkpf-wwert IS INITIAL.
+    ls_header-trans_date    = pcs_bkpf-wwert.
+  ENDIF.
+
+* Sollten zusätzliche Werte benötigt werden, hier übergeben
+* oder die Kopftabelle entsprechend "aufbohren".
+
+  pes_header = ls_header.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ADD_DATA_TO_BKPF
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM add_data_to_bkpf CHANGING pcs_bkpf TYPE gtys_bkpf.
+
+  TYPES: BEGIN OF ltys_t001,
+           bukrs TYPE t001-bukrs,
+           periv TYPE t001-periv,
+         END OF ltys_t001,
+         ltyt_t001 TYPE HASHED TABLE OF ltys_t001 WITH UNIQUE KEY bukrs.
+
+  STATICS: lv_first_call TYPE xfeld.
+  STATICS: lt_t001       TYPE ltyt_t001.
+  DATA: ls_t001 TYPE ltys_t001.
+  DATA: lv_buper TYPE poper.
+  DATA: lv_gjahr TYPE gjahr.
+  DATA: lv_budat TYPE bkpf-budat.
+
+* Ermittlung der Geschäftsjahresvariante für alle im System vorhandenen
+* Buchungskreise
+  IF lv_first_call IS INITIAL.
+    SELECT bukrs periv
+           FROM t001
+           INTO TABLE lt_t001.
+    MOVE abap_true TO lv_first_call.
+  ENDIF.
+
+  READ TABLE lt_t001 INTO ls_t001
+    WITH TABLE KEY bukrs = pcs_bkpf-bukrs.
+  IF sy-subrc EQ 0.
+    IF pcs_bkpf-budat IS INITIAL.
+      MOVE sy-datum       TO lv_budat.
+    ELSE.
+      MOVE pcs_bkpf-budat TO lv_budat.
+    ENDIF.
+
+*   Ermittlung der Periode und des Geschäftsjahres
+*   anhand des Buchungsdatum und der Geschäftsjahresvariante
+*   (Stichwort: Verschobenes Geschäftsjahr)
+    CALL FUNCTION 'DATE_TO_PERIOD_CONVERT'
+      EXPORTING
+        i_date         = lv_budat
+        i_periv        = ls_t001-periv
+      IMPORTING
+        e_buper        = lv_buper
+        e_gjahr        = lv_gjahr
+      EXCEPTIONS
+        input_false    = 1
+        t009_notfound  = 2
+        t009b_notfound = 3
+        OTHERS         = 4.
+    IF sy-subrc &lt;&gt; 0.
+      MESSAGE ID sy-msgid TYPE 'E' NUMBER sy-msgno
+              WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
+    MOVE: lv_buper TO pcs_bkpf-poper,
+          lv_gjahr TO pcs_bkpf-gjahr.
+  ELSE.
+*   Fehlermeldung - darf nicht vorkommen !!!!
+*   Buchungskreis &amp;1 ist nicht vorhanden
+    MESSAGE a215(fagl_emu) WITH pcs_bkpf-bukrs.
+  ENDIF.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ADD_CRED_LINE
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM add_cred_line  USING    pis_bkpf TYPE gtys_bkpf
+                             pis_bseg TYPE gtys_bseg
+                    CHANGING pct_cred TYPE bapiacap09_tab
+                             pct_ext2 TYPE tt_bapiparex.
+
+  DATA: ls_struc_ext2 TYPE zsc_s_soawf_badi_acc_doc.
+  DATA: ls_cred  LIKE LINE OF pct_cred.
+  DATA: ls_ext2  LIKE LINE OF pct_ext2.
+
+* Kreditorenzeile
+  ls_cred-itemno_acc        = pis_bseg-buzei.       "Positionsnummer des Rechnungswesenbeleges
+  ls_cred-vendor_no         = pis_bseg-gkont.       "Lieferantennummer
+* Das Sachkonto auf welches gebucht wird, ist immer das im Lieferantenstamm
+* eingetragene Abstimmkonto
+* Gilt übrigens auch für Debitoren. Dort ist es AKONT in der KNB1
+  SELECT SINGLE akont
+                FROM lfb1
+                INTO ls_cred-gl_account
+                WHERE lifnr EQ pis_bseg-gkont
+                AND   bukrs EQ pis_bkpf-bukrs.
+  ls_cred-item_text         = pis_bseg-sgtxt.       "Positionstext
+  ls_cred-supcountry        = pis_bseg-landl.       "Lieferland wenn nicht DE
+
+* Schmankerl 1
+* Übergabe eines nicht in der Kreditorenstruktur vorhandenen Feldes - in diesem
+* Falle das Landeszentralbankkennzeichen
+  IF NOT pis_bseg-lzbkz IS INITIAL.
+*   Hierzu MUSS!! man sich im DDIC eine Struktur definieren, welche
+*   all die Felder enthält, welche man zusätzlich übergeben will.
+*   Diese wird im Feld STRUCTURE der Struktur BAPIPAREX übergeben.
+*
+*   Als Maximalmenge können die Felder der Struktur ACCIT übergeben werden.
+*   Die Struktur MUSS!!! immer ein Feld vom Typen
+*   POSNR TYPE POSNR_ACC
+*   enthalten. Dieser stellt die Verbindung von der Übergabezeile (in diesem Falle
+*   der Kreditorenzeile) zur Extension2-Zeile her.
+*
+*   Als weitere Felder werden dann die zu zusätzlich benötigten Felder übergeben.
+*
+*   Um nun die Felder auch ins BAPI zu bringen, muß man zum BADI ACC_DOCUMENT
+*   mit der SE19 eine eigene Implementierung anlegen (oder, wenn Glück hat, ist
+*   bereits eine vorhanden).
+*   Hierzu MUSS!!! man den Filterwert auf BKPFF (nicht BKPF) stellen, da dieser
+*   vom BAPI gefordert bzw. geschrieben wird.
+*   Als Coding kann man das Coding der Beispielimplementierung der SAP nutzen, welche man
+*   aus der Beispielimplementierung in die eigene Implementierung kopiert.
+*   ACHTUNG!!!!!!
+*   Nicht den Fehler machen und die ACCIT als Strukturnamen und Übergabestruktur
+*   benutzen. Die Felder VALUEPART1 bis VALUEPART4 werden concateniert und sind
+*   insgesamt nur 960 Zeichen lang !!! Da kann man mit der ACCIT und Ihren 496 Feldern!
+*   auch schon mal ganz schnell ins Klo greifen, wenn die Felder erst hinter
+*   den 960 Zeichen aufgerufen werden.
+*   Wenn man mehr als 240 Zeichen Übergabe benötigt, ein Charakterfeld mit 960 Zeichen
+*   definieren, die Struktur darauf moven, dann zerhaken und als VALUEPART1 bis 4 übergeben.
+*   ACHTUNG !!!!
+*   Bei Übergabe von Zahlfeldern diese vorher in Charakterwerte umwandeln und dann übergeben,
+*   sonst geht es schief. Ggf. die Implentierung entsprechend anpassen.
+*   ACHTUNG !!!
+*   Da die Übergabefelder CHAR-Werte sind, kann Kleinschreibung nicht übergeben werden.
+*   Danke SAP!!!
+    MOVE 'Z_BADI_ACC_DOC' TO ls_ext2-structure.
+    ls_struc_ext2-posnr = pis_bseg-buzei.
+    ls_struc_ext2-lzbkz = pis_bseg-lzbkz.
+    MOVE ls_struc_ext2 TO ls_ext2-valuepart1.
+    APPEND ls_ext2 TO pct_ext2.
+  ENDIF.
+
+  APPEND ls_cred TO pct_cred.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ADD_CURR_LINE
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM add_curr_line  USING    pis_bkpf   TYPE gtys_bkpf
+                             pis_bseg   TYPE gtys_bseg
+                             piv_tabix  TYPE sy-tabix
+                    CHANGING pet_curr   TYPE bapiaccr09_tab.
+
+  DATA: ls_curr   LIKE LINE OF pet_curr.
+  DATA: lv_amount TYPE bseg-wrbtr.
+
+  CASE pis_bseg-koart.
+*   Kreditorische/Debitorische Zeilen nur einmal im Beleg
+*   als Kopfzeile - daher immer Brutto!!
+    WHEN 'K' OR 'D'.
+      MOVE pis_bseg-brutto TO lv_amount.
+    WHEN 'S'.
+*     Bei Sachkontenbuchungen Unterscheidung
+*     nach Kopf- und Positionszeilen
+      IF piv_tabix EQ 1.
+        MOVE pis_bseg-brutto TO lv_amount.
+      ELSE.
+        MOVE pis_bseg-netto  TO lv_amount.
+      ENDIF.
+  ENDCASE.
+
+* Habenwerte immer mit -1 multiplizieren (braucht das BAPI
+* um zu erkennen, was es buchen soll)
+  CASE pis_bseg-shkzg.
+    WHEN 'H'.
+      lv_amount = lv_amount * -1.
+  ENDCASE.
+
+  ls_curr-itemno_acc        = pis_bseg-buzei.
+  ls_curr-currency          = pis_bkpf-waers.
+* Wenn die Währung nicht stimmen sollte, hier umwandeln
+  ls_curr-currency_iso      = pis_bkpf-waers.
+  ls_curr-amt_doccur        = lv_amount.
+* Währungstyp
+* Hier steht die Belegwährung, was der Standardfall ist.
+* Sollen zusätzlich andere Typen verwendet werden, müßen die Werte angepaßt
+* werden. Aber das ist ein ganz eigenes Kapitel. Werde ich ggf. bei
+* Zeiten ergänzen.
+  ls_curr-curr_type         = '00'.
+* Umrechnungskurs für Fremdwährung
+* ACHTUNG!!!
+* Entweder hier KURSF ODER!!!! im Kopf WWERT mitgeben
+  ls_curr-exch_rate         = pis_bkpf-kursf.
+
+  APPEND ls_curr TO pet_curr.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ADD_SACH_LINE
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM add_sach_line  USING    pis_bkpf  TYPE gtys_bkpf
+                             pis_bseg  TYPE gtys_bseg
+                    CHANGING pct_sach  TYPE bapiacgl09_tab
+                             pct_crit  TYPE bapiackec9_tab
+                             pct_value TYPE bapiackev9_tab
+                             pct_ext2  TYPE tt_bapiparex
+                             pev_subrc TYPE sy-subrc.
+
+  DATA: ls_struc_ext2 TYPE zsc_s_soawf_badi_acc_doc.
+  DATA: ls_ext2       LIKE LINE OF pct_ext2.
+  DATA: ls_acc_gl     LIKE LINE OF pct_sach.
+  DATA: lv_subrc      TYPE sy-subrc.
+
+  CLEAR pev_subrc.
+
+  ls_acc_gl-itemno_acc        = pis_bseg-buzei.       "Positionsnummer des Rechnungswesenbeleges
+  ls_acc_gl-gl_account        = pis_bseg-gkont.       "Sachkonto der Hauptbuchhaltung
+  ls_acc_gl-item_text         = pis_bseg-sgtxt.       "Positionstext
+  ls_acc_gl-acct_key          = space.                "Vorgangsschlüssel
+* Bei Kontierung Kreditor auf Anlage muß die Kontoart auf 'A'
+* wie Anlage umgestellt werden.
+* Ferner brauchen wir das Abstimmkonto der Anlage
+* und wir müssen, über die Externen Felder, die Bewegungsart
+* mitgeben. Andernfalls bekommen wir keine Anlagenbuchung
+  IF NOT pis_bseg-anln1 IS INITIAL.
+    ls_acc_gl-acct_type         = 'A'.                "Kontoart
+    ls_acc_gl-gl_account        = pis_bseg-gkont.     "Sachkonto der Hauptbuchhaltung
+    ls_acc_gl-acct_key          = 'ANL'.              "Vorgangsschlüssel für Anlagenbuchungen (BSCHL 70/75)
+    MOVE 'ZSC_S_SOAWF_BADI_ACC_DOC' TO ls_ext2-structure.
+    ls_struc_ext2-posnr = pis_bseg-buzei.
+    ls_struc_ext2-anbwa = '100'.
+    MOVE ls_struc_ext2 TO ls_ext2-valuepart1.
+    APPEND ls_ext2 TO pct_ext2.
+  ELSE.
+    ls_acc_gl-acct_type         = 'S'.                "Kontoart
+    ls_acc_gl-gl_account        = pis_bseg-gkont.     "Sachkonto der Hauptbuchhaltung
+  ENDIF.
+
+  ls_acc_gl-acct_type         = pis_bseg-koart.       "Kontoart
+  ls_acc_gl-tax_code          = pis_bseg-mwskz.       "Mehrwertsteuerkennzeichen
+* Standardkontierungen, ggf. ergänzen.
+  ls_acc_gl-costcenter        = pis_bseg-kostl.       "Kostenstelle
+  ls_acc_gl-orderid           = pis_bseg-aufnr.       "Innenauftrag
+  ls_acc_gl-asset_no          = pis_bseg-anln1.       "Anlagenhauptnummer
+  ls_acc_gl-sub_number        = pis_bseg-anln2.       "Anlagenunternummer
+
+  IF NOT pis_bseg-vbeln IS INITIAL.
+    PERFORM add_copa_line USING    pis_bkpf
+                                   pis_bseg
+                          CHANGING pct_crit
+                                   pct_value
+                                   lv_subrc.
+    IF sy-subrc NE 0.
+      pev_subrc = 4.
+      RETURN.
+    ENDIF.
+  ENDIF.
+
+  APPEND ls_acc_gl TO pct_sach.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ADD_COPA_LINE
+*&amp;---------------------------------------------------------------------*
+*       Schmankerl CO-PA Kontierung
+*       Dem BAPI ACC_DOCUMENT_POST müssen die Merkmals- sowie die
+*       Wertedaten für die CO-PA Kontierung mitgegeben werden
+*       Hierbei kommt es vor, das von Kundenseite oder der Schnittstellt
+*       nur der Kundenauftrag zur Verfügung gestellt wird und die
+*       CO-PA Kontierungen dem Programmierer "überlassen" werden.
+*       Danke für die Info ;-)
+*       Was tun?
+*       Zum Glück für uns gibt es den Report RFBIBL00 bzw RFBBIBL01
+*       der ebenfalls mit CO-PA Daten bestückt werden kann.
+*       Hierfür gibt es den Baustein RKE_CONVERT_CRITERIA_PAOBJNR
+*       der aus gegegbenen Daten eine neu CO-PA Ableitung fährt
+*       aus der man dann die Merkmale nachlesen und dem BAPI unterschieben kann.
+******  ACHTUNG !!!!!! ***********
+*       Das neue Kontierungsobjekt wird nur dann weggeschrieben und
+*       kann nachgelesen werden, wenn ein COMMIT WORK erfolgt!!!!
+*       Das ist zwar unschön aber ich kenne keine andere Methode um an eine
+*       komplette Ableitung zu gelangen. Wenn jemand eine kennt, wäre
+*       ich dankbar, wenn diese öffentlich gemacht würde.
+*       Man muß also aufpassen, das man vorher keine Daten auf der
+*       Datenbank bereits geändert oder angelegt hat. Diese würde
+*       hier unweigerlich commited!!!!!
+*
+*       Das ist aber leider nur die Hälfte der Wahrheit
+*       Wir brauchen leider nicht nur die Merkmale, sondern wir müssen
+*       ja auch noch die WErtfelder bestücken.
+*       Hierzu siehe Routine ADD_VALUE_LINE
+*
+*       Und als ob das noch nicht reichen würde, müssen wir die erhaltene
+*       Ableitung auch noch durch eine Routine schicken, welche die
+*       alle relevanten Konvertierungsexits durchläuft, weil der
+*       Ableitungsbaustein nur die externe Darstellung (RFBIBL -&gt; BI-Programm)
+*       zurückliefert aber nicht die interne, welche das BAPI fordert.
+*       Hierzu siehe Routine 'CHANGE_DATA_CONV_EXIT
+*       Diese Routine kann man in abgewandelter Form auch benutzen, um
+*       z.B. Datenbankdaten für einen Batch-Input aufzubereiten (z.B.
+*       Arbeitsplätze oder PSP-Elemente).
+*----------------------------------------------------------------------*
+FORM add_copa_line  USING    pis_bkpf  TYPE gtys_bkpf
+                             pis_bseg  TYPE gtys_bseg
+                    CHANGING pct_crit  TYPE bapiackec9_tab
+                             pct_value TYPE bapiackev9_tab
+                             pev_subrc TYPE sy-subrc.
+
+  DATA: ls_copabbseg TYPE copabbseg.
+  DATA: ls_crit      LIKE LINE OF pct_crit.
+  DATA: lv_paobjnr   TYPE rkeobjnr.
+  DATA: lv_subrc     TYPE sy-subrc.
+  DATA: lt_copadata  TYPE gtyt_copadata.
+  DATA: ls_copadata  LIKE LINE OF lt_copadata.
+  DATA: ls_org_copa  TYPE gtys_org_copa.
+
+  CLEAR pev_subrc.
+
+  IF pis_bseg-vbeln IS INITIAL.
+    RETURN.
+  ENDIF.
+
+* Zuordnung BURKS zu KOKRS/ERKRS ermitteln
+  PERFORM get_orgdata_copa USING    pis_bkpf-bukrs
+                           CHANGING ls_org_copa.
+
+* Wertfeldtabelle füllen
+  PERFORM add_value_line USING    pis_bkpf
+                                  pis_bseg
+                                  ls_org_copa-kokrs
+                                  ls_org_copa-erkrs
+                         CHANGING pct_value
+                                  lv_subrc.
+  IF lv_subrc NE 0.
+    pev_subrc = 4.
+    RETURN.
+  ENDIF.
+
+* Übergabe für Baustein füttern
+* Buchungskreis MUSS zwingend gefüllt werden
+  MOVE: pis_bkpf-bukrs TO ls_copabbseg-rke_bukrs.
+  MOVE: pis_bseg-vbeln TO ls_copabbseg-rke_kaufn.
+  MOVE: pis_bseg-posnr TO ls_copabbseg-rke_kdpos.
+
+* Neue Ableitung
+  CALL FUNCTION 'RKE_CONVERT_CRITERIA_PAOBJNR'
+    EXPORTING
+      is_copabbseg     = ls_copabbseg
+*     i_date           =
+    IMPORTING
+      e_paobjnr        = lv_paobjnr
+    EXCEPTIONS
+      no_bukrs_found   = 1
+      no_erkrs_found   = 2
+      error_criterion  = 3
+      error_derivation = 4
+      OTHERS           = 5.
+  IF sy-subrc &lt;&gt; 0.
+*   Fehler bei Ableitung CO-PA Merkmale für ID &amp; Buzei &amp;.
+    pev_subrc = 4.
+    RETURN.
+  ENDIF.
+
+* Commit Work durchführen, damit die Ergebnisobjektnummer auf
+* der Datenbank vorliegt
+  COMMIT WORK  AND WAIT.
+  IF sy-subrc NE 0.
+*   Fehler bei der Fortschreibung PAOBJNR für ID &amp; Buzei &amp;.
+    pev_subrc = 4.
+    RETURN.
+  ENDIF.
+
+* Nachlesen der neuen Ableitung
+  CALL FUNCTION 'RKE_CONVERT_PAOBJNR_COPADATA'
+    EXPORTING
+      bukrs          = pis_bkpf-bukrs
+      kokrs          = ls_org_copa-kokrs
+      paobjnr        = lv_paobjnr
+    TABLES
+      i_copadata     = lt_copadata
+    EXCEPTIONS
+      no_erkrs_found = 1
+      paobjnr_wrong  = 2
+      OTHERS         = 3.
+  IF sy-subrc &lt;&gt; 0.
+*   Fehler bei Ermittlung Wertfelder aus PAOBJNR für ID &amp; Buzei &amp;.
+    pev_subrc = 4.
+    RETURN.
+  ENDIF.
+
+* Umstellung der externen Darstellung der Merkmale auf
+* interne Werte (durchlaufen der Konvertierungsexits)
+  IF NOT lt_copadata IS INITIAL.
+    PERFORM change_data_conv_exit USING    ls_org_copa-erkrs
+                                  CHANGING lt_copadata.
+  ENDIF.
+
+* Anhängen der Merkmale an die Merkmalstabelle für das BAPI
+  LOOP AT lt_copadata INTO ls_copadata.
+    IF NOT ls_copadata-fval IS INITIAL.
+      CLEAR ls_crit.
+
+      MOVE: pis_bseg-buzei   TO ls_crit-itemno_acc,
+            ls_copadata-fnam TO ls_crit-fieldname,
+            ls_copadata-fval TO ls_crit-character.
+      APPEND ls_crit TO pct_crit.
+    ENDIF.
+  ENDLOOP.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_ORGDATA_COPA
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM get_orgdata_copa  USING    piv_bukrs    TYPE bukrs
+                       CHANGING pes_org_copa TYPE gtys_org_copa.
+
+  CLEAR pes_org_copa.
+
+  DATA: ls_org_copa    LIKE pes_org_copa.
+  DATA: lv_kokrs       TYPE kokrs.
+  DATA: lv_erkrs       TYPE erkrs.
+  STATICS: lt_org_copa TYPE gtyt_org_copa_hash.
+
+  READ TABLE lt_org_copa INTO ls_org_copa
+    WITH TABLE KEY bukrs = piv_bukrs.
+  IF sy-subrc EQ 0.
+    pes_org_copa = ls_org_copa.
+    RETURN.
+  ENDIF.
+
+  CALL FUNCTION 'KOKRS_GET_FROM_BUKRS'
+    EXPORTING
+      i_bukrs        = piv_bukrs
+    IMPORTING
+      e_kokrs        = lv_kokrs
+    EXCEPTIONS
+      no_kokrs_found = 1
+      OTHERS         = 2.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE ID sy-msgid TYPE 'E' NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  CALL FUNCTION 'COPA_ERKRS_FIND'
+    EXPORTING
+      bukrs              = piv_bukrs
+    IMPORTING
+      erkrs              = lv_erkrs
+    EXCEPTIONS
+      error_kokrs_find   = 1
+      kokrs_wrong        = 2
+      no_erkrs_defined   = 3
+      no_erkrs_for_kokrs = 4
+      OTHERS             = 5.
+  IF sy-subrc &lt;&gt; 0.
+    MESSAGE ID sy-msgid TYPE 'E' NUMBER sy-msgno
+            WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  ENDIF.
+
+  MOVE: piv_bukrs TO ls_org_copa-bukrs,
+        lv_kokrs  TO ls_org_copa-kokrs,
+        lv_erkrs  TO ls_org_copa-erkrs.
+  INSERT ls_org_copa INTO TABLE lt_org_copa.
+  pes_org_copa = ls_org_copa.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ADD_VALUE_LINE
+*&amp;---------------------------------------------------------------------*
+*       Das BAPI fordert von uns nicht nur die Merkmale sondern wir
+*       müssen auch die Wertfelder bestücken - und zwar die richtigen!!!
+*
+*       Die erreichen wir, indem wir den Baustein
+*       COPA_GET_SETTLEMENT_STRUCTURE benutzen. Dieser gibt uns
+*       das Ergebnisschmema, die Zuordnung sowie den Inhalt der Tabelle
+*       TKB9F zurück.
+*       Hierzu muß man wissen, das für das Konto, auf welches gebucht
+*       werden soll, im Customizing hinterlegt sein MUSS, auf welches
+*       Wertfeld die Beträge laufen sollen.
+*       Also lesen wir zunächst mit dem Baustein Schema und Zuordnung
+*       und dann damit die Tabelle.
+*       Nicht wundern, das hier bestimmte Werte hart verdrahtet sind.
+*       Das ist so und muß auch so gecustomized sein.
+*       Es MUSS ein Wertfeld sein (MWKZ = 1) und das Fix-/Variabel Kz.
+*       MUSS auf Gesamtwert (FVKZ = 3) stehen. Ist das nicht der Fall,
+*       ist dies ein Fehler!!!!
+*       Hat man vor mehrere Belege für unterschiedliche Währungs-
+*       sichten zu erzeugen, so muß man dies auch hier tun. Im diesem
+*       Beispiel nehmen wir nur die Belegwährung
+*----------------------------------------------------------------------*
+FORM add_value_line USING    pis_bkpf  TYPE gtys_bkpf
+                             pis_bseg  TYPE gtys_bseg
+                             piv_kokrs TYPE kokrs
+                             piv_erkrs TYPE erkrs
+                    CHANGING pct_value TYPE bapiackev9_tab
+                             pev_subrc TYPE sy-subrc.
+
+  DATA: lt_9f TYPE STANDARD TABLE OF tkb9f.
+  DATA: ls_9f LIKE LINE OF lt_9f.
+  DATA: lv_ersch TYPE tkb9f-ersch.
+  DATA: lv_erzuo TYPE tkb9f-erzuo.
+
+  DATA: ls_value LIKE LINE OF pct_value.
+  DATA: BEGIN OF ls_wertfeld,
+          hkont  TYPE bseg-hkont,
+          wrtfld TYPE fieldname,
+        END OF ls_wertfeld.
+  STATICS: lt_wertfeld LIKE HASHED TABLE OF ls_wertfeld
+                       WITH UNIQUE KEY hkont.
+
+  CLEAR pev_subrc.
+
+* Statische Wertfeldtabelle lesen (damit es schneller geht)
+  READ TABLE lt_wertfeld INTO ls_wertfeld
+    WITH TABLE KEY hkont = pis_bseg-gkont.
+  IF sy-subrc EQ 0.
+    MOVE: pis_bseg-buzei     TO ls_value-itemno_acc,
+          ls_wertfeld-wrtfld TO ls_value-fieldname,
+          '00'               TO ls_value-curr_type,
+          pis_bkpf-waers     TO ls_value-currency,
+          pis_bkpf-waers     TO ls_value-currency_iso,
+          pis_bseg-netto     TO ls_value-amt_valcom.
+    APPEND ls_value TO pct_value.
+    RETURN.
+  ENDIF.
+
+* Ansonsten Ergebnisschema und -zuordnung ermitteln
+  CALL FUNCTION 'COPA_GET_SETTLEMENT_STRUCTURE'
+    EXPORTING
+      i_erkrs              = piv_erkrs
+      i_vrgng              = 'RFBU'
+      i_hkont              = pis_bseg-gkont
+      i_kokrs              = piv_kokrs
+    IMPORTING
+      e_ersch              = lv_ersch
+      e_erzuo              = lv_erzuo
+    TABLES
+      t_tkb9f              = lt_9f
+    EXCEPTIONS
+      incomplete_structure = 1
+      error_structure      = 2
+      OTHERS               = 3.
+  IF sy-subrc &lt;&gt; 0.
+*   Wertfeld für Bukrs &amp; Konto &amp; kann nicht ermittelt werden (&amp;).
+    pev_subrc = 4.
+    RETURN.
+  ENDIF.
+
+* TKB9F mit den ermittelten Werten lesen
+  READ TABLE lt_9f INTO ls_9f WITH KEY ersch = lv_ersch
+                                       erzuo = lv_erzuo
+                                       erkrs = piv_erkrs
+                                       mwkz  = '1'
+                                       fvkz  = '3'.
+  IF sy-subrc NE 0.
+*   Ist hier nichts zu finden, ist dies ein Fehler und der Beleg
+*   würde sowieso aufbrummen - also Schluß
+*   Wertfeld für Bukrs &amp; Konto &amp; kann nicht ermittelt werden (&amp;)
+    pev_subrc = 4.
+    RETURN.
+  ENDIF.
+
+* Value Rückgabetabelle füllen
+  MOVE: pis_bseg-buzei TO ls_value-itemno_acc,
+        ls_9f-wrtfld   TO ls_value-fieldname,
+        '00'           TO ls_value-curr_type,
+        pis_bkpf-waers TO ls_value-currency,
+        pis_bkpf-waers TO ls_value-currency_iso,
+        pis_bseg-netto TO ls_value-amt_valcom.
+  APPEND ls_value TO pct_value.
+
+* Und zum Schluß noch die statische Wertfeldtabelle erweitern
+  MOVE: pis_bseg-gkont TO ls_wertfeld-hkont,
+        ls_9f-wrtfld   TO ls_wertfeld-wrtfld.
+  INSERT ls_wertfeld INTO TABLE lt_wertfeld.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  CHANGE_DATA_CONV_EXIT
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM change_data_conv_exit  USING    piv_erkrs TYPE erkrs
+                            CHANGING pct_data  TYPE gtyt_copadata.
+
+  DATA: BEGIN OF ls_ddic,
+          tabname   TYPE dfies-tabname,
+          fieldname TYPE dfies-fieldname,
+          rollname  TYPE dfies-rollname,
+          convexit  TYPE dfies-convexit,
+          funcname  TYPE tfdir-funcname,
+          reference TYPE REF TO data,
+        END OF ls_ddic,
+        lt_ddic LIKE HASHED TABLE OF ls_ddic
+                WITH UNIQUE KEY tabname fieldname.
+  DATA: lt_ddic_info TYPE ddfields.
+  DATA: ls_ddic_info LIKE LINE OF lt_ddic_info.
+  DATA: lv_tabname   TYPE tabname.
+  DATA: lv_fieldname TYPE fieldname.
+  DATA: lv_value     TYPE REF TO data.
+
+  FIELD-SYMBOLS: &lt;ls_data&gt;  LIKE LINE OF pct_data,
+                 &lt;lv_value&gt; TYPE any.
+
+
+  CONCATENATE 'CE0' piv_erkrs INTO lv_tabname.
+
+  LOOP AT pct_data ASSIGNING &lt;ls_data&gt;.
+    CHECK NOT &lt;ls_data&gt;-fval IS INITIAL.
+    CLEAR: lv_tabname, ls_ddic.
+
+    CONCATENATE 'CE0' piv_erkrs INTO lv_tabname.
+    CONDENSE lv_tabname.
+
+    MOVE &lt;ls_data&gt;-fnam TO lv_fieldname.
+    READ TABLE lt_ddic INTO ls_ddic
+      WITH TABLE KEY tabname   = lv_tabname
+                     fieldname = lv_fieldname.
+    IF sy-subrc EQ 0.
+      IF ls_ddic-funcname IS INITIAL.
+        CONTINUE.
+      ENDIF.
+    ELSE.
+      CALL FUNCTION 'DDIF_FIELDINFO_GET'
+        EXPORTING
+          tabname        = lv_tabname
+          fieldname      = lv_fieldname
+        TABLES
+          dfies_tab      = lt_ddic_info
+        EXCEPTIONS
+          not_found      = 1
+          internal_error = 2
+          OTHERS         = 3.
+      IF sy-subrc &lt;&gt; 0.
+        MESSAGE ID sy-msgid TYPE 'E' NUMBER sy-msgno
+                WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+      ENDIF.
+      CLEAR ls_ddic.
+      READ TABLE lt_ddic_info INTO ls_ddic_info INDEX 1.
+      MOVE-CORRESPONDING ls_ddic_info TO ls_ddic.
+      IF NOT ls_ddic-convexit IS INITIAL.
+        CONCATENATE 'CONVERSION_EXIT_' ls_ddic_info-convexit '_INPUT'
+                    INTO ls_ddic-funcname.
+        CONDENSE ls_ddic-funcname.
+        CREATE DATA lv_value TYPE (ls_ddic-rollname).
+        MOVE lv_value TO ls_ddic-reference.
+      ENDIF.
+      INSERT ls_ddic INTO TABLE lt_ddic.
+    ENDIF.
+    IF NOT ls_ddic-funcname IS INITIAL.
+      ASSIGN ls_ddic-reference-&gt;* TO &lt;lv_value&gt;.
+      MOVE &lt;ls_data&gt;-fval TO &lt;lv_value&gt;.
+      CALL FUNCTION ls_ddic-funcname
+        EXPORTING
+          input  = &lt;lv_value&gt;
+        IMPORTING
+          output = &lt;lv_value&gt;
+        EXCEPTIONS
+          OTHERS = 0.
+      CLEAR &lt;ls_data&gt;-fval.
+      MOVE &lt;lv_value&gt; TO &lt;ls_data&gt;-fval.
+    ENDIF.
+  ENDLOOP.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_TAX
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM get_tax  USING    pis_bkpf  TYPE gtys_bkpf
+                       pis_bseg  TYPE gtys_bseg
+                       piv_tabix TYPE sy-tabix
+              CHANGING pct_tax   TYPE gtyt_tax.
+
+  DATA: lv_amount TYPE bseg-wrbtr.
+  DATA: lt_mwdat  TYPE STANDARD TABLE OF rtax1u15.
+  DATA: ls_mwdat  LIKE LINE OF lt_mwdat.
+  DATA: ls_tax    TYPE gtys_tax.
+  DATA: lt_tax    TYPE gtyt_tax.
+
+* Nur Steuer auf Positions-, nicht auf Kopfzeilen
+  IF piv_tabix EQ 1.
+    RETURN.
+  ENDIF.
+
+* Steuerkennzeichen muß mitgegeben sein
+  IF NOT pis_bseg-mwskz IS INITIAL.
+*   ACHTUNG
+*   Der Baustein ermittelt die Steuer abhängig vom
+*   übergebenen Wert. Da wir mit positiven Werten arbeiten
+*   müssen wir hier natürlich auch ggf. das Vorzeichen drehen
+*   sonst geht es schief.
+    lv_amount = pis_bseg-netto.
+    IF pis_bseg-shkzg EQ 'H'.
+      lv_amount = pis_bseg-netto * -1.
+    ENDIF.
+
+*   Baustein für Ermittlung der Steuer aus dem Nettowert
+*   Anmerkung: Gibt es auch für Bruttowerte
+*              CALCULATE_TAX_FROM_GROSSAMOUNT
+    CALL FUNCTION 'CALCULATE_TAX_FROM_NET_AMOUNT'
+      EXPORTING
+        i_bukrs           = pis_bkpf-bukrs
+        i_mwskz           = pis_bseg-mwskz
+        i_waers           = pis_bkpf-waers
+        i_wrbtr           = lv_amount
+      TABLES
+        t_mwdat           = lt_mwdat
+      EXCEPTIONS
+        bukrs_not_found   = 1
+        country_not_found = 2
+        mwskz_not_defined = 3
+        mwskz_not_valid   = 4
+        ktosl_not_found   = 5
+        kalsm_not_found   = 6
+        parameter_error   = 7
+        knumh_not_found   = 8
+        kschl_not_found   = 9
+        unknown_error     = 10
+        account_not_found = 11
+        txjcd_not_valid   = 12
+        OTHERS            = 13.
+    IF sy-subrc &lt;&gt; 0.
+      MESSAGE ID sy-msgid TYPE 'E' NUMBER sy-msgno
+              WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
+    LOOP AT lt_mwdat INTO ls_mwdat.
+      MOVE-CORRESPONDING ls_mwdat TO ls_tax                 ##ENH_OK.
+*     Wir brauchen für die Steuerzeilen aber auch noch das Steuerkenn-
+*     zeichen. Daher umkopieren auf eigene Struktur
+      MOVE: pis_bseg-mwskz TO ls_tax-mwskz.
+      APPEND ls_tax TO lt_tax.
+    ENDLOOP.
+    IF NOT lt_mwdat IS INITIAL.
+      APPEND LINES OF lt_tax TO pct_tax.
+    ENDIF.
+  ENDIF.
+
+ENDFORM.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  ADD_TAX_LINES
+*&amp;---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+FORM add_tax_lines  USING    pit_tax    TYPE gtyt_tax
+                             pis_bkpf   TYPE gtys_bkpf
+                             piv_buzei  TYPE bseg-buzei
+                    CHANGING pct_acc_tx TYPE bapiactx09_tab
+                             pct_cur_am TYPE bapiaccr09_tab.
+
+  DATA: ls_tax    LIKE LINE OF pit_tax.
+  DATA: ls_acc_tx LIKE LINE OF pct_acc_tx.
+  DATA: ls_cur_am LIKE LINE OF pct_cur_am.
+  DATA: lv_buzei  TYPE bseg-buzei.
+
+  DATA: BEGIN OF ls_collect,
+          mwskz TYPE mwskz,
+          kschl TYPE kschl,
+          ktosl TYPE ktosl,
+          hkont TYPE hkont,
+          wmwst TYPE wmwst,
+          kawrt TYPE kawrt,
+        END OF ls_collect.
+  DATA: lt_collect LIKE HASHED TABLE OF ls_collect
+                   WITH UNIQUE KEY mwskz ktosl kschl hkont.
+
+* Steuern müssen wir schon ermittelt haben
+  IF NOT pit_tax IS INITIAL.
+
+*   Über den Collect werden Steuer und Steuerbasis summiert
+*   und ggf. verdichtet
+    LOOP AT pit_tax INTO ls_tax.
+      MOVE-CORRESPONDING ls_tax TO ls_collect.
+      COLLECT ls_collect INTO lt_collect.
+    ENDLOOP.
+
+*   Wir kopieren die letzte Zeilennummer
+    lv_buzei = piv_buzei.
+
+*   Und los
+    LOOP AT lt_collect INTO ls_collect.
+*     Eins auf die Buchungszeile da wir eine neue
+*     Zeile erzuegen
+      ADD 1 TO lv_buzei.
+      CLEAR ls_acc_tx.
+*     Übertragung der Steuerdaten
+      MOVE: lv_buzei         TO ls_acc_tx-itemno_acc,
+            ls_collect-hkont TO ls_acc_tx-gl_account,
+            ls_collect-kschl TO ls_acc_tx-cond_key,
+            ls_collect-ktosl TO ls_acc_tx-acct_key,
+            ls_collect-mwskz TO ls_acc_tx-tax_code.
+*     Und anhängen
+      APPEND ls_acc_tx TO pct_acc_tx.
+
+*     Da dies nur die Parameter für die Steuerzeile sind,
+*     müssen wir auch noch eine Wertezeile erzeugen
+      CLEAR ls_cur_am.
+*     Gleiche Zeile wie Steuerzeile (Bezug!!!)
+      MOVE: lv_buzei         TO ls_cur_am-itemno_acc,
+            pis_bkpf-waers   TO ls_cur_am-currency,
+            pis_bkpf-waers   TO ls_cur_am-currency_iso,
+*           Ermittelter, summierter Steuerwert für Steuerkennzeichen
+            ls_collect-wmwst TO ls_cur_am-amt_doccur,
+*           Ermittelter, summierter Basiswert für Steuerkennzeichen
+            ls_collect-kawrt TO ls_cur_am-amt_base,
+            '00'             TO ls_cur_am-curr_type,
+*           Umrechnungskurs für Fremdwährung
+*           ACHTUNG!!!
+*           Entweder hier KURSF ODER!!!! im Kopf WWERT mitgeben!!!
+            pis_bkpf-kursf   TO ls_cur_am-exch_rate.
+      APPEND ls_cur_am TO pct_cur_am.
+    ENDLOOP.
+  ENDIF.
+
+ENDFORM.
+</pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/buchungsbelege-erstellen/">Buchungsbelege erstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Bankleitzahlen einlesen</title>
+		<link>/blog/bankleitzahlen-einlesen/</link>
+					<comments>/blog/bankleitzahlen-einlesen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 23 Jan 2015 10:40:43 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[bank]]></category>
+		<category><![CDATA[blz]]></category>
+		<category><![CDATA[bundesbank]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5224</guid>
+
+					<description><![CDATA[<p>Das Einlesen der Bankleitzahlen ist dabei gar nicht die größte Herausforderung, sondern das Finden der aktuellen Bankleitzahlendatei. Markus Völker hat hierfür eine kleine Klasse geschrieben, mit der 1.die URL der Bankleitzahlendatei ermittelt wird 2.Die Bankleitzahlen ins SAP-System eingelesen werden.</p>
+<p>Der Beitrag <a href="/blog/bankleitzahlen-einlesen/">Bankleitzahlen einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mal wieder ein Thema aus dem FI-Bereich. Diesmal geht es um die Aktualisierung der Bankleitzahlen. Die Bundesbank bietet die aktuellen Bankleitzahlen zum Download an. Weitere Infos gibt es <a title="Bankleitzahlen" href="http://www.bundesbank.de/Navigation/DE/Aufgaben/Unbarer_Zahlungsverkehr/Bankleitzahlen/bankleitzahlen.html">hier</a>.</p>
+<p>Das Einlesen der Bankleitzahlen ist dabei gar nicht die größte Herausforderung, sondern das Finden der aktuellen Bankleitzahlendatei. Markus Völker hat hierfür eine kleine Klasse geschrieben, mit der</p>
+<ol>
+<li>die URL der Bankleitzahlendatei ermittelt wird</li>
+<li>Die Bankleitzahlen ins SAP-System eingelesen werden</li>
+</ol>
+<h2>Verbesserungspotential</h2>
+<p>Die Klasse ermittelt und liest die Bankleitzahlen ein. Eventuelle wäre es jedoch wünschenswert zu sehen, welche und wie viele Debitoren von den Änderungen betroffen sind. Es müsste dafür eine Prüfung gegen die Tabelle KNBK gemacht werden.</p>
+<h2>Proxy</h2>
+<p>Falls du dich mit User und Kennwort am Proxy anmelden musst, dann muss du nach der Methode cl_http_client=&gt;create_by_url den folgenden Aufruf einbauen:</p>
+<pre>lo_client-&gt;propertytype_logon_popup = http_client-&gt;co_disabled.
+call method lo_client-&gt;authenticate
+     exporting
+        username  = 'myProxyUser'
+        password  = 'myProxyPassword'.</pre>
+<p>Dementsprechend muss der CONSTRUCTOR um die beiden Parameter username und password erweitert werden.</p>
+<h2>Coding</h2>
+<pre>REPORT  zrep_bbank_vs_bnka.
+**&amp;---------------------------------------------------------------------*
+**&amp; Report  ZREP_BBANK_VS_BNKA
+**&amp;
+**&amp;---------------------------------------------------------------------*
+**&amp; Dieser Report demonstriert die Benutzung der Klasse lcl_cmp_bnka_to_bbank
+**&amp; Author: Markus Völker
+**&amp;---------------------------------------------------------------------*
+
+
+PARAMETERS p_proxy TYPE string LOWER CASE DEFAULT '123.100.100.88'.
+PARAMETERS p_pport TYPE string            DEFAULT `80`.
+
+
+CLASS lcl_cmp_bnka_to_bbank DEFINITION.
+  PUBLIC SECTION.
+
+    TYPES:
+      BEGIN OF mts_bnka_result,
+             status TYPE char01,
+             bankl  TYPE bankl,
+      END OF mts_bnka_result .
+    TYPES:
+      mtt_bnka_result TYPE STANDARD TABLE OF mts_bnka_result WITH DEFAULT KEY .
+
+**Vergleiche:
+**http://www.bundesbank.de/Redaktion/DE/Downloads/Aufgaben/Unbarer_Zahlungsverkehr/Bankleitzahlen/merkblatt_bankleitzahlendatei.pdf?__blob=publicationFile
+    TYPES:
+      BEGIN OF mts_bundesbank,
+        blz(8), "Bankleitzahl
+        merkmal(1), "Merkmal, ob bankleitzahlführender Zahlungsdienstleister ("1") oder nicht ("2")
+        bezeichnung(58), "Bezeichnung des Zahlungsdienstleisters
+        plz(5), "Postleitzahl
+        ort(35), "Ort
+        kurzbezeichnung(27), "Kurzbezeichnung des Zahlungsdienstleisters mit Ort
+        pan(5), "Institutsnummer für PAN
+        bic(11), "Business Identifier Code (BIC)
+        pz(2), "Kennzeichen für Prüfzifferberechnungsmethode
+        datensatz(6), "Nummer des Datensatzes
+        aenderungs(1), "Änderungskennzeichen
+        blz_loesch(1), "Hinweis auf eine beabsichtigte Bankleitzahllöschung
+        nach_blz(8), "Hinweis auf Nachfolge-Bankleitzahl
+        knz_iban(6), "Kennzeichen für die IBAN-Regel
+      END OF mts_bundesbank .
+    TYPES:
+      mtt_bundesbank TYPE STANDARD TABLE OF mts_bundesbank WITH DEFAULT KEY .
+
+    CONSTANTS  mc_bank_changes  TYPE char01 VALUE 'C'.     "#EC NOTEXT "Die Bank ist zur Änderung vorgesehen
+    CONSTANTS  mc_bank_correct  TYPE char01 VALUE 'O'.     "#EC NOTEXT "Die Bank ist in Ordnung
+    CONSTANTS  mc_bank_missing  TYPE char01 VALUE 'M'.     "#EC NOTEXT "Die Bank existiert nicht mehr
+    CLASS-DATA mv_proxy_host    TYPE string .              "Proxy IP
+    CLASS-DATA mv_proxy_service TYPE string .              "Proxy Port
+    DATA       mt_bbank_datei   TYPE mtt_bundesbank .      "Datei der Bundesbank
+
+    METHODS constructor
+      IMPORTING
+        iv_proxy_host    TYPE string OPTIONAL
+        iv_proxy_service TYPE string OPTIONAL .
+    METHODS set_bbank_file
+      IMPORTING
+        iv_path        TYPE csequence OPTIONAL
+      EXPORTING
+        ev_subrc       TYPE sy-subrc
+        ev_err_message TYPE string.
+    TYPE-POOLS abap .
+    METHODS compare_bbank_with_bnka
+      IMPORTING
+        iv_with_missing      TYPE flag DEFAULT abap_true
+        iv_with_changes      TYPE flag DEFAULT abap_true
+        iv_with_correct      TYPE flag DEFAULT abap_true
+      RETURNING
+        VALUE(rt_result_tab) TYPE mtt_bnka_result .
+  PROTECTED SECTION.
+    METHODS get_bbank_file_from_web
+      EXPORTING
+        ev_subrc       TYPE sy-subrc
+        ev_err_message TYPE string
+        et_filetab     TYPE table .
+
+ENDCLASS.
+
+CLASS lcl_cmp_bnka_to_bbank IMPLEMENTATION.
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method COMPARE_BBANK_WITH_BNKA
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IV_WITH_MISSING                TYPE        FLAG (default =ABAP_TRUE)
+* | [---&gt;] IV_WITH_CHANGES                TYPE        FLAG (default =ABAP_TRUE)
+* | [---&gt;] IV_WITH_CORRECT                TYPE        FLAG (default =ABAP_TRUE)
+* | [&lt;-()] RT_RESULT_TAB                  TYPE        MTT_BNKA_RESULT
+* +--------------------------------------------------------------------------------------
+  METHOD compare_bbank_with_bnka.
+
+    DATA: lt_bnka  TYPE TABLE OF bnka,
+          lv_subrc TYPE sy-subrc.
+
+    FIELD-SYMBOLS: &lt;bnka&gt;   TYPE bnka,
+                   &lt;bbank&gt;  TYPE mts_bundesbank,
+                   &lt;result&gt; TYPE mts_bnka_result.
+
+    DEFINE append_result.
+      append initial line to rt_result_tab assigning &lt;result&gt;.
+      &lt;result&gt;-status = &amp;1.
+      &lt;result&gt;-bankl  = &amp;2.
+    END-OF-DEFINITION.
+
+* Wenn wir noch keine Daten haben, holen wir halt welche
+    IF mt_bbank_datei IS INITIAL.
+      set_bbank_file( IMPORTING ev_subrc = lv_subrc ).
+      IF lv_subrc &lt;&gt; 0.
+        RETURN.
+      ENDIF.
+    ENDIF.
+
+* Alle Banken holen
+    SELECT * FROM bnka INTO TABLE lt_bnka WHERE banks = 'DE'.
+
+* Vergleich der Daten
+*/--------------------------------------------------------------------------------\
+    LOOP AT lt_bnka ASSIGNING &lt;bnka&gt;.
+*   Lese die Vergleichsdaten
+      READ TABLE mt_bbank_datei ASSIGNING  WITH KEY blz = &lt;bnka&gt;-bnklz.  "#EC WARNOK.
+      IF sy-subrc &lt;&gt; 0.
+*     Die Bank existiert nicht mehr
+        append_result mc_bank_missing &lt;bnka&gt;-bankl.
+      ELSEIF -blz_loesch = '1'.
+*     Die Bank ist zum Löschen vorgemerkt
+        append_result mc_bank_changes &lt;bnka&gt;-bankl.
+      ELSE.
+*     Keine Veränderungen festzustellen
+        append_result mc_bank_correct &lt;bnka&gt;-bankl.
+      ENDIF.
+    ENDLOOP.
+*\--------------------------------------------------------------------------------/
+
+* Lösche ungewünschtes
+*/--------------------------------------------------------------------------------\
+    IF iv_with_missing = abap_false.
+      DELETE rt_result_tab WHERE status = mc_bank_missing.
+    ENDIF.
+    IF iv_with_changes = abap_false.
+      DELETE rt_result_tab WHERE status = mc_bank_changes.
+    ENDIF.
+    IF iv_with_correct = abap_false.
+      DELETE rt_result_tab WHERE status = mc_bank_correct.
+    ENDIF.
+*\--------------------------------------------------------------------------------/
+
+  ENDMETHOD.                                               "compare_bbank_with_bnka
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZZ_CMP_BNKA_TO_BBANK-&gt;CONSTRUCTOR
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IV_PROXY_HOST                  TYPE        STRING(optional)
+* | [---&gt;] IV_PROXY_SERVICE               TYPE        STRING(optional)
+* +--------------------------------------------------------------------------------------
+  METHOD constructor.
+* Das hier ist nur die Erinnerung, eventuell einen Proxy setzen zu müssen
+    mv_proxy_host    = iv_proxy_host .
+    mv_proxy_service = iv_proxy_service.
+  ENDMETHOD.                                               "constructor
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Protected Method GET_BBANK_FILE_FROM_WEB
+* +-------------------------------------------------------------------------------------------------+
+* | [&lt;---] EV_SUBRC                       TYPE        SY-SUBRC
+* | [&lt;---] EV_ERR_MESSAGE                 TYPE        STRING
+* | [&lt;---] ET_FILETAB                     TYPE        TABLE
+* +--------------------------------------------------------------------------------------
+  METHOD get_bbank_file_from_web.
+* Hole die Datei der Bundesbank per HTTP
+    DATA: lv_url     TYPE string,
+          lv_datvon  TYPE d,
+          lv_datbis  TYPE d,
+          lo_http    TYPE REF TO if_http_client,
+          lv_recdata TYPE xstring,
+          lt_tmpbin  TYPE TABLE OF raw256,
+          lv_tmplen  TYPE i.
+
+*******************
+* DATUMSBERECHNUNG
+*******************
+
+*     Monat/Jahr von:
+*/--------------------------------------------------------------------------------\
+    lv_datvon = sy-datum.
+    DO.
+      lv_datvon = cl_hrpad_date_computations=&gt;subtract_months_from_date( start_date = lv_datvon               " Datum von dem Monate subtrahiert werden
+                                                                         months     = 1  ).                   " Anzahl Monate
+      IF lv_datvon+4(2) MOD 3 = 0.
+        EXIT.
+      ENDIF.
+    ENDDO.
+*     Tag von ...
+    lv_datvon+6(2) = '01'.
+    DO.
+*      Finde den ersten Samstag im Monat ...
+      IF cl_hrpad_date_computations=&gt;get_weekday_number( lv_datvon ) = 6.            "Samstag
+        EXIT.
+      ENDIF.
+      lv_datvon = lv_datvon + 1.
+    ENDDO.
+    lv_datvon = lv_datvon + 2.                             "Wir brauchen aber den Montag
+*\--------------------------------------------------------------------------------/
+*     Monat/Jahr bis:
+*/--------------------------------------------------------------------------------\
+    lv_datbis = sy-datum.
+    DO.
+      IF lv_datbis+4(2) MOD 3 = 0.
+        EXIT.
+      ENDIF.
+      lv_datbis = cl_hrpad_date_computations=&gt;add_months_to_date( start_date = lv_datbis               " Datum von dem Monate subtrahiert werden
+                                                                  months     = 1  ).                   " Anzahl Monate
+    ENDDO.
+*     Tag von ...
+    lv_datbis+6(2) = '01'.
+    DO.
+*      Finde den ersten Samstag im Monat ...
+      IF cl_hrpad_date_computations=&gt;get_weekday_number( lv_datbis ) = 6.            "Samstag
+        EXIT.
+      ENDIF.
+      lv_datbis = lv_datbis + 1.
+    ENDDO.
+    lv_datbis = lv_datbis + 1.                             "geht bis Sonntag
+*\--------------------------------------------------------------------------------/
+
+* URL Zusammenbauen
+*/--------------------------------------------------------------------------------\
+    lv_url =    'http://www.bundesbank.de/Redaktion/DE/Downloads/Aufgaben/Unbarer_Zahlungsverkehr/Bankleitzahlen/' ##no_text
+             &amp;&amp; |{ lv_datbis(4) }_{ lv_datbis+4(2) }_{ lv_datbis+6(2) }/blz_{ lv_datvon(4) }_{ lv_datvon+4(2) }_{ lv_datvon+6(2) }_txt.txt?__blob=publicationFile|.
+*\--------------------------------------------------------------------------------/
+
+*******************
+* HTTP - Verbindung
+*******************
+* Erstellen des Verbindungsobjekts
+    cl_http_client=&gt;create_by_url( EXPORTING url           = lv_url
+                                             proxy_host    = mv_proxy_host               " logische Destination (Wird bei Funktionsaufruf angegeben)
+                                             proxy_service = mv_proxy_service            " Portnummer
+                                   IMPORTING
+                                             client        = lo_http ).             " HTTP Client Abstraction
+
+* Request senden
+    lo_http-&gt;send( EXCEPTIONS OTHERS = 1 ).
+    IF sy-subrc &lt;&gt; 0.
+      lo_http-&gt;get_last_error( IMPORTING code    = ev_subrc
+                                         message = ev_err_message ).
+      RETURN.
+    ENDIF.
+
+* Daten annehmen
+    lo_http-&gt;receive( EXCEPTIONS OTHERS = 1 ).
+    IF sy-subrc &lt;&gt; 0.
+      lo_http-&gt;get_last_error( IMPORTING code    = ev_subrc
+                                         message = ev_err_message ).
+      RETURN.
+    ENDIF.
+
+* Datei reinladen...
+    lv_recdata = lo_http-&gt;response-&gt;get_data( ).
+    IF lv_recdata IS INITIAL.
+      ev_subrc = 1024.
+      RETURN.
+    ENDIF.
+
+* Daten in eine "Datei" - Tabelle konvertieren
+*/--------------------------------------------------------------------------------\
+    CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
+      EXPORTING
+        buffer        = lv_recdata
+      IMPORTING
+        output_length = lv_tmplen
+      TABLES
+        binary_tab    = lt_tmpbin.
+
+    CALL FUNCTION 'SCMS_BINARY_TO_TEXT'
+      EXPORTING
+        input_length = lv_tmplen
+      TABLES
+        binary_tab   = lt_tmpbin
+        text_tab     = et_filetab.
+*\--------------------------------------------------------------------------------/
+
+  ENDMETHOD.                                               "GET_BBANK_FILE_FROM_HTML
+
+
+* ---------------------------------------------------------------------------------------+
+* | Instance Public Method ZZ_CMP_BNKA_TO_BBANK-&gt;SET_BBANK_FILE
+* +-------------------------------------------------------------------------------------------------+
+* | [---&gt;] IV_PATH                        TYPE        CSEQUENCE(optional)
+* | [&lt;---] EV_SUBRC                       TYPE        SY-SUBRC
+* | [&lt;---] EV_ERR_MESSAGE                 TYPE        STRING
+* | [EXC!] FAILED_VIA_UPLOAD
+* +--------------------------------------------------------------------------------------
+  METHOD set_bbank_file.
+
+    DATA: lt_filetab TYPE TABLE OF char512.
+    FIELD-SYMBOLS:  &lt;file&gt;  TYPE char512,
+                    &lt;bbank&gt; TYPE mts_bundesbank.
+
+    IF iv_path IS NOT INITIAL AND cl_gui_frontend_services=&gt;file_exist( iv_path ) = abap_true.
+*   Datei einfach vom Frontend hochladen
+      cl_gui_frontend_services=&gt;gui_upload( EXPORTING
+                                              filename = iv_path               " Name der Datei
+                                            CHANGING
+                                              data_tab = lt_filetab            " Übergabetabelle für Datei-Inhalt
+                                            EXCEPTIONS
+                                              OTHERS   = 1 ).
+      ev_subrc = sy-subrc.
+    ELSE.
+*   Datei per HTTP holen
+      me-&gt;get_bbank_file_from_web( IMPORTING ev_subrc       = ev_subrc
+                                             ev_err_message = ev_err_message
+                                             et_filetab     = lt_filetab ).
+    ENDIF.
+
+* Wenn die Datei leer ist machen wir hier nichts
+    IF lt_filetab IS INITIAL.
+      RETURN.
+    ENDIF.
+
+* In die richtige Struktur kippen:
+    LOOP AT lt_filetab ASSIGNING &lt;file&gt;.
+      APPEND INITIAL LINE TO mt_bbank_datei ASSIGNING &lt;bbank&gt;.
+      &lt;bbank&gt; = &lt;file&gt;.
+    ENDLOOP.
+  ENDMETHOD.                                               "set_bbank_file
+ENDCLASS.
+
+DATA gr_bbank  TYPE REF TO lcl_cmp_bnka_to_bbank.
+DATA gv_subrc  TYPE sy-subrc.
+DATA gv_err    TYPE string.
+DATA gt_result TYPE lcl_cmp_bnka_to_bbank=&gt;mtt_bnka_result.
+FIELD-SYMBOLS  TYPE lcl_cmp_bnka_to_bbank=&gt;mts_bnka_result.
+
+
+START-OF-SELECTION.
+
+* Objekt instanziieren
+  CREATE OBJECT gr_bbank
+    EXPORTING
+      iv_proxy_host    = p_proxy                           " logische Destination
+      iv_proxy_service = p_pport.                          " Portnummer
+
+* Datei innerhalb der Klasse organisieren
+  gr_bbank-&gt;set_bbank_file( IMPORTING
+                             ev_subrc       = gv_subrc     " Rückgabewert von ABAP-Anweisungen
+                             ev_err_message = gv_err       " Error - Message
+                           ).
+  IF gv_subrc &lt;&gt; 0.
+    WRITE: / gv_err.
+    RETURN.
+  ENDIF.
+
+* Vergleich der Daten aus der Bundesbank und SAP holen
+  gt_result = gr_bbank-&gt;compare_bbank_with_bnka( ).
+
+* primitive Ausgabe... :)
+  LOOP AT gt_result ASSIGNING .
+    CASE -status.
+      WHEN lcl_cmp_bnka_to_bbank=&gt;mc_bank_missing.
+        WRITE: / 'MISSING'.
+      WHEN lcl_cmp_bnka_to_bbank=&gt;mc_bank_changes.
+        WRITE: / 'CHANGING'.
+      WHEN lcl_cmp_bnka_to_bbank=&gt;mc_bank_correct.
+        WRITE: /  'OK'.
+    ENDCASE.
+    WRITE: 12 '|', -bankl.
+  ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/bankleitzahlen-einlesen/">Bankleitzahlen einlesen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/bankleitzahlen-einlesen/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>GLD Entwicklung</title>
+		<link>/blog/gld-entwicklung/</link>
+		
+		<dc:creator><![CDATA[M&#38;Mler]]></dc:creator>
+		<pubDate>Tue, 09 Dec 2014 06:00:00 +0000</pubDate>
+				<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[Module]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[Buchung]]></category>
+		<category><![CDATA[Preise]]></category>
+		<category><![CDATA[Durchschnittspreis]]></category>
+		<category><![CDATA[Materialbeleg]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5170</guid>
+
+					<description><![CDATA[<p>Oftmals die Gretchenfrage als MMler. Wie kam es dazu, dass der gleitende Durchschnittspreis Achterbahn fährt.</p>
+<p>Der Beitrag <a href="/blog/gld-entwicklung/">GLD Entwicklung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Oftmals die Gretchenfrage als MMler.<br />
+Wie ist es dazu gekommen, dass der gleitende Durchschnittspreis (GLD) eines Materials sich verändert hat? Welcher Materialbeleg ist schuld daran?</p>
+<p>Einflussfaktoren gibt es viele. Die üblichen Verdächtigen sind:</p>
+<ul>
+<li>Bestellungen</li>
+<li>Rechnungen</li>
+<li>Retourenbestellungen</li>
+<li>Gutschriften</li>
+<li>Umbewertungen</li>
+<li>&#8220;wilde MIGO Buchungen&#8221; mit Wertangabe <em>(ja das geht&#8230;)</em></li>
+<li>Umlagerungen &#8220;Werk an Werk&#8221;</li>
+<li>&#8230;</li>
+</ul>
+<p>Die Transaktion S_P00_07000139 aus dem Thailändischen Steuerrecht (?) zeigt wenigstens halbwegs, wie und mit welchem Beleg sich der GLD verändert hat.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/12/S_P00_07000139.png"><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-5174" src="https://tricktresor.com/wp-content/uploads/2014/12/S_P00_07000139-245x300.png" alt="S_P00_07000139" width="245" height="300" srcset="/wp-content/uploads/2014/12/S_P00_07000139-245x300.png 245w, /wp-content/uploads/2014/12/S_P00_07000139.png 566w" sizes="(max-width: 245px) 100vw, 245px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/12/gld_entwicklung.png"><img decoding="async" class="alignnone size-medium wp-image-5171" src="https://tricktresor.com/wp-content/uploads/2014/12/gld_entwicklung-300x119.png" alt="gld_entwicklung" width="300" height="119" srcset="/wp-content/uploads/2014/12/gld_entwicklung-300x119.png 300w, /wp-content/uploads/2014/12/gld_entwicklung-1024x407.png 1024w, /wp-content/uploads/2014/12/gld_entwicklung-624x248.png 624w, /wp-content/uploads/2014/12/gld_entwicklung.png 1335w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>1&#8211;&gt; 2 &#8211;&gt; 3Wert und Menge ergeben den GLD<br />
+4&#8211;&gt;5 Bestandswert reduziert um Buchungswert ergibt den neuen GLD</p>
+<p>Im Layout kann man sich noch diverse Zusatzinformationen einblenden lassen.</p>
+<h3>Tabellen rund um das Thema GLD:</h3>
+<table>
+<tbody>
+<tr>
+<td>MBEW</td>
+<td>Materialbewertung</td>
+</tr>
+<tr>
+<td>MBEWH</td>
+<td>Materialbewertung Historie</td>
+</tr>
+<tr>
+<td>QBEW</td>
+<td>Projektbestand</td>
+</tr>
+<tr>
+<td>EBEW</td>
+<td>Kundeneinzel- / Transitbestand</td>
+</tr>
+</tbody>
+</table>
+<h3>sinnvolle OSS Hinweise zur Transaktion:</h3>
+<table>
+<tbody>
+<tr>
+<td>1327549</td>
+</tr>
+<tr>
+<td>1175356</td>
+</tr>
+</tbody>
+</table>
+<h2>Alternative</h2>
+<p>Mithilfe des Programms <a href="https://wiki.scn.sap.com/wiki/display/ERPSCM/Unexpected+changes+in+the+Moving+Average+Price+-+MBMAPCHANGES">MBMAPCHANGES </a>kann die Entwicklung des gleitenden Durchschnittspreises ebenfalls nachvollzogen werden. Das Programm ist dokumentiert. Nachfolgend die ersten Absätze der Programmdokumentation:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/12/2016-11-02_13-04-49.jpg"><img decoding="async" class="size-full wp-image-903107 alignright" src="https://tricktresor.com/wp-content/uploads/2014/12/2016-11-02_13-04-49.jpg" alt="2016-11-02_13-04-49" width="530" height="353" srcset="/wp-content/uploads/2014/12/2016-11-02_13-04-49.jpg 530w, /wp-content/uploads/2014/12/2016-11-02_13-04-49-300x200.jpg 300w, /wp-content/uploads/2014/12/2016-11-02_13-04-49-480x320.jpg 480w" sizes="(max-width: 530px) 100vw, 530px" /></a></p>
+<h3>Kurztext</h3>
+<p>Änderungsanalyse für gleitenden Durchschnittspreis</p>
+<h3>Verwendung</h3>
+<p>Dieser Report dient zum Bereitstellen eines Werkzeugs, das die Analyse von Änderungen am gleitenden Durchschnittspreis für bestimmte Materialen ermöglicht. Es können zahlreiche Belege vorhanden sein, die den V-Preis ändern: Materialbelege, Rechnungsbelege, Kontenpflegebelege, Material-Ledger-Belege, Fertigungsabrechnungsbelege usw. Daher ist es nicht immer einfach, zu ermitteln, warum und wie der V-Preis geändert wurde. Dieses Werkzeug stellt einen zentralen Zugriffspunkt zur Anzeige aller dieser Belege zur Verfügung und ermöglicht es Endbenutzern, einen Schwellenwert &amp; zu ermitteln, über dem die Änderungen des gleitenden Durchschnittspreises als signifikant betrachtet werden.</p>
+<h3>Funktionsumfang</h3>
+<p>Der Report kann für beide Preissteuerungsarten S und V ausgeführt werden. Die statistischen GLD-Änderungen an standardpreisgesteuerten Materialien sind jedoch nicht immer verlässlich und daher sollten diese Beleglisten und -kennzahlen entsprechend interpretiert werden. (Siehe Abschnitt &#8220;Änderungen des statistischen gleitenden Durchschnittspreises&#8221;)</p>
+<p>Es ist möglich, über einen Doppelklick auf Zeilen der Ausgabeliste zu den entsprechenden Referenzbelegen zu navigieren.<br />
+Wenn ein Doppelklick auf die Statussymbole ausgeführt wird, wird ein Dialogfenster mit zusätzlichen Informationen und weiteren Navigationsoptionen zu den Referenzbelegen oder der Anwendungsdokumentation geöffnet.</p>
+<h4>Legende anzeigen:</h4>
+<ul style="list-style-type: square;">
+<li><strong>Blaue Zeilen:</strong><br />
+Belege, in denen die Preisänderungen in den Prozentsatz des hervorgehobenen Schwellenwerts fallen.</li>
+<li><strong>Rote Zeilen:</strong><br />
+Belege, in denen die Preisänderung eines V-preisgesteuerten Materials den Prozentsatz des Schwellenwerts übersteigt.<br />
+(Siehe Abschnitt &#8220;Signifikante Änderungen des gleitenden Durchschnittspreises&#8221;)</li>
+<li><strong>Gelbe Zeilen:</strong><br />
+Belege, in denen die Preisänderung eines S-preisgesteuerten Materials den Prozentsatz des Schwellenwerts übersteigt.<br />
+(Siehe Abschnitt &#8220;Änderungen des statistischen gleitenden Durchschnittspreises&#8221;)</li>
+<li><strong>Gelbe Zeilen mit roter Hervorhebung:</strong><br />
+In der vorherigen Periode gebuchten Belege, in denen die Preisänderung den Prozentsatz des Schwellenwerts übersteigt.<br />
+(Siehe Abschnitt &#8220;Rückbuchungsszenarios&#8221;)</li>
+<li><strong>Gelbe Zeilen mit blauer Hervorhebung:</strong><br />
+In der vorherigen Periode gebuchten Belege, in denen die Preisänderungen in den Prozentsatz des hervorgehobenen Schwellenwerts fallen.<br />
+(Siehe Abschnitt &#8220;Rückbuchungsszenarios&#8221;)</li>
+</ul>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/gld-entwicklung/">GLD Entwicklung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>FI-Beleg mit Umsatzsteuer buchen</title>
+		<link>/blog/fi-beleg-mit-umsatzsteuer-buchen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Sep 2014 16:23:48 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[BAPIs]]></category>
+		<category><![CDATA[Umsatzsteuer]]></category>
+		<category><![CDATA[Mehrwertsteuer]]></category>
+		<category><![CDATA[Vorsteuer]]></category>
+		<category><![CDATA[BAPI]]></category>
+		<category><![CDATA[Buchung]]></category>
+		<category><![CDATA[MM]]></category>
+		<category><![CDATA[Beleg]]></category>
+		<category><![CDATA[RFC]]></category>
+		<category><![CDATA[Steuersatz]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=5078</guid>
+
+					<description><![CDATA[<p>Ausnahmsweise mal ein Ausflug in die Welt der Finanzbuchhaltung. Für mich ein Rotes Tuch mit Sieben Siegeln aus einem böhmischen Dorf... Ich werde trotzdem versuchen, den Sachverhalt nicht nur syntaktisch sondern auch inhaltlich korrekt wiederzugeben. Aus diesem Grund werde ich mich bewusst so schwammig wie möglich ausdrücken und Fachtermini wie "Erlöskonto", "Bilanz" oder "Buchungsschlüssel" vermeiden.</p>
+<p>Der Beitrag <a href="/blog/fi-beleg-mit-umsatzsteuer-buchen/">FI-Beleg mit Umsatzsteuer buchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ausnahmsweise mal ein Ausflug in die Welt der Finanzbuchhaltung. Für mich ein Rotes Tuch mit Sieben Siegeln aus einem böhmischen Dorf&#8230; Ich werde trotzdem versuchen, den Sachverhalt nicht nur syntaktisch sondern auch inhaltlich korrekt wiederzugeben. Aus diesem Grund werde ich mich bewusst so schwammig wie möglich ausdrücken und Fachtermini wie &#8220;Erlöskonto&#8221;, &#8220;Bilanz&#8221; oder &#8220;Buchungsschlüssel&#8221; vermeiden.</p>
+<h2>Aufgabe</h2>
+<p>Buchen eines FI-Beleges mit Umsatzsteuer. Es soll ein Bruttobetrag auf ein Konto und der zugehörige Nettobetrag auf ein Gegenkonto gebucht werden. Die Umsatzsteuer soll auf das richtige Umsatzsteuerkonto gebucht werden.</p>
+<h2>Hilfsmittel</h2>
+<p>Dass nur der BAPI_ACC_DOCUMENT_POST für diese Zwecke infrage kommt, war mir immerhin schnell klar. Wie man mit diesem Baustein bucht, habe ich ebenfalls schnell heraus gefunden. Eine Herausforderung war die Buchung der Umsatzsteuer. Von der irrigen Annahme, der Baustein könnte die Umsatzsteuer selber rechnen, habe ich mich schnell verabschieden müssen. Die Umsatzsteuer muss dem Baustein übergeben werden.</p>
+<p>Um die Umsatzsteuer zu berechnen, helfen diese beiden Bausteine:</p>
+<ul>
+<li>CALCULATE_TAX_FROM_NET_AMOUNT</li>
+<li>CALCULATE_TAX_FROM_GROSSAMOUNT</li>
+</ul>
+<p>Desweiteren notwendig ist eine Buchungsperiode. Diese lässt sich zwar auch einfach aus dem Datum errechnen, aber der Baustein CON_FIN_CURRENT_PERIOD_GET_2 hilft ebenfalls weiter. Da der Baustein sich auf den MM-Periodenverschieber bezieht, bin ich mir nicht sicher, ob der Baustein wirklich sinnvoll ist, aber in meinem Fall funktioniert er.</p>
+<h2>Beleg</h2>
+<p>Dieser Beleg kommt bei so einer Buchung heraus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/09/Beleg.png"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-5079" src="https://tricktresor.com/wp-content/uploads/2014/09/Beleg-300x121.png" alt="Beleg" width="300" height="121" srcset="/wp-content/uploads/2014/09/Beleg-300x121.png 300w, /wp-content/uploads/2014/09/Beleg-624x252.png 624w, /wp-content/uploads/2014/09/Beleg.png 805w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT.
+PARAMETERs p_bukrs type bukrs DEFAULT '1000'.
+
+START-OF-SELECTION.
+
+  DATA ls_header TYPE bapiache09.
+  DATA lt_return TYPE STANDARD TABLE OF bapiret2.
+  DATA ls_return TYPE bapiret2.
+  DATA lt_acc_gl TYPE STANDARD TABLE OF bapiacgl09.
+  DATA ls_acc_gl LIKE LINE OF lt_acc_gl.
+  DATA lt_cur_am TYPE STANDARD TABLE OF bapiaccr09.
+  DATA ls_cur_am LIKE LINE OF lt_cur_am.
+  DATA lt_acc_tx TYPE STANDARD TABLE OF bapiactx09.
+  DATA ls_acc_tx LIKE LINE OF lt_acc_tx.
+  data lv_period type POPER.
+  data lv_year   type BDATJ.
+*== aktuelle Periode ermitteln
+  CALL FUNCTION 'CON_FIN_CURRENT_PERIOD_GET_2'
+    EXPORTING
+      id_bukrs                 = p_bukrs
+   IMPORTING
+     ED_CURRENT_YEAR          = lv_year
+     ED_CURRENT_PERIOD        = lv_period
+   EXCEPTIONS
+     INTERNAL_ERROR           = 1
+     OTHERS                   = 2.
+
+*== Header
+  ls_header-bus_act           = 'RFBU'.               "Betriebswirtschaftlicher Vorgang
+  ls_header-username          = 'ICH'.                "Name des Benutzers
+  ls_header-header_txt        = 'Test'.               "Belegkopftext
+  ls_header-comp_code         = p_bukrs.              "Buchungskreis
+  ls_header-doc_date          = sy-datum.             "Belegdatum im Beleg
+  ls_header-pstng_date        = sy-datum.             "Buchungsdatum im Beleg
+  ls_header-trans_date        = sy-datum.             "Umrechnungsdatum
+  ls_header-fisc_year         = lv_year.              "Geschäftsjahr
+  ls_header-fis_period        = lv_period.            "Geschäftsmonat
+  ls_header-doc_type          = 'SB'.                 "Belegart
+  ls_header-vatdate           = sy-datum.             "Steuermeldedatum
+
+
+*== Buchungszeile Haben
+  ls_acc_gl-itemno_acc        = 1.                    "Positionsnummer des Rechnungswesenbeleges
+  ls_acc_gl-gl_account        = '0000184040'.         "Sachkonto der Hauptbuchhaltung
+  ls_acc_gl-item_text         = 'Postext Haben'.      "Positionstext
+  ls_acc_gl-acct_key          = space.                "Vorgangsschlüssel
+  ls_acc_gl-acct_type         = 'S'.                  "Kontoart
+  ls_acc_gl-costcenter        = ''.
+  ls_acc_gl-value_date        = sy-datum.
+  APPEND ls_acc_gl TO lt_acc_gl.
+
+*== Buchungszeile Soll
+  ls_acc_gl-itemno_acc        = 2.                    "Positionsnummer des Rechnungswesenbeleges
+  ls_acc_gl-gl_account        = '0000420000'.         "Sachkonto der Hauptbuchhaltung
+  ls_acc_gl-item_text         = 'Postext Soll'  .     "Positionstext
+  ls_acc_gl-acct_key          = space.                "Vorgangsschlüssel
+  ls_acc_gl-acct_type         = 'S'.                  "Kontoart
+  ls_acc_gl-costcenter        = ''.
+  ls_acc_gl-value_date        = sy-datum.
+  ls_acc_gl-orderid           = 'XYZ'.                "Falls notwendig
+  APPEND ls_acc_gl TO lt_acc_gl.
+
+*== Haben Bruttobetrag
+  ls_cur_am-itemno_acc        = 1.
+  ls_cur_am-currency          = 'EUR'.
+  ls_cur_am-currency_iso      = 'EUR'.
+  ls_cur_am-amt_doccur        = '11.90-'.
+  ls_cur_am-curr_type         = '00'.
+  APPEND ls_cur_am TO lt_cur_am.
+
+*== Soll Nettobetrag
+  ls_cur_am-itemno_acc        = 2.
+  ls_cur_am-currency          = 'EUR'.
+  ls_cur_am-currency_iso      = 'EUR'.
+  ls_cur_am-amt_doccur        = '10.00'.
+  ls_cur_am-curr_type         = '00'.
+  APPEND ls_cur_am TO lt_cur_am.
+
+*== Soll Steuerbetrag
+  ls_cur_am-itemno_acc        = 3.
+  ls_cur_am-currency          = 'EUR'.
+  ls_cur_am-currency_iso      = 'EUR'.
+  ls_cur_am-amt_doccur        = '01.90'.
+  ls_cur_am-amt_base          = '10.00'.
+  ls_cur_am-curr_type         = '00'.
+  APPEND ls_cur_am TO lt_cur_am.
+
+*== Steuerinformation
+  ls_acc_tx-itemno_acc        = 3.
+  ls_acc_tx-tax_code          = 'AA'.
+  ls_acc_tx-cond_key          = 'MWAS'.
+  APPEND ls_acc_tx TO lt_acc_tx.
+
+*== Beleg buchen
+  CALL FUNCTION 'BAPI_ACC_DOCUMENT_POST'
+    EXPORTING
+      documentheader = ls_header
+    TABLES
+      accountgl      = lt_acc_gl
+      accounttax     = lt_acc_tx
+      currencyamount = lt_cur_am
+      return         = lt_return.
+
+*== Protokoll
+  LOOP AT lt_return INTO ls_return.
+    WRITE: / ls_return-row,
+             ls_return-message,
+           / ls_return-type,
+             ls_return-id,
+             ls_return-number,
+             ls_return-message_v1.
+  ENDLOOP.
+
+*== Commit work
+  CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+    IMPORTING
+      return = ls_return.</pre>
+<h2>Neuigkeiten</h2>
+<p>Januar 2015: SAP hat den Hinweis 2070697 zu den BAPIs BAPI_ACC_DOCUMENT_POST + BAPI_ACC_DOCUMENT_CHECK veröffentlicht:</p>
+<h3>Symptom</h3>
+<p>Es wird immer Steuer 0 errechnet oder nichtabzugsfähige Beträge werden nicht verteilt bei Verwendung der Methode gemäß Hinweis 1873588.</p>
+<h3>Ursache und Voraussetzungen</h3>
+<p>Mit Hinweis 1873588 wurde eine Methode zur Verfügung gestellt zur Ableitung der Steuerdaten für BAPIs. Die Methode soll das Füllen der Steuerdaten für die BAPIs bapi_acc_document_post und bapi_acc_document<strong>_</strong>check erleichtern, und zwar ursprünglich für die Ermittlung der Parameter für die zeilenweise Steuer mit Hinweis 1873588, weil hier grundlegende Änderungen im SAP Standard vorgenommen worden sind. Mit diesem Hinweis wird die Methode erweitert für die Berechnung von Steuern (VAT, Sales und Use Tax) inklusive Nichtabzugsfähigkeit und Anzahlungen. Es kann nun ein Gesamtsteuerbetrag für den Beleg vorgegeben werden, der dann entsprechend der berechneten Steuern verteilt wird. Ein neuer Parameter wurde eingeführt, mit dem der Methode mitgeteilt werden kann, dass der Belegsaldo die fehlende Steuer ist, die verteilt werden soll. Eine Berechnung wird nur für Belege durchgeführt, die keine Mischbelege sind, d.h. z.B. Belege mit Anzahlungen und steuerrelevanten Aufwandpositionen in einem Beleg werden <strong>nicht</strong> unterstützt. Steuern für Indien und Brasilien werden nicht durch diese Methode unterstützt. Direkte Steuern (DIRECT_TAX=&#8217;X&#8217;) werden ebenfalls nicht unterstützt.</p>
+<p>Des weiteren sind alle Änderungen inklusive der Änderungen des Hinweises 1873588 auch für SAPKH60000-60404 verfügbar, d.h. die Änderungen sind mit diesem Hinweis runtergezogen worden, wobei die zeilenweise Übergabe der Steuern erst ab SAPKH60405 möglich ist, weil die BAPIS mit SAPKH60405 um den Parameter ITEMNO_TAX erweitert worden sind. Die Serviceklasse ist somit ab SAPKH60000 verfügbar und wird in allen Enhancementpacks ab SAPKH60000 gleich gehalten. Zudem wird der Funktionsbaustein FI_TAX_SERVICES_CALCULATE angeboten, der RFC-fähig ist. Dieser kann über RFC aufgerufen werden und ruft im SAP-System anschließend die obengenannte  Methode FI_TAX_SERVICES=&gt;CALCULATE auf und gibt die Parameter zurück.</p>
+<h3>Lösung</h3>
+<p>Korrektur</p>
+<p>Der Beitrag <a href="/blog/fi-beleg-mit-umsatzsteuer-buchen/">FI-Beleg mit Umsatzsteuer buchen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Anzeige des Belegflusses</title>
+		<link>/blog/anzeige-des-belegflusses/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 18 Mar 2014 13:33:26 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4576</guid>
+
+					<description><![CDATA[<p>Der weitgehend unbekannte Transaktionscode ALO1 (Buchstabe O, nicht Null) zeigt vollständige Belegflüsse für Einkaufs-, Material- Vertriebs- und FI-Belege an. Das klappt sowohl Richtung Belegvorgänger als auch für die Nachfolger. Daneben bietet die ALO1 Reporting-Möglichkeiten für diese Belegarten und ist in der Lage, die Daten auch aus Archiven zu lesen.</p>
+<p>Der Beitrag <a href="/blog/anzeige-des-belegflusses/">Anzeige des Belegflusses</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der weitgehend unbekannte Transaktionscode ALO1 (Buchstabe O, nicht Null) zeigt vollständige Belegflüsse für Einkaufs-, Material- Vertriebs- und FI-Belege an. Das klappt sowohl Richtung Belegvorgänger als auch für die Nachfolger. Daneben bietet die ALO1 Reporting-Möglichkeiten für diese Belegarten und ist in der Lage, die Daten auch aus Archiven zu lesen.</p>
+<p>Im Einstiegsbild kann ausgewählt werden, über welchen Belegtyp man mit der Suche beginnen möchte.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_18_14_26_10.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4578" alt="Transaktion ALO1" src="https://tricktresor.com/wp-content/uploads/2014/03/03_18_14_26_10-254x300.jpg" width="254" height="300" srcset="/wp-content/uploads/2014/03/03_18_14_26_10-254x300.jpg 254w, /wp-content/uploads/2014/03/03_18_14_26_10.jpg 429w" sizes="(max-width: 254px) 100vw, 254px" /></a></p>
+<p>Über die nun dargestellte Liste kann in die Einzelansicht des Belegflusses verzweigt werden.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_18_14_31_05.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4579" alt="ALO1 - belegfluss" src="https://tricktresor.com/wp-content/uploads/2014/03/03_18_14_31_05-300x113.jpg" width="300" height="113" srcset="/wp-content/uploads/2014/03/03_18_14_31_05-300x113.jpg 300w, /wp-content/uploads/2014/03/03_18_14_31_05.jpg 436w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>[notice type=&#8217;alert&#8217;]Achtung: Die Selektion kann durchaus etwas länger dauern&#8230;[/notice]</p>
+<p>Der Beitrag <a href="/blog/anzeige-des-belegflusses/">Anzeige des Belegflusses</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Videos</title>
+		<link>/blog/videos/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 04 Jan 2011 16:52:26 +0000</pubDate>
+				<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[FICO]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=573</guid>
+
+					<description><![CDATA[<p>Videos vom fico-forum zu vielen Themen.</p>
+<p>Der Beitrag <a href="/blog/videos/">Videos</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Videos vom fico-forum zu vielen Themen.<br /><P>SAP Anlagenbuchhaltung (FI-AA)<BR><A href="http://www.youtube.com/watch?v=LcM9frhOOWA" Target="_blank">http://www.youtube.com/watch?v=LcM9frhOOWA</A> </P><P>SAP Collections Management (FSCM)<BR><A href="http://www.youtube.com/watch?v=hvnw97_7Kco" Target="_blank">http://www.youtube.com/watch?v=hvnw97_7Kco</A> </P><P>SAP Hauptbuch (NewGL)<BR><A href="http://www.youtube.com/watch?v=HgaLqYcTDHY" Target="_blank">http://www.youtube.com/watch?v=HgaLqYcTDHY</A> </P><P>SAP SEPA &#8211; Single Euro Payments Area<BR><A href="http://www.youtube.com/watch?v=3lHvKTfDK-k" Target="_blank">http://www.youtube.com/watch?v=3lHvKTfDK-k</A> </P></p>
+<p>Der Beitrag <a href="/blog/videos/">Videos</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Collections Management</title>
+		<link>/blog/collections-management/</link>
+					<comments>/blog/collections-management/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 07 Jul 2008 09:17:54 +0000</pubDate>
+				<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[FICO]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=493</guid>
+
+					<description><![CDATA[<p>Weltweit, branchen&#252;bergreifend und kontinuierlich verschlechtert sich die Zahlungsmoral. Zwar lassen sich heute aus jeder Standard-ERP-L&#246;sung Mahnbriefe verschicken, doch letztendlich f&#252;hrt der Mahnprozess nur dazu, dass sich der Zahlungseingang um Wochen verz&#246;gert. mySAP ERP 2005 stellt mit SAP Financial Supply Chain Management Collections Management (SAP FSCM Collections Management) neue Funktionalit&#228;ten zur Verf&#252;gung, um bereits vor der Mahnung aktiv zu werden. </p>
+<p>Der Beitrag <a href="/blog/collections-management/">Collections Management</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Weltweit, branchen&uuml;bergreifend und kontinuierlich verschlechtert sich die Zahlungsmoral. Zwar lassen sich heute aus jeder Standard-ERP-L&ouml;sung Mahnbriefe verschicken, doch letztendlich f&uuml;hrt der Mahnprozess nur dazu, dass sich der Zahlungseingang um Wochen verz&ouml;gert. mySAP ERP 2005 stellt mit SAP Financial Supply Chain Management Collections Management (SAP FSCM Collections Management) neue Funktionalit&auml;ten zur Verf&uuml;gung, um bereits vor der Mahnung aktiv zu werden. <br /><P>Selbstverst&auml;ndlich lohnt es sich nicht, jeden Kunden bei Zahlungsverzug sofort anzurufen. Erst ab einem gewissen Forderungsvolumen stehen hierf&uuml;r Aufwand und Nutzen in einer angemessenen Relation. </P><P>Ein effektives fr&uuml;hzeitiges Forderungsmanage-ment baut auf einem transparenten Prozess auf. Als Voraussetzung identifiziert, segmentiert und priorisiert es Kunden anhand vorher definierter Inkasso-Strategien.</P><P>Lesen Sie den vollst&auml;ndigen Artikel unter <A href="http://fico-forum.de/artikle/0806.php" Target="_blank">http://fico-forum.de/artikle/0806.php</A></P></p>
+<p>Der Beitrag <a href="/blog/collections-management/">Collections Management</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/collections-management/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Erfahrungsbericht Neues Hauptbuch</title>
+		<link>/blog/erfahrungsbericht-neues-hauptbuch/</link>
+					<comments>/blog/erfahrungsbericht-neues-hauptbuch/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 08 Apr 2008 17:22:40 +0000</pubDate>
+				<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[FICO]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=473</guid>
+
+					<description><![CDATA[<p>Die heutigen Anforderungen an das Rechnungswesen sind komplex. Neben unterschiedlichen Anforderungen der externen Rechnungslegung sind auch vielf&#228;ltige interne Reporting-Anforderungen zu bedienen. Das neue Hauptbuch und die Belegaufteilung liefern leistungsf&#228;hige Werkzeuge dazu. </p>
+<p>Der Beitrag <a href="/blog/erfahrungsbericht-neues-hauptbuch/">Erfahrungsbericht Neues Hauptbuch</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die heutigen Anforderungen an das Rechnungswesen sind komplex. Neben unterschiedlichen Anforderungen der externen Rechnungslegung sind auch vielf&auml;ltige interne Reporting-Anforderungen zu bedienen. Das neue Hauptbuch und die Belegaufteilung liefern leistungsf&auml;hige Werkzeuge dazu. <br /><P>SAP Consulting war seit 2004 in mehrere Projekte involviert, in denen Systeme auf Basis des neuen Hauptbuchs implementiert wurden. Im Fokus dieses Erfahrungsberichts stehen Systeme, die v&ouml;llig neu aufgesetzt worden sind (so genannter Greenfield-Approach). Die entsprechenden Kunden strebten entweder umfassende Harmonisierungen von heterogenen SAP-Landschaften an oder f&uuml;hrten SAP ERP neu ein. </P><P><EM>01.2008 &#8211; Autor: Lars Gartenschl&auml;ger&nbsp; I&nbsp; Quelle: SAPPRESS Buch &#8220;Das neue Hauptbuch in ERP Financials&#8221;</EM></P><P>Lesen Sie hier den gesamten Artikel:</P><P><A href="http://www.fico-forum.de/download/dlass.php?action=dload&amp;id=21" Target="_blank">http://www.fico-forum.de/download/dlass.php?action=dload&amp;id=21</A><BR></P></p>
+<p>Der Beitrag <a href="/blog/erfahrungsbericht-neues-hauptbuch/">Erfahrungsbericht Neues Hauptbuch</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/erfahrungsbericht-neues-hauptbuch/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Intercompany-Abstimmung in SAP ERP Financials</title>
+		<link>/blog/intercompany-abstimmung-in-sap-erp-financials/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sun, 06 Jan 2008 16:42:32 +0000</pubDate>
+				<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[FICO]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=452</guid>
+
+					<description><![CDATA[<p>Intercompany-Abstimmung in SAP ERP Financials: "Differenzen identifizieren, dokumentieren, eliminieren". Bereits ab zwei Buchungskreisen gibt es in der Regel &#252;bergreifende Gesch&#228;ftsvorf&#228;lle. Im Konzernabschluss sind diese Innenums&#228;tze zwischen verschiedenen organisatorischen Einheiten dann zu eliminieren, es entsteht Abstimmungsbedarf bei den Einzelbilanzen. </p>
+<p>Der Beitrag <a href="/blog/intercompany-abstimmung-in-sap-erp-financials/">Intercompany-Abstimmung in SAP ERP Financials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Intercompany-Abstimmung in SAP ERP Financials: &#8220;Differenzen identifizieren, dokumentieren, eliminieren&#8221;. Bereits ab zwei Buchungskreisen gibt es in der Regel &uuml;bergreifende Gesch&auml;ftsvorf&auml;lle. Im Konzernabschluss sind diese Innenums&auml;tze zwischen verschiedenen organisatorischen Einheiten dann zu eliminieren, es entsteht Abstimmungsbedarf bei den Einzelbilanzen. <br /><P class="head2">Differenzen identifizieren, dokumentieren, eliminieren</P><P><SPAN class="p_text">Bereits ab zwei Buchungskreisen gibt es in der Regel &uuml;bergreifende Gesch&auml;ftsvorf&auml;lle. Im Konzernabschluss sind diese Innenums&auml;tze zwischen verschiedenen organisatorischen Einheiten dann zu eliminieren, es entsteht Abstimmungsbedarf bei den Einzelbilanzen. <BR><BR>In einer reinen SAP-Umgebung sind solche Transaktionen l&auml;ngst kein Problem mehr. Bereits in SAP R/3 lassen sich die entsprechenden Forderungen und Verbindlichkeiten abgleichen. Buchungskreis&uuml;bergreifende Belege erm&ouml;glichen eine automatische Buchung in beiden Unternehmen und vermeiden auf diese Weise Intercompany-Differenzen im Vorfeld. Verf&uuml;gt jedoch eine Tochtergesellschaft nicht &uuml;ber eine SAP-L&ouml;sung, entsteht mit SAP R/3 am Periodenende in der Regel zus&auml;tzlicher Abstimmungsbedarf in den Bereichen Kreditorenbuchhaltung (Verbindlichkeiten), Debitorenbuchhaltung (Forderungen) und Sachkontenbuchhaltung. Mit SAP ERP Financials l&auml;sst sich dieser Arbeitsschritt bereits beim Einzelabschluss einfach erledigen. <BR></SPAN><BR><SPAN class="p_text">Der Link zum vollst&auml;ndigen Artikel als PDF<BR><A class="moz-txt-link-freetext" href="http://www.fico-forum.de/download/dlass.php?action=dload&amp;id=20" Target="_blank">http://www.fico-forum.de/download/dlass.php?action=dload&amp;id=20</A></SPAN></P></p>
+<p>Der Beitrag <a href="/blog/intercompany-abstimmung-in-sap-erp-financials/">Intercompany-Abstimmung in SAP ERP Financials</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Echtzeit-Steuerung für GRC</title>
+		<link>/blog/echtzeit-steuerung-fuer-grc/</link>
+					<comments>/blog/echtzeit-steuerung-fuer-grc/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 03 Nov 2007 19:50:31 +0000</pubDate>
+				<category><![CDATA[Finanz- und Rechnungswesen]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=444</guid>
+
+					<description><![CDATA[<p>Echtzeit-Steuerung bei SAP-L&#246;sungen f&#252;r GRC - Zugang kontrollieren – Risiken minimieren. In diesem Artikel erfahren Sie, was Sie bei der Steuerung der Zugriffs- und Berechtigungssysteme des Moduls Governance, Risk und Compliance (GRC) beachten m&#252;ssen.</p>
+<p>Der Beitrag <a href="/blog/echtzeit-steuerung-fuer-grc/">Echtzeit-Steuerung für GRC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Echtzeit-Steuerung bei SAP-L&ouml;sungen f&uuml;r GRC &#8211; Zugang kontrollieren – Risiken minimieren. In diesem Artikel erfahren Sie, was Sie bei der Steuerung der Zugriffs- und Berechtigungssysteme des Moduls Governance, Risk und Compliance (GRC) beachten m&uuml;ssen.<br /><P class="head2">Zugang kontrollieren – Risiken minimieren</P><P>Ein wichtiger Bestandteil der SAP-L&ouml;sungen f&uuml;r Governance, Risk und Compliance (GRC) sind die Anwendungen zur Steuerung und Kontrolle der Zugriffs- und Berechtigungssysteme: </P><UL><LI>&#8220;Virsa Compliance Calibrator&#8221;, </LI><LI>&#8220;Virsa Role Expert&#8221;, </LI><LI>&#8220;Virsa Access Enforcer&#8221; und </LI><LI>&#8220;Virsa FireFighter for SAP&#8221;. </LI></UL><P>Die integrierten Anwendungen &uuml;berpr&uuml;fen in SAP- und Nicht-SAP-Systemen in Echtzeit alle Transaktionen im Zugriffs- und Berechtigungswesen. Abh&auml;ngig von ihrer Gr&ouml;&szlig;e verf&uuml;gen Unternehmen &uuml;ber eine gewisse Anzahl von SAP-Anwendern, denen sich entsprechend ihrer Aufgaben im SAP-Standard angelegte Rollen zuweisen lassen. Ver&auml;nderte Verantwortungsbereiche, neue SAP-Funktionen oder neue kundeneigene Transaktionen sorgen jedoch meist rasch daf&uuml;r, dass sich diese Rollen &auml;ndern. Verbunden mit dieser nicht unbetr&auml;chtlichen Zahl von Rollen und Prozessen gilt es, Zugriffsregeln und Berechtigungen zu evaluieren, zu testen und Probleme zu beheben. Doch das birgt Risiken. </P><P>Der Link zum vollst&auml;ndigen Artikel als PDF<BR><A href="http://www.fico-forum.de/download/dlass.php?action=dload&amp;id=10" Target="_blank">http://www.fico-forum.de/download/dlass.php?action=dload&amp;id=10</A></P></p>
+<p>Der Beitrag <a href="/blog/echtzeit-steuerung-fuer-grc/">Echtzeit-Steuerung für GRC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/echtzeit-steuerung-fuer-grc/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

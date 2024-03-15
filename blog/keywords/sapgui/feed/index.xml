@@ -1,0 +1,1950 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>SAPGUI Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/sapgui/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 10 Jun 2021 11:02:20 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>SAPGUI Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Aufmerksamkeit erlangen &#8211; SAPGUI Modus in den Vordergrund</title>
+		<link>/blog/aufmerksamkeit-erlangen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 10 Jun 2021 11:01:27 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Modus]]></category>
+		<guid isPermaLink="false">/?p=1029150</guid>
+
+					<description><![CDATA[<p>Obwohl der SAPGUI bereits als &#8220;tot&#8221; eingestuft wird, finden sich immer wieder neue Erkenntnisse&#8230; In diesem Beitrag zeige ich dir, wie du einen SAPGUI-Modus in den Vordergrund bringen kannst, um die Aufmerksamkeit des Anwenders zurückzuerlangen. Solange der Anwender nur SAPGUI-Modi anzeigt, wird der gewünschte SAPGUI-Modus in den Vordergrund kommen und die anderen Fenster überlagern. Sollte noch ein anderes Programm (Browser, Outlook, Excel etc.), dann wird der Wunsch nach Aufmerksamkeit durch ein Blinken des SAPGUI-Icons in...</p>
+<p>Der Beitrag <a href="/blog/aufmerksamkeit-erlangen/">Aufmerksamkeit erlangen &#8211; SAPGUI Modus in den Vordergrund</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Obwohl der SAPGUI bereits als &#8220;tot&#8221; eingestuft wird, finden sich immer wieder neue Erkenntnisse&#8230; In diesem Beitrag zeige ich dir, wie du einen SAPGUI-Modus in den Vordergrund bringen kannst, um die Aufmerksamkeit des Anwenders zurückzuerlangen. </p>
+
+
+
+<p>Solange der Anwender nur SAPGUI-Modi anzeigt, wird der gewünschte SAPGUI-Modus in den Vordergrund kommen und die anderen Fenster überlagern. Sollte noch ein anderes Programm (Browser, Outlook, Excel etc.), dann wird der Wunsch nach Aufmerksamkeit durch ein Blinken des SAPGUI-Icons in der Taskleiste angezeigt.</p>
+
+
+
+<p>Das folgende Programm kannst du in zwei verschiedenen Modi starten um den Effekt zu sehen. Die beiden Modi sollten möglichst übereinander (nicht nebeneinander) liegen, um den Effekt erkennen zu können.</p>
+
+
+
+<h2 class="wp-block-heading">Coding</h2>
+
+
+
+<pre class="wp-block-code"><code>REPORT zz_activate_gui_mode.
+
+*--------------------------------------------------------------------*
+* Programm in 2 verschiedenen Modi aufrufen und etwa 1 Sekunde versetzt starten!
+*--------------------------------------------------------------------*
+
+DO 10 TIMES.
+  CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
+    EXPORTING
+      text = |Modus: { sy-modno }  Index: { sy-index }|.
+
+  CALL FUNCTION 'SAPGUI_SET_PROPERTY'
+    DESTINATION 'SAPGUI'
+    EXPORTING
+      property = 'ACTIVATE'
+      value    = 'X'
+    EXCEPTIONS
+      OTHERS   = 0.
+
+  WAIT UP TO 3 SECONDS.
+ENDDO.</code></pre>
+<p>Der Beitrag <a href="/blog/aufmerksamkeit-erlangen/">Aufmerksamkeit erlangen &#8211; SAPGUI Modus in den Vordergrund</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAPGUI Unscharf [Win10]</title>
+		<link>/blog/unscharf-win10/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 20 Feb 2020 07:14:42 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Hilfe]]></category>
+		<category><![CDATA[DPI]]></category>
+		<category><![CDATA[Kompatibilitätsmodus]]></category>
+		<category><![CDATA[unscharf]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<guid isPermaLink="false">/?p=1023228</guid>
+
+					<description><![CDATA[<p>Seit langem ist mir aufgefallen, dass mein SAPGUI irgendwie unscharf und verschwommen aussieht. Bei anderen Programmen habe ich das nicht und nahm deswegen ein Problem im SAPGUI an und habe es so hingenommen. Es war auch nicht wirklich störend, nur irgendwie &#8220;komisch&#8221;. Ich bin dann doch mal in einer langweiligen Minute auf die Suche gegangen und habe tatsächlich eine Lösung gefunden: Rechtsklick auf die Verknüpfung zum SAPGUI und Eigenschaften auswählen. Dann zur Registerkarte Kompatibilität wechseln:...</p>
+<p>Der Beitrag <a href="/blog/unscharf-win10/">SAPGUI Unscharf [Win10]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Seit langem ist mir aufgefallen, dass mein SAPGUI irgendwie unscharf und verschwommen aussieht. Bei anderen Programmen habe ich das nicht und nahm deswegen ein Problem im SAPGUI an und habe es so hingenommen. Es war auch nicht wirklich störend, nur irgendwie &#8220;komisch&#8221;.</p>
+
+
+
+<figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="300" height="300" src="/wp-content/uploads/2020/02/sapgui_unscharf.png" alt="" class="wp-image-1023229" srcset="/wp-content/uploads/2020/02/sapgui_unscharf.png 300w, /wp-content/uploads/2020/02/sapgui_unscharf-150x150.png 150w, /wp-content/uploads/2020/02/sapgui_unscharf-83x83.png 83w" sizes="(max-width: 300px) 100vw, 300px" /><figcaption>SAPGUI verschwommen</figcaption></figure>
+
+
+
+<p>Ich bin dann doch mal in einer langweiligen Minute auf die Suche gegangen und habe tatsächlich eine Lösung gefunden:</p>
+
+
+
+<p>Rechtsklick auf die Verknüpfung zum SAPGUI und <em>Eigenschaften</em> auswählen. Dann zur Registerkarte <em>Kompatibilität </em>wechseln:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="447" height="520" src="/wp-content/uploads/2020/02/sapgui_eigenschaften_kompatibilitaet.png" alt="" class="wp-image-1023230" srcset="/wp-content/uploads/2020/02/sapgui_eigenschaften_kompatibilitaet.png 447w, /wp-content/uploads/2020/02/sapgui_eigenschaften_kompatibilitaet-258x300.png 258w" sizes="(max-width: 447px) 100vw, 447px" /></figure>
+
+
+
+<p>Klicke auf <em>Hohe DPI-Einstellungen</em> ändern. Es erscheint ein weiteres Popup. Aktiviere hier die Option <em>Verhalten bei hoher DPI-Skalierung überschreiben </em>und setze <em>Skalierung durchgeführt von</em> auf <strong>System</strong>:</p>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="360" height="394" src="/wp-content/uploads/2020/02/sapgui_hohe_dpi.png" alt="" class="wp-image-1023231" srcset="/wp-content/uploads/2020/02/sapgui_hohe_dpi.png 360w, /wp-content/uploads/2020/02/sapgui_hohe_dpi-274x300.png 274w" sizes="(max-width: 360px) 100vw, 360px" /></figure>
+
+
+
+<p>Nun sieht auch mein SAPGUI wieder &#8220;normal&#8221; aus und ich weiß, alles, was nun unscharf ist, liegt an meinen Augen&#8230;</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="300" height="300" src="/wp-content/uploads/2020/02/sapgui_ok.png" alt="" class="wp-image-1023232" srcset="/wp-content/uploads/2020/02/sapgui_ok.png 300w, /wp-content/uploads/2020/02/sapgui_ok-150x150.png 150w, /wp-content/uploads/2020/02/sapgui_ok-83x83.png 83w" sizes="(max-width: 300px) 100vw, 300px" /></figure>
+<p>Der Beitrag <a href="/blog/unscharf-win10/">SAPGUI Unscharf [Win10]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAPLogon Shortcuts wiederherstellen</title>
+		<link>/blog/saplogon-shortcuts-wiederherstellen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 28 Jun 2016 12:41:02 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[saplogon]]></category>
+		<category><![CDATA[shortcut]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=700694</guid>
+
+					<description><![CDATA[<p>Mit der Einführung des SAP Logon 7.40 wurde die Art, wie die Konfigurationsdaten abgelegt werden, verändert. Gab es früher die Dateien saplogon.ini mit den SAP Systemen und sapshortcuts.ini mit den persönlichen Verweisen zu den häufig benötigten SAP Systemen, so sind diese Dateien nun zusammengefasst in einer einzigen XML Datei namens SapUiLandscape.xml.</p>
+<p>Der Beitrag <a href="/blog/saplogon-shortcuts-wiederherstellen/">SAPLogon Shortcuts wiederherstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit der Einführung des SAP Logon 7.40 wurde die Art, wie die Konfigurationsdaten abgelegt werden, verändert. Gab es früher die Dateien saplogon.ini mit den SAP Systemen und sapshortcuts.ini mit den persönlichen Verweisen zu den häufig benötigten SAP Systemen, so sind diese Dateien nun zusammengefasst in einer einzigen XML Datei namens SapUiLandscape.xml.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/06/2016-06-28_14-40-04.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-700697" src="https://tricktresor.com/wp-content/uploads/2016/06/2016-06-28_14-40-04.jpg" alt="2016-06-28_14-40-04" width="621" height="390" srcset="/wp-content/uploads/2016/06/2016-06-28_14-40-04.jpg 621w, /wp-content/uploads/2016/06/2016-06-28_14-40-04-300x188.jpg 300w" sizes="(max-width: 621px) 100vw, 621px" /></a></p>
+<h2>Die Beschreibung</h2>
+<p>Hier geht es zur ausführlichen Beschreibung: <a href="https://tricktresor.com/wp-content/uploads/2016/06/SAPlogon_shortcuts_story.pdf">SAPlogon_shortcuts_story</a></p>
+<h2>Das Programm</h2>
+<p>Hier der Link zum gezippten XLSM: <a href="https://tricktresor.com/wp-content/uploads/2016/06/SAPlogon_Shortcuts_xlsm.zip">SAPlogon_Shortcuts_xlsm</a></p>
+<p>&nbsp;</p>
+<p><em>Ernst Kofler hat diesen Trick zur Verfügung gestellt. Vielen Dank dafür!!</em></p>
+<p>Der Beitrag <a href="/blog/saplogon-shortcuts-wiederherstellen/">SAPLogon Shortcuts wiederherstellen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>High Definition SAP? Ein Jahr später</title>
+		<link>/blog/high-definition-sap-ein-jahr-spaeter/</link>
+					<comments>/blog/high-definition-sap-ein-jahr-spaeter/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 24 Jun 2015 13:03:43 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[icon]]></category>
+		<category><![CDATA[theme]]></category>
+		<category><![CDATA[Design]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=134429</guid>
+
+					<description><![CDATA[<p>Ein Jahr nach meinem Erfahrungsbericht hat die SAP das neue SAP Blue Crystal Design herausgebracht. Für dieses Design wurden alle Icons komplett überarbeitet und besser skalierbar gemacht. Mich hat das Design eher abgeschreckt, als überzeugt. Zudem sind immer noch nicht alle Darstellungsfehler ausgemerzt.</p>
+<p>Der Beitrag <a href="/blog/high-definition-sap-ein-jahr-spaeter/">High Definition SAP? Ein Jahr später</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Vor ziemlich genau einem Jahr habe ich mich darüber ausgelassen, dass der SAPGUI mit einer Auflösung größer als FullHD leider nicht zu verwenden ist: <a href="https://tricktresor.com/blog/high-definition-sap-ein-erfahrungsbericht/">High Definition SAP? Ein Erfahrungsbericht</a><br />
+Jetzt, ein Jahr später, führt die SAP im SAPGUI das <em>SAP Blue Crystal Design</em> ein:<br />
+<em><strong>Blue Crystal Design </strong><br />
+SAP Blue Crystal is a new visual design theme which succeeds Corbu. It provides a consistent design that allows users to seamlessly experience SAP GUI and NWBC elements. It is the standard theme of Fiori applications and comes with a new color palette and icons which are better scalable. The background texture has a stroke pattern in white and light blue with a gradient layer.</em><br />
+<a href="http://service.sap.com/sap/support/notes/2022335">SAP-Note 2022335</a></p>
+<h2>Hat sich was geändert?</h2>
+<p>Die SAP hat tatsächlich nachgebessert und für das Blue Crystal Design die Icons komplett neu gebaut. Ich persönlich finde das Design extrem unübersichtlich und hässlich. Leider wurden die Icons für das Signature Theme nicht überarbeitet.<br />
+Leider sind jedoch nach wie vor Elemente vergessen worden.<br />
+Folgend ein paar Screenshots mit hoher Auflösung und dem neuen SAP Blue Crystal Design.</p>
+<p>Der erste Blick gilt der SE80. Hier ist gut erkennbar, dass zwar die Icons gut skaliert wurden, der Auswahlbereich links oben jedoch immer noch nicht korrekt skaliert wird.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-16-55.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-134431" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-16-55-300x233.jpg" alt="SAP Blue Crystal Design - SE24" width="300" height="233" srcset="/wp-content/uploads/2015/06/2015-06-24_14-16-55-300x233.jpg 300w, /wp-content/uploads/2015/06/2015-06-24_14-16-55-1024x794.jpg 1024w, /wp-content/uploads/2015/06/2015-06-24_14-16-55.jpg 1451w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Ich wollte es kaum glauben: Das Calendar-Control wurde gar nicht angepasst:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-19-01.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-134432" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-19-01-300x283.jpg" alt="SAP Blue Crystal Design - Calendar" width="300" height="283" srcset="/wp-content/uploads/2015/06/2015-06-24_14-19-01-300x283.jpg 300w, /wp-content/uploads/2015/06/2015-06-24_14-19-01-1024x966.jpg 1024w, /wp-content/uploads/2015/06/2015-06-24_14-19-01.jpg 1335w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Das ALV-Grid sieht ordentlich aus. Die Icons finde ich jedoch gelinde gesagt schrecklich.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-20-05.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-134433" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-20-05-300x195.jpg" alt="SAP Blue Crystal Design - ALV Grid" width="300" height="195" srcset="/wp-content/uploads/2015/06/2015-06-24_14-20-05-300x195.jpg 300w, /wp-content/uploads/2015/06/2015-06-24_14-20-05.jpg 891w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Im Tree-Control-Demo sieht man, dass die &#8220;Anfasser&#8221; für die Ordner immer noch extrem klein sind.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-23-29.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-134434" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-23-29-300x209.jpg" alt="SAP Blue Crystal Design - Tree" width="300" height="209" srcset="/wp-content/uploads/2015/06/2015-06-24_14-23-29-300x209.jpg 300w, /wp-content/uploads/2015/06/2015-06-24_14-23-29.jpg 725w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Die Dynamischen Dokument werden gut skaliert. Allerdings nur der Text. Die Icons sind so klein, dass sie kaum zu erkennen sind.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-26-02.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-134435" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-26-02-300x186.jpg" alt="SAP Blue Crystal Design - HTML" width="300" height="186" srcset="/wp-content/uploads/2015/06/2015-06-24_14-26-02-300x186.jpg 300w, /wp-content/uploads/2015/06/2015-06-24_14-26-02-1024x636.jpg 1024w, /wp-content/uploads/2015/06/2015-06-24_14-26-02.jpg 1561w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><em>The background texture has a stroke pattern in white and light blue with a gradient layer.</em> Hier in vierfacher Vergrößerung. Mich hat der schraffierte Hintergrund sofort irritiert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-23-43.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-134436" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-23-43-300x122.jpg" alt="SAP Crystal Design - Hintergrund" width="300" height="122" srcset="/wp-content/uploads/2015/06/2015-06-24_14-23-43-300x122.jpg 300w, /wp-content/uploads/2015/06/2015-06-24_14-23-43-1024x416.jpg 1024w, /wp-content/uploads/2015/06/2015-06-24_14-23-43.jpg 1388w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Das SAP-Logon ebenfalls mit einem sehr kleinen &#8220;Auf- und Zuklapper&#8221;:</p>
+<p>&nbsp;</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-55-21.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-134504" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-55-21-300x269.jpg" alt="SAPlogon" width="300" height="269" srcset="/wp-content/uploads/2015/06/2015-06-24_14-55-21-300x269.jpg 300w, /wp-content/uploads/2015/06/2015-06-24_14-55-21.jpg 375w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Zuguter letzt bin ich  noch über die F4-Eingabehilfe gestolpert. Hier funktioniert das Skalieren so gar nicht.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-56-05.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-134505 size-medium" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_14-56-05-300x105.jpg" alt="f4" width="300" height="105" srcset="/wp-content/uploads/2015/06/2015-06-24_14-56-05-300x105.jpg 300w, /wp-content/uploads/2015/06/2015-06-24_14-56-05-1024x360.jpg 1024w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<h2>Fazit</h2>
+<p>Ich werde weiterhin mit meiner auf FullHD runter skalierten Auflösung arbeiten und weiterhin das Signature Theme verwenden. Schließlich will ich mit dem SAPGUI arbeiten&#8230;</p>
+<p>Ach so: Für alle, die an der genauen Info über den SAPGUI-Patch interessiert sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_15-01-09.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-134506" src="https://tricktresor.com/wp-content/uploads/2015/06/2015-06-24_15-01-09-300x237.jpg" alt="SAPLOGON Info" width="300" height="237" srcset="/wp-content/uploads/2015/06/2015-06-24_15-01-09-300x237.jpg 300w, /wp-content/uploads/2015/06/2015-06-24_15-01-09.jpg 1022w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>MAIN MODULE INFORMATION:<br />
+saplogon.exe<br />
+SAP Logon für Windows<br />
+740 Final Release<br />
+7400.1.3.1104<br />
+1588321</p>
+<p>Der Beitrag <a href="/blog/high-definition-sap-ein-jahr-spaeter/">High Definition SAP? Ein Jahr später</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/high-definition-sap-ein-jahr-spaeter/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>High Definition SAP? Ein Erfahrungsbericht</title>
+		<link>/blog/high-definition-sap-ein-erfahrungsbericht/</link>
+					<comments>/blog/high-definition-sap-ein-erfahrungsbericht/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 19 Jun 2014 19:14:57 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Hilfe]]></category>
+		<category><![CDATA[Materialstamm]]></category>
+		<category><![CDATA[Rahmen]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[auflösung]]></category>
+		<category><![CDATA[Performance]]></category>
+		<category><![CDATA[elemente]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Darstellung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[skalierung]]></category>
+		<category><![CDATA[Tree]]></category>
+		<category><![CDATA[Schriftgröße]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Generell]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4819</guid>
+
+					<description><![CDATA[<p>Mehr ist besser. Das gilt für Geschwindigkeit, Speicher und auch die Auflösung. Dass dies jedoch im Falle der Auflösung nicht unbedingt der Fall ist, möchte ich dir in diesem Artikel zeigen. Ein Notebook mit der Auflösung von 2880x1620 Bildpunkten sollte ein scharfes Bild und gemütliches Arbeiten garantieren. Leider ist dem nicht so, denn nicht nur das Betriebssystem muss mitspielen, sondern auch alle anderen Programme. Wie auch der SAPGUI...</p>
+<p>Der Beitrag <a href="/blog/high-definition-sap-ein-erfahrungsbericht/">High Definition SAP? Ein Erfahrungsbericht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ich habe ein neues Notebook: Lenovo T540p. Ein tolles Gerät! Schnell, lautlos und eine Auflösung von 2880&#215;1620 Bildpunkten. Bringt die hohe Auflösung etwas bei der Arbeit mit SAP? Um es gleich vorweg zu nehmen: Nein. Im Gegenteil, es bereitet eher Probleme, denn nicht alle GUI-Elemente werden entsprechend vergrößert.</p>
+<h2>Generell</h2>
+<p>Eine hohe Auflösung ist erst einmal toll, denn das Bild wird schärfer. Theoretisch jedenfalls, denn praktisch müssen alle beteiligten Komponenten mithelfen. Bei einer hohen Auflösung wird erst einmal alles kleiner, denn viele GUI-Elemente werden in Pixel gemessen und nicht in ihrer wahren Darstellungsgröße. Ein Desktopicon von Windows XP hat eine feste Größe von 32&#215;32 Pixeln. Moderne Betriebssysteme haben zwar inzwischen deutliche größere Icons, jedoch ist das gesamte Zusammenspiel zwischen Fenster, Fensterrahmen, Icons, GUI-Elementen (Dropdownboxen, Scrollbalken, Kontextmenus etc) und der Schrift wichtig. Nicht nur das Betriebssystem muss eine Skalierung der Darstellungsgröße unterstützen, sondern auch die Software. Meine Testsoftware ist in diesem Fall der SAPGUI.</p>
+<h2>SAPGUI 730</h2>
+<p>Den SAPGUI kann man skalieren indem man die Schriftgröße einstellt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190643.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4835 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190643-300x229.jpg" alt="Bild_2014_06_19_190643" width="300" height="229" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190643-300x229.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190643-1024x782.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190643-624x476.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190643.jpg 1604w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der Dialog sieht im Großen und Ganzen gut aus. Auffällig ist, dass die <em>Aufklapper</em> am TreeControl äußerst klein ausfallen. Dieser Umstand zieht sich leider durch den gesamten SAPGUI. Aus diesem Grund muss man bei der Arbeit mit einer hohen Auflösung auch bei einer großen Darstellung der Objekte eine ruhige Maushand haben.</p>
+<h2>Windows-Einstellungen</h2>
+<p>Im Folgenden möchte ich euch einfach mehr oder weniger kommentarlos ein paar Screenshots zeigen, die ich mit einer Windows-Skalierung von (meistens) 200% gemacht habe:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190619.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4823 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190619-300x184.jpg" alt="Bild_2014_06_19_190619" width="300" height="184" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190619-300x184.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190619-624x384.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190619.jpg 812w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Zum Angeben hier noch ein Screenshot meiner Auflösung:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190637.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4824 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190637-300x136.jpg" alt="Bild_2014_06_19_190637" width="300" height="136" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190637-300x136.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190637-624x283.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190637.jpg 908w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Icons und Fenster werden dadurch im Windows so dargestellt, dass ich nicht nach zwei Stunden Arbeit mit Augenkrebs rechnen muss.</p>
+<h2>Testen der SAPGUI-Elemente</h2>
+<p>Die folgenden Testst habe ich mit dem <a title="Signature Theme | SAP Design Guild" href="http://www.sapdesignguild.org/resources/visualdesign_mic.asp">Signature-Theme</a> gemacht. Um die einzelnen Controls auszuprobieren, habe ich die gängigen Entwicklungswerkzeuge geprüft und bin die SAP-Demoprogramme durchgegangen.</p>
+<p>Als erstes viel mir auf, dass die Standardicons leider alle unscharf dargestellt werden:</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4843" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190653.jpg" alt="Bild_2014_06_19_190653" width="145" height="55" /></p>
+<p>Auch die Suchhilfe sieht unschön aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190631.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4840 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190631-300x130.jpg" alt="Bild_2014_06_19_190631" width="300" height="130" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190631-300x130.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190631-1024x446.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190631-624x272.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190631.jpg 1552w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Im Startmenü sieht man deutlich, wie klein die <em>Baumaufklapper</em> sind. Auch ist gut zu erkennen, dass die Standardelemente unscharf sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190610.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4837 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190610-300x269.jpg" alt="Bild_2014_06_19_190610" width="300" height="269" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190610-300x269.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190610-624x560.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190610.jpg 760w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Hilfe zum SAPGUI ist okay:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190601.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4829 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190601-300x287.jpg" alt="Bild_2014_06_19_190601" width="300" height="287" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190601-300x287.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190601-624x597.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190601.jpg 972w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Eine Registerkarte verschluckt ein Teil der Beschriftung. Die Icons sowie die Schrift auf Drucktasten sieht sehr gequetscht aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190658.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4836 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190658-300x55.jpg" alt="Bild_2014_06_19_190658" width="300" height="55" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190658-300x55.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190658-624x115.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190658-800x148.jpg 800w, /wp-content/uploads/2014/06/Bild_2014_06_19_190658.jpg 803w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Icons im SAPLOGON werden nicht skaliert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190604.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4822 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190604-300x90.jpg" alt="Bild_2014_06_19_190604" width="300" height="90" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190604-300x90.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190604-624x188.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190604.jpg 752w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die F1-Hilfe im Performance-Assistant hat ein Problem mit dem Splitter:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190628.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4830 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190628-300x84.jpg" alt="Bild_2014_06_19_190628" width="300" height="84" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190628-300x84.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190628-1024x288.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190628-624x175.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190628.jpg 1100w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h3>Entwicklungswerkzeuge</h3>
+<p>Der Formulareditor sieht erstaunlicherweise sehr gut aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190659.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4847 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190659-300x68.jpg" alt="Bild_2014_06_19_190659" width="300" height="68" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190659-300x68.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190659-1024x233.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190659-624x142.jpg 624w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die grafische Tabellendarstellung ist okay (Transaktion SE11)</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190645.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4846 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190645-300x158.jpg" alt="Bild_2014_06_19_190645" width="300" height="158" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190645-300x158.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190645-1024x541.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190645-624x329.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190645.jpg 1302w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die SE80 hat große Probleme bei der Darstellung der Web-Elemente:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190645.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4820 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190651-300x148.jpg" alt="Bild_2014_06_19_190651" width="300" height="148" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190651-300x148.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-1024x507.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-624x308.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651.jpg 1036w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Schriftart im Editor lässt sich im übrigen einfach in der unteren rechten Ecke einstellen. Dies geht unabhängig von der Skalierung sehr gut:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_210641.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4848 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_210641-300x194.jpg" alt="Bild_2014_06_19_210641" width="300" height="194" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_210641-300x194.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_210641-624x404.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_210641.jpg 742w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Zum Vergleich: So sollte die SE80 aussehen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200629.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4827 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200629-300x184.jpg" alt="Bild_2014_06_19_200629" width="300" height="184" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_200629-300x184.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_200629-624x384.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_200629.jpg 710w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der grafische Dynproeditor sieht ebenfalls merkwürdig aus. Die Dynpro-Elemente sind deutlich größer als der Rest der Anwendung;</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190625.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4821 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190625-300x208.jpg" alt="Bild_2014_06_19_190625" width="300" height="208" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190625-300x208.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190625-1024x712.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190625-624x434.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190625.jpg 1299w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der Quickviewer sieht auf den ersten Blick gut aus. Auf den zweiten Blick fällt auf, dass die Schlüsselfelder mit einem äußerst kleinen Symbol gekennzeichnet sind. Die Überschrift in der Navigation passt nicht 100%ig. In der Drucktastenleiste sieht man wieder sehr schön, dass die Icons unscharf sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190602.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4845 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190602-300x253.jpg" alt="Bild_2014_06_19_190602" width="300" height="253" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190602-300x253.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190602-1024x866.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190602-624x527.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190602.jpg 1026w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h3>Controls</h3>
+<p>Als erstes habe ich das Calendar Control getestet. Gruselig und nicht zu verwenden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190651-2.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-4844" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190651-2.jpg" alt="Bild_2014_06_19_190651 (2)" width="666" height="221" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190651-2.jpg 666w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-2-300x99.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190651-2-624x207.jpg 624w" sizes="(max-width: 666px) 100vw, 666px" /></a></p>
+<p>Dropdown-Listboxen werden gut dargestellt:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190609.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4842 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190609-300x192.jpg" alt="Bild_2014_06_19_190609" width="300" height="192" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190609-300x192.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190609-624x399.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190609.jpg 687w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die HTML-Elemente auf Dynamischen Dokumenten sehen nicht wirklich gut aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190639.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4841 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190639-300x144.jpg" alt="Bild_2014_06_19_190639" width="300" height="144" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190639-300x144.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190639-1024x494.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190639-624x301.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190639.jpg 1129w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Das Text Control &#8211; hier ein Beispiel aus dem Materialstamm &#8211; sieht gut aus. Alle Elemente habe eine einheitliche Größe:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190654.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4839 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190654-300x140.jpg" alt="Bild_2014_06_19_190654" width="300" height="140" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190654-300x140.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190654-1024x480.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190654-624x292.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190654.jpg 1343w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Im ALV-Grid-Control fällt wieder auf, dass die Icons in der Toolbar unscharf sind. Das Element &#8220;Alle Einträge markieren&#8221; ist zu klein:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190616.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4838 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190616-300x102.jpg" alt="Bild_2014_06_19_190616" width="300" height="102" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190616-300x102.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190616-1024x348.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_190616-624x212.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190616.jpg 1363w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Im Tree Control fallen erneut lediglich die kleinen Aufklapper auf (bzw. eigentlich fallen sie gar nicht auf, weil sie so klein sind&#8230;):</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200604.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4828 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_200604-300x87.jpg" alt="Bild_2014_06_19_200604" width="300" height="87" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_200604-300x87.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_200604-1024x298.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_19_200604-624x182.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_200604.jpg 1498w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Der grafische Texteditor ist okay auch wenn die Listboxen zur Auswahl der Formate zu klein sind:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190618.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4833 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190618-300x80.jpg" alt="Bild_2014_06_19_190618" width="300" height="80" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190618-300x80.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_19_190618-624x166.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_19_190618.jpg 1016w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Die Druckansicht zeigt ein deutliches Missverhältnis zwischen Rahmen und Vorschautext:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190626-2.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4832 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_19_190626-2.jpg" alt="Bild_2014_06_19_190626 (2)" width="290" height="309" srcset="/wp-content/uploads/2014/06/Bild_2014_06_19_190626-2.jpg 290w, /wp-content/uploads/2014/06/Bild_2014_06_19_190626-2-281x300.jpg 281w" sizes="(max-width: 290px) 100vw, 290px" /></a></p>
+<h2>Fazit</h2>
+<p>Eine große Auflösung ist toll. Leider macht die Software noch nicht komplett mit. Das gilt nicht nur für den SAPGUI, auch andere Softwareprodukte haben Schwierigkeiten mit der hohen Auflösung. Die meisten Probleme sind eher kleiner Natur, jedoch stören sie für mein Empfinden den tollen Gesamteindruck eines so stark ausgestatteten Rechners. Immerhin möchte ich mit einem besseren Computer als vorher ein besseres Ergebnis haben und kein schlechteres. Ich kann also nicht empfehlen, einen Windows-Computer mit einer so hohen Auflösung zu kaufen. In vielen Fällen bringt dies Probleme mit sich. Es wird sicherlich noch ein paar Entwicklungszyklen brauchen, bis die Darstellung auf hochauflösenden Displays zufriedenstellend sein wird.</p>
+<p>Die Skalierung des SAPGUI funktioniert in den meisten Fällen gut. Anwender dürften wenig Probleme haben. Ich kann mir gut vorstellen, dass SAP in den nächsten SAPGUI-Updates die ärgerlichsten Fehler beheben wird und vielleicht gibt es demnächst auch ein High-Definition-Theme von SAP?</p>
+<p>Interessant wäre noch, wie sich das <a title="Corbu Design | SAP Design Guild" href="http://help.sap.com/saphelp_nw73ehp1/helpdata/de/13/20a20fb440434da696cb450d2a6bd3/content.htm">Corbu-Design</a> verhält.</p>
+<h2>Problemlösung</h2>
+<p>Nachdem die Darstellung des SAPGUI teilweise wirklich gruselig war und das Arbeiten im Falle der SE80 sogar stark behindert, habe ich mich entschieden, die Auflösung des Notebook-Displays einfach auf 1920&#215;1080 Pixel einzustellen. Die Auflösung des Bildschirms ist einerseits so hoch, dass ich keine Verzerrung und kein Verschwimmen bemerke und auf der anderen Seite ist sie hoch genug um viel Programm anzuzeigen. Es ist ein kleiner Wermutstropfen wenn ich meine Pferdestärken nicht ausfahren kann, aber das können mein Ego und ich verschmerzen&#8230;</p>
+<h2>Nachtrag</h2>
+<p>Wie bereits erwähnt wäre noch interessant, wie sich das Corbu-Theme verhält. Dies habe ich auch noch ausprobiert.</p>
+<p>Leider sind auch hier &#8211; wie zu erwarten &#8211; die Icons unscharf, da sie nur in einer geringen Auflösung vorliegen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180655.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-4860 size-medium" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180655-300x175.jpg" alt="Corbu-Theme groß" width="300" height="175" srcset="/wp-content/uploads/2014/06/Bild_2014_06_23_180655-300x175.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_23_180655-1024x598.jpg 1024w, /wp-content/uploads/2014/06/Bild_2014_06_23_180655-624x364.jpg 624w, /wp-content/uploads/2014/06/Bild_2014_06_23_180655.jpg 1027w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>&nbsp;</p>
+<p>Auch der SAPGUI in der Version 740 bringt leider keine Besserung&#8230;</p>
+<p>Der Beitrag <a href="/blog/high-definition-sap-ein-erfahrungsbericht/">High Definition SAP? Ein Erfahrungsbericht</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/high-definition-sap-ein-erfahrungsbericht/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>SimDia² &#8211; SAP-Datenimport einfach?</title>
+		<link>/blog/simdia2-sap-datenimport-einfach/</link>
+					<comments>/blog/simdia2-sap-datenimport-einfach/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 14 Apr 2014 15:24:30 +0000</pubDate>
+				<category><![CDATA[Partner]]></category>
+		<category><![CDATA[AddOns]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[Tools]]></category>
+		<category><![CDATA[simdia]]></category>
+		<category><![CDATA[programmierung]]></category>
+		<category><![CDATA[LSMW]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[Popups]]></category>
+		<category><![CDATA[EXCEL]]></category>
+		<category><![CDATA[Batch Input]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[Viewcluster]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Entwicklung]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[Scripting]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4659</guid>
+
+					<description><![CDATA[<p>Für die Datenmigration von Fremdsystemen oder Excel stehen in SAP viele Möglichkeiten offen. In diesem Artikel stelle ich euch SimDia² vor mit dem die Datenübernahme aus Exceldateien ein Kinderspiel wird. Die Übernahme der Felder wird durch einfaches Anklicken im SAPGUI definiert. Es können "Kopfdaten" und "Positionsdaten" übernommen werden. </p>
+<p>Der Beitrag <a href="/blog/simdia2-sap-datenimport-einfach/">SimDia² &#8211; SAP-Datenimport einfach?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><span style="line-height: 1.5em;">[pullquote float=&#8217;left&#8217; color=&#8217;#000000&#8242; bgcolor=&#8217;#ffffff&#8217;]Wir schärfen Ihre Axt, während Sie den Baum fällen.[/pullquote] So lautet das Motto von </span><a style="line-height: 1.5em;" title="ERSAsoft | Homepage" href="https://ersasoft.de/de?s=tt">ERSAsoft</a><span style="line-height: 1.5em;">.&nbsp;</span>Der Slogan ist eine Anspielung auf das Zitat „Ich hab keine Zeit meine Axt zu schärfen. Ich muss einen Baum fällen.“ aus der Erzählung „Komm, ich erzähl dir eine Geschichte“ von <a title="Jorge Bucay | Wikipedia" href="http://de.wikipedia.org/wiki/Jorge_Bucay">Jorge Bucay</a>.</p>
+<p>Er soll den Anspruch von ERSAsoft verdeutlichen, Tools zu entwickeln, die „den Umgang mit SAP so einfach und komfortabel wie möglich gestalten“. Ob das Datenimport-Tool SimDia²&nbsp; diesem Anspruch wirklich gerecht wird, wollte ich prüfen.</p>
+<h2>Was ist SimDia²?</h2>
+<p><a href="https://ersasoft.de/de/simdia/?s=tt">SimDia²</a> ist ein ein Tool, um Daten aus Excel nach SAP zu importieren. Dabei arbeitet das Programm direkt im SAPGUI-Dialog. Damit wird auch schnell klar, welche Zielrichtung SimDia² verfolgt: den Import kleinster bis mittlerer Datenmengen (von zwei bis &gt;10.000 Datensätzen). Für wirklich große Datenmigrationen mit mehreren 100.000 oder gar Millionen Datensätzen ist es nicht gedacht.</p>
+<p>Aufgaben, bei denen Daten von Excel in eine SAP-Transaktion übertragen werden, sollen mit SimDia² einfacher werden. Auf der&nbsp;<a title="Demo-Videos | SimDia²" href="https://ersasoft.de/de/videos/?s=tt">Video-Seite&nbsp;</a>werden deswegen auch typische Beispiele aus der täglichen Arbeit eines SAP-Fachanwenders vorgestellt: Personaldaten erfassen, Rechnungen buchen oder Materialstücklisten einpflegen.</p>
+<p>Diese Videos habe ich mir natürlich angesehen und war begeistert. Das Versprechen „Dateneingabe so einfach und komfortabel wie möglich“ war offensichtlich kein leeres. Und dass man damit wohl auch mehr machen kann, als Stamm- und Bewegungsdaten zu importieren, war mir schnell klar. Aber dazu später mehr.</p>
+<h2>Technik</h2>
+<p><span style="line-height: 1.5em;"><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_05_56.jpg"><img loading="lazy" decoding="async" class="alignright size-medium wp-image-4662" src="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_05_56-300x255.jpg" alt="simdia und se11" width="300" height="255" srcset="/wp-content/uploads/2014/03/03_21_17_05_56-300x255.jpg 300w, /wp-content/uploads/2014/03/03_21_17_05_56-624x531.jpg 624w, /wp-content/uploads/2014/03/03_21_17_05_56.jpg 861w" sizes="(max-width: 300px) 100vw, 300px" /></a>Nachdem ich mich in meinem SAP-Leben bereits häufiger mit den verschiedensten Tools zur Datenübernahme beschäftigt habe, war ich gespannt, was SimDia² zu bieten hat. Bei meinem ersten Kontakt mit dem Tool fand ich es spontan sehr innovativ und hilfreich, dass sich das SimDia²-Fenster in den SAP GUI integriert. Technisch stimmt das zwar nicht, denn SimDia²&nbsp; ist ein reines Windows-Programm mit einem eigenen Fenster, das sich über den SAP GUI legt, aber es sieht zuerst einmal so aus, als wäre das Tool nahtlos in SAP integriert.</span></p>
+<p>Das Programm verwendet die SAP GUI Scripting API, um Daten mit SAP GUI auszutauschen sowie VBA als Schnittstelle zu Excel. Ein gravierender Vorteil der Realisierung als Windows-Programm: außer einem aktivierten GUI-Scripting sind keinerlei Eingriffe in SAP erforderlich.</p>
+<p>Darüber hinaus ist SimDia² praktisch „out-of-the-box“ ablauffähig. Ausgeliefert wird es als ZIP-Archiv: nach dem Entpacken ist es <a href="https://ersasoft.de/de/videos/?s=tt#Video1">sofort startklar</a>.</p>
+<h2>Anwendung</h2>
+<p>Wie erwähnt, ist SimDia² als Datenimport-Tool konzipiert. Diese Aufgabe bewältigte es in den (wenigen) von mir durchgeführten Tests problemlos. Da ich aber aus der Entwicklung komme und eher selten (eigentlich: nie) typische Daten-Imports durchführen muss, habe ich überlegt, mit welcher Anwendung ich SimDia² noch testen könnte.</p>
+<p>Dabei stieß ich auf eine Tätigkeit, die mich jedes Mal schrecklich nervt: das Anlegen von Datenelementen und den dazugehörigen Domänen in ABAP. Da meine Entwicklungen in der Regel eher übersichtlich sind, kommt das massenweise Anlegen von Datenelementen und Domänen bei mir nicht häufig vor. Ich kann mir jedoch gut vorstellen, dass SimDia² bei größeren Projekten, in denen zuvor ein umfangreiches Datenmodell erstellt wird, gut zum Einsatz kommen kann.</p>
+<p>Hierfür könnten die Attribute von allen Datenelementen und Domänen in einer Excel-Datei einfach erfasst, diskutiert und gegebenenfalls noch geändert werden. Sobald die Entwicklung in SAP beginnt, lässt man die Repository Objekte durch SimDia²&nbsp;anlegen.</p>
+<p>Um zu prüfen, wie SimDia² mit Popups, Radiobuttons und Ankreuzfeldern klar kommt, wollte ich Datenelement und Domäne in einem Rutsch anlegen. Alle notwendigen Attribute hatte ich in einer Excel-Datei gespeichert und die Aufzeichnung gestartet.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/04_14_16_53_40.jpg"><img loading="lazy" decoding="async" class="size-medium wp-image-4707 alignleft" src="https://tricktresor.com/wp-content/uploads/2014/03/04_14_16_53_40-300x158.jpg" alt="simdia Excel" width="300" height="158" srcset="/wp-content/uploads/2014/03/04_14_16_53_40-300x158.jpg 300w, /wp-content/uploads/2014/03/04_14_16_53_40-624x330.jpg 624w, /wp-content/uploads/2014/03/04_14_16_53_40.jpg 724w" sizes="(max-width: 300px) 100vw, 300px" /></a><span style="line-height: 1.5em;">Für die Aufzeichnung werden im SimDia²-Fenster die Daten aus der ersten Tabellenzeile als Druckknöpfe angezeigt.</span></p>
+<p>Zur programm-internen <a href="https://ersasoft.de/de/videos/?s=tt#Tutorial1">Verknüpfung der Excel-Daten mit den jeweiligen SAP-Feldern</a> positioniert man einfach den Cursor im gewünschten SAP-Feld und klickt im SimDia²-Fenster auf den entsprechenden Button. Der Wert wird daraufhin übernommen und die Aktion aufgezeichnet. So verfährt man, bis alle erforderlichen Felder und Aktionen in SAP erfolgt und aufgezeichnet sind.&nbsp;Und das geht nun wirklich schnell, einfach und intuitiv.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_07_33.jpg"><img loading="lazy" decoding="async" class="alignright size-medium wp-image-4664" src="https://tricktresor.com/wp-content/uploads/2014/03/03_21_17_07_33-236x300.jpg" alt="simdia_buttons" width="236" height="300" srcset="/wp-content/uploads/2014/03/03_21_17_07_33-236x300.jpg 236w, /wp-content/uploads/2014/03/03_21_17_07_33.jpg 415w" sizes="(max-width: 236px) 100vw, 236px" /></a></p>
+<p><b>Funktionalität</b></p>
+<p>SimDia² kann grundsätzlich mit allen SAP-Dynpros und Transaktionen arbeiten (einige Transaktionen sind allerdings zur Automatisierung nicht besonders gut geeignet; s.u.). Dabei ist es egal, ob es sich um Standard-, modifizierte oder kundeneigene Transaktionen handelt. Auch nachträgliche Dynpro-Änderungen sind unproblematisch &#8211; solange keine in der Aufzeichnung benutzte Datenfelder entfernt werden.</p>
+<p>Während des Imports werden alle SAP-Meldungen direkt in der Excel-Datei protokolliert, sodass alle innerhalb von SAP durchgeführten Verarbeitungsschritte nachvollzogen werden können.</p>
+<p>Darüber hinaus enthält SimDia² einige Funktionen, die ich in anderen Import-Tools noch nie gesehen habe. Hier nur zwei Beispiele:</p>
+<ul>
+<li>In Table Controls lassen sich nicht nur neue Sätze <span style="text-decoration: underline;">anlegen</span>. Auch bereits existierende Sätze können zielsicher identifiziert und <span style="text-decoration: underline;">geändert</span> werden.</li>
+<li>SimDia² kann nicht nur Daten aus Excel nach SAP übertragen, sondern auch umgekehrt. Aber nicht nur das. Die exportierten Daten können z.B. mit Excel-internen Funktionen beliebig modifiziert und sofort nach SAP zurück übertragen werden.</li>
+</ul>
+<p>Wie weiter oben bereits angedeutet, kann SimDia² aber auch noch mehr, als Daten zu importieren. Da das Programm alle in SAP vorgenommenen Aktionen aufzeichnen und später beliebig wiederholen kann, eignet es sich auch super als Automatisierungstool für SAP. Da ist es egal, ob man schnell mal ein paar hundert Datensätze in einem Testsystem löschen muss, ViewCluster in der Transaktion SM34 anlegen will oder regelmäßig ein paar dutzend Reports ausführen soll.</p>
+<h2>Pro und Contra</h2>
+<p>SimDia² ist darauf spezialisiert, <em>flache Daten</em> und dazugehörige <em>Positionsdaten</em> zu übernehmen. Es können keine Abfragen oder Verzweigungen programmiert werden. Das macht das Tool einerseits sehr interessant für Key- oder Poweruser, die „ihre“ Imports jetzt selbst vorbereiten und durchführen können.</p>
+<p>Gleichzeitig zeigen sich aber auch die Grenzen zur klassischen Programmierung. Sobald eine SAP-Anwendung auf einen Eingabewert mit unterschiedlichen Dynpros &#8220;antwortet&#8221;, muss der Anwender für jeden Eingabewert eine eigene Aufzeichnung erstellen.</p>
+<p>Dem steht jedoch der benötigte Zeitaufwand gegenüber: mit etwas Erfahrung (s.u.) braucht man für eine Aufzeichnung mit SimDia² nicht länger als 1-2 Minuten. Bei einem Import mit der LSMW sind dies wohl eher 1-2 Stunden. Und ganz zu schweigen natürlich von einer klassisch programmierten Lösung.</p>
+<p>Der Support von <a href="https://ersasoft.de/de/?s=tt">ERSAsoft</a> ist super. Probleme oder Fragen sind schnell per Mail, Telefon oder Teamviewer geklärt. Rüdiger Specht, Gründer und Inhaber, ist dabei stets ruhig, freundlich, geduldig und kompetent. Bei Problemen oder Schwierigkeiten redet er nicht um den heißen Brei herum, sondern sagt klar und deutlich, was Sache ist.</p>
+<h2>Fazit</h2>
+<p>Obwohl SimDia² sehr einfach zu bedienen ist, hatte ich die ersten Male das Gefühl, dass es &#8220;rum zickt&#8221;. Ich habe jedoch schnell gemerkt, dass die Zickerei an den unterschiedlich programmierten SAP-Programmen liegt. Bei der Aufzeichnung muss man sich an die Gegebenheiten der SAP-Transaktionen richten. Auch wenn SimDia² einfach zu bedienen und schnell zu erlernen ist, heißt es auch hier: Übung macht den Meister und SAP-Knowhow sollte vorhanden sein.</p>
+<p>Insgesamt ist SimDia² sehr innovativ, wirklich einfach zu bedienen und schnell zu erlernen. Das ist das riesengroße Plus. Das, was ich bei SimDia² vermisst habe, als negativ zu bewerten, wäre falsch, denn einem Porsche kreide ich auch nicht an, dass er zwar 260 km/h fährt, ich aber nicht gleichzeitig ein Klavier damit transportieren kann. SimDia² ist dafür konzipiert, bestimmte Aufgaben im Zusammenspiel mit Excel schnell und intuitiv zu lösen. Und das tut es.</p>
+<p>Damit ist das Programm SAP-internen Tools wie LSMW oder Batch Input haushoch überlegen.</p>
+<p>Ist eine Aufzeichnung erst einmal &#8220;im Kasten&#8221;, dann ist der Aufruf schnell möglich und die neuen Daten sind ratzfatz im SAP. Anwendern, die regelmäßig Daten von Excel nach SAP überführen müssen, kann ich SimDia² wirklich nur ans Herz legen.</p>
+<h2>Update</h2>
+<p>In diesem Artikel beschreibe ich die neue Version von SimDia²:</p>
+<p>https://tricktresor.com/blog/simdia2-neue-version-des-besten-sap-import-tools/</p>
+<p><br />
+[accordian]</p>
+<p>Und jetzt kommt das Beste: ERSAsoft bietet allen Tricktresor-Fans einen Nachlass von 5% an. Füllt einfach das unten stehende Formular aus und ihr bekommt den erwähnten Nachlass gewährt. So. Noch leichter kann ich euch den SAP-Datenimport wirklich nicht machen&#8230;!</p>
+<h2>Tricktresor- Bonus</h2>
+<p>[accordian_list title=&#8217;Sichere dir einen 5%-Rabatt auf SimDia²!&#8217;]</p>
+<p>[notice type=&#8217;info&#8217;]</p>
+<p>https://tricktresor.com/blog/simdia%C2%B2-als-alternative-zur-programmierung/</p>
+<p>[/notice]</p>
+<p>[/accordian_list]</p>
+<p>[/accordian]</p>
+<p></p>
+<p>Der Beitrag <a href="/blog/simdia2-sap-datenimport-einfach/">SimDia² &#8211; SAP-Datenimport einfach?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/simdia2-sap-datenimport-einfach/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Sag mir wo die Icons sind, wo sind sie geblieben?</title>
+		<link>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/</link>
+					<comments>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/#comments</comments>
+		
+		<dc:creator><![CDATA[Stefan Schnell]]></dc:creator>
+		<pubDate>Sun, 22 Dec 2013 08:20:20 +0000</pubDate>
+				<category><![CDATA[Schnell programmiert]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[icons]]></category>
+		<category><![CDATA[bitmap]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[OCX]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=4101</guid>
+
+					<description><![CDATA[<p>Eine kleine Information über die Speicherung der SAP-Icons in den Ressource-Files des SAPGUI. </p>
+<p>Der Beitrag <a href="/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/">Sag mir wo die Icons sind, wo sind sie geblieben?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Der SAP GUI beinhaltet aktuell 926 Icons, die mit der Transaktion SE16 und der Tabelle ICONS angezeigt werden können. Diese reichen vom Platzhaltericon ICON_DUMMY mit der Ordnungsnummer @00@ bis zur inaktiven Datenbanktabelle ICON_DATABASE_TABLE_INA mit der Ordnungsnummer @PP@. Diese und weitere Informationen, wie z.B. Icon-Name, Beschreibung etc., sind auch in der Datei <strong>euspicld</strong> im SAP GUI für Windows Verzeichnis zu finden.</p>
+<p>Die Icons selbst sind als ImageList-Ressourcen in der Datei <strong>SAPguiRM.ocx</strong> des SAP GUI für Windows abgelegt. Die Ressourcen sind einfach nur nummeriert von 203 bis 210. Die 203 und 204 beinhalten das Standard-Design und die 207 und 208 das Corbu-Design. Mit dem <a title="Resource Hacker" href="http://www.angusj.com/" target="_blank">Resource Hacker</a> von Angus Johnson können die ImageLists einfach als binäre Dateien exportiert werden &#8211; Menü Action &gt; Save Resource as a binary file.</p>
+<p><figure id="attachment_4132" aria-describedby="caption-attachment-4132" style="width: 300px" class="wp-caption alignnone"><img loading="lazy" decoding="async" class="size-medium wp-image-4132" alt="Save Icons as file" src="https://tricktresor.com/wp-content/uploads/2013/12/01_08_16_36_59-300x165.jpg" width="300" height="165" srcset="/wp-content/uploads/2013/12/01_08_16_36_59-300x165.jpg 300w, /wp-content/uploads/2013/12/01_08_16_36_59-624x343.jpg 624w, /wp-content/uploads/2013/12/01_08_16_36_59.jpg 890w" sizes="(max-width: 300px) 100vw, 300px" /><figcaption id="caption-attachment-4132" class="wp-caption-text">Save Icons as file</figcaption></figure></p>
+<p>Nach dem Export müssen einfach die ersten 28 Bytes dieser exportierten ImageLists gelöscht werden, um eine Windows Bitmap (BMP-Datei) zu erhalten. Das geht recht einfach mit <a title="Notepad++" href="http://notepad-plus-plus.org/" target="_blank">Notepad++</a>. Einfach die Datei mit diesem Programm öffnen und am Anfang der Datei 28 mal auf ENTF drücken&#8230;</p>
+<p>Die Extension dieser Datei ist dann natürlich in BMP umzubenennen.</p>
+<p>Auf diesem Wege erhält man Zugriff auf alle Icons des SAP GUI. Leider als Sprite-Image, das heißt, alle Icons sind in dieser Datei in einem Raster vorhanden:</p>
+<p><img loading="lazy" decoding="async" class="size-medium wp-image-4133 alignleft" alt="Icons" src="https://tricktresor.com/wp-content/uploads/2013/12/01_08_16_40_24-170x300.jpg" width="170" height="300" srcset="/wp-content/uploads/2013/12/01_08_16_40_24-170x300.jpg 170w, /wp-content/uploads/2013/12/01_08_16_40_24.jpg 222w" sizes="(max-width: 170px) 100vw, 170px" /></p>
+<p>Mit einem Online-Tool, wie zum Beispiel <a title="ImageSplitter" href="http://imagesplitter.net/" target="_blank">ImageSplitter</a> wäre es theoretisch möglich, die Datei in einzelne Dateien zu exportieren. Leider ist die Anzahl der Zeilen und Spalten auf 32 limitiert&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f641.png" alt="🙁" class="wp-smiley" style="height: 1em; max-height: 1em;" /> Wir benötigen aber 4 Spalten und 308 Zeilen&#8230;</p>
+<p>Der Beitrag <a href="/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/">Sag mir wo die Icons sind, wo sind sie geblieben?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/sag-mir-wo-die-icons-sind-wo-sind-sie-geblieben/feed/</wfw:commentRss>
+			<slash:comments>2</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>SAP-Icons</title>
+		<link>/blog/sap-icons/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 06 Jul 2012 18:24:10 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Lieferung]]></category>
+		<category><![CDATA[farbe]]></category>
+		<category><![CDATA[corbu]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[icons]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[icon]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[gif]]></category>
+		<category><![CDATA[Wizard]]></category>
+		<category><![CDATA[theme]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Workflow]]></category>
+		<category><![CDATA[IDOCs]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=648</guid>
+
+					<description><![CDATA[<p>SAP-Icons, alt und CORBU themen</p>
+<p>Der Beitrag <a href="/blog/sap-icons/">SAP-Icons</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine Auflistung der alten SAP-Icons und der neuen Icons aus dem CORBU Theme.</p>
+<p>Die Icons können auch auf der Website der <a title="Icons SAP Design Guild" href="http://www.sapdesignguild.org/resources/icons_sap/index.htm" target="_blank">SAP Design Guild </a>betrachtet werden.</p>
+<table>
+<tbody>
+<tr>
+<td></td>
+<td>
+<h3><span style="color: #ff9c00;">SAP GUI Ikonen Release 7.30</span></h3>
+<table>
+<tbody>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;">Icon</td>
+<td style="width: 40px;">Corbu</td>
+<td width="100px">Name</td>
+<td width="50px">ID</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ausschneiden" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_cuto.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ausschneiden" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_cuto.gif" /></td>
+<td width="100px">Ausschneiden</td>
+<td width="50px">@2T@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_copy.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_copy.gif" /></td>
+<td width="100px">Kopieren</td>
+<td width="50px">@2U@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Einsetzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_past.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Einsetzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_past.gif" /></td>
+<td width="100px">Einsetzen</td>
+<td width="50px">@2V@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Markiermodus; Markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_mark.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Markiermodus; Markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_mark.gif" /></td>
+<td width="100px">Markiermodus; Markieren</td>
+<td width="50px">@2X@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Alle markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_mrka.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Alle markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_mrka.gif" /></td>
+<td width="100px">Alle markieren</td>
+<td width="50px">@4B@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Block markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_mrkb.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Block markieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_mrkb.gif" /></td>
+<td width="100px">Block markieren</td>
+<td width="50px">@4C@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Alle Mark. löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_mrkd.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Alle Mark. löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_mrkd.gif" /></td>
+<td width="100px">Alle Mark. löschen</td>
+<td width="50px">@4D@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Block deselektieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dmrk.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Block deselektieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dmrk.gif" /></td>
+<td width="100px">Block deselektieren</td>
+<td width="50px">@8J@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Spaltenmarkierung invertieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_invs.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Spaltenmarkierung invertieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_invs.gif" /></td>
+<td width="100px">Spaltenmarkierung invertieren</td>
+<td width="50px">@8K@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Zeilenmarkierung invertieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_invz.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeilenmarkierung invertieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_invz.gif" /></td>
+<td width="100px">Zeilenmarkierung invertieren</td>
+<td width="50px">@8L@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Agent" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_iagent.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Agent" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_iagent.gif" /></td>
+<td width="100px">Agent</td>
+<td width="50px">@VV@</td>
+</tr>
+</tbody>
+</table>
+<p><!---End of Part 1 --><!---Part 2 --></p>
+<p>&nbsp;</p>
+<table>
+<tbody>
+<tr bgcolor="white">
+<td style="width: 40px;">Icon</td>
+<td style="width: 40px;">Corbu</td>
+<td width="100px">Name</td>
+<td width="50px">ID</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ganz nach links; Erste(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_totl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ganz nach links; Erste(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_totl.gif" /></td>
+<td width="100px">Ganz nach links; Erste(r) &#8230;</td>
+<td width="50px">@0B@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ganz nach rechts; Letzte(r) .." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_totr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ganz nach rechts; Letzte(r) .." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_totr.gif" /></td>
+<td width="100px">Ganz nach rechts; Letzte(r) ..</td>
+<td width="50px">@0C@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Spalte links; Vorige(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_coll.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Spalte links; Vorige(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_coll.gif" /></td>
+<td width="100px">Spalte links; Vorige(r) &#8230;</td>
+<td width="50px">@0D@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Spalte rechts; Nächste(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_colr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Spalte rechts; Nächste(r) ..." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_colr.gif" /></td>
+<td width="100px">Spalte rechts; Nächste(r) &#8230;</td>
+<td width="50px">@0E@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Seite rechts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pagr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Seite rechts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pagr.gif" /></td>
+<td width="100px">Seite rechts</td>
+<td width="50px">@0F@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Seite links" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pagl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Seite links" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pagl.gif" /></td>
+<td width="100px">Seite links</td>
+<td width="50px">@0G@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Voriger Wert; Nächst. Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_prvi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Voriger Wert; Nächst. Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_prvi.gif" /></td>
+<td width="100px">Voriger Wert; Nächst. Eintrag</td>
+<td width="50px">@0H@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Nächster Wert; Voriger Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_nxti.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Nächster Wert; Voriger Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_nxti.gif" /></td>
+<td width="100px">Nächster Wert; Voriger Eintrag</td>
+<td width="50px">@0I@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Okay; Weiter; auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_okay.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Okay; Weiter; auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_okay.gif" /></td>
+<td width="100px">Okay; Weiter; auswählen</td>
+<td width="50px">@0V@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Abbrechen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_canc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Abbrechen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_canc.gif" /></td>
+<td width="100px">Abbrechen</td>
+<td width="50px">@0W@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anderes " alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_oobj.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anderes " alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_oobj.gif" /></td>
+<td width="100px">Anderes</td>
+<td width="50px">@2Q@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Voriges Bild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_prvo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Voriges Bild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_prvo.gif" /></td>
+<td width="100px">Voriges Bild</td>
+<td width="50px">@2R@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Nächstes Bild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_nxto.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Nächstes Bild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_nxto.gif" /></td>
+<td width="100px">Nächstes Bild</td>
+<td width="50px">@2S@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Erste Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_fstp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Erste Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_fstp.gif" /></td>
+<td width="100px">Erste Seite</td>
+<td width="50px">@2Y@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Vorige Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_prvp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vorige Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_prvp.gif" /></td>
+<td width="100px">Vorige Seite</td>
+<td width="50px">@2Z@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Nächste Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_nxtp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Nächste Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_nxtp.gif" /></td>
+<td width="100px">Nächste Seite</td>
+<td width="50px">@30@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Letzte Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_lstp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Letzte Seite" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_lstp.gif" /></td>
+<td width="100px">Letzte Seite</td>
+<td width="50px">@31@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Kopf; Grunddaten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_head.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kopf; Grunddaten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_head.gif" /></td>
+<td width="100px">Kopf; Grunddaten</td>
+<td width="50px">@3P@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Übersicht; Überblick; Listbild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_oviw.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Übersicht; Überblick; Listbild" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_oviw.gif" /></td>
+<td width="100px">Übersicht; Überblick; Listbild</td>
+<td width="50px">@3Q@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Detailsicht" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dail.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Detailsicht" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dail.gif" /></td>
+<td width="100px">Detailsicht</td>
+<td width="50px">@3R@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Periodenbild; Zeitaufriß" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_peri.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Periodenbild; Zeitaufriß" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_peri.gif" /></td>
+<td width="100px">Periodenbild; Zeitaufriß</td>
+<td width="50px">@58@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Nächster Schritt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_sten.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Nächster Schritt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_sten.gif" /></td>
+<td width="100px">Nächster Schritt</td>
+<td width="50px">@B8@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Vorheriger Schritt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_step.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vorheriger Schritt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_step.gif" /></td>
+<td width="100px">Vorheriger Schritt</td>
+<td width="50px">@B9@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Eintrag ganz nach oben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_tot_up.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Eintrag ganz nach oben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_tot_up.gif" /></td>
+<td width="100px">Eintrag ganz nach oben</td>
+<td width="50px">@HF@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Eintrag ganz nach unten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_tot_do.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Eintrag ganz nach unten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_tot_do.gif" /></td>
+<td width="100px">Eintrag ganz nach unten</td>
+<td width="50px">@HG@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Eintrag eine Seite nach oben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_pageup.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Eintrag eine Seite nach oben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_pageup.gif" /></td>
+<td width="100px">Eintrag eine Seite nach oben</td>
+<td width="50px">@HH@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Eintrag eine Seite nach unten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_pagedo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Eintrag eine Seite nach unten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_pagedo.gif" /></td>
+<td width="100px">Eintrag eine Seite nach unten</td>
+<td width="50px">@HI@</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<table>
+<tbody>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;">Icon</td>
+<td style="width: 40px;">Corbu</td>
+<td width="100px">Name</td>
+<td width="50px">ID</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Drucken" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_prnt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Drucken" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_prnt.gif" /></td>
+<td width="100px">Drucken</td>
+<td width="50px">@0X@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_crea.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_crea.gif" /></td>
+<td width="100px">Anlegen</td>
+<td width="50px">@0Y@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ändern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_chng.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ändern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_chng.gif" /></td>
+<td width="100px">Ändern</td>
+<td width="50px">@0Z@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_disp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_disp.gif" /></td>
+<td width="100px">Anzeigen</td>
+<td width="50px">@10@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dele.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dele.gif" /></td>
+<td width="100px">Löschen</td>
+<td width="50px">@11@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Testen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_test.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Testen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_test.gif" /></td>
+<td width="100px">Testen</td>
+<td width="50px">@12@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Suchen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_srch.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Suchen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_srch.gif" /></td>
+<td width="100px">Suchen</td>
+<td width="50px">@13@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title=" kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_copy.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title=" kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_copy.gif" /></td>
+<td width="100px">kopieren</td>
+<td width="50px">@14@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title=" ausführen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_exec.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title=" ausführen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_exec.gif" /></td>
+<td width="100px">ausführen</td>
+<td width="50px">@15@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title=" auswählen; Detail" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_detl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title=" auswählen; Detail" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_detl.gif" /></td>
+<td width="100px">auswählen; Detail</td>
+<td width="50px">@16@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zeile einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_insr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeile einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_insr.gif" /></td>
+<td width="100px">Zeile einfügen</td>
+<td width="50px">@17@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Zeile löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_delr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeile löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_delr.gif" /></td>
+<td width="100px">Zeile löschen</td>
+<td width="50px">@18@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Rückgängig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_f_undo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Rückgängig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_f_undo.gif" /></td>
+<td width="100px">Rückgängig</td>
+<td width="50px">@2W@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ersetzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_repl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ersetzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_repl.gif" /></td>
+<td width="100px">Ersetzen</td>
+<td width="50px">@37@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Prüfen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_chck.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Prüfen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_chck.gif" /></td>
+<td width="100px">Prüfen</td>
+<td width="50px">@38@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Aktivieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_acti.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Aktivieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_acti.gif" /></td>
+<td width="100px">Aktivieren</td>
+<td width="50px">@3C@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Sortieren aufsteigend" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_srtu.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Sortieren aufsteigend" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_srtu.gif" /></td>
+<td width="100px">Sortieren aufsteigend</td>
+<td width="50px">@3E@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Sortieren absteigend" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_srtd.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Sortieren absteigend" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_srtd.gif" /></td>
+<td width="100px">Sortieren absteigend</td>
+<td width="50px">@3F@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Umrechnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_conv.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Umrechnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_conv.gif" /></td>
+<td width="100px">Umrechnen</td>
+<td width="50px">@3H@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anzeigen Ändern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dpch.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigen Ändern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dpch.gif" /></td>
+<td width="100px">Anzeigen Ändern</td>
+<td width="50px">@3I@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Expandieren, Vergrößern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_expa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Expandieren, Vergrößern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_expa.gif" /></td>
+<td width="100px">Expandieren, Vergrößern</td>
+<td width="50px">@3S@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Komprimieren; Verkleinern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cols.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Komprimieren; Verkleinern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cols.gif" /></td>
+<td width="100px">Komprimieren; Verkleinern</td>
+<td width="50px">@3T@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Positionieren; Anderer Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_posn.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Positionieren; Anderer Eintrag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_posn.gif" /></td>
+<td width="100px">Positionieren; Anderer Eintrag</td>
+<td width="50px">@3Y@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Summieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_summ.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Summieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_summ.gif" /></td>
+<td width="100px">Summieren</td>
+<td width="50px">@3Z@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Verschieben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_move.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Verschieben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_move.gif" /></td>
+<td width="100px">Verschieben</td>
+<td width="50px">@40@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Zurückholen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_retr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zurückholen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_retr.gif" /></td>
+<td width="100px">Zurückholen</td>
+<td width="50px">@41@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Auffrischen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_refr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Auffrischen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_refr.gif" /></td>
+<td width="100px">Auffrischen</td>
+<td width="50px">@42@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Überspringen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_skip.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Überspringen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_skip.gif" /></td>
+<td width="100px">Überspringen</td>
+<td width="50px">@43@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Vergleichen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_comp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vergleichen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_comp.gif" /></td>
+<td width="100px">Vergleichen</td>
+<td width="50px">@46@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Importieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_uplo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Importieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_uplo.gif" /></td>
+<td width="100px">Importieren</td>
+<td width="50px">@48@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Exportieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_down.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Exportieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_down.gif" /></td>
+<td width="100px">Exportieren</td>
+<td width="50px">@49@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Transportieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_trns.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Transportieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_trns.gif" /></td>
+<td width="100px">Transportieren</td>
+<td width="50px">@4A@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Weiter suchen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_srcc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Weiter suchen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_srcc.gif" /></td>
+<td width="100px">Weiter suchen</td>
+<td width="50px">@4E@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Umbenennen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_renm.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Umbenennen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_renm.gif" /></td>
+<td width="100px">Umbenennen</td>
+<td width="50px">@4F@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Filtern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_filt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Filtern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_filt.gif" /></td>
+<td width="100px">Filtern</td>
+<td width="50px">@4G@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Hervorheben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_inte.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Hervorheben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_inte.gif" /></td>
+<td width="100px">Hervorheben</td>
+<td width="50px">@4K@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zwischensumme" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_sump.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zwischensumme" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_sump.gif" /></td>
+<td width="100px">Zwischensumme</td>
+<td width="50px">@5V@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Alles expandieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_aexp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Alles expandieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_aexp.gif" /></td>
+<td width="100px">Alles expandieren</td>
+<td width="50px">@68@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Alles komprimieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_acom.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Alles komprimieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_acom.gif" /></td>
+<td width="100px">Alles komprimieren</td>
+<td width="50px">@69@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Selektion, Auswahl" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_selc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Selektion, Auswahl" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_selc.gif" /></td>
+<td width="100px">Selektion, Auswahl</td>
+<td width="50px">@7X@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Freie Abgrenzungen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_fenc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Freie Abgrenzungen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_fenc.gif" /></td>
+<td width="100px">Freie Abgrenzungen</td>
+<td width="50px">@7Z@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Menge A" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_aboa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Menge A" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_aboa.gif" /></td>
+<td width="100px">Menge A</td>
+<td width="50px">@89@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Menge B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abob.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Menge B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abob.gif" /></td>
+<td width="100px">Menge B</td>
+<td width="50px">@8A@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Menge A+B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abpl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Menge A+B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abpl.gif" /></td>
+<td width="100px">Menge A+B</td>
+<td width="50px">@8B@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Schnittmenge AB" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_absc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Schnittmenge AB" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_absc.gif" /></td>
+<td width="100px">Schnittmenge AB</td>
+<td width="50px">@8C@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Subtraktion A-B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abmb.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Subtraktion A-B" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abmb.gif" /></td>
+<td width="100px">Subtraktion A-B</td>
+<td width="50px">@8D@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Subtraktion B-A" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abma.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Subtraktion B-A" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abma.gif" /></td>
+<td width="100px">Subtraktion B-A</td>
+<td width="50px">@8E@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="In Menge A kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abca.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="In Menge A kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abca.gif" /></td>
+<td width="100px">In Menge A kopieren</td>
+<td width="50px">@8F@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="In Menge B kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abcb.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="In Menge B kopieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abcb.gif" /></td>
+<td width="100px">In Menge B kopieren</td>
+<td width="50px">@8G@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Deaktivieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dact.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Deaktivieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dact.gif" /></td>
+<td width="100px">Deaktivieren</td>
+<td width="50px">@8I@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Weiterleiten zur Bearbeitung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_sumi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Weiterleiten zur Bearbeitung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_sumi.gif" /></td>
+<td width="100px">Weiterleiten zur Bearbeitung</td>
+<td width="50px">@8W@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Genehmigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_okye.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Genehmigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_okye.gif" /></td>
+<td width="100px">Genehmigen</td>
+<td width="50px">@8X@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ablehnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_okno.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ablehnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_okno.gif" /></td>
+<td width="100px">Ablehnen</td>
+<td width="50px">@8Y@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Simulieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_rksi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Simulieren" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_rksi.gif" /></td>
+<td width="100px">Simulieren</td>
+<td width="50px">@8Z@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Pfeil links" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_arle.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Pfeil links" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_arle.gif" /></td>
+<td width="100px">Pfeil links</td>
+<td width="50px">@9S@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Pfeil rechts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_arri.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Pfeil rechts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_arri.gif" /></td>
+<td width="100px">Pfeil rechts</td>
+<td width="50px">@9T@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Operation, Objekt verarbeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_oper.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Operation, Objekt verarbeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_oper.gif" /></td>
+<td width="100px">Operation, Objekt verarbeiten</td>
+<td width="50px">@9X@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Aktivität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_acty.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Aktivität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_acty.gif" /></td>
+<td width="100px">Aktivität</td>
+<td width="50px">@9Y@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Vertauschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_exch.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vertauschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_exch.gif" /></td>
+<td width="100px">Vertauschen</td>
+<td width="50px">@BB@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ablegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_stor.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ablegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_stor.gif" /></td>
+<td width="100px">Ablegen</td>
+<td width="50px">@C0@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zuordnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_link.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zuordnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_link.gif" /></td>
+<td width="100px">Zuordnen</td>
+<td width="50px">@C1@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Abgeschlossen; einwandfrei" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_comple.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Abgeschlossen; einwandfrei" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_comple.gif" /></td>
+<td width="100px">Abgeschlossen; einwandfrei</td>
+<td width="50px">@DF@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Partner aufrufen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_partne.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Partner aufrufen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_partne.gif" /></td>
+<td width="100px">Partner aufrufen</td>
+<td width="50px">@DG@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Protokoll aufrufen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_protok.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Protokoll aufrufen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_protok.gif" /></td>
+<td width="100px">Protokoll aufrufen</td>
+<td width="50px">@DH@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="XXL-Listviewer Aufruf" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_lisvie.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="XXL-Listviewer Aufruf" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_lisvie.gif" /></td>
+<td width="100px">XXL-Listviewer Aufruf</td>
+<td width="50px">@DJ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Aufruf Textverarbeitung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_textva.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Aufruf Textverarbeitung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_textva.gif" /></td>
+<td width="100px">Aufruf Textverarbeitung</td>
+<td width="50px">@DK@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="ABC-Analyse" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_abcana.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="ABC-Analyse" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_abcana.gif" /></td>
+<td width="100px">ABC-Analyse</td>
+<td width="50px">@DL@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anzeigevariante auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_varcho.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigevariante auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_varcho.gif" /></td>
+<td width="100px">Anzeigevariante auswählen</td>
+<td width="50px">@DM@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Anzeigevariante sichern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_varsav.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigevariante sichern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_varsav.gif" /></td>
+<td width="100px">Anzeigevariante sichern</td>
+<td width="50px">@DN@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Dezimalstellen vergrößern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_incdec.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Dezimalstellen vergrößern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_incdec.gif" /></td>
+<td width="100px">Dezimalstellen vergrößern</td>
+<td width="50px">@DP@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Dezimalstellen verkleinern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_decdec.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Dezimalstellen verkleinern" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_decdec.gif" /></td>
+<td width="100px">Dezimalstellen verkleinern</td>
+<td width="50px">@DQ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Fehlerprotokoll" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_fehler.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Fehlerprotokoll" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_fehler.gif" /></td>
+<td width="100px">Fehlerprotokoll</td>
+<td width="50px">@DR@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Entfernen aus Favoritenliste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_delfav.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Entfernen aus Favoritenliste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_delfav.gif" /></td>
+<td width="100px">Entfernen aus Favoritenliste</td>
+<td width="50px">@ES@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Aufnehmen in Favoritenliste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_insfav.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Aufnehmen in Favoritenliste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_insfav.gif" /></td>
+<td width="100px">Aufnehmen in Favoritenliste</td>
+<td width="50px">@EV@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Anlegen mit Vorlage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_crecop.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anlegen mit Vorlage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_crecop.gif" /></td>
+<td width="100px">Anlegen mit Vorlage</td>
+<td width="50px">@EZ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Werte vorschlagen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_bwsuva.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Werte vorschlagen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_bwsuva.gif" /></td>
+<td width="100px">Werte vorschlagen</td>
+<td width="50px">@F6@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Anlage anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_attach.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anlage anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_attach.gif" /></td>
+<td width="100px">Anlage anzeigen</td>
+<td width="50px">@FM@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Mappeninhalt anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_clofol.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Mappeninhalt anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_clofol.gif" /></td>
+<td width="100px">Mappeninhalt anzeigen</td>
+<td width="50px">@FN@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Mappe öffnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_opfold.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Mappe öffnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_opfold.gif" /></td>
+<td width="100px">Mappe öffnen</td>
+<td width="50px">@FO@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Objectfolder öffnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_objfol.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Objectfolder öffnen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_objfol.gif" /></td>
+<td width="100px">Objectfolder öffnen</td>
+<td width="50px">@FP@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ausgang anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_outbox.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ausgang anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_outbox.gif" /></td>
+<td width="100px">Ausgang anzeigen</td>
+<td width="50px">@FQ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Wiedervorlage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_resubm.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Wiedervorlage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_resubm.gif" /></td>
+<td width="100px">Wiedervorlage</td>
+<td width="50px">@FR@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Persönlich Ablage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_prifil.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Persönlich Ablage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_prifil.gif" /></td>
+<td width="100px">Persönlich Ablage</td>
+<td width="50px">@FS@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Allgemeine Ablage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_pubfil.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Allgemeine Ablage" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_pubfil.gif" /></td>
+<td width="100px">Allgemeine Ablage</td>
+<td width="50px">@FT@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Abonnierte Mappen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_subscr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Abonnierte Mappen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_subscr.gif" /></td>
+<td width="100px">Abonnierte Mappen</td>
+<td width="50px">@FU@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ermittlung des Durchschnitts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_averag.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ermittlung des Durchschnitts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_averag.gif" /></td>
+<td width="100px">Ermittlung des Durchschnitts</td>
+<td width="50px">@FV@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Fettdruck" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_x_bold.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Fettdruck" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_x_bold.gif" /></td>
+<td width="100px">Fettdruck</td>
+<td width="50px">@FW@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kursivdruck" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_italic.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kursivdruck" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_italic.gif" /></td>
+<td width="100px">Kursivdruck</td>
+<td width="50px">@FX@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Unterstrichen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_underl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Unterstrichen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_underl.gif" /></td>
+<td width="100px">Unterstrichen</td>
+<td width="50px">@FY@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="linksbündig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_aligle.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="linksbündig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_aligle.gif" /></td>
+<td width="100px">linksbündig</td>
+<td width="50px">@FZ@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="rechtsbündig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_aligri.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="rechtsbündig" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_aligri.gif" /></td>
+<td width="100px">rechtsbündig</td>
+<td width="50px">@G0@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="zentriert" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_aligce.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="zentriert" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_aligce.gif" /></td>
+<td width="100px">zentriert</td>
+<td width="50px">@G1@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Blocktext" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_justif.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Blocktext" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_justif.gif" /></td>
+<td width="100px">Blocktext</td>
+<td width="50px">@G2@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Farbe" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_xcolor.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Farbe" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_xcolor.gif" /></td>
+<td width="100px">Farbe</td>
+<td width="50px">@G3@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="alle Attribute löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_delatt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="alle Attribute löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_delatt.gif" /></td>
+<td width="100px">alle Attribute löschen</td>
+<td width="50px">@G4@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Anzeigen von Idocs" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_xidocs.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigen von Idocs" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_xidocs.gif" /></td>
+<td width="100px">Anzeigen von Idocs</td>
+<td width="50px">@G5@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Verbindung aufbauen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_connec.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Verbindung aufbauen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_connec.gif" /></td>
+<td width="100px">Verbindung aufbauen</td>
+<td width="50px">@GB@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Verbindung trennen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_discon.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Verbindung trennen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_discon.gif" /></td>
+<td width="100px">Verbindung trennen</td>
+<td width="50px">@GC@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Filter zurücknehmen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_filtun.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Filter zurücknehmen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_filtun.gif" /></td>
+<td width="100px">Filter zurücknehmen</td>
+<td width="50px">@GD@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung zurücknehmen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_intund.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung zurücknehmen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_intund.gif" /></td>
+<td width="100px">Hervorhebung zurücknehmen</td>
+<td width="50px">@GF@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="mehrer Zeilen einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_inmali.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="mehrer Zeilen einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_inmali.gif" /></td>
+<td width="100px">mehrer Zeilen einfügen</td>
+<td width="50px">@GU@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Massenänderung durchführen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_massch.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Massenänderung durchführen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_massch.gif" /></td>
+<td width="100px">Massenänderung durchführen</td>
+<td width="50px">@HB@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung kritisch" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_intcri.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung kritisch" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_intcri.gif" /></td>
+<td width="100px">Hervorhebung kritisch</td>
+<td width="50px">@HC@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung unkritisch" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_intunc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Hervorhebung unkritisch" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_intunc.gif" /></td>
+<td width="100px">Hervorhebung unkritisch</td>
+<td width="50px">@HD@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Spalten auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_chocol.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Spalten auswählen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_chocol.gif" /></td>
+<td width="100px">Spalten auswählen</td>
+<td width="50px">@HE@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Datei lesen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_readfi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Datei lesen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_readfi.gif" /></td>
+<td width="100px">Datei lesen</td>
+<td width="50px">@HJ@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Datei schreiben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_writfi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Datei schreiben" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_writfi.gif" /></td>
+<td width="100px">Datei schreiben</td>
+<td width="50px">@HK@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Datei bearbeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_editfi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Datei bearbeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_editfi.gif" /></td>
+<td width="100px">Datei bearbeiten</td>
+<td width="50px">@HL@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Berichts-Berichtsaufruf" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_repcal.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Berichts-Berichtsaufruf" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_repcal.gif" /></td>
+<td width="100px">Berichts-Berichtsaufruf</td>
+<td width="50px">@I2@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Markieren mit Bedingung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_sewico.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Markieren mit Bedingung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_sewico.gif" /></td>
+<td width="100px">Markieren mit Bedingung</td>
+<td width="50px">@KG@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Anzeigevarianten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_varian.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Anzeigevarianten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_varian.gif" /></td>
+<td width="100px">Anzeigevarianten</td>
+<td width="50px">@LZ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Absatzzeichen ein/ausblenden" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_paragr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Absatzzeichen ein/ausblenden" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_paragr.gif" /></td>
+<td width="100px">Absatzzeichen ein/ausblenden</td>
+<td width="50px">@P2@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Werte löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_eraser.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Werte löschen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_eraser.gif" /></td>
+<td width="100px">Werte löschen</td>
+<td width="50px">@TS@</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<table>
+<tbody>
+<tr bgcolor="white">
+<td style="width: 40px;">icon</td>
+<td style="width: 40px;">Corbu</td>
+<td width="100px">Name</td>
+<td width="50px">ID</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Notiz; Notiz ändern; Anmerkung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_anno.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Notiz; Notiz ändern; Anmerkung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_anno.gif" /></td>
+<td width="100px">Notiz; Notiz ändern; Anmerkung</td>
+<td width="50px">@0J@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Notiz anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_nocr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Notiz anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_nocr.gif" /></td>
+<td width="100px">Notiz anlegen</td>
+<td width="50px">@0K@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Notiz anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_nodp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Notiz anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_nodp.gif" /></td>
+<td width="100px">Notiz anzeigen</td>
+<td width="50px">@0L@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Kalkulation" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_calc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kalkulation" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_calc.gif" /></td>
+<td width="100px">Kalkulation</td>
+<td width="50px">@0M@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Grafik" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_graf.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Grafik" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_graf.gif" /></td>
+<td width="100px">Grafik</td>
+<td width="50px">@0N@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Text anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_txcr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Text anlegen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_txcr.gif" /></td>
+<td width="100px">Text anlegen</td>
+<td width="50px">@0O@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Text anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_txdp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Text anzeigen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_txdp.gif" /></td>
+<td width="100px">Text anzeigen</td>
+<td width="50px">@0P@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Text; Text ändern; Langtext" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_text.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Text; Text ändern; Langtext" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_text.gif" /></td>
+<td width="100px">Text; Text ändern; Langtext</td>
+<td width="50px">@0Q@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Varianten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_vari.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Varianten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_vari.gif" /></td>
+<td width="100px">Varianten</td>
+<td width="50px">@0R@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Information" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_info.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Information" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_info.gif" /></td>
+<td width="100px">Information</td>
+<td width="50px">@0S@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Adresse" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_addr.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Adresse" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_addr.gif" /></td>
+<td width="100px">Adresse</td>
+<td width="50px">@0T@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Viewer optisches Archiv" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_opta.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Viewer optisches Archiv" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_opta.gif" /></td>
+<td width="100px">Viewer optisches Archiv</td>
+<td width="50px">@0U@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Seitenansicht" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_layt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Seitenansicht" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_layt.gif" /></td>
+<td width="100px">Seitenansicht</td>
+<td width="50px">@3G@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Status setzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_stat.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Status setzen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_stat.gif" /></td>
+<td width="100px">Status setzen</td>
+<td width="50px">@3J@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Liste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_list.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Liste" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_list.gif" /></td>
+<td width="100px">Liste</td>
+<td width="50px">@3W@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Werkzeuge, Fertigungshilfsmit." alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_tool.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Werkzeuge, Fertigungshilfsmit." alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_tool.gif" /></td>
+<td width="100px">Werkzeuge, Fertigungshilfsmit.</td>
+<td width="50px">@45@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Netzplangrafik" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_netg.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Netzplangrafik" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_netg.gif" /></td>
+<td width="100px">Netzplangrafik</td>
+<td width="50px">@56@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Balkenplangrafik; Plantafel" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_plan.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Balkenplangrafik; Plantafel" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_plan.gif" /></td>
+<td width="100px">Balkenplangrafik; Plantafel</td>
+<td width="50px">@57@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Mitarbeiter" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_empl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Mitarbeiter" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_empl.gif" /></td>
+<td width="100px">Mitarbeiter</td>
+<td width="50px">@5W@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zeitzone" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_timz.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeitzone" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_timz.gif" /></td>
+<td width="100px">Zeitzone</td>
+<td width="50px">@5X@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Historie" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_rkhi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Historie" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_rkhi.gif" /></td>
+<td width="100px">Historie</td>
+<td width="50px">@96@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zeit inaktiv" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_tina.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zeit inaktiv" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_tina.gif" /></td>
+<td width="100px">Zeit inaktiv</td>
+<td width="50px">@9R@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="ABAP-Routine" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_abap.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="ABAP-Routine" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_abap.gif" /></td>
+<td width="100px">ABAP-Routine</td>
+<td width="50px">@9U@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Auftrag, Order" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_orda.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Auftrag, Order" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_orda.gif" /></td>
+<td width="100px">Auftrag, Order</td>
+<td width="50px">@9Z@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kunde" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cust.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kunde" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cust.gif" /></td>
+<td width="100px">Kunde</td>
+<td width="50px">@A0@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Zentrallager" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cewa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Zentrallager" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cewa.gif" /></td>
+<td width="100px">Zentrallager</td>
+<td width="50px">@A1@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Dispositionsebene" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dilo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Dispositionsebene" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dilo.gif" /></td>
+<td width="100px">Dispositionsebene</td>
+<td width="50px">@A2@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Distributionszentrum" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_dice.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Distributionszentrum" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_dice.gif" /></td>
+<td width="100px">Distributionszentrum</td>
+<td width="50px">@A3@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kundenlager" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cuwa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kundenlager" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cuwa.gif" /></td>
+<td width="100px">Kundenlager</td>
+<td width="50px">@A4@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Umlagerungspunkt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_trap.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Umlagerungspunkt" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_trap.gif" /></td>
+<td width="100px">Umlagerungspunkt</td>
+<td width="50px">@A5@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Material" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_matl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Material" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_matl.gif" /></td>
+<td width="100px">Material</td>
+<td width="50px">@A6@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Modell" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_modl.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Modell" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_modl.gif" /></td>
+<td width="100px">Modell</td>
+<td width="50px">@A7@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Werk" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_plnt.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Werk" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_plnt.gif" /></td>
+<td width="100px">Werk</td>
+<td width="50px">@A8@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Produktgruppe" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_prog.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Produktgruppe" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_prog.gif" /></td>
+<td width="100px">Produktgruppe</td>
+<td width="50px">@A9@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Verbindung, Beziehung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_resh.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Verbindung, Beziehung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_resh.gif" /></td>
+<td width="100px">Verbindung, Beziehung</td>
+<td width="50px">@AA@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ressource" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_resu.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ressource" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_resu.gif" /></td>
+<td width="100px">Ressource</td>
+<td width="50px">@AB@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Lagerort" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_stol.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Lagerort" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_stol.gif" /></td>
+<td width="100px">Lagerort</td>
+<td width="50px">@AC@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Lieferant" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_supp.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Lieferant" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_supp.gif" /></td>
+<td width="100px">Lieferant</td>
+<td width="50px">@AD@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Transportart" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_tram.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Transportart" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_tram.gif" /></td>
+<td width="100px">Transportart</td>
+<td width="50px">@AE@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Ort" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_loca.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ort" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_loca.gif" /></td>
+<td width="100px">Ort</td>
+<td width="50px">@AF@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Arbeitsplan" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_plaa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Arbeitsplan" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_plaa.gif" /></td>
+<td width="100px">Arbeitsplan</td>
+<td width="50px">@AJ@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Wartungsplan" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_plaw.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Wartungsplan" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_plaw.gif" /></td>
+<td width="100px">Wartungsplan</td>
+<td width="50px">@AK@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Meldung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_repo.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Meldung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_repo.gif" /></td>
+<td width="100px">Meldung</td>
+<td width="50px">@AL@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Arbeitsplatz" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_wopa.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Arbeitsplatz" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_wopa.gif" /></td>
+<td width="100px">Arbeitsplatz</td>
+<td width="50px">@AM@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Ausstattung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_equi.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Ausstattung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_equi.gif" /></td>
+<td width="100px">Ausstattung</td>
+<td width="50px">@AN@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Dokument" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_docu.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Dokument" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_docu.gif" /></td>
+<td width="100px">Dokument</td>
+<td width="50px">@AR@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Storno Zahlungsposten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_reve.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Storno Zahlungsposten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_reve.gif" /></td>
+<td width="100px">Storno Zahlungsposten</td>
+<td width="50px">@BA@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Kostenstelle" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_cost.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kostenstelle" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_cost.gif" /></td>
+<td width="100px">Kostenstelle</td>
+<td width="50px">@BL@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Query Tool" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_quer.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Query Tool" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_quer.gif" /></td>
+<td width="100px">Query Tool</td>
+<td width="50px">@BO@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Workflow Eingang" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_ibox.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Workflow Eingang" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_ibox.gif" /></td>
+<td width="100px">Workflow Eingang</td>
+<td width="50px">@BP@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Wizard" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_wiza.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Wizard" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_wiza.gif" /></td>
+<td width="100px">Wizard</td>
+<td width="50px">@BY@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Einmallieferung Wunschtermin" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_elie.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Einmallieferung Wunschtermin" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_elie.gif" /></td>
+<td width="100px">Einmallieferung Wunschtermin</td>
+<td width="50px">@CB@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Vollständige Lieferung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_klie.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Vollständige Lieferung" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_klie.gif" /></td>
+<td width="100px">Vollständige Lieferung</td>
+<td width="50px">@CC@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Liefervorschlag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_vlie.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Liefervorschlag" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_vlie.gif" /></td>
+<td width="100px">Liefervorschlag</td>
+<td width="50px">@CD@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Planrichtung rückwärts (Umsch)" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pruu.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planrichtung rückwärts (Umsch)" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pruu.gif" /></td>
+<td width="100px">Planrichtung rückwärts (Umsch)</td>
+<td width="50px">@CE@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Planungsrichtung rückwärts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pruc.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planungsrichtung rückwärts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pruc.gif" /></td>
+<td width="100px">Planungsrichtung rückwärts</td>
+<td width="50px">@CF@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Planungsrichtung vorwärts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pvor.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planungsrichtung vorwärts" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pvor.gif" /></td>
+<td width="100px">Planungsrichtung vorwärts</td>
+<td width="50px">@CG@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Planrichtung vorwärts (Umsch)" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pvou.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planrichtung vorwärts (Umsch)" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pvou.gif" /></td>
+<td width="100px">Planrichtung vorwärts (Umsch)</td>
+<td width="50px">@CH@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Finite Kapazität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pfik.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Finite Kapazität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pfik.gif" /></td>
+<td width="100px">Finite Kapazität</td>
+<td width="50px">@CI@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Variationen Nichtarbeitszeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pnar.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Variationen Nichtarbeitszeiten" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pnar.gif" /></td>
+<td width="100px">Variationen Nichtarbeitszeiten</td>
+<td width="50px">@CJ@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Planmodus freie Kapazität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pfka.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planmodus freie Kapazität" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pfka.gif" /></td>
+<td width="100px">Planmodus freie Kapazität</td>
+<td width="50px">@CK@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Planmodus Vorgang einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pvef.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planmodus Vorgang einfügen" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pvef.gif" /></td>
+<td width="100px">Planmodus Vorgang einfügen</td>
+<td width="50px">@CL@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Planmodus Vorgang einrütteln" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pver.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planmodus Vorgang einrütteln" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pver.gif" /></td>
+<td width="100px">Planmodus Vorgang einrütteln</td>
+<td width="50px">@CM@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Planmodus Reihenfolge beibehal" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_b_pvre.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Planmodus Reihenfolge beibehal" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_b_pvre.gif" /></td>
+<td width="100px">Planmodus Reihenfolge beibehal</td>
+<td width="50px">@CN@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Profit Center Stammsatz" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_procen.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Profit Center Stammsatz" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_procen.gif" /></td>
+<td width="100px">Profit Center Stammsatz</td>
+<td width="50px">@D2@</td>
+</tr>
+<tr bgcolor="whitesmoke">
+<td style="width: 40px;"><img decoding="async" title="Buchungskreis" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_comcod.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Buchungskreis" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_comcod.gif" /></td>
+<td width="100px">Buchungskreis</td>
+<td width="50px">@D9@</td>
+</tr>
+<tr bgcolor="white">
+<td style="width: 40px;"><img decoding="async" title="Kostenrechnungskreis" alt="" src="/wp-content/uploads/tt_images/corbu/gifs/s_conare.gif" /></td>
+<td style="width: 40px;"><img decoding="async" title="Kostenrechnungskreis" alt="" src="/wp-content/uploads/tt_images/corbu/gifs_corbu/s_conare.gif" /></td>
+<td width="100px">Kostenrechnungskreis</td>
+<td width="50px">@DX@</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Der Beitrag <a href="/blog/sap-icons/">SAP-Icons</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Gamification</title>
+		<link>/blog/gamification/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 19 Aug 2011 15:11:42 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<category><![CDATA[Spiele]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=615</guid>
+
+					<description><![CDATA[<p>Mit "Gamification" ist ein neues Schlagwort in der (SAP-) Welt aufgetaucht. Es gibt wohl zwei Grundgedanken. Erstens: Worin genau sind Gamer eigentlich gut? Zweitens: Wie kann man in der Gesch&#228;ftswelt diesen Spielegedanken umsetzen, so dass die Mitarbeiter Spa&#223; an der Arbeit haben und zudem hoch konzentriert sind?</p>
+<p>Der Beitrag <a href="/blog/gamification/">Gamification</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit &#8220;Gamification&#8221; ist ein neues Schlagwort in der (SAP-) Welt aufgetaucht. Es gibt wohl zwei Grundgedanken. Erstens: Worin genau sind Gamer eigentlich gut? Zweitens: Wie kann man in der Geschäftswelt diesen Spielegedanken umsetzen, so dass die Mitarbeiter Spaß an der Arbeit haben und zudem hoch konzentriert sind?</p>
+<p class="head1">Turning Work Into Play</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/blog/Bild554.jpg" alt="" /></p>
+<p>Heute bin ich über das Stichwort &#8220;Gamification&#8221; gestolpert. Und zwar auf der Internetseite von Anton Hartl. (Die Seite und Artikel sind leider nicht mehr online. Hier der Link auf die aktuelle Internetpräsenz: <a href="http://www.stacknoise.com/" target="_blank">http://www.stacknoise.com/</a>)</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/blog/Bild557.jpg" alt="" /></p>
+<p>Auf der Seite sind Links zu dem Thema &#8220;Gamification&#8221;. Ich habe mir mal die Präsentation von<strong> Jane McGonigal &#8220;Videospiele für eine bessere Welt&#8221;</strong> angeschaut &#8211; welche ich sehr spannend fand. Sie geht der Frage nach, warum verbringen Gamer so viel Zeit damit, virtuelle Aufgaben zu lösen? Wie kann man es schaffen, diese Energie, Hartnäckigkeit und Aufmerksamkeit in die Arbeitswelt zu übertragen? Könnte man dies nur ansatzweise schaffen, wäre das eine Produktivitätssteigerung sondergleichen. <strong>McGonigal </strong>erzählt, dass alle Spieler bei World of Warcraft bisher 5,93 Millionen Jahre damit zugebracht haben, die Fantasiewelt Azeroth zu beleben. In einem Land, in dem viel Videospiele gespielt werden, wird ein Spieler <strong>bis zum 21. Lebensjahr 10.000 Stunden</strong> mit Videospielen zugebracht haben. Das ist in etwa die gleiche Menge an Stunden, die dem Unterricht einer amerikanischen High School entspricht!</p>
+<p class="head1">UI &#8211; User Interface</p>
+<p>Anton Hartl beschäftigt sich mit der Implementierung einer visionären Benutzeroberfläche für SAP. Ziel ist es, ausgewählte SAP-Funktionalitäten in grafischen Benutzeroberflächen zu präsentieren, die man bisher nur aus CSI New York oder Avatar kannte.Danach einen kurzen Chat mit Anton Hartl gehabt, der mir ein bisschen über das Projekt erzählt hat.</p>
+<p>Er ist gerade dabei, mit Partnern Prototypen für so eine zukünftige UI zu erstellen. Den SAPGUI wird es allerdings wohl auch in Zukunft geben, denn die Visualisierung von Fakten und Bearbeitung auf 55&#8243; Touch Screens wird wohl nur bei einigen Spezialanwendungen Sinn machen.</p>
+<p class="head1">Turn User Into Fans</p>
+<p>Ich finde es schon interessant, wenn ich mir vorstelle, dass der Mitarbeiter meiner Lieblingstelefongesellschaft mich erst dann anruft, wenn er gegen seine Kollegen im Tarifdschungelmemory gewonnen hat oder erst, sobald er 7800 Telefongesprächserfahrungspunkte gesammelt hat!</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/blog/Bild559.jpg" alt="" /></p>
+<p>Nein, mal Ernst beiseite&#8230;</p>
+<p>Auf den ersten Blick betrachtet macht eine &#8220;spielerische Oberfläche&#8221; oder auch eine &#8220;Virtualisierung der Arbeit&#8221; wahrscheinlich keinen Sinn. Auf den zweiten Blick jedoch, macht es durchaus Sinn, die Benutzerfreundlichkeit und Intuitive Erfassung von Funktionalitäten an erste Stelle zu setzen. Und auch wenn eine bunte verspielte Oberfläche &#8211; bei der ich vielleicht noch meinen Avatar selbst gestalten kann &#8211; in einem ERP-System merkwürdig anmutet: Es wäre wirklich fahrlässig, das was auch immer die Jugend von heute beim Spielen mit der Wii oder der Playstation lernt, nicht zu nutzen.</p>
+<p>Ich kann mir gut vorstellen, dass Leute, die einen Kundenauftrag mit einer &#8220;Spiele-Oberfläche&#8221; eingeben müsssen wahrscheinlich eher noch nebenbei chatten und parallel dazu noch effektive Routenplanung machen können.</p>
+<p>Exceltabellen werden aber wohl so schnell nicht von der Bildfläche verschwinden&#8230;</p>
+<p>Ich bin jedenfalls gespannt, wie es weiter geht!</p>
+<p class="head1">Links</p>
+<p class="head2">Jane McGonigal (Deutsche Untertitel zuschaltbar!)</p>
+<p><a href="http://www.ted.com/talks/lang/eng/jane_mcgonigal_gaming_can_make_a_better_world.html" target="_blank">http://www.ted.com/talks/lang/eng/jane_mcgonigal_<br />
+gaming_can_make_a_better_world.html</a></p>
+<p class="head2">Homepage Anton Hartl</p>
+<p><a href="http://www.stacknoise.com/" target="_blank">http://www.stacknoise.com/</a></p>
+<p>Der Beitrag <a href="/blog/gamification/">Gamification</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>SAPLogon Varianten</title>
+		<link>/blog/saplogon-varianten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 18 Aug 2009 11:38:01 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[SAPGUI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=527</guid>
+
+					<description><![CDATA[<p>Legen Sie sich mehrere Verkn&#252;pfungen an f&#252;r mehrere Kunden oder Bereiche! So umgehen Sie den Umstand, dass im SAPlogon Systeme nicht gruppiert werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/saplogon-varianten/">SAPLogon Varianten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Legen Sie sich mehrere Verkn&uuml;pfungen an f&uuml;r mehrere Kunden oder Bereiche! So umgehen Sie den Umstand, dass im SAPlogon Systeme nicht gruppiert werden k&ouml;nnen.<br /><P>Im SAPlogon k&ouml;nnen leider keine Gruppierungen vorgenommen werden, so dass ein SAPlogon mit vielen System schnell un&uuml;bersichtlich aussieht.</P><P>Mit folgendem Parameter k&ouml;nnen Sie unterschiedliche INI-Dateien ansteuern:</P><P>Legen Sie eine Verkn&uuml;pfung zu SAPLOGON.EXE an und geben Sie dann im Feld &#8220;Ziel&#8221; den Parameter &#8220;ini_file&#8221; an: </P><P>C:/Programme/SAP/FrontEnd/SAPgui/saplogon.exe &#8220;/ini_file=C:/Arbeit/SAP/saplogon_eins.ini&#8221; </P><P>Ist die INI-Datei nicht vorhanden, so legt das System eine an. Sie k&ouml;nnen sich so verschiedene Verkn&uuml;pfungen auf den Desktop oder ins Startmen&uuml; legen und&nbsp;haben dann nur die SAP-Systeme im Zugriff, die&nbsp;Sie ben&ouml;tigen.</P><P>Ich verstehe allerdings auch nicht, warum &nbsp;die SAP nicht einen &#8220;sch&ouml;nen TreeControl&#8221; einbaut, mit dem man die Systeme gruppieren kann. </P></p>
+<p>Der Beitrag <a href="/blog/saplogon-varianten/">SAPLogon Varianten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

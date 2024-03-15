@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>System-Log Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/system-log/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 03 Dec 2020 15:32:04 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>System-Log Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Syslog-Eintrag schreiben</title>
+		<link>/blog/syslog-eintrag-schreiben/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Oct 2009 16:40:16 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Syslog]]></category>
+		<category><![CDATA[System-Log]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=531</guid>
+
+					<description><![CDATA[<p>Die einfachste Art, einen Syslog-Eintrag zu schreiben, ist der Aufruf eines Funktionsbausteins. Hier beschreiben wir kurz, wie das funktioniert.</p>
+<p>Der Beitrag <a href="/blog/syslog-eintrag-schreiben/">Syslog-Eintrag schreiben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Die einfachste Art, einen Syslog-Eintrag zu schreiben, ist der Aufruf eines Funktionsbausteins. Hier beschreiben wir kurz, wie das funktioniert.</p>
+
+
+
+<p>Verwenden tun wir den Funktionsbaustein RSLG_WRITE_SYSLOG_ENTRY. Folgend der Aufruf für einen einfachen Syslog-Eintrag:</p>
+
+
+
+<pre class="wp-block-code"><code>    CALL FUNCTION 'RSLG_WRITE_SYSLOG_ENTRY'
+       EXPORTING
+         data_word1       = 'ZTEST'
+         data_word2       = 'User'
+         data_word3       = sy-uname
+         data_word4       = 'hat die Variante umgestellt:'
+         data_word5       = lv_variant
+         sl_message_area  = 'C4'
+         sl_message_subid = '1'  "Anwendung &amp;A warnt: &amp;B &amp;C &amp;D &amp;E"
+       EXCEPTIONS
+         OTHERS           = 5.</code></pre>
+
+
+
+<p>Die Meldung taucht dann im Syslog auf:</p>
+
+
+
+<pre class="wp-block-preformatted">Applikation ZTEST warnt: User EWULFF hat die Variante umgestellt: /DEFAULT</pre>
+
+
+
+<p>Eine Liste der möglichen Meldungsnummern stehen in der Tabelle TSL1T.  Eine Auflistung der Meldungen ist mit Programm RSLG0011 möglich.</p>
+<p>Der Beitrag <a href="/blog/syslog-eintrag-schreiben/">Syslog-Eintrag schreiben</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Syslog Meldungen</title>
+		<link>/blog/syslog-meldungen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 07 Oct 2009 16:21:28 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[Syslog]]></category>
+		<category><![CDATA[System-Log]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=530</guid>
+
+					<description><![CDATA[<p>Die Meldungen im Syslog sind so &#228;hnlich wie die Nachrichten, die mit MESSAGE erzeugt werden. Allerdings hat man im Syslog mehr M&#246;glichkeiten. Hier wollen wir kurz erkl&#228;ren, was zu einer Syslog-Meldung geh&#246;rt.</p>
+<p>Der Beitrag <a href="/blog/syslog-meldungen/">Syslog Meldungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Meldungen im Syslog sind so &auml;hnlich wie die Nachrichten, die mit MESSAGE erzeugt werden. Allerdings hat man im Syslog mehr M&ouml;glichkeiten. Hier wollen wir kurz erkl&auml;ren, was zu einer Syslog-Meldung geh&ouml;rt.<br /><P>Die Meldungen werden mit Transaktion SE92 gepflegt. Diese ist schon ziemlich veraltet, was man ihr an verschiedenen Stellen anmerkt. So wird z.B. noch nicht einmal die Meldung gesperrt, wenn man sie bearbeitet&#8230; </P><P class="head1">Meldungsgebiete</P><P>Es gibt verschiedene Meldungsgebiete:</P><UL><LI>A:&nbsp; ABAP-Nachrichten <LI>B:&nbsp; Datenbankschnittstelle und SQL <LI>DD:&nbsp; Data Dictionary <LI>E:&nbsp; Hintergrundverarbeitung <LI>und andere&#8230;</LI></UL><P>Eigene Meldungen sollten nat&uuml;rlich mit &#8220;Z&#8221; beginnen&#8230;</P><P class="head1">Problemklasse</P><P>Die meisten Sachen sind dokumentiert, wenn auch nur versteckt. So muss man z.B. um g&uuml;ltige Werte f&uuml;r &#8220;Problemklasse alt&#8221; zu bekommen, erst von der F1-Hilfe zum&nbsp;Datenelement, &uuml;ber die Dom&auml;ne hin zur Pr&uuml;ftabelle TSL2D h&uuml;pfen:</P><UL><LI>K &#8211; Problem in der SAP-Basis <LI>S &#8211; Betriebsverfolgung <LI>T &#8211; Problem in einer Transaktion <LI>W &#8211; Warnung <LI>X &#8211; Sonstiges</LI></UL><P class="head1">Kategorie</P><P>Desweiteren muss eine Kategorie angegeben werden, die den Schaverhalt am besten trifft.</P><P>Auch der &#8220;Schweregrad&#8221; ist wichtig. Der Grad ist &auml;hnlich aufgebaut, wie bei den Ampeln, allerdings in etwas abgewandelter Form:</P><UL><LI>Wei&szlig;: Information <LI>Gr&uuml;n: Warnung <LI>Gelb: Hohe Priorit&auml;t <LI>rot: Sehr hohe Priorit&auml;t</LI></UL><P class="head1">Meldungstext</P><P>Der Meldungstext ist &auml;hnlich aufgebaut, wie eine &#8220;Nachricht&#8221;. Es k&ouml;nnen Platzhalter vergeben werden, die dann sp&auml;ter aufgef&uuml;llt werden.</P><P>Hier funktionieren die Platzhalter allerdings etwas anders&#8230; So werden die Platzhalter &amp;1 oder &amp;2 nicht durch den &#8220;Parameter-1&#8221; und &#8220;Parameter-2&#8221; ersetzt, sondern jeweils in der angegebenen L&auml;nge des entsprechenden Parameters. In diesem Fall also: 1. Parameter mit der L&auml;nge &#8220;1&#8221; und 2. Parameter mit der L&auml;nge &#8220;2&#8221;&#8230;</P><P>Die &#8220;richtigen&#8221; Parameter sind dann: &amp;A, &amp;B usw. Die Verwendung wird aber gut erkl&auml;rt.</P><P><STRONG><U>Achtung:</U></STRONG><BR>Das Meldungsgebiet &#8220;AU&#8221; hat anscheinend eine besondere Bedeutung f&uuml;r das &#8220;Security Audit-Log&#8221;. Hier sind andere Kategorieren sichtbar.</P><P>Doku &#8220;Security-Audit-Log:<BR><A href="http://help.sap.com/saphelp_erp2005/helpdata/DE/2c/c59d37d373243de10000009b38f8cf/frameset.htm" target="_blank" Target="_blank">http://help.sap.com/saphelp_erp2005/helpdata/DE/<BR>2c/c59d37d373243de10000009b38f8cf/frameset.htm</A></P></p>
+<p>Der Beitrag <a href="/blog/syslog-meldungen/">Syslog Meldungen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

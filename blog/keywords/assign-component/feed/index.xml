@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>assign component Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/assign-component/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:04 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>assign component Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Interne Tabelle DDIC</title>
+		<link>/blog/interne-tabelle-ddic/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2012 13:57:36 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[create data]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[cl_abap_tabledescr]]></category>
+		<category><![CDATA[assign component]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[cl_abap_typedescr]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=655</guid>
+
+					<description><![CDATA[<p>Eine interne Tabelle anhand einer gegebenen DDIC-Struktur erzeugen und Ausgabe als einfache Liste</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-ddic/">Interne Tabelle DDIC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine interne Tabelle anhand einer gegebenen DDIC-Struktur erzeugen und Ausgabe als einfache Liste</p>
+<p class="head1">Verwendung</p>
+<p>Die in diesem Beispiel verwendete Möglichkeit interne Tabellen und Arbeitsbereiche dynamisch zu erzeugen kann verwendet werden, wenn der Inhalt einer Datenbanktabelle ausgelesen werden soll.</p>
+<p>So könnte man zum Beispiel ein Programm schreiben, das alle Tabellen ausliest, in denen das Datenelement &#8220;MATNR&#8221; vor kommt. Für jede Tabelle wird dann dynamisch eine interne Tabelle generiert und mittels ASSIGN COMPONENT &#8216;MATNR&#8217; könnten dynamisch Prüfungen auf die Materialnummer erfolgen.</p>
+<p class="head1">Coding</p>
+<p class="sap1"><span style="color: #fb2412;">*== data</span><br />
+DATA gr_struct     TYPE REF TO cl_abap_structdescr.<br />
+DATA gr_table      TYPE REF TO cl_abap_tabledescr.<br />
+DATA gd_table      TYPE REF TO data.<br />
+DATA gd_line       TYPE REF TO data.</p>
+<p class="sap1"><span style="color: #fb2412;">*== field symbols</span><br />
+FIELD-SYMBOLS &lt;workarea&gt; TYPE ANY.<br />
+FIELD-SYMBOLS &lt;table&gt;    TYPE ANY TABLE.<br />
+FIELD-SYMBOLS &lt;value&gt;    TYPE ANY.</p>
+<p class="sap1">PARAMETERS p_table TYPE tabname DEFAULT &#8216;T000&#8217;.</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*== get structure description</span><br />
+gr_struct  ?= cl_abap_typedescr=&gt;describe_by_name( p_table ).<br />
+*== create table description using structure description<br />
+gr_table   ?= cl_abap_tabledescr=&gt;create( gr_struct ).</p>
+<p class="sap1"><span style="color: #fb2412;">*== create work area</span><br />
+CREATE DATA gd_line TYPE HANDLE gr_struct.<br />
+ASSIGN gd_line-&gt;* TO &lt;workarea&gt;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== create internal table</span><br />
+CREATE DATA gd_table TYPE HANDLE gr_table.<br />
+ASSIGN gd_table-&gt;* TO &lt;table&gt;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== select data from database into dynamically generated internal table</span><br />
+SELECT * FROM (p_table)<br />
+INTO CORRESPONDING FIELDS OF TABLE &lt;table&gt; UP TO 20 ROWS.</p>
+<p class="sap1"><span style="color: #fb2412;">*== loop at all table lines for output</span><br />
+LOOP AT &lt;table&gt; ASSIGNING &lt;workarea&gt;.<br />
+NEW-LINE.<br />
+DO.<br />
+<span style="color: #fb2412;">*== loop at all components of the structure</span><br />
+ASSIGN COMPONENT sy-index OF STRUCTURE &lt;workarea&gt; TO &lt;value&gt;.<br />
+IF sy-subrc &gt; 0.<br />
+EXIT.<br />
+ELSE.<br />
+<span style="color: #fb2412;">*== and write into list</span><br />
+WRITE &lt;value&gt; COLOR COL_NORMAL.<br />
+ENDIF.<br />
+ENDDO.<br />
+ENDLOOP.</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-ddic/">Interne Tabelle DDIC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

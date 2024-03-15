@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Eigene Programme Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/eigene-programme/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:02 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Eigene Programme Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>ALV-Layout gegen Überschreiben schützen</title>
+		<link>/blog/alv-layout-gegen-ueberschreiben-schuetzen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 16 Jan 2014 13:44:23 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Eigene Programme]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[Layout]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[Eigenentwicklungen]]></category>
+		<category><![CDATA[SQL]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4254</guid>
+
+					<description><![CDATA[<p>Die Layoutverwaltung von ALVs ist nicht ganz einfach und hat einige Macken. In diesem Artikel erfährst du, wie ein Layout gegen unbeabsichtigtes Überschreiben geschützt werden kann.</p>
+<p>Der Beitrag <a href="/blog/alv-layout-gegen-ueberschreiben-schuetzen/">ALV-Layout gegen Überschreiben schützen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Layoutverwaltung des ALV (Grid als auch Liste) hat ein paar Macken. Eine davon ist die, dass es nur ein Berechtigungsobjekt S_ALV_LAYO gibt. Mit diesem Objekt wird definiert, ob ein Anwender Layouts ändern darf, oder nicht. Es gibt keine Unterscheidung zwischen System- und Benutzerlayouts.</p>
+<h2>Speicherung</h2>
+<p>Die Varianten werden in den Clustertabellen LTDX und LTDXT gespeichert. Benutzerlayouts müssen mit einer Zahl oder einem Buchstaben anfangen, Systemlayouts mit einem Schrägstrich. Diesen Umstand machen wir uns zu nutze, indem wir ein vorhandenes Layout einfach auf ein Layout kopieren, das mit einem Sonderzeichen beginnt, wie z.B. der Tilde. Dieses Layout kann dann nicht mehr geändert werden, da der Name unzulässig ist:</p>
+<p><img fetchpriority="high" decoding="async" width="511" height="492" class="alignnone size-full wp-image-4256" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d7e09bc93a5.png" alt="" srcset="/wp-content/uploads/2014/01/img_52d7e09bc93a5.png 511w, /wp-content/uploads/2014/01/img_52d7e09bc93a5-300x288.png 300w" sizes="(max-width: 511px) 100vw, 511px" /></p>
+<h2>Layout schützen</h2>
+<p>Der folgende Programmcode liest ein vorhandenes Layout ein und speichert es unter neuem Namen ab.</p>
+<p>[notice type=&#8217;info&#8217;]Der Eintrag für die Texte im Cluster LTDXT wird nicht kopiert. Dies sollte der Vollständigkeit halber ebenfalls gemacht werden![/notice]</p>
+<pre>  DATA: gt_ltdx TYPE STANDARD TABLE OF ltdx WITH NON-UNIQUE DEFAULT KEY,
+        gs_ltdx LIKE LINE OF lt_ltdx.
+
+  PARAMETERS: p_report TYPE repid       OBLIGATORY.
+  PARAMETERS: p_handle TYPE slis_handl  OBLIGATORY.
+  PARAMETERS: p_layout TYPE slis_vari   OBLIGATORY.
+  SELECT *
+    INTO TABLE gt_ltdx
+    FROM ltdx
+    WHERE relid   = 'LT'
+      AND report  = p_report
+      AND handle  = p_handle
+      AND variant = p_layout
+      AND type    = 'F'.
+  CHECK sy-subrc = 0.
+
+*== Replace first character in variant with "unallowed" character "~"
+  gs_ltdx-variant = p_layout.
+  gs_ltdx-variant(1) = '~'.
+
+  MODIFY gt_ltdx FROM gs_ltdx TRANSPORTING variant WHERE variant &lt;&gt; gs_ltdx-variant.
+
+  TRY.
+      INSERT ltdx FROM TABLE gt_ltdx.
+      COMMIT WORK.
+      MESSAGE i000(oo) WITH 'Layout kopiert:' gs_ltdx-variant.
+    CATCH cx_sy_open_sql_db.
+      MESSAGE i000(oo) WITH 'Fehler beim Kopieren!'.
+  ENDTRY.</pre>
+<h2>Fertig</h2>
+<p>Nachdem ein Layout kopiert wurde, taucht es in der Layoutverwaltung auf und kann ausgewählt und verwendet werden. Allerdings kann es nicht mehr geändert werden, denn der Name kann aufgrund des Sonderzeichens im Dialog nicht verwendet werden.</p>
+<p><img decoding="async" width="517" height="166" class="alignnone size-full wp-image-4255" src="https://tricktresor.com/wp-content/uploads/2014/01/img_52d7d7abf260e.png" alt="" srcset="/wp-content/uploads/2014/01/img_52d7d7abf260e.png 517w, /wp-content/uploads/2014/01/img_52d7d7abf260e-300x96.png 300w" sizes="(max-width: 517px) 100vw, 517px" /></p>
+<p>[notice type=&#8217;alert&#8217;]Das Layout ist nur durch Überschreiben geschützt! Es kann jedoch nach wie vor gelöscht werden![/notice]</p>
+<h2>Komplettes Programm</h2>
+<p>Hier das komplette Programm mit Berücksichtigung der Texte und F4-Hilfe für vorhandene Layouts.</p>
+<p>[accordian]<br />
+[accordian_list title=&#8217;ZZ_PROTECT_ALV_LAYOUT&#8217;]</p>
+<pre>REPORT  zz_protect_alv_layout.
+
+DATA c_protection_character TYPE c LENGTH 1 VALUE '~'.
+
+SELECTION-SCREEN BEGIN OF BLOCK bl1 WITH FRAME TITLE text-bl1.
+PARAMETERS  p_report TYPE repid       OBLIGATORY.
+PARAMETERS: p_handle TYPE slis_handl  OBLIGATORY.
+PARAMETERS: p_layout TYPE slis_vari   OBLIGATORY.
+SELECTION-SCREEN END OF BLOCK bl1.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_layout.
+  PERFORM f4_layout.
+
+AT SELECTION-SCREEN ON p_layout.
+  IF p_layout(1)  &lt;&gt; '/'.
+    MESSAGE 'Nur ungeschütze Standardlayouts (beginnend mit /) können geschützt werden' TYPE 'E'.
+  ENDIF.
+
+START-OF-SELECTION.
+
+  PERFORM protect.
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  PROTECT
+*&amp;---------------------------------------------------------------------*
+* Replace first character in ALV-Layout with "unallowed" character
+* This way this variant can't be saved any more and thus not be overwritten
+*&amp;---------------------------------------------------------------------*
+FORM protect .
+
+  DATA lt_ltdx  TYPE STANDARD TABLE OF ltdx  WITH NON-UNIQUE DEFAULT KEY.
+  DATA ls_ltdx  LIKE LINE OF lt_ltdx.
+  DATA lt_ltdxt TYPE STANDARD TABLE OF ltdxt WITH NON-UNIQUE DEFAULT KEY.
+  DATA ls_ltdxt LIKE LINE OF lt_ltdxt.
+
+*== read layout (main data)
+  SELECT * INTO TABLE lt_ltdx
+    FROM ltdx
+    WHERE relid   = 'LT'
+      AND report  = p_report
+      AND handle  = p_handle
+      AND variant = p_layout
+      AND type    = 'F'.
+  CHECK sy-subrc = 0.
+
+*--------------------------------------------------------------------*
+* Replace first character in variant with unallowed character
+*--------------------------------------------------------------------*
+  ls_ltdx-variant = p_layout.
+  ls_ltdx-variant(1) = c_protection_character.
+
+  MODIFY lt_ltdx FROM ls_ltdx TRANSPORTING variant WHERE variant &lt;&gt; ls_ltdx-variant.
+
+  TRY.
+*== Insert layout (main data)
+      INSERT ltdx FROM TABLE lt_ltdx.
+*== read layout (texts)
+      SELECT * FROM ltdxt INTO TABLE lt_ltdxt
+        WHERE relid   = 'LT'
+          AND report  = p_report
+          AND handle  = p_handle
+          AND variant = p_layout
+          AND type    = 'F'.
+      IF sy-subrc = 0.
+*== Insert Layout (text)
+        ls_ltdxt-variant = ls_ltdx-variant.
+        MODIFY lt_ltdxt FROM ls_ltdxt TRANSPORTING variant WHERE variant &lt;&gt; ls_ltdxt-variant.
+        INSERT ltdxt FROM TABLE lt_ltdxt.
+      ENDIF.
+      COMMIT WORK.
+      MESSAGE i000(oo) WITH 'Geschützte Variante' ls_ltdx-variant 'wurde neu angelegt'.
+    CATCH cx_sy_open_sql_db.
+      MESSAGE 'ALV-Layout existiert schon und wird nicht überschrieben' TYPE 'I'.
+  ENDTRY.
+
+ENDFORM.                    " PROTECT
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  F4_LAYOUT
+*&amp;---------------------------------------------------------------------*
+FORM f4_layout.
+
+  DATA lv_repid      TYPE syrepid.
+  data lv_dynnr      TYPE sydynnr.
+  data lt_dynpfields TYPE STANDARD TABLE OF dynpread WITH NON-UNIQUE DEFAULT KEY.
+  DATA ls_variant    TYPE disvariant.
+
+  FIELD-SYMBOLS: &lt;ls_dynpfield&gt; LIKE LINE OF lt_dynpfields.
+
+*== Layout parameters
+  ls_variant-report  = p_report.
+  ls_variant-variant = p_layout.
+  ls_variant-handle  = p_handle.
+
+*== updating from current screen
+*--------------------------------------------------------------------*
+  lv_repid = sy-repid.
+  lv_dynnr = '1000'.
+
+  CALL FUNCTION 'DYNP_VALUES_READ'                          "#EC
+    EXPORTING
+      dyname               = lv_repid
+      dynumb               = lv_dynnr
+      translate_to_upper   = 'X'
+      request              = 'A'
+    TABLES
+      dynpfields           = lt_dynpfields
+    EXCEPTIONS             = 11.
+
+  READ TABLE lt_dynpfields WITH KEY fieldname = 'P_REPORT'   ASSIGNING &lt;ls_dynpfield&gt;.
+  IF sy-subrc = 0.
+    ls_variant-report = &lt;ls_dynpfield&gt;-fieldvalue.
+  ENDIF.
+
+  READ TABLE lt_dynpfields WITH KEY fieldname = 'P_HANDLE'   ASSIGNING &lt;ls_dynpfield&gt;.
+  IF sy-subrc = 0.
+    ls_variant-handle = &lt;ls_dynpfield&gt;-fieldvalue.
+  ENDIF.
+
+*--------------------------------------------------------------------*
+* Standard ALV-F4
+*--------------------------------------------------------------------*
+  CALL FUNCTION 'REUSE_ALV_VARIANT_F4'
+    EXPORTING
+      is_variant         = ls_variant
+      i_save             = 'X'
+      i_display_via_grid = 'X'  " Only standard variants here
+    IMPORTING
+      es_variant         = ls_variant
+    EXCEPTIONS
+      not_found          = 1
+      program_error      = 2
+      OTHERS             = 3.
+  CHECK sy-subrc = 0.
+  CHECK ls_variant-variant IS NOT INITIAL.
+  p_layout = ls_variant-variant.
+
+ENDFORM.                    " F4_LAYOUT</pre>
+<p>[/accordian_list]<br />
+[/accordian]</p>
+<p>Der Beitrag <a href="/blog/alv-layout-gegen-ueberschreiben-schuetzen/">ALV-Layout gegen Überschreiben schützen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Kopfdaten einer HU ändern</title>
+		<link>/blog/kopfdaten-einer-hu-aendern/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 12 Feb 2008 14:04:34 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[HU]]></category>
+		<category><![CDATA[Eigene Programme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=455</guid>
+
+					<description><![CDATA[<p>Mit folgendem Programm k&#246;nnen Sie (beinahe) beliebige Daten einer Handling Unit &#228;ndern. </p>
+<p>Der Beitrag <a href="/blog/kopfdaten-einer-hu-aendern/">Kopfdaten einer HU ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Mit folgendem Programm k&ouml;nnen Sie (beinahe) beliebige Daten einer Handling Unit &auml;ndern. <br /><P class="head1">Beschreibung</P><P class="text1">In diesem Fall wird das Feld &#8220;GEWFX&#8221; (Gewicht/ Volumen Fix) initialisiert. Dadurch werden Gewichts- und Volumenberechnungen in dieser Handling Unit wieder standardm&auml;&szlig;ig durchgef&uuml;ht.</P><P class="head1">Coding</P><P class="sap1"><FONT color="#fb2412">*** Data</FONT><BR>DATA lt_new_vals TYPE hum_update_header_t.<BR>DATA ls_new_val&nbsp; TYPE hum_update_header.<BR>DATA lt_mess&nbsp;&nbsp;&nbsp;&nbsp; TYPE huitem_messages_t.<BR>DATA lt_hus&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE hum_exidv_t.</P><P class="sap1">PARAMETER p_exidv TYPE exidv DEFAULT &#8216;12345&#8217;.</P><P class="sap1">START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*** Lesen der zu bearbeitenden Handling Unit</FONT><BR>&nbsp; APPEND p_exidv TO lt_hus.<BR>&nbsp; CALL FUNCTION &#8216;HU_GET_HUS&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it_hus = lt_hus<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS = 4.<BR>&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp;<FONT color="#fb2412"> &#8220;error handling</FONT><BR>&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*** zu &auml;nderndes Feld: GEWFX (Gewicht/ Volumen fix)</FONT><BR>&nbsp; ls_new_val-hdl_unit_itid = space.<BR>&nbsp; ls_new_val-hdl_unit_exid = p_exidv.<BR>&nbsp; ls_new_val-field_name&nbsp;&nbsp;&nbsp; = &#8216;GEWFX&#8217;.<BR>&nbsp; ls_new_val-field_value&nbsp;&nbsp; = space.<BR>&nbsp; APPEND ls_new_val TO lt_new_vals.</P><P class="sap1"><FONT color="#fb2412">*** Feld &auml;ndern</FONT><BR>&nbsp; CALL FUNCTION &#8216;HU_HEADER_UPDATE&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it_new_values = lt_new_vals<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; et_messages&nbsp;&nbsp; = lt_mess<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_possible&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp;<FONT color="#fb2412"> &#8220;error handling</FONT><BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** Verbuchen der HU</FONT><BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;HU_POST&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if_commit = &#8216;X&#8217;.<BR>&nbsp; ENDIF.<BR></P><P class="head1">Alternative</P><P>Zum &Auml;ndern von Kopfdaten kann ebenfalls der <STRONG>BAPI_HU_CHANGE_HEADER</STRONG> verwendet werden:</P><P class="sap1">DATA gs_hdr_change TYPE bapihuheader.<BR><BR>CLEAR gs_hdr_change.<BR>gs_hdr_change-hu_grp2 = &#8216;ABC&#8217;.<BR>CALL FUNCTION &#8216;BAPI_HU_CHANGE_HEADER&#8217;<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; hukey&nbsp;&nbsp;&nbsp;&nbsp; = gv_exidv<BR>&nbsp;&nbsp;&nbsp; huchanged = gs_hdr_change<BR>&nbsp; TABLES<BR>&nbsp;&nbsp;&nbsp; return&nbsp;&nbsp;&nbsp; = gt_return.<BR><BR>CALL FUNCTION &#8216;BAPI_TRANSACTION_COMMIT&#8217;<BR>&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp; wait = &#8216;X&#8217;.</P></p>
+<p>Der Beitrag <a href="/blog/kopfdaten-einer-hu-aendern/">Kopfdaten einer HU ändern</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Verpacken einer Handling Unit</title>
+		<link>/blog/verpacken-einer-handling-unit/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 29 Aug 2006 21:42:01 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[HU]]></category>
+		<category><![CDATA[Eigene Programme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=377</guid>
+
+					<description><![CDATA[<p>In diesem Beispiel soll gezeigt werden, wie eine vorhandene Handling Unit in eine neu zu erzeugende Handling Unit gepackt wird.</p>
+<p>Der Beitrag <a href="/blog/verpacken-einer-handling-unit/">Verpacken einer Handling Unit</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beispiel soll gezeigt werden, wie eine vorhandene Handling Unit in eine neu zu erzeugende Handling Unit gepackt wird.<br /><P>Die Handling Unit, die eingegeben wird, muss nat&uuml;rlich existieren. Hierbei wird die interne Identifikationsnummer verlangt (VEKP-VENUM). </P><P><STRONG>ACHTUNG:<BR></STRONG>In den meisten Transaktionen, die Handling Units anzeigen (z. B. HUMO), wird aber nur die externe Identifikation angezeigt (VEKP-EXIDV)!!</P><P class="head1">&nbsp;Coding</P><P class="sap1"><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp; Verpacken&nbsp;einer vorhandenen Handling Unit in eine neue HU<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR></FONT>REPORT&nbsp; zsdhu_pack_hu_demo.</P><P class="sap1">TYPE-POOLS vsep.</P><P class="sap1">DATA:<BR>&nbsp; gs_hu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE huitem_from,<BR>&nbsp; gt_venums&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE hum_venum_t,<BR>&nbsp; gv_venum&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE venum,<BR>&nbsp; gs_headers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE vekpvb,<BR>&nbsp; gs_header_proposal LIKE huhdr_proposal,<BR>&nbsp; gs_item_proposal&nbsp;&nbsp; TYPE huitm_proposal,<BR>&nbsp; gs_pack_req&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE vsep_s_pithu.</P><P class="sap1"><FONT color="#fb2412">*** Eingabe der Handling Unit, die verpackt werden soll<BR></FONT>PARAMETERS: p_venum TYPE venum DEFAULT &#8216;6658&#8217;.</P><P class="sap1"><BR>START-OF-SELECTION.</P><P class="sap1"><FONT color="#fb2412">*** Initialisierung Verpacken</FONT><BR>&nbsp; APPEND p_venum TO gt_venums.<BR>&nbsp; CALL FUNCTION &#8216;HU_INITIALIZE_PACKING&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it_internal_numbers = gt_venums<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_possible&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.</P><P class="sap1">&nbsp; CLEAR: gs_headers, gs_header_proposal.</P><P class="sap1"><FONT color="#fb2412">*** Neue Handling Unit erzeugen: Vorbereitung<BR></FONT>&nbsp; gs_header_proposal-exidv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;$1&#8217;.<BR>&nbsp; gs_header_proposal-hu_status_init = &#8216;A&#8217;.<BR><FONT color="#fb2412">*** HU soll aus diesem Packmittel sein: KARTON</FONT><BR>&nbsp; gs_header_proposal-vhilm&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;KARTON&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** HU erzeugen</FONT><BR>&nbsp; CALL FUNCTION &#8216;HU_CREATE_ONE_HU&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if_create_hu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216; &#8216;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; is_header_proposal = gs_header_proposal<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; es_header&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gs_headers<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; input_missing&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_possible&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; header_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; item_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; serial_nr_error&nbsp;&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fatal_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 7.<BR>&nbsp; IF sy-subrc &lt;&gt; 0.<BR><FONT color="#fb2412">*** Fehler beim Erzeugen der neuen HU</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Fehler Create:&#8217;, sy-subrc.<BR>&nbsp;&nbsp;&nbsp; STOP.<BR>&nbsp; ELSE.<BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;HU Created:&#8217;,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / &#8216;- VENUM:&#8217;, gs_headers-venum,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / &#8216;- EXIDV:&#8217;, gs_headers-exidv.<BR>&nbsp; ENDIF.</P><P class="sap1"><BR>&nbsp; LOOP AT gt_venums INTO gv_venum.<BR><FONT color="#fb2412">*** Vorhandene HU soll eingepackt werden&#8230;</FONT><BR>&nbsp;&nbsp;&nbsp; gs_hu-venum = gs_headers-venum.<BR><FONT color="#fb2412">*** &#8230; in die neu erzeugte HU:</FONT><BR>&nbsp;&nbsp;&nbsp; CLEAR gs_item_proposal.<BR>&nbsp;&nbsp;&nbsp; gs_item_proposal-velin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;3&#8217;.<BR>&nbsp;&nbsp;&nbsp; gs_item_proposal-sub_hu_venum = gv_venum.</P><P class="sap1"><FONT color="#fb2412">*** Neue Position als HU eintragen</FONT><BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;HU_CREATE_ITEM&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; is_handling_unit = gs_hu<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; is_item_proposal = gs_item_proposal<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_possible&nbsp;&nbsp;&nbsp;&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc &gt; 0.<BR><FONT color="#fb2412">*** Fehlerprotokoll</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Fehler HU_CREATE_ITEM&#8217;, sy-subrc.<BR>&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*** Protokoll</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Create Item&#8217;, gv_venum, sy-subrc.<BR><FONT color="#fb2412">*** Verbuchen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;HU_POST&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if_synchron = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if_commit&nbsp;&nbsp; = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">&nbsp; ENDLOOP.</P></p>
+<p>Der Beitrag <a href="/blog/verpacken-einer-handling-unit/">Verpacken einer Handling Unit</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Auspacken von HU&#8217;s</title>
+		<link>/blog/auspacken-von-hus/</link>
+					<comments>/blog/auspacken-von-hus/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 29 Aug 2006 21:30:33 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Eigene Programme]]></category>
+		<category><![CDATA[HU]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=376</guid>
+
+					<description><![CDATA[<p>In diesem Beispielprogramm wird das Auspacken von HU's demonstriert.</p>
+<p>Der Beitrag <a href="/blog/auspacken-von-hus/">Auspacken von HU&#8217;s</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem Beispielprogramm wird das Auspacken von HU&#8217;s demonstriert.<br /><P>Im folgenden Coding wird eine Position aus einer Handling Unit ausgepackt. Die auszupackenden HU&#8217;s m&uuml;ssen vorher gesperrt sein. Das geschieht mit dem Baustein HU_GET_HUS. </P><P>Danach werden die Position und die Menge&nbsp;bestimmt, die ausgepackt werden soll. Wenn aus einer geschachtelten HU eine andere HU ausgepackt werden soll, so muss VELIN&nbsp;= 3 sein und es darf keine Menge &uuml;bergeben werden.</P><P class="head1">Coding</P><P class="sap1">REPORT zsdhu_unpack_demo.</P><P class="sap1"><FONT color="#fb2412">*** Variablen</FONT><BR>DATA:<BR>&nbsp; gt_items&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE hum_hu_item_t,<BR>&nbsp; gs_item&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE vepovb,<BR>&nbsp; gt_venums&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE hum_venum_t,<BR>&nbsp; gv_venum&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE venum,<BR>&nbsp; gs_unpack_isfrom&nbsp; TYPE huitem_from,<BR>&nbsp; gs_unpack_item&nbsp;&nbsp;&nbsp; TYPE huitem_unpack.</P><P class="sap1"><FONT color="#fb2412">*** Interne Identifikation HU</FONT><BR>PARAMETERS: p_venum TYPE venum DEFAULT &#8216;6658&#8217;.</P><P class="sap1">START-OF-SELECTION.<BR><FONT color="#fb2412">*** HU-Nummer</FONT><BR>&nbsp; APPEND p_venum TO gt_venums.<BR><FONT color="#fb2412">*** HU muss vor dem Auspacken gelesen werden</FONT><BR>&nbsp; CALL FUNCTION &#8216;HU_GET_HUS&#8217;<BR>&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if_lock_hus = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it_venum&nbsp;&nbsp;&nbsp; = gt_venums<BR>&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; et_items&nbsp;&nbsp;&nbsp; = gt_items<BR>&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hus_locked&nbsp; = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no_hu_found = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fatal_error = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 4.<BR>&nbsp; IF sy-subrc &lt;&gt; 0.<BR><FONT color="#fb2412">*** Fehler-Protokoll</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Fehler lesen:&#8217;, sy-subrc.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** Protokoll: HU wurde gelesen</FONT><BR>&nbsp;&nbsp;&nbsp; WRITE: / &#8216;HU gelesen&#8217;.<BR><FONT color="#fb2412">*** Init</FONT><BR>&nbsp;&nbsp;&nbsp; CLEAR gs_unpack_item.<BR><FONT color="#fb2412">*** Auszupackende HU-Nummer</FONT><BR>&nbsp;&nbsp;&nbsp; gs_unpack_isfrom-venum = p_venum.<BR><FONT color="#fb2412">*** In der HU befindet sich eine Position:<BR>*** Diese soll ausgepackt werden<BR></FONT>&nbsp;&nbsp;&nbsp; READ TABLE gt_items INTO gs_item WITH KEY velin = &#8216;1&#8217;.<BR><FONT color="#fb2412">*** Typ der Packposition: 1 = Material</FONT><BR>&nbsp;&nbsp;&nbsp; gs_unpack_item-velin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gs_item-velin.<BR><FONT color="#fb2412">*** Positionsnummer des Materials<BR></FONT>&nbsp;&nbsp;&nbsp; gs_unpack_item-item_number&nbsp; = gs_item-vepos.<BR><FONT color="#fb2412">*** Auszupackende Menge + Einheit</FONT><BR>&nbsp;&nbsp;&nbsp; gs_unpack_item-quantity&nbsp;&nbsp;&nbsp;&nbsp; = gs_item-vemng.<BR>&nbsp;&nbsp;&nbsp; gs_unpack_item-meins&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gs_item-vemeh.<BR><FONT color="#fb2412">*** HU auspacken&#8230;</FONT><BR>&nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;HU_UNPACK&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; is_from&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gs_unpack_isfrom<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; is_item&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = gs_unpack_item<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; input_missing = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; input_error&nbsp;&nbsp; = 2<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_possible&nbsp; = 3<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not_packed&nbsp;&nbsp;&nbsp; = 4<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fatal_error&nbsp;&nbsp; = 5<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 6.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR><FONT color="#fb2412">*** Fehlerprotokoll<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / &#8216;Fehler auspacken:&#8217;, sy-subrc.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; STOP.<BR>&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">*** Protokoll: HU wurde ausgepackt</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WRITE: / &#8216;HU ausgepackt.&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Sichern der Daten<BR></FONT>&nbsp; &nbsp;&nbsp;&nbsp; CALL FUNCTION &#8216;HU_POST&#8217;<BR>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if_synchron&nbsp;&nbsp;&nbsp; = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; if_commit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = &#8216;X&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if_no_messages = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp; ENDIF.</P></p>
+<p>Der Beitrag <a href="/blog/auspacken-von-hus/">Auspacken von HU&#8217;s</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/auspacken-von-hus/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

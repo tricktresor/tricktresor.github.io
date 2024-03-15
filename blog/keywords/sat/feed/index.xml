@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>sat Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/sat/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:55 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>sat Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Log-Points zur Performancemessung</title>
+		<link>/blog/log-points-zur-performancemessung/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 19 Aug 2015 07:42:50 +0000</pubDate>
+				<category><![CDATA[Performance]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[sat]]></category>
+		<category><![CDATA[saab]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=204178</guid>
+
+					<description><![CDATA[<p>Performance ist früher oder später immer ein Thema. Es gibt zahlreiche Tools, die zur Performanceanalyse herangezogen werden können. Doch nicht immer sind diese hilfreich. So kann es notwendig sein, die Performance einzelner Programmabschnitte genauer und gezielt zu protokollieren. Ich zeige euch eine Möglichkeit, dies zu tun. Der Clou dabei: Ich benutze die Log-Points.</p>
+<p>Der Beitrag <a href="/blog/log-points-zur-performancemessung/">Log-Points zur Performancemessung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Performance ist ein komplexes Thema. Häufig ist es schwer überhaupt einen Ansatzpunkt zu finden, wo man mit der Performanceoptimierung beginnen soll. Ich habe ein einfaces Testprogramm geschrieben, um das Problem zu verdeutlichen. Es berechnet in einer Schleife ein Ergebnis mit unterschiedlichen Rechenoperationen.</p>
+<p>[notice type=&#8217;info&#8217;]Der folgende Tipp zeigt in erster Linie, wie man die Log-Points zur Protokollierung einsetzen kann. eine zuverlässige Laufzeitanalyse ist so nicht unbedingt möglich.</p>
+<p>Die Transaktion SAT bietet die Möglichkeit, eine definierte Laufzeitmessung durchzuführen. Mittels SET RUN TIME ANALYZER ON/ OFF können explizit Blöcke für die Messung definiert werden. In der Variante kannst du definieren, dass nur diese Blöcke analysiert werden sollen. Zudem kann die <em>Aggregation</em> ausgestellt werden.[/notice]</p>
+<h2>Testprogramm</h2>
+<p>Zuerst wird die Tabellen mit Testdaten gefüllt (TESTDATA). Diese Tabelle wird per LOOP durchlaufen und die Berechnung durchgeführt (CALCULATE). Bei Bedarf kann das Ergebnis ausgegeben werden (OUTPUT).</p>
+<pre class="">REPORT zzenno38.
+CLASS lcl_test DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS: main,
+                output.
+
+ PROTECTED SECTION.
+ TYPES: BEGIN OF ty_data,
+          type TYPE c LENGTH 1,
+          count TYPE i,
+          result TYPE f,
+          p1 TYPE f,
+          p2 TYPE f,
+        END OF ty_data.
+
+ CLASS-DATA gt_data TYPE STANDARD TABLE OF ty_data.
+
+ CLASS-METHODS:
+       testdata,
+       calculate IMPORTING type TYPE char1
+                           count TYPE i
+                           p1 TYPE f
+                           p2 TYPE f
+                 RETURNING VALUE(result) TYPE f .
+
+ENDCLASS.
+
+CLASS lcl_test IMPLEMENTATION.
+ METHOD testdata.
+ FIELD-SYMBOLS &lt;data&gt; TYPE ty_data.
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'A'.
+ &lt;data&gt;-count = 1000.
+ &lt;data&gt;-p1 = 123.
+ &lt;data&gt;-p2 = 456.
+
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'A'.
+ &lt;data&gt;-count = 10000.
+ &lt;data&gt;-p1 = 123.
+ &lt;data&gt;-p2 = 456.
+
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'A'.
+ &lt;data&gt;-count = 10000.
+ &lt;data&gt;-p1 = 123456.
+ &lt;data&gt;-p2 = 4567890.
+
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'B'.
+ &lt;data&gt;-count = 100000.
+ &lt;data&gt;-p1 = 123.
+ &lt;data&gt;-p2 = 456.
+
+ APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+ &lt;data&gt;-type = 'C'.
+ &lt;data&gt;-count = 10000.
+ &lt;data&gt;-p1 = 1234567.
+ &lt;data&gt;-p2 = 4.
+
+ ENDMETHOD.
+
+ METHOD main.
+   FIELD-SYMBOLS &lt;data&gt; TYPE ty_data.
+
+   testdata( ).
+
+   LOOP AT gt_data ASSIGNING &lt;data&gt;.
+     &lt;data&gt;-result = calculate( type = &lt;data&gt;-type
+                               count = &lt;data&gt;-count
+                                  p1 = &lt;data&gt;-p1
+                                  p2 = &lt;data&gt;-p2 ).
+   ENDLOOP.
+ ENDMETHOD.
+
+ METHOD output.
+   DATA lr_grid TYPE REF TO cl_salv_table.
+   cl_salv_table=&gt;factory( IMPORTING r_salv_table = lr_grid
+                           CHANGING t_table = gt_data ).
+   lr_grid-&gt;display( ).
+ ENDMETHOD.
+
+ METHOD calculate.
+
+   DO count TIMES.
+     CASE type.
+       WHEN 'A'.
+         result = p1 * p2.
+       WHEN 'B'.
+         result = p1 / p2.
+       WHEN 'C'.
+         result = p1 ** p2.
+     ENDCASE.
+ ENDDO.
+
+ ENDMETHOD.
+
+ENDCLASS.
+
+PARAMETERS p_output AS CHECKBOX DEFAULT space.
+
+START-OF-SELECTION.
+
+ lcl_test=&gt;main( ).
+ IF p_output = abap_true.
+   lcl_test=&gt;output( ).
+ ENDIF.</pre>
+<h2>Auswertung</h2>
+<p>In der Transaktion SAT erhält man leider zu wenig aussagekräftige Informationen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-14-26.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-medium wp-image-204179" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-14-26-300x170.jpg" alt="2015-08-19_01-14-26" width="300" height="170" srcset="/wp-content/uploads/2015/08/2015-08-19_01-14-26-300x170.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_01-14-26-1024x580.jpg 1024w, /wp-content/uploads/2015/08/2015-08-19_01-14-26.jpg 1349w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-14-44.jpg"><img decoding="async" class="alignnone wp-image-204180 size-medium" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-14-44-300x64.jpg" alt="2015-08-19_01-14-44" width="300" height="64" srcset="/wp-content/uploads/2015/08/2015-08-19_01-14-44-300x64.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_01-14-44.jpg 967w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Wir brauchen also eine andere Möglichkeit, um die Performance weiter zu analysieren.</p>
+<h2>Eigene Performanceprotokollierung</h2>
+<p>Die Protokollierung der Performance ist mit GET RUN TIME möglich. Der Befehl muss jedoch zu Beginn des Tests aufgerufen werden und zum Ende der Messung. Die Zeitendifferenz &#8211; also die Laufzeit &#8211; muss noch berechnet werden. Das ist umständlich, wenn man mehrere Routinen protokollieren möchte.</p>
+<p>Es liegt also nah, diese Funktion auszulagern:</p>
+<pre>CLASS lcl_performance DEFINITION.
+ PUBLIC SECTION.
+ CLASS-METHODS:
+   start IMPORTING id TYPE any,
+   stopp IMPORTING id TYPE any.
+ PROTECTED SECTION.
+   TYPES: BEGIN OF ty_id_table,
+            id TYPE string,
+            count TYPE i,
+            runtime TYPE i,
+          END OF ty_id_table.
+  CLASS-DATA gt_id_table TYPE STANDARD TABLE OF ty_id_table.
+ENDCLASS.
+
+CLASS lcl_performance IMPLEMENTATION.
+  METHOD start.
+    FIELD-SYMBOLS &lt;id_table&gt; TYPE ty_id_table.
+    READ TABLE gt_id_table ASSIGNING &lt;id_table&gt; WITH KEY id = id.
+    IF sy-subrc &gt; 0.
+      APPEND INITIAL LINE TO gt_id_table ASSIGNING &lt;id_table&gt;.
+      &lt;id_table&gt;-id = id.
+    ENDIF.
+    ADD 1 TO &lt;id_table&gt;-count.
+    GET RUN TIME FIELD &lt;id_table&gt;-runtime.
+  ENDMETHOD.
+METHOD stopp.
+FIELD-SYMBOLS &lt;id_table&gt; TYPE ty_id_table.
+DATA lv_runtime TYPE i.
+DATA lv_subkey TYPE c LENGTH 200.
+READ TABLE gt_id_table ASSIGNING &lt;id_table&gt; WITH KEY id = id.
+CHECK sy-subrc = 0.
+GET RUN TIME FIELD lv_runtime.
+&lt;id_table&gt;-runtime = lv_runtime - &lt;id_table&gt;-runtime.
+lv_subkey = |{ id }, Run { &lt;id_table&gt;-count }: { &lt;id_table&gt;-runtime NUMBER = USER }ms|.
+LOG-POINT ID z_performance SUBKEY lv_subkey FIELDS &lt;id_table&gt;-runtime.
+ENDMETHOD.
+ENDCLASS.</pre>
+<h2>Aufruf der Protokollierung</h2>
+<p>Wir müssen die Methoden unserer Protokollklasse nun nur noch einbinden:</p>
+<pre>METHOD main.
+  FIELD-SYMBOLS &lt;data&gt; TYPE ty_data.
+  testdata( ).
+  LOOP AT gt_data ASSIGNING &lt;data&gt;.
+    lcl_performance=&gt;start( &lt;data&gt;-type ).
+    &lt;data&gt;-result = calculate( type = &lt;data&gt;-type
+                              count = &lt;data&gt;-count
+                                 p1 = &lt;data&gt;-p1
+                                 p2 = &lt;data&gt;-p2 ).
+    lcl_performance=&gt;stopp( &lt;data&gt;-type ).
+  ENDLOOP.
+ENDMETHOD.</pre>
+<h2>Log-Points</h2>
+<p>In dem Coding zur Performanceprotokollierung benutze ich bereits eines Log-Point. Diesen kannst du mit der Transaktion SAAB anlegen. Log-Points haben den Vorteil, dass man diese in jedem System bei Bedarf aktivieren kann. Du benötigst also keine separate Tabelle, um einstellen zu können, was wann protokolliert werden muss, sondern kannst du Standardfunktionalität nutzen.</p>
+<p>Mit der Transaktion SAAB musst du den Log-Point auch einschalten. Du kannst wählen, für welchen Zeitraum die Protokollierung aktiv sein soll:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_00-46-371.jpg"><img decoding="async" class="alignnone size-medium wp-image-204252" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_00-46-371-300x128.jpg" alt="2015-08-19_00-46-37" width="300" height="128" srcset="/wp-content/uploads/2015/08/2015-08-19_00-46-371-300x128.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_00-46-371.jpg 524w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Normalerweise würde man den Log-Point in dieser Form verwenden:</p>
+<pre>LOG-POINT ID z_performance SUBKEY id FIELDS &lt;id_table&gt;-runtime.</pre>
+<p>Diese Protokollierung ist jedoch sehr umständlich auszuwerten: Man sieht erstens nur den letzten Aufruf des Log-Points und zweitens muss man die Hierarchie aufklappen.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-50-34.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-204181" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_01-50-34-300x164.jpg" alt="2015-08-19_01-50-34" width="300" height="164" srcset="/wp-content/uploads/2015/08/2015-08-19_01-50-34-300x164.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_01-50-34-1024x559.jpg 1024w, /wp-content/uploads/2015/08/2015-08-19_01-50-34.jpg 1208w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<p>Aber ich wollte die Auswertung ja einfacher machen. Also machen wir uns den Umstand zunutze, dass die Log-Point-ID bis zu 200 Zeichen lang sein darf und basteln uns für jeden Aufruf eine eigene ID. Das Ergebnis ist viel aussagekräftiger:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_00-50-19.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-204247" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_00-50-19-300x254.jpg" alt="2015-08-19_00-50-19" width="300" height="254" srcset="/wp-content/uploads/2015/08/2015-08-19_00-50-19-300x254.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_00-50-19.jpg 375w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Variante</h2>
+<p>Es ist auch möglich, einem Log-Point eine interne Tabelle zu übergeben! Da jeweils nur der letzte Log-Point gesichert wird, können wir uns diesen Umstand ebenfalls gut zunutze machen:</p>
+<p>Wir rufen den Log-Point einfach mit einem festen Wert auf und übergeben bei FIELDS die interne Tabelle:</p>
+<pre>LOG-POINT ID z_performance SUBKEY 'Default' FIELDS gt_id_table.</pre>
+<p>Das Ergebnis sieht folgendermaßen aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_02-01-472.jpg"><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-204250" src="https://tricktresor.com/wp-content/uploads/2015/08/2015-08-19_02-01-472-300x228.jpg" alt="2015-08-19_02-01-47" width="300" height="228" srcset="/wp-content/uploads/2015/08/2015-08-19_02-01-472-300x228.jpg 300w, /wp-content/uploads/2015/08/2015-08-19_02-01-472.jpg 984w" sizes="(max-width: 300px) 100vw, 300px" /></a></p>
+<h2>Erweiterungsmöglichkeiten</h2>
+<p>Die Protokollierung ist natürlich auch noch sehr begrenzt. Du kannst die Methoden jedoch um Parameter erweitern, so dass bei jedem Aufruf zusätzliche Informationen übergeben werden können. Auch könnte die Protokollklasse sich selbst je Log-Id instanziieren, so dass je Log-Id nur die eigenen Aufrufe an den Log-Point übergeben werden. So würde die Messung von mehreren Abschnitten wahrscheinlich übersichtlicher werden.</p>
+<h2>Doku</h2>
+<p>Für die genauen Möglichkeiten der Log-Points solltest du dir die Hilfe durchlesen: <a href="http://help.sap.com/abapdocu_702/de/abaplog-point.htm">LOG-POINT.</a></p>
+<p>Der Beitrag <a href="/blog/log-points-zur-performancemessung/">Log-Points zur Performancemessung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

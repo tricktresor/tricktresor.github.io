@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>cl_abap_elemdescr Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cl_abap_elemdescr/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:25:04 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>cl_abap_elemdescr Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Interne Tabelle mit COMPONENTS</title>
+		<link>/blog/interne-tabelle-mit-components/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2012 15:03:25 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[create data]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[cl_abap_tabledescr]]></category>
+		<category><![CDATA[cl_abap_structdescr]]></category>
+		<category><![CDATA[cl_abap_elemdescr]]></category>
+		<category><![CDATA[abap]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=657</guid>
+
+					<description><![CDATA[<p>Hier wird eine interne Tabelle anhand von einer beliebigen Anzahl Feldern generiert.</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-mit-components/">Interne Tabelle mit COMPONENTS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier wird eine interne Tabelle anhand von einer beliebigen Anzahl Feldern generiert.</p>
+<p>Die Tabelle, aus der die Daten gelesen werden sollen, muss angegeben werden. Dann müssen die Felder EINZELN in der Select-Option eingetragen werden. Die Feldnamen müssen mit dem Namen des Datenelements übereinstimmen.</p>
+<p>Eine schönere Version wäre die Komponenten der angegebenen Tabelle zu ermitteln (CL_ABAP_STRUCTDESCR-&gt;GET_COMPONENTS).</p>
+<p><strong><span style="text-decoration: underline;">Achtung:</span><br />
+</strong>Es erfolgt keine Prüfung ob die Felder in der Tabelle vorhanden sind! Wenn Feldnamen angegeben werden, die nicht in der angegebenen Tabelle existieren, kommt es zu einem Dump!</p>
+<p>Es erfolgt keine Ausgabe der Daten!</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true  ">*== Create internal table dynamically by given fields
+ DATA: gr_element   TYPE REF TO cl_abap_elemdescr,
+ gr_struc     TYPE REF TO cl_abap_structdescr,
+ gr_table     TYPE REF TO cl_abap_tabledescr,
+ gt_comp      TYPE cl_abap_structdescr=&gt;component_table,
+ gs_comp      LIKE LINE OF lt_comp,
+ gr_data      TYPE REF TO data,
+ gt_fields    TYPE STANDARD TABLE OF string,
+ hf_fieldname TYPE fieldname.
+
+FIELD-SYMBOLS &lt;table&gt; TYPE ANY TABLE.
+
+*== selection screen
+ PARAMETERS p_table TYPE tabname DEFAULT 'MARA'.
+ SELECT-OPTIONS s_fields FOR hf_fieldname.
+ 
+
+START-OF-SELECTION.
+
+  LOOP AT s_fields.
+ CLEAR: gs_comp.
+
+*== Element Description for field
+ gr_element ?= cl_abap_elemdescr=&gt;describe_by_name( s_fields-low ).
+ *== Field name
+ gs_comp-name = s_fields-low.
+ *== Field type (element)
+ gs_comp-type = gr_element.
+ *== add element to components table
+ APPEND gs_comp TO gt_comp.
+
+*== add column to selection table
+ APPEND s_fields-low TO gt_fields.
+
+  ENDLOOP.
+
+*== Create structure/ work area
+ gr_struc = cl_abap_structdescr=&gt;create( gt_comp ).
+
+*== create table by structure reference
+ gr_table = cl_abap_tabledescr=&gt;create(
+ p_line_type  = gr_struc
+ p_table_kind = cl_abap_tabledescr=&gt;tablekind_std
+ p_unique     = abap_false ).
+
+*== create data handle for table
+ CREATE DATA gr_data TYPE HANDLE gr_table.
+
+*== assign data to table-pointer
+ ASSIGN gr_data-&gt;* TO &lt;table&gt;.
+
+*== Select data into dynamic internal table
+ SELECT (gt_fields) FROM  (p_table)
+ INTO CORRESPONDING FIELDS OF TABLE &lt;table&gt;
+ UP TO 10 ROWS.</pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-mit-components/">Interne Tabelle mit COMPONENTS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

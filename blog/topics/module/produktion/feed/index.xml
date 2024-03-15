@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Produktion Archive - Tricktresor</title>
+	<atom:link href="/blog/topics/module/produktion/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:47 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Produktion Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Fertigungsauftrag rückmelden</title>
+		<link>/blog/fertigungsauftrag-rueckmelden/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 01 Apr 2017 01:30:54 +0000</pubDate>
+				<category><![CDATA[Produktion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017978</guid>
+
+					<description><![CDATA[<p>Ein kurzes und knappes Code-Beispiel um eine Rückmeldung zu einem Fertigungsauftrag mit Hilfe des Bausteins BAPI_PRODORDCONF_CREATE_TT zu erfassen. Die Rückmeldedaten werden erfasst und dann dem Baustein übergeben.</p>
+<p>Der Beitrag <a href="/blog/fertigungsauftrag-rueckmelden/">Fertigungsauftrag rückmelden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein kurzes und knappes Code-Beispiel um eine Rückmeldung zu einem Fertigungsauftrag mit Hilfe des Bausteins BAPI_PRODORDCONF_CREATE_TT zu erfassen. Die Rückmeldedaten werden erfasst und dann dem Baustein übergeben.</p>
+<p>Um das ganze etwas interessanter zu machen, verwende ich die neuen ABAP-740 Sprachfeatures VALUE und SWITCH&#8230;</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-01_03-30-09.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-1017981 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-01_03-30-09.jpg" alt="" width="587" height="410" srcset="/wp-content/uploads/2017/04/2017-04-01_03-30-09.jpg 587w, /wp-content/uploads/2017/04/2017-04-01_03-30-09-300x210.jpg 300w, /wp-content/uploads/2017/04/2017-04-01_03-30-09-200x140.jpg 200w" sizes="(max-width: 587px) 100vw, 587px" /></a></p>
+<h2>Time Ticket füllen</h2>
+<pre class=""> append value #(
+   "Rückmeldedaten füllen
+    orderid        = aufnr
+    operation      = vornr
+    work_cntr      = arbpl
+    plant          = werks
+    postg_date     = sy-datum
+    conf_text      = |Rückmeldung Hugo|
+    yield          = gutmenge
+    conf_quan_unit = 'ST'
+    recordtype     = COND #( WHEN gutmenge &gt;= gesamtmenge THEN 'L40' ELSE 'L20' )
+  ) TO tickets.</pre>
+<h2>Rückmeldung buchen</h2>
+<pre class=""> DATA return     TYPE bapiret1.
+ DATA return_det TYPE STANDARD TABLE OF bapi_coru_return.
+ DATA return_det TYPE bapi_coru_return.
+
+ "Rückmeldung buchen
+ CALL FUNCTION 'BAPI_PRODORDCONF_CREATE_TT'
+   EXPORTING
+     post_wrong_entries = '0'
+     testrun       = abap_false
+   IMPORTING
+     return        = return
+   TABLES
+     timetickets   = tickets
+     detail_return = return_det.
+</pre>
+<p>Wie bei allen BAPIs muss die Buchung durch ein BAPI_TRANSACTION_COMMIT bestätigt werden</p>
+<p>Der Beitrag <a href="/blog/fertigungsauftrag-rueckmelden/">Fertigungsauftrag rückmelden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Vorgang im Fertigungsauftrag anlegen</title>
+		<link>/blog/vorgang-im-fertigungsauftrag-anlegen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Sat, 01 Apr 2017 00:27:00 +0000</pubDate>
+				<category><![CDATA[Produktion]]></category>
+		<category><![CDATA[Vorgang]]></category>
+		<category><![CDATA[Fertigungsauftrag]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017973</guid>
+
+					<description><![CDATA[<p>BAPIs sollten eigentlich programmtechnisch das möglich machen, was auch im Dialog möglich ist. Leider gibt es sehr viele Unterschiede zwischen BAPI und entsprechender Dialog-Transaktion.</p>
+<p>Im Produktionsumfeld ist es so, dass ein Fertigungsauftrag gar nicht komplett mit Hilfe von BAPIs angelegt werden kann. Die Anlage bzw. Änderung muss in mehrere Schritten erfolgen. Normalerweise reicht es dem BAPI_PRODORD_CREATE unter Angabe einer Materialnummer und eines Werkes um einen Fertigungsauftrag anzulegen.</p>
+<p>Der Beitrag <a href="/blog/vorgang-im-fertigungsauftrag-anlegen/">Vorgang im Fertigungsauftrag anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>BAPIs sollten eigentlich programmtechnisch das möglich machen, was auch im Dialog möglich ist. Leider gibt es sehr viele Unterschiede zwischen BAPI und entsprechender Dialog-Transaktion.</p>
+<p>Im Produktionsumfeld ist es so, dass ein Fertigungsauftrag gar nicht komplett mit Hilfe von BAPIs angelegt werden kann. Die Anlage bzw. Änderung muss in mehrere Schritten erfolgen. Normalerweise reicht es dem BAPI_PRODORD_CREATE unter Angabe einer Materialnummer und eines Werkes um einen Fertigungsauftrag anzulegen.</p>
+<p>Aber natürlich gibt es immer Umstände, die eine gezielte Anlage oder Manipulation des Fertigungsauftrags notwendig machen. In diesem Beispiel zeige ich die Anlage eines Vorgangs. Hierfür gibt es leider keinen BAPI und ich verwende den Baustein CO_SE_PRODORD_CHANGE, da dieser problemlos separat aufzurufen war. Es gibt noch den Baustein CO_XT_OPERATION_CHANGE, der jedoch Vorbereitungen mit anderen CO_XT-Bausteinen benötigt.</p>
+<h2>Code</h2>
+<pre class="">"Lokale Daten
+ DATA lv_aufnr TYPE aufnr.
+ DATA ls_return TYPE bapiret2.
+ DATA lt_operations TYPE cose_t_operation.
+ DATA ls_operation TYPE cose_s_operation.
+ DATA ls_header TYPE cose_s_header.
+
+"Vorgangsdaten
+ ls_operation-standard_value_01 = data-vgw01.
+ ls_operation-standard_value_01_unit = data-vge01.
+ ls_operation-standard_value_02 = data-vgw02.
+ ls_operation-standard_value_02_unit = data-vge02.
+ ls_operation-short_text = data-vorgangstext.
+
+ ls_operation-sequence = space.
+ ls_operation-operation = data-vornr.
+ ls_operation-work_center = data-arbpl.
+ ls_operation-control_key = data-steus. 
+ ls_operation-earliest_end_exec_date = data-endtermin.
+ ls_operation-earliest_end_exec_time = '210000'.
+ ls_operation-base_quantity = data-menge.
+ ls_operation-dispatch_indicator = abap_false.
+ ls_operation-user_field_02_character = data-xyz.
+
+ ls_operation-standard_value_01_x = abap_true.
+ ls_operation-standard_value_01_unit_x = abap_true.
+ ls_operation-standard_value_02_x = abap_true.
+ ls_operation-standard_value_02_unit_x = abap_true.
+ ls_operation-work_center_x = abap_true.
+ ls_operation-earliest_end_exec_date_x = abap_true.
+ ls_operation-earliest_end_exec_time_x = abap_true.
+ ls_operation-short_text_x = abap_true.
+ ls_operation-base_quantity_x = abap_true.
+ ls_operation-user_field_02_character_x = abap_true.
+ APPEND ls_operation TO lt_operations.
+
+ SET UPDATE TASK LOCAL.
+
+"Anlage/ Änderung des Vorgangs
+ CALL FUNCTION 'CO_SE_PRODORD_CHANGE'
+   EXPORTING
+     iv_order_number = lv_aufnr
+     is_header = ls_header
+     it_operation = lt_operations
+     iv_commit = abap_true
+   IMPORTING
+     es_return = ls_return.
+     export_werks_to_memory( space ).
+
+ IF ls_return IS INITIAL.
+   COMMIT WORK.
+ ELSE.
+   RAISE EXCEPTION TYPE zcx_order.
+ ENDIF.</pre>
+<h2>Keine Werksänderung möglich</h2>
+<p>Leider hat der verwendete Baustein eine Einschränkung, die es im Dialog nicht gibt: Es kann kein abweichendes Werk im Vorgang übergeben werden. Dies war jedoch zwingend notwendig. Ich wusste dann keine andere Möglichkeit, als an geeigneter Stelle eine Erweiterungsimplementierung zu erstellen, die das vom Baustein gefundene Default-Werk überschreibt.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-01_02-25-13.jpg"><img decoding="async" class="size-full wp-image-1017975 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-01_02-25-13.jpg" alt="" width="593" height="573" srcset="/wp-content/uploads/2017/04/2017-04-01_02-25-13.jpg 593w, /wp-content/uploads/2017/04/2017-04-01_02-25-13-300x290.jpg 300w" sizes="(max-width: 593px) 100vw, 593px" /></a></p>
+<p>Die Erweiterung habe ich im Programm LCO_SEF03 am Ende der FORM-Routine <strong>opr_set_default_values</strong> gesetzt. Vor Aufruf des Bausteins CO_SE_PROORD_CHANGE exportiere ich das zu verwendende Werk über EXPORT TO MEMORY in den SAP-Speicher. Die Erweiterungsimplementierung überschreibt das Feld gs_afvgd-werks  mittels IMPORT FROM MEMORY (sofern vorhanden). Hiermit ist nur die Anlage oder Änderung <strong>eines</strong> Vorgangs möglich. Für das Ändern mehrerer Vorgänge muss die Logik entsprechend angepasst werden und man muss in der Erweiterung prüfen, welcher Vorgang gerade bearbeitet wird.</p>
+<p>Der Beitrag <a href="/blog/vorgang-im-fertigungsauftrag-anlegen/">Vorgang im Fertigungsauftrag anlegen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Komponenten einem Fertigungsauftrag hinzufügen</title>
+		<link>/blog/komponenten-einem-fertigungsauftrag-hinzufuegen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 31 Mar 2017 23:42:35 +0000</pubDate>
+				<category><![CDATA[Produktion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Komponente]]></category>
+		<category><![CDATA[Fertigungsauftrag]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1017963</guid>
+
+					<description><![CDATA[<p>Für den Fertigungsaufträge sind die BAPIs leider sehr rar gesät und man muss auf andere Bausteine ausweichen. Um einem Auftrag Komponenten hinzuzufügen, habe ich nur den Baustein CO_XT_COMPONENT_ADD gefunden. Die CO_XT-Funktionsbausteine sind zwar prinzipiell "extern" und in der Funktionsgruppe "APIs Fertigungsauftrag", jedoch sind die Bausteine allesamt sehr mit Vorsicht zu genießen.</p>
+<p>Der Beitrag <a href="/blog/komponenten-einem-fertigungsauftrag-hinzufuegen/">Komponenten einem Fertigungsauftrag hinzufügen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Für den Fertigungsaufträge sind die BAPIs leider sehr rar gesät und man muss auf andere Bausteine ausweichen. Um einem Auftrag Komponenten hinzuzufügen, habe ich nur den Baustein CO_XT_COMPONENT_ADD gefunden. Die CO_XT-Funktionsbausteine sind zwar prinzipiell &#8220;extern&#8221; und in der Funktionsgruppe &#8220;APIs Fertigungsauftrag&#8221;, jedoch sind die Bausteine allesamt sehr mit Vorsicht zu genießen.</p>
+<p>Das folgende Coding fügt einem Fertigungsauftrag eine Komponente (Materialnummer) hinzu.</p>
+<h2>Code</h2>
+<pre class="">"Lokale Daten
+DATA ls_return TYPE coxt_bapireturn.
+DATA lt_return TYPE coxt_t_bapireturn.
+DATA lv_error_occurred TYPE boolean.
+DATA ls_resbd_created TYPE resbd.
+DATA lt_resbt_exp TYPE STANDARD TABLE OF resbb.
+DATA lv_posnr TYPE positionno.
+
+DATA ls_quan TYPE coxt_s_quantity.
+DATA ls_stor_loc TYPE coxt_s_storage_location.
+DATA ls_stor_loc_x TYPE coxt_s_storage_locationx.
+
+ls_quan-quantity    = menge.
+ls_quan-uom         = meins.
+
+ls_stor_loc-werks   = werks.
+ls_stor_loc-lgort   = lgort.
+ls_stor_loc_x-werks = abap_true.
+ls_stor_loc_x-lgort = abap_true.
+
+"Komponente hinzufügen
+CALL FUNCTION 'CO_XT_COMPONENT_ADD'
+  EXPORTING
+    is_order_key         = aufnr
+    i_material           = matnr
+    is_requ_quan         = ls_quan
+    i_operation          = 1
+    is_storage_location  = ls_stor_loc
+    is_storage_locationx = ls_stor_loc_x
+    i_postp              = 'L' "Lagerposition
+    i_posno              = lv_posnr
+  IMPORTING
+    es_bapireturn        = ls_return
+    e_error_occurred     = lv_error_occurred
+    es_resbd_created     = ls_resbd_created
+  TABLES
+    resbt_exp            = lt_resbt_exp.
+
+IF lv_error_occurred = abap_false.
+*== PRE-Commit
+  CALL FUNCTION 'CO_XT_ORDER_PREPARE_COMMIT'
+    TABLES
+      et_bapireturn = lt_return.
+
+"Keine Fehler!
+  CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'.
+ELSE.
+"Fehlerbehandlung
+ENDIF.</pre>
+<h2>Fehlende Positionsnummer</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-01_01-41-27.jpg"><img decoding="async" class="size-full wp-image-1017967 alignnone" src="https://tricktresor.com/wp-content/uploads/2017/04/2017-04-01_01-41-27.jpg" alt="" width="455" height="140" srcset="/wp-content/uploads/2017/04/2017-04-01_01-41-27.jpg 455w, /wp-content/uploads/2017/04/2017-04-01_01-41-27-300x92.jpg 300w" sizes="(max-width: 455px) 100vw, 455px" /></a></p>
+<p>Der Baustein hat leider einen kleinen Schönheitsfehler: Die Positionsnummer (RSB-POSNR) wird leider nicht gesetzt und kann auch nicht ohne weiteres geändert werden. Um die Positionsnummer trotzdem ändern zu können, habe ich zwei Lösungen gefunden:</p>
+<ol>
+<li>Die Änderung der internen Tabelle RESB_BT  über einen Dirty-Assign</li>
+<li>Änderung über die Standardbausteine
+<ul>
+<li>CO_BT_RESB_READ_WITH_KEY</li>
+<li>CO_BT_RESB_GET_LAST_POSNR</li>
+<li>CO_BT_RESB_UPDATE</li>
+</ul>
+</li>
+</ol>
+<p>Die Änderung muss nach dem CO_XT_COMPONENT_ADD und vor dem Commit erfolgen.</p>
+<h3>Positionsnummer ändern über Dirty-Assign</h3>
+<pre class="">*--------------------------------------------------------------------*
+* set item number
+*--------------------------------------------------------------------*
+  TYPES: BEGIN OF ts_resb_bt.
+    INCLUDE TYPE resbb.
+    TYPES: indold LIKE sy-tabix,
+    no_req_upd LIKE sy-datar,
+  END OF ts_resb_bt.
+
+  TYPES tt_resb_bt TYPE TABLE OF ts_resb_bt.
+  FIELD-SYMBOLS &lt;lt_resb_bt&gt; TYPE tt_resb_bt.
+  FIELD-SYMBOLS &lt;ls_resb_bt&gt; TYPE ts_resb_bt.
+
+  ASSIGN ('(SAPLCOBC)RESB_BT[]') TO &lt;lt_resb_bt&gt;.
+  LOOP AT &lt;lt_resb_bt&gt; ASSIGNING &lt;ls_resb_bt&gt;.
+    IF &lt;ls_resb_bt&gt;-posnr IS INITIAL.
+      &lt;ls_resb_bt&gt;-posnr = CONV numc04( &lt;ls_resb_bt&gt;-rspos * 10 ).
+    ENDIF.
+  ENDLOOP.
+</pre>
+<h3>Änderung der Positionsnummer über Funktionsbausteine</h3>
+<pre class=""> DATA resbd_exp TYPE resbd.
+ DATA posnr_max TYPE tcn41-posnr_mat.
+ DATA index_exp TYPE sy-tabix.
+ DATA vbkz_exp  TYPE resbb-vbkz.
+ DATA nfgrp_exp TYPE resbd-nfgrp.
+ DATA posnr_exp TYPE resbd-posnr.
+
+ CALL FUNCTION 'CO_BT_RESB_READ_WITH_KEY'
+   EXPORTING
+     rsart_imp = ls_resbd-rsart
+     rsnum_imp = ls_resbd-rsnum
+     rspos_imp = ls_resbd-rspos
+   IMPORTING
+     index_exp = index_exp " Index interner Tabellen
+     posnr_exp = posnr_exp " Nummer der Stücklistenposition
+     resbd_exp = resbd_exp " Reservierung/Sekundärbedarf
+     nfgrp_exp = nfgrp_exp " Ein-/Auslaufdaten: Nachfolgegruppe
+     vbkz_exp  = vbkz_exp " Verbuchungskennzeichen
+   EXCEPTIONS
+     not_found = 1
+     OTHERS    = 2.
+
+ CALL FUNCTION 'CO_BT_RESB_GET_LAST_POSNR'
+   EXPORTING
+     aufpl     = aufpl
+     aplzl     = aplzl
+   IMPORTING
+     posnr_max = posnr_max. 
+
+ resbd_exp-posnr = posnr_max + 10.
+
+ CALL FUNCTION 'CO_BT_RESB_UPDATE'
+   EXPORTING
+     resb_new  = resbd_exp
+     tabix_old = index_exp.</pre>
+<h2>Dialog oder nicht Dialog?</h2>
+<p>Ein weiteres Problem könnte der Baustein CO_XT_ORDER_PREPARE_COMMIT machen, denn bei der Änderung des Fertigungsauftrags können Popups erscheinen, die vom Anwender bestätigt werden müssen.</p>
+<p>Wenn man Dialoge verhindern möchte, dann muss der Update-Baustein CO_ZV_ORDER_POST direkt aufgerufen werden. Dieser hat einen Parameter NO_DIALOG, den man entsprechend mit X besetzen kann.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/komponenten-einem-fertigungsauftrag-hinzufuegen/">Komponenten einem Fertigungsauftrag hinzufügen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

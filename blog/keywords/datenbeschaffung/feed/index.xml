@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Datenbeschaffung Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/datenbeschaffung/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 26 Mar 2019 13:13:16 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Datenbeschaffung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Daten einer Website per HTTP ermitteln</title>
+		<link>/blog/daten-einer-website/</link>
+					<comments>/blog/daten-einer-website/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Jul 2012 20:02:59 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Regex]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[cl_http_client]]></category>
+		<category><![CDATA[url]]></category>
+		<category><![CDATA[LINKS]]></category>
+		<category><![CDATA[ABAP eigene Programme]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=649</guid>
+
+					<description><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In diesem kleinen Demoprogramm zeigen wir, wie man sich die Daten einer Website beschafft. Aus den Daten werden alle Links extrahiert und angezeigt.</p>
+<p>Mithilfe der Klasse CL_HTTP_CLIENT besorgen wir uns den Quelltext einer Internetseite. Die URL muss dabei komplett angegeben werden, also inklusive http://</p>
+<h2 class="head1">Coding</h2>
+<p class="sap1">
+<pre class="lang:abap decode:true ">*:: Selection screen
+PARAMETERS p_url TYPE string LOWER CASE
+DEFAULT '/wp-content/index.php?aID=0'.
+
+START-OF-SELECTION.
+
+  PERFORM get_urls USING p_url.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  GET_URLS
+*&amp;---------------------------------------------------------------------*
+FORM get_urls  USING  iv_url TYPE clike.
+
+*:: local data
+  DATA lv_http_url     TYPE string.
+  DATA lr_http_client  TYPE REF TO if_http_client.
+  DATA lv_html_code    TYPE string.
+
+  DATA lt_urls         TYPE STANDARD TABLE OF string
+WITH NON-UNIQUE DEFAULT KEY.
+  DATA lt_new          LIKE lt_urls.
+  DATA lv_regex        TYPE string.
+
+  DATA lv_url          TYPE string.
+  DATA lv_dummy1       TYPE string.
+  DATA lv_dummy2       TYPE string.
+
+  STATICS lt_list      TYPE HASHED TABLE OF string
+WITH UNIQUE KEY table_line.
+
+*:: create url
+  CALL METHOD cl_http_client=&gt;create_by_url
+    EXPORTING
+      url                = iv_url
+    IMPORTING
+      client             = lr_http_client
+    EXCEPTIONS
+      argument_not_found = 1
+      plugin_not_active  = 2
+      internal_error     = 3
+      OTHERS             = 4.
+  IF sy-subrc &gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to create url, Sy-Subrc;', sy-subrc.
+    STOP.
+  ENDIF.
+
+*:: Send out request
+  lr_http_client-&gt;send( ).
+
+*:: Receive result as stream
+  CALL METHOD lr_http_client-&gt;receive
+    EXCEPTIONS
+      http_communication_failure = 1
+      http_invalid_state         = 2
+      http_processing_failed     = 3
+      OTHERS                     = 4.
+
+  IF sy-subrc &lt;&gt; 0.
+*:: error
+    WRITE: AT 40 'Unable to read data, Sy-Subrc;', sy-subrc.
+  ELSE.
+*:: Get sourcecode
+    lv_html_code = lr_http_client-&gt;response-&gt;get_cdata( ).
+    WRITE:/ iv_url COLOR 5.
+
+*:: simple method - Find urls
+    SPLIT lv_html_code AT 'href=' INTO TABLE lt_urls.
+    LOOP AT lt_urls INTO lv_url.
+      FORMAT COLOR OFF.
+      CHECK lv_url IS NOT INITIAL.
+      CHECK lv_url(1) = `"`
+      OR lv_url(1) = `'`.
+      FIND lv_url(1) IN lv_url+1 MATCH OFFSET sy-fdpos.
+      CHECK sy-subrc = 0.
+      lv_url = lv_url+1(sy-fdpos).
+
+      IF lv_url IS INITIAL.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '#'.
+        CONCATENATE iv_url lv_url INTO lv_url.
+
+      ELSEIF lv_url(1) = '/'.  "Root
+        FORMAT COLOR COL_GROUP.
+
+      ELSEIF lv_url(1) = '?'.
+        SPLIT iv_url AT '?' INTO lv_dummy1 lv_dummy2.
+        IF sy-subrc = 0.
+          CONCATENATE lv_dummy1 lv_url INTO lv_url.
+        ELSE.
+        ENDIF.
+      ELSEIF lv_url(5) = 'https' OR lv_url(5) = 'HTTPS'.
+        FORMAT COLOR COL_POSITIVE.
+      ELSEIF lv_url(4) = 'http' OR lv_url(4) = 'HTTP'.
+        FORMAT COLOR COL_NORMAL.
+      ENDIF.
+
+*:: try to find main URL in link
+      CONCATENATE '^' iv_url INTO lv_regex.
+      FIND REGEX lv_regex IN lv_url.
+      IF sy-subrc = 0.
+        FORMAT INTENSIFIED ON.
+      ELSE.
+        FORMAT INTENSIFIED OFF.
+      ENDIF.
+      WRITE: /10 lv_url.
+
+    ENDLOOP.
+    ULINE.
+
+  ENDIF.
+
+ENDFORM.                    " GET_URLS</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/daten-einer-website/">Daten einer Website per HTTP ermitteln</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/daten-einer-website/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Daten dynamisch verwalten</title>
+		<link>/blog/daten-dynamisch-verwalten/</link>
+					<comments>/blog/daten-dynamisch-verwalten/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 31 May 2012 16:05:40 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Customizing]]></category>
+		<category><![CDATA[export to database]]></category>
+		<category><![CDATA[export]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[call transformation]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[rtti]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Tricktresor]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=647</guid>
+
+					<description><![CDATA[<p>Daten werden in der Regel in Tabellen abgelegt. Bei komplexen Datenstrukturen oder auch bei Daten, die nicht allzulange vorgehalten werden m&#252;ssen, bietet sich ein EXPORT TO DATABASE an. Zusammen mit der Umwandlung von Daten ins XML-Format kann man eine Menge interessanter Dinge machen. In diesem Beispiel Speichern wir eine Tabelle mit einer bestimmten Struktur und lesen die Daten danach wieder in eine Tabelle mit einer anderen Struktur.</p>
+<p>Der Beitrag <a href="/blog/daten-dynamisch-verwalten/">Daten dynamisch verwalten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Daten werden in der Regel in Tabellen abgelegt. Bei komplexen Datenstrukturen oder auch bei Daten, die nicht allzulange vorgehalten werden müssen, bietet sich ein EXPORT TO DATABASE an. Zusammen mit der Umwandlung von Daten ins XML-Format kann man eine Menge interessanter Dinge machen. In diesem Beispiel Speichern wir eine Tabelle mit einer bestimmten Struktur und lesen die Daten danach wieder in eine Tabelle mit einer anderen Struktur.</p>
+<h2 class="head1">Um was geht es?</h2>
+<p>Wir simulieren in diesem Beispiel eine Strukturänderung, die in Folge einer Programmerweiterung auftreten kann.</p>
+<p>Stellen Sie sich vor, Sie haben eine Struktur in der Sie die Materialnummer und eine Serialnummer zu einem &#8220;Vorgang&#8221; speichern.</p>
+<p>Die Struktur sähe dann z.B. so aus:</p>
+<pre class="lang:abap decode:true ">TYPES: BEGIN OF ty_struc,
+         vorgang TYPE c LENGTH 10,
+         matnr   TYPE c LENGTH 18,
+         sernr   TYPE c LENGTH 18,
+       END OF ty_struc.</pre>
+<p>Die Speicherung erfolgt durch EXPORT TO DATABASE:</p>
+<p class="sap1">EXPORT gt_data TO DATABASE indx(zz) ID &#8216;$mydata$&#8217;.</p>
+<p>Das Programm läuft und funktioniert gut. Es werden zu einem Vorgang Materialnummer und Serialnummer gespeichert und gelesen.</p>
+<h2 class="head1">Strukturänderung</h2>
+<p>Nach einiger Zeit erweist es sich jedoch als hilfreich, die Equipmentnummer zum Vorgang ebenfalls zu speichern. Sie fügen den Feldern VORGANG, MATNR und SERNR also das Feld EQUNR hinzu:</p>
+<pre class="lang:abap decode:true ">TYPES: BEGIN OF ty_struc,
+         vorgang TYPE c LENGTH 10,
+         equnr   TYPE c LENGTH 18,
+         matnr   TYPE c LENGTH 18,
+         sernr   TYPE c LENGTH 18,
+       END OF ty_struc.</pre>
+<p>Wenn Sie nun allerdings einen alten Vorgang bearbeiten, werden Sie einen Shortdump bekommen:</p>
+<p class="sap1">Laufzeitfehler         CONNE_IMPORT_WRONG_COMP_LENG<br />
+Ausnahme               CX_SY_IMPORT_MISMATCH_ERROR</p>
+<p class="text1">Die Zusätze IGNORING STRUCTURE BOUNDARIES oder IGNORING CONVERSION CONVERSION ERRORS helfen uns leider nicht weiter.</p>
+<h2 class="head1">Die Lösung</h2>
+<p class="text1">Man kann einfach Abhilfe schaffen, in dem man von Anfang an die Daten in ein XML-Objekt umwandelt. Das geht mithilfe von CALL TRANSFORMATION extrem schnell, unkompliziert und sicher.</p>
+<pre class="lang:abap decode:true ">CALL TRANSFORMATION id 
+     SOURCE data = gt_data
+     RESULT XML xml_string.</pre>
+<p>Der Trick dabei ist, dass im Datencluster nicht vorhandene Felder einfach ignoriert werden. Ebenso werden Felder ignoriert, die zwar im Datencluster, aber nicht in der zu importierenden Struktur/ Tabelle vorhanden sind.</p>
+<p class="text1">Die Struktur kann fast beliebig geändert werden, solange die Feldnamen identisch bleiben. Sogar Feldtypen können problemlos geändert werden.</p>
+<p class="text1">Wenn natürlich ein CHAR-Feld in ein INT-Feld geändert wird, dann kann ein C-Wert natürlich nicht in ein numerisches Feld gewandelt werden.</p>
+<h2 class="head1">Und wozu brauche ich das?</h2>
+<p class="text1">Die Anwendung ist sicherlich nicht ganz alltäglich, denn normalerweise wird man wohl eine Datenbank-Tabelle definieren und die Daten dort strukturiert ablegen.</p>
+<p class="text1">Interessant wird es, wenn die Daten zu einer Anwendung teilweise dynamisch &#8211; zum Beispiel unterschiedliche Felder je Belegart &#8211; verwaltet werden. Sie könnten dann per Customizing zusätzliche Felder definieren, die in einer Anwendung geändert werden sollen. Mittels RTTI ist es inzwischen einfach, anhand eines Feldkatalogs eine interne Tabelle zu generieren.</p>
+<p class="text1">siehe: <a href="/wp-content/index.php?aID=426" target="_self">Interne Tabelle zur Laufzeit generieren</a></p>
+<p class="text1">Zur Anzeige oder Änderung kann dann ein ALV-Grid verwendet werden. Wenn Sie diese Art der Datenspeicherung verwenden, dann kann die Tabellenstruktur fast beliebig geändert werden.</p>
+<h2 class="head1">Coding</h2>
+<p class="text1">Das folgende Programm demonstriert das Vorgehen und simuliert die zeitliche Änderung einer Struktur dadurch, das einfach zwei verschiedene Strukturen verwendet werden.</p>
+<pre class="lang:abap decode:true ">*== old structure
+TYPES: BEGIN OF ty_test1,
+         eins TYPE c LENGTH 2,
+         zwei TYPE c LENGTH 2,
+         drei TYPE c LENGTH 2,
+       END OF ty_test1.
+
+*== new structure
+TYPES: BEGIN OF ty_test2,
+         neu TYPE c LENGTH 2,
+         eins TYPE c LENGTH 5,
+         zwei TYPE i,
+       END OF ty_test2.
+
+*== data tables
+DATA gt_test1 TYPE STANDARD TABLE OF ty_test1.
+DATA gt_test2 TYPE STANDARD TABLE OF ty_test2.
+*== id for storing data
+DATA gc_id TYPE c LENGTH 20 VALUE '$TRICKTRESOR!'.
+*== XML-String containing the data in XML-format
+DATA gv_xml TYPE string.
+*== exception reference CALL TRANSFORMATION
+DATA gx_error TYPE REF TO cx_dynamic_check.
+
+START-OF-SELECTION.
+
+*== add test data to "old" table
+  APPEND 'AA1111' TO gt_test1.
+  APPEND 'BB2222' TO gt_test1.
+  APPEND 'CC3333' TO gt_test1.</pre>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/screenshots/gt_test1.jpg" alt="" /></p>
+<p class="sap1">
+<pre class="lang:abap decode:true">*== save xml string into&amp;nbsp;data cluster*== Transform data table into xml string
+CALL TRANSFORMATION id
+     SOURCE test = gt_test1
+     RESULT XML gv_xml.
+
+EXPORT test = gv_xml TO DATABASE indx(zv) ID gc_id.
+
+*== clearance
+CLEAR gt_test1.
+CLEAR gt_test2.
+CLEAR gv_xml.
+
+*== import data into xml string
+IMPORT test TO gv_xml FROM DATABASE indx(zv) ID gc_id.
+
+TRY .
+*== transform xml data into table with NEW structure
+  CALL TRANSFORMATION id
+       SOURCE XML gv_xml
+       RESULT test = gt_test2.
+    CATCH cx_transformation_error INTO gx_error.
+  BREAK-POINT.
+ENDTRY.</pre>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/screenshots/gt_test2.jpg" alt="" /></p>
+<p>Der Beitrag <a href="/blog/daten-dynamisch-verwalten/">Daten dynamisch verwalten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/daten-dynamisch-verwalten/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Dynamische WHERE-Bedingung</title>
+		<link>/blog/dynamische-where-bedingung/</link>
+					<comments>/blog/dynamische-where-bedingung/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 09 Sep 2010 10:33:33 +0000</pubDate>
+				<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<category><![CDATA[Data Dictionary]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=562</guid>
+
+					<description><![CDATA[<p>Für eine dynamische erstellte WHERE-Bedingung muss man manchmal ziemlich viel programmieren und es ist leicht, hier Fehler einzubauen. Mit Bausteinen von der SAP kann man sich unter Umständen Arbeit ersparen...</p>
+<p>Der Beitrag <a href="/blog/dynamische-where-bedingung/">Dynamische WHERE-Bedingung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Für eine dynamische erstellte WHERE-Bedingung muss man manchmal ziemlich viel programmieren und es ist leicht, hier Fehler einzubauen. Mit Bausteinen von der SAP kann man sich unter Umständen Arbeit ersparen…</p>
+<p>Zum Beispiel mit diesem hier:</p>
+<p class="head1">FREE_SELECTIONS_RANGE_2_WHERE</p>
+<p>Mit diesem Funktionsbaustein können Sie anhand von vorhandenen RANGES-Tabellen eine WHERE-Bedingung aufbauen lassen. Hierzu muss die Tabelle FIELD_RANGES entsprechend gefüllt werden:</p>
+<ul>
+<li>Tabellenname</li>
+<li>Feldname</li>
+<li>SIGN</li>
+<li>OPTION</li>
+<li>LOW</li>
+<li>HIGH</li>
+</ul>
+<p>Zurück kommt eine komplette WHERE-Bedingung.</p>
+<h2>Generierung WHERE-Bedingung aus Select-Options</h2>
+<p>Die Klasse CL_SHDB_SELTAB macht es möglich: Mehrere RANGES-Tabellen können in eine Where-Bedingung umgewandelt werden.</p>
+<p>Siehe auch:</p>
+<p><a href="https://blogs.sap.com/2015/03/30/handling-of-select-options-parameters-within-amdp/">https://blogs.sap.com/2015/03/30/handling-of-select-options-parameters-within-amdp/</a></p>
+<p>Der Beitrag <a href="/blog/dynamische-where-bedingung/">Dynamische WHERE-Bedingung</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/dynamische-where-bedingung/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>PACKAGE SIZE</title>
+		<link>/blog/package-size/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 13 Jul 2009 17:55:22 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Datenbeschaffung]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=524</guid>
+
+					<description><![CDATA[<p>Informationen zum PACKAGE SIZE-Zusatz des SELECT-Befehls. In diesem Artikel zeigen wir eine M&#246;glichkeit, die Verarbeitung von Paketen Ereignisgesteuert auszuf&#252;hren. Sicherlich keine Revolution, aber so geht's eben auch...</p>
+<p>Der Beitrag <a href="/blog/package-size/">PACKAGE SIZE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Informationen zum PACKAGE SIZE-Zusatz des SELECT-Befehls. In diesem Artikel zeigen wir eine M&ouml;glichkeit, die Verarbeitung von Paketen Ereignisgesteuert auszuf&uuml;hren. Sicherlich keine Revolution, aber so geht&#8217;s eben auch&#8230;<br /><P class="head1">Standard</P><P>Um Daten St&uuml;ck f&uuml;r St&uuml;ck von der Datenbank zu lesen, ist der PACKAGE SIZE-Zusatz die erste Wahl:</P><P class="sap1"><FONT color="#fb2412">*** Read data</FONT><BR>SELECT * FROM vbak<BR>&nbsp; PACKAGE SIZE&nbsp;1000<BR>&nbsp; INTO TABLE lt_vbak<BR>&nbsp;WHERE auart = iv_auart.<BR><FONT color="#fb2412">*** Start processing read data</FONT><BR>&nbsp; PERFORM verarbeitung USING lt_vbak.<BR>ENDSELECT.</P><P class="head1">Erweiterung</P><P>Das oben genannte Coding funktioniert nat&uuml;rlich nur, wenn die Datenselektion und die Verarbeitung innerhalb eines Programms statt finden. Kniffeliger wird es dann schon, wenn die Datenbeschaffung in einer Methode ausgef&uuml;hrt wird.</P><P>Hier kann man sich aber das Eventhandling zu nutze machen: Wird der Datenbeschaffungsmethode <STRONG>keine</STRONG> &#8220;Paketgr&ouml;&szlig;e&#8221; mitgegeben, so werden alle Daten selektiert und zur&uuml;ck gegeben. </P><P>Bei &Uuml;bergabe einer Paketgr&ouml;&szlig;e wird jedoch st&uuml;ckchenweise gelesen und die Daten des Pakets mittels &#8220;RAISE EVENT&#8221; zur Verf&uuml;gung gestellt.</P><P>Das Ganze kann dann in etwa so aussehen:</P><P class="head1">Klasse ZCL_DATA</P><P class="head2">Methode GET_DATA</P><P class="sap1">METHOD get_data. &#8220;PUBLIC STATIC METHOD<BR><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<BR>* Schnittstelle:<BR>* Importing: IV_AUART&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE AUART&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Verkaufsbelegart<BR>* Importing: IV_PACKAGE_SIZE&nbsp; TYPE I&nbsp; DEFAULT 0 &#8220;Paketgr&ouml;&szlig;e<BR>* Exporting: ET_VBAK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE&nbsp; VBAK_T&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;Tabellentyp VBAK<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;</FONT><BR><BR>&nbsp; DATA lt_vbak TYPE vbak_t.<BR>&nbsp; IF iv_package_size IS INITIAL.<BR><FONT color="#fb2412">*** Read data complete</FONT><BR>&nbsp;&nbsp;&nbsp; SELECT * FROM vbak<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INTO TABLE et_vbak<BR>&nbsp;&nbsp;&nbsp;&nbsp; WHERE auart = iv_auart<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND ernam = sy-uname.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** Read data in packets</FONT><BR>&nbsp;&nbsp;&nbsp; SELECT * FROM vbak<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PACKAGE SIZE iv_package_size<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INTO TABLE lt_vbak<BR>&nbsp;&nbsp;&nbsp;&nbsp; WHERE auart = iv_auart<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND ernam = sy-uname.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RAISE EVENT package_read EXPORTING et_vbak = lt_vbak.<BR>&nbsp;&nbsp;&nbsp; ENDSELECT.<BR>&nbsp; ENDIF.<BR><BR>ENDMETHOD.</P><P class="head2">Ereignis PACKAGE_READ </P><P>Public, static</P><P>Parameters: ET_VBAK TYPE VBAK_T</P><P class="head1">Verarbeitungsprogramm</P><P class="text1">In diesem Beispiel wird die statische Methode der Klasse ZL_DATA verwendet, um die Tabelle VBAK zu lesen.</P><P class="text1">Um das Event PACKAGE_READ der Klasse ZCL_DATA abzufangen, wurde die lokale Klasse ZCL_GET_PACKAGE erzeugt.</P><P class="text1">Wenn die Datenverarbeitung schon modular aufgebaut war, so ist die &Auml;nderung auf paketweise Verarbeitung recht gering.</P><P class="text1"><U><STRONG>Hinweis:</STRONG></U><BR>Diese Verarbeitungslogik offenbart dann&nbsp;ihre T&uuml;cken, sobald die S&auml;tze voneinander abh&auml;ngen. In diesem Fall k&ouml;nnten das Auftr&auml;ge sein, die durch Submissionsnummern &#8220;verbunden&#8221; sind oder sobald alle Auftr&auml;ge eines Tages zusammen verarbeitet werden sollen.</P><P class="sap1">DATA gt_vbak&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE vbak_t.<BR>FIELD-SYMBOLS &lt;vbak&gt;&nbsp; TYPE vbak.<BR><BR>PARAMETERS p_auart TYPE auart DEFAULT &#8216;SO&#8217;.<BR>PARAMETERS p_psize TYPE i&nbsp;&nbsp;&nbsp;&nbsp; DEFAULT 0.<BR><BR><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS zcl_get_package DEFINITION<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</FONT><BR>CLASS zcl_get_package DEFINITION.<BR>&nbsp; PUBLIC SECTION.<BR>&nbsp;&nbsp;&nbsp; CLASS-METHODS get_package FOR EVENT package_read<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OF zcl_data<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING et_vbak .<BR>ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;zcl_get_package DEFINITION<BR><BR><FONT color="#fb2412">*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*<BR>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLASS zcl_get_package IMPLEMENTATION<BR>*&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;-*</FONT><BR>CLASS zcl_get_package IMPLEMENTATION.<BR>&nbsp; METHOD get_package.<BR>&nbsp;&nbsp;&nbsp; PERFORM print_data USING et_vbak.<BR>&nbsp;&nbsp;&nbsp; uline.<BR>&nbsp; ENDMETHOD.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;get_package<BR>ENDCLASS.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;zcl_get_package IMPLEMENTATION<BR><BR>START-OF-SELECTION.<BR><BR>&nbsp; IF p_psize = 0.<BR><FONT color="#fb2412">*** get data complete</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD zcl_data=&gt;get_data<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_auart = p_auart<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; et_vbak&nbsp; = gt_vbak.<BR>&nbsp;&nbsp;&nbsp; PERFORM print_data USING gt_vbak.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** Set Handler to register event<BR></FONT>&nbsp;&nbsp;&nbsp; SET HANDLER zcl_get_package=&gt;get_package.<BR><FONT color="#fb2412">*** Get data package by package</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD zcl_data=&gt;get_data<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_auart&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = p_auart<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iv_package_size = p_psize.<BR>&nbsp; ENDIF.<BR><BR><FONT color="#fb2412">*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*<BR>*&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Form&nbsp; print_data<BR>*&amp;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;*</FONT><BR>FORM print_data USING it_vbak TYPE vbak_t.<BR>&nbsp; LOOP AT it_vbak ASSIGNING &lt;vbak&gt;.<BR>&nbsp;&nbsp;&nbsp; WRITE: / &lt;vbak&gt;-vbeln.<BR>&nbsp; ENDLOOP.<BR>ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8220;print_data</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/package-size/">PACKAGE SIZE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

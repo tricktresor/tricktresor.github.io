@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Zuordnung Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/zuordnung/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:59 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Zuordnung Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</title>
+		<link>/blog/dragndrop-framwork-alv-grid/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 13 Jun 2014 16:13:04 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Liste]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Zuordnung]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[ALV]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[grid]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4805</guid>
+
+					<description><![CDATA[<p>Usability ist bei SAP ja so eine Sache... Heute habe ich eine Klasse gefunden, die Zuordnungen intuitiv und benutzerfreundlich macht. In diesem kleinen Demoprogramm zeige ich euch, wie man die Klassen benutzt.</p>
+<p>Der Beitrag <a href="/blog/dragndrop-framwork-alv-grid/">Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute bin ich beim Surfen im SAP-System über die Klasse CL_ALV_DD_LISTBOX gestolpert. Dolle Sache:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-4806" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg" alt="Bild_2014_06_13_170651" width="729" height="351" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_170651.jpg 729w, /wp-content/uploads/2014/06/Bild_2014_06_13_170651-300x144.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_170651-624x300.jpg 624w" sizes="(max-width: 729px) 100vw, 729px" /></a></p>
+<p>&nbsp;</p>
+<p>Einfach zwei Datentabellen definieren, zwei Grids erzeugen, der Instanz von  cl_alv_dd_double_listbox übergeben und die zwei Funktionscodes zum Bewegen der Einträge definieren. Aufrufen und am Ende hat man in seinen zwei Datentabellen die vom Anwender definierten Einträge.</p>
+<p>Die Anregung stammt aus dem Report RSPLS_ENQUEUE_INFO.</p>
+<h2>Coding</h2>
+<pre>DATA gr_dd     TYPE REF TO cl_alv_dd_double_listbox.
+DATA gr_grid_s TYPE REF TO cl_alv_dd_listbox.              "source
+DATA gr_grid_t TYPE REF TO cl_alv_dd_listbox.              "target
+DATA gr_cont_s TYPE REF TO cl_gui_custom_container.        "source
+DATA gr_cont_t TYPE REF TO cl_gui_custom_container.        "target
+DATA gs_layo_s TYPE lvc_s_layo.
+DATA gs_layo_t TYPE lvc_s_layo.
+
+DATA gt_fcat   TYPE lvc_t_fcat.
+DATA gt_sort   TYPE lvc_t_sort.
+
+DATA gt_data_s TYPE STANDARD TABLE OF t006a.
+DATA gt_data_t TYPE STANDARD TABLE OF t006a.
+
+
+START-OF-SELECTION.
+
+  PERFORM init.
+
+  CALL SCREEN 100.
+
+
+*----------------------------------------------------------------------*
+*  MODULE pbo OUTPUT
+*----------------------------------------------------------------------*
+MODULE pbo OUTPUT.
+
+  SET PF-STATUS 'DD_GRID'.
+
+  PERFORM prepare_grid USING gr_grid_s
+                             gr_cont_s
+                             'CONT_SOURCE'
+                             gs_layo_s
+                             gt_data_s.
+
+  PERFORM prepare_grid USING gr_grid_t
+                             gr_cont_t
+                             'CONT_TARGET'
+                             gs_layo_t
+                             gt_data_t.
+
+  IF gr_dd IS INITIAL.
+    CREATE OBJECT gr_dd
+      EXPORTING
+        i_grid1 = gr_grid_s
+        i_grid2 = gr_grid_t.
+  ENDIF.
+
+ENDMODULE.                                                 "pbo OUTPUT
+
+
+*----------------------------------------------------------------------*
+*  MODULE pai INPUT
+*----------------------------------------------------------------------*
+MODULE pai INPUT.
+  CASE sy-ucomm.
+    WHEN 'BACK'.
+      SET SCREEN 0. LEAVE SCREEN.
+
+    WHEN 'MOVE_TO_TARGET'.
+      CALL METHOD gr_dd-&gt;movetogrid2
+        EXPORTING
+          i_ok_code = sy-ucomm.
+
+    WHEN 'MOVE_TO_SOURCE'.
+      CALL METHOD gr_dd-&gt;movetogrid1
+        EXPORTING
+          i_ok_code = sy-ucomm.
+  ENDCASE.
+
+*  IF NOT gr_dd IS INITIAL.
+*    CALL METHOD gr_dd-&gt;set_grids_state( abap_true ). "X = display/ space = edit
+*  ENDIF.
+
+ENDMODULE.                                                 "pai INPUT
+
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  prepare_grid
+*&amp;---------------------------------------------------------------------*
+FORM prepare_grid USING grid TYPE REF TO cl_alv_dd_listbox
+                        cont TYPE REF TO cl_gui_custom_container
+                        name TYPE        clike
+                        layo TYPE        lvc_s_layo
+                        data TYPE STANDARD TABLE.
+
+  IF cont IS INITIAL.
+*==   create container
+    CREATE OBJECT cont
+      EXPORTING
+        container_name = name.
+  ENDIF.
+
+  IF grid IS INITIAL.
+*== create grid
+    CREATE OBJECT grid
+      EXPORTING
+        i_parent     = cont
+        i_grid_style = 1.
+
+*== set  grid
+    CALL METHOD grid-&gt;set_table_for_first_display
+      EXPORTING
+        is_layout       = layo
+      CHANGING
+        it_outtab       = data
+        it_fieldcatalog = gt_fcat
+        it_sort         = gt_sort.
+  ELSE.
+*== refresh
+    CALL METHOD grid-&gt;set_frontend_fieldcatalog
+      EXPORTING
+        it_fieldcatalog = gt_fcat.
+    CALL METHOD grid-&gt;set_frontend_layout
+      EXPORTING
+        is_layout = gs_layo_s.
+    CALL METHOD grid-&gt;refresh_table_display.
+  ENDIF.
+
+ENDFORM.                    "prepare_grid
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  init
+*&amp;---------------------------------------------------------------------*
+FORM init.
+
+*== local data
+  FIELD-SYMBOLS  LIKE LINE OF gt_fcat.
+
+*== get source data
+  SELECT * FROM t006a INTO TABLE gt_data_s
+      UP TO 20 ROWS
+   WHERE spras = sy-langu.
+
+
+*== set title for source:
+  gs_layo_s-grid_title = text-003.
+  gs_layo_s-smalltitle = 'X'.
+  gs_layo_s-cwidth_opt = 'X'.
+  gs_layo_s-sel_mode   = 'A'.
+
+*== set title for target:
+  gs_layo_t-grid_title = text-004.
+  gs_layo_t-smalltitle = 'X'.
+  gs_layo_t-cwidth_opt = 'X'.
+  gs_layo_t-sel_mode   = 'A'.
+
+*== get fieldcatalog
+  CALL FUNCTION 'LVC_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_structure_name       = 'T006A'
+      i_client_never_display = 'X'
+    CHANGING
+      ct_fieldcat            = gt_fcat
+    EXCEPTIONS
+      OTHERS                 = 3.
+
+*== display only unit and text
+  LOOP AT gt_fcat ASSIGNING .
+    CASE -fieldname.
+      WHEN 'MSEHI' OR 'MSEH3' OR 'MSEH6'.
+        -tech = abap_true.
+    ENDCASE.
+  ENDLOOP.
+
+ENDFORM.                    "init</pre>
+<h2>Dynpro</h2>
+<h3>Ablauflogik</h3>
+<p>PROCESS BEFORE OUTPUT.<br />
+MODULE pbo.<br />
+*<br />
+PROCESS AFTER INPUT.<br />
+MODULE pai.</p>
+<h2><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg"><img decoding="async" class="alignnone size-full wp-image-4808" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg" alt="Bild_2014_06_13_180645" width="562" height="423" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_180645.jpg 562w, /wp-content/uploads/2014/06/Bild_2014_06_13_180645-300x225.jpg 300w" sizes="(max-width: 562px) 100vw, 562px" /></a></h2>
+<h2>GUI-Status</h2>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg"><img decoding="async" class="alignnone size-full wp-image-4807" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg" alt="Bild_2014_06_13_180616" width="808" height="483" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_180616.jpg 808w, /wp-content/uploads/2014/06/Bild_2014_06_13_180616-300x179.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_180616-624x373.jpg 624w" sizes="(max-width: 808px) 100vw, 808px" /></a></p>
+<p>[notice type = &#8216;info&#8217;]Leider haben die Klassen eine kleine Macken. Sobald die ersten Einträge per Funktionstasten verschoben wurden, erscheint die Markierspalte und es ist kein Drag-and-Drop mehr möglich&#8230; :([/notice]</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/dragndrop-framwork-alv-grid/">Drag&#8217;n&#8217;Drop-Framwork ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

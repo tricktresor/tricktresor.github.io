@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Datei Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/datei/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Mon, 23 May 2022 08:53:38 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Datei Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Drop Files in ALV-Grid</title>
+		<link>/blog/drop-files-in-alv-grid/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 21 Feb 2014 13:43:34 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Datei]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[Explorer]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Drag and Drop]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[set handler]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4499</guid>
+
+					<description><![CDATA[<p>In diesem Artikel erfährst du, wie du ein ALV-Grid dazu verwenden kannst, um Dateien aus dem Explorer per Drag and Drop in SAP zu übernehmen. Dabei werden jedoch nicht die Dateien selbst, sondern nur der Pfad und Dateiname zur Verfügung gestellt.</p>
+<p>Der Beitrag <a href="/blog/drop-files-in-alv-grid/">Drop Files in ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p><a class="keychainify-checked" href="https://tricktresor.com/wp-content/uploads/2014/02/02_21_14_37_32.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-4500 alignright" src="https://tricktresor.com/wp-content/uploads/2014/02/02_21_14_37_32.jpg" alt="drag files in grid" width="263" height="231" /></a></p>
+<p>Seit etwa 2012 ist es möglich, Dateien aus dem Explorer in ein ALV-Grid zu ziehen und die Namen dort zu verarbeiten (<a class="keychainify-checked" title="Drop External Files | SAP Note" href="http://search.sap.com/notes?id=0001748468">SAP Note 1748468</a>). Ob das in deinem SAP-System bereits funktioniert, kannst du daran erkennen, dass die Klasse CL_GUI_ALV_GRID die Methode GET_DROPPED_EXTERNAL_FILES hat.</p>
+<p>Das Event DROP_EXTERNAL_FILES muss registriert werden und mit der Methode DRAG_ACCEPT_FILES( 1 ) muss die Funktionalität aktiviert werden.</p>
+<p>Es kann das gesamte ALV-Grid-Control als &#8220;Ablagefläche&#8221; genutzt werden, also auch dort, wo keine Zeilen vorhanden sind. Werden die Dateien auf einer Zelle abgelegt, dann kann diese Zelle bestimmte werden. In dem Beispielcoding werden die Dateien der Spalte hinzugefügt, auf der sie abgelegt wurden.</p>
+<h2>Coding</h2>
+<pre>REPORT zz_drop_files_on_grid.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_appl DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_appl DEFINITION.
+
+  PUBLIC SECTION.
+
+*== type for Grid-Demonstration: Columns EINS, ZWEI and DREI
+    TYPES: BEGIN OF ty_files,
+             eins TYPE string,
+             zwei TYPE string,
+             drei TYPE string,
+           END OF ty_files.
+
+*== table containing the data (text/ files)
+    CLASS-DATA gt_data TYPE STANDARD TABLE OF ty_files.
+*== ALV-Grid
+    CLASS-DATA gr_grid TYPE REF TO cl_gui_alv_grid.
+
+*== setup ALV-Grid
+    CLASS-METHODS init.
+*== get dropped files and display in grid
+    CLASS-METHODS get_dropped_files FOR EVENT drop_external_files OF cl_gui_alv_grid
+                                    IMPORTING files.
+
+ENDCLASS.                    "lcl_appl DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_appl IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_appl IMPLEMENTATION.
+
+  METHOD init.
+
+*== local data
+    DATA lt_fcat         TYPE lvc_t_fcat.
+    FIELD-SYMBOLS &lt;fcat&gt; LIKE LINE OF lt_fcat.
+    FIELD-SYMBOLS &lt;data&gt; LIKE LINE OF gt_data.
+
+    CHECK gr_grid IS INITIAL.
+
+*== set initial data
+    DO 5 TIMES.
+      APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+      &lt;data&gt;-eins = 'Drop'.
+      &lt;data&gt;-zwei = 'Files'.
+      &lt;data&gt;-drei = 'Here'.
+    ENDDO.
+
+*== Create Grid-control
+    CREATE OBJECT gr_grid
+      EXPORTING
+        i_parent = cl_gui_container=&gt;screen0.
+
+*== build field catalog
+    APPEND INITIAL LINE TO lt_fcat ASSIGNING &lt;fcat&gt;.
+    &lt;fcat&gt;-fieldname = 'EINS'.
+    &lt;fcat&gt;-reptext   = 'Eins'.
+    &lt;fcat&gt;-style     = 1.
+    &lt;fcat&gt;-datatype  = 'STRG'.
+    APPEND INITIAL LINE TO lt_fcat ASSIGNING &lt;fcat&gt;.
+    &lt;fcat&gt;-fieldname = 'ZWEI'.
+    &lt;fcat&gt;-reptext   = 'Zwei'.
+    &lt;fcat&gt;-style     = 2.
+    &lt;fcat&gt;-datatype  = 'STRG'.
+    APPEND INITIAL LINE TO lt_fcat ASSIGNING &lt;fcat&gt;.
+    &lt;fcat&gt;-fieldname = 'DREI'.
+    &lt;fcat&gt;-reptext   = 'Drei'.
+    &lt;fcat&gt;-style     = 4.
+    &lt;fcat&gt;-datatype  = 'STRG'.
+
+*== display grid
+    gr_grid-&gt;set_table_for_first_display(
+      CHANGING it_fieldcatalog = lt_fcat
+               it_outtab       = gt_data ).
+
+*== Allow drop files action
+    gr_grid-&gt;drag_accept_files( 1 ).
+
+*== set handler to react on file drop
+    SET HANDLER get_dropped_files FOR gr_grid ACTIVATION abap_true.
+
+  ENDMETHOD.                                               "init
+
+  METHOD get_dropped_files.
+
+*== local data
+    DATA lt_files        TYPE filetable.
+    FIELD-SYMBOLS &lt;file&gt; LIKE LINE OF lt_files.
+    DATA lv_row_id       TYPE i.
+    DATA lv_col_id       TYPE i.
+    FIELD-SYMBOLS &lt;data&gt; LIKE LINE OF gt_data.
+
+*== get dropped files in a table
+    gr_grid-&gt;get_dropped_external_files(
+       IMPORTING  files     = lt_files
+                  row_id    = lv_row_id
+                  col_id    = lv_col_id
+       EXCEPTIONS OTHERS    = 3 ).
+
+*== put file names in grid
+    IF lt_files IS NOT INITIAL.
+      CLEAR gt_data.
+      LOOP AT lt_files ASSIGNING &lt;file&gt;.
+        APPEND INITIAL LINE TO gt_data ASSIGNING &lt;data&gt;.
+        CASE lv_col_id.
+          WHEN 1. &lt;data&gt;-eins = &lt;file&gt;.
+          WHEN 2. &lt;data&gt;-zwei = &lt;file&gt;.
+          WHEN 3. &lt;data&gt;-drei = &lt;file&gt;.
+        ENDCASE.
+      ENDLOOP.
+*== refresh display
+      gr_grid-&gt;refresh_table_display( ).
+    ENDIF.
+
+  ENDMETHOD.                                               "get_dropped_files
+
+ENDCLASS.                                                  "lcl_appl IMPLEMENTATION
+
+START-OF-SELECTION.
+
+<!--StartFragment --><span class="L0S52">START-OF-SELECTION</span><span class="L0S55">.</span>
+  <span class="L0S52">WRITE </span><span class="L0S33">'nothign to see here...!'</span><span class="L0S55">.</span>
+  lcl_appl<span class="L0S70">=&gt;</span>init<span class="L0S55">( </span><span class="L0S55">)</span><span class="L0S55">.</span></pre>
+<p>Der Beitrag <a href="/blog/drop-files-in-alv-grid/">Drop Files in ALV-Grid</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

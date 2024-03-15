@@ -1,0 +1,1024 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>suchhilfe-exit Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/suchhilfe-exit/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 17 Aug 2023 17:01:14 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>suchhilfe-exit Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>SALV-Table-Popup als Suchhilfe</title>
+		<link>/blog/salv-table-popup-als-suchhilfe/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 14 Oct 2022 14:30:36 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[suchhilfe]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<category><![CDATA[cl_salv_table]]></category>
+		<guid isPermaLink="false">/?p=1039202</guid>
+
+					<description><![CDATA[<p>In diesem Artikel habe ich dir gezeigt, wie du die Klasse CL_SALV_TABLE als Popup und zur Auswahl von Daten nutzen kannst. Heute möchte ich dir zeigen, wie du diese Funktion in einer Suchhilfe mit Hilfe eines Suchhilfe-Exits nutzen kannst. In diesem Beispiel rufen wir, wie in dem verlinkten Artikel, eine Liste der Wochentage auf aus denen der Anwender einen auswählen kann. Der einzige Unterschied zum verlinkten Code ist, dass ich für die Schlüsselkomponente nun ein...</p>
+<p>Der Beitrag <a href="/blog/salv-table-popup-als-suchhilfe/">SALV-Table-Popup als Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>In diesem <a class="keychainify-checked" href="/blog/cl_salv_table-als-auswahl-popup/">Artikel</a> habe ich dir gezeigt, wie du die Klasse CL_SALV_TABLE als Popup und zur Auswahl von Daten nutzen kannst. Heute möchte ich dir zeigen, wie du diese Funktion in einer Suchhilfe mit Hilfe eines Suchhilfe-Exits nutzen kannst. In diesem Beispiel rufen wir, wie in dem verlinkten Artikel, eine Liste der Wochentage auf aus denen der Anwender einen auswählen kann.</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="161" height="252" src="/wp-content/uploads/2022/10/image-6.png" alt="" class="wp-image-1039205"/><figcaption class="wp-element-caption">Auswahl Wochentag</figcaption></figure>
+
+
+
+<p>Der einzige Unterschied zum verlinkten Code ist, dass ich für die Schlüsselkomponente nun ein einstelliges Kennzeichen vom Typ WEEKDAY verwende.</p>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe</h2>
+
+
+
+<p>In der Codezentrale kannst du dir ansehen, wie du einen Wert in einem Report über eine eigenprogrammierte F4-Suchhilfe übergeben kannst:</p>
+
+
+
+<figure class="wp-block-embed is-type-wp-embed is-provider-die-codezentrale wp-block-embed-die-codezentrale"><div class="wp-block-embed__wrapper">
+<blockquote hcb-fetch-image-from="https://codezentrale.de/abap-salv-table-als-f4-suchhilfe-popup-verwenden/" class="wp-embedded-content" data-secret="z0AikdQtOG"><a href="https://codezentrale.de/abap-salv-table-als-f4-suchhilfe-popup-verwenden/">[ABAP] SALV-Table als F4-Suchhilfe-PopUp verwenden</a></blockquote><iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" title="&#8222;[ABAP] SALV-Table als F4-Suchhilfe-PopUp verwenden&#8220; &#8212; Die Codezentrale" src="https://codezentrale.de/abap-salv-table-als-f4-suchhilfe-popup-verwenden/embed/#?secret=EJsPswRNQw#?secret=z0AikdQtOG" data-secret="z0AikdQtOG" width="600" height="338" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
+</div></figure>
+
+
+
+<p>Das Verfahren nützt dir jedoch nichts, wenn du die F4-Hilfe ohne Programmierung in einem Dynprofeld nutzen möchtest. Hierfür musst du in der Transaktion SE11 eine separate Suchhilfe anlegen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img fetchpriority="high" decoding="async" width="771" height="584" src="/wp-content/uploads/2022/10/image-4.png" alt="" class="wp-image-1039203" srcset="/wp-content/uploads/2022/10/image-4.png 771w, /wp-content/uploads/2022/10/image-4-300x227.png 300w, /wp-content/uploads/2022/10/image-4-768x582.png 768w" sizes="(max-width: 771px) 100vw, 771px" /><figcaption class="wp-element-caption">Suchhilfe mit Suchhilfe-Exit</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe-Exit</h2>
+
+
+
+<p>Die Anlage der Suchhilfe ist in diesem Fall jedoch erst Schritt zwei. Im ersten Schritt musst du einen Funktionsbaustein anlegen, der die Werte anzeigt und mit der Suchhilfe kommuniziert.</p>
+
+
+
+<p>Für den Suchhilfe-Exit benötigst du einen Funktionsbaustein mit einer definierten Schnittstelle. In der F1-Hilfe zum Suchhilfe-Exit erfährst du, dass du den Baustein <strong>F4IF_SHLP_EXIT_EXAMPLE</strong> als Vorlage verwenden kannst. Du  musst eine neue Funktionsgruppe anlegen (Transaktion SE37: <em>Springen • Funktionsgruppe • Funktionsgruppe anlegen</em>) und den Vorlage-Baustein in diese Gruppe kopieren.</p>
+
+
+
+<figure class="wp-block-image size-full"><img decoding="async" width="399" height="142" src="/wp-content/uploads/2022/10/image-5.png" alt="" class="wp-image-1039204" srcset="/wp-content/uploads/2022/10/image-5.png 399w, /wp-content/uploads/2022/10/image-5-300x107.png 300w" sizes="(max-width: 399px) 100vw, 399px" /><figcaption class="wp-element-caption">Vorlagebaustein kopieren</figcaption></figure>
+
+
+
+<p>Am Ende des kopierten Funktionsbausteins setzt du das folgende Coding ein:</p>
+
+
+
+<pre class="wp-block-code"><code>  IF callcontrol-step = 'DISP'.
+    DATA(my_popup) = NEW main( ).
+
+    my_popup-&gt;set_items(
+      VALUE #(
+        ( key = '1' value = 'Monday' )
+        ( key = '2' value = 'Tuesday' )
+        ( key = '3' value = 'Wednesday' )
+        ( key = '4' value = 'Thursday' )
+        ( key = '5' value = 'Friday' )
+        ( key = '6' value = 'Saturday' )
+        ( key = '7' value = 'Sunday' ) ) ).
+
+    TRY.
+        DATA(selected_entry) = my_popup-&gt;ask( 'Select day' ).
+        append value #( string = conv #( selected_entry-key ) ) to record_tab.
+        callcontrol-step = 'RETURN'.
+      CATCH cancelled.
+        callcontrol-step = 'EXIT'.
+    ENDTRY.
+  ENDIF.
+</code></pre>
+
+
+
+<p>In diesem Beispiel habe ich das Coding (Siehe <a class="keychainify-checked" href="/blog/cl_salv_table-als-auswahl-popup/">CL_SALV_TABLE als Auswahl-Popup</a>) als lokale Klasse im Funktionsbaustein verwendet. Sinnvoller wäre es jedoch, die Klasse MAIN als globale Klasse anzulegen (Transaktion SE24). In diesem Fall musst du bei der Instanziierung natürlich nicht MAIN verwenden, sondern den Namen der globalen Klasse.</p>
+
+
+
+<p>Wichtig ist, dass bei Auswahl eines Eintrags die RECORD_TAB mit dem gewählten Eintrag angereichert wird und der CALLCONTROL-STEP auf &#8220;RETURN&#8221; gesetzt wird. Bricht der Benutzer den Dialog ab, dann muss CALLCONTROL-STEP auf &#8220;EXIT&#8221; gesetzt werden.</p>
+
+
+
+<p>Den Funktionsbaustein und die Funktionsgruppe musst du selbstverständlich aktivieren.</p>
+
+
+
+<h2 class="wp-block-heading">Aktivierung Suchhilfe</h2>
+
+
+
+<p>Nachdem du den Suchhilfe-Exit Funktionsbaustein in die Suchhilfe eingetragen hast, musst du die Suchhilfe aktivieren und kannst sie testen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="744" height="584" src="/wp-content/uploads/2022/10/image-7.png" alt="" class="wp-image-1039206" srcset="/wp-content/uploads/2022/10/image-7.png 744w, /wp-content/uploads/2022/10/image-7-300x235.png 300w, /wp-content/uploads/2022/10/image-7-117x91.png 117w" sizes="(max-width: 744px) 100vw, 744px" /><figcaption class="wp-element-caption">Test der Suchhilfe</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe einbinden</h2>
+
+
+
+<p>Du kannst diese Suchhilfe nun in einem Datenelement unter der Registerkarte &#8220;Weitere Eigenschaften&#8221; festlegen:</p>
+
+
+
+<figure class="wp-block-image size-full"><img loading="lazy" decoding="async" width="587" height="407" src="/wp-content/uploads/2022/10/image-8.png" alt="" class="wp-image-1039207" srcset="/wp-content/uploads/2022/10/image-8.png 587w, /wp-content/uploads/2022/10/image-8-300x208.png 300w, /wp-content/uploads/2022/10/image-8-200x140.png 200w" sizes="(max-width: 587px) 100vw, 587px" /><figcaption class="wp-element-caption">Suchhilfe im Datenelement definieren</figcaption></figure>
+
+
+
+<p>Die Suchhilfe steht dir nun immer zur Verfügung, wenn du dieses Datenelement in einer Struktur verwendest. </p>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe testen</h2>
+
+
+
+<p>Wenn du Suchhilfen mit Suchhilfe-Exits testest, dann achte darauf, dass du nach jeder Codeänderung im Suchhilfe-Exit-Funktionsbaustein die Transaktion SE11 neu aufrufst. Andernfalls ist das alte Coding noch geladen und du wirst die Änderungen nicht sehen!</p>
+<p>Der Beitrag <a href="/blog/salv-table-popup-als-suchhilfe/">SALV-Table-Popup als Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Dynamische Vorschlagssuche</title>
+		<link>/blog/dynamische-vorschlagssuche/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 26 Apr 2021 11:58:25 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<category><![CDATA[Suchhilfen]]></category>
+		<guid isPermaLink="false">/?p=1027653</guid>
+
+					<description><![CDATA[<p>Seit SAP Release 7.40 gibt es in der F4-Suchhilfe die erweiterte Option &#8220;Vorschlagssuche auf Eingabefeldern&#8221;. Im englischen wird es auch type-ahead oder proposal search genannt. Sie zeigt dem Anwender sofort nach Eingabe eines Zeichens in das Eingabefeld mögliche Treffer an. Je nach Datenbank kann in der Suchhilfe auch die Spaltenübergreifende Volltextsuche (fuzzy search) aktiviert werden. Die Vorschlagssuche wird in den gängigsten SAP-Transaktionen verwendet. Einstellung im SAPGUI Man kann die Vorschlagssuche in den SAPGUI-Optionen abschalten, denn...</p>
+<p>Der Beitrag <a href="/blog/dynamische-vorschlagssuche/">Dynamische Vorschlagssuche</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Seit SAP Release 7.40 gibt es in der F4-Suchhilfe die erweiterte Option &#8220;Vorschlagssuche auf Eingabefeldern&#8221;. Im englischen wird es auch <em>type-ahead</em> oder <em>proposal search</em> genannt. Sie zeigt dem Anwender sofort nach Eingabe eines Zeichens in das Eingabefeld mögliche Treffer an. Je nach Datenbank kann in der Suchhilfe auch die Spaltenübergreifende Volltextsuche (fuzzy search) aktiviert werden. </p>
+
+
+
+<p>Die Vorschlagssuche wird in den gängigsten SAP-Transaktionen verwendet.</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="590" height="439" src="/wp-content/uploads/2021/04/SNAG-01509.png" alt="" class="wp-image-1027655" srcset="/wp-content/uploads/2021/04/SNAG-01509.png 590w, /wp-content/uploads/2021/04/SNAG-01509-300x223.png 300w" sizes="(max-width: 590px) 100vw, 590px" /><figcaption>Vorschlagssuche in Transaktion SE24</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Einstellung im SAPGUI</h2>
+
+
+
+<p>Man kann die Vorschlagssuche in den SAPGUI-Optionen abschalten, denn die Verwendung ist manchmal problematisch. So wird die Ergebnismenge zu langsam eingeblendet oder das eingegebene Wort kommt als auch die Suche kommen durcheinander, wenn man das Wort zu schnell editiert.</p>
+
+
+
+<p>Folgende Einstellung im SAPGUI steuert die Verwendung der Vorschlagssuche:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="795" height="550" src="/wp-content/uploads/2021/04/SNAG-01510.png" alt="" class="wp-image-1027654" srcset="/wp-content/uploads/2021/04/SNAG-01510.png 795w, /wp-content/uploads/2021/04/SNAG-01510-300x208.png 300w, /wp-content/uploads/2021/04/SNAG-01510-768x531.png 768w" sizes="(max-width: 795px) 100vw, 795px" /><figcaption>Aktivierte Vorschlagssuche im SAPGUI</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Eigene Vorschlagsliste </h2>
+
+
+
+<p>In der Regel basieren die Einträge auf der der Suchhilfe zu Grunde liegenden Selektionsmethode. Ich zeige dir eine Methode, wie du die Vorschlagssuche für eine dynamisch zusammengestellte Liste. In meinem Beispiel habe ich die 30 größten deutschen Städte sowie deren Bundesländer ermittelt. Aus diesen Städten soll sich der Anwender eine Stadt auswählen:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="564" height="173" src="/wp-content/uploads/2021/04/SNAG-01511.png" alt="" class="wp-image-1027656" srcset="/wp-content/uploads/2021/04/SNAG-01511.png 564w, /wp-content/uploads/2021/04/SNAG-01511-300x92.png 300w" sizes="(max-width: 564px) 100vw, 564px" /><figcaption>Einfaches Eingabefeld</figcaption></figure>
+
+
+
+<p>Was musst du tun, um die dynamische Vorschlagssuche zu realisieren? du benötigst im Grunde nur einen Suchhilfe-Exit, der die folgenden Dinge tut:</p>
+
+
+
+<ul><li>Ermittlung der gültigen Werte</li><li>Einschränkung der Werte</li><li>Zurückstellen der in Frage kommenden Werte in die Trefferliste</li></ul>
+
+
+
+<p>Die Frage ist natürlich, wie kommen die in Frage kommenden Werte in die Suchhilfe? Der mir einfachste Weg ist der Austausch über das SAP-Memory. Die Daten werden vom Programm per EXPORT TO MEMORY in den Speicher geschrieben und von der Suchhilfe mit IMPORT FROM MEMORY wieder ausgelesen.</p>
+
+
+
+<h2 class="wp-block-heading">Suchhilfe-Exit</h2>
+
+
+
+<p>Ein Suchhilfe-Exit greift bei den verschiedenen Aktionen der Suchhilfe-Verarbeitung ein. Lege eine neue Funktionsgruppe an und kopiere den Baustein F4IF_SHLP_EXIT_EXAMPLE auf einen Namen deiner Wahl. Ich habe den Baustein Z_SHLP_EXIT_DYNAMIC genannt.</p>
+
+
+
+<p>Bei der Ausführung der F4-Wertsuchhilfe werden mehrere Verarbeitungsschritte durchlaufen. Der Funktionsbaustein wird bei jedem dieser Schritte aufgerufen. Was im jeweiligen Schritt getan werden muss, muss über den Eingabeparameter CALLCONTROL-STEP gesteuert werden.</p>
+
+
+
+<p>Der Verarbeitungsschritt, der wohl am häufigsten verwendet wird, ist &#8220;SELECT&#8221;. Auch wir nutzen diesen Schritt, um die Werteliste zu ermitteln und zur Verfügung zu stellen.</p>
+
+
+
+<h3 class="wp-block-heading">Funktionsbaustein Z_SHLP_EXIT_DYNAMIC</h3>
+
+
+
+<p>Im folgenden Coding importiere ich die Werteliste, die vom Programm per SAP-Memory übergeben wurden. Danach lese ich den Wert, den der Anwender bereits eingegeben hat und prüfe damit die einzelnen Einträge. Die Werte, die nicht passen, lösche ich aus der Tabelle.</p>
+
+
+
+<p>Die am Ende verbleibenden Werte werden Spaltenweise mit dem Funktionsbaustein F4UT_PARAMETER_RESULTS_PUT an die Ergebnistabelle übertragen.</p>
+
+
+
+<pre class="wp-block-code"><code>FUNCTION Z_SHLP_EXIT_DYNAMIC .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  TABLES
+*"      SHLP_TAB TYPE  SHLP_DESCT
+*"      RECORD_TAB STRUCTURE  SEAHLPRES
+*"  CHANGING
+*"     REFERENCE(SHLP) TYPE  SHLP_DESCR
+*"     REFERENCE(CALLCONTROL) LIKE  DDSHF4CTRL STRUCTURE  DDSHF4CTRL
+*"----------------------------------------------------------------------
+
+  TYPES: BEGIN OF ts_value,
+           line TYPE text40,
+           text TYPE text40,
+         END OF ts_value.
+  DATA values TYPE STANDARD TABLE OF ts_value WITH EMPTY KEY.
+
+
+  IF callcontrol-step = 'SELECT'.
+
+    IMPORT values TO values FROM MEMORY ID 'Trcktrsr'.
+
+    DATA(selval) = to_upper( shlp-interface&#91; shlpfield = 'VALUE' ]-value ).
+
+
+    LOOP AT values ASSIGNING FIELD-SYMBOL(&lt;val>).
+      DATA(val) = to_upper( &lt;val>-line ).
+      IF NOT val CP selval.
+        DELETE values INDEX sy-tabix.
+      ENDIF.
+    ENDLOOP.
+
+    CALL FUNCTION 'F4UT_PARAMETER_RESULTS_PUT'
+      EXPORTING
+        parameter         = 'VALUE'
+        fieldname         = 'LINE'         " Name of the source field in SOURCE_TAB
+      TABLES
+        shlp_tab          = shlp_tab    " Table of Elementary Search Helps
+        record_tab        = record_tab  " Hit list
+        source_tab        = values
+      CHANGING
+        shlp              = shlp        " Single (Current) Search Help
+        callcontrol       = callcontrol " Control of the F4 process
+      EXCEPTIONS
+        parameter_unknown = 1           " No suitable parameter of the search help
+        OTHERS            = 2.
+    IF sy-subrc > 0.
+      RETURN.
+    ELSE.
+      CALL FUNCTION 'F4UT_PARAMETER_RESULTS_PUT'
+        EXPORTING
+          parameter         = 'TEXT'
+          fieldname         = 'TEXT'         " Name of the source field in SOURCE_TAB
+        TABLES
+          shlp_tab          = shlp_tab    " Table of Elementary Search Helps
+          record_tab        = record_tab  " Hit list
+          source_tab        = values
+        CHANGING
+          shlp              = shlp        " Single (Current) Search Help
+          callcontrol       = callcontrol " Control of the F4 process
+        EXCEPTIONS
+          parameter_unknown = 1           " No suitable parameter of the search help
+          OTHERS            = 2.
+      IF sy-subrc > 0.
+        RETURN.
+      ENDIF.
+
+      callcontrol-step = 'DISPLAY'.
+    ENDIF.
+  ENDIF.
+
+
+ENDFUNCTION.</code></pre>
+
+
+
+<h2 class="wp-block-heading">Definition der Suchhilfe</h2>
+
+
+
+<p>Nun musst du noch die Suchhilfe definieren, in der du die Parameter der Suchhilfe definierst und die Datenbeschaffung über den Suchhilfe-Exit steuerst.</p>
+
+
+
+<p>Den Suchhilfe-Exit legst du in Transaktion SE11 an. Aktiviere die Option <em>Vorschlagssuche auf Eingabefeldern</em>. Trage den Namen des Funktionsbausteins in das Feld Suchhilfe-Exit ein und definiere die Parameter:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="821" height="441" src="/wp-content/uploads/2021/04/image-1.png" alt="" class="wp-image-1027658" srcset="/wp-content/uploads/2021/04/image-1.png 821w, /wp-content/uploads/2021/04/image-1-300x161.png 300w, /wp-content/uploads/2021/04/image-1-768x413.png 768w" sizes="(max-width: 821px) 100vw, 821px" /><figcaption>Suchhilfe ZDYNFUZZ</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Verwendung im Programm</h2>
+
+
+
+<p>Sobald du die Suchhilfe angelegt hast, kannst du sie im Programm verwenden, indem du diese zur Verwendung im Feld angibst:</p>
+
+
+
+<pre class="wp-block-code"><code>PARAMETERS p_val TYPE text40 MATCHCODE OBJECT zdynfuzz.</code></pre>
+
+
+
+<p>Bei Initialisierung ermitteln wir die möglichen Werte und schreiben sie ins SAP-Memory. Das war auch schon alles.</p>
+
+
+
+<pre class="wp-block-code"><code>REPORT.
+
+PARAMETERS p_val TYPE text40 MATCHCODE OBJECT zdynfuzz.
+
+
+INITIALIZATION.
+
+  TYPES: BEGIN OF ts_value,
+           line TYPE text40,
+           text type text40,
+         END OF ts_value.
+  DATA gt_values TYPE STANDARD TABLE OF ts_value WITH EMPTY KEY.
+
+  gt_values = VALUE #(
+    ( line = 'Berlin'            text = 'Berlin' )
+    ( line = 'Hamburg'           text = 'Hamburg' )
+    ( line = 'München'           text = 'Bayern' )
+    ( line = 'Köln'              text = 'Nordrhein-Westfalen' )
+    ( line = 'Frankfurt am Main' text = 'Hessen' )
+    ( line = 'Stuttgart'         text = 'Baden-Württemberg' )
+    ( line = 'Düsseldorf'        text = 'Nordrhein-Westfalen' )
+    ( line = 'Leipzig'           text = 'Sachsen' )
+    ( line = 'Dortmund'          text = 'Nordrhein-Westfalen' )
+    ( line = 'Essen'             text = 'Nordrhein-Westfalen' )
+    ( line = 'Bremen'            text = 'Bremen' )
+    ( line = 'Dresden'           text = 'Sachsen' )
+    ( line = 'Hannover'          text = 'Niedersachsen' )
+    ( line = 'Nürnberg'          text = 'Bayern' )
+    ( line = 'Duisburg'          text = 'Nordrhein-Westfalen' )
+    ( line = 'Bochum'            text = 'Nordrhein-Westfalen' )
+    ( line = 'Wuppertal'         text = 'Nordrhein-Westfalen' )
+    ( line = 'Bielefeld'         text = 'Nordrhein-Westfalen' )
+    ( line = 'Bonn'              text = 'Nordrhein-Westfalen' )
+    ( line = 'Münster'           text = 'Nordrhein-Westfalen' )
+    ( line = 'Karlsruhe'         text = 'Baden-Württemberg' )
+    ( line = 'Mannheim'          text = 'Baden-Württemberg' )
+    ( line = 'Augsburg'          text = 'Bayern' )
+    ( line = 'Wiesbaden'         text = 'Hessen' )
+    ( line = 'Mönchengladbach'   text = 'Nordrhein-Westfalen' )
+    ( line = 'Gelsenkirchen'     text = 'Nordrhein-Westfalen' )
+    ( line = 'Braunschweig'      text = 'Niedersachsen' )
+    ( line = 'Aachen'            text = 'Nordrhein-Westfalen' )
+    ( line = 'Kiel'              text = 'Schleswig-Holstein' )
+    ( line = 'Chemnitz'          text = 'Sachsen' ) ).
+
+
+  EXPORT values FROM gt_values TO MEMORY ID 'Trcktrsr'.</code></pre>
+
+
+
+<h2 class="wp-block-heading">Ergebnis</h2>
+
+
+
+<p>Nun bekommt der Anwender alle Werte direkt angezeigt, die zur bereits getätigten Eingabe passen:</p>
+
+
+
+<figure class="wp-block-image size-large"><img loading="lazy" decoding="async" width="592" height="236" src="/wp-content/uploads/2021/04/SNAG-01512.png" alt="" class="wp-image-1027659" srcset="/wp-content/uploads/2021/04/SNAG-01512.png 592w, /wp-content/uploads/2021/04/SNAG-01512-300x120.png 300w" sizes="(max-width: 592px) 100vw, 592px" /><figcaption>Aktiviert Vorschlagssuche</figcaption></figure>
+
+
+
+<p>Die Einträge können mit den Pfeiltasten direkt ausgewählt werden.</p>
+<p>Der Beitrag <a href="/blog/dynamische-vorschlagssuche/">Dynamische Vorschlagssuche</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Genereller Suchhilfe-Exit zur Anzeige von Icons</title>
+		<link>/blog/generelle-suchhilfe-exit-zur-anzeige-von-icons/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 15 Nov 2018 08:56:13 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Suchhilfen]]></category>
+		<category><![CDATA[icons]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1019454</guid>
+
+					<description><![CDATA[<p>Suchhilfe-Exits sind eine recht komplexe Angelegenheit. In diesem Beitrag stelle ich dir einen Suchhilfe-Exit vor, den du generell zur Darstellung von Icons verwenden kannst. Er zeigt das Vorgehen, wie ein Suchhilfe-Exit auf Parameter der Suchhilfe zugreifen und nutzen kann.</p>
+<p>Der Beitrag <a href="/blog/generelle-suchhilfe-exit-zur-anzeige-von-icons/">Genereller Suchhilfe-Exit zur Anzeige von Icons</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Die Verwendung von grafischen Elementen im SAP-System ist doch arg eingeschränkt. Icons sind im Grunde die einzige Möglichkeit, etwas Farbe und Abwechslung in eine ALV-Liste zu bekommen. Schön ist es, wenn der Anwender selber einstellen kann, welche Icons zu welchen Informationen angezeigt werden sollen. Eine Status bietet sich perfekt an, um diesen durch ein geeignetes Icon visuell darzustellen.</p>
+<p>Für die Definition des zu verwendenden Icons sollte jedoch der Name des Icons verwendet werden (ICON_OKAY, ICON_MESSAGE_INFORMATION etc) anstelle der entsprechenden Icon-ID (@0V@, @19@ usw). Der Vorteil der Icon-ID ist zwar, dass dann das Icon direkt angezeigt wird, wenn das Feld nicht Eingabe bereit ist, allerdings ist die ID überhaupt nicht sprechend und die Pflege wird zum Glücksspiel.</p>
+<p>Wenn allerdings der Name des Icons verwendet wird, dann sieht man eben nur den Namen, aber nicht das zugehörige Icon.</p>
+<h2>Beispiel</h2>
+<p>Um zu verdeutlichen, wie ich die Icons einsetze, habe ich eine kleine Statustabelle definiert:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat01.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019461" src="https://tricktresor.com/wp-content/uploads/2018/11/stat01.png" alt="" width="315" height="77" srcset="/wp-content/uploads/2018/11/stat01.png 315w, /wp-content/uploads/2018/11/stat01-300x73.png 300w" sizes="(max-width: 315px) 100vw, 315px" /></a></p>
+<blockquote><p>Der Text sollte natürlich besser in eine separat definierte Texttabelle ausgelagert werden, aber in diesem Fall soll es nur als Beispiel dienen.</p></blockquote>
+<p>Ich habe also eine Tabelle mit verschiedenen Status. Irgendein Eintrag/ Objekt kann einen dieser Status haben. In der Listausgabe wird zu einem Status der Name des zugeordneten Icons ermittelt und als Icon ausgegeben.</p>
+<h2>Darstellung eines Icons</h2>
+<p>Ein Icon besteht immer mindestens aus dem Icon selbst. Ein Icon muss immer Anfang eines Feldes stehen! Ich kann in jedem Anzeigefeld ein Icon ausgeben, indem ich die Icon-ID der Icons von zwei Klammeraffen umgeben eintrage: @1A@.</p>
+<p>Ein Icon kann aber auch noch einen Text besitzen, der mit angezeigt wird. Ebenso kann ein Icon eine 40 Zeichen lange Quickinfo enthalten, die bei MouseOver angezeigt wird.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat05.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019462" src="https://tricktresor.com/wp-content/uploads/2018/11/stat05.png" alt="" width="135" height="81" /></a></p>
+<h2>Erzeugen eines Icons</h2>
+<p>Der richtige Weg, um Icons für die Ausgabe in einem Feld vorzubereiten ist die Verwendung des Funktionsbausteins ICON_CREATE:</p>
+<pre>    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name            = 'ICON_DELETE'
+        text            = 'Löschen'
+        info            = 'Markiertes Objekt löschen'
+        add_stdinf      = ' '
+      IMPORTING
+        result          = lv_icon
+      EXCEPTIONS
+        OTHERS          = 3.</pre>
+<p>Dem Funktionsbaustein ist es egal, ob der Name oder die ID des Icons verwendet wird. Es kann also der Text &#8220;ICON_DELETE&#8221; übergeben werden oder die Konstante ICON_DELETE. Die Icon-Konstanten sind im Type-Pool ICON definiert und in jedem ABAP-Programm vorhanden.</p>
+<p><span style="text-decoration: underline;"><strong>Tipp:</strong></span></p>
+<p>Erstelle eine globale Klasse mit einer Methode, die dir das fertige Icon direkt zurück gibt. Die Erzeugung von Icons ist dann sehr einfach:</p>
+<pre>DATA(lv_icon) = zcl_icon=&gt;create( icon_okay ).</pre>
+<h2>Suchhilfe</h2>
+<p>Zurück zum Thema. Ich wollte ja eigentlich was ganz anderes&#8230;</p>
+<p>Eine Suchhilfe zum Status wäre sehr sinnvoll:</p>
+<ol>
+<li>Der Anwender kann in einer ALV-Gridliste durch betätigen der F4-Hilfe auf dem Statusfeld alle möglichen Status sehen (Legende)</li>
+<li>Bei der Auswahl eines Status ist eine Suchhilfe sowieso sinnvoll.</li>
+</ol>
+<p>Leider wird in diesem Fall ja nur der Name des Icons angezeigt und nicht das Icon selber. Das möchte ich ändern. Allerdings möchte ich nicht für genau diese eine Tabelle einen Suchhilfe-Exit basteln, der genau für diese Tabelle das Statusicon anzeigt. Ich möchte eine Suchhilfe erstellen, die für alle ähnlichen Tabellen ebenfalls verwendet werden kann.</p>
+<h3>Suchhilfe-Parameter</h3>
+<p>Zu diesem Zweck verwende ich die wenig bekannte Möglichkeit, in der Suchhilfe einen <em>Parameter</em> zu definieren. ein Parameter ist kein Feld der zugrunde liegenden Tabelle, sondern ein separat definierter Eintrag. Ein Parameter wird nicht in der Suchhilfe ausgegeben sondern dient der Übergabe an den Funktionsbausteins eines Suchhilfe-Exits.</p>
+<h3>Suchhilfe-Exit Funktionsbaustein</h3>
+<p>Ein Suchhilfe-Exit ist ein Funktionsbaustein mit einer definierten Schnittstelle. Zur Erstellung eines Suchhilfe-Exits wird am besten der Funktionsbaustein F4IF_SHLP_EXIT_EXAMPLE kopiert, der auch in der Hilfe zum Dynprofeld &#8220;Suchhilfe-Exit&#8221; erwähnt wird.</p>
+<p>In diesem Funktionsbaustein kann die Suchhilfe zu verschiedenen Zeitpunkten manipuliert werden (Datenselektion, Darstellung etc).</p>
+<p>Mit Hilfe des Funktionsbausteins F4UT_PARAMETER_VALUE_GET kann der Wert zu einem Parameter aus der Suchhilfe ermittelt werden.</p>
+<h2>Vorgehen</h2>
+<p>Ich möchte einen Suchhilfe-Exit erstellen, der aus der Suchhilfe ermittelt, in welchem Feld der Name des Icons steht und in welchem Feld das Icon selbst angezeigt werden soll.</p>
+<p>Das Ergebnis sieht so aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat04.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019458" src="https://tricktresor.com/wp-content/uploads/2018/11/stat04.png" alt="" width="349" height="200" srcset="/wp-content/uploads/2018/11/stat04.png 349w, /wp-content/uploads/2018/11/stat04-300x172.png 300w, /wp-content/uploads/2018/11/stat04-265x153.png 265w, /wp-content/uploads/2018/11/stat04-148x85.png 148w, /wp-content/uploads/2018/11/stat04-193x112.png 193w, /wp-content/uploads/2018/11/stat04-71x40.png 71w" sizes="(max-width: 349px) 100vw, 349px" /></a></p>
+<h2>Lösung</h2>
+<h3>Suchhilfe definieren</h3>
+<p>Als erstes muss ich in der Transaktion SE11 eine Suchhilfe anlegen:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat06.png"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-1019463" src="https://tricktresor.com/wp-content/uploads/2018/11/stat06.png" alt="" width="719" height="394" srcset="/wp-content/uploads/2018/11/stat06.png 719w, /wp-content/uploads/2018/11/stat06-300x164.png 300w, /wp-content/uploads/2018/11/stat06-71x40.png 71w" sizes="(max-width: 719px) 100vw, 719px" /></a></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2018/11/stat03.png"><img loading="lazy" decoding="async" class="alignnone size-large wp-image-1019459" src="https://tricktresor.com/wp-content/uploads/2018/11/stat03.png" alt="" width="640" height="260" srcset="/wp-content/uploads/2018/11/stat03.png 861w, /wp-content/uploads/2018/11/stat03-300x122.png 300w, /wp-content/uploads/2018/11/stat03-768x312.png 768w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<h3>Suchhilfe-Exit anlegen</h3>
+<p>Den Suchhilfe-Exit kopiere ich vom Funktionsbaustein F4IF_SHLP_EXIT_EXAMPLE.</p>
+<p>&nbsp;</p>
+<p>Das Coding sieht folgendermaßen aus:</p>
+<pre>FUNCTION z_f4if_shlp_exit_icon.
+*"----------------------------------------------------------------------
+*"*"Lokale Schnittstelle:
+*"  TABLES
+*"      SHLP_TAB TYPE  SHLP_DESCT
+*"      RECORD_TAB STRUCTURE  SEAHLPRES
+*"  CHANGING
+*"     VALUE(SHLP) TYPE  SHLP_DESCR
+*"     VALUE(CALLCONTROL) LIKE  DDSHF4CTRL STRUCTURE  DDSHF4CTRL
+*"----------------------------------------------------------------------
+
+  DEFINE get_param.
+    CALL FUNCTION 'F4UT_PARAMETER_VALUE_GET'
+      EXPORTING
+        parameter         = &amp;1
+        fieldname         = '*'
+      IMPORTING
+        value             = lv_parameter_value
+      TABLES
+        shlp_tab          = shlp_tab
+        record_tab        = record_tab
+      CHANGING
+        shlp              = shlp
+        callcontrol       = callcontrol
+      EXCEPTIONS
+        parameter_unknown = 1.
+    IF sy-subrc = 0.
+      &amp;2 = lv_parameter_value.
+    ENDIF.
+  END-OF-DEFINITION.
+
+  DEFINE icon_create.
+    CALL FUNCTION 'ICON_CREATE'
+      EXPORTING
+        name            = &amp;1
+        info            = &amp;2
+        add_stdinf      = ''
+      IMPORTING
+        result          = &amp;3
+      EXCEPTIONS
+        OTHERS          = 3.
+
+  END-OF-DEFINITION.
+
+*== Info:
+* Dieser Baustein kann in Suchhilfen als Suchhilfe-Exit verwendet werden
+*== Zweck:
+* Anzeige des Icons zu einem Icon-Namen, der in der Tabelle vorhanden ist
+*== Voraussetzung:
+* Spalte mit dem Namen eines Icons
+*
+
+  "Tabelle für den Iconnamen, der aus der RESULTTAB ermittelt wird
+  DATA lt_col_iconname TYPE STANDARD TABLE OF icon_name.
+  "Tabelle für den Inhalt der Info zum Icon
+  DATA lt_col_iconinfo TYPE STANDARD TABLE OF icon_text.
+  "Tabelle für das Aufbereitete Icon, das an die RESULTTAB übergeben wird
+  DATA lt_col_icontext TYPE STANDARD TABLE OF icon_text.
+  DATA lv_icontext TYPE icon_text.
+
+  "Generischer Parameter
+  DATA lv_parameter_value       TYPE  ddshvalue.
+  "Name der Spalte, die den Iconnamen enthält
+  DATA lv_column_with_icon_name TYPE  shlpfield.
+  "Name der Spalte, die den Icontext enthält
+  DATA lv_column_with_icon_info TYPE  shlpfield.
+  "Name der Spalte, in der das aufbereitete Icon dargestellt werden soll
+  DATA lv_column_for_display    TYPE  shlpfield.
+
+
+* EXIT immediately, if you do not want to handle this step
+  IF callcontrol-step &lt;&gt; 'SELONE' AND
+     callcontrol-step &lt;&gt; 'SELECT' AND
+     callcontrol-step &lt;&gt; 'SELONE' AND
+     callcontrol-step &lt;&gt; 'PRESEL' AND
+     callcontrol-step &lt;&gt; 'SELECT' AND
+     callcontrol-step &lt;&gt; 'DISP'.
+    EXIT.
+  ENDIF.
+
+*"----------------------------------------------------------------------
+* STEP DISP     (Display values)
+*"----------------------------------------------------------------------
+  IF callcontrol-step = 'DISP'.
+
+    get_param 'COLUMN_WITH_ICON_NAME'    lv_column_with_icon_name.
+    get_param 'COLUMN_WITH_ICON_INFO'    lv_column_with_icon_info.
+    get_param 'COLUMN_FOR_ICON_DISPLAY'  lv_column_for_display.
+
+
+    "Ermitteln aller ICON_NAMEN der einzelnen Einträge
+    CALL FUNCTION 'F4UT_PARAMETER_VALUE_GET'
+      EXPORTING
+        parameter         = lv_column_with_icon_name
+        fieldname         = '*'
+      TABLES
+        shlp_tab          = shlp_tab
+        record_tab        = record_tab
+        results_tab       = lt_col_iconname
+      CHANGING
+        shlp              = shlp
+        callcontrol       = callcontrol
+      EXCEPTIONS
+        parameter_unknown = 1
+        OTHERS            = 2.
+    IF sy-subrc = 0.
+      "Wenn alles geklappt hat, dann sind in Tabelle LT_COL_ICONNAME die Namen
+      "der Icons aus dem Parameter COLUMN_WITH_ICON_NAME
+
+      "Nun noch die die Texte für die Quickinfo ermitteln
+      CALL FUNCTION 'F4UT_PARAMETER_VALUE_GET'
+        EXPORTING
+          parameter         = lv_column_with_icon_info
+          fieldname         = '*'
+        TABLES
+          shlp_tab          = shlp_tab
+          record_tab        = record_tab
+          results_tab       = lt_col_iconinfo
+        CHANGING
+          shlp              = shlp
+          callcontrol       = callcontrol
+        EXCEPTIONS
+          parameter_unknown = 1
+          OTHERS            = 2.
+      if sy-subrc &gt; 0.
+        "Macht nichts: Es ist kein Feld definiert/ vorhanden, das zum Icon angezeigt werden soll
+        "Die Tabelle LT_COL_ICONINFO ist dann halt leer
+      endif.
+
+
+      LOOP AT lt_col_iconname INTO DATA(lv_iconname).
+        "Info zum Icon lesen:
+        READ TABLE lt_col_iconinfo INTO DATA(lv_iconinfo) INDEX sy-tabix.
+        "Aufbereitung des Icons zur Darstellung
+        icon_create lv_iconname lv_iconinfo lv_icontext.
+        APPEND lv_icontext TO lt_col_icontext.
+      ENDLOOP.
+    ENDIF.
+
+    "Alle aufbereiteten Icons an RESULTTAB übergeben
+    CALL FUNCTION 'F4UT_PARAMETER_RESULTS_PUT'
+      EXPORTING
+        parameter         = lv_column_for_display
+      TABLES
+        shlp_tab          = shlp_tab
+        record_tab        = record_tab
+        source_tab        = lt_col_icontext
+      CHANGING
+        shlp              = shlp
+        callcontrol       = callcontrol
+      EXCEPTIONS
+        parameter_unknown = 1
+        OTHERS            = 2.
+    IF sy-subrc &lt;&gt; 0.
+      EXIT.
+    ENDIF.
+    EXIT.
+  ENDIF.
+
+ENDFUNCTION.</pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/generelle-suchhilfe-exit-zur-anzeige-von-icons/">Genereller Suchhilfe-Exit zur Anzeige von Icons</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Dynamische Suchhilfe</title>
+		<link>/blog/dynamische-suchhilfe/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 27 Sep 2016 07:00:00 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<category><![CDATA[Funktionsbaustein]]></category>
+		<category><![CDATA[suchhilfe]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=843068</guid>
+
+					<description><![CDATA[<p>Suchhilfen geben immer wieder Anlass zu viel Diskussionen. Es gibt viele Wege zum Ziel; häufig sind diese jedoch umständlich oder zumindest nicht ideal. Für den Fall, dass du mal eine Suchhilfe brauchst, von denen die Felder erst zur Laufzeit bekannt sind, kannst du folgendes Vorgehen nutzen:</p>
+<p>Der Beitrag <a href="/blog/dynamische-suchhilfe/">Dynamische Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Suchhilfen geben immer wieder Anlass zu viel Diskussionen. Es gibt viele Wege zum Ziel; häufig sind diese jedoch umständlich oder zumindest nicht ideal. Für den Fall, dass du mal eine Suchhilfe brauchst, bei der die Felder erst zur Laufzeit bekannt sind, kannst du folgendes Vorgehen nutzen:</p>
+<h2>Suchhilfe-Exit Funktionsbaustein kopieren</h2>
+<p>Als erstes benötigst du einen Suchhilfe-Exit. Dieser Exit besteht aus einem Funktionsbaustein mit definierter Schnittstelle. Am besten kopierst du den Funktionsbaustein F4IF_SHLP_EXIT_EXAMPLE auf z. B. Z_F4IF_SHLP_EXIT_NEU1.</p>
+<p>Hierfür benötigst du eine eigene Funktionsgruppe. Diese muss vor dem Kopieren vorhanden sein. In diesem Beispiel heißt der Funktionsbaustein z_f4ifshlp_exit_4_enno.</p>
+<h3>Funktionsbaustein Suchhilfe-Exit</h3>
+<pre>FUNCTION z_f4ifshlp_exit_4_enno.
+*"----------------------------------------------------------------------
+*"*"Lokale Schnittstelle:
+*" TABLES
+*" SHLP_TAB TYPE SHLP_DESCT
+*" RECORD_TAB STRUCTURE SEAHLPRES
+*" CHANGING
+*" REFERENCE(SHLP) TYPE SHLP_DESCR
+*" REFERENCE(CALLCONTROL) LIKE DDSHF4CTRL STRUCTURE DDSHF4CTRL
+*"----------------------------------------------------------------------
+
+DATA: rc TYPE sy-subrc.
+
+IF callcontrol-step = 'SELONE'.
+EXIT.
+ENDIF.
+
+IF callcontrol-step = 'PRESEL'.
+EXIT.
+ENDIF.
+
+*"----------------------------------------------------------------------
+* STEP SELECT (Select values)
+*"----------------------------------------------------------------------
+* This step may be used to overtake the data selection completely.
+* To skip the standard seletion, you should return 'DISP' as following
+* step in CALLCONTROL-STEP.
+* Normally RECORD_TAB should be filled after this step.
+* Standard function module F4UT_RESULTS_MAP may be very helpfull in this
+* step.
+IF callcontrol-step = 'SELECT'.
+PERFORM shlp_4_enno USING shlp_tab[]
+CHANGING callcontrol
+shlp
+record_tab[]
+rc.
+IF rc = 0.
+callcontrol-step = 'DISP'.
+ELSE.
+callcontrol-step = 'EXIT'.
+ENDIF.
+EXIT. "Don't process STEP DISP additionally in this call.
+ENDIF.
+
+IF callcontrol-step = 'DISP'.
+EXIT.
+ENDIF.
+
+ENDFUNCTION.</pre>
+<h3>Unterroutine</h3>
+<p>In dieser Unterroutine wird die Ergebnistabelle aufgebaut. Wir verwenden hier zwar eine feste Struktur (zshlp_4_enno_structure), aber das Ergebnis wird dynamisch an die Ergebnistabelle übergeben.<br />
+Die Struktur sieht folgendermaßen aus:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-41-50.jpg"><img loading="lazy" decoding="async" class="alignnone wp-image-843069 size-full" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-41-50.jpg" alt="2016-09-26_15-41-50" width="702" height="224" srcset="/wp-content/uploads/2016/09/2016-09-26_15-41-50.jpg 702w, /wp-content/uploads/2016/09/2016-09-26_15-41-50-300x96.jpg 300w" sizes="(max-width: 702px) 100vw, 702px" /></a></p>
+<pre>FORM shlp_4_enno USING it_shlp TYPE shlp_desct
+CHANGING i_callcontrol TYPE ddshf4ctrl
+i_shlp TYPE shlp_descr
+xt_records TYPE ddshreslts
+e_rc TYPE sy-subrc.
+
+DATA: lt_data TYPE STANDARD TABLE OF zshlp_4_enno_structure WITH NON-UNIQUE DEFAULT KEY,
+*--------------------------------------------------------------------*
+* Für jedes Feld das in der Selopt als Importparaemter gekennzeichnet ist eine Range erstellen
+* Kann man sicher auch dynamisch machen - aber dann wird's schwerer lesbar
+*--------------------------------------------------------------------*
+lt_r_datum TYPE RANGE OF zshlp_4_enno_structure-datum,
+lt_r_uname TYPE RANGE OF zshlp_4_enno_structure-uname,
+ls_data LIKE LINE OF lt_data,
+ls_address TYPE bapiaddr3,
+lt_return TYPE bapiret2_t.
+.
+
+FIELD-SYMBOLS: &lt;ls_selopt_line&gt; TYPE any.
+
+*--------------------------------------------------------------------*
+* Ranges für Daten-Selektion füllen
+*--------------------------------------------------------------------*
+LOOP AT i_shlp-selopt ASSIGNING FIELD-SYMBOL(&lt;ls_selopt&gt;).
+
+CASE &lt;ls_selopt&gt;-shlpfield.
+WHEN 'DATUM'.
+APPEND INITIAL LINE TO lt_r_datum ASSIGNING &lt;ls_selopt_line&gt;.
+WHEN 'UNAME'.
+APPEND INITIAL LINE TO lt_r_uname ASSIGNING &lt;ls_selopt_line&gt;.
+WHEN OTHERS.
+CONTINUE.
+ENDCASE.
+
+MOVE-CORRESPONDING &lt;ls_selopt&gt; TO &lt;ls_selopt_line&gt;.
+
+ENDLOOP.
+
+*--------------------------------------------------------------------*
+* Die so gefüllten Ranges jetzt für irgend eine Datenselektion nehmen
+*--------------------------------------------------------------------*
+SELECT bname AS uname, trdat AS datum
+FROM usr02
+WHERE bname IN @lt_r_uname
+AND trdat IN @lt_r_datum
+INTO CORRESPONDING FIELDS OF TABLE @lt_data.
+
+LOOP AT lt_data ASSIGNING FIELD-SYMBOL(&lt;ls_data&gt;).
+
+CALL FUNCTION 'BAPI_USER_GET_DETAIL'
+EXPORTING
+username = &lt;ls_data&gt;-uname
+IMPORTING
+address = ls_address
+TABLES
+return = lt_return.
+&lt;ls_data&gt;-freitext = ls_address-fullname.
+
+ENDLOOP.
+
+*--------------------------------------------------------------------*
+* Und SAP das Ganze so aufbereiten lassen, wie man es kennt
+*--------------------------------------------------------------------*
+CALL FUNCTION 'F4UT_RESULTS_MAP'
+EXPORTING
+source_structure = 'ZSHLP_4_ENNO_STRUCTURE'
+TABLES
+shlp_tab = it_shlp
+record_tab = xt_records[]
+source_tab = lt_data[]
+CHANGING
+shlp = i_shlp
+callcontrol = i_callcontrol
+EXCEPTIONS
+OTHERS = 0.
+ENDFORM.</pre>
+<h2>Suchhilfe anlegen</h2>
+<p>In Transaktion SE11 musst du nun noch eine Suchhilfe anlegen, die den Suchhilfe-Exit verwendet. Normalerweise gibst du in der Suchhilfe direkt eine <em>Selektionsmethode</em> an, also die Tabelle oder den View, aus dem gelesen wird. Da wir die Suchhilfe dynamisch aufbauen, bleibt dieses Feld leer und wir tragen nur den Baustein für den Suchhilfe-Exit ein:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-43-42.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-843070" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-43-42.jpg" alt="2016-09-26_15-43-42" width="706" height="542" srcset="/wp-content/uploads/2016/09/2016-09-26_15-43-42.jpg 706w, /wp-content/uploads/2016/09/2016-09-26_15-43-42-300x230.jpg 300w" sizes="(max-width: 706px) 100vw, 706px" /></a></p>
+<p>Das war auch schon alles. Die Suchhilfe kann direkt getestet werden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-46-31.jpg"><img loading="lazy" decoding="async" class="alignnone size-full wp-image-843071" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_15-46-31.jpg" alt="2016-09-26_15-46-31" width="627" height="159" srcset="/wp-content/uploads/2016/09/2016-09-26_15-46-31.jpg 627w, /wp-content/uploads/2016/09/2016-09-26_15-46-31-300x76.jpg 300w" sizes="(max-width: 627px) 100vw, 627px" /></a></p>
+<h2>Anwendungsbeispiele</h2>
+<p>Der Anwendungsfall, für den man eine dynamische Suchhilfe benötigt, ist sicherlich nicht allzu oft vorhanden. Es ist aber schön, es zu können, wenn man mal vor dieser Herausforderung steht. Eine Möglichkeit wäre zum Beispiel jeweils andere Felder zu zeigen, je nachdem welche Partnerart der Anwender für die Selektion ausgewählt hat:  Kunde, Lieferant oder Sachbearbeiter. Auch könnte ich mir vorstellen, dass zu Materialnummern unterschiedliche Felder je Materialart oder Anwendergruppe angezeigt werden.</p>
+<p>Vielen Dank an Stefan für das Beispiel!!</p>
+<p>Der Beitrag <a href="/blog/dynamische-suchhilfe/">Dynamische Suchhilfe</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Pfadauswahl mit DIRECTORY_BROWSE</title>
+		<link>/blog/pfadauswahl-mit-directory-browse/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 06 Feb 2014 13:46:59 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[Download]]></category>
+		<category><![CDATA[f4]]></category>
+		<category><![CDATA[value-request]]></category>
+		<category><![CDATA[browse]]></category>
+		<category><![CDATA[directory]]></category>
+		<category><![CDATA[Verzeichnis]]></category>
+		<category><![CDATA[suchhilfe]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[suchhilfe-exit]]></category>
+		<category><![CDATA[Selektionsbilder]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4372</guid>
+
+					<description><![CDATA[<p>Hier demonstriere ich die Verwendung der Methode CL_GUI_FRONTEND_SERVICES=>DIRECTORY_BROWSE. Eigentlich einfach zu verwenden, aber für die F4-Hilfe ist ein kleiner Trick notwendig. Zudem zeige ich, wie die Methode in einem Suchhilfe-Exit verwendet werden kann.</p>
+<p>Der Beitrag <a href="/blog/pfadauswahl-mit-directory-browse/">Pfadauswahl mit DIRECTORY_BROWSE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um einen Dateipfad auf dem Frontend auszuwählen, gibt es die Methode DIRECTORY_BROWSE der Klasse CL_GUI_FRONTEND_SERVICES. Um sie jedoch in der F4-Hilfe eines Reports sinnvoll verwenden zu können, muss man sich noch eines Tricks bedienen. Das Problem: Bei Aufruf der F4-Hilfe steht der Wert des Parameters für den die F4-Hilfe aufgerufen wurde, nicht zur Verfügung.</p>
+<p>Aus diesem Grund muss der Feldinhalt explizit mit Hilfe des Funktionsbausteins DYNP_VALUES_READ gelesen werden.</p>
+<p><img loading="lazy" decoding="async" width="675" height="422" class="alignnone size-full wp-image-4374" src="https://tricktresor.com/wp-content/uploads/2014/02/img_52f391e706cfb.png" alt="" srcset="/wp-content/uploads/2014/02/img_52f391e706cfb.png 675w, /wp-content/uploads/2014/02/img_52f391e706cfb-300x187.png 300w, /wp-content/uploads/2014/02/img_52f391e706cfb-624x390.png 624w" sizes="(max-width: 675px) 100vw, 675px" /></p>
+<h2>Coding</h2>
+<pre>REPORT z_test_browse_directory.
+
+*== SELECTION SCREEN
+PARAMETERS p_path  TYPE text200 OBLIGATORY LOWER CASE.
+
+*== Help Value path
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_path.
+  PERFORM f4_path.
+
+*== init
+INITIALIZATION.
+  PERFORM get_download_path.
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  get_download_path
+*&amp;---------------------------------------------------------------------*
+FORM get_download_path.
+
+*== local data
+  DATA lv_upload_path    TYPE string.
+  DATA lv_download_path  TYPE string.
+
+*== get current download path
+  CALL METHOD cl_gui_frontend_services=&gt;get_upload_download_path
+    CHANGING
+      upload_path   = lv_upload_path
+      download_path = lv_download_path.
+
+*== set parameter
+  p_path = lv_download_path.
+
+ENDFORM.                    "get_download_path
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  f4_path
+*&amp;---------------------------------------------------------------------*
+FORM f4_path.
+
+*== local data
+  DATA lv_out    TYPE string.
+  DATA lv_in     TYPE string.
+  DATA lt_fields TYPE TABLE OF dynpread.
+  DATA ls_field  TYPE dynpread.
+
+*== get current value for path
+  ls_field = 'P_PATH'.
+  APPEND ls_field TO lt_fields.
+
+  CALL FUNCTION 'DYNP_VALUES_READ'
+    EXPORTING
+      dyname     = sy-cprog
+      dynumb     = sy-dynnr
+    TABLES
+      dynpfields = lt_fields
+    EXCEPTIONS
+      OTHERS     = 1.
+
+  IF sy-subrc = 0.
+    READ TABLE lt_fields INTO ls_field INDEX 1.
+    lv_in = ls_field-fieldvalue.
+  ENDIF.
+
+*== call popup for directory selection
+  CALL METHOD cl_gui_frontend_services=&gt;directory_browse
+    EXPORTING
+      initial_folder  = lv_in
+    CHANGING
+      selected_folder = lv_out
+    EXCEPTIONS
+      OTHERS          = 4.
+
+  IF sy-subrc = 0 AND lv_out IS NOT INITIAL.
+*== set selected path
+    p_path = lv_out.
+  ELSE.
+*== set origin path
+    p_path = lv_in.
+  ENDIF.
+
+ENDFORM.</pre>
+<h1>Verwendung in einer Suchhilfe</h1>
+<p>Einfacher und sinnvoller jedoch ist die Verwendung in einer Suchhilfe! Warum? Erstens kann die Suchhilfe an ein entsprechendes Feld einer Dictionarystruktur angebunden werden und zweitens lässt sich auch in einem Report eine Suchhilfe einfacher verwenden.</p>
+<p>Das Programm reduziert sich so auf die folgende Angabe bei dem Parameter P_PATH:</p>
+<pre>PARAMETERS p_path  TYPE string OBLIGATORY LOWER CASE <span style="color: #ff0000;">MATCHCODE OBJECT ZSH_DIRECTORY</span>.</pre>
+<p>du ahnst es schon: Die Suchhilfe heißt in diesem Fall ZSH_DIRECTORY. Um diese zu erstellen musst du folgendes tun:</p>
+<ol>
+<li>Anlage der Suchhilfe in der SE11</li>
+<li>Anlage eines Funktionsbausteins, der als Suchhilfe-Exit verwendet wird.</li>
+</ol>
+<p>Wir fangen bei 2. an:</p>
+<h2>2. Anlage Suchhilfe-Exit</h2>
+<p>Du benötigst eine Funktionsgruppe. Einfach in der SE80 eine anlegen. In diese Funktionsgruppe kopierst du den Baustein F4IF_SHLP_EXIT_EXAMPLE auf den Baustein Z_F4IF_SHLP_EXIT_DIRECTORY. Das Kopieren ist wichtig, da die Suchhilfe-Exit-Bausteine eine definierte Schnittstelle haben.</p>
+<p>Im STEP SELECT fügst du das Coding ein, dessen Kern wir bereits aus dem vorherigen Coding kennen:</p>
+<pre>  IF callcontrol-step = 'SELECT'.
+*== data (please set data definitions to top of function module!)
+    DATA lv_in TYPE string.
+    DATA lv_out TYPE string.
+    FIELD-SYMBOLS &lt;itf&gt; LIKE LINE OF shlp-interface.
+    FIELD-SYMBOLS &lt;rec&gt; LIKE LINE OF record_tab.
+*== get field value
+    READ TABLE shlp-interface WITH KEY shlpfield = 'PATH' ASSIGNING &lt;itf&gt;.
+    IF sy-subrc = 0.
+*== use field value as start directory
+      lv_in = &lt;itf&gt;-value.
+*== call popup for directory selection
+      CALL METHOD cl_gui_frontend_services=&gt;directory_browse
+        EXPORTING
+          initial_folder  = lv_in
+        CHANGING
+          selected_folder = lv_out
+        EXCEPTIONS
+          OTHERS          = 4.
+      IF sy-subrc = 0 AND lv_out IS NOT INITIAL.
+        APPEND INITIAL LINE TO record_tab ASSIGNING &lt;rec&gt;.
+        &lt;rec&gt;-string = lv_out.
+        callcontrol-step = 'RETURN'.
+      ENDIF.
+    ENDIF.
+  ENDIF.</pre>
+<p>Grob passiert folgendes:</p>
+<ol>
+<li>Wir lesen aus der Schnittstellenbeschreibung den Parameter PATH, den wir in der Suchhilfe definiert haben, aus und verwenden ihn als Startverzeichnis</li>
+<li>Aufruf der Methode DIRECTORY_BROWSE</li>
+<li>Füllen der Rückgabetabelle RECORD_TAB</li>
+<li>Setzen des Folgeschrittes RETURN um die Anzeige des gefundenen Verzeichnisses im Popup zu verhindern</li>
+</ol>
+<p>[notice type=&#8217;info&#8217;]Eventuell kann es sein, dass in dem Beispiel das Startverzeichnis nicht in die Suchhilfe übernommen wird. In dem Fall muss gegebenenfalls ebenfalls der Funktionsbaustein DYNP_VALUES_READ eingesetzt werden. Das verwendete Parametername steht in der INTERFACE-Struktur im Feld VALFIELD.[/notice]</p>
+<h2>1. Anlage der Suchhilfe</h2>
+<p>Transaktion SE11: Suchhilfe Anlegen:</p>
+<p><img loading="lazy" decoding="async" width="414" height="359" class="alignnone size-full wp-image-4377" src="https://tricktresor.com/wp-content/uploads/2014/02/img_52f395b7a234f.png" alt="" srcset="/wp-content/uploads/2014/02/img_52f395b7a234f.png 414w, /wp-content/uploads/2014/02/img_52f395b7a234f-300x260.png 300w" sizes="(max-width: 414px) 100vw, 414px" /></p>
+<p>In der Suchhilfe muss der erstellte Funktionsbaustein als Suchhilfe-Exit eingetragen werden:</p>
+<p><img loading="lazy" decoding="async" width="737" height="429" class="alignnone size-full wp-image-4378" src="https://tricktresor.com/wp-content/uploads/2014/02/img_52f3960b0c6f8.png" alt="" srcset="/wp-content/uploads/2014/02/img_52f3960b0c6f8.png 737w, /wp-content/uploads/2014/02/img_52f3960b0c6f8-300x174.png 300w, /wp-content/uploads/2014/02/img_52f3960b0c6f8-624x363.png 624w" sizes="(max-width: 737px) 100vw, 737px" /></p>
+<p>Der Beitrag <a href="/blog/pfadauswahl-mit-directory-browse/">Pfadauswahl mit DIRECTORY_BROWSE</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

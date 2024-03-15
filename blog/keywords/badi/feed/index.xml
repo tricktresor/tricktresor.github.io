@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>BAdI Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/badi/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 12 Sep 2017 09:24:59 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>BAdI Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Selektion für MD04/ MD06 + MS04/06 eingrenzen</title>
+		<link>/blog/selektion-fuer-md04-md06-ms0406-eingrenzen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 29 Jul 2016 15:47:54 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Materialwirtschaft]]></category>
+		<category><![CDATA[BAdI]]></category>
+		<category><![CDATA[MD04]]></category>
+		<category><![CDATA[md06]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=750280</guid>
+
+					<description><![CDATA[<p>Je nach Größe und aufkommen in Werk und Dispobereich dauert die Auswertung in den Transaktionen recht lange. Die Standardselektion erlaubt es leider nur sehr begrenzt die Ergebnismenge einzugrenzen – Select-Options vermisst man gänzlich. Dies lässt sich jedoch anpassen...</p>
+<p>Der Beitrag <a href="/blog/selektion-fuer-md04-md06-ms0406-eingrenzen/">Selektion für MD04/ MD06 + MS04/06 eingrenzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Je nach Größe und aufkommen in Werk und Dispobereich dauert die Auswertung in den Transaktionen recht lange. Die Standardselektion erlaubt es leider nur sehr begrenzt die Ergebnismenge einzugrenzen – Select-Options vermisst man gänzlich. Der Benutzer wird oft gezwungen die komplette Liste aufzubauen und anschließend mit Filtern die Datenmenge einzugrenzen.<br />
+Zum Glück bietet die SAP uns hier die Möglichkeit die Situation mittels BAdI MD_EXCLUDE_MATERIAL zu verbessern. Der BAdI erlaubt es im Einstiegsbild einen zusätzlichen Reiter „Zusatzselektion“ einzubinden und dort ein eigenes Dynpro mit einem Selektionsbild einzubinden.</p>
+<h2>Link zur SAP-Doku</h2>
+<p>https://help.sap.com/erp_hcm_ias_2013_01/helpdata/de/45/188147e1235d79e10000000a11466f/content.htm</p>
+<blockquote><p>„SAP empfiehlt, sich stark an der Beispielimplementierung zu orientieren und einen speziellen kundenspezifischen Report analog dem Report RMD07_BADI_SCREEN_EXTENSION01 mit Selektionsscreen 347 und Auswahl-Formroutine zu definieren. Der Selektions-Subscreen muss dann in der Screen-Erweiterung den leeren Subscreen 347 ersetzen, während die Auswahl-Formroutine innerhalb der Methode EXCLUDE_MATERIAL_EVAL aufgerufen werden muss.“</p></blockquote>
+<h2>Demoreport der SAP</h2>
+<p>Report RMD07_BADI_SCREEN_EXTENSION01</p>
+<h2>Beispiel</h2>
+<p>Beispielsweise könnte das wie folgt aussehen:</p>
+<figure id="attachment_750281" aria-describedby="caption-attachment-750281" style="width: 547px" class="wp-caption alignnone"><a href="https://tricktresor.com/wp-content/uploads/2016/07/2016-07-29_17-35-45.jpg"><img fetchpriority="high" decoding="async" class="size-full wp-image-750281" src="https://tricktresor.com/wp-content/uploads/2016/07/2016-07-29_17-35-45.jpg" alt="Erweiterung der Selektionsoptionen bei MD04" width="547" height="444" srcset="/wp-content/uploads/2016/07/2016-07-29_17-35-45.jpg 547w, /wp-content/uploads/2016/07/2016-07-29_17-35-45-300x244.jpg 300w" sizes="(max-width: 547px) 100vw, 547px" /></a><figcaption id="caption-attachment-750281" class="wp-caption-text">Erweiterung der Selektionsoptionen bei MD04</figcaption></figure>
+<p>Vor der Auswertung der Dispositionsdaten wird dann für jedes Material im Dispobereich die BAdI-Methode gerufen und die Möglichkeit gegeben das Material aus der Auswertung auszuschließen.<br />
+Unbefriediegend dabei ist, dass die „Speichern“ Funktion des Standards die Eingabewert im Subscreen nicht mit speichert und entsprechend beim Start der Transaktion nicht wiederherstellt. Zum Glück erlaubt uns das Sel-Screen Eventing die entsprechenden Zeitpunkte ebenfalls abzuhandeln und das so zu ermöglichen. *** Einmalig beim Start der Transaktion gespeicherte Daten wiederherstellen via FuBa RS_SUPPORT_SELECTIONS</p>
+<pre>CASE sy-ucomm. 
+  WHEN 'YES'. 
+*** Wiederherstellen Selektionsbild via FuBa RS_SUPPORT_SELECTIONS wenn 
+*** der Benutzer zurück aus der Auswertung kommt. 
+  WHEN 'SAVP'. 
+*** Speichern des Selektionsbild via FuBa RS_REFRESH_FROM_SELECTOPTIONS 
+*** und RS_CHANGE_CREATED_VARIANT_255 bzw. RS_CREATE_VARIANT_255 
+ENDCASE.</pre>
+<p>Der Beitrag <a href="/blog/selektion-fuer-md04-md06-ms0406-eingrenzen/">Selektion für MD04/ MD06 + MS04/06 eingrenzen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>ALV-Grid-Erweiterung &#8220;Langtext&#8221;</title>
+		<link>/blog/alv-grid-erweiterung-langtext/</link>
+					<comments>/blog/alv-grid-erweiterung-langtext/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 13 Jun 2014 19:07:40 +0000</pubDate>
+				<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[Texte]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[Controls]]></category>
+		<category><![CDATA[BAdI]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[Dokumentation]]></category>
+		<category><![CDATA[Container]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4811</guid>
+
+					<description><![CDATA[<p>Immer mal wieder stolpere ich über kleine Perlen im SAP-Standard. Diese Perle ist evtl. in einem älteren System noch nicht vorhanden, aber die Funktionalität finde ich sehr nett. Gut zu wissen, dass es sowas gibt.</p>
+<p>Der Beitrag <a href="/blog/alv-grid-erweiterung-langtext/">ALV-Grid-Erweiterung &#8220;Langtext&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute war Tag der Ablenkung. Nachdem ich in der CL_GUI_ALV_GRID-Klasse etwas herum experimentiert hatte, bin ich nun auch noch über eine Ableitung dieser Klasse mit der Erweiterung <em>Automatische Langtextermittlung</em> gestoßen: Die Klasse heißt CL_ALV_GRID_XT, das zugehörige Demoprogramm lautet R_ALV_GRID_XT.</p>
+<p>Um zu verstehen, was SAP in diesem Fall mit <em>Langtext</em> meint, habe ich eine abgespeckte Demoversion geschrieben. In diesem Programm wird die Tabelle TVKO, die die Definition der Verkaufsorganisationen enthält. Mit der automatischen Langtextermittlung  können Felder definiert werden, die entweder einen beschreibenden Text in einer zugehörigen Customizingtabelle haben, oder bei dem die Werte als Festwerte in der Domäne hinterlegt sind.</p>
+<p>Der Parameter <em>KEEP = X</em> bewirkt, dass das Schlüsselfeld angezeigt wird. Bei <em>KEEP = space</em> wird das Feld automatisch ausgeblendet und es wird nur das Feld mit dem Langtext angezeigt.</p>
+<p>[notice type = &#8216;info&#8217;]Zusätzlich gibt es die Option <em>Ausgabe optimieren</em>. Wird diese Option aktiviert, dann werden bei der Ausgabe alle komplett leeren Spalten ausgeblendet. Ein nettes Feature![/notice]</p>
+<h2>Beschreibung</h2>
+<p>Das Demoprogramm liest die Tabelle TVKO. Die Beschreibung der Verkaufsorganisationen stehen in der Texttabelle TVKOT. Um diese in einem ALV anzuzeigen müsste man entweder einen View bemühen oder die Texte aus der Tabelle manuell nachlesen. Diese Arbeit nimmt uns die Option <em>Automatische Langtextermittlung</em> ab. Um nicht extra eine neue Tabelle bzw. einen Feldkatalog aufbauen zu müssen, verwende ich vorhandene Felder, in die die Langtexte geschrieben werden. Der Name der VKORG kommt in das Feld TXNAM_KOP, der zugehörige Festwert zum Feld BSTYP ins Feld TXNAM_SDB.</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_200629.jpg"><img decoding="async" class="alignnone size-full wp-image-4812" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_13_200629.jpg" alt="Bild_2014_06_13_200629" width="724" height="126" srcset="/wp-content/uploads/2014/06/Bild_2014_06_13_200629.jpg 724w, /wp-content/uploads/2014/06/Bild_2014_06_13_200629-300x52.jpg 300w, /wp-content/uploads/2014/06/Bild_2014_06_13_200629-624x108.jpg 624w" sizes="(max-width: 724px) 100vw, 724px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT.
+
+PARAMETER p_optim  TYPE xfeld DEFAULT 'X'.
+PARAMETER p_ltxt   TYPE xfeld DEFAULT 'X'.
+PARAMETER p_keep   TYPE xfeld DEFAULT 'X'.
+
+
+DATA gt_autotext   TYPE alv_auto_text_t.
+DATA gt_data       TYPE STANDARD TABLE OF tvko.
+DATA gr_alv        TYPE REF TO cl_alv_grid_xt.
+DATA gr_container  TYPE REF TO cl_gui_custom_container.
+
+
+START-OF-SELECTION.
+  PERFORM start_of_selection.
+
+*---------------------------------------------------------------------*
+*       Form  start_of_selection
+*---------------------------------------------------------------------*
+*       Start program execution
+*---------------------------------------------------------------------*
+FORM start_of_selection.
+
+  PERFORM get_data.
+
+  IF p_ltxt IS NOT INITIAL.
+    PERFORM prep_auto_text.
+  ENDIF.
+
+  CALL SCREEN 100.
+
+ENDFORM.                    "start_of_selection
+
+*&amp;---------------------------------------------------------------------*
+*&amp;      Form  prep_auto_text
+*&amp;---------------------------------------------------------------------*
+FORM prep_auto_text.
+
+  DATA ls_autotext LIKE LINE OF gt_autotext.
+
+  ls_autotext-keep_fieldname_visible = p_keep.
+  ls_autotext-fieldname              = 'VKORG'.
+  ls_autotext-fieldname_longtext     = 'TXNAM_KOP'.
+  INSERT ls_autotext INTO TABLE gt_autotext.
+
+  ls_autotext-keep_fieldname_visible = p_keep.
+  ls_autotext-fieldname              = 'BSTYP'.
+  ls_autotext-fieldname_longtext     = 'TXNAM_SDB'.
+  INSERT ls_autotext INTO TABLE gt_autotext.
+
+ENDFORM.                    "prep_auto_text
+*---------------------------------------------------------------------*
+*       Form  get_data
+*---------------------------------------------------------------------*
+*       Select application data (here SFLIGHT)
+*---------------------------------------------------------------------*
+FORM get_data.
+
+  FIELD-SYMBOLS &lt;data&gt; LIKE LINE OF gt_data.
+
+*== read all sales organizations
+  SELECT * FROM tvko INTO TABLE gt_data.
+
+*== clear fields that shall contain the long text
+  LOOP AT gt_data ASSIGNING <data>.
+    CLEAR &lt;data&gt;-txnam_kop.
+    CLEAR &lt;data&gt;-txnam_sdb.
+  ENDLOOP.
+
+ENDFORM.                    "get_data
+
+*----------------------------------------------------------------------*
+*       Module  d0100_init  OUTPUT
+*----------------------------------------------------------------------*
+*       Initialize ALV Grid screen
+*----------------------------------------------------------------------*
+MODULE d0100_init OUTPUT.
+
+  SET: PF-STATUS '100',
+       TITLEBAR  '100'.
+
+  CHECK gr_container IS INITIAL.
+
+
+*== Create ALV container
+  CREATE OBJECT gr_container
+    EXPORTING
+      container_name = 'ALV_GRID'.
+
+*== Create ALV grid
+  CREATE OBJECT gr_alv
+    EXPORTING
+      i_parent          = gr_container
+      i_optimize_output = p_optim
+      it_auto_text_det  = gt_autotext.
+
+
+* Display ALV data
+  CALL METHOD gr_alv-&gt;set_table_for_first_display
+    EXPORTING
+      i_save                        = 'A'
+      i_structure_name              = 'TVKO'
+    CHANGING
+      it_outtab                     = gt_data
+    EXCEPTIONS
+      invalid_parameter_combination = 1
+      program_error                 = 2
+      too_many_lines                = 3
+      OTHERS                        = 4.
+
+ENDMODULE.                 " d0100_init  OUTPUT
+
+*----------------------------------------------------------------------*
+*       Module  d0100_exit  INPUT
+*----------------------------------------------------------------------*
+MODULE d0100_exit INPUT.
+
+  CALL METHOD: gr_alv-&gt;free,
+               gr_container-&gt;free.
+
+  LEAVE TO SCREEN 0.
+ENDMODULE.                 " d0100_exit  INPUT</pre>
+<h2>Dynpro</h2>
+<p>Das Dynpro 100 muss angelegt werden und der GUI-Status &#8220;100&#8221; ebenfalls. Das PAI-Modul anzupassen, so dass es funktioniert, sollte ein Kinderspiel sein.</p>
+<p>[notice type=&#8217;info&#8217;]Der SAP-Demoreport bietet noch eine Funktionalität mit BAdI <em>BADI_ALV_GRID_XT </em>(Transaktion SE18). Diese werde ich mir evtl. demnächst noch einmal anschauen und berichten. Die Dokumentation verspricht einiges: &#8220;Es ist Ihnen mit Hilfe dieser Daten möglich, kundeneigene Felder im Grid zu füllen, den Feldkatalog zu ändern und sich auf Events des Grid<br />
+Controls zu registrieren, z.B. TOOLBAR oder USER_COMMAND.[/notice]</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/alv-grid-erweiterung-langtext/">ALV-Grid-Erweiterung &#8220;Langtext&#8221;</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/alv-grid-erweiterung-langtext/feed/</wfw:commentRss>
+			<slash:comments>1</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>BAdI&#8217;s finden</title>
+		<link>/blog/badis-finden/</link>
+					<comments>/blog/badis-finden/#respond</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 21 Jul 2008 15:54:12 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[BAdI]]></category>
+		<category><![CDATA[Business Application Add-Ins]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=503</guid>
+
+					<description><![CDATA[<p>Um herauszufinden, welche BAdI's verwendet werden, k&#246;nnen Sie diesen Trick verwenden...</p>
+<p>Der Beitrag <a href="/blog/badis-finden/">BAdI&#8217;s finden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Um herauszufinden, welche BAdI&#8217;s verwendet werden, k&ouml;nnen Sie diesen Trick verwenden&#8230;<br /><P>Rufen Sie die Transaktion SE24 auf und w&auml;hlen Sie die Klasse <STRONG>CL_EXITHANDLER</STRONG>.</P><P>Machen Sie einen Doppelklick auf die Methode GET_INSTANCE. Sie gelangen dann in das Coding.</P><P>bei <STRONG>CASE sy-subrc </STRONG>setzen Sie einen Break-Point. </P><P>Rufen Sie dann die Transaktion auf, zu der Sie pr&uuml;fen wollen, welcher BAdI aufgerufen wird.</P><P>Wenn Sie im Debugger sind, enth&auml;lt das Feld <STRONG>EXIT_NAME</STRONG>&nbsp;den Namen der&nbsp;BAdI-Definition.</P><P>Mit der Transaktion <STRONG>SE18 </STRONG>k&ouml;nnen Sie die Definition des BAdI anschauen.</P><P>Verwenden Sie die Transaktion <STRONG>SE19</STRONG>, um einen BAdI zu implementieren.</P></p>
+<p>Der Beitrag <a href="/blog/badis-finden/">BAdI&#8217;s finden</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/badis-finden/feed/</wfw:commentRss>
+			<slash:comments>0</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

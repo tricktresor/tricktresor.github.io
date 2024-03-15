@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>game Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/game/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Wed, 10 Jan 2018 19:49:37 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>game Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Tentactics &#8211; Puzzle Game</title>
+		<link>/blog/tentactics-puzzle-game/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 15 Apr 2016 09:00:00 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[game]]></category>
+		<category><![CDATA[Spiele]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=578841</guid>
+
+					<description><![CDATA[<p>Seit einiger Zeit fesselt mich das simple Puzzlespiel Numberama2, das für iOS im Appstore verfügbar ist. Neben dem Spielen habe ich mir auch Gedanken darüber gemacht, wie man das wohl am einfachsten programmieren könnte. In diesem Artikel präsentiere ich dir das Ergebnis meiner Bemühungen. Viel Spaß!</p>
+<p>Der Beitrag <a href="/blog/tentactics-puzzle-game/">Tentactics &#8211; Puzzle Game</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Seit einiger Zeit fesselt mich das simple Puzzlespiel <a href="https://itunes.apple.com/de/app/numberama-2/id581489308?mt=8">Numberama2</a>, das für iOS im Appstore verfügbar ist. Neben dem Spielen habe ich mir auch Gedanken darüber gemacht, wie man das wohl am einfachsten programmieren könnte. Ich hatte dann eine Idee, die ich leider doch verwerfen musste. Am Ende ist das Spiel deutlich komplexer und aufwändiger geworden, als ich dachte. So ist das halt häufig&#8230;</p>
+<h2>Gameplay</h2>
+<p>Gespielt wird auf einem 9 Spielfelder breiten und nach unten offenem Spielfeld. Die Spielfelder werden gleichmäßig mit Zahlen von 1 bis 9 aufgefüllt. Nun gilt es, Paare zu finden. Ein gültiges Paar sind zwei Zahlen, die</p>
+<ul style="list-style-type: square;">
+<li>direkt neben-, oder untereinander stehen</li>
+<li>Ohne andere Zahlen neben- oder untereinander stehen</li>
+<li>in einer Reihe rechts aufhören und in der nächsten Reihe links wieder beginnen</li>
+</ul>
+<p>Paare müssen folgende Eigenschaften haben:</p>
+<ul style="list-style-type: square;">
+<li>Die Summe muss 10 ergeben (1 + 9, 2 + 8 usw)</li>
+<li>Die Zahlen müssen gleich sein (1 + 1, 2 + 2 usw)</li>
+</ul>
+<p>Die Zahlen gültiger Paare können angeklickt und dadurch vom Spielfeld entfernt werden.</p>
+<p>Ziel des Spieles ist es, alle Zahlen zu löschen.</p>
+<p>Ausgangsbasis sind Zufallszahlen (random mode) oder die Startreihe (classic mode)</p>
+<pre>123456789
+111213141
+516171819</pre>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/04/2016-03-28_17-04-33.jpg"><img decoding="async" class="alignnone size-full wp-image-578844" src="https://tricktresor.com/wp-content/uploads/2016/04/2016-03-28_17-04-33.jpg" alt="2016-03-28_17-04-33" width="251" height="199" /></a></p>
+<p>Sind alle Paare gefunden, dann muss der &#8220;Next&#8221; Button gedrückt werden. Hierdurch werden allen verbliebenen Zahlen ohne Lücken an die vorhandenen Zahlen angehängt. Dadurch ergeben sich wieder neue Kombinationsmöglichkeiten.</p>
+<p>Man startet mit einer Punktzahl von 1000. Jedes eliminierte Zahlenpaar verringert die Punktzahl um 5. Gelöschte Reihen erhöhen die Punktzahl um 10.</p>
+<p>Die Punktzahl ist jedoch meiner Meinung nach nebensächlich. Es ist schon schwer genug, die Zahlen zu eliminieren.</p>
+<h2>Der Name</h2>
+<p>Eigentlich wollte ich &#8211; da es sich um eine Programmieraufgabe mit ABAP handelt &#8211; das Spiel NUMBERABAP nennen. Zwischendurch fiel mir jedoch der Name TENTACTICS ein, den ich deutlich spannender finde. TEN in Anlehnung an das Spielprinzip, dass die Summe der Paare 10 ergeben muss und TACTICS, da man durchaus taktisch agieren muss, um alle Zahlen zu eliminieren. Und Alliterationen sind immer gut.</p>
+<h2>Programmbeschreibung</h2>
+<p>Die erste Idee, um das Spielprinzip abbilden zu können, war die Verwendung einer internen Tabelle mit den Feldern</p>
+<ul style="list-style-type: square;">
+<li>number</li>
+<li>column</li>
+<li>row</li>
+</ul>
+<p>und zwei Indizes:</p>
+<ul style="list-style-type: square;">
+<li>column &#8211; row</li>
+<li>row &#8211; column</li>
+</ul>
+<p>So wäre es einfach, Paare zu finden, denn diese müssen entweder im einen oder im anderen Index direkt &#8220;nebeneinander&#8221; liegen.</p>
+<p>Leider brauchte ich natürlich zusätzlich eine Tabelle für das Spielfeld. Die verschiedenen Zugvariationen machten es schwierig, beide Tabellen auf dem gleichen Stand zu halten. Deswegen habe ich in der zweiten Version nur mit dem Spielfeld als &#8220;Zahlenspeicher&#8221; gearbeitet. Für die Lösungssuche bin ich dann allerdings wieder auf die erste Programmidee zurück gekommen.</p>
+<p>Die Lösungssuche funktioniert nicht zuverlässig, denn die Idee mit den &#8220;nebeneinander&#8221; liegenden Zahlen war zwar gut, findet aber nicht alle möglichen Paare. Um alle Paare zuverlässig identifizieren zu können, müsste man oben links im Spielfeld beginnen und jede Zahl der Reihe nach nach möglichen Kombinationen (nach oben, unten, rechts und links) absuchen.</p>
+<p>Das Spielfeld ist ein simples ALV-Grid mit einer kleinen Besonderheit: Die Klasse CL_GUI_ALV_GRID habe ich abgeleitet und um die Methode SET_NO_RESIZE erweitert. Diese ruft die geschützte Methode SET_RESIZE_COLS( 0 ) auf, mit der die Größenänderung der Spalten verhindert wird.</p>
+<p>Ich habe bei der Programmierung mit &#8220;Buttons&#8221; und &#8220;Links&#8221; experimentiert und bin zu dem Schluss gekommen, dass die Buttons am besten aussehen. Die Links sind alle unterstrichen und das machte die Zahlen unübersichtlich.</p>
+<h2>Spieltipps<a href="https://tricktresor.com/wp-content/uploads/2016/04/2016-03-28_17-05-03.jpg"><img decoding="async" class="size-full wp-image-578843 alignright" src="https://tricktresor.com/wp-content/uploads/2016/04/2016-03-28_17-05-03.jpg" alt="2016-03-28_17-05-03" width="144" height="167" /></a></h2>
+<p>Eliminiere zuerst die eindeutigen Paare, also Zahlen, die direkt nebeneinander stehen und bei denen es nur eine Lösungsmöglichkeit gibt.</p>
+<p>Dreier-Kombinationen lasse außen vor und versuche bessere Paare außen herum zu finden, so dass es eine passende vierte Zahl in Frage kommt.</p>
+<p>Auch bei eindeutigen Paaren darauf achten, ob es eventuell Kombinationen gibt, die besser vorher gelöst werden sollten. In folgendem Beispiel sind ZWEI Paare versteckt. Offensichtlich sind die zwei Vieren ganz links. Weniger offensichtlich, jedoch besser (da man zwei Paare löst), ist es, die Vier oben rechts mit der Vier aus der nächsten Reihe zu lösen und gleiches in der folgenden Zeile.</p>
+<pre>1 2 3 4 5 6 7 8 4
+4 5   5 6 5 6 4
+4 7 1 8   1     7
+  8 4 7 1 3 9</pre>
+<p>Der Button &#8220;Check&#8221; prüft, wie viele Paare noch vorhanden sind und gibt Hinweise darauf, wo sich noch Paare verstecken.</p>
+<p>Eventuell ist es besser, nicht alle möglichen Paare zu löschen, sondern schon vorher den NEXT-Button zu betätigen.</p>
+<h2>Known Bugs</h2>
+<p>Es wird nicht erkannt, ob das Spiel zu Ende ist.</p>
+<p>Ich dachte, dass es nur möglich wäre, höchstens eine Zeile zur Zeit zu eliminieren. Das stimmt nicht, es können auch zwei Zeilen gelöscht werden. In folgender Konstellation bilden die beiden Vieren ein Paar und können gelöscht werden. Dadurch werden auch die beiden Zeilen gelöscht:</p>
+<pre>1 2 3 4 5 6 7 8 9
+              4  
+3 4 5 6 7 8     2
+              4
+1 7             5</pre>
+<p>Wie bereits oben beschrieben, ist die Lösungssuche nicht 100% zuverlässig. Einige Paare werden nicht korrekt erkannt.</p>
+<h2>Unterschiede zum Original</h2>
+<p>Du wirst nicht durch einen blinkenden NEXT-Button darüber informiert, dass es keine Züge mehr gibt. Dies wäre noch leicht einzubauen.</p>
+<p>Du bekommst Hinweise, wo sich noch Paare verstecken. Das ist leider in der Originalversion nicht so und hat mich schon manches Mal zur Verzweiflung getrieben.</p>
+<p>Der größte Unterschied ist jedoch, dass dieses Spiel in ABAP geschrieben wurde. <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<h2>How To Start</h2>
+<p>Lege ein neues Programm in der Transaktion SE38 an und kopiere den Code von TENTACTICS Editor und aktiviere das Programm. Führe das Programm aus und wähle den Spielmodus &#8220;Classic&#8221; oder &#8220;Random&#8221;. Drücke &lt;ENTER&gt; um das Spiel zu starten (NICHT Ausführen!).</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/04/2016-03-28_17-06-06.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-578842" src="https://tricktresor.com/wp-content/uploads/2016/04/2016-03-28_17-06-06.jpg" alt="2016-03-28_17-06-06" width="268" height="331" srcset="/wp-content/uploads/2016/04/2016-03-28_17-06-06.jpg 268w, /wp-content/uploads/2016/04/2016-03-28_17-06-06-243x300.jpg 243w" sizes="(max-width: 268px) 100vw, 268px" /></a></p>
+<h2>Quelltext</h2>
+<p>Hier gibt es den Quelltext zum Download: <a href="https://tricktresor.com/wp-content/uploads/2016/04/tentactics.abap_.txt">tentactics.abap</a></p>
+<p>Der Beitrag <a href="/blog/tentactics-puzzle-game/">Tentactics &#8211; Puzzle Game</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>assign Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/assign/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Fri, 24 Aug 2018 09:40:57 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>assign Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Feldname mit doppeltem Feldnamen</title>
+		<link>/blog/feldname-mit-doppeltem-feldnamen/</link>
+					<comments>/blog/feldname-mit-doppeltem-feldnamen/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Thu, 29 Sep 2016 09:00:00 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[Dynamische Struktur]]></category>
+		<category><![CDATA[Struktur]]></category>
+		<category><![CDATA[ALIAS]]></category>
+		<category><![CDATA[Gruppenname]]></category>
+		<category><![CDATA[Include]]></category>
+		<category><![CDATA[tabelle]]></category>
+		<category><![CDATA[assign]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=843204</guid>
+
+					<description><![CDATA[<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt. Was aber, wenn sich die Feldnamen unterscheiden?</p>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hä?</p>
+<p>Die nordfriesisch höfliche Nachfrage ist berechtigt. Wie kann ein Feldname einen doppelten Feldnamen besitzen? Aber der Reihe nach. Erst das Problem, dann die Idee und zum Schluss die Lösung.</p>
+<h2>MOVE-CORRESPONDING</h2>
+<p>Der MOVE-CORRESPONDING-Befehl ist sehr bequem. Man kann einfach alle Felder einer Struktur in die gleichnamigen Felder einer anderen Struktur kopieren. Wird ein neues Feld in die Strukturen eingefügt, wird es automatisch berücksichtigt.</p>
+<p>&lt;offtopic&gt;Eigentlich müsste der Befehl dann ja COPY-CORRESPONDING heißen, denn der Feldinhalt wird ja nicht verschoben, sondern kopiert&#8230;&lt;/offtopic&gt;.</p>
+<p>Der Befehl birgt aber auch Tücken, denn die Feldnamen müssen immer gleich sein. Häufig hat man jedoch den Fall, dass Feldnamen &#8211; trotz gleicher Funktion und gleichem Datenelement &#8211; in verschiedenen Strukturen anders heißen. Zum Beispiel könnte das Feld in der Quellstruktur LIFNR heißen, in der Zielstruktur heißt es jedoch LIEFERANT.</p>
+<p>Ein nachträgliches MOVE ist in diesem Fall erforderlich:</p>
+<pre>MOVE quell_struktur-lifnr TO ziel_struktrur-lieferant.</pre>
+<p>Das ist nicht weiter schlimm. Wenn man jedoch eine dynamische Struktur als Quellstruktur hat, dann muss man umständlich mittels ASSIGN COMPONENT den Quellwert lesen und dann zuweisen. Das ist umständlich und gegebenenfalls auch zeitkritisch.</p>
+<pre>ASSIGN COMPONENT 'LIFNR' OF STRUCTURE dynamische_quell_struktur TO FIELD-SYMBOLS(&lt;lifnr&gt;).
+IF sy-subrc = 0.
+  ziel_struktur-lieferant = &lt;lifnr&gt;.
+ENDIF.</pre>
+<p>Sofern es sich um kundeneigene Tabellen handelt, kann man den folgenden Trick anwenden und quasi einen ALIAS vergeben:</p>
+<h2>ALIAS-Feldname</h2>
+<p>Stichwort: Benanntes Include. Wir machen uns den Umstand zu Nutze, dass man ein Include in eine Tabelle einbinden kann und dieses Include benennen kann. Das ist eigentlich für inkludierte Strukturen gedacht, um zum Beispiel die komplette Tabelle MARA per Include einbinden zu können und diese auch MARA benennen zu können. Die komplette Struktur MARA steht dann in der inkludierten Struktur zur Verfügung:</p>
+<pre>SELECT * FROM MARA INTO my_struc-mara WHERE...</pre>
+<p>Wir verwenden diese <em>Gruppe</em> nun nicht für eine inkludierte Struktur, sondern nur für ein inkludiertes <em>Feld</em>. Die Technik ist die gleiche.</p>
+<p>Die Tabelle bestand vorher aus den Feldern</p>
+<ul>
+<li>MANDT</li>
+<li>MATNR</li>
+<li>KENNZ</li>
+</ul>
+<p>Ich möchte diese Tabelle nun so abändern, dass das Feld KENNZ auch unter dem Namen KENNZEICHEN ansprechbar ist. Dafür lege ich einen Include an, der nur das eine Feld KENNZ enthält. Dieses Include wird in die Tabelle eingebunden:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg"><img fetchpriority="high" decoding="async" class="alignnone size-full wp-image-843270" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg" alt="2016-09-26_18-01-48" width="802" height="310" srcset="/wp-content/uploads/2016/09/2016-09-26_18-01-48.jpg 802w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-300x116.jpg 300w, /wp-content/uploads/2016/09/2016-09-26_18-01-48-768x297.jpg 768w" sizes="(max-width: 802px) 100vw, 802px" /></a></p>
+<p>Die Struktur der Tabelle ist hinterher genau so, wie vorher:</p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg"><img decoding="async" class="alignnone size-full wp-image-843271" src="https://tricktresor.com/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg" alt="2016-09-26_18-02-48" width="441" height="224" srcset="/wp-content/uploads/2016/09/2016-09-26_18-02-48.jpg 441w, /wp-content/uploads/2016/09/2016-09-26_18-02-48-300x152.jpg 300w" sizes="(max-width: 441px) 100vw, 441px" /></a></p>
+<h2>Die richtige Ansprache</h2>
+<p>Den Vorteil, den ich jetzt habe: ich kann das Feld mit dem richtigen Namen KENNZ und mit dem <em>Alias KENNZEICHEN</em>, dem <em>Gruppennamen des Includes</em> ansprechen:</p>
+<pre>DATA lt_tt1 TYPE STANDARD TABLE OF ztt1.
+DATA ls_tt1 TYPE ztt1.
+
+
+SELECT * FROM ztt1 INTO TABLE lt_tt1.
+
+LOOP AT lt_tt1 INTO ls_tt1.
+ IF ls_tt1-kennz = 'X'.
+   ls_tt1-kennzeichen = 'F'.
+ ENDIF.
+ WRITE: / ls_tt1-matnr, ls_tt1-kennz.
+ENDLOOP.</pre>
+<p>Der Beitrag <a href="/blog/feldname-mit-doppeltem-feldnamen/">Feldname mit doppeltem Feldnamen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/feldname-mit-doppeltem-feldnamen/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+		<item>
+		<title>Flexible Erzeugung des Feldkataloges</title>
+		<link>/blog/flexible-erzeugung-des-feldkataloges/</link>
+		
+		<dc:creator><![CDATA[stefan]]></dc:creator>
+		<pubDate>Mon, 23 Jun 2014 16:56:06 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[Reports]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[cl_abap_structdescr]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[cl_abap_typedescr]]></category>
+		<category><![CDATA[GUI]]></category>
+		<category><![CDATA[cl_gui_alv_grid]]></category>
+		<category><![CDATA[feldkatalog]]></category>
+		<category><![CDATA[style]]></category>
+		<category><![CDATA[Container]]></category>
+		<category><![CDATA[create data]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=4862</guid>
+
+					<description><![CDATA[<p>In dem Artikel DATA ... RENAMING WITH SUFFIX wurde die Aussage gemacht: "Die ALVs haben Probleme mit komplexen Strukturen". Das stimmt so nicht. Natürlich ist es kein Problem des ALV sondern ein Problem bei der Erzeugung des Feldkatalogs. Ich habe mich darauf hin des Problems um die Erzeugung des Feldkatalogs zu einer komplexen Struktur angenommen und ein Programm entwickelt. Das Programm analysiert die komplexe Datenstruktur einer internen Tabelle und baut den Feldkatalog so auf, dass der ALV ihn zur Anzeige der Daten verwenden kann.</p>
+<p>Der Beitrag <a href="/blog/flexible-erzeugung-des-feldkataloges/">Flexible Erzeugung des Feldkataloges</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In dem Artikel <a title="DATA … RENAMING WITH SUFFIX" href="https://tricktresor.com/blog/data-renaming-with-suffix/">DATA &#8230; RENAMING WITH SUFFIX</a> macht Enno die Aussage &#8220;Die ALVs haben Probleme mit komplexen Strukturen&#8221;. Das stimmt so nicht. Natürlich ist es kein Problem des ALV sondern ein Problem bei der Erzeugung des Feldkatalogs. Ich habe mich deswegen einmal um die Erzeugung des Feldkatalogs zu einer komplexen Struktur gekümmert und ein Programm entwickelt, dass einen Feldkatalog zu einer tiefen Struktur aufbauen kann.</p>
+<h2>Arbeitsweise</h2>
+<p>Das Programm analysiert die komplexe Datenstruktur einer internen Tabelle und baut den Feldkatalog so auf, dass der ALV ihn zur Anzeige der Daten verwenden kann.</p>
+<p>Die Anzeige ist etwas bunter ausgefallen&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f609.png" alt="😉" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p><a href="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180623.jpg"><img decoding="async" class="alignnone wp-image-4863 size-full" src="https://tricktresor.com/wp-content/uploads/2014/06/Bild_2014_06_23_180623.jpg" alt="Bild_2014_06_23_180623" width="572" height="286" srcset="/wp-content/uploads/2014/06/Bild_2014_06_23_180623.jpg 572w, /wp-content/uploads/2014/06/Bild_2014_06_23_180623-300x150.jpg 300w" sizes="(max-width: 572px) 100vw, 572px" /></a></p>
+<h2>Coding</h2>
+<pre>REPORT .
+
+TYPES: BEGIN OF gts_data,
+*         mara TYPE mara,
+*         marc TYPE marc,
+         t005  TYPE t005,
+         t005t TYPE t005t,
+       END OF gts_data.
+
+
+DATA gt_data     TYPE STANDARD TABLE OF gts_data WITH NON-UNIQUE DEFAULT KEY.
+DATA gt_fieldcat TYPE lvc_t_fcat.
+DATA go_grid     TYPE REF TO cl_gui_alv_grid.
+DATA gv_style    TYPE i.
+
+*----------------------------------------------------------------------*
+*       CLASS lcx_general_exceptions DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcx_general_exceptions DEFINITION INHERITING FROM cx_static_check.
+ENDCLASS.                    "lcx_general_exceptions DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_alv_utilities DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_alv_utilities DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS create_fieldcat_lvc  IMPORTING i_data TYPE  any
+                                       RETURNING value(et_fieldcat) TYPE lvc_t_fcat
+                                       RAISING lcx_general_exceptions.
+  PRIVATE SECTION.
+    CLASS-METHODS create_fieldcat_line IMPORTING i_data TYPE  any
+                                       RETURNING value(et_fieldcat) TYPE lvc_t_fcat.
+ENDCLASS.                    "lcl_alv_utilities DEFINITION
+
+
+START-OF-SELECTION.
+  WRITE '.'.
+
+  SELECT * UP TO 100 ROWS
+    INTO TABLE gt_data
+*    FROM mara JOIN marc ON mara~matnr = marc~matnr.
+    FROM t005 JOIN t005t ON t005~land1 = t005t~land1.
+
+  CREATE OBJECT go_grid
+    EXPORTING
+      i_parent = cl_gui_container=&gt;screen0.
+  gt_fieldcat = lcl_alv_utilities=&gt;create_fieldcat_lvc( gt_data ).
+  go_grid-&gt;set_table_for_first_display( CHANGING
+                                          it_outtab       = gt_data
+                                          it_fieldcatalog = gt_fieldcat ).
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_alv_utilities IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_alv_utilities IMPLEMENTATION.
+
+  METHOD create_fieldcat_lvc.
+
+    FIELD-SYMBOLS: &lt;lt_data&gt; TYPE ANY TABLE,
+                   &lt;ls_line&gt; TYPE any,
+                   &lt;ls_dref&gt; TYPE any.
+
+    DATA lr_dref                 TYPE REF TO data.
+    data lo_descr                TYPE REF TO cl_abap_typedescr.
+    data lo_structdescr          TYPE REF TO cl_abap_structdescr.
+    DATA lt_components           TYPE cl_abap_structdescr=&gt;component_table.
+    FIELD-SYMBOLS &lt;ls_component&gt; LIKE LINE OF lt_components.
+
+    lo_descr = cl_abap_typedescr=&gt;describe_by_data( i_data ).
+
+    CASE lo_descr-&gt;kind.
+
+      WHEN cl_abap_typedescr=&gt;kind_elem.                   
+" Special case.  We see this when we have something like 
+"... type standard table of syucomm.
+* Tried various things but Grid won't show anything - 
+" no matter what I try to provide a faked fieldcat
+        RAISE EXCEPTION TYPE lcx_general_exceptions.       " Not foreseen yet
+
+      WHEN cl_abap_typedescr=&gt;kind_struct.                 
+        " Structure is fine --&gt; create fieldcat from this
+        et_fieldcat = create_fieldcat_line( i_data ).
+
+      WHEN cl_abap_typedescr=&gt;kind_table.                  
+        " Table --&gt; restart with linetype of table
+        ASSIGN i_data TO &lt;lt_data&gt;.
+        CREATE DATA lr_dref LIKE LINE OF &lt;lt_data&gt;.
+        ASSIGN lr_dref-&gt;* TO &lt;ls_line&gt;.
+        et_fieldcat = create_fieldcat_lvc( &lt;ls_line&gt; ).
+
+      WHEN cl_abap_typedescr=&gt;kind_ref.                    
+        " Reference --&gt; restart with dereferenced value
+        ASSIGN i_data-&gt;* TO &lt;ls_dref&gt;.
+        et_fieldcat = create_fieldcat_lvc( &lt;ls_dref&gt; ).
+
+*    when cl_abap_typedescr=&gt;KIND_CLASS.
+*    when cl_abap_typedescr=&gt;KIND_INTF  .
+      WHEN OTHERS.
+        BREAK-POINT.  " Ich will das vorher sehen
+        RAISE EXCEPTION TYPE lcx_general_exceptions.       " Not foreseen yet
+
+    ENDCASE.
+
+  ENDMETHOD.                                               "create_fieldcat_lvc
+
+
+  METHOD create_fieldcat_line.
+
+    DATA lr_dref               TYPE REF TO data.
+    data lo_salv               TYPE REF TO cl_salv_table.
+    data lo_salv_columns_table TYPE REF TO cl_salv_columns_table.
+    data lo_salv_aggregations  TYPE REF TO cl_salv_aggregations.
+    data lv_help_id            TYPE string.
+
+    FIELD-SYMBOLS &lt;ls_fc&gt;      LIKE LINE OF et_fieldcat.
+    FIELD-SYMBOLS &lt;lv_field&gt;   TYPE any.
+
+    FIELD-SYMBOLS &lt;lt_data&gt;    TYPE STANDARD TABLE.
+
+*--------------------------------------------------------------------*
+* Create standard table of input
+*--------------------------------------------------------------------*
+    CREATE DATA lr_dref LIKE STANDARD TABLE OF i_data.
+    ASSIGN lr_dref-&gt;* TO &lt;lt_data&gt;.
+    TRY.
+        cl_salv_table=&gt;factory( IMPORTING
+                                  r_salv_table   = lo_salv
+                                CHANGING
+                                  t_table        = &lt;lt_data&gt; ).
+        lo_salv_columns_table = lo_salv-&gt;get_columns( ).
+        lo_salv_aggregations  = lo_salv-&gt;get_aggregations( ).
+
+        et_fieldcat = cl_salv_controller_metadata=&gt;get_lvc_fieldcatalog(
+                            r_columns      = lo_salv_columns_table
+                            r_aggregations = lo_salv_aggregations ).
+*--------------------------------------------------------------------*
+* Internal fields w/o descriptions --&gt; set fieldname into header line
+*--------------------------------------------------------------------*
+        LOOP AT et_fieldcat ASSIGNING &lt;ls_fc&gt; WHERE scrtext_s = space
+                                                AND scrtext_m = space
+                                                AND scrtext_l = space.
+          &lt;ls_fc&gt;-scrtext_m = &lt;ls_fc&gt;-fieldname.
+        ENDLOOP.
+
+*--------------------------------------------------------------------*
+* Add F1 and F4-Help
+* Idea from http://wiki.scn.sap.com/wiki/display/Snippets/ALV+fieldcatalog+-+create+for+ANY+table
+*--------------------------------------------------------------------*
+        LOOP AT et_fieldcat ASSIGNING &lt;ls_fc&gt;.
+
+          ASSIGN COMPONENT &lt;ls_fc&gt;-fieldname OF STRUCTURE i_data TO &lt;lv_field&gt;.
+          CHECK sy-subrc = 0.
+          &lt;ls_fc&gt;-style     = gv_style.
+          ADD 1 TO gv_style.
+
+        TRY.
+          CLEAR lv_help_id.
+          DESCRIBE FIELD &lt;lv_field&gt; HELP-ID lv_help_id.
+          IF lv_help_id CA '-'.
+            SPLIT lv_help_id AT '-' INTO &lt;ls_fc&gt;-ref_table &lt;ls_fc&gt;-ref_field.
+          ENDIF.
+          CATCH cx_root.
+        ENDTRY.
+
+        ENDLOOP.
+
+      CATCH cx_salv_msg .
+    ENDTRY.
+
+  ENDMETHOD.                                               "create_fieldcat_line
+ENDCLASS.                    "lcl_alv_utilities IMPLEMENTATION</pre>
+<p>Der Beitrag <a href="/blog/flexible-erzeugung-des-feldkataloges/">Flexible Erzeugung des Feldkataloges</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Interne Tabelle mit COMPONENTS</title>
+		<link>/blog/interne-tabelle-mit-components/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2012 15:03:25 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[cl_abap_structdescr]]></category>
+		<category><![CDATA[cl_abap_elemdescr]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[select]]></category>
+		<category><![CDATA[create data]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[cl_abap_tabledescr]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=657</guid>
+
+					<description><![CDATA[<p>Hier wird eine interne Tabelle anhand von einer beliebigen Anzahl Feldern generiert.</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-mit-components/">Interne Tabelle mit COMPONENTS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Hier wird eine interne Tabelle anhand von einer beliebigen Anzahl Feldern generiert.</p>
+<p>Die Tabelle, aus der die Daten gelesen werden sollen, muss angegeben werden. Dann müssen die Felder EINZELN in der Select-Option eingetragen werden. Die Feldnamen müssen mit dem Namen des Datenelements übereinstimmen.</p>
+<p>Eine schönere Version wäre die Komponenten der angegebenen Tabelle zu ermitteln (CL_ABAP_STRUCTDESCR-&gt;GET_COMPONENTS).</p>
+<p><strong><span style="text-decoration: underline;">Achtung:</span><br />
+</strong>Es erfolgt keine Prüfung ob die Felder in der Tabelle vorhanden sind! Wenn Feldnamen angegeben werden, die nicht in der angegebenen Tabelle existieren, kommt es zu einem Dump!</p>
+<p>Es erfolgt keine Ausgabe der Daten!</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true  ">*== Create internal table dynamically by given fields
+ DATA: gr_element   TYPE REF TO cl_abap_elemdescr,
+ gr_struc     TYPE REF TO cl_abap_structdescr,
+ gr_table     TYPE REF TO cl_abap_tabledescr,
+ gt_comp      TYPE cl_abap_structdescr=&gt;component_table,
+ gs_comp      LIKE LINE OF lt_comp,
+ gr_data      TYPE REF TO data,
+ gt_fields    TYPE STANDARD TABLE OF string,
+ hf_fieldname TYPE fieldname.
+
+FIELD-SYMBOLS &lt;table&gt; TYPE ANY TABLE.
+
+*== selection screen
+ PARAMETERS p_table TYPE tabname DEFAULT 'MARA'.
+ SELECT-OPTIONS s_fields FOR hf_fieldname.
+ 
+
+START-OF-SELECTION.
+
+  LOOP AT s_fields.
+ CLEAR: gs_comp.
+
+*== Element Description for field
+ gr_element ?= cl_abap_elemdescr=&gt;describe_by_name( s_fields-low ).
+ *== Field name
+ gs_comp-name = s_fields-low.
+ *== Field type (element)
+ gs_comp-type = gr_element.
+ *== add element to components table
+ APPEND gs_comp TO gt_comp.
+
+*== add column to selection table
+ APPEND s_fields-low TO gt_fields.
+
+  ENDLOOP.
+
+*== Create structure/ work area
+ gr_struc = cl_abap_structdescr=&gt;create( gt_comp ).
+
+*== create table by structure reference
+ gr_table = cl_abap_tabledescr=&gt;create(
+ p_line_type  = gr_struc
+ p_table_kind = cl_abap_tabledescr=&gt;tablekind_std
+ p_unique     = abap_false ).
+
+*== create data handle for table
+ CREATE DATA gr_data TYPE HANDLE gr_table.
+
+*== assign data to table-pointer
+ ASSIGN gr_data-&gt;* TO &lt;table&gt;.
+
+*== Select data into dynamic internal table
+ SELECT (gt_fields) FROM  (p_table)
+ INTO CORRESPONDING FIELDS OF TABLE &lt;table&gt;
+ UP TO 10 ROWS.</pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-mit-components/">Interne Tabelle mit COMPONENTS</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Interne Tabelle DDIC</title>
+		<link>/blog/interne-tabelle-ddic/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 29 Aug 2012 13:57:36 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[cl_abap_typedescr]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[create data]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[cl_abap_tabledescr]]></category>
+		<category><![CDATA[assign component]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=655</guid>
+
+					<description><![CDATA[<p>Eine interne Tabelle anhand einer gegebenen DDIC-Struktur erzeugen und Ausgabe als einfache Liste</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-ddic/">Interne Tabelle DDIC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine interne Tabelle anhand einer gegebenen DDIC-Struktur erzeugen und Ausgabe als einfache Liste</p>
+<p class="head1">Verwendung</p>
+<p>Die in diesem Beispiel verwendete Möglichkeit interne Tabellen und Arbeitsbereiche dynamisch zu erzeugen kann verwendet werden, wenn der Inhalt einer Datenbanktabelle ausgelesen werden soll.</p>
+<p>So könnte man zum Beispiel ein Programm schreiben, das alle Tabellen ausliest, in denen das Datenelement &#8220;MATNR&#8221; vor kommt. Für jede Tabelle wird dann dynamisch eine interne Tabelle generiert und mittels ASSIGN COMPONENT &#8216;MATNR&#8217; könnten dynamisch Prüfungen auf die Materialnummer erfolgen.</p>
+<p class="head1">Coding</p>
+<p class="sap1"><span style="color: #fb2412;">*== data</span><br />
+DATA gr_struct     TYPE REF TO cl_abap_structdescr.<br />
+DATA gr_table      TYPE REF TO cl_abap_tabledescr.<br />
+DATA gd_table      TYPE REF TO data.<br />
+DATA gd_line       TYPE REF TO data.</p>
+<p class="sap1"><span style="color: #fb2412;">*== field symbols</span><br />
+FIELD-SYMBOLS &lt;workarea&gt; TYPE ANY.<br />
+FIELD-SYMBOLS &lt;table&gt;    TYPE ANY TABLE.<br />
+FIELD-SYMBOLS &lt;value&gt;    TYPE ANY.</p>
+<p class="sap1">PARAMETERS p_table TYPE tabname DEFAULT &#8216;T000&#8217;.</p>
+<p class="sap1">START-OF-SELECTION.</p>
+<p class="sap1"><span style="color: #fb2412;">*== get structure description</span><br />
+gr_struct  ?= cl_abap_typedescr=&gt;describe_by_name( p_table ).<br />
+*== create table description using structure description<br />
+gr_table   ?= cl_abap_tabledescr=&gt;create( gr_struct ).</p>
+<p class="sap1"><span style="color: #fb2412;">*== create work area</span><br />
+CREATE DATA gd_line TYPE HANDLE gr_struct.<br />
+ASSIGN gd_line-&gt;* TO &lt;workarea&gt;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== create internal table</span><br />
+CREATE DATA gd_table TYPE HANDLE gr_table.<br />
+ASSIGN gd_table-&gt;* TO &lt;table&gt;.</p>
+<p class="sap1"><span style="color: #fb2412;">*== select data from database into dynamically generated internal table</span><br />
+SELECT * FROM (p_table)<br />
+INTO CORRESPONDING FIELDS OF TABLE &lt;table&gt; UP TO 20 ROWS.</p>
+<p class="sap1"><span style="color: #fb2412;">*== loop at all table lines for output</span><br />
+LOOP AT &lt;table&gt; ASSIGNING &lt;workarea&gt;.<br />
+NEW-LINE.<br />
+DO.<br />
+<span style="color: #fb2412;">*== loop at all components of the structure</span><br />
+ASSIGN COMPONENT sy-index OF STRUCTURE &lt;workarea&gt; TO &lt;value&gt;.<br />
+IF sy-subrc &gt; 0.<br />
+EXIT.<br />
+ELSE.<br />
+<span style="color: #fb2412;">*== and write into list</span><br />
+WRITE &lt;value&gt; COLOR COL_NORMAL.<br />
+ENDIF.<br />
+ENDDO.<br />
+ENDLOOP.</p>
+<p>Der Beitrag <a href="/blog/interne-tabelle-ddic/">Interne Tabelle DDIC</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Exporting ALV to Memory2</title>
+		<link>/blog/exporting-alv-to-memory2/</link>
+					<comments>/blog/exporting-alv-to-memory2/#comments</comments>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 12 Sep 2011 14:54:53 +0000</pubDate>
+				<category><![CDATA[Datenbanken & Datenselektion]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynamische Programmierung]]></category>
+		<category><![CDATA[color]]></category>
+		<category><![CDATA[assign]]></category>
+		<category><![CDATA[xml]]></category>
+		<category><![CDATA[demoprogramme]]></category>
+		<category><![CDATA[if_ixml]]></category>
+		<category><![CDATA[if_ixml_stream_factory]]></category>
+		<category><![CDATA[Office]]></category>
+		<category><![CDATA[if_ixml_document]]></category>
+		<category><![CDATA[ALV-Grid]]></category>
+		<category><![CDATA[if_ixml_parser]]></category>
+		<category><![CDATA[cl_alv_table_create=>create_dynamic_table]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=625</guid>
+
+					<description><![CDATA[<p>Wir greifen den Trick - nach SUBMIT an die ALV-Daten im Office-Format zu gelangen - noch einmal auf und zeigen, wie man aus dem XML-String eine Tabelle erh&#228;lt.</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory2/">Exporting ALV to Memory2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Wir greifen den Trick &#8211; nach SUBMIT an die ALV-Daten im Office-Format zu gelangen &#8211; noch einmal auf und zeigen, wie man aus dem XML-String eine Tabelle erhält.</p>
+<p>In diesem Beispiel rufen wir das Beispielprogramm BCALV_FULLSCREEN_DEMO auf, um mittels ALV-Grid Daten zu erzeugen.</p>
+<p>Die Flugdatenbank muss natürlich gefüllt sein!!</p>
+<p><img loading="lazy" decoding="async" class="alignnone size-medium wp-image-4193" src="https://tricktresor.com/wp-content/uploads/2011/09/01_13_11_46_26-300x140.jpg" alt="BCALV_FULLSCREEN_DEMO" width="300" height="140" srcset="/wp-content/uploads/2011/09/01_13_11_46_26-300x140.jpg 300w, /wp-content/uploads/2011/09/01_13_11_46_26-624x292.jpg 624w, /wp-content/uploads/2011/09/01_13_11_46_26.jpg 727w" sizes="(max-width: 300px) 100vw, 300px" /></p>
+<p>Die grundlegenden Bestandteile sind bereits im vorherigen Artikel erläutert worden. In diesem Programm zeigen wir, wie man die im XML-Format vorliegenden Daten in eine interne Tabelle umwandelt.</p>
+<p>Das XML-Ergebnis wird dabei Ereignisgesteuert bearbeitet. Das bedeutet: Die XML-Tags werden Stück für Stück durchlaufen und im Programm wird entsprechend darauf reagiert.</p>
+<p class="head1">XML</p>
+<p>Die zurückgelieferte XML-Struktur, die die Tabelle beschreibt ist recht komplex. Hier ist die Beispiel-XML-Datei zu sehen: <a href="http://pastebin.com/XkgctkJA" target="_blank" rel="noopener">http://pastebin.com/XkgctkJA</a></p>
+<p>Uns interessieren jedoch nur die folgenden Tags:</p>
+<p class="head2">Anzahl der Spalten</p>
+<p class="sap1">&lt;Table&gt;&lt;Column/&gt;&lt;Column/&gt;&lt;/Table&gt;</p>
+<p class="head2">Zellen und Zelleninhalte</p>
+<p class="sap1">&lt;Cell&gt;&lt;Data&gt;Inhalt&lt;/data&gt;&lt;/cell&gt;</p>
+<h2 class="head1">Coding</h2>
+<pre class="lang:abap decode:true ">REPORT  zz_export_alv_to_memory_demo01.
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_xml DEFINITION
+*----------------------------------------------------------------------*
+CLASS lcl_xml DEFINITION.
+
+  PUBLIC SECTION.
+CLASS-METHODS call_report  IMPORTING iv_repid TYPE syrepid
+iv_list  TYPE char1.
+
+    CLASS-METHODS create_table IMPORTING iv_fields TYPE i
+EXPORTING ed_table TYPE REF TO data.
+
+    CLASS-METHODS display_data IMPORTING it_table TYPE STANDARD TABLE PREFERRED PARAMETER it_table.
+
+ENDCLASS.                    "lcl_xml DEFINITION
+
+*----------------------------------------------------------------------*
+*       CLASS lcl_xml IMPLEMENTATION
+*----------------------------------------------------------------------*
+CLASS lcl_xml IMPLEMENTATION.
+
+  METHOD call_report.
+
+*== Data
+DATA lv_guid   TYPE guid_32.
+DATA ls_params TYPE rsparams.
+DATA lt_params TYPE TABLE OF rsparams.
+
+*== Create and export GUIID for ALV
+lv_guid = cl_salv_export_db_storage=&gt;create_guid( ).
+EXPORT l_mode = 'M' TO MEMORY ID 'ALV_EXTRACT_MODE'.
+EXPORT l_guid = lv_guid TO MEMORY ID 'ALV_EXTRACT_GUID'.
+
+*== Call Report
+    SUBMIT (iv_repid)
+WITH SELECTION-TABLE lt_params
+AND RETURN.                                       "#EC CI_SUBMIT
+
+    DATA lv_xstring           TYPE xstring.
+DATA lr_stream_factory    TYPE REF TO if_ixml_stream_factory.
+DATA lr_ixml              TYPE REF TO if_ixml.
+DATA lr_istream           TYPE REF TO if_ixml_istream.
+DATA lr_doc               TYPE REF TO if_ixml_document.
+DATA lr_parser            TYPE REF TO if_ixml_parser.
+DATA lv_events            TYPE i.
+DATA lv_number_of_fields  TYPE i.
+
+    DATA lr_event             TYPE REF TO if_ixml_event.
+DATA lv_type              TYPE i.
+DATA lv_current_node      TYPE string.
+DATA lv_current_value     TYPE string.
+DATA lv_cell_index        TYPE i.
+
+*== Import XML-data from AVL and convert to stream
+lv_xstring        = cl_salv_export_db_storage=&gt;import_xmlstring
+( guid  = lv_guid ).
+lr_ixml           = cl_ixml=&gt;create( ).
+lr_stream_factory = lr_ixml-&gt;create_stream_factory( ).
+lr_istream        = lr_stream_factory-&gt;create_istream_xstring
+( string = lv_xstring ).
+
+    lr_doc            = lr_ixml-&gt;create_document( ).
+
+*== Create parser for document
+    lr_parser   = lr_ixml-&gt;create_parser(
+document       = lr_doc
+istream        = lr_istream
+stream_factory = lr_stream_factory ).
+
+*== deactivate DOM generation
+lr_parser-&gt;set_dom_generating( space ).
+
+*== data for dynamically generated internal table
+DATA ld_table            TYPE REF TO data.
+FIELD-SYMBOLS &lt;table&gt;    TYPE STANDARD TABLE.
+FIELD-SYMBOLS &lt;row&gt;      TYPE ANY. "line of &lt;table&gt;.
+FIELD-SYMBOLS &lt;cell&gt;     TYPE string.
+
+*== define Parser events
+lv_events = if_ixml_event=&gt;co_event_element_pre2
++ if_ixml_event=&gt;co_event_element_post
++ if_ixml_event=&gt;co_event_text_post.
+
+*== Register XML-Events
+lr_parser-&gt;set_event_subscription( lv_events ).
+
+    DO.
+
+*== get next event (XML-tag)
+lr_event = lr_parser-&gt;parse_event( ).
+IF lr_event IS INITIAL.
+EXIT.
+ENDIF.
+
+*== get type of event
+lv_type = lr_event-&gt;get_type( ).
+*== New element
+CASE lv_type.
+WHEN if_ixml_event=&gt;co_event_element_pre2.
+*===&gt; Event "PRE2"
+lv_current_node = lr_event-&gt;get_name( ).
+IF iv_list &lt;&gt; space.
+WRITE: / lv_current_node.
+ENDIF.
+
+          CASE lv_current_node.
+WHEN 'Column'.
+*=====&gt; New Column: Add column counter
+ADD 1 TO lv_number_of_fields.
+
+            WHEN 'Row'.
+*=====&gt; New Row
+IF &lt;table&gt; IS NOT ASSIGNED.
+*=====&gt; Create table if not done yet
+create_table( EXPORTING iv_fields = lv_number_of_fields
+IMPORTING ed_table  = ld_table ).
+
+                ASSIGN ld_table-&gt;* TO &lt;table&gt;.
+ENDIF.
+
+*=====&gt; Insert new table line
+APPEND INITIAL LINE TO &lt;table&gt; ASSIGNING &lt;row&gt;.
+CLEAR lv_cell_index.
+
+            WHEN 'Cell'.
+*======&gt; new cell data:
+ADD 1 TO lv_cell_index.
+ASSIGN COMPONENT lv_cell_index
+OF STRUCTURE &lt;row&gt; TO &lt;cell&gt;.
+ENDCASE.
+
+        WHEN if_ixml_event=&gt;co_event_text_post.
+*===&gt; Event "TEXT"
+CASE lv_current_node.
+WHEN 'Data'.
+*=====&gt; get cell value and assign to table cell
+&lt;cell&gt; = lr_event-&gt;get_value( ).
+ENDCASE.
+
+          IF iv_list &lt;&gt; space.
+lv_current_value = lr_event-&gt;get_value( )..
+WRITE lv_current_value COLOR COL_TOTAL.
+ENDIF.
+
+        WHEN if_ixml_event=&gt;co_event_element_post.
+*===&gt; Event "POST"
+IF iv_list &lt;&gt; space.
+lv_current_node = lr_event-&gt;get_name( ).
+WRITE: lv_current_node COLOR COL_GROUP.
+ENDIF.
+
+      ENDCASE.
+ENDDO.
+
+*== Display table
+    IF &lt;table&gt; IS ASSIGNED.
+display_data( &lt;table&gt; ).
+ENDIF.
+
+  ENDMETHOD.                    "call_report
+
+METHOD create_table.
+
+*== field catalog
+    DATA lt_fcat             TYPE lvc_t_fcat.
+FIELD-SYMBOLS &lt;fcat&gt;     TYPE lvc_s_fcat.
+
+*== create field catalog for internal table
+    DO iv_fields TIMES.
+*== cell
+APPEND INITIAL LINE TO lt_fcat ASSIGNING &lt;fcat&gt;.
+&lt;fcat&gt;-fieldname = sy-index.
+CONDENSE &lt;fcat&gt;-fieldname.
+&lt;fcat&gt;-tabname   = 'GT_TABLE'.
+&lt;fcat&gt;-inttype   = 'g'. "String
+ENDDO.
+
+*== generate internal table from given field catalog
+CALL METHOD cl_alv_table_create=&gt;create_dynamic_table
+EXPORTING
+it_fieldcatalog           = lt_fcat
+IMPORTING
+ep_table                  = ed_table
+EXCEPTIONS
+generate_subpool_dir_full = 1
+OTHERS                    = 2.
+
+  ENDMETHOD.                    "create_table
+
+  METHOD display_data.
+
+*== Data
+DATA lv_col          TYPE i.
+FIELD-SYMBOLS &lt;row&gt;  TYPE ANY.
+FIELD-SYMBOLS &lt;cell&gt; TYPE string.
+
+*== Display all table lines
+LOOP AT it_table ASSIGNING &lt;row&gt;.
+NEW-LINE.
+DO.
+*== Display each table cell
+ASSIGN COMPONENT sy-index OF STRUCTURE &lt;row&gt; TO &lt;cell&gt;.
+IF sy-subrc = 0.
+lv_col = ( sy-index - 1 ) * 21.
+WRITE AT lv_col(19)  &lt;cell&gt; COLOR COL_POSITIVE.
+ELSE.
+EXIT. "from do
+ENDIF.
+ENDDO.
+ENDLOOP.
+ENDMETHOD.                    "display_data
+
+ENDCLASS.                    "lcl_xml IMPLEMENTATION
+
+***___________________________________________________________________
+***
+*** SELECTION SCREEN
+***___________________________________________________________________
+***
+
+SELECTION-SCREEN BEGIN OF BLOCK reps   WITH FRAME TITLE text-var.
+PARAMETERS p_repid TYPE syrepid        DEFAULT 'BCALV_FULLSCREEN_DEMO'.
+PARAMETERS p_data  RADIOBUTTON GROUP x DEFAULT 'X'.
+PARAMETERS p_list  RADIOBUTTON GROUP x.
+SELECTION-SCREEN END OF BLOCK reps.
+
+START-OF-SELECTION.
+
+*== Start report
+lcl_xml=&gt;call_report( EXPORTING iv_repid = p_repid
+iv_list  = p_list ).
+
+</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/exporting-alv-to-memory2/">Exporting ALV to Memory2</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+					<wfw:commentRss>/blog/exporting-alv-to-memory2/feed/</wfw:commentRss>
+			<slash:comments>4</slash:comments>
+		
+		
+			</item>
+	</channel>
+</rss>

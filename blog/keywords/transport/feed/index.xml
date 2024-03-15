@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>Transport Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/transport/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Tue, 21 Nov 2017 12:12:16 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>Transport Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Mussfelder</title>
+		<link>/blog/mussfelder/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 11 Mar 2009 17:17:09 +0000</pubDate>
+				<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[Dynpros]]></category>
+		<category><![CDATA[Transport]]></category>
+		<category><![CDATA[abap]]></category>
+		<category><![CDATA[ABAP Profitricks]]></category>
+		<category><![CDATA[GUI]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=517</guid>
+
+					<description><![CDATA[<p>Ein h&#228;ufiger Wunsch ist die dynamische Aktivierung von Musseingabefeldern. Hierbei gibt es jedoch das Problem, dass die Mussfelder nicht beliebig hin- und hergeschaltet werden k&#246;nnen. Denn: Ist ein Mussfeld einmal aktiv, muss es auch gef&#252;llt werden. Andere Aktionen werden mit "Bitte erst alle Mussfelder ausf&#252;llen" quittiert.</p>
+<p>Der Beitrag <a href="/blog/mussfelder/">Mussfelder</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Ein häufiger Wunsch ist die dynamische Aktivierung von Musseingabefeldern. Hierbei gibt es jedoch das Problem, dass die Mussfelder nicht beliebig hin- und hergeschaltet werden können. Denn: Ist ein Mussfeld einmal aktiv, muss es auch gefüllt werden. Andere Aktionen werden mit &#8220;Bitte erst alle Mussfelder ausfüllen&#8221; quittiert.</p>
+<p>Um dieses &#8211; ansich ja gewollte Verhalten &#8211; zu umgehen, müssen wir uns einiger Tricks bedienen&#8230;</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/abap/Radiobutton/Radio_muss.gif" alt="" /></p>
+<p>Im folgenden wollen wir an einem Beispiel zeigen, wie die Mussfeldeigenschaft von Feldern geändert werden kann, sobald ein anderer Radiobutton aktiv ist.</p>
+<h2 class="head1">Trick 1</h2>
+<p>Wir hinterlegen beim Radiobutton einen Funktionscode und versehen ihn mit dem Funktionstyp &#8220;E&#8221; (Exit-Kommando).</p>
+<p><img decoding="async" src="/wp-content/uploads/tt_images/abap/Radiobutton/eck_063.jpg" alt="" /></p>
+<p>Damit können wir im PAI des Dynpros das aktivieren der Radiobuttons mittels des folgenden Befehls abfangen:</p>
+<p>MODULE MyExitModule AT EXIT-COMMAND</p>
+<p>Nun brauchen wir in MyExitModule nur noch auf &#8220;RB&#8221; abzufragen, machen dann nix und&#8230; Wir kriegen die Meldung &#8220;Bitte alle Mussfelder ausfüllen&#8221;.</p>
+<p>Wir könnten nun zwar noch ein &#8220;LEAVE SCREEN&#8221; hinten dran hängen, aber dann erfolgt kein Transport der Feldwerte in die ABAP-Variablen, also wird auch unser Radiobutton auf dem alten Wert belassen.</p>
+<h2 class="head1">Trick 2</h2>
+<p>Wir simulieren den Feldtransport mit dem Funktionsbaustein &#8220;DYNP_VALUES_READ&#8221; und verlassen danach die Verarbeitung. Effekt: Die Radiobuttons werden korrekt gesetzt und auch alle bereits eingegebenen Werte bleiben erhalten.</p>
+<pre class="lang:abap decode:true ">CALL FUNCTION 'DYNP_VALUES_READ'
+  EXPORTING
+    dyname                   = repid
+    dynumb                   = dynnr
+    request                  = 'A'
+    perform_conversion_exits = 'X'
+    perform_input_conversion = ' '
+  TABLES
+    dynpfields               = t_fields
+  EXCEPTIONS
+    OTHERS                   = 11.</pre>
+<p>Normalerweise muss man dem Baustein alle zu lesenden Feldnamen übergeben. Wenn wir den Parameter REQUEST aber mit &#8220;A&#8221; füllen, dann liefert der Baustein alle auf dem Dynpro vorhandenen Felder zurück&#8230; <img src="https://s.w.org/images/core/emoji/14.0.0/72x72/1f600.png" alt="😀" class="wp-smiley" style="height: 1em; max-height: 1em;" /></p>
+<p>Wir müssen jetzt noch die Feldinhalte in die entsprechenden Felder stellen:</p>
+<pre class="lang:abap decode:true ">LOOP AT t_fields INTO wa_field.
+  ASSIGN (wa_field-fieldname) TO &lt;field&gt;.
+  CHECK sy-subrc = 0.
+  &lt;field&gt; = wa_field-fieldvalue.
+ENDLOOP.</pre>
+<p>Jetzt können wir schon mit den Radiobuttons hin- und herschalten und je nach Radiobutton ein anderes Feld zum Mussfeld machen.</p>
+<p>Wenn jedoch Datumsfelder, Uhrzeiten oder Dezimalzahlen auf dem Dynpro auftauchen, müssen wir diese auch selbst ins interne Format umwandeln.</p>
+<p>Deswegen:</p>
+<h2 class="head1">Trick 3</h2>
+<pre class="lang:abap decode:true">DESCRIBE FIELD &lt;field&gt; TYPE lv_field_type.
+CASE lv_field_type.
+  WHEN 'P'.
+*** Packed
+    CALL FUNCTION 'RS_CONV_EX_2_IN_DTEL'
+      EXPORTING
+        input_external  = wa_field-fieldvalue
+        dtel            = 'NETWR'
+      IMPORTING
+        output_internal = &lt;field&gt;
+      EXCEPTIONS
+        OTHERS          = 21.
+
+  WHEN 'T'.
+*** Time
+    CALL FUNCTION 'CONVERSION_EXIT_TIMLO_INPUT'
+      EXPORTING
+        input       = wa_field-fieldvalue
+      IMPORTING
+        output      = &lt;field&gt;
+      EXCEPTIONS
+        wrong_input = 1
+      OTHERS      = 2.
+
+  WHEN 'D'.
+*** Date
+    CALL FUNCTION 'CONVERSION_EXIT_SDATE_INPUT'
+      EXPORTING
+        input  = wa_field-fieldvalue
+      IMPORTING
+        output = &lt;field&gt;.
+
+  WHEN OTHERS.
+*** other fields
+    &lt;field&gt; = wa_field-fieldvalue.
+ENDCASE.</pre>
+<h2 class="head1">Beispielprogramm</h2>
+<p>Hier gibt es nochmal das ganze <a title="Mussfelder" href="https://tricktresor.com/wp-content/downloads/radiobuttons.txt" target="_blank" rel="noopener">Coding</a>.</p>
+<p>Hier die Ablauflogik vom Dynpro:</p>
+<pre class="lang:abap decode:true ">PROCESS BEFORE OUTPUT.
+MODULE status_0100.
+*
+PROCESS AFTER INPUT.
+MODULE exit_command_0100 AT EXIT-COMMAND.
+MODULE user_command_0100.</pre>
+<p>Der GUI-Status &#8216;100&#8217; muss natürlich noch angelegt werden. Es müssen nur die Tasten F3, SHIFT-F3 und F12 mit &#8220;EXIT&#8221; belegt werden (Exit-Code &#8220;E&#8221; nicht vergsessen!!).</p>
+<p>Der Beitrag <a href="/blog/mussfelder/">Mussfelder</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Up- und Download von Transporten</title>
+		<link>/blog/up-und-download-von-transporten/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Mon, 07 Jul 2008 09:24:39 +0000</pubDate>
+				<category><![CDATA[Cross Applications]]></category>
+		<category><![CDATA[KTW]]></category>
+		<category><![CDATA[Transport]]></category>
+		<category><![CDATA[Upload]]></category>
+		<category><![CDATA[Download]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=494</guid>
+
+					<description><![CDATA[<p>Worum geht es? Will man ein SAP-System mit seinen Entwicklungen  best&#252;cken, so mu&#223; man die Transport-Dateien umst&#228;ndlich hochladen. Je  nach Ausstattung fehlen grundlegende Transaktionen. Hierf&#252;r gibt es nun das folgende Programm, das sowohl einen Up- als auch einen Download auf einfache Weise erm&#246;glicht. </p>
+<p>Der Beitrag <a href="/blog/up-und-download-von-transporten/">Up- und Download von Transporten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Worum geht es? Will man ein SAP-System mit seinen Entwicklungen bestücken, so muß man die Transport-Dateien umständlich hochladen. Je nach Ausstattung fehlen grundlegende Transaktionen. Hierfür gibt es nun das folgende Programm, das sowohl einen Up- als auch einen Download auf einfache Weise ermöglicht.</p>
+<p>Download des Quellcodes <a href="https://tricktresor.com/wp-content/downloads/zSTW_UPL_DOWNL_AUFTRAG.txt" target="_blank">hier</a>.</p>
+<p>Vielen Dank an Stefan Wagenblast!</p>
+<h2 class="head1">Neue Version von Stefan Schnell</h2>
+<p class="text1">Stefan hat das Programm noch mal erweitert.</p>
+<p class="text1">Das angepaste Programm ist <a href="/wp-content/downloads/zSTW_UPL_DOWNL_AUFTRAG.txt" target="_blank">hier</a>, die ausführliche Dokumentation im PDF-Format kann <a href="/wp-content/downloads/zSTW_UPL_DOWNL_AUFTRAG_Anleitung.pdf" target="_blank">hier</a> herunter geladen werden.</p>
+<p class="head1">
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/up-und-download-von-transporten/">Up- und Download von Transporten</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Transportanschluss</title>
+		<link>/blog/transportanschluss/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Editor]]></category>
+		<category><![CDATA[Transport]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=366</guid>
+
+					<description><![CDATA[<p>Pflegetabellen k&#246;nnen entweder mit dem Standardtransportanschluss versehen werden, dann werden die &#196;nderungen immer in einen Transportauftrag aufgenommen. &#196;nderungen in anderen Systemen sind dann nicht m&#246;glich. Oder es wird kein Transportanschluss verwendet, dann k&#246;nnen die Eintr&#228;ge aber auch manuell nicht transportiert werden. Diese L&#246;sung zeigt Ihnen, wie Eintr&#228;ge transportiert und in anderen System trotzdem ge&#228;ndert werden k&#246;nnen.</p>
+<p>Der Beitrag <a href="/blog/transportanschluss/">Transportanschluss</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Pflegetabellen k&ouml;nnen entweder mit dem Standardtransportanschluss versehen werden, dann werden die &Auml;nderungen immer in einen Transportauftrag aufgenommen. &Auml;nderungen in anderen Systemen sind dann nicht m&ouml;glich. Oder es wird kein Transportanschluss verwendet, dann k&ouml;nnen die Eintr&auml;ge aber auch manuell nicht transportiert werden. Diese L&ouml;sung zeigt Ihnen, wie Eintr&auml;ge transportiert und in anderen System trotzdem ge&auml;ndert werden k&ouml;nnen.<br /><P>Pflegetabellen k&ouml;nnen entweder mit dem Standardtransportanschluss versehen werden, dann werden die &Auml;nderungen immer in einen Transportauftrag aufgenommen. &Auml;nderungen in anderen Systemen sind dann nicht m&ouml;glich. </P><P>Die andere M&ouml;glichkeit:&nbsp;Es wird kein Transportanschluss verwendet, dann k&ouml;nnen die Eintr&auml;ge aber auch manuell nicht transportiert werden. </P><P>Mit der folgenden L&ouml;sung k&ouml;nnen Sie Eintr&auml;ge im Entwicklungssystem wie gewohnt transportieren und in anderen Systemen trotzdem &auml;ndern.</P><P class="head1">Tabellenpflegedialog</P><P>In der Generierungsumgebung des Tabellenpflegedialogs m&uuml;ssen Sie bei &#8220;<STRONG>Angaben&nbsp;zum Datentransports&nbsp;des Dialogs</STRONG>&#8221; den Radiobutton &#8220;Standard Aufzeichnungsroutine&#8221; aktivieren.</P><P class="head1">Zeitpunkte</P><P>Wechseln Sie dann unter &#8220;<EM>Umfeld &#8211; Modifikation &#8211; Zeitpunkte</EM>&#8221; zu der Pflege der Zeitpunkte zum Pflegedialog.</P><P>Die Warnung, dass die Daten SAP geh&ouml;ren, k&ouml;nnen Sie getrost ignorieren.</P><P>Legen Sie dann einen neuen Eintrag mit dem Zeitpunkt&nbsp;&#8220;<STRONG>01</STRONG>&#8221; an. Nennen Sie die Routine ZZ_TRANSPORT.</P><P>Mit einem Klick auf das Editor-Icon gelangen Sie in den Editor. Legen Sie hier&nbsp;das folgende Coding an:</P><P class="sap1">FORM zz_transport.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>&nbsp; IF sy-sysid &lt;&gt; &#8216;DEV&#8217;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR><FONT color="#fb2412">*** Im&nbsp;Entwicklungssystem wird ein Transportauftrag verlangt&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <BR>*** In alle anderen Systemen kein Transportanschlu&szlig;!<BR></FONT>&nbsp;&nbsp;&nbsp; LOOP AT x_header WHERE flag = space.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x_header-flag = vim_transport_denied.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY x_header.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp; ENDIF.<BR><FONT color="#fb2412">***&nbsp; Sichern erlaubt und erw&uuml;nscht!</FONT><BR>&nbsp; CLEAR sy-subrc.<BR><BR>ENDFORM.</P><P>Ersetzen Sie die System-ID &#8220;DEV&#8221; durch die Kennung Ihres Entwicklungssystems.</P></p>
+<p>Der Beitrag <a href="/blog/transportanschluss/">Transportanschluss</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Transportieren?</title>
+		<link>/blog/transportieren/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate></pubDate>
+				<category><![CDATA[Tabellenpflegedialog]]></category>
+		<category><![CDATA[Programmierung]]></category>
+		<category><![CDATA[DDIC]]></category>
+		<category><![CDATA[Transport]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=351</guid>
+
+					<description><![CDATA[<p>Eine Tabelle k&#246;nnen Sie entweder als "Anwendungstabelle" oder als "Customizingtabelle" klassifizieren. Dies hat Auswirkungen auf den Pflegedialog: Eine Anwendungstabelle kann in jedem System ge&#228;ndert werden, eine Customizingtabelle kann nur ge&#228;ndert werden, wenn das System auf "&#228;nderbar" gesetzt ist. Anwendungsdaten k&#246;nnen nicht transportiert werden... Oder doch?</p>
+<p>Der Beitrag <a href="/blog/transportieren/">Transportieren?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Eine Tabelle k&ouml;nnen Sie entweder als &#8220;Anwendungstabelle&#8221; oder als &#8220;Customizingtabelle&#8221; klassifizieren. Dies hat Auswirkungen auf den Pflegedialog: Eine Anwendungstabelle kann in jedem System ge&auml;ndert werden, eine Customizingtabelle kann nur ge&auml;ndert werden, wenn das System auf &#8220;&auml;nderbar&#8221; gesetzt ist. Anwendungsdaten k&ouml;nnen nicht transportiert werden&#8230; Oder doch?<br /><P>Im folgenden Fall m&ouml;chte ich Ihnen eine L&ouml;sung vorstellen, bei der Sie eine Tabelle in <STRONG>jedem System </STRONG>pflegen k&ouml;nnen und trotzdem Eintr&auml;ge aus dem Entwicklungsystem <STRONG>transportiert werden</STRONG>.</P><P>In diesem Fall werden automatisch <STRONG>neue Eintr&auml;ge</STRONG> in einen Transportauftrag &uuml;bernommen. Bereits vorhandene Eintr&auml;ge werden nicht transportiert. F&uuml;r neue Eintr&auml;ge hingegen wird ein Transportauftrag verlangt.</P><P>Um&nbsp;das zu realisieren, m&uuml;ssen Sie folgendes tun:</P><P class="head1">1. Tabelle anlegen</P><P>Legen Sie eine Customizingtabelle <STRONG>ZMYTAB</STRONG> an (Auslieferungsklasse &#8220;<STRONG>C</STRONG>&#8220;).</P><P class="head1">2. Pflegedialog generieren</P><P>Generieren Sie den Pflegedialog dazu. </P><P>Aktivieren Sie bitte das H&auml;kchen &#8220;Keine oder individuelle Aufzeichnungsroutine&#8221;</P><P class="head1">3. Zeitpunkte und Coding erfassen</P><P>Nach dem&nbsp;Generieren des Pflegedialogs springen Sie bitte im Men&uuml; in die Zeitpunkte: <EM>Umfeld &#8211; Modifikationen &#8211; Zeitpunkte</EM>.</P><P>Dort m&uuml;ssen Sie die folgenden Zeitpunkte anlegen:</P><UL><LI>Zeitpunkt &#8220;<STRONG>01</STRONG>&#8221;&nbsp;ZZ_SICHERN_VORHER <LI>Zeitpunkt &#8220;<STRONG>10</STRONG>&#8221;&nbsp;ZZ_TRANSPORT_KOPF <LI>Zeitpunkt &#8220;<STRONG>12</STRONG>&#8221;&nbsp;ZZ_TRANSPORTTABELLE_AENDERN</LI></UL><P>Mit dem Druckknopf neben dem Routinennamen gelangen Sie in das Coding. Das System fragt nach einem Include, in dem die Unterroutinen angelegt werden sollen. Definieren Sie gegebenenfalls ein neues Include.</P><P class="head2">Coding f&uuml;r Zeitpunkt 01</P><P class="text1">Hier wird vor dem Sichern das Kennzeichen ge&auml;ndert, dass normalerweise bei &#8220;Keine Aufzeichnungsroutine&#8221; aktiv ist und den Transport verhindert.</P><P class="sap1">FORM zz_sichern_vorher.</P><P class="sap1">&nbsp; PERFORM zz_check_transport.</P><P class="sap1">ENDFORM.</P><P class="head2">Coding f&uuml;r Zeitpunkt 10</P><P class="sap1">FORM zz_transport_kopf.</P><P class="sap1">&nbsp; PERFORM zz_check_transport.</P><P class="sap1">ENDFORM.</P><P class="head2">Coding f&uuml;r Zeitpunkt 12</P><P>Beim &Auml;ndern der Transporttabelle werden alle Eintr&auml;ge wieder rausgeworfen, die nur ge&auml;ndert oder gel&ouml;scht worden sind, so&nbsp;dass nur die neu angelegten Eintr&auml;ge im Transportauftrag stehen.</P><P class="sap1">FORM zz_transporttabelle_aendern.</P><P class="sap1">&nbsp; FIELD-SYMBOLS &lt;key&gt;.</P><P class="sap1">&nbsp; LOOP AT corr_keytab WHERE pgmid&nbsp;&nbsp; = &#8216;R3TR&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND object&nbsp; = &#8216;TABU&#8217;<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AND objname = x_header-roottab.<BR><FONT color="#fb2412">*** Keyfeld<BR></FONT>&nbsp;&nbsp;&nbsp; ASSIGN corr_keytab-tabkey(x_header-keylen) TO &lt;key&gt;.<BR><FONT color="#fb2412">*** Alle Eintr&auml;ge zur Tabelle pr&uuml;fen:<BR></FONT>&nbsp;&nbsp;&nbsp; READ TABLE total INTO zmytab_total<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WITH KEY &lt;key&gt;.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc = 0 AND zmytab_total-action &lt;&gt; neuer_eintrag.<BR><FONT color="#fb2412">*** Wenn der Satz nur ge&auml;ndert oder gel&ouml;scht wurde, dann aus der<BR>*** Transporttabelle l&ouml;schen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELETE corr_keytab.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">&nbsp; ENDLOOP.</P><P class="sap1">ENDFORM.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &#8221; ZZ_TRANSPORTTABELLE_AENDERN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </P><P class="head2">Coding zum Pr&uuml;fen ob Transportauftrag ben&ouml;tigt wird</P><P class="text1"><STRONG><U>Achtung!</U></STRONG> Bitte setzen Sie bei SY-SYSID Ihr Entwicklungssystem ein!&nbsp;</P><P class="sap1">FORM zz_check_transport.</P><P class="sap1">&nbsp; DATA new.<BR>&nbsp; CLEAR new.</P><P class="sap1">&nbsp; IF sy-sysid = &#8216;TTE&#8217;. &#8220;Entwicklungssystem<BR><FONT color="#fb2412">*** Im&nbsp;Entwicklungssystem wird ein Transportauftrag verlangt, <BR>*** wenn neue Eintr&auml;ge zugef&uuml;gt wurden<BR></FONT>&nbsp;&nbsp;&nbsp; LOOP AT total INTO zmytab_total.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF zmytab_total-action = neuer_eintrag.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new = &#8216;X&#8217;.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;&nbsp;&nbsp; LOOP AT x_header.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF new = space.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x_header-flag = vim_transport_denied.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ELSE.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x_header-flag = space.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ENDIF.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODIFY x_header.<BR>&nbsp;&nbsp;&nbsp; ENDLOOP.<BR>&nbsp; ELSE.<BR><FONT color="#fb2412">*** In alle anderen Systemen kein Transportanschlu&szlig;!<BR></FONT>&nbsp;&nbsp; LOOP AT x_header.<BR>&nbsp;&nbsp;&nbsp;&nbsp; x_header-flag = vim_transport_denied.<BR>&nbsp;&nbsp;&nbsp;&nbsp; MODIFY x_header.<BR>&nbsp;&nbsp; ENDLOOP.<BR>&nbsp;ENDIF.</P><P class="sap1">ENDFORM.</P><P class="head1">Globale Datendefinition (Release 4.6C)</P><P>Bitte legen Sie noch die folgende Struktur zu Beginn des Includes an:</P><P class="sap1">DATA: BEGIN OF zmytab_total.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INCLUDE STRUCTURE zmytab.<BR>DATA:&nbsp;&nbsp; action(1),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mark(1),<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; END OF zmytab_total.</P><P>Das Coding ist in einem 4.5B-System nicht n&ouml;tig.</P></p>
+<p>Der Beitrag <a href="/blog/transportieren/">Transportieren?</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>Lieferungen löschen</title>
+		<link>/blog/lieferungen-loeschen/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Tue, 23 Nov 2004 15:22:00 +0000</pubDate>
+				<category><![CDATA[Vertrieb]]></category>
+		<category><![CDATA[Transport]]></category>
+		<category><![CDATA[V7 - SD Transporte]]></category>
+		<guid isPermaLink="false">http://wp.tricktresor.com/?p=293</guid>
+
+					<description><![CDATA[<p>In einem Transport k&#246;nnen Sie &#252;ber eine Customer-Function abfragen, ob Funktionscodes ausgef&#252;hrt werden d&#252;rfen. Leider wird beim L&#246;schen einer Lieferung die Lieferungsnummer selbst nicht &#252;bergeben. Ein fieser Trick hilft hier.</p>
+<p>Der Beitrag <a href="/blog/lieferungen-loeschen/">Lieferungen löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>In einem Transport k&ouml;nnen Sie &uuml;ber eine Customer-Function abfragen, ob Funktionscodes ausgef&uuml;hrt werden d&uuml;rfen. Leider wird beim L&ouml;schen einer Lieferung die Lieferungsnummer selbst nicht &uuml;bergeben. Ein fieser Trick hilft hier.<br /><P>Folgender Trick bezieht sich auf die <STRONG>Transaktion VT02n </STRONG>ab SAP R/3 Release 4.6</P><P>Das folgende Coding verbietet das L&ouml;schen einer Lieferung, wenn diese schon Warenausgang gebucht wurde.</P><P>Als Erstes m&uuml;ssen Sie die Erweiterung </P><P><STRONG>V56AFCCH</STRONG> &#8211; Transportbearbeitung: Pr&uuml;fen Funktionscode erlaubt</P><P>in ein Erweiterungsprojekt aufnehmen (Transaktion CMOD).</P><P>Im Funktionsexit EXIT_SAPMV56A_001 m&uuml;ssen Sie das vorgegebene Include anlegen und das folgende Coding hinterlegen:</P><P class="sap1">CASE i_fcode.<BR><FONT color="#fb2412">*** Pr&uuml;fen, ob Lieferung gel&ouml;scht werden darf:</FONT><BR>&nbsp; WHEN &#8216;MM_TPDL&#8217;.</P><P class="sap1"><FONT color="#fb2412">*** Datendeklaration</FONT><BR>&nbsp;&nbsp;&nbsp; DATA: l_tree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE REF TO cl_gui_alv_tree,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_wbstk&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE wbstk,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_selected_node&nbsp;&nbsp;&nbsp; TYPE lvc_nkey,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_fieldname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE lvc_fname,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_vbeln&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE vbeln_vl,<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; l_node_text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TYPE lvc_value.</P><P class="sap1"><FONT color="#fb2412">*** Feldsymbol</FONT><BR>&nbsp;&nbsp;&nbsp; FIELD-SYMBOLS &lt;fs_treemodel&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Dirty Assign f&uuml;r das TreeModel in&nbsp;Transaktion VT02n</FONT><BR>&nbsp;&nbsp;&nbsp; ASSIGN (&#8216;(SAPLV56I_PLAN_SCREEN)G_VIEW_ADM-ASSG-REF_ALV_TREE&#8217;)<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TO &lt;fs_treemodel&gt;.<BR>&nbsp;&nbsp;&nbsp; CHECK sy-subrc = 0.<BR>&nbsp;&nbsp;&nbsp; l_tree = &lt;fs_treemodel&gt;.</P><P class="sap1"><FONT color="#fb2412">*** Den ausgew&auml;hlten Knoten ermitteln<BR></FONT>&nbsp;&nbsp;&nbsp; CALL METHOD l_tree-&gt;get_selected_item<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING&nbsp; e_selected_node = l_selected_node<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e_fieldname&nbsp;&nbsp;&nbsp;&nbsp; = l_fieldname<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.</P><P class="sap1">&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp;&nbsp;&nbsp; ELSE.<BR><FONT color="#fb2412">***&nbsp;Nur weiter,&nbsp;wenn die Lieferung selbst markiert wurde:<BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHECK l_fieldname = &#8216;&amp;Hierarchy&#8217;.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">*** Der Knotentext enth&auml;lt die&nbsp;angeklickte Lieferung</FONT><BR>&nbsp;&nbsp;&nbsp; CALL METHOD l_tree-&gt;get_outtab_line<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXPORTING&nbsp; i_node_key&nbsp;&nbsp;&nbsp;&nbsp; = l_selected_node<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IMPORTING&nbsp; e_node_text&nbsp;&nbsp;&nbsp; = l_node_text<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXCEPTIONS node_not_found = 1<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 2.<BR>&nbsp;&nbsp;&nbsp; IF sy-subrc &lt;&gt; 0.<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EXIT.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1"><FONT color="#fb2412">***&nbsp;Pr&uuml;fung durchf&uuml;hren, ob Lieferung gel&ouml;scht werden darf<BR>*** In diesem Fall darf die Lieferung nicht gel&ouml;scht werden,<BR>*** wenn sie schon Warenausgang gebucht wurde</FONT><BR>&nbsp;&nbsp;&nbsp; SELECT SINGLE vbeln wbstk FROM vbuk <BR>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;INTO (l_vbeln, l_wbstk)<BR>&nbsp;&nbsp;&nbsp;&nbsp; WHERE vbeln = l_node_text.<BR>&nbsp;&nbsp;&nbsp;&nbsp;CHECK sy-subrc = 0.</P><P class="sap1">&nbsp;&nbsp;&nbsp; IF l_wbstk = &#8216;C&#8217;.<BR><FONT color="#fb2412">*** Ausnahme ausl&ouml;sen</FONT><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MESSAGE e001(zv7) with l_vbeln<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RAISING fcode_not_permitted.<BR>&nbsp;&nbsp;&nbsp; ENDIF.</P><P class="sap1">ENDCASE.</P><P class="sap1">&nbsp;</P><P>&nbsp;</P></p>
+<p>Der Beitrag <a href="/blog/lieferungen-loeschen/">Lieferungen löschen</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>

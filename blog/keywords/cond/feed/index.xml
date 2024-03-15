@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	xmlns:series="https://publishpress.com/"
+	>
+
+<channel>
+	<title>COND Archive - Tricktresor</title>
+	<atom:link href="/blog/keywords/cond/feed/" rel="self" type="application/rss+xml" />
+	<link></link>
+	<description>Tipps und Tricks zu SAP R/3</description>
+	<lastBuildDate>Thu, 18 Feb 2021 16:36:15 +0000</lastBuildDate>
+	<language>de-DE</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=6.4.3</generator>
+
+<image>
+	<url>/wp-content/uploads/2019/02/cropped-Tricktresor-favicon-2019-32x32.png</url>
+	<title>COND Archive - Tricktresor</title>
+	<link></link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Modernes ABAP  &#8211; Ein Beispiel</title>
+		<link>/blog/modernes-abap-ein-beispiel/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Fri, 29 Nov 2019 16:28:04 +0000</pubDate>
+				<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP 750]]></category>
+		<category><![CDATA[COND]]></category>
+		<category><![CDATA[corresponding]]></category>
+		<category><![CDATA[switch]]></category>
+		<category><![CDATA[VALUE]]></category>
+		<guid isPermaLink="false">/?p=1022972</guid>
+
+					<description><![CDATA[<p>Die Neuerungen im ABAP-Umfeld sind inzwischen bereits einige Jahre alt. Über den VALUE Operator, der mit Release 7.40 eingeführt wurde, hat Horst Keller bereits 2013 gebloggt. Trotzdem werden einige der neuen Befehle nur sparsam eingesetzt. Das liegt einerseits daran, dass man sich wirklich an die Verwendung gewöhnen muss, andererseits ist man vielleicht unsicher, welche Gefahren (Performance) sie bergen. Ich persönlich finde zudem, dass ein übermäßiger Einsatz der Befehle, die sehr vielfältig untereinander geschachtelt werden können,...</p>
+<p>Der Beitrag <a href="/blog/modernes-abap-ein-beispiel/">Modernes ABAP  &#8211; Ein Beispiel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[
+<p>Die Neuerungen im ABAP-Umfeld sind inzwischen bereits einige Jahre alt. Über den VALUE Operator, der mit Release 7.40 eingeführt wurde, hat Horst Keller bereits <a href="https://blogs.sap.com/2013/05/27/abap-news-for-release-740-constructor-operator-value/">2013 gebloggt</a>. Trotzdem werden einige der neuen Befehle nur sparsam eingesetzt. Das liegt einerseits daran, dass man sich wirklich an die Verwendung gewöhnen muss, andererseits ist man vielleicht unsicher, welche Gefahren (Performance) sie bergen. Ich persönlich finde zudem, dass ein übermäßiger Einsatz der Befehle, die sehr vielfältig untereinander geschachtelt werden können, auch schnell nicht mehr <em>schön</em> aussehen und zudem schwer zu überblicken sind.</p>
+
+
+
+<p>Aber um mal wieder einen Beitrag zu schreiben und weil es vielleicht doch <em>elegant</em> ist, eine komplexe Aufgabe in nur <em>einer Zeile</em> zu lösen, stelle ich dir heute folgende Lösung vor.</p>
+
+
+
+<h2 class="wp-block-heading">Interne Tabelle kopieren</h2>
+
+
+
+<p>Nehmen wir an, wir hätten eine Tabelle mit einer <em>Materialnummer</em>, einer <em>gewünschten Menge</em> (QTY) und der <em>verfügbaren Menge</em> (AVQ). Für die Anzeige im SALV-Grid soll die Tabelle noch um den Materialkurztext erweitert werden und Einträge, bei denen die gewünschte Menge von der verfügbaren Menge abweicht, sollen farblich gekennzeichnet werden.</p>
+
+
+
+<h3 class="wp-block-heading">Datenstrukturen</h3>
+
+
+
+<p>Die Strukturen der Quelltabelle (SRC) und der Zieltabelle (TGT) sehen wie folgt aus:</p>
+
+
+
+<pre class="wp-block-code"><code>  TYPES: BEGIN OF _src,
+           mat TYPE c LENGTH 1, "material number
+           qty TYPE i, "requested qty
+           avq TYPE i, "available qty
+         END OF _src,
+         _src_t TYPE STANDARD TABLE OF _src WITH EMPTY KEY,
+
+         BEGIN OF _tgt,
+           mat TYPE c LENGTH 1,
+           qty TYPE i,
+           avq TYPE c LENGTH 2,
+           txt TYPE maktx,
+           col TYPE lvc_t_scol,
+         END OF _tgt,
+         _tgt_t TYPE STANDARD TABLE OF _tgt WITH EMPTY KEY.</code></pre>
+
+
+
+<h2 class="wp-block-heading">Testdaten</h2>
+
+
+
+<p>Die Tabelle, die ich in die Ausgabetabelle für das SALV-Grid kopieren möchte, wird mit ein paar Testdaten gefüllt:</p>
+
+
+
+<pre class="wp-block-code"><code>  DATA(src) = VALUE _src_t(
+      ( mat = 'A' qty = 10 avq = 10 )
+      ( mat = 'B' qty = 20 avq = 15 )
+      ( mat = 'C' qty = 30 avq = 30 ) ).</code></pre>
+
+
+
+<h2 class="wp-block-heading">Hilfsklasse</h2>
+
+
+
+<p>Mit der folgenden Hilfsklasse wird der Text zu einem Material ermittelt:</p>
+
+
+
+<pre class="wp-block-code"><code>CLASS mat DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS text
+      IMPORTING mat          TYPE char1
+      RETURNING VALUE(descr) TYPE string.
+ENDCLASS.
+
+CLASS mat IMPLEMENTATION.
+  METHOD text.
+    descr = SWITCH #( mat
+      WHEN 'A' THEN `Antenna`
+      WHEN 'B' THEN `Brain`
+      WHEN 'C' THEN `Case`
+      ELSE `unknown` ).
+  ENDMETHOD.
+ENDCLASS.</code></pre>
+
+
+
+<h3 class="wp-block-heading">Herkömmliche Vorgehensweise</h3>
+
+
+
+<p>Das althergebrachte Coding ohne neue ABAP-Features könnte wie folgt aussehen: </p>
+
+
+
+<pre class="wp-block-code"><code>  DATA tgt1     TYPE _tgt_t.
+  DATA tgt_line TYPE _tgt.
+  DATA col_line TYPE lvc_s_scol.
+
+  LOOP AT src INTO DATA(src_line).
+    CLEAR tgt_line.
+    MOVE-CORRESPONDING src_line TO tgt_line.
+    tgt_line-txt = mat=&gt;text( tgt_line-mat ).
+    IF tgt_line-qty &lt;&gt; tgt_line-avq.
+      CLEAR col_line.
+      col_line-fname = space.
+      col_line-color-col = 6.
+      APPEND col_line TO tgt_line-col.
+    ENDIF.
+    append tgt_line to tgt1.
+  ENDLOOP.</code></pre>
+
+
+
+<h3 class="wp-block-heading">Neue Vorgehensweise</h3>
+
+
+
+<p>Mit Hilfe der neuen ABAP-Features VALUE, COND, FOR und CORRESPONDING habe ich die folgende Lösung erarbeitet:</p>
+
+
+
+<pre class="wp-block-code"><code>  DATA(tgt) = VALUE _tgt_t( FOR line IN src (
+      VALUE #( BASE CORRESPONDING #( line )
+      txt = mat=&gt;text( line-mat )
+      col = COND #( LET color = VALUE lvc_t_scol( ) IN
+                WHEN line-qty &lt;&gt; line-avq 
+                  THEN VALUE #( ( fname = '' color-col = 6 ) ) )
+      ) ) ).</code></pre>
+
+
+
+<p>Auffällig sind folgende Dinge:</p>
+
+
+
+<ul><li>Das Coding ist deutlich kürzer</li><li>Es sind keine Variablendeklarationen notwendig</li><li>Es sieht einigermaßen <em>konfus </em>aus</li></ul>
+
+
+
+<p>Schön ist auf jeden Fall, dass mit Hilfe <em>eines</em> Befehls, bzw. einer Befehlskette, Daten von einer Tabelle in eine andere kopiert werden können und sozusagen nebenbei weitere Feldmanipulationen vorgenommen werden können.</p>
+
+
+
+<h3 class="wp-block-heading">VALUE</h3>
+
+
+
+<p>Den Value-Befehl habe ich lieben gelernt, denn er macht es in vielfältigen Situationen einfach, Daten in eine Struktur oder Tabelle einzufügen. Und zwar ohne dass eine Datendeklaration notwendig wäre.</p>
+
+
+
+<p>Der Value-Befehl wird direkt gefolgt von der Typendefinition, die verwendet werden soll. Wenn die Typendefinition implizit ermittelbar ist, zum Beispiel, weil die Daten an eine bereits definierte Variable übergeben werden, dann reicht die Angabe des &#8220;#&#8221;. In meinem Beispiel möchte ich aber gerade die Datendefinition durch den VALUE-Befehl definieren, also gebe ich den zu verwendenden Tabellentyp an:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) VALUE _tgt_t( ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">FOR</h3>
+
+
+
+<p>In der VALUE-Angabe führe ich einen LOOP über die Quelltabelle aus und kopiere die Felder der Quelltabelle in die Zieltabelle mittels CORRESPONDING:</p>
+
+
+
+<pre class="wp-block-code"><code>  DATA(tgt) = VALUE _tgt_t( 
+    FOR line IN src (
+      CORRESPONDING #( line ) ) ).</code></pre>
+
+
+
+<p>Der Befehl FOR line IN src entspricht also in etwa dem Befehl:</p>
+
+
+
+<pre class="wp-block-code"><code>LOOP AT src INTO DATA(line).</code></pre>
+
+
+
+<h3 class="wp-block-heading">CORRESPONDING</h3>
+
+
+
+<p>Eine Herausforderung war es, zusätzlich zu CORRESPONDING noch weitere Felder anderweitig belegen zu können. Das folgende Coding funktioniert nämlich nicht:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) = VALUE _tgt_t( 
+  FOR line IN src (
+    CORRESPONDING #( line )
+    txt = mat=&gt;text( line-mat ) ) ).</code></pre>
+
+
+
+<p>Hier muss mit einer erneuten VALUE-Operation gearbeitet werden:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) = VALUE _tgt_t(
+  FOR line IN src (
+    VALUE #( BASE CORRESPONDING #( line )
+    txt = mat=&gt;text( line-mat ) ) ) ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">COND</h3>
+
+
+
+<p>Nun haben wir bereits die Tabelle kopiert und zusätzlich den Materialtext dazu gelesen. Zusätzlich möchte ich noch die COLOR-Tabelle füllen, wenn sich die angeforderte Menge von der verfügbaren Menge unterscheidet. Diese Anforderung habe ich mit COND realisiert:</p>
+
+
+
+<pre class="wp-block-code"><code>col = COND #( LET color = VALUE lvc_t_scol( ) IN
+        WHEN line-qty &lt;&gt; line-avq
+          THEN VALUE #( ( fname = '' color-col = 6 ) ) )</code></pre>
+
+
+
+<p>Alleine diesen Befehl finde ich deutlich komplexer als eine zuvor ausgeführten IF-Anweisung. COND ist allerdings notwendig, wenn der Code Inline ausgeführt werden soll. Zudem ist er sehr mächtig, denn es können verschiedene Bedingungen abgefragt werden. Er entspricht also in etwa einer verschachtelten IF &#8211; ELSEIF &#8211; ELSE Struktur.</p>
+
+
+
+<h3 class="wp-block-heading">SWITCH</h3>
+
+
+
+<p>Den Switch-Befehl, der in etwa einer CASE-Anweisung entspricht, habe ich nicht mehr in der Kopier-Anweisung unter bekommen&#8230; Die Arbeitsweise lässt sich jedoch gut in der Hilfsmethode MAT=&gt;TEXT( ) ersehen.</p>
+
+
+
+<h2 class="wp-block-heading">Ausgabe </h2>
+
+
+
+<p>Die Ausgabe der aufbereiteten Tabelle erfolgt mit Hilfe des SALV-Grid:</p>
+
+
+
+<pre class="wp-block-code"><code>  TRY.
+      cl_salv_table=&gt;factory(
+        IMPORTING
+          r_salv_table   = DATA(salv)
+        CHANGING
+          t_table        = tgt ).
+      DATA(cols) = salv-&gt;get_columns( ).
+      cols-&gt;set_color_column( 'COL' ).
+      salv-&gt;display( ).
+    CATCH cx_salv_msg.
+      MESSAGE 'error salv' TYPE 'I'.
+  ENDTRY.</code></pre>
+
+
+
+<figure class="wp-block-image size-large"><img decoding="async" width="465" height="72" src="/wp-content/uploads/2019/11/salv1.png" alt="" class="wp-image-1022973" srcset="/wp-content/uploads/2019/11/salv1.png 465w, /wp-content/uploads/2019/11/salv1-300x46.png 300w" sizes="(max-width: 465px) 100vw, 465px" /><figcaption>Ausgabe der kopierten Tabelle</figcaption></figure>
+
+
+
+<h2 class="wp-block-heading">Fazit</h2>
+
+
+
+<p>Zu der vorgestellten Lösung und allgemein möchte ich folgendes anmerken:</p>
+
+
+
+<h3 class="wp-block-heading">Formatierung</h3>
+
+
+
+<p>Formatierung ist alles!</p>
+
+
+
+<p>Die neuen ABAP-Features sind so komplex und können im Grunde <em>endlos</em> verschachtelt werden. Deswegen ist es notwendig, den Quelltext so zu formatieren, dass deutlich wird, welche Befehle und Sequenzen zusammengehören. Erschwerend kommt hinzu, dass für die neuen Befehle kein Pretty-Print möglich ist. Man muss also selber entscheiden, was noch in eine Zeile passt und was wie weit eingerückt werden sollte.</p>
+
+
+
+<p>Wenn das obige Coding sinnlos formatiert wird, dann sieht es wirklich sehr unübersichtlich aus:</p>
+
+
+
+<pre class="wp-block-code"><code>DATA(tgt) = VALUE _tgt_t( FOR line IN src (  VALUE #( BASE 
+      CORRESPONDING #( line )  txt = mat=&gt;text( line-mat )
+          col = COND #( LET color =  VALUE lvc_t_scol( ) 
+        IN WHEN line-qty &lt;&gt; line-avq 
+             THEN VALUE #( ( fname = '' color-col = 6 ) ) ) ) ) ).</code></pre>
+
+
+
+<h3 class="wp-block-heading">Anzahl der Verwendungen</h3>
+
+
+
+<p>Wenn die Zuweisungen oder Ermittlungen, die durch die neuen ABAP-Features gemacht werden sozusagen <em>einmalig</em> sind, dann sind sie eine elegante Möglichkeit, die Programmierung kürzer zu machen. Sobald die Ergebnisse jedoch vielschichtiger werden oder die Abfragen komplexer, dann ist es sinnvoll, die entsprechenden Anweisungen entweder vorab berechnet oder in Funktionen ausgelagert werden. </p>
+
+
+
+<h3 class="wp-block-heading">Debugging</h3>
+
+
+
+<p>Was man immer im Hinterkopf behalten sollte ist, dass das Debuggen komplexer Anweisungsketten deutlich erschwert wird. Man kann zwar im Debugger die Schrittweite setzen, die ein Debuggen der Einzelteile ermöglicht, allerdings ist dies sehr mühsam. Es kann kein Break-Point innerhalb einer Anweisungskette gesetzt werden.</p>
+
+
+
+<h3 class="wp-block-heading">Anwendung</h3>
+
+
+
+<p>Auf jeden Fall sollte man sich mit den neuen Befehlen beschäftigen und diese in die tägliche Arbeit einfließen lassen. Es übt und erleichtert in vielen Fällen die Arbeit. Nur so lernt man, fremden Code zu verstehen und wann und wie man die neuen Befehle selber am sinnvollsten einsetzt. </p>
+
+
+
+<p>Eine gute Möglichkeit, um auf dem Laufenden zu bleiben und auch um die Anwendung der ABAP-Features zu verstehen, ist, <a href="https://people.sap.com/horst.keller">Horst Keller</a> auf <a href="https://people.sap.com/horst.keller#content:blogposts">blogs.sap.com</a> zu folgen.</p>
+<p>Der Beitrag <a href="/blog/modernes-abap-ein-beispiel/">Modernes ABAP  &#8211; Ein Beispiel</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+		<item>
+		<title>REDUCE + SWITCH + COND [ABAP740]</title>
+		<link>/blog/reduce-switch-cond-abap740/</link>
+		
+		<dc:creator><![CDATA[Enno Wulff]]></dc:creator>
+		<pubDate>Wed, 03 May 2017 13:07:57 +0000</pubDate>
+				<category><![CDATA[Blog]]></category>
+		<category><![CDATA[Info/ Doku/ Demo]]></category>
+		<category><![CDATA[ABAP 740]]></category>
+		<category><![CDATA[ABAP OO]]></category>
+		<category><![CDATA[abap740]]></category>
+		<category><![CDATA[REDUCE]]></category>
+		<category><![CDATA[switch]]></category>
+		<category><![CDATA[CONV]]></category>
+		<category><![CDATA[COND]]></category>
+		<category><![CDATA[string]]></category>
+		<guid isPermaLink="false">https://tricktresor.com/?p=1018016</guid>
+
+					<description><![CDATA[<p>Heute im Code-Dojo hatte ich die Aufgabe gestellt, eine Funktion zu schreiben, die einen String mit variabel zu bestimmender Länge und zufälligen Zeichenfolgen aus Zahlen und Buchstaben zurück liefert. Zum Beispiel &#8220;I71B7HJ4BG&#8221; oder &#8220;6EE17ICBF54IE486EHD8&#8221;. Idee Mit VALUE und FOR sollte ein String Zeichen für Zeichen zusammengesetzt werden. Mit einer Zufallsfunktion sollte ermittelt werden, ob ein Buchstabe oder eine Zahl eingesetzt werden soll. Per SWITCH sollte ebenfalls eine Zufallsfunktion aufgerufen werden, die eine Zahl bzw. einen Buchstaben...</p>
+<p>Der Beitrag <a href="/blog/reduce-switch-cond-abap740/">REDUCE + SWITCH + COND [ABAP740]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></description>
+										<content:encoded><![CDATA[<p>Heute im Code-Dojo hatte ich die Aufgabe gestellt, eine Funktion zu schreiben, die einen String mit variabel zu bestimmender Länge und zufälligen Zeichenfolgen aus Zahlen und Buchstaben zurück liefert. Zum Beispiel &#8220;I71B7HJ4BG&#8221; oder &#8220;6EE17ICBF54IE486EHD8&#8221;.</p>
+<h2>Idee</h2>
+<p>Mit VALUE und FOR sollte ein String Zeichen für Zeichen zusammengesetzt werden. Mit einer Zufallsfunktion sollte ermittelt werden, ob ein Buchstabe oder eine Zahl eingesetzt werden soll. Per SWITCH sollte ebenfalls eine Zufallsfunktion aufgerufen werden, die eine Zahl bzw. einen Buchstaben zurück liefert.. Per String-Konkatenation sollten die zufälligen Zeichen zusammengesetzt werden.</p>
+<h2>Abweichung</h2>
+<p>die Aufgabe lässt sich mit VALUE nicht lösen. Stattdessen muss REDUCE genommen werden.</p>
+<h2>Code</h2>
+<p>Für jede Stelle des zu generierenden Strings (FOR &#8211; UNTIL &#8211; NEXT) wird eine Funktion RND_TYPE aufgerufen. Diese gibt zufällig den Wert TRUE oder FALSE zurück. Per SWITCH-Anweisung wird entschieden, ob eine Zahl (FALSE) oder ein Buchstabe (TRUE) generiert werden soll. Das generierte Zeichen wird per String-Konkatenation Zeichen für Zeichen zusammengebaut.</p>
+<p>&nbsp;</p>
+<pre class="lang:abap decode:true">REPORT.
+
+CLASS main DEFINITION.
+   PUBLIC SECTION.
+     DATA rnd_num TYPE REF TO cl_abap_random_int.
+     DATA rnd_chr TYPE REF TO cl_abap_random_int.
+     METHODS constructor.
+     METHODS rnd_type
+       RETURNING VALUE(type) TYPE boolean.
+     METHODS create_random_string
+       IMPORTING max           TYPE i
+       RETURNING VALUE(string) TYPE string.
+     METHODS get_random_char
+       RETURNING VALUE(char) TYPE char01.
+     METHODS get_random_number
+       RETURNING VALUE(number) TYPE numc01.
+ ENDCLASS.
+
+CLASS main IMPLEMENTATION.
+   METHOD constructor.
+     rnd_chr = cl_abap_random_int=&gt;create( seed = CONV #( sy-uzeit ) min = 0 max = 25 ).
+     rnd_num = cl_abap_random_int=&gt;create( seed = CONV #( sy-uzeit ) min = 0 max = 9 ).
+   ENDMETHOD.
+   METHOD rnd_type.
+
+    type = COND #( LET random = get_random_number( ) IN
+                    WHEN random &lt;= 5 THEN abap_true
+                    ELSE abap_false ).
+   ENDMETHOD.
+
+  METHOD get_random_char.
+     DATA(offset) = rnd_num-&gt;get_next( ).
+     char = sy-abcde+offset(1).
+   ENDMETHOD.
+
+  METHOD get_random_number.
+     number = rnd_num-&gt;get_next( ).
+   ENDMETHOD.
+
+  METHOD create_random_string.
+
+    string = REDUCE #( INIT text = ``
+                        FOR i = 1
+                        UNTIL i &gt; max
+                        NEXT text = text &amp;&amp; SWITCH #( rnd_type( )
+                                              WHEN abap_true  THEN get_random_char( )
+                                              WHEN abap_false THEN get_random_number( ) ) ).
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+PARAMETERS p_len type i DEFAULT 10.
+PARAMETERS p_str TYPE char20 MODIF ID a.
+
+AT SELECTION-SCREEN OUTPUT.
+   LOOP AT SCREEN.
+     CASE screen-group1.
+       WHEN 'A'.
+         screen-input = '0'.
+         MODIFY SCREEN.
+     ENDCASE.
+   ENDLOOP.
+
+AT SELECTION-SCREEN.
+   p_str = NEW main( )-&gt;create_random_string( p_len ).</pre>
+<h2>Lessons Learned</h2>
+<p>Mit REDUCE können Operationen auf einen Datentyp &#8220;reduziert&#8221; werden. Mit VALUE funktioniert das nicht.</p>
+<pre class="lang:abap decode:true">string = REDUCE #( INIT text = ``
+                   FOR i = 1
+                   UNTIL i &gt; max
+                   NEXT text = text &amp;&amp; SWITCH #( rnd_type( )
+                                         WHEN abap_true  THEN get_random_char( )
+                                         WHEN abap_false THEN get_random_number( ) ) ).</pre>
+<p>Mit SWITCH können nur Exakte Werte abgefragt werden (wie bei CASE auch mit OR verknüpft). Es sind jedoch keine &#8220;Größer-/ Kleiner-Vergleiche&#8221; möglich.</p>
+<pre class="lang:abap decode:true ">[...] SWITCH #( rnd_type( )
+        WHEN abap_true  THEN get_random_char( )
+        WHEN abap_false THEN get_random_number( ) ) ).</pre>
+<p>Mit COND können beliebige Bedingungen geprüft werden. Allerdings muss hier jede Bedingung separat angegeben werden. Wenn der abzufragende Wert das Ergebnis einer Funktion ist, so sollte mit LET gearbeitet werden, um nicht für jede Bedingung die Funktion aufrufen zu müssen.</p>
+<pre class="lang:abap decode:true">var = COND #( LET random = get_random_number( ) IN
+              WHEN random &lt;= 5 THEN abap_true
+              ELSE abap_false ).</pre>
+<p>Die implizite Typ-Definition mit INIT (bei der REDUCE-Anweisung) ist mit Vorsicht zu genießen! Ich hatte aus Gewohnheit einen leeren &#8220;String&#8221; mit Hochkomma-Space-Hochkomma definiert. In Wirklichkeit hatte ich damit aber einen CHAR(1)-Feld definiert und die Funktion hat immer nur ein Zeichen zurück geliefert. Die String-Konkatenation hat diesen fest definierten Typ also nicht automatisch erweitert, so wie es beim String der Fall ist. Erst die Verwendung eines <em>echten</em> Strings durch die Backticks &#8220; liefert das gewünschte Ergebnis.</p>
+<p>Es kann auch der Typ direkt angegeben werden (INIT text TYPE string) aber dann ist keine Vorbelegung mehr möglich. Eine implizite Definition durch Vorbelegung ist dann jedoch wieder durch die Verwendung von CONV möglich: INIT text = CONV string( &#8216;hallo&#8217; )</p>
+<p>Bei der FOR-Funktion (FOR i = 1) muss das Hochzählen der Variable (THEN i + 1) nicht zwingend definiert werden! Wird THEN nicht angegeben, so wird implizit die Inkrementierung um Eins vorgenommen:</p>
+<pre class="lang:abap decode:true ">[...] FOR i = 1 UNTIL i &gt; 10 [...]</pre>
+<p>&nbsp;</p>
+<p>Der Beitrag <a href="/blog/reduce-switch-cond-abap740/">REDUCE + SWITCH + COND [ABAP740]</a> erschien zuerst auf <a href="/">Tricktresor</a>.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>
